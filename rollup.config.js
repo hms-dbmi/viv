@@ -23,9 +23,7 @@ export default {
   ],
   plugins: [
     external(),
-    resolve({
-      browser: true
-    }),
+    resolve(),
     babel({
          exclude: 'node_modules/**'
     }),
@@ -39,7 +37,10 @@ export default {
           "PropTypes",
           "createElement"
         ],
-        "node_modules/react-dom/index.js": ["render"]
+        "node_modules/react-dom/index.js": ["render"],
+        "node_modules/@loaders.gl/loader-utils/dist/esm/lib/library-utils/require-utils.node.js": ["requireFromFile"],
+        "node_modules/probe.gl/env.js": ["global", "isBrowser", "getBrowser"],
+        "node_modules/s2-geometry/src/s2geometry.js" : ["S2"]
       }
     })
   ]
