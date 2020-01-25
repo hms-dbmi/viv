@@ -32,7 +32,7 @@ const defaultProps = Object.assign({}, BaseTileLayer.defaultProps, {
   },
 });
 
-export class MicroscopyViewerLayer extends BaseTileLayer {
+export default class MicroscopyViewerLayer extends BaseTileLayer {
 
   constructor(props) {
     const layerProps = Object.assign({}, defaultProps, props, {
