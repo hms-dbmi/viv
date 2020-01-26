@@ -1,13 +1,13 @@
 {
-  "name": "react-component-library",
-  "version": "1.0.0",
-  "main": "build/index.js",
-  "module": "build/index.es.js",
-  "jsnext:main": "build/index.es.js",
+  "name": "viv",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "jsnext:main": "dist/index.es.js",
   "files": [
-    "build"
+    "dist"
   ],
-  "description": "A skeleton to create your own React component library using Rollup, TypeScript, Sass and Storybook",
+  "description": "High bit depth, high resolution, many channels, low overhead",
   "scripts": {
     "build": "rollup -c",
     "storybook": "start-storybook -p 6006",
@@ -15,15 +15,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HarveyD/react-component-library.git"
+    "url": "git+https://github.com/hubmapconsortium/vitessce-image-viewer.git"
   },
   "keywords": [],
-  "author": "Harvey Delaney",
-  "license": "ISC",
+  "author": "Ilan Gold",
+  "license": "",
   "bugs": {
-    "url": "https://github.com/HarveyD/react-component-library/issues"
+    "url": "https://github.com/hubmapconsortium/vitessce-image-viewer/issues"
   },
-  "homepage": "https://github.com/HarveyD/react-component-library#readme",
+  "homepage": "https://github.com/hubmapconsortium/vitessce-image-viewer#readme",
   "dependencies": {
     "@deck.gl/core": "^8.1.0-alpha.1",
     "@deck.gl/layers": "^8.1.0-alpha.1",
