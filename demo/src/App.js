@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import DeckGL from '@deck.gl/react';
 import { COORDINATE_SYSTEM, OrthographicView } from 'deck.gl';
-import { MicroscopyViewer } from './microscopy-viewer'
+import { MicroscopyViewer } from 'microscopy-viewer'
 import { slice, openArray } from 'zarr';
 import Slider from '@material-ui/core/Slider';
 import { withStyles } from '@material-ui/core/styles';

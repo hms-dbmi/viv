@@ -1,6 +1,4 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import MicroscopyViewer from './microscopy-viewer';
+import MicroscopyViewerLayer from './microscopy-viewer-layer';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+export {MicroscopyViewer, MicroscopyViewerLayer}
