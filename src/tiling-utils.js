@@ -10,9 +10,6 @@ export function tileToBoundingBox({
   };
 }
 
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable class-methods-use-this */
-
 function getBoundingBox(viewport) {
   const corners = [
     ...viewport.unproject([0, 0]),

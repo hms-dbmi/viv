@@ -32,8 +32,7 @@ export default class MicroscopyViewer extends PureComponent {
   }
 
   render() {
-    console.log(this.props.screenWidth)
-    var view = new OrthographicView({id:'ortho', controller:true, height: this.props.screenHeight, width: this.props.screenWidth})
+    var view = new OrthographicView({id:'ortho', controller:true, height: this.props.viewHeight, width: this.props.viewWidth})
     const initialViewState = this.props.initialViewState
     return (
       <div>

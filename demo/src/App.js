@@ -54,7 +54,6 @@ function loadZarr({ sourceChannels, tileSize, x, y, z, imageWidth }) {
     },
   }));
   const stride = tileSize * tileSize;
-  // eslint-disable-next-line  arrow-body-style
   const configListPromises = configList.map((config) => {
     return getData({
       config, tileSize, x, y, stride, tilingWidth,
@@ -77,8 +76,8 @@ export default class App extends PureComponent {
         greenSliderValue: 10000,
         blueSliderValue: 10000
       },
-      screenHeight: window.innerHeight * .9,
-      screenWidth: window.innerWidth * .8
+      viewHeight: window.innerHeight * .9,
+      viewWidth: window.innerWidth * .8
     };
     this.picSize = 256;
     this.max =  65535
@@ -101,8 +100,8 @@ export default class App extends PureComponent {
   resize(){
     console.log('here')
     this.setState({
-      screenHeight: window.innerHeight * .9,
-      screenWidth: window.innerWidth * .7
+      viewHeight: window.innerHeight * .9,
+      viewWidth: window.innerWidth * .7
     });
   };
 

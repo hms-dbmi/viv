@@ -8,12 +8,6 @@ const defaultProps = {
   rgbData: null,
 };
 
-/*
- * @class
- * @param {object} props
- * @param {number} props.transparentColor - color to interpret transparency to
- * @param {number} props.tintColor - color bias
- */
 export class XRLayer extends Layer {
   getShaders() {
     return super.getShaders({ vs, fs, modules: [project32] });
@@ -55,7 +49,6 @@ export class XRLayer extends Layer {
       if (this.state.model) {
         this.state.model.delete();
       }
-      // eslint-disable-next-line  no-underscore-dangle
       this.setState({ model: this._getModel(gl) });
       this.getAttributeManager().invalidateAll();
     }
@@ -70,7 +63,6 @@ export class XRLayer extends Layer {
     }
   }
 
-  // eslint-disable-next-line  no-underscore-dangle
   _getModel(gl) {
     if (!gl) {
       return null;
@@ -108,7 +100,6 @@ export class XRLayer extends Layer {
              |                  |
       (minX0, minY1) ---- (maxX2, minY1)
    */
-    /* eslint-disable prefer-destructuring */
     positions[0] = bounds[0];
     positions[1] = bounds[1];
     positions[2] = 0;
@@ -124,9 +115,7 @@ export class XRLayer extends Layer {
     positions[9] = bounds[2];
     positions[10] = bounds[1];
     positions[11] = 0;
-    /* eslint-disable prefer-destructuring */
 
-    // eslint-disable-next-line no-param-reassign
     attributes.value = positions;
   }
 
