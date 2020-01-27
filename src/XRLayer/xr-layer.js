@@ -8,6 +8,12 @@ const defaultProps = {
   rgbData: null,
 };
 
+const dataToTextureName = {
+  redData: 'redTexture',
+  greenData: 'greenTexture',
+  blueData: 'blueTexture',
+}
+
 export class XRLayer extends Layer {
   getShaders() {
     return super.getShaders({ vs, fs, modules: [project32] });
@@ -168,7 +174,7 @@ export class XRLayer extends Layer {
           || (isInt32 && GL.UNSIGNED_INT),
     };
     const texObj = {};
-    texObj[name] = new Texture2D(this.context.gl, {
+    texObj[dataToTextureName[name]] = new Texture2D(this.context.gl, {
       width: this.props.tileSize,
       height: this.props.tileSize,
       data,

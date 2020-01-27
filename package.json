@@ -1,17 +1,17 @@
 {
   "name": "viv",
   "version": "0.0.0",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
-  "jsnext:main": "dist/index.es.js",
+  "main": "viv/index.js",
+  "module": "viv/index.es.js",
+  "jsnext:main": "viv/index.es.js",
   "files": [
     "dist"
   ],
   "description": "High bit depth, high resolution, many channels, low overhead",
   "scripts": {
-    "build": "rollup -c",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-component": "rollup -c",
+    "build-site": "node_modules/.bin/webpack --config webpack.prod.js --mode production",
+    "start": "node_modules/.bin/webpack-dev-server --mode development --open --hot"
   },
   "repository": {
     "type": "git",
@@ -33,7 +33,8 @@
     "@luma.gl/shadertools": "8.0.3",
     "deck.gl": "^8.1.0-alpha.1",
     "math.gl": "^3.1.3",
-    "nebula.gl": "^0.17.1"
+    "nebula.gl": "^0.17.1",
+    "zarr": "^0.1.4"
   },
   "peerDependencies": {
     "react": "^16.12.0",
@@ -41,18 +42,25 @@
   },
   "devDependencies": {
     "@babel/core": "^7.7.4",
+    "@babel/preset-env": "^7.8.3",
     "@babel/preset-react": "^7.8.3",
+    "@material-ui/core": "^4.8.3",
     "@rollup/plugin-commonjs": "^11.0.1",
     "@rollup/plugin-node-resolve": "^7.0.0",
-    "@storybook/addon-actions": "^5.2.6",
-    "@storybook/addon-links": "^5.2.6",
-    "@storybook/addons": "^5.2.6",
-    "@storybook/react": "^5.2.6",
+    "autoprefixer": "^9.7.4",
     "babel-loader": "^8.0.6",
-    "babel-preset-env": "^1.7.0",
     "babel-preset-stage-0": "^6.24.1",
+    "css-loader": "^3.4.2",
+    "html-webpack-plugin": "^3.2.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "postcss-loader": "^3.0.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
     "rollup": "^1.27.4",
     "rollup-plugin-babel": "4.3.3",
-    "rollup-plugin-peer-deps-external": "^2.2.0"
+    "rollup-plugin-peer-deps-external": "^2.2.0",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.10.1"
   }
 }
