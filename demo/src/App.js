@@ -1,14 +1,9 @@
 import React, {PureComponent} from 'react';
-import DeckGL from '@deck.gl/react';
-import { COORDINATE_SYSTEM, OrthographicView } from 'deck.gl';
-import { MicroscopyViewer } from 'microscopy-viewer'
-import { slice, openArray } from 'zarr';
+import { MicroscopyViewer, loadZarr } from '../../src'
+import { source } from './source-info'
 import Slider from '@material-ui/core/Slider';
 import { withStyles } from '@material-ui/core/styles';
 import './App.css';
-
-var tilingWidth = {}
-var zarrArrays = {}
 
 const RedSlider = withStyles({
   root: {
@@ -26,41 +21,7 @@ const GreenSlider = withStyles({
   }
 })(Slider)
 
-async function getData({ config, tileSize, x, y, stride, tilingWidth }) {
-  const arrSlice = slice(stride * tilingWidth * y + stride * x, stride * tilingWidth * y + stride * (x + 1));
-  const zarrKey = config.zarrConfig.store + config.zarrConfig.path;
-  if (!zarrArrays[zarrKey]) {
-    zarrArrays[zarrKey] = await openArray(config.zarrConfig);
-  }
-  const arr = zarrArrays[zarrKey];
-  const dataSlice = await arr.get([arrSlice]);
-  const { data } = dataSlice;
-  const { channelType } = config;
-  const texObj = {};
-  texObj[channelType] = data
-  return texObj;
-}
 
-function loadZarr({ sourceChannels, tileSize, x, y, z, imageWidth }) {
-  const tilingWidth = Math.ceil(imageWidth / (tileSize * (2 ** z)));
-  const textureNames = ['redTexture', 'greenTexture', 'blueTexture'];
-  const configList = sourceChannels.map((channel, i) => ({
-    channelName: channel.name,
-    channelType: textureNames[i],
-    zarrConfig: {
-      store: `${channel.tileSource}/`,
-      path: `pyramid_${z}.zarr`,
-      mode: 'r',
-    },
-  }));
-  const stride = tileSize * tileSize;
-  const configListPromises = configList.map((config) => {
-    return getData({
-      config, tileSize, x, y, stride, tilingWidth,
-    });
-  });
-  return Promise.all(configListPromises).then(list => list);
-}
 
 export default class App extends PureComponent {
 
@@ -79,7 +40,6 @@ export default class App extends PureComponent {
       viewHeight: window.innerHeight * .9,
       viewWidth: window.innerWidth * .8
     };
-    this.picSize = 256;
     this.max =  65535
     window.addEventListener("resize", this.resize);
 
@@ -98,7 +58,6 @@ export default class App extends PureComponent {
   }
 
   resize(){
-    console.log('here')
     this.setState({
       viewHeight: window.innerHeight * .9,
       viewWidth: window.innerWidth * .7
@@ -107,33 +66,13 @@ export default class App extends PureComponent {
 
   render() {
     const initialViewState = {
-      zoom: -6.5,
+      zoom: -5.5,
       target: [
         30000,
         10000,
         0
-      ]
+      ],
     }
-    const layerType = 'tiff'
-    const source = {
-        height: 141,
-        width: 206,
-        tileSize: 256,
-        channels: [
-          {
-            name: "0",
-            tileSource: "https://vitessce-vanderbilt-data.storage.googleapis.com/test-data/vanderbilt-data/single_channel_pyramid/img_pyramid/channel_0"
-          },
-          {
-            name: "1",
-            tileSource: "https://vitessce-vanderbilt-data.storage.googleapis.com/test-data/vanderbilt-data/single_channel_pyramid/img_pyramid/channel_1"
-          },
-          {
-            name: "2",
-            tileSource: "https://vitessce-vanderbilt-data.storage.googleapis.com/test-data/vanderbilt-data/single_channel_pyramid/img_pyramid/channel_2"
-          }
-        ]
-      };
     const propSettings = {
       imageHeight: source.height * source.tileSize,
       imageWidth: source.width * source.tileSize,
@@ -155,8 +94,7 @@ export default class App extends PureComponent {
     }
     return (
       <div>
-      <MicroscopyViewer {...props}>
-      </MicroscopyViewer>
+      <MicroscopyViewer {...props}/>
       <div className="slider-container-red">
       <RedSlider
         value={this.state.sliderValues.redSliderValue}
@@ -166,7 +104,6 @@ export default class App extends PureComponent {
         min={0}
         max={this.max}
         orientation="vertical"
-        color="red"
       />
       </div>
       <div className="slider-container-green">
@@ -178,7 +115,6 @@ export default class App extends PureComponent {
         min={0}
         max={this.max}
         orientation="vertical"
-        color="green"
       />
       </div>
       <div className="slider-container-blue">
@@ -190,7 +126,6 @@ export default class App extends PureComponent {
         min={0}
         max={this.max}
         orientation="vertical"
-        color="blue"
       />
       </div>
       </div>

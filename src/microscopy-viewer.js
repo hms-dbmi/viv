@@ -32,13 +32,11 @@ export default class MicroscopyViewer extends PureComponent {
   }
 
   render() {
-    var view = new OrthographicView({id:'ortho', controller:true, height: this.props.viewHeight, width: this.props.viewWidth})
+    var views = [new OrthographicView({id:'ortho', controller:true, height: this.props.viewHeight, width: this.props.viewWidth})]
     const initialViewState = this.props.initialViewState
     return (
-      <div>
-      <DeckGL glOptions={{webgl2: true}} layers={this.state.gl ? this._renderLayers() : []} initialViewState={initialViewState} onWebGLInitialized={this._onWebGLInitialized} controller={true} views={view}>
+      <DeckGL glOptions={{webgl2: true}} layers={this.state.gl ? this._renderLayers() : []} initialViewState={initialViewState} onWebGLInitialized={this._onWebGLInitialized} controller={true} views={views}>
       </DeckGL>
-      </div>
     );
   }
 }
