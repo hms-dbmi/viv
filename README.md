@@ -1,5 +1,6 @@
 # viv
-A viewer for high bit depth, high resolution, multi-channel images.
+A viewer for high bit depth, high resolution, multi-channel images using DeckGL
+over the hood and WebGL under the hood.
 
 ## Build
 To build the component, alone via `rollup` use `npm run-script build-component`.
@@ -13,10 +14,11 @@ Simply run `npm start` and you will be able to update the component and use the
 ## Component Library API
 There are two components being exported for use:
 #### MicroscopyViewer
-This component is for pure drop-in use without an external `DeckGL` setup.  The
-API exposed:
+This component is for pure drop-in use without an external `DeckGL` setup.
+#### MicroscopyViewerLayer
+This component can be used with an already existing `DeckGL` setup.
 
-## Properties
+## MicroscopyViewer and MicroscopyViewerLayer Properties
 
 ##### `getTileData` (Function) **FUTURE BREAKING CHANGES WITH NEW FEATURES**
 
