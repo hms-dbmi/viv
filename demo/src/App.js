@@ -32,11 +32,7 @@ export default class App extends PureComponent {
     this.handleBlueSliderChange = this.handleBlueSliderChange.bind(this)
     this.resize = this.resize.bind(this)
     this.state = {
-      sliderValues:{
-        redSliderValue: 10000,
-        greenSliderValue: 10000,
-        blueSliderValue: 10000
-      },
+      sliderValues:[10000,10000,10000],
       viewHeight: window.innerHeight * .9,
       viewWidth: window.innerWidth * .8
     };
@@ -46,15 +42,21 @@ export default class App extends PureComponent {
   }
 
   handleRedSliderChange(event, value){
-    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {redSliderValue: value})})
+    var sliderValues = this.state.sliderValues.concat([])
+    sliderValues[0] = value
+    this.setState({sliderValues})
   }
 
   handleGreenSliderChange(event, value){
-    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {greenSliderValue: value})})
+    var sliderValues = this.state.sliderValues.concat([])
+    sliderValues[1] = value
+    this.setState({sliderValues})
   }
 
   handleBlueSliderChange(event, value){
-    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {blueSliderValue: value})})
+    var sliderValues = this.state.sliderValues.concat([])
+    sliderValues[2] = value
+    this.setState({sliderValues})
   }
 
   resize(){
@@ -97,7 +99,7 @@ export default class App extends PureComponent {
       <MicroscopyViewer {...props}/>
       <div className="slider-container-red">
       <RedSlider
-        value={this.state.sliderValues.redSliderValue}
+        value={this.state.sliderValues[0]}
         onChange={this.handleRedSliderChange}
         valueLabelDisplay="auto"
         aria-label="range-slider-red"
@@ -108,7 +110,7 @@ export default class App extends PureComponent {
       </div>
       <div className="slider-container-green">
       <GreenSlider
-        value={this.state.sliderValues.greenSliderValue}
+        value={this.state.sliderValues[1]}
         onChange={this.handleGreenSliderChange}
         valueLabelDisplay="auto"
         aria-label="range-slider-green"
@@ -119,7 +121,7 @@ export default class App extends PureComponent {
       </div>
       <div className="slider-container-blue">
       <BlueSlider
-        value={this.state.sliderValues.blueSliderValue}
+        value={this.state.sliderValues[2]}
         onChange={this.handleBlueSliderChange}
         valueLabelDisplay="auto"
         aria-label="range-slider-blue"

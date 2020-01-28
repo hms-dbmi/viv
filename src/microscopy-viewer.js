@@ -10,11 +10,7 @@ export default class MicroscopyViewer extends PureComponent {
     this._onWebGLInitialized = this._onWebGLInitialized.bind(this);
     this.state = {
       gl: null,
-      sliderValues:{
-        redSliderValue: 10000,
-        greenSliderValue: 10000,
-        blueSliderValue: 10000
-      }
+      sliderValues:[10000,10000,10000] // rgb
     };
   }
 

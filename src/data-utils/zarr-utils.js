@@ -12,14 +12,12 @@ async function getData({ config, tileSize, x, y, stride, tilingWidth }) {
   const dataSlice = await arr.get([arrSlice]);
   const { data } = dataSlice;
   const { channelType } = config;
-  const texObj = {};
-  texObj[channelType] = data
-  return texObj;
+  return data;
 }
 
 export default function loadZarr({ sourceChannels, tileSize, x, y, z, imageWidth }) {
   const tilingWidth = Math.ceil(imageWidth / (tileSize * (2 ** z)));
-  const dataNames = ['redData', 'greenData', 'blueData'];
+  const dataNames = ['redData', 'greenData', 'blueData']; // denotes order rgb
   const configList = sourceChannels.map((channel, i) => ({
     channelName: channel.name,
     channelType: dataNames[i],

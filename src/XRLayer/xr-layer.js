@@ -6,12 +6,6 @@ import fs from './xr-layer-fragment';
 
 const defaultProps = {
   rgbData: null,
-};
-
-const dataToTextureName = {
-  redData: 'redTexture',
-  greenData: 'greenTexture',
-  blueData: 'blueTexture',
 }
 
 export class XRLayer extends Layer {
@@ -43,8 +37,8 @@ export class XRLayer extends Layer {
   finalizeState() {
     super.finalizeState();
 
-    if (this.state.rgbTextures) {
-      Object.values(this.state.rgbTextures).forEach(tex => tex.delete());
+    if (this.state.textures) {
+      Object.values(this.state.textures).forEach(tex => tex.delete());
     }
   }
 
@@ -126,13 +120,14 @@ export class XRLayer extends Layer {
   }
 
   draw({ uniforms }) {
-    const { rgbTextures, model } = this.state;
-    if (rgbTextures && model) {
+    const { textures, model } = this.state;
+    if (textures && model) {
       model
         .setUniforms(
           Object.assign({}, uniforms, {
-            ...this.props.sliderValues,
-            ...rgbTextures,
+            sliderValues:  this.props.sliderValues,
+            textures:  textures,
+            textureCount: textures.length
           }),
         )
         .draw();
@@ -142,25 +137,17 @@ export class XRLayer extends Layer {
   loadTexture(data) {
     if (data instanceof Promise) {
       data.then((dataResolved) => {
-        this.setState({ rgbTextures: Object.assign(
-          {}, ...Object.keys(dataResolved).map(channelName =>
-            this.dataToTexture(dataResolved[channelName]))
-          )
-        });
+        this.setState({ textures: dataResolved.map((d) => this.dataToTexture(d))
       });
+    });
     } else if (data instanceof Object) {
-      this.setState({ rgbTextures: Object.assign(
-        {}, ...Object.keys(data).map(channelName =>
-          this.dataToTexture(data[channelName]))
-        )
+      this.setState({ textures: this.dataToTexture(dataResolved)
       });
     }
   }
 
-  dataToTexture(textureData) {
+  dataToTexture(data) {
     // eslint-disable-next-line no-nested-ternary
-    const name = Object.keys(textureData)[0]
-    const data = Object.values(textureData)[0]
     const isInt8 = data instanceof Uint8Array;
     const isInt16 = data instanceof Uint16Array;
     const isInt32 = data instanceof Uint32Array;
@@ -173,8 +160,7 @@ export class XRLayer extends Layer {
           || (isInt16 && GL.UNSIGNED_SHORT)
           || (isInt32 && GL.UNSIGNED_INT),
     };
-    const texObj = {};
-    texObj[dataToTextureName[name]] = new Texture2D(this.context.gl, {
+    const texture = new Texture2D(this.context.gl, {
       width: this.props.tileSize,
       height: this.props.tileSize,
       data,
@@ -187,7 +173,7 @@ export class XRLayer extends Layer {
       },
       ...formats,
     });
-    return texObj;
+    return texture;
   }
 }
 
