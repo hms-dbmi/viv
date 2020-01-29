@@ -18,13 +18,14 @@ const defaultProps = Object.assign({}, BaseTileLayer.defaultProps, {
         west, south, east, north,
       },
     } = props.tile;
-    const { sliderValues } = props;
+    const { sliderValues, data, colorValues } = props;
     const xrl = new XRLayer(props, {
       id: `XR-Layer-${west}-${south}-${east}-${north}`,
       pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-      rgbData: props.data,
+      rgbData: data,
       sliderValues,
+      colorValues,
       bounds: [west, south, east, north],
       visible: true,
     });

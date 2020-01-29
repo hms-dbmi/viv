@@ -6,11 +6,24 @@ precision highp usampler2D;
 
 
 // our texture
-uniform usampler2D redTexture;
-uniform usampler2D greenTexture;
-uniform usampler2D blueTexture;
+uniform usampler2D channel0;
+uniform usampler2D channel1;
+uniform usampler2D channel2;
+uniform usampler2D channel3;
+uniform usampler2D channel4;
+uniform usampler2D channel5;
+
 // range
-uniform uint sliderValues[3];
+uniform float sliderValues[6];
+
+// color
+uniform vec3 colorValue0;
+uniform vec3 colorValue1;
+uniform vec3 colorValue2;
+uniform vec3 colorValue3;
+uniform vec3 colorValue4;
+uniform vec3 colorValue5;
+
 
 in vec2 vTexCoord;
 
@@ -48,22 +61,26 @@ vec3 rgb2hsv(vec3 rgb) {
  }
 
 void main() {
-  vec4 redTextureColor = vec4(texture(redTexture, vTexCoord)) / float(sliderValues[0]);
-  vec4 greenTextureColor = vec4(texture(greenTexture, vTexCoord)) / float(sliderValues[1]);
-  vec4 blueTextureColor = vec4(texture(blueTexture, vTexCoord)) / float(sliderValues[2]);
+  float channel0Color = float(texture(channel0, vTexCoord).r) / sliderValues[0];
+  float channel1Color = float(texture(channel1, vTexCoord).r) / sliderValues[1];
+  float channel2Color = float(texture(channel2, vTexCoord).r) / sliderValues[2];
+  float channel3Color = float(texture(channel3, vTexCoord).r) / sliderValues[3];
+  float channel4Color = float(texture(channel4, vTexCoord).r) / sliderValues[4];
+  float channel5Color = float(texture(channel5, vTexCoord).r) / sliderValues[5];
 
-  vec3 hsvCombo1 = rgb2hsv(vec3(1.0,0.0,0.0));
-  hsvCombo1 = vec3(hsvCombo1.xy, redTextureColor.r);
-  vec3 rgbCombo1 = hsv2rgb(hsvCombo1);
+  vec3 rgbCombo = vec3(0.0);
+  vec3 hsvCombo = vec3(0.0);
+  float channelArray[6] = float[6](channel0Color, channel1Color, channel2Color, channel3Color, channel4Color, channel5Color);
+  vec3 colorValues[6] = vec3[6](colorValue0, colorValue1, colorValue2, colorValue3, colorValue4, colorValue5);
 
-  vec3 hsvCombo2 = rgb2hsv(vec3(0.0,1.0,0.0));
-  hsvCombo2 = vec3(hsvCombo2.xy, greenTextureColor.r);
-  vec3 rgbCombo2 = hsv2rgb(hsvCombo2);
 
-  vec3 hsvCombo3 = rgb2hsv(vec3(0.0,0.0,1.0));
-  hsvCombo3 = vec3(hsvCombo3.xy, blueTextureColor.r);
-  vec3 rgbCombo3 = hsv2rgb(hsvCombo3);
+  for(int i = 0; i < 6; i++) {
+    hsvCombo = rgb2hsv(vec3(colorValues[i]));
+    hsvCombo = vec3(hsvCombo.xy, channelArray[i]);
+    rgbCombo += hsv2rgb(hsvCombo);
+  }
 
-  color = vec4(rgbCombo1 + rgbCombo2 + rgbCombo3, 1);
+  color = vec4(rgbCombo, 1.0);
+
 }
 `;

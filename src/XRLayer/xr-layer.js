@@ -38,7 +38,7 @@ export class XRLayer extends Layer {
     super.finalizeState();
 
     if (this.state.textures) {
-      Object.values(this.state.textures).forEach(tex => tex.delete());
+      Object.values(this.state.textures).forEach(tex => tex && tex.delete());
     }
   }
 
@@ -122,12 +122,19 @@ export class XRLayer extends Layer {
   draw({ uniforms }) {
     const { textures, model } = this.state;
     if (textures && model) {
+      var sliderValues = this.props.sliderValues;
+      var colorValues  = this.props.colorValues;
       model
         .setUniforms(
           Object.assign({}, uniforms, {
-            sliderValues:  this.props.sliderValues,
-            textures:  textures,
-            textureCount: textures.length
+            colorValue0:colorValues[0],
+            colorValue1:colorValues[1],
+            colorValue2:colorValues[2],
+            colorValue3:colorValues[3],
+            colorValue4:colorValues[4],
+            colorValue5:colorValues[5],
+            sliderValues,
+            ...textures
           }),
         )
         .draw();
@@ -135,14 +142,26 @@ export class XRLayer extends Layer {
   }
 
   loadTexture(data) {
+    var textures = {
+      channel0: null,
+      channel2: null,
+      channel3: null,
+      channel4: null,
+      channel5: null,
+    }
+    if(this.state.textures) {
+      Object.values(this.state.textures).forEach(tex => tex && tex.delete());
+    }
     if (data instanceof Promise) {
       data.then((dataResolved) => {
-        this.setState({ textures: dataResolved.map((d) => this.dataToTexture(d))
-      });
-    });
-    } else if (data instanceof Object) {
-      this.setState({ textures: this.dataToTexture(dataResolved)
-      });
+        dataResolved.forEach((d, i) => textures[`channel${i}`] = this.dataToTexture(d))
+      }).then(() =>
+        this.setState({ textures: textures })
+      );
+    }
+    else if (data instanceof Object) {
+      data.forEach((d, i) => textures[`channel${i}`] = this.dataToTexture(d))
+      this.setState({ textures: textures });
     }
   }
 
