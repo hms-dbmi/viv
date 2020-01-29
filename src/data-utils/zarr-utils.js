@@ -11,20 +11,20 @@ async function getData({ config, tileSize, x, y, stride, tilingWidth }) {
   const arr = zarrArrays[zarrKey];
   const dataSlice = await arr.get([arrSlice]);
   const { data } = dataSlice;
-  const { channelType } = config;
-  const texObj = {};
-  texObj[channelType] = data
-  return texObj;
+  const { channelName } = config;
+  const dataObj = {}
+  dataObj[channelName] = data
+  return dataObj;
 }
 
 export default function loadZarr({ sourceChannels, tileSize, x, y, z, imageWidth }) {
   const tilingWidth = Math.ceil(imageWidth / (tileSize * (2 ** z)));
-  const dataNames = ['redData', 'greenData', 'blueData'];
-  const configList = sourceChannels.map((channel, i) => ({
-    channelName: channel.name,
+  const dataNames = ['redData', 'greenData', 'blueData']; // denotes order rgb
+  const configList = Object.keys(sourceChannels).map((channel, i) => ({
+    channelName: channel,
     channelType: dataNames[i],
     zarrConfig: {
-      store: `${channel.tileSource}/`,
+      store: `${sourceChannels[channel]}/`,
       path: `pyramid_${z}.zarr`,
       mode: 'r',
     },
@@ -35,5 +35,12 @@ export default function loadZarr({ sourceChannels, tileSize, x, y, z, imageWidth
       config, tileSize, x, y, stride, tilingWidth,
     });
   });
-  return Promise.all(configListPromises).then(list => list);
+  return Promise.all(configListPromises).then((dataList) => {
+    const orderedList = []
+    const dataObj = Object.assign({}, ...dataList)
+    Object.keys(dataObj).sort().forEach(function(key) {
+      orderedList.push(dataObj[key]);
+    })
+    return orderedList;
+  });
 }

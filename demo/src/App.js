@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import { MicroscopyViewer, loadZarr } from '../../src'
+import { MicroscopyViewer } from '../../src'
 import { source } from './source-info'
 import Slider from '@material-ui/core/Slider';
 import { withStyles } from '@material-ui/core/styles';
@@ -20,6 +20,11 @@ const GreenSlider = withStyles({
     color: 'green',
   }
 })(Slider)
+const OrangeSlider = withStyles({
+  root: {
+    color: 'orange',
+  }
+})(Slider)
 
 
 
@@ -30,12 +35,20 @@ export default class App extends PureComponent {
     this.handleRedSliderChange = this.handleRedSliderChange.bind(this)
     this.handleGreenSliderChange = this.handleGreenSliderChange.bind(this)
     this.handleBlueSliderChange = this.handleBlueSliderChange.bind(this)
+    this.handleOrangeSliderChange = this.handleOrangeSliderChange.bind(this)
     this.resize = this.resize.bind(this)
     this.state = {
       sliderValues:{
-        redSliderValue: 10000,
-        greenSliderValue: 10000,
-        blueSliderValue: 10000
+        channel_0: 10000,
+        channel_1: 10000,
+        channel_2: 10000,
+        channel_3: 10000
+      },
+      colorValues:{
+        channel_0: [255, 0, 0],
+        channel_1: [0, 255, 0],
+        channel_2: [255, 128, 0],
+        channel_3: [0, 0, 255],
       },
       viewHeight: window.innerHeight * .9,
       viewWidth: window.innerWidth * .8
@@ -46,15 +59,19 @@ export default class App extends PureComponent {
   }
 
   handleRedSliderChange(event, value){
-    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {redSliderValue: value})})
+    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {channel_0: value})})
   }
 
   handleGreenSliderChange(event, value){
-    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {greenSliderValue: value})})
+    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {channel_1: value})})
   }
 
   handleBlueSliderChange(event, value){
-    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {blueSliderValue: value})})
+    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {channel_3: value})})
+  }
+
+  handleOrangeSliderChange(event, value){
+    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {channel_2: value})})
   }
 
   resize(){
@@ -82,12 +99,9 @@ export default class App extends PureComponent {
         -1 * Math.log2(Math.max(source.height * source.tileSize, source.width * source.tileSize)),
       )
     }
+    const useZarr = true
     const props = {
-      getTileData: ({ x, y, z }) => {
-        return loadZarr({
-          x, y, z: -1 * z, ...propSettings,
-        });
-      },
+      useZarr,
       initialViewState,
       ...propSettings,
       ...this.state
@@ -95,9 +109,20 @@ export default class App extends PureComponent {
     return (
       <div>
       <MicroscopyViewer {...props}/>
+      <div className="slider-container-orange">
+      <OrangeSlider
+        value={this.state.sliderValues.channel_2}
+        onChange={this.handleOrangeSliderChange}
+        valueLabelDisplay="auto"
+        aria-label="range-slider-red"
+        min={0}
+        max={this.max}
+        orientation="vertical"
+      />
+      </div>
       <div className="slider-container-red">
       <RedSlider
-        value={this.state.sliderValues.redSliderValue}
+        value={this.state.sliderValues.channel_0}
         onChange={this.handleRedSliderChange}
         valueLabelDisplay="auto"
         aria-label="range-slider-red"
@@ -108,7 +133,7 @@ export default class App extends PureComponent {
       </div>
       <div className="slider-container-green">
       <GreenSlider
-        value={this.state.sliderValues.greenSliderValue}
+        value={this.state.sliderValues.channel_1}
         onChange={this.handleGreenSliderChange}
         valueLabelDisplay="auto"
         aria-label="range-slider-green"
@@ -119,7 +144,7 @@ export default class App extends PureComponent {
       </div>
       <div className="slider-container-blue">
       <BlueSlider
-        value={this.state.sliderValues.blueSliderValue}
+        value={this.state.sliderValues.channel_3}
         onChange={this.handleBlueSliderChange}
         valueLabelDisplay="auto"
         aria-label="range-slider-blue"

@@ -36,6 +36,13 @@
   height: 300px;
 }
 
+.slider-container-orange{
+  right: 20%;
+  top: 75px;
+  position: absolute;
+  height: 300px;
+}
+
 .slider-container-blue{
   right: 5%;
   top: 75px;

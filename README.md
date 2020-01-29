@@ -21,9 +21,10 @@ This component can be used with an already existing `DeckGL` setup.
 
 ## MicroscopyViewer and MicroscopyViewerLayer Properties
 
-##### `getTileData` (Function) **FUTURE BREAKING CHANGES WITH NEW FEATURES**
+##### `getTileData` (Function) **POTENIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
 
-`getTileData` given x, y, z indices of the tile, returns the tile data or a Promise that resolves to the tile data.
+`getTileData` given x, y, z indices of the tile, returns the tile data or a Promise that resolves to the tile data.  Alternatively, pass in `useZarr` as true to use `zarr` and our funcionality.  Look
+at [this](IMAGE_RENDERING.md) for how the zarr should be laid out.
 
 Receives arguments:
 
@@ -33,19 +34,21 @@ Receives arguments:
 
 Returns:
 
-- An array of `[{redData:data}, {blueData:data}, {greenData:data}]` where `data`
-is a typed array of a single channel's worth of data.
+- An array of `[colorData1, ..., colorDataN]` where `colorDataI`
+is a typed array of a single channel's worth of data.  The order matters as it must match
 
 A `loadZarr` function is provided to assist and a `loadTiff` function will be coming.  
 They need to be wrapped so in a  `getTileData` function that accepts the right arguments
 (as stated above).  For now, the `loadZarr` function also accepts:
- - sourceChannels (Array) `[{name:'redChannel',tileSource:'tilesourceRed.com'}, {name:'blueChannel',tileSource:'tilesourceBlue.com'}, {name:'greenChannel',tileSource:'tilesourceGreen.com'}]``
+ - sourceChannels (Array) `[{name:'tilesource1.com'}, {name:'tilesource2.com'}, ... {name:'tilesourceN.com'}]``
  - `tileSize`
  - `x`
  - `y`
  - `z`
  - `imageWidth` The real width of the image
 
+Returns:
+`[{name:data}, {name:data}, {name:data}]`
 
 ##### `viewHeight` & `viewWidth` (Number)
 
@@ -67,9 +70,13 @@ An object containing two things
 These control the max and min zoom sizes, generally the number of images `n` in your pyramid,
 ranging from `-n` (zoomed out) to `0`, the highest resolution.
 
-##### `sliderValues` (Object) **FUTURE BREAKING CHANGES WITH NEW FEATURES**
+##### `sliderValues` (Array) **POTENIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
 
-An object containing multiple things
- - `redSliderValue` (Number) The cutoff for red values
- - `greenSliderValue` (Number) The cutoff for green values
- - `blueSliderValue` (Number) The cutoff for green values
+An object containing slider (max/min) values for each channel,
+`{sliderValues:{name:value}, {name:value}, {name:value}}`
+
+##### `colors` (Array)
+
+Again, this is an objecting matching the sliders and the data of the colors
+that you wish to map to a full range for displaying,
+`{colorValues:{name:[r,g,b]}, {name:[r,g,b]}, {name:[r,g,b]}}`
