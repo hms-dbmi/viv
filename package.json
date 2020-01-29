@@ -1,15 +1,15 @@
 {
-  "name": "viv",
-  "version": "0.0.0",
-  "main": "viv/index.js",
-  "module": "viv/index.es.js",
-  "jsnext:main": "viv/index.es.js",
+  "name": "@hubmap/viv",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "jsnext:main": "dist/index.es.js",
   "files": [
     "dist"
   ],
   "description": "High bit depth, high resolution, many channels, low overhead",
   "scripts": {
-    "build-component": "rollup -c",
+    "build-component": "rm -r dist && rollup -c",
     "build-site": "node_modules/.bin/webpack --config webpack.prod.js --mode production",
     "start": "node_modules/.bin/webpack-dev-server --mode development --open --hot"
   },
@@ -19,7 +19,7 @@
   },
   "keywords": [],
   "author": "Ilan Gold",
-  "license": "",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/hubmapconsortium/vitessce-image-viewer/issues"
   },

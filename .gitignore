@@ -3,7 +3,7 @@
 # dependencies
 /node_modules
 /demo/node_modules
-/vitessce-image-viewer
+/dist
 /.pnp
 .pnp.js
 
