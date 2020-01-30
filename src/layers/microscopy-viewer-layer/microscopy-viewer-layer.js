@@ -2,7 +2,7 @@ import {BaseTileLayer} from '@deck.gl/layers';
 import {Texture2D} from '@luma.gl/webgl'
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM } from 'deck.gl';
-import { XRLayer } from './XRLayer';
+import { XRLayer } from '../xr-layer';
 import {tileToBoundingBox} from './tiling-utils';
 import {getTileIndices} from './tiling-utils';
 
@@ -33,7 +33,7 @@ const defaultProps = Object.assign({}, BaseTileLayer.defaultProps, {
   },
 });
 
-export default class MicroscopyViewerLayer extends BaseTileLayer {
+export class MicroscopyViewerLayer extends BaseTileLayer {
 
   constructor(props) {
     const layerProps = Object.assign({}, defaultProps, props, {

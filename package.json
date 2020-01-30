@@ -2,8 +2,8 @@
   "name": "@hubmap/vitessce-image-viewer",
   "version": "0.0.1",
   "main": "dist/index.js",
-  "module": "dist/index.es.js",
-  "jsnext:main": "dist/index.es.js",
+  "module": "dist/index.js",
+  "jsnext:main": "dist/index.js",
   "files": [
     "dist",
     "src"

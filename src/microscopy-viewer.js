@@ -1,10 +1,10 @@
 import React, {PureComponent} from 'react';
 import DeckGL from '@deck.gl/react';
 import { OrthographicView } from 'deck.gl';
-import MicroscopyViewerLayer from './microscopy-viewer-layer'
+import { MicroscopyViewerLayer } from './layers'
 import { loadZarr } from './data-utils'
 
-export default class MicroscopyViewer extends PureComponent {
+export class MicroscopyViewer extends PureComponent {
 
   constructor(props){
     super(props)
