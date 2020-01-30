@@ -5,12 +5,13 @@
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "description": "High bit depth, high resolution, many channels, low overhead",
   "scripts": {
     "build-component": "rm -r dist && rollup -c",
-    "build-site": "node_modules/.bin/webpack --config webpack.prod.js --mode production",
+    "build-site": "rm -r dist && node_modules/.bin/webpack --config webpack.prod.js --mode production",
     "start": "node_modules/.bin/webpack-dev-server --mode development --open --hot"
   },
   "repository": {

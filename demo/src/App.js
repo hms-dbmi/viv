@@ -51,7 +51,7 @@ export default class App extends PureComponent {
         channel_3: [0, 0, 255],
       },
       viewHeight: window.innerHeight * .9,
-      viewWidth: window.innerWidth * .8
+      viewWidth: window.innerWidth * .7
     };
     this.max =  65535
     window.addEventListener("resize", this.resize);
