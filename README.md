@@ -1,7 +1,7 @@
-# viv
+# vitessce-image-viewer ("Viv")
 A viewer for high bit depth, high resolution, multi-channel images using DeckGL
 over the hood and WebGL under the hood. To learn more about the "theory" behind
-this, look at [this](IMAGE_RENDERING.md)
+this, look at [this](IMAGE_RENDERING.md).
 
 ## Build
 To build the component, alone via `rollup` use `npm run-script build-component`.
