@@ -1,5 +1,5 @@
 {
-  "name": "@hubmap/viv",
+  "name": "@hubmap/vitessce-image-viewer",
   "version": "0.0.1",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
@@ -10,8 +10,8 @@
   ],
   "description": "High bit depth, high resolution, many channels, low overhead",
   "scripts": {
-    "build-component": "rm -r dist && rollup -c",
-    "build-site": "rm -r dist && node_modules/.bin/webpack --config webpack.prod.js --mode production",
+    "build-component": "mkdir dist || rm -r dist && node_modules/.bin/webpack --config webpack.component.prod.js --mode production",
+    "build-site": "mkdir dist || rm -r dist && node_modules/.bin/webpack --config webpack.site.prod.js --mode production",
     "start": "node_modules/.bin/webpack-dev-server --mode development --open --hot"
   },
   "repository": {
