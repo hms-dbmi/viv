@@ -59,3 +59,43 @@ Then the browser can go through the following steps to get a channel of an OME-T
   3. Once the data is on the shaders, map the values down and render.
 
 While the pipeline is rather simple, __DeckGL__ and __HTTP2__ are doing a lot of leg work here.  This would simply not be possible to do quickly without these libraries.
+
+Here is a small script for rendering the images in __zarr__:
+
+```python
+import numpy as np
+from apeer_ometiff_library import io
+from skimage.transform import pyramid_gaussian
+import zarr
+import random
+import math
+from numcodecs import Zlib
+filename = ""
+(array, omexml) = io.read_ometiff(filename)
+# index the array to only get what you need to create the pyramid
+# this example is a multichannel so we index out the first four dimensions
+# to only get CWH
+array = array[0][0][0][0]
+pyramid_list = []
+# iterate over however many dimensions you need
+for arr in array:
+    pyramid_list += [np.asarray(list(tuple(pyramid_gaussian(arr, downscale=2))))]
+j= 0
+tile_size = 256
+for pyramid in pyramid_list:
+    i = 0
+    for p in pyramid:
+        padded = np.pad(p, pad_width = [(0, math.ceil(p.shape[0] / tile_size) * tile_size - p.shape[0]), (0, math.ceil(p.shape[1] / tile_size) * tile_size - p.shape[1])], constant_values=0)
+        padded = padded.reshape(padded.shape[0]//tile_size, tile_size, padded.shape[1]//tile_size, tile_size).swapaxes(1, 2)
+        padded_reshape_flatten = padded.ravel()
+        padded_reshape_shape = padded.shape
+        del padded
+        # name it as you wish, probably more helpful than numbers to channels
+        z = zarr.open(f"img_pyramid/channel_{j}/pyramid_{i}.zarr", shape=list(padded_reshape_flatten.shape), chunks=(tile_size*tile_size,), compressor=Zlib(level=1), dtype='<u2')
+        z.attrs['height'] = padded_reshape_shape[0]
+        z.attrs['width'] = padded_reshape_shape[1]
+        print(z)
+        z[:,] = padded_reshape_flatten
+        i = i + 1
+    j = j + 1
+```
