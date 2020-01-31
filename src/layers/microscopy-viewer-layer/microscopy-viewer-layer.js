@@ -5,6 +5,7 @@ import { COORDINATE_SYSTEM } from 'deck.gl';
 import { XRLayer } from '../xr-layer';
 import {tileToBoundingBox} from './tiling-utils';
 import {getTileIndices} from './tiling-utils';
+import { loadZarr } from './data-utils';
 
 const defaultProps = Object.assign({}, BaseTileLayer.defaultProps, {
   id: `microscopy-tile-layer`,
@@ -36,18 +37,52 @@ const defaultProps = Object.assign({}, BaseTileLayer.defaultProps, {
 export class MicroscopyViewerLayer extends BaseTileLayer {
 
   constructor(props) {
-    const layerProps = Object.assign({}, defaultProps, props, {
-      getTileIndices: (viewport, maxZoom, minZoom) => {
-        return getTileIndices({
-          viewport, maxZoom, minZoom, ...props,
-        });
-      },
-      tileToBoundingBox: (x, y, z) => {
-        return tileToBoundingBox({
-          x, y, z, ...props,
-        });
-      },
+    const minZoom = Math.floor(-1 * Math.log2(Math.max(props.imageHeight, props.imageWidth)));
+    const {sliderValues, colorValues} = props
+    var orderedSliderValues = []
+    var orderedColorValues = []
+    Object.keys(sliderValues).sort().forEach(function(key) {
+      orderedSliderValues.push(sliderValues[key]);
     })
+    Object.keys(colorValues).sort().forEach(function(key) {
+      orderedColorValues.push(colorValues[key]);
+    })
+    var diff = 6 - orderedSliderValues.length
+    for (var i = 0; i < diff; i++) {
+      orderedSliderValues.push(65535);
+    }
+    var diff = 6 - orderedColorValues.length
+    for (var j = 0; j < diff; j++) {
+      orderedColorValues.push([0,0,0]);
+    }
+    orderedColorValues = orderedColorValues.map(color => color.map(ch => ch / 255))
+    const getZarr = ({ x, y, z }) => {
+      return loadZarr({
+        x, y, z: -1 * z, ...props,
+      });
+    }
+    const getTileData = props.useZarr
+      ? getZarr
+      : props.getTileData
+    const overrideValuesProps = Object.assign(
+      {}, props, {
+        sliderValues: orderedSliderValues,
+        colorValues: orderedColorValues,
+        minZoom,
+        getTileData,
+        getTileIndices: (viewport, maxZoom, minZoom) => {
+          return getTileIndices({
+            viewport, maxZoom, minZoom, ...props,
+          });
+        },
+        tileToBoundingBox: (x, y, z) => {
+          return tileToBoundingBox({
+            x, y, z, ...props,
+          });
+        },
+      }
+    )
+    const layerProps = Object.assign({}, defaultProps, overrideValuesProps)
     super(layerProps)
   }
 

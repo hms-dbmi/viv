@@ -25,7 +25,9 @@
     "url": "https://github.com/hubmapconsortium/vitessce-image-viewer/issues"
   },
   "homepage": "https://github.com/hubmapconsortium/vitessce-image-viewer#readme",
-  "dependencies": {
+  "peerDependencies": {
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
     "@deck.gl/core": "^8.1.0-alpha.1",
     "@deck.gl/layers": "^8.1.0-alpha.1",
     "@loaders.gl/core": "^2.0.2",
@@ -37,14 +39,16 @@
     "nebula.gl": "^0.17.1",
     "zarr": "^0.1.4"
   },
-  "peerDependencies": {
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0"
-  },
   "devDependencies": {
     "@babel/core": "^7.7.4",
     "@babel/preset-env": "^7.8.3",
     "@babel/preset-react": "^7.8.3",
+    "@deck.gl/core": "^8.1.0-alpha.1",
+    "@deck.gl/layers": "^8.1.0-alpha.1",
+    "@loaders.gl/core": "^2.0.2",
+    "@loaders.gl/loader-utils": "^2.0.2",
+    "@luma.gl/core": "8.0.3",
+    "@luma.gl/shadertools": "8.0.3",
     "@material-ui/core": "^4.8.3",
     "@rollup/plugin-commonjs": "^11.0.1",
     "@rollup/plugin-node-resolve": "^7.0.0",
@@ -52,8 +56,11 @@
     "babel-loader": "^8.0.6",
     "babel-preset-stage-0": "^6.24.1",
     "css-loader": "^3.4.2",
+    "deck.gl": "^8.1.0-alpha.1",
     "html-webpack-plugin": "^3.2.0",
+    "math.gl": "^3.1.3",
     "mini-css-extract-plugin": "^0.9.0",
+    "nebula.gl": "^0.17.1",
     "postcss-loader": "^3.0.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
@@ -62,6 +69,8 @@
     "rollup-plugin-peer-deps-external": "^2.2.0",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.10.1"
+    "webpack-dev-server": "^3.10.1",
+    "webpack-node-externals": "^1.7.2",
+    "zarr": "^0.1.4"
   }
 }

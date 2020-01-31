@@ -1,4 +1,5 @@
 const path = require("path");
+var nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   devtool: 'source-map',
@@ -9,6 +10,7 @@ module.exports = {
         library: 'vitessce-image-viewer',
         libraryTarget: 'umd'
     },
+    externals: [nodeExternals()],
     module: {
         rules: [{
             test: /\.js$/,
