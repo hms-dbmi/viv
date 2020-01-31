@@ -1,5 +1,4 @@
-import MicroscopyViewer from './microscopy-viewer';
-import MicroscopyViewerLayer from './microscopy-viewer-layer';
-import {loadZarr} from './data-utils';
+import { MicroscopyViewerLayer } from './layers';
+import { MicroscopyViewer } from './microscopy-viewer';
 
-export {MicroscopyViewer, MicroscopyViewerLayer, loadZarr}
+export { MicroscopyViewerLayer, MicroscopyViewer}

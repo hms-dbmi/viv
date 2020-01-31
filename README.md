@@ -3,8 +3,29 @@ A viewer for high bit depth, high resolution, multi-channel images using DeckGL
 over the hood and WebGL under the hood. To learn more about the "theory" behind
 this, look at [this](IMAGE_RENDERING.md).
 
+## Using this in your project
+In the interest of keeping this app as lightweight and extensible as possible,
+it ships with nothing except the code.  That means you will have to add the proper
+peer depenedencies from this package into your own:
+
+```
+"@deck.gl/core": "^8.1.0-alpha.1",
+"@deck.gl/layers": "^8.1.0-alpha.1",
+"@loaders.gl/core": "^2.0.2",
+"@loaders.gl/loader-utils": "^2.0.2",
+"@luma.gl/core": "8.0.3",
+"@luma.gl/shadertools": "8.0.3",
+"deck.gl": "^8.1.0-alpha.1",
+"math.gl": "^3.1.3",
+"nebula.gl": "^0.17.1",
+"zarr": "^0.1.4"
+```
+
+The reason for this is primarily to support export external DeckGL setups so that
+you might combine our layer with your own.
+
 ## Build
-To build the component, alone via `rollup` use `npm run-script build-component`.
+To build the component, alone via `webpack` use `npm run-script build-component`.
 To build the demo used for visual testing (seen on `npm start`), run
 `npm run-script build-site`.
 
@@ -23,7 +44,7 @@ This component can be used with an already existing `DeckGL` setup.
 
 ##### `getTileData` (Function) **POTENIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
 
-`getTileData` given x, y, z indices of the tile, returns the tile data or a Promise that resolves to the tile data.  Alternatively, pass in `useZarr` as true to use `zarr` and our funcionality.  Look
+`getTileData` given x, y, z indices of the tile, returns the tile data or a Promise that resolves to the tile data.  Alternatively, pass in `useZarr` as true to use `zarr` and our funcionality. Soon, there will be a `useGeoTIFF` as well. Look
 at [this](IMAGE_RENDERING.md) for how the zarr should be laid out.
 
 Receives arguments:
@@ -50,7 +71,7 @@ They need to be wrapped so in a  `getTileData` function that accepts the right a
 Returns:
 `[{name:data}, {name:data}, {name:data}]`
 
-##### `viewHeight` & `viewWidth` (Number)
+##### `viewHeight` & `viewWidth` (Number) [ONLY NECESSARY FOR MicrsocopyViewer]
 
 These control the size of the viewport in your app.
 
@@ -58,7 +79,7 @@ These control the size of the viewport in your app.
 
 The height and width of the image you wish to render.
 
-##### `initialViewState` (object)
+##### `initialViewState` (object) [ONLY NECESSARY FOR MicrsocopyViewer]
 
 An object containing two things
  - `target` (Array) An `[x,y,0]` location in image coordinates of the image.  The 0
