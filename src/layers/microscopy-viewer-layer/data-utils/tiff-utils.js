@@ -7,11 +7,10 @@ async function loadTile({image, channel, x, y, pool}) {
   return dataObj
 }
 
-export function loadTiff({sourceChannels, x, y, z}){
+export function loadTiff({connections, x, y, z}){
   const pool = new Pool();
-  const configListPromises = Object.keys(sourceChannels).map(async (channel) => {
-    var tiff = await fromUrl(sourceChannels[channel])
-    var image = await tiff.getImage(z)
+  const configListPromises = Object.keys(connections).map((channel) => {
+    var image = connections[channel][z]
     return loadTile({image, channel, x, y, pool})
   })
   return Promise.all(configListPromises).then((dataList) => {
@@ -24,8 +23,8 @@ export function loadTiff({sourceChannels, x, y, z}){
   });
 }
 
-export async function getTiffConnections({sourceChannels, x, y, maxZoom}){
-  const tiffConnections = await Object.assign({}, ...Object.keys(sourceChannels).map(async (channel) => {
+export function getTiffConnections({sourceChannels, maxZoom}){
+  const tiffConnections = Object.keys(sourceChannels).map(async (channel) => {
     var tiff = await fromUrl(sourceChannels[channel])
     var imageObj = {}
     for(var i = 0; i < -maxZoom; i++) {
@@ -38,6 +37,6 @@ export async function getTiffConnections({sourceChannels, x, y, maxZoom}){
 
     }
     return imageObj
-  }))
-  return tiffConnections
+  })
+  return Promise.all(tiffConnections)
 }
