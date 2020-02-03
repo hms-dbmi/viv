@@ -3,7 +3,12 @@ import {fromUrl, Pool, getDecoder } from 'geotiff/dist/geotiff.bundle.min.js';
 async function loadTile({image, channel, x, y, pool}) {
   var tile = await image.getTileOrStrip(x,y, 0, pool)
   var dataObj = {}
-  dataObj[channel] = new Uint16Array(tile.data)
+  const bits8 = image.fileDirectory.BitsPerSample[0]===8
+  const bits16 = image.fileDirectory.BitsPerSample[0]===16
+  const bits32 = image.fileDirectory.BitsPerSample[0]===32
+  dataObj[channel] = (bits8 && new Uint8Array(tile.data)) ||
+                    (bits16 && new Uint16Array(tile.data)) ||
+                    (bits32 && new Uint32Array(tile.data))
   return dataObj
 }
 
