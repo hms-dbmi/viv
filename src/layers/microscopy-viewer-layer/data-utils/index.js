@@ -1,4 +1,4 @@
 import loadZarr from './zarr-utils';
-import loadTiff from './tiff-utils';
+import {loadTiff, getTiffConnections} from './tiff-utils';
 
-export {loadZarr, loadTiff}
+export {loadZarr, loadTiff, getTiffConnections}

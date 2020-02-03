@@ -96,7 +96,8 @@ export default class App extends PureComponent {
       sourceChannels: source.channels,
       minZoom: Math.floor(
         -1 * Math.log2(Math.max(source.height * source.tileSize, source.width * source.tileSize)),
-      )
+      ),
+      maxZoom: -9
     }
     const props = {
       initialViewState,

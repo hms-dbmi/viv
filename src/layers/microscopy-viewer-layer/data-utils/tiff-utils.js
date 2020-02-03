@@ -7,7 +7,7 @@ async function loadTile({image, channel, x, y, pool}) {
   return dataObj
 }
 
-export default function loadTiff({sourceChannels, x, y, z}){
+export function loadTiff({sourceChannels, x, y, z}){
   const pool = new Pool();
   const configListPromises = Object.keys(sourceChannels).map(async (channel) => {
     var tiff = await fromUrl(sourceChannels[channel])
@@ -22,4 +22,22 @@ export default function loadTiff({sourceChannels, x, y, z}){
     })
     return orderedList;
   });
+}
+
+export async function getTiffConnections({sourceChannels, x, y, maxZoom}){
+  const tiffConnections = await Object.assign({}, ...Object.keys(sourceChannels).map(async (channel) => {
+    var tiff = await fromUrl(sourceChannels[channel])
+    var imageObj = {}
+    for(var i = 0; i < -maxZoom; i++) {
+      var image = await tiff.getImage(i)
+      if(!imageObj[channel]) {
+        imageObj[channel] = [image]
+      } else {
+        imageObj[channel].push(image)
+      }
+
+    }
+    return imageObj
+  }))
+  return tiffConnections
 }
