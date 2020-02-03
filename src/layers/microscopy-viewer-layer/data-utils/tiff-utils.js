@@ -12,8 +12,7 @@ async function loadTile({image, channel, x, y, pool}) {
   return dataObj
 }
 
-export function loadTiff({connections, x, y, z}){
-  const pool = new Pool();
+export function loadTiff({connections, x, y, z, pool}){
   const configListPromises = Object.keys(connections).map((channel) => {
     var image = connections[channel][z]
     return loadTile({image, channel, x, y, pool})

@@ -1,12 +1,14 @@
 import {MicroscopyViewerLayerBase} from './microscopy-viewer-layer-Base'
 import {getTiffConnections,getZarrConnections} from './data-utils'
 import {CompositeLayer} from '@deck.gl/core';
+import {fromUrl, Pool, getDecoder } from 'geotiff/dist/geotiff.bundle.min.js';
 
 export class MicroscopyViewerLayer extends CompositeLayer {
 
   initializeState(){
     this.state = {
-      connections: null
+      connections: null,
+      pool: null
     }
   }
 
@@ -17,7 +19,7 @@ export class MicroscopyViewerLayer extends CompositeLayer {
   updateState(){
     this.props.useTiff
     ? !this.state.connections && getTiffConnections({...this.props}).then((connections) => {
-      this.setState({connections})
+      this.setState({connections, pool: new Pool()})
     })
     : !this.state.connections && getZarrConnections({...this.props}).then((connections) => {
       this.setState({connections})
@@ -25,7 +27,7 @@ export class MicroscopyViewerLayer extends CompositeLayer {
   }
 
   renderLayers() {
-    const layers = this.state.connections ? new MicroscopyViewerLayerBase({connections: Object.assign({},...this.state.connections), ...this.props}) : []
+    const layers = this.state.connections ? new MicroscopyViewerLayerBase({connections: Object.assign({},...this.state.connections), pool: this.state.pool, ...this.props}) : []
     return layers
   }
 

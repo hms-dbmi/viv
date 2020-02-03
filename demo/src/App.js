@@ -89,7 +89,7 @@ export default class App extends PureComponent {
       ],
     }
     const propSettings = {
-      useZarr: true,
+      useTiff: true,
       imageHeight: source.height * source.tileSize,
       imageWidth: source.width * source.tileSize,
       tileSize: source.tileSize,
