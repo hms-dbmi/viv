@@ -14,7 +14,7 @@ uniform usampler2D channel4;
 uniform usampler2D channel5;
 
 // range
-uniform float sliderValues[6];
+uniform vec2 sliderValues[6];
 
 // color
 uniform vec3 colorValue0;
@@ -61,18 +61,17 @@ vec3 rgb2hsv(vec3 rgb) {
  }
 
 void main() {
-  float channel0Color = float(texture(channel0, vTexCoord).r) / sliderValues[0];
-  float channel1Color = float(texture(channel1, vTexCoord).r) / sliderValues[1];
-  float channel2Color = float(texture(channel2, vTexCoord).r) / sliderValues[2];
-  float channel3Color = float(texture(channel3, vTexCoord).r) / sliderValues[3];
-  float channel4Color = float(texture(channel4, vTexCoord).r) / sliderValues[4];
-  float channel5Color = float(texture(channel5, vTexCoord).r) / sliderValues[5];
+  float channel0Color = (float(texture(channel0, vTexCoord).r) - sliderValues[0][0]) / sliderValues[0][1];
+  float channel1Color = (float(texture(channel1, vTexCoord).r) - sliderValues[1][0]) / sliderValues[1][1];
+  float channel2Color = (float(texture(channel2, vTexCoord).r) - sliderValues[2][0]) / sliderValues[2][1];
+  float channel3Color = (float(texture(channel3, vTexCoord).r) - sliderValues[3][0]) / sliderValues[3][1];
+  float channel4Color = (float(texture(channel4, vTexCoord).r) - sliderValues[4][0]) / sliderValues[4][1];
+  float channel5Color = (float(texture(channel5, vTexCoord).r) - sliderValues[5][0]) / sliderValues[5][1];
 
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
   float channelArray[6] = float[6](channel0Color, channel1Color, channel2Color, channel3Color, channel4Color, channel5Color);
   vec3 colorValues[6] = vec3[6](colorValue0, colorValue1, colorValue2, colorValue3, colorValue4, colorValue5);
-
 
   for(int i = 0; i < 6; i++) {
     hsvCombo = rgb2hsv(vec3(colorValues[i]));
@@ -81,6 +80,5 @@ void main() {
   }
 
   color = vec4(rgbCombo, 1.0);
-
 }
 `;
