@@ -5,7 +5,7 @@ import { COORDINATE_SYSTEM } from 'deck.gl';
 import { XRLayer } from '../xr-layer';
 import {tileToBoundingBox} from './tiling-utils';
 import {getTileIndices} from './tiling-utils';
-import { loadZarr } from './data-utils';
+import { loadZarr, loadTiff } from './data-utils';
 
 const defaultProps = Object.assign({}, BaseTileLayer.defaultProps, {
   id: `microscopy-tile-layer`,
@@ -61,9 +61,14 @@ export class MicroscopyViewerLayer extends BaseTileLayer {
         x, y, z: -1 * z, ...props,
       });
     }
-    const getTileData = props.useZarr
-      ? getZarr
-      : props.getTileData
+    const getTiff = ({ x, y, z }) => {
+      return loadTiff({
+        x, y, z: -1 * z, ...props,
+      });
+    }
+    const getTileData = (props.useZarr && getZarr) ||
+                        (props.useTiff && getTiff) ||
+                        props.getTileData
     const overrideValuesProps = Object.assign(
       {}, props, {
         sliderValues: orderedSliderValues,

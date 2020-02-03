@@ -56,6 +56,11 @@ module.exports = {
         }
         ]
     },
+    node: {
+      fs: 'empty',
+      buffer: 'empty',
+      http: 'empty',
+    },
     plugins: [
         new HtmlWebPackPlugin({
             hash: true,

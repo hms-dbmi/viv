@@ -26,8 +26,6 @@ const OrangeSlider = withStyles({
   }
 })(Slider)
 
-
-
 export default class App extends PureComponent {
 
   constructor(props){
@@ -91,6 +89,7 @@ export default class App extends PureComponent {
       ],
     }
     const propSettings = {
+      useTiff: true,
       imageHeight: source.height * source.tileSize,
       imageWidth: source.width * source.tileSize,
       tileSize: source.tileSize,
@@ -99,9 +98,7 @@ export default class App extends PureComponent {
         -1 * Math.log2(Math.max(source.height * source.tileSize, source.width * source.tileSize)),
       )
     }
-    const useZarr = true
     const props = {
-      useZarr,
       initialViewState,
       ...propSettings,
       ...this.state

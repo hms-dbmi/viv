@@ -16,6 +16,7 @@ peer depenedencies from this package into your own:
 "@luma.gl/core": "8.0.3",
 "@luma.gl/shadertools": "8.0.3",
 "deck.gl": "^8.1.0-alpha.1",
+"geotiff": "^1.0.0-beta.6",
 "math.gl": "^3.1.3",
 "nebula.gl": "^0.17.1",
 "zarr": "^0.1.4"
@@ -44,7 +45,7 @@ This component can be used with an already existing `DeckGL` setup.
 
 ##### `getTileData` (Function) **POTENIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
 
-`getTileData` given x, y, z indices of the tile, returns the tile data or a Promise that resolves to the tile data.  Alternatively, pass in `useZarr` as true to use `zarr` and our funcionality. Soon, there will be a `useGeoTIFF` as well. Look
+`getTileData` given x, y, z indices of the tile, returns the tile data or a Promise that resolves to the tile data.  Alternatively, pass in `useZarr` as true to use `zarr` and our functionality. Otherwise, you can use `useTiff` to make range requests directly against a pyramid/tiled tiff. Look
 at [this](IMAGE_RENDERING.md) for how the zarr should be laid out.
 
 Receives arguments:
