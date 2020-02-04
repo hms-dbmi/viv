@@ -1,0 +1,15 @@
+sudo: false
+
+language: node_js
+node_js:
+  - 10
+
+cache:
+  directories:
+    # I think it defaults to this:
+    - node_modules
+    # Default if "npm ci" were the script, but non-empty, so include it explicitly:
+    - ~/.npm
+
+script:
+  - ./test.sh
