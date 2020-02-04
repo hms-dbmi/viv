@@ -1,7 +1,7 @@
-import {MicroscopyViewerLayerBase} from './microscopy-viewer-layer-Base'
-import {getTiffConnections,getZarrConnections} from './data-utils'
 import {CompositeLayer} from '@deck.gl/core';
 import {fromUrl, Pool, getDecoder } from 'geotiff/dist/geotiff.bundle.min.js';
+import {MicroscopyViewerLayerBase} from './microscopy-viewer-layer-Base'
+import {getTiffConnections,getZarrConnections} from './data-utils'
 
 export class MicroscopyViewerLayer extends CompositeLayer {
 

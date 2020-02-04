@@ -23,7 +23,7 @@ export class MicroscopyViewer extends PureComponent {
   }
 
   render() {
-    var views = [
+    const views = [
       new OrthographicView({
         id: "ortho",
         controller: true,
@@ -31,16 +31,16 @@ export class MicroscopyViewer extends PureComponent {
         width: this.props.viewWidth
       })
     ];
-    const initialViewState = this.props.initialViewState;
+    const {initialViewState} = this.props;
     return (
       <DeckGL
         glOptions={{ webgl2: true }}
         layers={this.state.gl ? this._renderLayers() : []}
         initialViewState={initialViewState}
         onWebGLInitialized={this._onWebGLInitialized}
-        controller={true}
+        controller
         views={views}
-      ></DeckGL>
+      />
     );
   }
 }
