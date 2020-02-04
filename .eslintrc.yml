@@ -2,7 +2,6 @@ extends:
   - react-app
   - eslint:recommended
   - plugin:react/recommended
-  - plugin:cypress/recommended
   - airbnb
 plugins:
   - react
