@@ -26,8 +26,6 @@ const OrangeSlider = withStyles({
   }
 })(Slider)
 
-
-
 export default class App extends PureComponent {
 
   constructor(props){
@@ -39,10 +37,10 @@ export default class App extends PureComponent {
     this.resize = this.resize.bind(this)
     this.state = {
       sliderValues:{
-        channel_0: 10000,
-        channel_1: 10000,
-        channel_2: 10000,
-        channel_3: 10000
+        channel_0: [0, 20000],
+        channel_1: [0, 20000],
+        channel_2: [0, 20000],
+        channel_3: [0, 20000]
       },
       colorValues:{
         channel_0: [255, 0, 0],
@@ -91,17 +89,17 @@ export default class App extends PureComponent {
       ],
     }
     const propSettings = {
+      useTiff: true,
       imageHeight: source.height * source.tileSize,
       imageWidth: source.width * source.tileSize,
       tileSize: source.tileSize,
       sourceChannels: source.channels,
       minZoom: Math.floor(
         -1 * Math.log2(Math.max(source.height * source.tileSize, source.width * source.tileSize)),
-      )
+      ),
+      maxZoom: -9
     }
-    const useZarr = true
     const props = {
-      useZarr,
       initialViewState,
       ...propSettings,
       ...this.state
