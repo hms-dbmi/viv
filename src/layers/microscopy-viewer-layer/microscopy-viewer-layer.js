@@ -24,6 +24,7 @@ export class MicroscopyViewerLayer extends CompositeLayer {
     : !this.state.connections && getZarrConnections({...this.props}).then((connections) => {
       this.setState({connections})
     })
+
   }
 
   renderLayers() {
