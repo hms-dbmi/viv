@@ -1,35 +1,46 @@
-import React, {PureComponent} from 'react';
-import DeckGL from '@deck.gl/react';
-import { OrthographicView } from 'deck.gl';
-import { MicroscopyViewerLayer } from './layers'
+import React, { PureComponent } from "react";
+import DeckGL from "@deck.gl/react";
+import { OrthographicView } from "deck.gl";
+import { MicroscopyViewerLayer } from "./layers";
 
 export class MicroscopyViewer extends PureComponent {
-
-  constructor(props){
-    super(props)
+  constructor(props) {
+    super(props);
     this._onWebGLInitialized = this._onWebGLInitialized.bind(this);
     this.state = {
       gl: null
     };
   }
 
-  _renderLayers(){
-
+  _renderLayers() {
     return new MicroscopyViewerLayer({
       ...this.props
     });
   }
 
   _onWebGLInitialized(gl) {
-    this.setState({gl})
+    this.setState({ gl });
   }
 
   render() {
-    var views = [new OrthographicView({id:'ortho', controller:true, height: this.props.viewHeight, width: this.props.viewWidth})]
-    const initialViewState = this.props.initialViewState
+    var views = [
+      new OrthographicView({
+        id: "ortho",
+        controller: true,
+        height: this.props.viewHeight,
+        width: this.props.viewWidth
+      })
+    ];
+    const initialViewState = this.props.initialViewState;
     return (
-      <DeckGL glOptions={{webgl2: true}} layers={this.state.gl ? this._renderLayers() : []} initialViewState={initialViewState} onWebGLInitialized={this._onWebGLInitialized} controller={true} views={views}>
-      </DeckGL>
+      <DeckGL
+        glOptions={{ webgl2: true }}
+        layers={this.state.gl ? this._renderLayers() : []}
+        initialViewState={initialViewState}
+        onWebGLInitialized={this._onWebGLInitialized}
+        controller={true}
+        views={views}
+      ></DeckGL>
     );
   }
 }
