@@ -3,12 +3,11 @@ import {Texture2D} from '@luma.gl/webgl'
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM } from 'deck.gl';
 import { XRLayer } from '../xr-layer';
-import {tileToBoundingBox} from './tiling-utils';
-import {getTileIndices} from './tiling-utils';
+import {tileToBoundingBox,getTileIndices} from './tiling-utils';
+
 import { loadZarr, loadTiff } from './data-utils';
 
-const defaultProps = Object.assign({}, BaseTileLayer.defaultProps, {
-  id: `microscopy-tile-layer`,
+const defaultProps = { ...BaseTileLayer.defaultProps, id: `microscopy-tile-layer`,
   pickable: false,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   maxZoom: 0,
@@ -31,16 +30,15 @@ const defaultProps = Object.assign({}, BaseTileLayer.defaultProps, {
       visible: true,
     });
     return xrl;
-  },
-});
+  },};
 
 export class MicroscopyViewerLayerBase extends BaseTileLayer {
 
   constructor(props) {
     const minZoom = Math.floor(-1 * Math.log2(Math.max(props.imageHeight, props.imageWidth)));
     const {sliderValues, colorValues} = props
-    var orderedSliderValues = []
-    var orderedColorValues = []
+    const orderedSliderValues = []
+    let orderedColorValues = []
     Object.keys(sliderValues).sort().forEach(function(key) {
       orderedSliderValues.push(sliderValues[key]);
     })
@@ -52,7 +50,7 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
       orderedSliderValues.push([0,65535]);
     }
     var diff = 6 - orderedColorValues.length
-    for (var j = 0; j < diff; j++) {
+    for (let j = 0; j < diff; j++) {
       orderedColorValues.push([0,0,0]);
     }
     orderedColorValues = orderedColorValues.map(color => color.map(ch => ch / 255))
@@ -71,9 +69,8 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
     const getTileData = (props.useZarr && getZarr) ||
                         (props.useTiff && getTiff) ||
                         props.getTileData
-    const overrideValuesProps = Object.assign(
-      {}, props, {
-        sliderValues: flatSliderValues,
+    const overrideValuesProps = {
+       ...props, sliderValues: flatSliderValues,
         colorValues: orderedColorValues,
         minZoom,
         getTileData,
@@ -87,9 +84,8 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
             x, y, z, ...props,
           });
         },
-      }
-    )
-    const layerProps = Object.assign({}, defaultProps, overrideValuesProps)
+    }
+    const layerProps = { ...defaultProps, ...overrideValuesProps}
     super(layerProps)
   }
 

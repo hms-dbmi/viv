@@ -1,8 +1,8 @@
 import React, {PureComponent} from 'react';
-import { MicroscopyViewer } from '../../src'
-import { source } from './source-info'
 import Slider from '@material-ui/core/Slider';
 import { withStyles } from '@material-ui/core/styles';
+import { MicroscopyViewer } from '../../src'
+import { source } from './source-info'
 import './App.css';
 
 const RedSlider = withStyles({
@@ -57,19 +57,19 @@ export default class App extends PureComponent {
   }
 
   handleRedSliderChange(event, value){
-    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {channel_0: value})})
+    this.setState({sliderValues: { ...this.state.sliderValues, channel_0: value}})
   }
 
   handleGreenSliderChange(event, value){
-    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {channel_1: value})})
+    this.setState({sliderValues: { ...this.state.sliderValues, channel_1: value}})
   }
 
   handleBlueSliderChange(event, value){
-    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {channel_3: value})})
+    this.setState({sliderValues: { ...this.state.sliderValues, channel_3: value}})
   }
 
   handleOrangeSliderChange(event, value){
-    this.setState({sliderValues: Object.assign({}, this.state.sliderValues, {channel_2: value})})
+    this.setState({sliderValues: { ...this.state.sliderValues, channel_2: value}})
   }
 
   resize(){
@@ -106,51 +106,51 @@ export default class App extends PureComponent {
     }
     return (
       <div>
-      <MicroscopyViewer {...props}/>
-      <div className="slider-container-orange">
-      <OrangeSlider
-        value={this.state.sliderValues.channel_2}
-        onChange={this.handleOrangeSliderChange}
-        valueLabelDisplay="auto"
-        aria-label="range-slider-red"
-        min={0}
-        max={this.max}
-        orientation="vertical"
-      />
-      </div>
-      <div className="slider-container-red">
-      <RedSlider
-        value={this.state.sliderValues.channel_0}
-        onChange={this.handleRedSliderChange}
-        valueLabelDisplay="auto"
-        aria-label="range-slider-red"
-        min={0}
-        max={this.max}
-        orientation="vertical"
-      />
-      </div>
-      <div className="slider-container-green">
-      <GreenSlider
-        value={this.state.sliderValues.channel_1}
-        onChange={this.handleGreenSliderChange}
-        valueLabelDisplay="auto"
-        aria-label="range-slider-green"
-        min={0}
-        max={this.max}
-        orientation="vertical"
-      />
-      </div>
-      <div className="slider-container-blue">
-      <BlueSlider
-        value={this.state.sliderValues.channel_3}
-        onChange={this.handleBlueSliderChange}
-        valueLabelDisplay="auto"
-        aria-label="range-slider-blue"
-        min={0}
-        max={this.max}
-        orientation="vertical"
-      />
-      </div>
+        <MicroscopyViewer {...props} />
+        <div className="slider-container-orange">
+          <OrangeSlider
+            value={this.state.sliderValues.channel_2}
+            onChange={this.handleOrangeSliderChange}
+            valueLabelDisplay="auto"
+            aria-label="range-slider-red"
+            min={0}
+            max={this.max}
+            orientation="vertical"
+          />
+        </div>
+        <div className="slider-container-red">
+          <RedSlider
+            value={this.state.sliderValues.channel_0}
+            onChange={this.handleRedSliderChange}
+            valueLabelDisplay="auto"
+            aria-label="range-slider-red"
+            min={0}
+            max={this.max}
+            orientation="vertical"
+          />
+        </div>
+        <div className="slider-container-green">
+          <GreenSlider
+            value={this.state.sliderValues.channel_1}
+            onChange={this.handleGreenSliderChange}
+            valueLabelDisplay="auto"
+            aria-label="range-slider-green"
+            min={0}
+            max={this.max}
+            orientation="vertical"
+          />
+        </div>
+        <div className="slider-container-blue">
+          <BlueSlider
+            value={this.state.sliderValues.channel_3}
+            onChange={this.handleBlueSliderChange}
+            valueLabelDisplay="auto"
+            aria-label="range-slider-blue"
+            min={0}
+            max={this.max}
+            orientation="vertical"
+          />
+        </div>
       </div>
     );
   }
