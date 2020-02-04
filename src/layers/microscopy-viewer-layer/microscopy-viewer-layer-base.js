@@ -46,14 +46,16 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
       orderedColorValues.push(colorValues[key]);
     })
     var diff = 6 - orderedSliderValues.length
-    for (let i = 0; i < diff; i++) {
-      orderedSliderValues.push(65535);
+    for (var i = 0; i < diff; i++) {
+      orderedSliderValues.push([0,65535]);
     }
     var diff = 6 - orderedColorValues.length
     for (let j = 0; j < diff; j++) {
       orderedColorValues.push([0,0,0]);
     }
     orderedColorValues = orderedColorValues.map(color => color.map(ch => ch / 255))
+    // flatten for use on shaders
+    var flatSliderValues = [].concat.apply([], orderedSliderValues)
     const getZarr = ({ x, y, z }) => {
       return loadZarr({
         x, y, z: -1 * z, ...props,
@@ -68,7 +70,7 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
                         (props.useTiff && getTiff) ||
                         props.getTileData
     const overrideValuesProps = {
-       ...props, sliderValues: orderedSliderValues,
+       ...props, sliderValues: flatSliderValues,
         colorValues: orderedColorValues,
         minZoom,
         getTileData,
