@@ -20,7 +20,7 @@ export function loadTiff({connections, x, y, z, pool}){
   return Promise.all(configListPromises).then((dataList) => {
     const orderedList = []
     const dataObj = Object.assign({}, ...dataList)
-    Object.keys(dataObj).sort().forEach(function(key) {
+    Object.keys(dataObj).sort().forEach((key) => {
       orderedList.push(dataObj[key]);
     })
     return orderedList;
