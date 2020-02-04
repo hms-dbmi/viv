@@ -9,6 +9,10 @@ start prettier
 node_modules/prettier/bin-prettier.js --check **/*.js
 end prettier
 
+start eslint
+node_modules/eslint/bin/eslint.js .
+end eslint
+
 start changelog
 if [ "$TRAVIS_BRANCH" != 'master' ]; then
   diff CHANGELOG.md <(curl "https://raw.githubusercontent.com/$TRAVIS_REPO_SLUG/master/CHANGELOG.md") \
