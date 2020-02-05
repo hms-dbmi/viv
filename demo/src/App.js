@@ -40,6 +40,14 @@ export default class App extends PureComponent {
     window.addEventListener("resize", this.resize);
   }
 
+  handleSliderChange(event, value, channel) {
+    var channelValue = {};
+    channelValue[channel] = value;
+    this.setState({
+      sliderValues: { ...this.state.sliderValues, ...channelValue }
+    });
+  }
+
   resize() {
     this.setState({
       viewHeight: window.innerHeight * 0.9,
@@ -77,20 +85,13 @@ export default class App extends PureComponent {
     const sliders = this.sliders.map(sliderObj => {
       const Slider = Object.values(sliderObj)[0];
       const channel = Object.keys(sliderObj)[0];
-      const handleSliderChange = (event, value, channel) => {
-        var channelValue = {};
-        channelValue[channel] = value;
-        this.setState({
-          sliderValues: { ...this.state.sliderValues, ...channelValue }
-        });
-      };
       return (
         <div key={`container-${channel}`}>
           <p key={`name-${channel}`}>{channel}</p>
           <Slider
             key={`slider-${channel}`}
             value={this.state.sliderValues[channel]}
-            onChange={(e, v) => handleSliderChange(e, v, channel)}
+            onChange={(e, v) => this.handleSliderChange(e, v, channel)}
             valueLabelDisplay="auto"
             getAriaLabel={() => `${channel}`}
             min={0}
