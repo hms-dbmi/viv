@@ -1,6 +1,6 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
-import { MicroscopyViewerLayerBase } from './microscopy-viewer-layer-Base';
+import { MicroscopyViewerLayerBase } from './microscopy-viewer-layer-base';
 import { getTiffConnections, getZarrConnections } from './data-utils';
 
 export class MicroscopyViewerLayer extends CompositeLayer {
