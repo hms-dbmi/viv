@@ -43,8 +43,8 @@ export default class App extends PureComponent {
   handleSliderChange(event, value, channel) {
     var channelValue = {};
     channelValue[channel] = value;
-    this.setState({
-      sliderValues: { ...this.state.sliderValues, ...channelValue }
+    this.setState((prevState) => {
+      return {sliderValues: Object.assign({}, this.state.sliderValues, channelValue)}
     });
   }
 
@@ -87,9 +87,8 @@ export default class App extends PureComponent {
       const channel = Object.keys(sliderObj)[0];
       return (
         <div key={`container-${channel}`}>
-          <p key={`name-${channel}`}>{channel}</p>
+          <p>{channel}</p>
           <Slider
-            key={`slider-${channel}`}
             value={this.state.sliderValues[channel]}
             onChange={(e, v) => this.handleSliderChange(e, v, channel)}
             valueLabelDisplay="auto"
