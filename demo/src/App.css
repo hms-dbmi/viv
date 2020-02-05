@@ -21,31 +21,14 @@
   color: #09d3ac;
 }
 
-.slider-container-red{
-  right: 15%;
-  top: 75px;
+.slider-container {
+  right: 0;
+  top: 0;
+  width: 25%;
   position: absolute;
-  height: 300px;
+  margin: 2em;
 }
 
-
-.slider-container-green{
-  right: 10%;
-  top: 75px;
-  position: absolute;
-  height: 300px;
-}
-
-.slider-container-orange{
-  right: 20%;
-  top: 75px;
-  position: absolute;
-  height: 300px;
-}
-
-.slider-container-blue{
-  right: 5%;
-  top: 75px;
-  position: absolute;
-  height: 300px;
+.slider-container p {
+  color: white;
 }

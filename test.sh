@@ -13,9 +13,14 @@ start eslint
 node_modules/eslint/bin/eslint.js .
 end eslint
 
+start build
+npm run-script build-component
+npm run-script build-site
+end build
+
 start changelog
 if [ "$TRAVIS_BRANCH" != 'master' ]; then
-  diff CHANGELOG.md <(curl "https://raw.githubusercontent.com/$TRAVIS_REPO_SLUG/master/CHANGELOG.md") \
+  diff CHANGELOG.md <(curl "https://raw.githubusercontent.com/hubmapconsortium/vitessce-image-viewer/master/CHANGELOG.md") \
     && die 'Update CHANGELOG.md'
 fi
 end changelog
