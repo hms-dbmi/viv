@@ -1,81 +1,43 @@
-import React, { PureComponent } from 'react';
-import Slider from '@material-ui/core/Slider';
-import { withStyles } from '@material-ui/core/styles';
-import { MicroscopyViewer } from '../../src';
-import { source } from './source-info';
-import './App.css';
-
-const RedSlider = withStyles({
-  root: {
-    color: 'red'
-  }
-})(Slider);
-const BlueSlider = withStyles({
-  root: {
-    color: 'blue'
-  }
-})(Slider);
-const GreenSlider = withStyles({
-  root: {
-    color: 'green'
-  }
-})(Slider);
-const OrangeSlider = withStyles({
-  root: {
-    color: 'orange'
-  }
-})(Slider);
+import React, { PureComponent } from "react";
+import Slider from "@material-ui/core/Slider";
+import { withStyles } from "@material-ui/core/styles";
+import { MicroscopyViewer } from "../../src";
+import { source } from "./source-info";
+import "./App.css";
 
 export default class App extends PureComponent {
   constructor(props) {
     super(props);
-    this.handleRedSliderChange = this.handleRedSliderChange.bind(this);
-    this.handleGreenSliderChange = this.handleGreenSliderChange.bind(this);
-    this.handleBlueSliderChange = this.handleBlueSliderChange.bind(this);
-    this.handleOrangeSliderChange = this.handleOrangeSliderChange.bind(this);
     this.resize = this.resize.bind(this);
+    var sliderValues = {};
+    var colorValues = {};
+    var sliders = [];
+    const colorOptions = [
+      [255, 0, 0],
+      [0, 255, 0],
+      [0, 0, 255],
+      [255, 128, 0]
+    ];
+    Object.keys(source.channels).forEach((channel, i) => {
+      const sliderObj = {};
+      sliderValues[channel] = [0, 20000];
+      colorValues[channel] = colorOptions[i];
+      sliderObj[channel] = withStyles({
+        root: {
+          color: `rgb(${colorOptions[i]})`
+        }
+      })(Slider);
+      sliders.push(sliderObj);
+    });
     this.state = {
-      sliderValues: {
-        channel_0: [0, 20000],
-        channel_1: [0, 20000],
-        channel_2: [0, 20000],
-        channel_3: [0, 20000]
-      },
-      colorValues: {
-        channel_0: [255, 0, 0],
-        channel_1: [0, 255, 0],
-        channel_2: [255, 128, 0],
-        channel_3: [0, 0, 255]
-      },
+      sliderValues,
+      colorValues,
       viewHeight: window.innerHeight * 0.9,
       viewWidth: window.innerWidth * 0.7
     };
     this.max = 65535;
-    window.addEventListener('resize', this.resize);
-  }
-
-  handleRedSliderChange(event, value) {
-    this.setState({
-      sliderValues: { ...this.state.sliderValues, channel_0: value }
-    });
-  }
-
-  handleGreenSliderChange(event, value) {
-    this.setState({
-      sliderValues: { ...this.state.sliderValues, channel_1: value }
-    });
-  }
-
-  handleBlueSliderChange(event, value) {
-    this.setState({
-      sliderValues: { ...this.state.sliderValues, channel_3: value }
-    });
-  }
-
-  handleOrangeSliderChange(event, value) {
-    this.setState({
-      sliderValues: { ...this.state.sliderValues, channel_2: value }
-    });
+    this.sliders = sliders;
+    window.addEventListener("resize", this.resize);
   }
 
   resize() {
@@ -112,6 +74,32 @@ export default class App extends PureComponent {
       ...propSettings,
       ...this.state
     };
+    const sliders = this.sliders.map(sliderObj => {
+      const Slider = Object.values(sliderObj)[0];
+      const channel = Object.keys(sliderObj)[0];
+      const handleSliderChange = (event, value, channel) => {
+        var channelValue = {};
+        channelValue[channel] = value;
+        this.setState({
+          sliderValues: { ...this.state.sliderValues, ...channelValue }
+        });
+      };
+      return (
+        <div key={`container-${channel}`}>
+          <p key={`name-${channel}`}>{channel}</p>
+          <Slider
+            key={`slider-${channel}`}
+            value={this.state.sliderValues[channel]}
+            onChange={(e, v) => handleSliderChange(e, v, channel)}
+            valueLabelDisplay="auto"
+            getAriaLabel={() => `${channel}`}
+            min={0}
+            max={this.max}
+            orientation="horizontal"
+          />
+        </div>
+      );
+    });
     return (
       <div>
         <MicroscopyViewer {...props} />
@@ -130,46 +118,7 @@ export default class App extends PureComponent {
               NPM
             </a>
           </p>
-          <p>Orange</p>
-          <OrangeSlider
-            value={this.state.sliderValues.channel_2}
-            onChange={this.handleOrangeSliderChange}
-            valueLabelDisplay="auto"
-            aria-label="range-slider-red"
-            min={0}
-            max={this.max}
-            orientation="horizontal"
-          />
-          <p>Red</p>
-          <RedSlider
-            value={this.state.sliderValues.channel_0}
-            onChange={this.handleRedSliderChange}
-            valueLabelDisplay="auto"
-            aria-label="range-slider-red"
-            min={0}
-            max={this.max}
-            orientation="horizontal"
-          />
-          <p>Green</p>
-          <GreenSlider
-            value={this.state.sliderValues.channel_1}
-            onChange={this.handleGreenSliderChange}
-            valueLabelDisplay="auto"
-            aria-label="range-slider-green"
-            min={0}
-            max={this.max}
-            orientation="horizontal"
-          />
-          <p>Blue</p>
-          <BlueSlider
-            value={this.state.sliderValues.channel_3}
-            onChange={this.handleBlueSliderChange}
-            valueLabelDisplay="auto"
-            aria-label="range-slider-blue"
-            min={0}
-            max={this.max}
-            orientation="horizontal"
-          />
+          {sliders}
         </div>
       </div>
     );
