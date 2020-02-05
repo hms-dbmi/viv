@@ -117,9 +117,9 @@ export default class App extends PureComponent {
         <MicroscopyViewer {...props} />
         <div className="slider-container">
           <p>
-            <strong>vitessce-image-viewer</strong> ("Viv"): A viewer for high
-            bit depth, high resolution, multi-channel images using DeckGL over
-            the hood and WebGL under the hood.
+            <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer
+            for high bit depth, high resolution, multi-channel images using
+            DeckGL over the hood and WebGL under the hood.
           </p>
           <p>
             <a href="https://github.com/hubmapconsortium/vitessce-image-viewer">
