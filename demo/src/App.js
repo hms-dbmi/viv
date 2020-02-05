@@ -116,6 +116,20 @@ export default class App extends PureComponent {
       <div>
         <MicroscopyViewer {...props} />
         <div className="slider-container">
+          <p>
+            <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer
+            for high bit depth, high resolution, multi-channel images using
+            DeckGL over the hood and WebGL under the hood.
+          </p>
+          <p>
+            <a href="https://github.com/hubmapconsortium/vitessce-image-viewer">
+              Github
+            </a>
+            &nbsp; / &nbsp;
+            <a href="https://www.npmjs.com/package/@hubmap/vitessce-image-viewer">
+              NPM
+            </a>
+          </p>
           <p>Orange</p>
           <OrangeSlider
             value={this.state.sliderValues.channel_2}
