@@ -23,7 +23,6 @@ rules:
   class-methods-use-this: [0]
   global-require: [0]
   import/extensions: [0]
-  import/no-extraneous-dependencies: [0]
   import/no-unresolved: [0]
   no-await-in-loop: [0]
   no-dupe-keys: [0]
