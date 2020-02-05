@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 npm run-script build-component
 npm publish --access public
 echo "Published npm demo"
