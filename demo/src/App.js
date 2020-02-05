@@ -93,7 +93,7 @@ export default class App extends PureComponent {
             value={this.state.sliderValues[channel]}
             onChange={(e, v) => this.handleSliderChange(e, v, channel)}
             valueLabelDisplay="auto"
-            getAriaLabel={() => `${channel}`}
+            getAriaLabel={() => channel}
             min={0}
             max={this.max}
             orientation="horizontal"
