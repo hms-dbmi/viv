@@ -1,7 +1,7 @@
-import React, { PureComponent } from "react";
-import DeckGL from "@deck.gl/react";
-import { OrthographicView } from "deck.gl";
-import { MicroscopyViewerLayer } from "./layers";
+import React, { PureComponent } from 'react';
+import DeckGL from '@deck.gl/react';
+import { OrthographicView } from 'deck.gl';
+import { MicroscopyViewerLayer } from './layers';
 
 export class MicroscopyViewer extends PureComponent {
   constructor(props) {
@@ -25,7 +25,7 @@ export class MicroscopyViewer extends PureComponent {
   render() {
     const views = [
       new OrthographicView({
-        id: "ortho",
+        id: 'ortho',
         controller: true,
         height: this.props.viewHeight,
         width: this.props.viewWidth

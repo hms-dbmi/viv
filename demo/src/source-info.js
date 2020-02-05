@@ -14,5 +14,4 @@ export const source = {
     "DAPI - Hoescht (nuclei)": "https://vitessce-vanderbilt-data.storage.googleapis.com/test-data/VAN0001-RK-1-21_24-MxIF-mxIF_toIMS/vanderbilt_test_DAPI - Hoescht (nuclei).ome.tiff",
     "FITC - Laminin (basement membrane)": "https://vitessce-vanderbilt-data.storage.googleapis.com/test-data/VAN0001-RK-1-21_24-MxIF-mxIF_toIMS/vanderbilt_test_FITC - Laminin (basement membrane).ome.tiff",
   }
-
 };

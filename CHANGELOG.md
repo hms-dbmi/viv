@@ -4,6 +4,10 @@
 
 ### Added
 
-- Linting and Travis integration. (Ignore mose ESLint errors for now.)
 - Automate Deployment
 - Add slider names corresponding to metadata in demo
+- Linting and Travis integration. Apply prettier to everything. (Ignore most ESLint errors for now
+
+### Changed
+
+- Fix no-extraneous-dependencies
