@@ -30,7 +30,16 @@ This component can be used with an already existing `DeckGL` setup.
 
 ## `MicroscopyViewer` and `MicroscopyViewerLayer` Properties
 
-##### `getTileData` (Function) **POTENIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
+##### `useZarr` (Function)
+
+A `useZarr` flag for using the built in zarr functionality.  This is currently
+experimental (see [this](IMAGE_RENDERING.md))
+
+##### `useTiff` (Function)
+
+A flag for using the built-in pyramidal/tiled TIFF fetching functionality.
+
+##### `getTileData` (Function) **POTENTIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
 
 `getTileData` given x, y, z indices of the tile, returns the tile data or a Promise that resolves to the tile data.  Alternatively, pass in `useZarr` as true to use `zarr` and our functionality. Otherwise, you can use `useTiff` to make range requests directly against a pyramid/tiled tiff. Look
 at [this](IMAGE_RENDERING.md) for how the zarr should be laid out.
@@ -45,21 +54,6 @@ Returns:
 
 - An array of `[colorData1, ..., colorDataN]` where `colorDataI`
 is a typed array of a single channel's worth of data.  The order must match.
-
-##### `loadZarr` (Function)
-
-A `loadZarr` function is provided to help (and a `loadTiff` function is coming).  
-They need to be wrapped so in a  `getTileData` function that accepts the right arguments
-(as stated above).  For now, the `loadZarr` function also accepts:
- - sourceChannels (Array) `[{name:'tilesource1.com'}, {name:'tilesource2.com'}, ... {name:'tilesourceN.com'}]``
- - `tileSize`
- - `x`
- - `y`
- - `z`
- - `imageWidth` The real width of the image
-
-Returns:
-`[{name:data}, {name:data}, {name:data}]`
 
 ##### `viewHeight` & `viewWidth` (Number) [ONLY NECESSARY FOR MicrsocopyViewer]
 
