@@ -9,9 +9,9 @@ export default class App extends PureComponent {
   constructor(props) {
     super(props);
     this.resize = this.resize.bind(this);
-    var sliderValues = {};
-    var colorValues = {};
-    var sliders = [];
+    const sliderValues = {};
+    const colorValues = {};
+    const sliders = [];
     const colorOptions = [
       [255, 0, 0],
       [0, 255, 0],
@@ -44,7 +44,7 @@ export default class App extends PureComponent {
     var channelValue = {};
     channelValue[channel] = value;
     this.setState((prevState) => {
-      return {sliderValues: Object.assign({}, this.state.sliderValues, channelValue)}
+      return {sliderValues: Object.assign({}, prevState.sliderValues, channelValue)}
     });
   }
 
