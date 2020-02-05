@@ -21,7 +21,6 @@ rules:
 
   # TODO:
   class-methods-use-this: [0]
-  func-names: [0]
   global-require: [0]
   import/extensions: [0]
   import/no-extraneous-dependencies: [0]
