@@ -4,4 +4,4 @@
 
 ### Added
 
-- Linting and Travis integration. (Ignore mose ESLint errors for now.)
+- Linting and Travis integration. Apply prettier to everything. (Ignore most ESLint errors for now.)
