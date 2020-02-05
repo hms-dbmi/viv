@@ -9,3 +9,4 @@
 ### Changed
 
 - Fix no-extraneous-dependencies
+- Fix global-require
