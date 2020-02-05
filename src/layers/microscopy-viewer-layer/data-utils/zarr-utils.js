@@ -1,6 +1,6 @@
 import { slice, openArray } from 'zarr';
 
-async function getData({ arr, channel, tileSize, x, y, stride, tilingWidth }) {
+async function getData({ arr, channel, x, y, stride, tilingWidth }) {
   const arrSlice = slice(
     stride * tilingWidth * y + stride * x,
     stride * tilingWidth * y + stride * (x + 1)

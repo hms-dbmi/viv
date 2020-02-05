@@ -1,6 +1,4 @@
 import { BaseTileLayer } from '@deck.gl/layers';
-import { Texture2D } from '@luma.gl/webgl';
-import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM } from 'deck.gl';
 import { XRLayer } from '../xr-layer';
 import { tileToBoundingBox, getTileIndices } from './tiling-utils';
