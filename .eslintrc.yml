@@ -19,6 +19,7 @@ rules:
   react/prop-types: [0] # Re-enable: https://github.com/hubmapconsortium/vitessce/issues/144
   import/prefer-default-export: [0] # Hit eslint error: SyntaxError: Unexpected token, expected {
   import/no-extraneous-dependencies: [2, { "devDependencies": ["demo/**/*.js", "webpack.*.js"]}]
+  # For some locations, just having a dev dependency is sufficient.
 
   # TODO:
   class-methods-use-this: [0]
