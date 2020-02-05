@@ -58,8 +58,8 @@ module.exports = {
     plugins: [
         new HtmlWebPackPlugin({
             hash: true,
-            filename: "index.html",  //target html
-            template: "./demo/public/index.html" //source html
+            filename: "index.html",  // target html
+            template: "./demo/public/index.html" // source html
         }),
         new MiniCssExtractPlugin({ filename: 'css/style.css' })
     ]
