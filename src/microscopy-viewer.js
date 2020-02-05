@@ -31,7 +31,7 @@ export class MicroscopyViewer extends PureComponent {
         width: this.props.viewWidth
       })
     ];
-    const {initialViewState} = this.props;
+    const { initialViewState } = this.props;
     return (
       <DeckGL
         glOptions={{ webgl2: true }}
