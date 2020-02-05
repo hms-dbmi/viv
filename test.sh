@@ -15,7 +15,7 @@ end eslint
 
 start changelog
 if [ "$TRAVIS_BRANCH" != 'master' ]; then
-  diff CHANGELOG.md <(curl "https://raw.githubusercontent.com/$TRAVIS_REPO_SLUG/master/CHANGELOG.md") \
+  diff CHANGELOG.md <(curl "https://raw.githubusercontent.com/hubmapconsortium/vitessce-image-viewer/master/CHANGELOG.md") \
     && die 'Update CHANGELOG.md'
 fi
 end changelog
