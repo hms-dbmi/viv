@@ -1,9 +1,9 @@
-import React, { PureComponent } from "react";
-import Slider from "@material-ui/core/Slider";
-import { withStyles } from "@material-ui/core/styles";
-import { MicroscopyViewer } from "../../src";
-import { source } from "./source-info";
-import "./App.css";
+import React, { PureComponent } from 'react';
+import Slider from '@material-ui/core/Slider';
+import { withStyles } from '@material-ui/core/styles';
+import { MicroscopyViewer } from '../../src';
+import { source } from './source-info';
+import './App.css';
 
 export default class App extends PureComponent {
   constructor(props) {
@@ -37,14 +37,14 @@ export default class App extends PureComponent {
     };
     this.max = 65535;
     this.sliders = sliders;
-    window.addEventListener("resize", this.resize);
+    window.addEventListener('resize', this.resize);
   }
 
   handleSliderChange(event, value, channel) {
     var channelValue = {};
     channelValue[channel] = value;
-    this.setState((prevState) => {
-      return {sliderValues: {...prevState.sliderValues, ...channelValue}}
+    this.setState(prevState => {
+      return { sliderValues: { ...prevState.sliderValues, ...channelValue } };
     });
   }
 

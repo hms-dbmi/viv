@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.0.4 - In Progress
+
+### Added
+
+- Anti-aliasing for the borders implemented.
+
 ## v0.0.3
 
 ### Added
