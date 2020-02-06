@@ -1,8 +1,8 @@
-import GL from "@luma.gl/constants";
-import { Layer, project32 } from "@deck.gl/core";
-import { Model, Geometry, Texture2D } from "@luma.gl/core";
-import vs from "./xr-layer-vertex";
-import fs from "./xr-layer-fragment";
+import GL from '@luma.gl/constants';
+import { Layer, project32 } from '@deck.gl/core';
+import { Model, Geometry, Texture2D } from '@luma.gl/core';
+import vs from './xr-layer-vertex';
+import fs from './xr-layer-fragment';
 
 const defaultProps = {
   rgbData: null
@@ -31,7 +31,7 @@ export class XRLayer extends Layer {
       positions: new Float64Array(12)
     });
 
-    attributeManager.remove("instancePickingColors");
+    attributeManager.remove('instancePickingColors');
   }
 
   finalizeState() {
@@ -59,7 +59,7 @@ export class XRLayer extends Layer {
     const attributeManager = this.getAttributeManager();
 
     if (props.bounds !== oldProps.bounds) {
-      attributeManager.invalidate("positions");
+      attributeManager.invalidate('positions');
     }
   }
 
@@ -196,5 +196,5 @@ export class XRLayer extends Layer {
   }
 }
 
-XRLayer.layerName = "XRLayer";
+XRLayer.layerName = 'XRLayer';
 XRLayer.defaultProps = defaultProps;
