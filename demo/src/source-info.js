@@ -1,5 +1,5 @@
 const rootTIFFUrl = 'https://vitessce-vanderbilt-data.storage.googleapis.com/test-data/VAN0001-RK-1-21_24-MxIF-mxIF_toIMS/'
-const rootZarrUrl = 'https://vitessce-vanderbilt-data.storage.googleapis.com/test-data/vanderbilt-data/single_channel_pyramid/img_pyramid/'
+// const rootZarrUrl = 'https://vitessce-vanderbilt-data.storage.googleapis.com/test-data/vanderbilt-data/single_channel_pyramid/img_pyramid/'
 export const source = {
   height: 141,
   width: 206,

@@ -44,7 +44,7 @@ export default class App extends PureComponent {
     var channelValue = {};
     channelValue[channel] = value;
     this.setState((prevState) => {
-      return {sliderValues: Object.assign({}, prevState.sliderValues, channelValue)}
+      return {sliderValues: {...prevState.sliderValues, ...channelValue}}
     });
   }
 
