@@ -6,7 +6,10 @@ end() { echo travis_fold':'end:$1; }
 die() { set +v; echo "$*" 1>&2 ; sleep 1; exit 1; }
 
 start prettier
-node_modules/prettier/bin-prettier.js --check **/*.js
+node_modules/prettier/bin-prettier.js --check '**/*.js' --loglevel debug
+# '**' is quoted so the glob is expanded by prettier, not bash.
+# (Mac default bash silently ignores **!)
+# 'debug' so we get a list of files scanned.
 end prettier
 
 start eslint
