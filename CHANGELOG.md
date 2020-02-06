@@ -4,7 +4,7 @@
 
 ### Added
 
-- Anti-aliasing for the borders implemented
+- Anti-aliasing for the borders implemented.
 
 ## v0.0.3
 
