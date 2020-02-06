@@ -6,6 +6,10 @@
 
 - Anti-aliasing for the borders implemented.
 
+### Changed
+
+- Fixed no-unused-expressions
+
 ## v0.0.3
 
 ### Added
