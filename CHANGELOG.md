@@ -9,6 +9,7 @@
 ### Changed
 
 - Fixed no-unused-expressions
+- Prettier on CI will now actually scan all files.
 
 ## v0.0.3
 
@@ -21,3 +22,4 @@
 ### Changed
 
 - Fix no-extraneous-dependencies
+- Fix global-require
