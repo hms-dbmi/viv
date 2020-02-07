@@ -1,7 +1,20 @@
 # Changelog
 
-## v0.0.3 - In progress
+## v0.0.4 - In Progress
 
 ### Added
 
-- Linting and Travis integration. (Ignore mose ESLint errors for now.)
+- Anti-aliasing for the borders implemented.
+
+## v0.0.3
+
+### Added
+
+- Automate Deployment
+- Add slider names corresponding to metadata in demo
+- Linting and Travis integration. Apply prettier to everything. (Ignore most ESLint errors for now
+
+### Changed
+
+- Fix no-extraneous-dependencies
+- Fix global-require
