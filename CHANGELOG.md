@@ -6,6 +6,10 @@
 
 - Anti-aliasing for the borders implemented.
 
+### Changed
+
+- Prettier on CI will now actually scan all files.
+
 ## v0.0.3
 
 ### Added
