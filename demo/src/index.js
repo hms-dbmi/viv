@@ -11,5 +11,6 @@ if (demo in sources) {
   const source = sources[demo];
   ReactDOM.render(<App source={source} />, document.getElementById('root'));
 } else {
-  window.location.search = '?demo=tiff';
+  const defaultDemo = Object.keys(sources)[0];
+  window.location.search = `?demo=${defaultDemo}`;
 }
