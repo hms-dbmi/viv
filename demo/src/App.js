@@ -3,6 +3,7 @@ import Slider from '@material-ui/core/Slider';
 import { withStyles } from '@material-ui/core/styles';
 import { MicroscopyViewer } from '../../src';
 import './App.css';
+import sources from './sources';
 
 export default class App extends PureComponent {
   constructor(props) {
@@ -103,6 +104,13 @@ export default class App extends PureComponent {
         </div>
       );
     });
+    const demos = Object.keys(sources)
+      .map(source => (
+        <a href={`?demo=${source}`} key={source}>
+          {source}
+        </a>
+      ))
+      .reduce((prev, curr) => [prev, ' / ', curr]);
     return (
       <div>
         <MicroscopyViewer {...props} />
@@ -112,15 +120,18 @@ export default class App extends PureComponent {
             for high bit depth, high resolution, multi-channel images using
             DeckGL over the hood and WebGL under the hood.
           </p>
+          <p>Demos: {demos}</p>
           <p>
+            More info:{' '}
             <a href="https://github.com/hubmapconsortium/vitessce-image-viewer">
               Github
-            </a>
-            &nbsp; / &nbsp;
+            </a>{' '}
+            /{' '}
             <a href="https://www.npmjs.com/package/@hubmap/vitessce-image-viewer">
               NPM
             </a>
           </p>
+          <br />
           {sliders}
         </div>
       </div>
