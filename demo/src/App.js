@@ -2,8 +2,10 @@ import React, { PureComponent } from 'react';
 import Slider from '@material-ui/core/Slider';
 import { withStyles } from '@material-ui/core/styles';
 import { MicroscopyViewer } from '../../src';
-import { source } from './source-info';
+import { zarrInfo, tiffInfo } from './source-info';
 import './App.css';
+
+const source = tiffInfo;
 
 export default class App extends PureComponent {
   constructor(props) {
