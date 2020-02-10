@@ -16,15 +16,17 @@ export class MicroscopyViewerLayer extends CompositeLayer {
   }
 
   updateState() {
-    this.props.useTiff
-      ? !this.state.connections &&
+    if (!this.state.connections) {
+      if (this.props.useTiff) {
         getTiffConnections({ ...this.props }).then(connections => {
           this.setState({ connections, pool: new Pool() });
-        })
-      : !this.state.connections &&
+        });
+      } else {
         getZarrConnections({ ...this.props }).then(connections => {
           this.setState({ connections });
         });
+      }
+    }
   }
 
   renderLayers() {

@@ -33,7 +33,6 @@ rules:
   no-return-assign: [0]
   no-shadow: [0]
   no-underscore-dangle: [0]
-  no-unused-expressions: [0]
   no-var: [0]
   prefer-destructuring: [0]
   prefer-spread: [0]
