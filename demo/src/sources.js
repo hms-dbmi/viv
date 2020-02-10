@@ -1,7 +1,7 @@
 const rootTIFFUrl =
   'https://vitessce-vanderbilt-data.storage.googleapis.com/test-data/VAN0001-RK-1-21_24-MxIF-mxIF_toIMS/';
 
-export const tiffInfo = {
+const tiffInfo = {
   isTiff: true,
   isZarr: false,
   height: 141,
@@ -18,7 +18,7 @@ export const tiffInfo = {
 const rootZarrUrl =
   'https://vitessce-vanderbilt-data.storage.googleapis.com/test-data/vanderbilt-data/single_channel_pyramid/img_pyramid/';
 
-export const zarrInfo = {
+const zarrInfo = {
   isTiff: false,
   isZarr: true,
   height: 141,
@@ -30,4 +30,9 @@ export const zarrInfo = {
     'DAPI - Hoescht (nuclei)': `${rootZarrUrl}channel_2`,
     'FITC - Laminin (basement membrane)': `${rootZarrUrl}channel_3`
   }
+};
+
+export default {
+  zarr: zarrInfo,
+  tiff: tiffInfo
 };

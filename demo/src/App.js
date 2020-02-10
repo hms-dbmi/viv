@@ -2,24 +2,13 @@ import React, { PureComponent } from 'react';
 import Slider from '@material-ui/core/Slider';
 import { withStyles } from '@material-ui/core/styles';
 import { MicroscopyViewer } from '../../src';
-import { zarrInfo, tiffInfo } from './source-info';
 import './App.css';
-
-const sources = {
-  tiff: tiffInfo,
-  zarr: zarrInfo
-};
 
 export default class App extends PureComponent {
   constructor(props) {
     super(props);
     this.resize = this.resize.bind(this);
-    const demo = document.location.hash.substr(1);
-    if (demo in sources) {
-      this.source = sources[demo];
-    } else {
-      // Redirect?
-    }
+    this.source = props.source;
     const sliderValues = {};
     const colorValues = {};
     const sliders = [];
