@@ -85,7 +85,6 @@ export default class App extends PureComponent {
       ...propSettings,
       ...this.state
     };
-    console.warn(props);
     const sliders = this.sliders.map(sliderObj => {
       const Slider = Object.values(sliderObj)[0];
       const channel = Object.keys(sliderObj)[0];
