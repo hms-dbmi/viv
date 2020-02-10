@@ -21,7 +21,7 @@ const defaultProps = {
       id: `XR-Layer-${west}-${south}-${east}-${north}`,
       pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-      rgbData: data,
+      data,
       sliderValues,
       colorValues,
       bounds: [west, south, east, north],
@@ -45,19 +45,20 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
     Object.keys(colorValues)
       .sort()
       .forEach(key => orderedColorValues.push(colorValues[key]));
-    var diff = 6 - orderedSliderValues.length;
-    for (var i = 0; i < diff; i++) {
+    const diffSliders = 6 - orderedSliderValues.length;
+    for (let i = 0; i < diffSliders; i += 1) {
       orderedSliderValues.push([0, 65535]);
     }
-    var diff = 6 - orderedColorValues.length;
-    for (let j = 0; j < diff; j++) {
+    const diffColors = 6 - orderedColorValues.length;
+    for (let j = 0; j < diffColors; j += 1) {
       orderedColorValues.push([0, 0, 0]);
     }
     orderedColorValues = orderedColorValues.map(color =>
       color.map(ch => ch / 255)
     );
     // flatten for use on shaders
-    var flatSliderValues = [].concat.apply([], orderedSliderValues);
+    // eslint-disable-next-line prefer-spread
+    const flatSliderValues = [].concat.apply([], orderedSliderValues);
     const getZarr = ({ x, y, z }) => {
       return loadZarr({
         x,
@@ -84,6 +85,7 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
       colorValues: orderedColorValues,
       minZoom,
       getTileData,
+      // eslint-disable-next-line no-shadow
       getTileIndices: (viewport, maxZoom, minZoom) => {
         return getTileIndices({
           viewport,

@@ -1,4 +1,5 @@
 import { CompositeLayer } from '@deck.gl/core';
+// eslint-disable-next-line import/extensions
 import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 import { MicroscopyViewerLayerBase } from './microscopy-viewer-layer-base';
 import { getTiffConnections, getZarrConnections } from './data-utils';
@@ -11,20 +12,23 @@ export class MicroscopyViewerLayer extends CompositeLayer {
     };
   }
 
+  // eslint-disable-next-line class-methods-use-this
   shouldUpdateState({ changeFlags }) {
     return changeFlags.somethingChanged;
   }
 
   updateState() {
-    this.props.useTiff
-      ? !this.state.connections &&
+    if (!this.state.connections) {
+      if (this.props.useTiff) {
         getTiffConnections({ ...this.props }).then(connections => {
           this.setState({ connections, pool: new Pool() });
-        })
-      : !this.state.connections &&
+        });
+      } else {
         getZarrConnections({ ...this.props }).then(connections => {
           this.setState({ connections });
         });
+      }
+    }
   }
 
   renderLayers() {

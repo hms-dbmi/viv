@@ -39,7 +39,8 @@ export function loadZarr({ connections, tileSize, x, y, z, imageWidth }) {
 export function getZarrConnections({ sourceChannels, maxZoom }) {
   const zarrConnections = Object.keys(sourceChannels).map(async channel => {
     const zarrObj = {};
-    for (let i = 0; i < -maxZoom; i++) {
+    for (let i = 0; i < -maxZoom; i += 1) {
+      // eslint-disable-next-line no-await-in-loop
       const zarr = await openArray({
         store: `${sourceChannels[channel]}/`,
         path: `pyramid_${i}.zarr`,

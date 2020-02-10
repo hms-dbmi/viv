@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/extensions
 import { fromUrl } from 'geotiff/dist/geotiff.bundle.min.js';
 
 async function loadTile({ image, channel, x, y, pool }) {
@@ -34,7 +35,8 @@ export function getTiffConnections({ sourceChannels, maxZoom }) {
   const tiffConnections = Object.keys(sourceChannels).map(async channel => {
     const tiff = await fromUrl(sourceChannels[channel]);
     const imageObj = {};
-    for (let i = 0; i < -maxZoom; i++) {
+    for (let i = 0; i < -maxZoom; i += 1) {
+      // eslint-disable-next-line no-await-in-loop
       const image = await tiff.getImage(i);
       if (!imageObj[channel]) {
         imageObj[channel] = [image];

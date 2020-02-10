@@ -1,3 +1,5 @@
+/* eslint-disable prefer-destructuring */
+
 import GL from '@luma.gl/constants';
 import { Layer, project32 } from '@deck.gl/core';
 import { Model, Geometry, Texture2D } from '@luma.gl/core';
@@ -5,7 +7,7 @@ import vs from './xr-layer-vertex';
 import fs from './xr-layer-fragment';
 
 const defaultProps = {
-  rgbData: null
+  data: null
 };
 
 export class XRLayer extends Layer {
@@ -53,7 +55,7 @@ export class XRLayer extends Layer {
       this.getAttributeManager().invalidateAll();
     }
     if (changeFlags.dataChanged) {
-      this.loadTexture(props.rgbData);
+      this.loadTexture(props.data);
     }
 
     const attributeManager = this.getAttributeManager();
@@ -114,6 +116,7 @@ export class XRLayer extends Layer {
     positions[10] = bounds[1];
     positions[11] = 0;
 
+    // eslint-disable-next-line  no-param-reassign
     attributes.value = positions;
   }
 
@@ -139,6 +142,7 @@ export class XRLayer extends Layer {
   }
 
   loadTexture(data) {
+    /* eslint-disable no-return-assign */
     const textures = {
       channel0: null,
       channel2: null,
@@ -153,13 +157,16 @@ export class XRLayer extends Layer {
       data
         .then(dataResolved => {
           dataResolved.forEach(
+            // eslint-disable-next-line no-return-assign
             (d, i) => (textures[`channel${i}`] = this.dataToTexture(d))
           );
         })
         .then(() => this.setState({ textures }));
     } else if (data instanceof Object) {
+      // eslint-disable-next-line no-return-assign
       data.forEach((d, i) => (textures[`channel${i}`] = this.dataToTexture(d)));
       this.setState({ textures });
+      /* eslint-disable no-return-assign */
     }
   }
 

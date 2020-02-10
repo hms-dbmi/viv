@@ -41,7 +41,7 @@ export default class App extends PureComponent {
   }
 
   handleSliderChange(event, value, channel) {
-    var channelValue = {};
+    const channelValue = {};
     channelValue[channel] = value;
     this.setState(prevState => {
       return { sliderValues: { ...prevState.sliderValues, ...channelValue } };
@@ -60,36 +60,16 @@ export default class App extends PureComponent {
       zoom: -5.5,
       target: [30000, 10000, 0]
     };
-    const propSettings = {
-      useTiff: true,
-      imageHeight: source.height * source.tileSize,
-      imageWidth: source.width * source.tileSize,
-      tileSize: source.tileSize,
-      sourceChannels: source.channels,
-      minZoom: Math.floor(
-        -1 *
-          Math.log2(
-            Math.max(
-              source.height * source.tileSize,
-              source.width * source.tileSize
-            )
-          )
-      ),
-      maxZoom: -9
-    };
-    const props = {
-      initialViewState,
-      ...propSettings,
-      ...this.state
-    };
+    const { sliderValues, colorValues, viewHeight, viewWidth } = this.state;
     const sliders = this.sliders.map(sliderObj => {
-      const Slider = Object.values(sliderObj)[0];
+      const ChannelSlider = Object.values(sliderObj)[0];
       const channel = Object.keys(sliderObj)[0];
+      const sliderValue = sliderValues[channel];
       return (
         <div key={`container-${channel}`}>
           <p>{channel}</p>
-          <Slider
-            value={this.state.sliderValues[channel]}
+          <ChannelSlider
+            value={sliderValue}
             onChange={(e, v) => this.handleSliderChange(e, v, channel)}
             valueLabelDisplay="auto"
             getAriaLabel={() => channel}
@@ -100,9 +80,33 @@ export default class App extends PureComponent {
         </div>
       );
     });
+    /* eslint-disable react/jsx-props-no-spreading */
     return (
       <div>
-        <MicroscopyViewer {...props} />
+        <MicroscopyViewer
+          {...{
+            useTiff: true,
+            imageHeight: source.height * source.tileSize,
+            imageWidth: source.width * source.tileSize,
+            tileSize: source.tileSize,
+            sourceChannels: source.channels,
+            minZoom: Math.floor(
+              -1 *
+                Math.log2(
+                  Math.max(
+                    source.height * source.tileSize,
+                    source.width * source.tileSize
+                  )
+                )
+            ),
+            maxZoom: -9,
+            viewHeight,
+            viewWidth,
+            sliderValues,
+            colorValues,
+            initialViewState
+          }}
+        />
         <div className="slider-container">
           <p>
             <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer
@@ -122,5 +126,6 @@ export default class App extends PureComponent {
         </div>
       </div>
     );
+    /* eslint-disable react/jsx-props-no-spreading */
   }
 }

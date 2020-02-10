@@ -1,4 +1,4 @@
-/* eslint-disable global-require */
+/* eslint-disable global-require, no-dupe-keys */
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
