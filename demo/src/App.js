@@ -5,12 +5,21 @@ import { MicroscopyViewer } from '../../src';
 import { zarrInfo, tiffInfo } from './source-info';
 import './App.css';
 
-const source = tiffInfo;
+const sources = {
+  tiff: tiffInfo,
+  zarr: zarrInfo
+};
 
 export default class App extends PureComponent {
   constructor(props) {
     super(props);
     this.resize = this.resize.bind(this);
+    const demo = document.location.hash.substr(1);
+    if (demo in sources) {
+      this.source = sources[demo];
+    } else {
+      // Redirect?
+    }
     const sliderValues = {};
     const colorValues = {};
     const sliders = [];
@@ -20,7 +29,7 @@ export default class App extends PureComponent {
       [0, 0, 255],
       [255, 128, 0]
     ];
-    Object.keys(source.channels).forEach((channel, i) => {
+    Object.keys(this.source.channels).forEach((channel, i) => {
       const sliderObj = {};
       sliderValues[channel] = [0, 20000];
       colorValues[channel] = colorOptions[i];
@@ -62,6 +71,7 @@ export default class App extends PureComponent {
       zoom: -5.5,
       target: [30000, 10000, 0]
     };
+    const source = this.source;
     const propSettings = {
       useTiff: true,
       imageHeight: source.height * source.tileSize,
