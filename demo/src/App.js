@@ -73,7 +73,8 @@ export default class App extends PureComponent {
     };
     const source = this.source;
     const propSettings = {
-      useTiff: true,
+      useTiff: source.isTiff,
+      useZarr: source.isZarr,
       imageHeight: source.height * source.tileSize,
       imageWidth: source.width * source.tileSize,
       tileSize: source.tileSize,
@@ -94,6 +95,7 @@ export default class App extends PureComponent {
       ...propSettings,
       ...this.state
     };
+    console.warn(props);
     const sliders = this.sliders.map(sliderObj => {
       const Slider = Object.values(sliderObj)[0];
       const channel = Object.keys(sliderObj)[0];

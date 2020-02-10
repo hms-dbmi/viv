@@ -5,6 +5,7 @@
 ### Added
 
 - Anti-aliasing for the borders implemented.
+- Demo can toggle between examples.
 
 ### Changed
 
