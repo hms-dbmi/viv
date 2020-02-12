@@ -1,4 +1,6 @@
 /* eslint-disable prefer-destructuring */
+// A lot of this codes inherits paradigms form DeckGL that
+// we live in place for now, hence some of the not-destructuring
 
 import GL from '@luma.gl/constants';
 import { Layer, project32 } from '@deck.gl/core';
@@ -142,7 +144,6 @@ export class XRLayer extends Layer {
   }
 
   loadTexture(data) {
-    /* eslint-disable no-return-assign */
     const textures = {
       channel0: null,
       channel2: null,
@@ -166,7 +167,6 @@ export class XRLayer extends Layer {
       // eslint-disable-next-line no-return-assign
       data.forEach((d, i) => (textures[`channel${i}`] = this.dataToTexture(d)));
       this.setState({ textures });
-      /* eslint-disable no-return-assign */
     }
   }
 

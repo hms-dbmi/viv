@@ -33,7 +33,6 @@ module.exports = {
             loader: 'css-loader',
             options: {
               sourceMap: true,
-              modules: true,
               modules: {
                 localIdentName: '[local]'
               }

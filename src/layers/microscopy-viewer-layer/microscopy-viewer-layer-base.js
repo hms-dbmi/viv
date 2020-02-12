@@ -1,7 +1,7 @@
 import { BaseTileLayer } from '@deck.gl/layers';
 import { COORDINATE_SYSTEM } from 'deck.gl';
 import { XRLayer } from '../xr-layer';
-import { tileToBoundingBox, getTileIndices } from './tiling-utils';
+import { tileToScreen, getRasterTileIndices } from './tiling-utils';
 
 import { loadZarr, loadTiff } from './data-utils';
 
@@ -58,7 +58,7 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
     );
     // flatten for use on shaders
     // eslint-disable-next-line prefer-spread
-    const flatSliderValues = [].concat.apply([], orderedSliderValues);
+    const flatSliderValues = [].concat(...orderedSliderValues);
     const getZarr = ({ x, y, z }) => {
       return loadZarr({
         x,
@@ -87,7 +87,7 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
       getTileData,
       // eslint-disable-next-line no-shadow
       getTileIndices: (viewport, maxZoom, minZoom) => {
-        return getTileIndices({
+        return getRasterTileIndices({
           viewport,
           maxZoom,
           minZoom,
@@ -95,7 +95,7 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
         });
       },
       tileToBoundingBox: (x, y, z) => {
-        return tileToBoundingBox({
+        return tileToScreen({
           x,
           y,
           z,

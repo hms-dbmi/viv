@@ -12,6 +12,7 @@ export class MicroscopyViewerLayer extends CompositeLayer {
     };
   }
 
+  // see https://github.com/uber/deck.gl/blob/master/docs/api-reference/layer.md#shouldupdatestate
   // eslint-disable-next-line class-methods-use-this
   shouldUpdateState({ changeFlags }) {
     return changeFlags.somethingChanged;

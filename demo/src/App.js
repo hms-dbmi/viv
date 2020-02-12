@@ -11,7 +11,7 @@ export default class App extends PureComponent {
     this.resize = this.resize.bind(this);
     const sliderValues = {};
     const colorValues = {};
-    const sliders = [];
+    const sliders = {};
     const colorOptions = [
       [255, 0, 0],
       [0, 255, 0],
@@ -19,15 +19,13 @@ export default class App extends PureComponent {
       [255, 128, 0]
     ];
     Object.keys(source.channels).forEach((channel, i) => {
-      const sliderObj = {};
       sliderValues[channel] = [0, 20000];
       colorValues[channel] = colorOptions[i];
-      sliderObj[channel] = withStyles({
+      sliders[channel] = withStyles({
         root: {
           color: `rgb(${colorOptions[i]})`
         }
       })(Slider);
-      sliders.push(sliderObj);
     });
     this.state = {
       sliderValues,
@@ -61,9 +59,8 @@ export default class App extends PureComponent {
       target: [30000, 10000, 0]
     };
     const { sliderValues, colorValues, viewHeight, viewWidth } = this.state;
-    const sliders = this.sliders.map(sliderObj => {
-      const ChannelSlider = Object.values(sliderObj)[0];
-      const channel = Object.keys(sliderObj)[0];
+    const sliders = Object.keys(this.sliders).map(channel => {
+      const ChannelSlider = this.sliders[channel];
       const sliderValue = sliderValues[channel];
       return (
         <div key={`container-${channel}`}>
@@ -80,10 +77,10 @@ export default class App extends PureComponent {
         </div>
       );
     });
-    /* eslint-disable react/jsx-props-no-spreading */
     return (
       <div>
         <MicroscopyViewer
+          /* eslint-disable react/jsx-props-no-spreading */
           {...{
             useTiff: true,
             imageHeight: source.height * source.tileSize,
@@ -106,6 +103,7 @@ export default class App extends PureComponent {
             colorValues,
             initialViewState
           }}
+          /* eslint-disable react/jsx-props-no-spreading */
         />
         <div className="slider-container">
           <p>
@@ -126,6 +124,5 @@ export default class App extends PureComponent {
         </div>
       </div>
     );
-    /* eslint-disable react/jsx-props-no-spreading */
   }
 }
