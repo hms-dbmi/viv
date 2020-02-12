@@ -1,4 +1,5 @@
 import { CompositeLayer } from '@deck.gl/core';
+// eslint-disable-next-line import/extensions
 import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 import { MicroscopyViewerLayerBase } from './microscopy-viewer-layer-base';
 import { getTiffConnections, getZarrConnections } from './data-utils';
@@ -11,6 +12,8 @@ export class MicroscopyViewerLayer extends CompositeLayer {
     };
   }
 
+  // see https://github.com/uber/deck.gl/blob/master/docs/api-reference/layer.md#shouldupdatestate
+  // eslint-disable-next-line class-methods-use-this
   shouldUpdateState({ changeFlags }) {
     return changeFlags.somethingChanged;
   }

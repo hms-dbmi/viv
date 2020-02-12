@@ -12,23 +12,22 @@ export default class App extends PureComponent {
     this.source = props.source;
     const sliderValues = {};
     const colorValues = {};
-    const sliders = [];
+    const sliders = {};
     const colorOptions = [
       [255, 0, 0],
       [0, 255, 0],
       [0, 0, 255],
       [255, 128, 0]
     ];
-    Object.keys(this.source.channels).forEach((channel, i) => {
-      const sliderObj = {};
+
+    Object.keys(source.channels).forEach((channel, i) => {
       sliderValues[channel] = [0, 20000];
       colorValues[channel] = colorOptions[i];
-      sliderObj[channel] = withStyles({
+      sliders[channel] = withStyles({
         root: {
           color: `rgb(${colorOptions[i]})`
         }
       })(Slider);
-      sliders.push(sliderObj);
     });
     this.state = {
       sliderValues,
@@ -42,7 +41,7 @@ export default class App extends PureComponent {
   }
 
   handleSliderChange(event, value, channel) {
-    var channelValue = {};
+    const channelValue = {};
     channelValue[channel] = value;
     this.setState(prevState => {
       return { sliderValues: { ...prevState.sliderValues, ...channelValue } };
@@ -61,38 +60,16 @@ export default class App extends PureComponent {
       zoom: -5.5,
       target: [30000, 10000, 0]
     };
-    const source = this.source;
-    const propSettings = {
-      useTiff: source.isTiff,
-      useZarr: source.isZarr,
-      imageHeight: source.height * source.tileSize,
-      imageWidth: source.width * source.tileSize,
-      tileSize: source.tileSize,
-      sourceChannels: source.channels,
-      minZoom: Math.floor(
-        -1 *
-          Math.log2(
-            Math.max(
-              source.height * source.tileSize,
-              source.width * source.tileSize
-            )
-          )
-      ),
-      maxZoom: -9
-    };
-    const props = {
-      initialViewState,
-      ...propSettings,
-      ...this.state
-    };
-    const sliders = this.sliders.map(sliderObj => {
-      const Slider = Object.values(sliderObj)[0];
-      const channel = Object.keys(sliderObj)[0];
+
+    const { sliderValues, colorValues, viewHeight, viewWidth } = this.state;
+    const sliders = Object.keys(this.sliders).map(channel => {
+      const ChannelSlider = this.sliders[channel];
+      const sliderValue = sliderValues[channel];
       return (
         <div key={`container-${channel}`}>
           <p>{channel}</p>
-          <Slider
-            value={this.state.sliderValues[channel]}
+          <ChannelSlider
+            value={sliderValue}
             onChange={(e, v) => this.handleSliderChange(e, v, channel)}
             valueLabelDisplay="auto"
             getAriaLabel={() => channel}
@@ -112,7 +89,32 @@ export default class App extends PureComponent {
       .reduce((prev, curr) => [prev, ' / ', curr]);
     return (
       <div>
-        <MicroscopyViewer {...props} />
+        <MicroscopyViewer
+          /* eslint-disable react/jsx-props-no-spreading */
+          {...{
+            useTiff: true,
+            imageHeight: source.height * source.tileSize,
+            imageWidth: source.width * source.tileSize,
+            tileSize: source.tileSize,
+            sourceChannels: source.channels,
+            minZoom: Math.floor(
+              -1 *
+                Math.log2(
+                  Math.max(
+                    source.height * source.tileSize,
+                    source.width * source.tileSize
+                  )
+                )
+            ),
+            maxZoom: -9,
+            viewHeight,
+            viewWidth,
+            sliderValues,
+            colorValues,
+            initialViewState
+          }}
+          /* eslint-disable react/jsx-props-no-spreading */
+        />
         <div className="slider-container">
           <p>
             <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer
