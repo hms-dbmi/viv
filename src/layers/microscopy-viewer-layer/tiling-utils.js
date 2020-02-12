@@ -1,11 +1,4 @@
-export function tileToBoundingBox({
-  x,
-  y,
-  z,
-  imageHeight,
-  imageWidth,
-  tileSize
-}) {
+export function tileToScreen({ x, y, z, imageHeight, imageWidth, tileSize }) {
   return {
     west: x * tileSize * 2 ** (-1 * z),
     north: y * tileSize * 2 ** (-1 * z),
@@ -31,7 +24,7 @@ function pixelsToTileIndex(pixelCount, z, tileSize) {
  * than minZoom, return an empty array. If the current zoom level is greater than maxZoom,
  * return tiles that are on maxZoom.
  */
-export function getTileIndices({
+export function getRasterTileIndices({
   viewport,
   minZoom,
   tileSize,

@@ -23,6 +23,7 @@ export class MicroscopyViewer extends PureComponent {
   }
 
   render() {
+    /* eslint-disable react/destructuring-assignment */
     const views = [
       new OrthographicView({
         id: 'ortho',
@@ -42,5 +43,6 @@ export class MicroscopyViewer extends PureComponent {
         views={views}
       />
     );
+    /* eslint-disable react/destructuring-assignment */
   }
 }
