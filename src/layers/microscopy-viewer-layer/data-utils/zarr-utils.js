@@ -40,7 +40,7 @@ export function getZarrConnections({ sourceChannels, maxZoom }) {
   const zarrConnections = Object.keys(sourceChannels).map(async channel => {
     const zarrObj = {};
     const zarrPromiseList = [];
-    for (let i = 0; i < -maxZoom; i += 1) {
+    for (let i = 0; i < -minZoom; i += 1) {
       // eslint-disable-next-line no-await-in-loop
       const zarr = openArray({
         store: `${sourceChannels[channel]}/`,
