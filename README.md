@@ -2,7 +2,8 @@
 
 A viewer for high bit depth, high resolution, multi-channel images using DeckGL
 over the hood and WebGL under the hood. To learn more about the "theory" behind
-this, look at [this](IMAGE_RENDERING.md).
+this, look at [this](IMAGE_RENDERING.md). To really make this sing, you need to
+use an http2 server, both in development and in production (s3 is passable, though).
 
 ## Using this in your project
 
@@ -25,6 +26,9 @@ for your preferred editor. (Badly formatted code will fail on Travis.)
 For the demo, run `npm start` and you will be able to update the component and use the
 `demo/src/App.js` to visually test.
 
+Additionally, while developing, you may want to serve your own content locally.
+For that, you should serve on an (HTTP2 server)[https://github.com/GoogleChromeLabs/simplehttp2server]
+
 ## Component Library API
 
 There are two components being exported for use:
@@ -41,7 +45,7 @@ This component can be used with an already existing `DeckGL` setup.
 
 ##### `useZarr` (Function)
 
-A `useZarr` flag for using the built in zarr functionality.  This is currently
+A `useZarr` flag for using the built in zarr functionality. This is currently
 experimental (see [this](IMAGE_RENDERING.md))
 
 ##### `useTiff` (Function)
@@ -62,7 +66,7 @@ Receives arguments:
 Returns:
 
 - An array of `[colorData1, ..., colorDataN]` where `colorDataI`
-is a typed array of a single channel's worth of data.  The order must match.
+  is a typed array of a single channel's worth of data. The order must match.
 
 A `loadZarr` function is provided to assist and a `loadTiff` function will be coming.  
 They need to be wrapped so in a `getTileData` function that accepts the right arguments
@@ -89,6 +93,7 @@ The height and width of the image you wish to render.
 ##### `initialViewState` (object) [ONLY NECESSARY FOR `MicrsocopyViewer`]
 
 An object containing two things
+
 - `target` (Array) An `[x,y,0]` location in image coordinates of the image. The 0
   represents a hypothetical (and potentially future addition) of a third spatial dimension.
 - `zoom` (Number) The initial zoom level to render the image at
@@ -96,7 +101,9 @@ An object containing two things
 ##### `minZoom` & `maxZoom` (Number)
 
 These control the max and min zoom sizes, generally the number of images `n` in your pyramid,
-ranging from `-n` (zoomed out) to `0`, the highest resolution.
+ranging from `-n` (`minZoom`), the lowest reoslution, to `0` (`maxZoom`), the highest resolution. You don't need to
+pass these in (they can be inferred from heigh/width/tile size), although
+if you wish to limit zoom levels, you may.
 
 ##### `sliderValues` (Array) **POTENIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
 
