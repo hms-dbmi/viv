@@ -83,9 +83,6 @@ export default class App extends PureComponent {
           /* eslint-disable react/jsx-props-no-spreading */
           {...{
             useTiff: true,
-            imageHeight: source.height * source.tileSize,
-            imageWidth: source.width * source.tileSize,
-            tileSize: source.tileSize,
             sourceChannels: source.channels,
             viewHeight,
             viewWidth,

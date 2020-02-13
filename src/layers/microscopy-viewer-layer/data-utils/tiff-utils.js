@@ -31,13 +31,15 @@ export function loadTiff({ connections, x, y, z, pool }) {
   });
 }
 
-export function getTiffConnections({ sourceChannels, minZoom }) {
+export function getTiffConnections({ sourceChannels }) {
   const tiffConnections = Object.keys(sourceChannels).map(async channel => {
     const tiff = await fromUrl(sourceChannels[channel]);
+    // get the first image and check its size
+    const pyramid = await tiff.parseFileDirectories();
+    const minZoom = pyramid.length;
     const imageObj = {};
     const imagePromiseList = [];
-    for (let i = 0; i < -maxZoom; i += 1) {
-      // eslint-disable-next-line no-await-in-loop
+    for (let i = 0; i < minZoom; i += 1) {
       const imagePromise = tiff.getImage(i);
       imagePromiseList.push(imagePromise);
     }

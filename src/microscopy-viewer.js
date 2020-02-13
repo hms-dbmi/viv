@@ -13,16 +13,8 @@ export class MicroscopyViewer extends PureComponent {
   }
 
   _renderLayers() {
-    const { imageHeight, imageWidth, tileSize } = this.props;
-    const zoom = {
-      minZoom: Math.floor(
-        -1 * Math.log2(Math.max(imageHeight / tileSize, imageWidth / tileSize))
-      ),
-      maxZoom: 0
-    };
     return new MicroscopyViewerLayer({
-      ...this.props,
-      ...zoom
+      ...this.props
     });
   }
 

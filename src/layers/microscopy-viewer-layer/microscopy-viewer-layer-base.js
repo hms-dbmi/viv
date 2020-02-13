@@ -33,9 +33,6 @@ const defaultProps = {
 
 export class MicroscopyViewerLayerBase extends BaseTileLayer {
   constructor(props) {
-    const minZoom = Math.floor(
-      -1 * Math.log2(Math.max(props.imageHeight, props.imageWidth))
-    );
     const { sliderValues, colorValues } = props;
     const orderedSliderValues = [];
     let orderedColorValues = [];
@@ -83,7 +80,6 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
       ...props,
       sliderValues: flatSliderValues,
       colorValues: orderedColorValues,
-      minZoom,
       getTileData,
       // eslint-disable-next-line no-shadow
       getTileIndices: (viewport, maxZoom, minZoom) => {
