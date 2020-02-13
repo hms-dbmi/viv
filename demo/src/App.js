@@ -86,7 +86,9 @@ export default class App extends PureComponent {
 
     const sourceButtons = Object.keys(sources).map(sourceName => (
       <Button
+        variant="contained"
         key={sourceName}
+        disabled={sourceName == this.state.sourceName}
         onClick={() => {
           this.setState({ sourceName: sourceName });
         }}
