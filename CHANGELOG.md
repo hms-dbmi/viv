@@ -6,6 +6,7 @@
 
 - Anti-aliasing for the borders implemented.
 - Resolve linting
+- Simplify API for TIFF by inferring metadata from file
 
 ### Changed
 
