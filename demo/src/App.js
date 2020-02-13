@@ -34,7 +34,8 @@ export default class App extends PureComponent {
       sliderValues,
       colorValues,
       viewHeight: window.innerHeight * 0.9,
-      viewWidth: window.innerWidth * 0.7
+      viewWidth: window.innerWidth * 0.7,
+      sourceName: 'zarr'
     };
     this.max = 65535;
     this.sliders = sliders;
@@ -83,8 +84,18 @@ export default class App extends PureComponent {
     });
 
     const sourceButtons = Object.keys(sources).map(sourceName => (
-      <Button key={sourceName}>{sourceName}</Button>
+      <Button
+        key={sourceName}
+        onClick={() => {
+          this.setState({ sourceName: sourceName });
+        }}
+      >
+        {sourceName}
+      </Button>
     ));
+
+    const source = sources[this.state.sourceName];
+    console.log('isTiff', source.isTiff);
 
     return (
       <div>
