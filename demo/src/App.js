@@ -84,21 +84,24 @@ export default class App extends PureComponent {
       );
     });
 
-    const sourceButtons = Object.keys(sources).map(sourceName => (
-      <Button
-        variant="contained"
-        key={sourceName}
-        disabled={sourceName == this.state.sourceName}
-        onClick={() => {
-          this.setState({ sourceName: sourceName });
-        }}
-      >
-        {sourceName}
-      </Button>
-    ));
+    const sourceButtons = Object.keys(sources).map(name => {
+      const { sourceName } = this.state;
+      return (
+        <Button
+          variant="contained"
+          key={name}
+          disabled={name === sourceName}
+          onClick={() => {
+            this.setState({ sourceName: name });
+          }}
+        >
+          {name}
+        </Button>
+      );
+    });
 
-    const source = sources[this.state.sourceName];
-
+    const { sourceName } = this.state;
+    const source = sources[sourceName];
     return (
       <div>
         <MicroscopyViewer
