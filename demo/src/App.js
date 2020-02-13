@@ -54,7 +54,7 @@ export default class App extends PureComponent {
   }
 
   render() {
-    const initialViewState = {
+    const initialViewState = source.initialViewState || {
       zoom: -5.5,
       target: [30000, 10000, 0]
     };
