@@ -1,8 +1,11 @@
 import React, { PureComponent } from 'react';
+import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Slider from '@material-ui/core/Slider';
 import { withStyles } from '@material-ui/core/styles';
 import { MicroscopyViewer } from '../../src';
 import { source } from './source-info';
+import sources from './source-info';
 import './App.css';
 
 export default class App extends PureComponent {
@@ -59,6 +62,7 @@ export default class App extends PureComponent {
       target: [30000, 10000, 0]
     };
     const { sliderValues, colorValues, viewHeight, viewWidth } = this.state;
+
     const sliders = Object.keys(this.sliders).map(channel => {
       const ChannelSlider = this.sliders[channel];
       const sliderValue = sliderValues[channel];
@@ -77,6 +81,11 @@ export default class App extends PureComponent {
         </div>
       );
     });
+
+    const sourceButtons = Object.keys(sources).map(sourceName => (
+      <Button key={sourceName}>{sourceName}</Button>
+    ));
+
     return (
       <div>
         <MicroscopyViewer
@@ -112,14 +121,18 @@ export default class App extends PureComponent {
             DeckGL over the hood and WebGL under the hood.
           </p>
           <p>
+            More information:{' '}
             <a href="https://github.com/hubmapconsortium/vitessce-image-viewer">
               Github
             </a>
-            &nbsp; / &nbsp;
+            ,&nbsp;
             <a href="https://www.npmjs.com/package/@hubmap/vitessce-image-viewer">
               NPM
             </a>
           </p>
+          <ButtonGroup color="primary" size="small">
+            {sourceButtons}
+          </ButtonGroup>
           {sliders}
         </div>
       </div>
