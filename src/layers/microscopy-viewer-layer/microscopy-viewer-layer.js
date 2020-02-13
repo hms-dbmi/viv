@@ -8,7 +8,9 @@ export class MicroscopyViewerLayer extends CompositeLayer {
   initializeState() {
     this.state = {
       connections: null,
-      pool: null
+      pool: null,
+      isZarr: false,
+      isTiff: false
     };
   }
 
@@ -19,25 +21,35 @@ export class MicroscopyViewerLayer extends CompositeLayer {
   }
 
   updateState() {
-    if (!this.state.connections) {
+    if (
+      !this.state.connections ||
+      this.props.useTiff ^ this.state.isTiff ||
+      this.props.useZarr ^ this.state.isZarr
+    ) {
       if (this.props.useTiff) {
         getTiffConnections({ ...this.props }).then(connections => {
-          this.setState({ connections, pool: new Pool() });
+          this.setState({
+            connections,
+            pool: new Pool(),
+            isTiff: true,
+            isZarr: false
+          });
         });
       } else {
         getZarrConnections({ ...this.props }).then(connections => {
-          this.setState({ connections });
+          this.setState({ connections, isZarr: true, isTiff: false });
         });
       }
     }
   }
 
   renderLayers() {
+    // const useTiff = !(this.state.pool ^ this.state.isTiff);
     const layers = this.state.connections
       ? new MicroscopyViewerLayerBase({
           connections: Object.assign({}, ...this.state.connections),
           pool: this.state.pool,
-          ...this.props
+          ...this.getSubLayerProps(this.props)
         })
       : [];
     return layers;

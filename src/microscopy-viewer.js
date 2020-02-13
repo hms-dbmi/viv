@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { OrthographicView } from 'deck.gl';
+import { setParameters } from '@luma.gl/gltools';
+import GL from '@luma.gl/constants';
 import { MicroscopyViewerLayer } from './layers';
 
 export class MicroscopyViewer extends PureComponent {
@@ -14,11 +16,16 @@ export class MicroscopyViewer extends PureComponent {
 
   _renderLayers() {
     return new MicroscopyViewerLayer({
+      id: `MicroscopyViewerLayer-${this.props.useTiff ? 'tiff' : 'zarr'}`,
       ...this.props
     });
   }
 
   _onWebGLInitialized(gl) {
+    // setParameters(gl, {
+    //   blend: true,
+    //   blendFunc: [GL.ONE, GL.ONE]
+    // });
     this.setState({ gl });
   }
 
