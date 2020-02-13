@@ -36,6 +36,3 @@ export default {
   zarr: zarrInfo,
   tiff: tiffInfo
 };
-
-// TODO: Remove this and just use the default
-export const source = tiffInfo;

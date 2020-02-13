@@ -4,9 +4,10 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Slider from '@material-ui/core/Slider';
 import { withStyles } from '@material-ui/core/styles';
 import { MicroscopyViewer } from '../../src';
-import { source } from './source-info';
 import sources from './source-info';
 import './App.css';
+
+const initSourceName = 'zarr';
 
 export default class App extends PureComponent {
   constructor(props) {
@@ -21,7 +22,7 @@ export default class App extends PureComponent {
       [0, 0, 255],
       [255, 128, 0]
     ];
-    Object.keys(source.channels).forEach((channel, i) => {
+    Object.keys(sources[initSourceName].channels).forEach((channel, i) => {
       sliderValues[channel] = [0, 20000];
       colorValues[channel] = colorOptions[i];
       sliders[channel] = withStyles({
@@ -35,7 +36,7 @@ export default class App extends PureComponent {
       colorValues,
       viewHeight: window.innerHeight * 0.9,
       viewWidth: window.innerWidth * 0.7,
-      sourceName: 'zarr'
+      sourceName: initSourceName
     };
     this.max = 65535;
     this.sliders = sliders;
@@ -95,7 +96,6 @@ export default class App extends PureComponent {
     ));
 
     const source = sources[this.state.sourceName];
-    console.log('isTiff', source.isTiff);
 
     return (
       <div>
