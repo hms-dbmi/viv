@@ -21,11 +21,13 @@ export class MicroscopyViewerLayer extends CompositeLayer {
   }
 
   updateState() {
+    /* eslint-disable no-bitwise */
     if (
       !this.state.connections ||
       this.props.useTiff ^ this.state.isTiff ||
       this.props.useZarr ^ this.state.isZarr
     ) {
+      /* eslint-disable no-bitwise */
       if (this.props.useTiff) {
         getTiffConnections({ ...this.props }).then(connections => {
           this.setState({
