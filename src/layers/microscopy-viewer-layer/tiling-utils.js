@@ -35,7 +35,6 @@ export function getRasterTileIndices({
   const scale = tileSize * 2 ** (-1 * z);
   const maxXTilePossible = Math.round(imageWidth / scale);
   const maxYTilePossible = Math.round(imageHeight / scale);
-  console.log(minZoom, z);
   if (z < minZoom) {
     return [];
   }
