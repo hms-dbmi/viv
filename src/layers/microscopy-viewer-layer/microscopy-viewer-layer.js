@@ -45,6 +45,13 @@ export class MicroscopyViewerLayer extends CompositeLayer {
 
   renderLayers() {
     const { connections, pool, imageWidth, imageHeight, tileSize } = this.state;
+    if (
+      (this.props.imageWidth && imageWidth) ||
+      (this.props.imageHeight && imageHeight) ||
+      (this.props.tileSize && tileSize)
+    ) {
+      throw new Error('Do not pass in image size data and use tiff');
+    }
     const layers = connections
       ? new MicroscopyViewerLayerBase({
           connections: Object.assign({}, ...connections),
