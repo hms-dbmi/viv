@@ -6,6 +6,7 @@
 
 - Anti-aliasing for the borders implemented.
 - Resolve linting
+- Update demo switching
 
 ### Changed
 
