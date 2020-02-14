@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import Slider from '@material-ui/core/Slider';
+import Checkbox from '@material-ui/core/Checkbox';
 import { withStyles } from '@material-ui/core/styles';
 import { MicroscopyViewer } from '../../src';
 import { source } from './source-info';
@@ -12,6 +13,8 @@ export default class App extends PureComponent {
     const sliderValues = {};
     const colorValues = {};
     const sliders = {};
+    const checkboxes = {};
+    const channelsOn = {};
     const colorOptions = [
       [255, 0, 0],
       [0, 255, 0],
@@ -21,20 +24,33 @@ export default class App extends PureComponent {
     Object.keys(source.channels).forEach((channel, i) => {
       sliderValues[channel] = [0, 20000];
       colorValues[channel] = colorOptions[i];
+      channelsOn[channel] = true;
       sliders[channel] = withStyles({
         root: {
           color: `rgb(${colorOptions[i]})`
         }
       })(Slider);
+      checkboxes[channel] = withStyles({
+        root: {
+          color: `rgb(${colorOptions[i]})`,
+          '&$checked': {
+            color: colorOptions[i]
+          }
+        },
+        checked: {}
+        // eslint-disable-next-line react/jsx-props-no-spreading
+      })(checkBoxProps => <Checkbox color="default" {...checkBoxProps} />);
     });
     this.state = {
       sliderValues,
       colorValues,
+      channelsOn,
       viewHeight: window.innerHeight * 0.9,
       viewWidth: window.innerWidth * 0.7
     };
     this.max = 65535;
     this.sliders = sliders;
+    this.checkboxes = checkboxes;
     window.addEventListener('resize', this.resize);
   }
 
@@ -43,6 +59,15 @@ export default class App extends PureComponent {
     channelValue[channel] = value;
     this.setState(prevState => {
       return { sliderValues: { ...prevState.sliderValues, ...channelValue } };
+    });
+  }
+
+  toggleChannel(channel) {
+    this.setState(prevState => {
+      const channelOn = {};
+      const channelToggle = !prevState.channelsOn[channel];
+      channelOn[channel] = channelToggle;
+      return { channelsOn: { ...prevState.channelsOn, ...channelOn } };
     });
   }
 
@@ -58,22 +83,37 @@ export default class App extends PureComponent {
       zoom: -5.5,
       target: [30000, 10000, 0]
     };
-    const { sliderValues, colorValues, viewHeight, viewWidth } = this.state;
+    const {
+      sliderValues,
+      colorValues,
+      viewHeight,
+      viewWidth,
+      channelsOn
+    } = this.state;
     const sliders = Object.keys(this.sliders).map(channel => {
       const ChannelSlider = this.sliders[channel];
+      const ChannelCheckbox = this.checkboxes[channel];
       const sliderValue = sliderValues[channel];
       return (
         <div key={`container-${channel}`}>
           <p>{channel}</p>
-          <ChannelSlider
-            value={sliderValue}
-            onChange={(e, v) => this.handleSliderChange(e, v, channel)}
-            valueLabelDisplay="auto"
-            getAriaLabel={() => channel}
-            min={0}
-            max={this.max}
-            orientation="horizontal"
-          />
+          <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
+            <ChannelCheckbox
+              // eslint-disable-next-line no-unused-vars
+              onChange={e => this.toggleChannel(channel)}
+              checked={channelsOn[channel]}
+            />
+            <ChannelSlider
+              style={{ top: '7px' }}
+              value={sliderValue}
+              onChange={(e, v) => this.handleSliderChange(e, v, channel)}
+              valueLabelDisplay="auto"
+              getAriaLabel={() => channel}
+              min={0}
+              max={this.max}
+              orientation="horizontal"
+            />
+          </div>
         </div>
       );
     });
@@ -101,6 +141,7 @@ export default class App extends PureComponent {
             viewWidth,
             sliderValues,
             colorValues,
+            channelsOn,
             initialViewState
           }}
           /* eslint-disable react/jsx-props-no-spreading */

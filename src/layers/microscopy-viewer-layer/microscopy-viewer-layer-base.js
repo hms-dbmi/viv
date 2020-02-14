@@ -36,15 +36,25 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
     const minZoom = Math.floor(
       -1 * Math.log2(Math.max(props.imageHeight, props.imageWidth))
     );
-    const { sliderValues, colorValues } = props;
+    const { sliderValues, colorValues, channelsOn } = props;
+    const inputColorValues = {};
+    const inputSliderValues = {};
+    Object.keys(colorValues).forEach(channel => {
+      inputColorValues[channel] = channelsOn[channel]
+        ? colorValues[channel]
+        : [0, 0, 0];
+      inputSliderValues[channel] = channelsOn[channel]
+        ? sliderValues[channel]
+        : [65535, 65535];
+    });
     const orderedSliderValues = [];
     let orderedColorValues = [];
-    Object.keys(sliderValues)
+    Object.keys(inputSliderValues)
       .sort()
-      .forEach(key => orderedSliderValues.push(sliderValues[key]));
-    Object.keys(colorValues)
+      .forEach(key => orderedSliderValues.push(inputSliderValues[key]));
+    Object.keys(inputColorValues)
       .sort()
-      .forEach(key => orderedColorValues.push(colorValues[key]));
+      .forEach(key => orderedColorValues.push(inputColorValues[key]));
     const diffSliders = 6 - orderedSliderValues.length;
     for (let i = 0; i < diffSliders; i += 1) {
       orderedSliderValues.push([0, 65535]);
