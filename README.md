@@ -41,7 +41,7 @@ This component can be used with an already existing `DeckGL` setup.
 
 ##### `useZarr` (Function)
 
-A `useZarr` flag for using the built in zarr functionality.  This is currently
+A `useZarr` flag for using the built in zarr functionality. This is currently
 experimental (see [this](IMAGE_RENDERING.md))
 
 ##### `useTiff` (Function)
@@ -62,7 +62,7 @@ Receives arguments:
 Returns:
 
 - An array of `[colorData1, ..., colorDataN]` where `colorDataI`
-is a typed array of a single channel's worth of data.  The order must match.
+  is a typed array of a single channel's worth of data. The order must match.
 
 A `loadZarr` function is provided to assist and a `loadTiff` function will be coming.  
 They need to be wrapped so in a `getTileData` function that accepts the right arguments
@@ -84,11 +84,13 @@ These control the size of the viewport in your app.
 
 ##### `imageHeight` & `imageWidth` (Number)
 
-The height and width of the image you wish to render.
+The height and width of the image you wish to render. They are not necessary
+if you use tiff.
 
 ##### `initialViewState` (object) [ONLY NECESSARY FOR `MicrsocopyViewer`]
 
 An object containing two things
+
 - `target` (Array) An `[x,y,0]` location in image coordinates of the image. The 0
   represents a hypothetical (and potentially future addition) of a third spatial dimension.
 - `zoom` (Number) The initial zoom level to render the image at
@@ -96,15 +98,22 @@ An object containing two things
 ##### `minZoom` & `maxZoom` (Number)
 
 These control the max and min zoom sizes, generally the number of images `n` in your pyramid,
-ranging from `-n` (zoomed out) to `0`, the highest resolution.
+ranging from `-n` (zoomed out) to `0`, the highest resolution. They are not necessary
+if you use tiffs.
 
-##### `sliderValues` (Array) **POTENIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
+##### `sliderValues` (Array)
 
 An object containing slider (max/min) values for each channel:
-`{sliderValues:{name:value}, {name:value}, {name:value}}`
+`{sliderValues:{name:value, name:value, name:value}}`
 
-##### `colors` (Array)
+##### `colorValues` (Array)
 
-Again, this is an objecting matching the sliders and the data of the colors
+Again, this is an object matching the channel names and colors
 that you wish to map to a full range for displaying,
-`{colorValues:{name:[r,g,b]}, {name:[r,g,b]}, {name:[r,g,b]}}`
+`{colorValues:{name:[r,g,b], name:[r,g,b], name:[r,g,b]}}`
+
+##### `channelsOn` (Array)
+
+Again, this is an object matching the channel names and toggles
+that you wish to turn on or off.
+`{channelsOn:{name: false, name:false, name:true}`
