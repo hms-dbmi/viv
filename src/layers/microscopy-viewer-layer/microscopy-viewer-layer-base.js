@@ -33,9 +33,6 @@ const defaultProps = {
 
 export class MicroscopyViewerLayerBase extends BaseTileLayer {
   constructor(props) {
-    const minZoom = Math.floor(
-      -1 * Math.log2(Math.max(props.imageHeight, props.imageWidth))
-    );
     const { sliderValues, colorValues, channelsOn } = props;
     const inputColorValues = {};
     const inputSliderValues = {};
