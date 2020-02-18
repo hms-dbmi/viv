@@ -13,6 +13,7 @@
 ### Changed
 
 - Fixed no-unused-expressions
+- Removed `Microscopy` from export names
 
 ## v0.0.4
 

@@ -4,7 +4,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Slider from '@material-ui/core/Slider';
 import Checkbox from '@material-ui/core/Checkbox';
 import { withStyles } from '@material-ui/core/styles';
-import { MicroscopyViewer } from '../../src';
+import { Viewer } from '../../src';
 import sources from './source-info';
 import './App.css';
 
@@ -152,7 +152,7 @@ export default class App extends PureComponent {
     }
     return (
       <div>
-        <MicroscopyViewer
+        <Viewer
           /* eslint-disable react/jsx-props-no-spreading */
           {...{
             useTiff: source.isTiff,
