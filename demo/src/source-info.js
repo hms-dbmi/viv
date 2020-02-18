@@ -1,17 +1,12 @@
 const rootTIFFUrl =
-  'https://vitessce-vanderbilt-data.storage.googleapis.com/test-data/VAN0001-RK-1-21_24-MxIF-mxIF_toIMS/';
+  'https://vitessce-data.storage.googleapis.com/vanderbilt.images/';
 
-const tiffInfo = {
-  isTiff: true,
-  isZarr: false,
-  height: 141,
-  width: 206,
-  tileSize: 256,
+export const source = {
   channels: {
-    'Cy3 - Synaptopodin (glomerular)': `${rootTIFFUrl}vanderbilt_test_Cy3 - Synaptopodin (glomerular).ome.tiff`,
-    'Cy5 - THP (thick limb)': `${rootTIFFUrl}vanderbilt_test_Cy5 - THP (thick limb).ome.tiff`,
-    'DAPI - Hoescht (nuclei)': `${rootTIFFUrl}vanderbilt_test_DAPI - Hoescht (nuclei).ome.tiff`,
-    'FITC - Laminin (basement membrane)': `${rootTIFFUrl}vanderbilt_test_FITC - Laminin (basement membrane).ome.tiff`
+    'Cy3 - Synaptopodin (glomerular)': `${rootTIFFUrl}Cy3 - Synaptopodin (glomerular).ome.tiff`,
+    'Cy5 - THP (thick limb)': `${rootTIFFUrl}Cy5 - THP (thick limb).ome.tiff`,
+    'DAPI - Hoescht (nuclei)': `${rootTIFFUrl}DAPI - Hoescht (nuclei).ome.tiff`,
+    'FITC - Laminin (basement membrane)': `${rootTIFFUrl}FITC - Laminin (basement membrane).ome.tiff`
   }
 };
 
