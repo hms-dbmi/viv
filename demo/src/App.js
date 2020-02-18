@@ -54,7 +54,7 @@ export default class App extends PureComponent {
   }
 
   render() {
-    const initialViewState = {
+    const initialViewState = source.initialViewState || {
       zoom: -5.5,
       target: [30000, 10000, 0]
     };
@@ -83,20 +83,7 @@ export default class App extends PureComponent {
           /* eslint-disable react/jsx-props-no-spreading */
           {...{
             useTiff: true,
-            imageHeight: source.height * source.tileSize,
-            imageWidth: source.width * source.tileSize,
-            tileSize: source.tileSize,
             sourceChannels: source.channels,
-            minZoom: Math.floor(
-              -1 *
-                Math.log2(
-                  Math.max(
-                    source.height * source.tileSize,
-                    source.width * source.tileSize
-                  )
-                )
-            ),
-            maxZoom: -9,
             viewHeight,
             viewWidth,
             sliderValues,
