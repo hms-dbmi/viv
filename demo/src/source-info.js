@@ -12,36 +12,21 @@ const tiffInfo = {
   }
 };
 
+// We store all chunks in the same pyramid so they all have the same URL.
+// TODO: Add logic for when pyramids are in separate files; most similar to tiff.
 const rootZarrUrl =
   'https://vitessce-demo-data.storage.googleapis.com/test-data/vanderbilt-data/vanderbilt_mxif_ims.zarr/mxif_pyramid';
 
 export const zarrInfo = {
   isTiff: false,
   isZarr: true,
-    channels: {
-     'Cy3 - Synaptopodin (glomerular)': rootZarrUrl,
-     'Cy5 - THP (thick limb)': rootZarrUrl,
-     'DAPI - Hoescht (nuclei)': rootZarrUrl,
-     'FITC - Laminin (basement membrane)': rootZarrUrl
-   }
+  channels: {
+    'Cy3 - Synaptopodin (glomerular)': rootZarrUrl,
+    'Cy5 - THP (thick limb)': rootZarrUrl,
+    'DAPI - Hoescht (nuclei)': rootZarrUrl,
+    'FITC - Laminin (basement membrane)': rootZarrUrl
+  }
  };
-
-// const rootZarrUrl =
-//   'https://vitessce-vanderbilt-data.storage.googleapis.com/test-data/vanderbilt-data/single_channel_pyramid/img_pyramid/';
-
-// const zarrInfo = {
-//   isTiff: false,
-//   isZarr: true,
-//   height: 141,
-//   width: 206,
-//   tileSize: 256,
-//   channels: {
-//     'Cy3 - Synaptopodin (glomerular)': `${rootZarrUrl}channel_0`,
-//     'Cy5 - THP (thick limb)': `${rootZarrUrl}channel_1`,
-//     'DAPI - Hoescht (nuclei)': `${rootZarrUrl}channel_2`,
-//     'FITC - Laminin (basement membrane)': `${rootZarrUrl}channel_3`
-//   }
-// };
 
 export default {
   zarr: zarrInfo,
