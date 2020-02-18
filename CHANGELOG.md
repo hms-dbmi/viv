@@ -6,6 +6,7 @@
 
 - Anti-aliasing for the borders implemented.
 - Resolve linting
+- Clean up vertex shader
 
 ### Changed
 
