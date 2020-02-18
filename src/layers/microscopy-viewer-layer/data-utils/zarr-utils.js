@@ -26,9 +26,9 @@ export async function loadZarr({ connections, x, y, z }) {
   }
 }
 
-export async function getZarrConnections({ maxZoom, pyramidBaseUrl, pyramidBasePathUrl, sourceChannels }) {
+export async function getZarrConnections({ minZoom, pyramidBaseUrl, pyramidBasePathUrl, sourceChannels }) {
   const pyramidConn = [];
-  for (let i = 0; i < -maxZoom; i += 1) {
+  for (let i = 0; i < -minZoom; i += 1) {
     const config = {
       store: pyramidBaseUrl,
       path: `${pyramidBasePathUrl}/${String(i).padStart(2, "0")}`,
