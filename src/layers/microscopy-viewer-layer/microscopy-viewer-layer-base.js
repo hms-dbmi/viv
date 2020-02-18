@@ -94,7 +94,6 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
       ...props,
       sliderValues: flatSliderValues,
       colorValues: orderedColorValues,
-      minZoom,
       getTileData,
       // eslint-disable-next-line no-shadow
       getTileIndices: (viewport, maxZoom, minZoom) => {

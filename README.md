@@ -2,7 +2,8 @@
 
 A viewer for high bit depth, high resolution, multi-channel images using DeckGL
 over the hood and WebGL under the hood. To learn more about the "theory" behind
-this, look at [this](IMAGE_RENDERING.md).
+this, look at [this](IMAGE_RENDERING.md). To really make this sing, you need to
+use an http2 server in production (s3 is passable, though).
 
 ## Using this in your project
 
@@ -24,6 +25,12 @@ for your preferred editor. (Badly formatted code will fail on Travis.)
 
 For the demo, run `npm start` and you will be able to update the component and use the
 `demo/src/App.js` to visually test.
+
+For development,
+HTTP is acceptable but potentially slower than HTTP2 for `TIFF`. However, for
+development with `zarr`, you should use an [HTTP2 server](https://github.com/GoogleChromeLabs/simplehttp2server)
+for best performance. Our demo
+uses Google Cloud Storage, which is HTTP2 by default.
 
 ## Component Library API
 
@@ -98,8 +105,9 @@ An object containing two things
 ##### `minZoom` & `maxZoom` (Number)
 
 These control the max and min zoom sizes, generally the number of images `n` in your pyramid,
-ranging from `-n` (zoomed out) to `0`, the highest resolution. They are not necessary
-if you use tiffs.
+ranging from `-n` (`minZoom`), the lowest resolution, to `0` (`maxZoom`), the highest resolution. You don't need to
+pass these in (they can be inferred from heigh/width/tile size), although
+if you wish to limit zoom levels, you may.
 
 ##### `sliderValues` (Object)
 

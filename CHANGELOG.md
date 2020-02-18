@@ -1,17 +1,26 @@
 # Changelog
 
-## v0.0.4 - In Progress
+## 0.0.5 - In Progress
 
 ### Added
 
-- Anti-aliasing for the borders implemented.
 - Resolve linting
 - Add channel-toggling
+- Simplify API for TIFF by inferring metadata from file
 - Clean up vertex shader
 
 ### Changed
 
 - Fixed no-unused-expressions
+
+## v0.0.4 - Complete
+
+### Added
+
+- Anti-aliasing for the borders implemented.
+
+### Changed
+
 - Prettier on CI will now actually scan all files.
 
 ## v0.0.3
