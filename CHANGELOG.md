@@ -5,6 +5,7 @@
 ### Added
 
 - Resolve linting
+- Add channel-toggling
 - Simplify API for TIFF by inferring metadata from file
 - Clean up vertex shader
 

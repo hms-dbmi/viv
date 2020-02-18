@@ -91,7 +91,8 @@ These control the size of the viewport in your app.
 
 ##### `imageHeight` & `imageWidth` (Number)
 
-The height and width of the image you wish to render.
+The height and width of the image you wish to render. They are not necessary
+if you use tiff.
 
 ##### `initialViewState` (object) [ONLY NECESSARY FOR `MicrsocopyViewer`]
 
@@ -108,13 +109,19 @@ ranging from `-n` (`minZoom`), the lowest resolution, to `0` (`maxZoom`), the hi
 pass these in (they can be inferred from heigh/width/tile size), although
 if you wish to limit zoom levels, you may.
 
-##### `sliderValues` (Array) **POTENIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
+##### `sliderValues` (Object)
 
 An object containing slider (max/min) values for each channel:
-`{sliderValues:{name:value}, {name:value}, {name:value}}`
+`{channel1: [min, max], channel2: [min, max], channel3:[min, max]}`
 
-##### `colors` (Array)
+##### `colorValues` (Object)
 
-Again, this is an objecting matching the sliders and the data of the colors
+Again, this is an object matching the channel names and colors
 that you wish to map to a full range for displaying,
-`{colorValues:{name:[r,g,b]}, {name:[r,g,b]}, {name:[r,g,b]}}`
+`{channel1: [r,g,b], channel2: [r,g,b], channel3: [r,g,b]}`
+
+##### `channelsOn` (Array)
+
+Again, this is an object matching the channel names and toggles
+that you wish to turn on or off.
+`{channel1: false, channel2:false, channel3:true}`
