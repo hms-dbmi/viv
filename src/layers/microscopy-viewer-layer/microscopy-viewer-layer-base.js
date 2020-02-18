@@ -40,10 +40,11 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
     const inputColorValues = {};
     const inputSliderValues = {};
     Object.keys(colorValues).forEach(channel => {
-      inputColorValues[channel] = channelsOn[channel]
+      const channelIsOn = channelsOn[channel];
+      inputColorValues[channel] = channelIsOn
         ? colorValues[channel]
         : [0, 0, 0];
-      inputSliderValues[channel] = channelsOn[channel]
+      inputSliderValues[channel] = channelIsOn
         ? sliderValues[channel]
         : [65535, 65535];
     });

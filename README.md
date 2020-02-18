@@ -106,11 +106,11 @@ if you use tiffs.
 An object containing slider (max/min) values for each channel:
 `{sliderValues:{name:value, name:value, name:value}}`
 
-##### `colorValues` (Array)
+##### `colorValues` (Object)
 
 Again, this is an object matching the channel names and colors
 that you wish to map to a full range for displaying,
-`{colorValues:{name:[r,g,b], name:[r,g,b], name:[r,g,b]}}`
+`{colorValues: {channel1: [r,g,b], channel2: [r,g,b], channel3: [r,g,b]}}`
 
 ##### `channelsOn` (Array)
 

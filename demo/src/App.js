@@ -39,7 +39,10 @@ export default class App extends PureComponent {
         },
         checked: {}
         // eslint-disable-next-line react/jsx-props-no-spreading
-      })(checkBoxProps => <Checkbox color="default" {...checkBoxProps} />);
+      })(checkBoxProps => (
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        <Checkbox color="default" {...checkBoxProps} />
+      ));
     });
     this.state = {
       sliderValues,
@@ -62,11 +65,11 @@ export default class App extends PureComponent {
     });
   }
 
-  toggleChannel(channel) {
+  toggleChannel(channelName) {
     this.setState(prevState => {
       const channelOn = {};
-      const channelToggle = !prevState.channelsOn[channel];
-      channelOn[channel] = channelToggle;
+      const channelToggle = !prevState.channelsOn[channelName];
+      channelOn[channelName] = channelToggle;
       return { channelsOn: { ...prevState.channelsOn, ...channelOn } };
     });
   }
