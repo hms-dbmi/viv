@@ -1,4 +1,4 @@
-export function tileToScreen({ x, y, z, imageHeight, imageWidth, tileSize }) {
+export function tileToScreen({ x, y, z, tileSize }) {
   return {
     west: x * tileSize * 2 ** (-1 * z),
     north: y * tileSize * 2 ** (-1 * z),

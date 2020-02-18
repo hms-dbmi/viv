@@ -37,7 +37,15 @@ export class MicroscopyViewerLayer extends CompositeLayer {
         });
       } else {
         getZarrConnections({ ...this.props }).then(connections => {
-          this.setState({ connections });
+          const baseLayer = Object.values(connections[0])[0][0];
+          const [ , imageHeight, imageWidth] = baseLayer.shape;
+          const [ , , tileSize] = baseLayer.chunks;
+          this.setState({
+            connections,
+            tileSize,
+            imageHeight,
+            imageWidth
+          });
         });
       }
     }

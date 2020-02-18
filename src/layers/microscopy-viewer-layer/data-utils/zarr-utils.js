@@ -15,29 +15,36 @@ function decodeChannels({ data, shape }) {
 
 export async function loadZarr({ connections, x, y, z }) {
   const img = connections[ "Cy3 - Synaptopodin (glomerular)"][z];
-  // console.log(img)
   try {
     const tile = await img.getRawChunk([0, y, x]);
     const tiles = decodeChannels(tile);
     return tiles
   } catch(error) {
-    const empty = [emptyTile, emptyTile, emptyTile, emptyTile]
-    return empty
+    // const empty = [emptyTile, emptyTile, emptyTile, emptyTile]
+    // return empty
+    throw new error
   }
 }
 
-export async function getZarrConnections({ minZoom, pyramidBaseUrl, pyramidBasePathUrl, sourceChannels }) {
+export async function getZarrConnections({ sourceChannels }) {
+  const rootZarrUrl = Object.values(sourceChannels)[0]; // all are the same
+  // Known issue with how zarr.js does string concatenation for urls
+  // The prefix gets chunked off for some reason and must be repeating in the config.
+  // https://github.com/gzuidhof/zarr.js/issues/36
+  const prefix = rootZarrUrl.split('/').slice(-1)[0];
+  const minZoom = -8;
   const pyramidConn = [];
   for (let i = 0; i < -minZoom; i += 1) {
     const config = {
-      store: pyramidBaseUrl,
-      path: `${pyramidBasePathUrl}/${String(i).padStart(2, "0")}`,
+      store: rootZarrUrl,
+      path: `${prefix}/${String(i).padStart(2, "0")}`,
       mode: 'r'
     }
     const z = openArray(config);
     pyramidConn.push(z)
   }
   const imgPyramid = await Promise.all(pyramidConn);
+  window.pyr = imgPyramid
   // eslint-disable-next-line no-restricted-syntax
   const output = []
   // eslint-disable-next-line no-restricted-syntax
