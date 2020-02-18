@@ -1,7 +1,9 @@
 const rootTIFFUrl =
   'https://vitessce-data.storage.googleapis.com/vanderbilt.images/';
 
-export const source = {
+const tiffInfo = {
+  isTiff: true,
+  isZarr: false,
   channels: {
     'Cy3 - Synaptopodin (glomerular)': `${rootTIFFUrl}Cy3 - Synaptopodin (glomerular).ome.tiff`,
     'Cy5 - THP (thick limb)': `${rootTIFFUrl}Cy5 - THP (thick limb).ome.tiff`,

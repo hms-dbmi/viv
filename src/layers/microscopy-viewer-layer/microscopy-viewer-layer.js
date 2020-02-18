@@ -10,7 +10,7 @@ export class MicroscopyViewerLayer extends CompositeLayer {
       connections: null,
       pool: null,
       isZarr: false,
-      isTiff: false
+      isTiff: false,
       imageWidth: 0,
       imageHeight: 0,
       tileSize: 0
