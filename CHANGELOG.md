@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.0.5 - In Progress
+## 0.0.5
 
 ### Added
 
@@ -14,7 +14,7 @@
 
 - Fixed no-unused-expressions
 
-## v0.0.4 - Complete
+## v0.0.4
 
 ### Added
 
