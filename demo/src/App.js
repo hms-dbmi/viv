@@ -87,8 +87,8 @@ export default class App extends PureComponent {
   }
 
   render() {
-    const initialViewState = sources[this.state.sourceName]
-      .initialViewState || {
+    const { sourceName } = this.state;
+    const initialViewState = sources[sourceName].initialViewState || {
       zoom: -5.5,
       target: [30000, 10000, 0]
     };
@@ -128,7 +128,6 @@ export default class App extends PureComponent {
     });
 
     const sourceButtons = Object.keys(sources).map(name => {
-      const { sourceName } = this.state;
       return (
         <Button
           variant="contained"
@@ -143,7 +142,6 @@ export default class App extends PureComponent {
       );
     });
 
-    const { sourceName } = this.state;
     const source = sources[sourceName];
     const dimensions = {};
     if (source.isZarr) {
