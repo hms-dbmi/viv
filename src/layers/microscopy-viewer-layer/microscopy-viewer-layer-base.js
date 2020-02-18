@@ -7,7 +7,6 @@ import { loadZarr, loadTiff } from './data-utils';
 
 const defaultProps = {
   ...BaseTileLayer.defaultProps,
-  id: `microscopy-tile-layer`,
   pickable: false,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   maxZoom: 0,
@@ -18,7 +17,7 @@ const defaultProps = {
     } = props.tile;
     const { sliderValues, data, colorValues } = props;
     const xrl = new XRLayer(props, {
-      id: `XR-Layer-${west}-${south}-${east}-${north}`,
+      id: `XR-Layer-${west}-${south}-${east}-${north}-${props.useTiff}`,
       pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data,

@@ -13,7 +13,9 @@ export class MicroscopyViewer extends PureComponent {
   }
 
   _renderLayers() {
+    const { useTiff } = this.props;
     return new MicroscopyViewerLayer({
+      id: `MicroscopyViewerLayer-${useTiff ? 'tiff' : 'zarr'}`,
       ...this.props
     });
   }
