@@ -14,6 +14,7 @@ function decodeChannels({ data, shape }) {
 export async function loadZarr({ connections, x, y, z }) {
   const tile = await connections[z].getRawChunk([0, y, x]);
   const tiles = decodeChannels(tile);
+  console.log(tiles)
   return tiles
 }
 

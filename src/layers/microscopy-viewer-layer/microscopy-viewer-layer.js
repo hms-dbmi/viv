@@ -9,6 +9,8 @@ export class MicroscopyViewerLayer extends CompositeLayer {
     this.state = {
       connections: null,
       pool: null,
+      isZarr: false,
+      isTiff: false,
       imageWidth: 0,
       imageHeight: 0,
       tileSize: 0,
@@ -23,7 +25,13 @@ export class MicroscopyViewerLayer extends CompositeLayer {
   }
 
   updateState() {
-    if (!this.state.connections) {
+    /* eslint-disable no-bitwise */
+    if (
+      !this.state.connections ||
+      this.props.useTiff ^ this.state.isTiff ||
+      this.props.useZarr ^ this.state.isZarr
+    ) {
+      /* eslint-disable no-bitwise */
       if (this.props.useTiff) {
         initTiff({ ...this.props }).then(({ connections, minZoom, imageWidth, imageHeight, tileSize }) => {
           this.setState({
@@ -33,6 +41,8 @@ export class MicroscopyViewerLayer extends CompositeLayer {
             imageHeight,
             tileSize,
             pool: new Pool(),
+            isZarr: false,
+            isTiff: true,
           });
         });
       } else {
@@ -43,6 +53,8 @@ export class MicroscopyViewerLayer extends CompositeLayer {
             imageWidth,
             imageHeight,
             tileSize,
+            isZarr: true,
+            isTiff: false,
           });
         });
       }
@@ -67,7 +79,7 @@ export class MicroscopyViewerLayer extends CompositeLayer {
           tileSize,
           minZoom,
           maxZoom: 0,
-          ...this.props
+          ...this.getSubLayerProps(this.props)
         })
       : [];
     return layers;

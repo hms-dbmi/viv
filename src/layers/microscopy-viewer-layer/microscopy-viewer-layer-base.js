@@ -7,7 +7,6 @@ import { loadZarr, loadTiff } from './data-utils';
 
 const defaultProps = {
   ...BaseTileLayer.defaultProps,
-  id: `microscopy-tile-layer`,
   pickable: false,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   maxZoom: 0,
@@ -18,7 +17,7 @@ const defaultProps = {
     } = props.tile;
     const { sliderValues, data, colorValues } = props;
     const xrl = new XRLayer(props, {
-      id: `XR-Layer-${west}-${south}-${east}-${north}`,
+      id: `XR-Layer-${west}-${south}-${east}-${north}-${props.useTiff}`,
       pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data,
@@ -33,15 +32,26 @@ const defaultProps = {
 
 export class MicroscopyViewerLayerBase extends BaseTileLayer {
   constructor(props) {
-    const { sliderValues, colorValues } = props;
+    const { sliderValues, colorValues, channelsOn } = props;
+    const inputColorValues = {};
+    const inputSliderValues = {};
+    Object.keys(colorValues).forEach(channel => {
+      const channelIsOn = channelsOn[channel];
+      inputColorValues[channel] = channelIsOn
+        ? colorValues[channel]
+        : [0, 0, 0];
+      inputSliderValues[channel] = channelIsOn
+        ? sliderValues[channel]
+        : [65535, 65535];
+    });
     const orderedSliderValues = [];
     let orderedColorValues = [];
-    Object.keys(sliderValues)
+    Object.keys(inputSliderValues)
       .sort()
-      .forEach(key => orderedSliderValues.push(sliderValues[key]));
-    Object.keys(colorValues)
+      .forEach(key => orderedSliderValues.push(inputSliderValues[key]));
+    Object.keys(inputColorValues)
       .sort()
-      .forEach(key => orderedColorValues.push(colorValues[key]));
+      .forEach(key => orderedColorValues.push(inputColorValues[key]));
     const diffSliders = 6 - orderedSliderValues.length;
     for (let i = 0; i < diffSliders; i += 1) {
       orderedSliderValues.push([0, 65535]);

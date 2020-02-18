@@ -1,10 +1,12 @@
 # Changelog
 
-## 0.0.5 - In Progress
+## 0.0.5
 
 ### Added
 
 - Resolve linting
+- Update demo switching
+- Add channel-toggling
 - Simplify API for TIFF by inferring metadata from file
 - Clean up vertex shader
 
@@ -12,7 +14,7 @@
 
 - Fixed no-unused-expressions
 
-## v0.0.4 - Complete
+## v0.0.4
 
 ### Added
 
