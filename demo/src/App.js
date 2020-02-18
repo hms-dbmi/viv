@@ -67,10 +67,10 @@ export default class App extends PureComponent {
 
   toggleChannel(channelName) {
     this.setState(prevState => {
-      const channelOn = {};
-      const channelToggle = !prevState.channelsOn[channelName];
-      channelOn[channelName] = channelToggle;
-      return { channelsOn: { ...prevState.channelsOn, ...channelOn } };
+      const newChannelsOn = {
+        [channelName]: !prevState.channelsOn[channelName]
+      };
+      return { channelsOn: { ...prevState.channelsOn, ...newChannelsOn } };
     });
   }
 
