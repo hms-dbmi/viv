@@ -2,8 +2,8 @@ export function tileToScreen({ x, y, z, imageHeight, imageWidth, tileSize }) {
   return {
     west: x * tileSize * 2 ** (-1 * z),
     north: y * tileSize * 2 ** (-1 * z),
-    east: Math.min(imageWidth, (x + 1) * tileSize * 2 ** (-1 * z)),
-    south: Math.min(imageHeight, (y + 1) * tileSize * 2 ** (-1 * z))
+    east: (x + 1) * tileSize * 2 ** (-1 * z),
+    south: (y + 1) * tileSize * 2 ** (-1 * z)
   };
 }
 
@@ -33,8 +33,8 @@ export function getRasterTileIndices({
 }) {
   const z = Math.min(0, Math.ceil(viewport.zoom));
   const scale = tileSize * 2 ** (-1 * z);
-  const maxXTilePossible = Math.round(imageWidth / scale);
-  const maxYTilePossible = Math.round(imageHeight / scale);
+  const maxXTilePossible = Math.ceil(imageWidth / scale);
+  const maxYTilePossible = Math.ceil(imageHeight / scale);
   if (z <= minZoom) {
     return [{ x: 0, y: 0, z: minZoom }];
   }

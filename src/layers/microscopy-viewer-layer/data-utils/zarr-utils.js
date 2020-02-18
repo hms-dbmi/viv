@@ -1,56 +1,50 @@
-import { slice, openArray } from 'zarr';
+/* eslint-disable import/no-extraneous-dependencies */
+import { openArray } from 'zarr'
 
-async function getData({ arr, channel, x, y, stride, tilingWidth }) {
-  const arrSlice = slice(
-    stride * tilingWidth * y + stride * x,
-    stride * tilingWidth * y + stride * (x + 1)
-  );
-  const dataSlice = await arr.get([arrSlice]);
-  const { data } = dataSlice;
-  const dataObj = {};
-  dataObj[channel] = data;
-  return dataObj;
+const emptyTile = new Uint32Array(512 * 512);
+
+function decodeChannels({ data, shape }) {
+  const offset = data.length / shape[0];
+  const tileData = [];
+  for (let i = 0; i < shape[0]; i += 1) {
+    const channelData = data.subarray(offset * i, offset * i + offset);
+    tileData.push(channelData);
+  }
+  return tileData;
 }
 
-export function loadZarr({ connections, tileSize, x, y, z, imageWidth }) {
-  const tilingWidth = Math.ceil(imageWidth / (tileSize * 2 ** z));
-  const stride = tileSize * tileSize;
-  const channelPromises = Object.keys(connections).map(channel => {
-    return getData({
-      arr: connections[channel][z],
-      channel,
-      tileSize,
-      x,
-      y,
-      stride,
-      tilingWidth
-    });
-  });
-  return Promise.all(channelPromises).then(dataList => {
-    const orderedList = [];
-    const dataObj = Object.assign({}, ...dataList);
-    Object.keys(dataObj)
-      .sort()
-      .forEach(key => orderedList.push(dataObj[key]));
-    return orderedList;
-  });
+export async function loadZarr({ connections, x, y, z }) {
+  const img = connections[ "Cy3 - Synaptopodin (glomerular)"][z];
+  // console.log(img)
+  try {
+    const tile = await img.getRawChunk([0, y, x]);
+    const tiles = decodeChannels(tile);
+    return tiles
+  } catch(error) {
+    const empty = [emptyTile, emptyTile, emptyTile, emptyTile]
+    return empty
+  }
 }
 
-export function getZarrConnections({ sourceChannels, maxZoom }) {
-  const zarrConnections = Object.keys(sourceChannels).map(async channel => {
-    const zarrObj = {};
-    const zarrPromiseList = [];
-    for (let i = 0; i < -maxZoom; i += 1) {
-      // eslint-disable-next-line no-await-in-loop
-      const zarr = openArray({
-        store: `${sourceChannels[channel]}/`,
-        path: `pyramid_${i}.zarr`,
-        mode: 'r'
-      });
-      zarrPromiseList.push(zarr);
+export async function getZarrConnections({ maxZoom, pyramidBaseUrl, pyramidBasePathUrl, sourceChannels }) {
+  const pyramidConn = [];
+  for (let i = 0; i < -maxZoom; i += 1) {
+    const config = {
+      store: pyramidBaseUrl,
+      path: `${pyramidBasePathUrl}/${String(i).padStart(2, "0")}`,
+      mode: 'r'
     }
-    zarrObj[channel] = await Promise.all(zarrPromiseList);
-    return zarrObj;
-  });
-  return Promise.all(zarrConnections);
+    const z = openArray(config);
+    pyramidConn.push(z)
+  }
+  const imgPyramid = await Promise.all(pyramidConn);
+  // eslint-disable-next-line no-restricted-syntax
+  const output = []
+  // eslint-disable-next-line no-restricted-syntax
+  for (const key of Object.keys(sourceChannels)) {
+    const obj = {};
+    obj[key] = imgPyramid;
+    output.push(obj)
+  }
+  return output;
 }
