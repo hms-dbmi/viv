@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { openArray } from 'zarr'
+import { openArray } from 'zarr';
 
 function decodeChannels({ data, shape }) {
   const offset = data.length / shape[0];
@@ -14,7 +14,7 @@ function decodeChannels({ data, shape }) {
 export async function loadZarr({ connections, x, y, z }) {
   const tile = await connections[z].getRawChunk([0, y, x]);
   const tiles = decodeChannels(tile);
-  return tiles
+  return tiles;
 }
 
 export async function initZarr({ sourceChannels, minZoom }) {
@@ -29,11 +29,11 @@ export async function initZarr({ sourceChannels, minZoom }) {
   for (let i = 0; i < -minZoom; i += 1) {
     const config = {
       store: rootZarrUrl,
-      path: `${prefix}/${String(i).padStart(2, "0")}`,
+      path: `${prefix}/${String(i).padStart(2, '0')}`,
       mode: 'r'
-    }
+    };
     const z = openArray(config);
-    zarrStores.push(z)
+    zarrStores.push(z);
   }
   const connections = await Promise.all(zarrStores);
 
@@ -47,5 +47,5 @@ export async function initZarr({ sourceChannels, minZoom }) {
   const tileSize = baseLayer.chunks.slice(-1)[0];
 
   // Ideally we will also have metadata here about the minZoom so it's not a parameter supplied in App.js
-  return { connections, imageHeight, imageWidth, tileSize, minZoom }
+  return { connections, imageHeight, imageWidth, tileSize, minZoom };
 }

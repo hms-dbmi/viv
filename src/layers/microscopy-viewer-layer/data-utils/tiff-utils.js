@@ -49,7 +49,7 @@ export async function initTiff({ sourceChannels }) {
   // Map connections to channel keys
   const connections = {};
   for (let i = 0; i < channelNames.length; i += 1) {
-    connections[channelNames[i]] = resolvedTiffConnections[i]
+    connections[channelNames[i]] = resolvedTiffConnections[i];
   }
 
   // Get other properties for viewer
@@ -58,8 +58,7 @@ export async function initTiff({ sourceChannels }) {
   const minZoom = -1 * resolvedTiffConnections[0].length;
   const imageWidth = firstFullImage.ImageWidth;
   const imageHeight = firstFullImage.ImageLength;
-  const tileSize= firstFullImage.TileWidth;
+  const tileSize = firstFullImage.TileWidth;
 
-  return { connections, minZoom, imageWidth, imageHeight, tileSize }
+  return { connections, minZoom, imageWidth, imageHeight, tileSize };
 }
-

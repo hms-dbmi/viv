@@ -14,7 +14,7 @@ export class MicroscopyViewerLayer extends CompositeLayer {
       imageWidth: 0,
       imageHeight: 0,
       tileSize: 0,
-      minZoom: 0,
+      minZoom: 0
     };
   }
 
@@ -33,36 +33,47 @@ export class MicroscopyViewerLayer extends CompositeLayer {
     ) {
       /* eslint-disable no-bitwise */
       if (this.props.useTiff) {
-        initTiff({ ...this.props }).then(({ connections, minZoom, imageWidth, imageHeight, tileSize }) => {
-          this.setState({
-            connections,
-            minZoom,
-            imageWidth,
-            imageHeight,
-            tileSize,
-            pool: new Pool(),
-            isZarr: false,
-            isTiff: true,
-          });
-        });
+        initTiff({ ...this.props }).then(
+          ({ connections, minZoom, imageWidth, imageHeight, tileSize }) => {
+            this.setState({
+              connections,
+              minZoom,
+              imageWidth,
+              imageHeight,
+              tileSize,
+              pool: new Pool(),
+              isZarr: false,
+              isTiff: true
+            });
+          }
+        );
       } else {
-        initZarr({ ...this.props }).then(({ connections, minZoom, imageWidth, imageHeight, tileSize }) => {
-          this.setState({
-            connections,
-            minZoom,
-            imageWidth,
-            imageHeight,
-            tileSize,
-            isZarr: true,
-            isTiff: false,
-          });
-        });
+        initZarr({ ...this.props }).then(
+          ({ connections, minZoom, imageWidth, imageHeight, tileSize }) => {
+            this.setState({
+              connections,
+              minZoom,
+              imageWidth,
+              imageHeight,
+              tileSize,
+              isZarr: true,
+              isTiff: false
+            });
+          }
+        );
       }
     }
   }
 
   renderLayers() {
-    const { connections, pool, imageWidth, imageHeight, tileSize, minZoom } = this.state;
+    const {
+      connections,
+      pool,
+      imageWidth,
+      imageHeight,
+      tileSize,
+      minZoom
+    } = this.state;
     // if (
     //   (this.props.imageWidth && imageWidth) ||
     //   (this.props.imageHeight && imageHeight) ||

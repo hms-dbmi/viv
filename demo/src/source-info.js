@@ -26,7 +26,7 @@ export const zarrInfo = {
     'DAPI - Hoescht (nuclei)': rootZarrUrl,
     'FITC - Laminin (basement membrane)': rootZarrUrl
   }
- };
+};
 
 export default {
   zarr: zarrInfo,
