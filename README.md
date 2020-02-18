@@ -101,19 +101,19 @@ These control the max and min zoom sizes, generally the number of images `n` in 
 ranging from `-n` (zoomed out) to `0`, the highest resolution. They are not necessary
 if you use tiffs.
 
-##### `sliderValues` (Array)
+##### `sliderValues` (Object)
 
 An object containing slider (max/min) values for each channel:
-`{sliderValues:{name:value, name:value, name:value}}`
+`{channel1: [min, max], channel2: [min, max], channel3:[min, max]}`
 
 ##### `colorValues` (Object)
 
 Again, this is an object matching the channel names and colors
 that you wish to map to a full range for displaying,
-`{colorValues: {channel1: [r,g,b], channel2: [r,g,b], channel3: [r,g,b]}}`
+`{channel1: [r,g,b], channel2: [r,g,b], channel3: [r,g,b]}`
 
 ##### `channelsOn` (Array)
 
 Again, this is an object matching the channel names and toggles
 that you wish to turn on or off.
-`{channelsOn:{name: false, name:false, name:true}`
+`{channel1: false, channel2:false, channel3:true}`
