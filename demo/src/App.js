@@ -82,7 +82,8 @@ export default class App extends PureComponent {
         <MicroscopyViewer
           /* eslint-disable react/jsx-props-no-spreading */
           {...{
-            useZarr: true,
+            // useZarr: true,
+            useTiff: true,
             sourceChannels: source.channels,
             viewHeight,
             viewWidth,

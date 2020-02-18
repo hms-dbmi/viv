@@ -2,7 +2,7 @@ import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
 import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 import { MicroscopyViewerLayerBase } from './microscopy-viewer-layer-base';
-import { getTiffConnections, getZarrConnections } from './data-utils';
+import { initTiff, initZarr } from './data-utils';
 
 export class MicroscopyViewerLayer extends CompositeLayer {
   initializeState() {
@@ -11,7 +11,8 @@ export class MicroscopyViewerLayer extends CompositeLayer {
       pool: null,
       imageWidth: 0,
       imageHeight: 0,
-      tileSize: 0
+      tileSize: 0,
+      minZoom: 0,
     };
   }
 
@@ -24,27 +25,24 @@ export class MicroscopyViewerLayer extends CompositeLayer {
   updateState() {
     if (!this.state.connections) {
       if (this.props.useTiff) {
-        getTiffConnections({ ...this.props }).then(connections => {
-          const firstFullImage = Object.values(connections[0])[0][0]
-            .fileDirectory;
+        initTiff({ ...this.props }).then(({ connections, minZoom, imageWidth, imageHeight, tileSize }) => {
           this.setState({
             connections,
+            minZoom,
+            imageWidth,
+            imageHeight,
+            tileSize,
             pool: new Pool(),
-            imageWidth: firstFullImage.ImageWidth,
-            imageHeight: firstFullImage.ImageLength,
-            tileSize: firstFullImage.TileWidth
           });
         });
       } else {
-        getZarrConnections({ ...this.props }).then(connections => {
-          const baseLayer = Object.values(connections[0])[0][0];
-          const [ , imageHeight, imageWidth] = baseLayer.shape;
-          const [ , , tileSize] = baseLayer.chunks;
+        initZarr({ ...this.props }).then(({ connections, minZoom, imageWidth, imageHeight, tileSize }) => {
           this.setState({
             connections,
-            tileSize,
+            minZoom,
+            imageWidth,
             imageHeight,
-            imageWidth
+            tileSize,
           });
         });
       }
@@ -52,7 +50,7 @@ export class MicroscopyViewerLayer extends CompositeLayer {
   }
 
   renderLayers() {
-    const { connections, pool, imageWidth, imageHeight, tileSize } = this.state;
+    const { connections, pool, imageWidth, imageHeight, tileSize, minZoom } = this.state;
     if (
       (this.props.imageWidth && imageWidth) ||
       (this.props.imageHeight && imageHeight) ||
@@ -62,12 +60,12 @@ export class MicroscopyViewerLayer extends CompositeLayer {
     }
     const layers = connections
       ? new MicroscopyViewerLayerBase({
-          connections: Object.assign({}, ...connections),
+          connections,
           pool,
           imageWidth,
           imageHeight,
           tileSize,
-          minZoom: -1 * Object.values(connections[0])[0].length,
+          minZoom,
           maxZoom: 0,
           ...this.props
         })
