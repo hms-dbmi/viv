@@ -7,6 +7,7 @@
 - Anti-aliasing for the borders implemented.
 - Resolve linting
 - Add channel-toggling
+- Clean up vertex shader
 
 ### Changed
 
