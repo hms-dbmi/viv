@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.6 - In Progress
+
+### Changed
+
+ - Fix brightness from channel toggling
+
 ## 0.0.5
 
 ### Added
