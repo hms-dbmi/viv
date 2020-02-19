@@ -66,7 +66,14 @@ export class MicroscopyViewerLayer extends CompositeLayer {
   }
 
   renderLayers() {
-    const { connections, pool, imageWidth, imageHeight, tileSize, minZoom } = this.state;
+    const {
+      connections,
+      pool,
+      imageWidth,
+      imageHeight,
+      tileSize,
+      minZoom
+    } = this.state;
     const layers = connections
       ? new MicroscopyViewerLayerBase({
           connections,

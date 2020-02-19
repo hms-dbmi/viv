@@ -47,21 +47,24 @@ export async function initTiff({ sourceChannels }) {
 
   // Map connections to channel keys
   const connections = Object.fromEntries(
-    resolvedTiffConnections.map((connection, i) => [channelNames[i], connection])
+    resolvedTiffConnections.map((connection, i) => [
+      channelNames[i],
+      connection
+    ])
   );
 
   // Get other properties for viewer
   const firstFullImage = resolvedTiffConnections[0][0].fileDirectory;
 
   /*
-  * These are the required return objects for setting state in the imaging layer.
-  * It is the responsibility of the .init<DataType> function to determine
-  * the appropriate values are for:
-  *
-  *    connections, minZoom, imageWidth, imageHeight, and tileSize
-  *
-  * All logic for determining these parameters should be carried out in this util function.
-  */
+   * These are the required return objects for setting state in the imaging layer.
+   * It is the responsibility of the .init<DataType> function to determine
+   * the appropriate values are for:
+   *
+   *    connections, minZoom, imageWidth, imageHeight, and tileSize
+   *
+   * All logic for determining these parameters should be carried out in this util function.
+   */
   const minZoom = -1 * resolvedTiffConnections[0].length;
   const imageWidth = firstFullImage.ImageWidth;
   const imageHeight = firstFullImage.ImageLength;
