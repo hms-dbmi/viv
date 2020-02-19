@@ -1,6 +1,9 @@
 # Changelog
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 31f493260da2fa840b213d68fad89ae26accd159
 ## 0.0.6 - in progress
 
 ### Added
@@ -9,10 +12,17 @@
 
 ### Changed
 
+<<<<<<< HEAD
 - Consolidated data access logic to data-utils
 - Refactored `microscopy-viewer-layer-base.js`
 - Fix brightness from channel toggling
 - Removed `Microscopy` from export names
+=======
+ - Fix brightness from channel toggling
+ - Removed `Microscopy` from export names
+ - Consolidated data access logic to data-utils
+ - Refactored `microscopy-viewer-layer-base.js`
+>>>>>>> 31f493260da2fa840b213d68fad89ae26accd159
 
 ## 0.0.5
 
