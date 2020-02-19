@@ -4,7 +4,8 @@
 
 ### Changed
 
-- Removed `Microscopy` from export names
+ - Fix brightness from channel toggling
+ - Removed `Microscopy` from export names
 
 ## 0.0.5
 
