@@ -36,15 +36,15 @@ uses Google Cloud Storage, which is HTTP2 by default.
 
 There are two components being exported for use:
 
-#### `MicroscopyViewer`
+#### `Viewer`
 
 This component is for pure drop-in use without an external `DeckGL` setup.
 
-#### `MicroscopyViewerLayer`
+#### `ViewerLayer`
 
 This component can be used with an already existing `DeckGL` setup.
 
-## `MicroscopyViewer` and `MicroscopyViewerLayer` Properties
+## `Viewer` and `ViewerLayer` Properties
 
 ##### `useZarr` (Function)
 
