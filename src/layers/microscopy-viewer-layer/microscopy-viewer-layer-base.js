@@ -4,7 +4,7 @@ import { XRLayer } from '../xr-layer';
 import { tileToScreen, getRasterTileIndices } from './tiling-utils';
 
 import { loadZarr, loadTiff } from './data-utils';
-import { padWithDefault, setOrderedValues, MAX_SLIDER_VALUE } from "./utils"
+import { padWithDefault, setOrderedValues, MAX_SLIDER_VALUE } from './utils';
 
 const MAX_SLIDERS_AND_CHANNELS = 6;
 
@@ -37,15 +37,28 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
   constructor(props) {
     const { sliderValues, colorValues, channelsOn } = props;
     const orderedChannelNames = Object.keys(sliderValues).sort();
-    const { orderedSliderValues, orderedColorValues } = setOrderedValues(orderedChannelNames, colorValues, sliderValues, channelsOn)
+    const { orderedSliderValues, orderedColorValues } = setOrderedValues(
+      orderedChannelNames,
+      colorValues,
+      sliderValues,
+      channelsOn
+    );
 
     // Need to pad sliders and colors with default values (required by shader)
     const padSize = MAX_SLIDERS_AND_CHANNELS - orderedChannelNames.length;
     if (padSize < 0) {
-      throw Error("Too many channels specified for shader.")
+      throw Error('Too many channels specified for shader.');
     }
-    const paddedSliderValues = padWithDefault(orderedSliderValues, [0, MAX_SLIDER_VALUE], padSize);
-    const paddedColorValues = padWithDefault(orderedColorValues, [0, 0, 0], padSize);
+    const paddedSliderValues = padWithDefault(
+      orderedSliderValues,
+      [0, MAX_SLIDER_VALUE],
+      padSize
+    );
+    const paddedColorValues = padWithDefault(
+      orderedColorValues,
+      [0, 0, 0],
+      padSize
+    );
 
     const getZarr = ({ x, y, z }) => {
       return loadZarr({
@@ -69,7 +82,7 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
       props.getTileData;
     const overrideValuesProps = {
       ...props,
-      sliderValues: paddedSliderValues.flat(),  // flatten for use on shaders
+      sliderValues: paddedSliderValues.flat(), // flatten for use on shaders
       colorValues: paddedColorValues,
       getTileData,
       // eslint-disable-next-line no-shadow

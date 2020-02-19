@@ -26,7 +26,6 @@ export default class App extends PureComponent {
       [255, 128, 0]
     ];
     Object.keys(sources[initSourceName].channels).forEach((channel, i) => {
-      console.log(channel)
       sliderValues[channel] = [0, 20000];
       colorValues[channel] = colorOptions[i];
       channelsOn[channel] = true;
