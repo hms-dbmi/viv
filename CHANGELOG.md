@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.6 - in progress
+
+### Changed
+
+- Removed `Microscopy` from export names
+
 ## 0.0.5
 
 ### Added
@@ -13,7 +19,6 @@
 ### Changed
 
 - Fixed no-unused-expressions
-- Removed `Microscopy` from export names
 
 ## v0.0.4
 
