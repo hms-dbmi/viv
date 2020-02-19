@@ -1,10 +1,11 @@
 # Changelog
 
-## 0.0.6 - In Progress
+## 0.0.6 - in progress
 
 ### Changed
 
  - Fix brightness from channel toggling
+ - Removed `Microscopy` from export names
 
 ## 0.0.5
 
