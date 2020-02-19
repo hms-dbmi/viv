@@ -50,7 +50,6 @@ export async function initTiff({ sourceChannels }) {
     resolvedTiffConnections.map((connection, i) => [channelNames[i], connection])
   );
 
-
   // Get other properties for viewer
   const firstFullImage = resolvedTiffConnections[0][0].fileDirectory;
 
@@ -66,8 +65,7 @@ export async function initTiff({ sourceChannels }) {
   const minZoom = -1 * resolvedTiffConnections[0].length;
   const imageWidth = firstFullImage.ImageWidth;
   const imageHeight = firstFullImage.ImageLength;
-  const tileSize= firstFullImage.TileWidth;
+  const tileSize = firstFullImage.TileWidth;
 
-  return { connections, minZoom, imageWidth, imageHeight, tileSize }
+  return { connections, minZoom, imageWidth, imageHeight, tileSize };
 }
-

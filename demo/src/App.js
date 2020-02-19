@@ -157,7 +157,7 @@ export default class App extends PureComponent {
             sliderValues,
             colorValues,
             channelsOn,
-            initialViewState,
+            initialViewState
           }}
           /* eslint-disable react/jsx-props-no-spreading */
         />
