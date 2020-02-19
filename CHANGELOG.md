@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.6
+
+### Added
+
+- New zarr API and standardize data utilities
+
+### Changed
+
+- Consolidated data access logic to data-utils
+- Refactored `microscopy-viewer-layer-base.js`
+
 ## 0.0.5
 
 ### Added
@@ -9,7 +20,6 @@
 - Add channel-toggling
 - Simplify API for TIFF by inferring metadata from file
 - Clean up vertex shader
-- Add new zarr API and standardize data utilities
 
 ### Changed
 
