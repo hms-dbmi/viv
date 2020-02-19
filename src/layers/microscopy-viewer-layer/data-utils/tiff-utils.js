@@ -1,16 +1,13 @@
 // eslint-disable-next-line import/extensions
 import { fromUrl } from 'geotiff/dist/geotiff.bundle.min.js';
+import { range } from './utils';
 
 async function getChannelConnections(channelUrl) {
   const tiff = await fromUrl(channelUrl);
   // Get the first image and check its size.
   const pyramid = await tiff.parseFileDirectories();
   const maxLevel = pyramid.length;
-  const pyramidLevels = [];
-  for (let i = 0; i < maxLevel; i += 1) {
-    const pyramidLevel = tiff.getImage(i);
-    pyramidLevels.push(pyramidLevel);
-  }
+  const pyramidLevels = range(maxLevel).map(i => tiff.getImage(i));
   const resolvedConnections = await Promise.all(pyramidLevels);
   return resolvedConnections;
 }

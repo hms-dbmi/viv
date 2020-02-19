@@ -1,12 +1,11 @@
 import { openArray } from 'zarr';
+import { range } from './utils';
 
 function decodeChannels({ data, shape }) {
   const offset = data.length / shape[0];
-  const tileData = [];
-  for (let i = 0; i < shape[0]; i += 1) {
-    const channelData = data.subarray(offset * i, offset * i + offset);
-    tileData.push(channelData);
-  }
+  const tileData = range(shape[0]).map(i =>
+    data.subarray(offset * i, offset * i + offset)
+  );
   return tileData;
 }
 
@@ -24,16 +23,17 @@ export async function initZarr({ sourceChannels, minZoom }) {
   // https://github.com/gzuidhof/zarr.js/issues/36
   const prefix = rootZarrUrl.split('/').slice(-1)[0];
 
-  const zarrStores = [];
-  for (let i = 0; i < -minZoom; i += 1) {
+  // Not necessary but this is something we should be parsing from metadata
+  const maxLevel = -minZoom;
+
+  const zarrStores = range(maxLevel).map(i => {
     const config = {
       store: rootZarrUrl,
       path: `${prefix}/${String(i).padStart(2, '0')}`,
       mode: 'r'
     };
-    const z = openArray(config);
-    zarrStores.push(z);
-  }
+    return openArray(config);
+  });
   const connections = await Promise.all(zarrStores);
 
   // Get other properties for image viewer
