@@ -1,7 +1,8 @@
-export const MAX_SLIDER_VALUE = 65535;
+const MAX_SLIDER_VALUE = 65535;
 const MAX_COLOR_INTENSITY = 255;
-const DEFAULT_SLIDER_OFF = [MAX_SLIDER_VALUE, MAX_SLIDER_VALUE];
-const DEFAULT_COLOR_OFF = [0, 0, 0];
+
+export const DEFAULT_SLIDER_OFF = [MAX_SLIDER_VALUE, MAX_SLIDER_VALUE];
+export const DEFAULT_COLOR_OFF = [0, 0, 0];
 
 export function range(len) {
   return [...Array(len).keys()];

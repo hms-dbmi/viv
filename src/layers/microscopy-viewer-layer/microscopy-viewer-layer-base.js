@@ -4,7 +4,12 @@ import { XRLayer } from '../xr-layer';
 import { tileToScreen, getRasterTileIndices } from './tiling-utils';
 
 import { loadZarr, loadTiff } from './data-utils';
-import { padWithDefault, setOrderedValues, MAX_SLIDER_VALUE } from './utils';
+import {
+  padWithDefault,
+  setOrderedValues,
+  DEFAULT_COLOR_OFF,
+  DEFAULT_SLIDER_OFF
+} from './utils';
 
 const MAX_SLIDERS_AND_CHANNELS = 6;
 
@@ -51,12 +56,12 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
     }
     const paddedSliderValues = padWithDefault(
       orderedSliderValues,
-      [0, MAX_SLIDER_VALUE],
+      DEFAULT_SLIDER_OFF,
       padSize
     );
     const paddedColorValues = padWithDefault(
       orderedColorValues,
-      [0, 0, 0],
+      DEFAULT_COLOR_OFF,
       padSize
     );
 

@@ -1,6 +1,7 @@
 # Changelog
 
-## 0.0.6
+<<<<<<< HEAD
+## 0.0.6 - in progress
 
 ### Added
 
@@ -10,6 +11,8 @@
 
 - Consolidated data access logic to data-utils
 - Refactored `microscopy-viewer-layer-base.js`
+- Fix brightness from channel toggling
+- Removed `Microscopy` from export names
 
 ## 0.0.5
 
