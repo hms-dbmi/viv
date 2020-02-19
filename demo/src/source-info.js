@@ -17,7 +17,7 @@ const tiffInfo = {
 const rootZarrUrl =
   'https://vitessce-demo-data.storage.googleapis.com/test-data/vanderbilt-data/vanderbilt_mxif_ims.zarr/mxif_pyramid';
 
-export const zarrInfo = {
+const zarrInfo = {
   isTiff: false,
   isZarr: true,
   channels: {

@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import { openArray } from 'zarr'
 
 function decodeChannels({ data, shape }) {

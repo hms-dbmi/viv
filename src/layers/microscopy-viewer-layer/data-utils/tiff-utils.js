@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 // eslint-disable-next-line import/extensions
 import { fromUrl } from 'geotiff/dist/geotiff.bundle.min.js';
 
@@ -47,14 +46,23 @@ export async function initTiff({ sourceChannels }) {
   const resolvedTiffConnections = await Promise.all(tiffConnections);
 
   // Map connections to channel keys
-  const connections = {};
-  for (let i = 0; i < channelNames.length; i += 1) {
-    connections[channelNames[i]] = resolvedTiffConnections[i]
-  }
+  const connections = Object.fromEntries(
+    resolvedTiffConnections.map((connection, i) => [channelNames[i], connection])
+  );
+
 
   // Get other properties for viewer
   const firstFullImage = resolvedTiffConnections[0][0].fileDirectory;
 
+  /*
+  * These are the required return objects for setting state in the imaging layer.
+  * It is the responsibility of the .init<DataType> function to determine
+  * the appropriate values are for:
+  *
+  *    connections, minZoom, imageWidth, imageHeight, and tileSize
+  *
+  * All logic for determining these parameters should be carried out in this util function.
+  */
   const minZoom = -1 * resolvedTiffConnections[0].length;
   const imageWidth = firstFullImage.ImageWidth;
   const imageHeight = firstFullImage.ImageLength;
