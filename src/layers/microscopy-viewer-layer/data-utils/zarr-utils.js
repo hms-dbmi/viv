@@ -1,5 +1,5 @@
 import { openArray } from 'zarr';
-import { range } from './utils';
+import { range } from '../utils';
 
 function decodeChannels({ data, shape }) {
   const offset = data.length / shape[0];

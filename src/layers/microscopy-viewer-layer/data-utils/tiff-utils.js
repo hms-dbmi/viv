@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/extensions
 import { fromUrl } from 'geotiff/dist/geotiff.bundle.min.js';
-import { range } from './utils';
+import { range } from '../utils';
 
 async function getChannelConnections(channelUrl) {
   const tiff = await fromUrl(channelUrl);
