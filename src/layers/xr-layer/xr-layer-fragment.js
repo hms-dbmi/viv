@@ -75,7 +75,7 @@ void main() {
 
   for(int i = 0; i < 6; i++) {
     hsvCombo = rgb2hsv(vec3(colorValues[i]));
-    hsvCombo = vec3(hsvCombo.xy, channelArray[i]);
+    hsvCombo = vec3(hsvCombo.xy, max(0.0,channelArray[i]));
     rgbCombo += hsv2rgb(hsvCombo);
   }
 
