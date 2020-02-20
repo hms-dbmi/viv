@@ -1,56 +1,50 @@
-import { slice, openArray } from 'zarr';
+import { openArray } from 'zarr';
+import { range } from '../utils';
 
-async function getData({ arr, channel, x, y, stride, tilingWidth }) {
-  const arrSlice = slice(
-    stride * tilingWidth * y + stride * x,
-    stride * tilingWidth * y + stride * (x + 1)
+function decodeChannels({ data, shape }) {
+  const offset = data.length / shape[0];
+  const tileData = range(shape[0]).map(i =>
+    data.subarray(offset * i, offset * i + offset)
   );
-  const dataSlice = await arr.get([arrSlice]);
-  const { data } = dataSlice;
-  const dataObj = {};
-  dataObj[channel] = data;
-  return dataObj;
+  return tileData;
 }
 
-export function loadZarr({ connections, tileSize, x, y, z, imageWidth }) {
-  const tilingWidth = Math.ceil(imageWidth / (tileSize * 2 ** z));
-  const stride = tileSize * tileSize;
-  const channelPromises = Object.keys(connections).map(channel => {
-    return getData({
-      arr: connections[channel][z],
-      channel,
-      tileSize,
-      x,
-      y,
-      stride,
-      tilingWidth
-    });
-  });
-  return Promise.all(channelPromises).then(dataList => {
-    const orderedList = [];
-    const dataObj = Object.assign({}, ...dataList);
-    Object.keys(dataObj)
-      .sort()
-      .forEach(key => orderedList.push(dataObj[key]));
-    return orderedList;
-  });
+export async function loadZarr({ connections, x, y, z }) {
+  const tile = await connections[z].getRawChunk([0, y, x]);
+  const tiles = decodeChannels(tile);
+  return tiles;
 }
 
-export function getZarrConnections({ sourceChannels, minZoom }) {
-  const zarrConnections = Object.keys(sourceChannels).map(async channel => {
-    const zarrObj = {};
-    const zarrPromiseList = [];
-    for (let i = 0; i <= -minZoom; i += 1) {
-      // eslint-disable-next-line no-await-in-loop
-      const zarr = openArray({
-        store: `${sourceChannels[channel]}/`,
-        path: `pyramid_${i}.zarr`,
-        mode: 'r'
-      });
-      zarrPromiseList.push(zarr);
-    }
-    zarrObj[channel] = await Promise.all(zarrPromiseList);
-    return zarrObj;
+export async function initZarr({ sourceChannels, minZoom }) {
+  const rootZarrUrl = Object.values(sourceChannels)[0]; // all are the same so get first
+
+  // Known issue with how zarr.js does string concatenation for urls
+  // The prefix gets chunked off for some reason and must be repeating in the config.
+  // https://github.com/gzuidhof/zarr.js/issues/36
+  const prefix = rootZarrUrl.split('/').slice(-1)[0];
+
+  // Not necessary but this is something we should be parsing from metadata
+  const maxLevel = -minZoom;
+
+  const zarrStores = range(maxLevel).map(i => {
+    const config = {
+      store: rootZarrUrl,
+      path: `${prefix}/${String(i).padStart(2, '0')}`,
+      mode: 'r'
+    };
+    return openArray(config);
   });
-  return Promise.all(zarrConnections);
+  const connections = await Promise.all(zarrStores);
+
+  // Get other properties for image viewer
+
+  // Somewhat hard coded for now, but good to keep all this logic in the data loaders so we can edit in the future.
+  const baseLayer = connections[0]; // shape [4, 36040, 52660]
+  // last two dimensions of the 3D array are width and height
+  const [imageHeight, imageWidth] = baseLayer.shape.slice(1);
+  // chunks are [4, 512, 512], grab last dimentsion. Maybe add check for if last two are the same?
+  const tileSize = baseLayer.chunks.slice(-1)[0];
+
+  // Ideally we will also have metadata here about the minZoom so it's not a parameter supplied in App.js
+  return { connections, imageHeight, imageWidth, tileSize, minZoom };
 }

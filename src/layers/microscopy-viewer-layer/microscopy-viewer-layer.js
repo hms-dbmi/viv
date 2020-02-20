@@ -2,7 +2,7 @@ import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
 import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 import { MicroscopyViewerLayerBase } from './microscopy-viewer-layer-base';
-import { getTiffConnections, getZarrConnections } from './data-utils';
+import { initTiff, initZarr } from './data-utils';
 
 export class MicroscopyViewerLayer extends CompositeLayer {
   initializeState() {
@@ -13,7 +13,8 @@ export class MicroscopyViewerLayer extends CompositeLayer {
       isTiff: false,
       imageWidth: 0,
       imageHeight: 0,
-      tileSize: 0
+      tileSize: 0,
+      minZoom: 0
     };
   }
 
@@ -32,44 +33,55 @@ export class MicroscopyViewerLayer extends CompositeLayer {
     ) {
       /* eslint-disable no-bitwise */
       if (this.props.useTiff) {
-        getTiffConnections({ ...this.props }).then(connections => {
-          const firstFullImage = Object.values(connections[0])[0][0]
-            .fileDirectory;
-          this.setState({
-            connections,
-            pool: new Pool(),
-            imageWidth: firstFullImage.ImageWidth,
-            imageHeight: firstFullImage.ImageLength,
-            tileSize: firstFullImage.TileWidth,
-            isTiff: true,
-            isZarr: false
-          });
-        });
+        initTiff({ ...this.props }).then(
+          ({ connections, minZoom, imageWidth, imageHeight, tileSize }) => {
+            this.setState({
+              connections,
+              minZoom,
+              imageWidth,
+              imageHeight,
+              tileSize,
+              pool: new Pool(),
+              isZarr: false,
+              isTiff: true
+            });
+          }
+        );
       } else {
-        getZarrConnections({ ...this.props }).then(connections => {
-          this.setState({ connections, isZarr: true, isTiff: false });
-        });
+        initZarr({ ...this.props }).then(
+          ({ connections, minZoom, imageWidth, imageHeight, tileSize }) => {
+            this.setState({
+              connections,
+              minZoom,
+              imageWidth,
+              imageHeight,
+              tileSize,
+              isZarr: true,
+              isTiff: false
+            });
+          }
+        );
       }
     }
   }
 
   renderLayers() {
-    const { connections, pool, imageWidth, imageHeight, tileSize } = this.state;
-    if (
-      (this.props.imageWidth && imageWidth) ||
-      (this.props.imageHeight && imageHeight) ||
-      (this.props.tileSize && tileSize)
-    ) {
-      throw new Error('If using tiff, do not set image size');
-    }
+    const {
+      connections,
+      pool,
+      imageWidth,
+      imageHeight,
+      tileSize,
+      minZoom
+    } = this.state;
     const layers = connections
       ? new MicroscopyViewerLayerBase({
-          connections: Object.assign({}, ...connections),
+          connections,
           pool,
           imageWidth,
           imageHeight,
           tileSize,
-          minZoom: -1 * Object.values(connections[0])[0].length,
+          minZoom,
           maxZoom: 0,
           ...this.getSubLayerProps(this.props)
         })

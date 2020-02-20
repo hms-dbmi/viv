@@ -2,10 +2,17 @@
 
 ## 0.0.6 - in progress
 
+### Added
+
+- New zarr API and standardize data utilities
+
 ### Changed
 
- - Fix brightness from channel toggling
- - Removed `Microscopy` from export names
+- Fix brightness from channel toggling
+- Removed `Microscopy` from export names
+- Consolidated data access logic to data-utils
+- Refactored `microscopy-viewer-layer-base.js`
+- Fix toggling defaults for sliders and colors when channels are off.
 
 ## 0.0.5
 

@@ -5,11 +5,22 @@ start() { echo travis_fold':'start:$1; echo $1; }
 end() { echo travis_fold':'end:$1; }
 die() { set +v; echo "$*" 1>&2 ; sleep 1; exit 1; }
 
+start changelog
+if [ "$TRAVIS_BRANCH" != 'master' ]; then
+  diff CHANGELOG.md <(curl "https://raw.githubusercontent.com/hubmapconsortium/vitessce-image-viewer/master/CHANGELOG.md") \
+    && die 'Update CHANGELOG.md'
+fi
+end changelog
+
 start prettier
-node_modules/prettier/bin-prettier.js --check '**/*.js' --loglevel debug
-# '**' is quoted so the glob is expanded by prettier, not bash.
+PRETTIER=node_modules/prettier/bin-prettier.js
+PRETTIER_GLOB='**/*.js'
+$PRETTIER --check "$PRETTIER_GLOB" --loglevel debug \
+  || die "Prettier failed. Run:
+     $PRETTIER --check '$PRETTIER_GLOB' --write"
+# The '**' is quoted so the glob is expanded by prettier, not bash.
 # (Mac default bash silently ignores **!)
-# 'debug' so we get a list of files scanned.
+# Use 'debug' so we get a list of files scanned.
 end prettier
 
 start eslint
@@ -20,10 +31,3 @@ start build
 npm run-script build-component
 npm run-script build-site
 end build
-
-start changelog
-if [ "$TRAVIS_BRANCH" != 'master' ]; then
-  diff CHANGELOG.md <(curl "https://raw.githubusercontent.com/hubmapconsortium/vitessce-image-viewer/master/CHANGELOG.md") \
-    && die 'Update CHANGELOG.md'
-fi
-end changelog

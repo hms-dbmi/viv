@@ -4,6 +4,14 @@ import { XRLayer } from '../xr-layer';
 import { tileToScreen, getRasterTileIndices } from './tiling-utils';
 
 import { loadZarr, loadTiff } from './data-utils';
+import {
+  padWithDefault,
+  setOrderedValues,
+  DEFAULT_COLOR_OFF,
+  DEFAULT_SLIDER_OFF
+} from './utils';
+
+const MAX_SLIDERS_AND_CHANNELS = 6;
 
 const defaultProps = {
   ...BaseTileLayer.defaultProps,
@@ -33,39 +41,30 @@ const defaultProps = {
 export class MicroscopyViewerLayerBase extends BaseTileLayer {
   constructor(props) {
     const { sliderValues, colorValues, channelsOn } = props;
-    const inputColorValues = {};
-    const inputSliderValues = {};
-    Object.keys(colorValues).forEach(channel => {
-      const channelIsOn = channelsOn[channel];
-      inputColorValues[channel] = channelIsOn
-        ? colorValues[channel]
-        : [0, 0, 0];
-      inputSliderValues[channel] = channelIsOn
-        ? sliderValues[channel]
-        : [65535, 65535];
-    });
-    const orderedSliderValues = [];
-    let orderedColorValues = [];
-    Object.keys(inputSliderValues)
-      .sort()
-      .forEach(key => orderedSliderValues.push(inputSliderValues[key]));
-    Object.keys(inputColorValues)
-      .sort()
-      .forEach(key => orderedColorValues.push(inputColorValues[key]));
-    const diffSliders = 6 - orderedSliderValues.length;
-    for (let i = 0; i < diffSliders; i += 1) {
-      orderedSliderValues.push([0, 65535]);
-    }
-    const diffColors = 6 - orderedColorValues.length;
-    for (let j = 0; j < diffColors; j += 1) {
-      orderedColorValues.push([0, 0, 0]);
-    }
-    orderedColorValues = orderedColorValues.map(color =>
-      color.map(ch => ch / 255)
+    const orderedChannelNames = Object.keys(sliderValues).sort();
+    const { orderedSliderValues, orderedColorValues } = setOrderedValues(
+      orderedChannelNames,
+      colorValues,
+      sliderValues,
+      channelsOn
     );
-    // flatten for use on shaders
-    // eslint-disable-next-line prefer-spread
-    const flatSliderValues = [].concat(...orderedSliderValues);
+
+    // Need to pad sliders and colors with default values (required by shader)
+    const padSize = MAX_SLIDERS_AND_CHANNELS - orderedChannelNames.length;
+    if (padSize < 0) {
+      throw Error('Too many channels specified for shader.');
+    }
+    const paddedSliderValues = padWithDefault(
+      orderedSliderValues,
+      DEFAULT_SLIDER_OFF,
+      padSize
+    );
+    const paddedColorValues = padWithDefault(
+      orderedColorValues,
+      DEFAULT_COLOR_OFF,
+      padSize
+    );
+
     const getZarr = ({ x, y, z }) => {
       return loadZarr({
         x,
@@ -88,8 +87,8 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
       props.getTileData;
     const overrideValuesProps = {
       ...props,
-      sliderValues: flatSliderValues,
-      colorValues: orderedColorValues,
+      sliderValues: paddedSliderValues.flat(), // flatten for use on shaders
+      colorValues: paddedColorValues,
       getTileData,
       // eslint-disable-next-line no-shadow
       getTileIndices: (viewport, maxZoom, minZoom) => {

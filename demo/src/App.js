@@ -143,13 +143,6 @@ export default class App extends PureComponent {
     });
 
     const source = sources[sourceName];
-    const dimensions = {};
-    if (source.isZarr) {
-      // TODO: This will go away when Trevor merges.
-      dimensions.imageWidth = source.width * source.tileSize;
-      dimensions.imageHeight = source.height * source.tileSize;
-      dimensions.tileSize = source.tileSize;
-    }
     return (
       <div>
         <VivViewer
@@ -164,8 +157,7 @@ export default class App extends PureComponent {
             sliderValues,
             colorValues,
             channelsOn,
-            initialViewState,
-            ...dimensions
+            initialViewState
           }}
           /* eslint-disable react/jsx-props-no-spreading */
         />
