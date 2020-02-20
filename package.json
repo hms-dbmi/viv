@@ -33,7 +33,7 @@
     "@deck.gl/react": "^8.0.13",
     "@loaders.gl/core": "^2.0.2",
     "@loaders.gl/loader-utils": "^2.0.2",
-    "@luma.gl/constants": "^8.0.3",
+    "@luma.gl/constants": "8.0.3",
     "@luma.gl/core": "8.0.3",
     "@luma.gl/shadertools": "8.0.3",
     "deck.gl": "^8.1.0-alpha.1",
