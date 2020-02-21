@@ -6,10 +6,6 @@ import { MicroscopyViewerLayer } from './layers';
 export class MicroscopyViewer extends PureComponent {
   constructor(props) {
     super(props);
-    this._onWebGLInitialized = this._onWebGLInitialized.bind(this);
-    this.state = {
-      gl: null
-    };
   }
 
   _renderLayers() {
@@ -20,9 +16,7 @@ export class MicroscopyViewer extends PureComponent {
     });
   }
 
-  _onWebGLInitialized(gl) {
-    this.setState({ gl });
-  }
+
 
   render() {
     /* eslint-disable react/destructuring-assignment */
@@ -38,9 +32,8 @@ export class MicroscopyViewer extends PureComponent {
     return (
       <DeckGL
         glOptions={{ webgl2: true }}
-        layers={this.state.gl ? this._renderLayers() : []}
+        layers={this._renderLayers()}
         initialViewState={initialViewState}
-        onWebGLInitialized={this._onWebGLInitialized}
         controller
         views={views}
       />

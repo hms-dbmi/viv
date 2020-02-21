@@ -10,6 +10,12 @@ module.exports = {
     path: path.join(__dirname, '/dist'),
     filename: 'index_bundle.js'
   },
+  resolve: {
+    // force usage of my luma gl version
+    alias: {
+      "@luma.gl": path.resolve(__dirname, 'node_modules/@luma.gl'),
+    }
+  },
   module: {
     rules: [
       {

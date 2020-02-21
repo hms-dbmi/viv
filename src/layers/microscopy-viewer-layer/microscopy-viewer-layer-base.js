@@ -1,7 +1,6 @@
-import { BaseTileLayer } from '@deck.gl/layers';
+import {TileLayer} from '@deck.gl/geo-layers';
 import { COORDINATE_SYSTEM } from 'deck.gl';
 import { XRLayer } from '../xr-layer';
-import { tileToScreen, getRasterTileIndices } from './tiling-utils';
 
 import { loadZarr, loadTiff } from './data-utils';
 import {
@@ -14,31 +13,34 @@ import {
 const MAX_SLIDERS_AND_CHANNELS = 6;
 
 const defaultProps = {
-  ...BaseTileLayer.defaultProps,
+  ...TileLayer.defaultProps,
   pickable: false,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   maxZoom: 0,
   onViewportLoad: false,
+  onTileError: (e) => {},
+  onTileLoad: (e) => {},
   renderSubLayers: props => {
     const {
-      bbox: { west, south, east, north }
+      bbox: {left, top, right, bottom}
     } = props.tile;
+    const inBounds = left >= 0 && right >= 0 && top >= 0 && bottom >= 0
     const { sliderValues, data, colorValues } = props;
-    const xrl = new XRLayer(props, {
-      id: `XR-Layer-${west}-${south}-${east}-${north}-${props.useTiff}`,
+    const xrl = data && inBounds && new XRLayer(props, {
+      id: `XR-Layer-${left}-${top}-${right}-${bottom}-${props.useTiff}`,
       pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data,
       sliderValues,
       colorValues,
-      bounds: [west, south, east, north],
+      bounds: [left, bottom, right, top],
       visible: true
     });
     return xrl;
   }
 };
 
-export class MicroscopyViewerLayerBase extends BaseTileLayer {
+export class MicroscopyViewerLayerBase extends TileLayer {
   constructor(props) {
     const { sliderValues, colorValues, channelsOn } = props;
     const orderedChannelNames = Object.keys(sliderValues).sort();
@@ -89,24 +91,7 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
       ...props,
       sliderValues: paddedSliderValues.flat(), // flatten for use on shaders
       colorValues: paddedColorValues,
-      getTileData,
-      // eslint-disable-next-line no-shadow
-      getTileIndices: (viewport, maxZoom, minZoom) => {
-        return getRasterTileIndices({
-          viewport,
-          maxZoom,
-          minZoom,
-          ...props
-        });
-      },
-      tileToBoundingBox: (x, y, z) => {
-        return tileToScreen({
-          x,
-          y,
-          z,
-          ...props
-        });
-      }
+      getTileData
     };
     const layerProps = { ...defaultProps, ...overrideValuesProps };
     super(layerProps);
