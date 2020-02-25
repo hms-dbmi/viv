@@ -4,13 +4,22 @@
 
 import GL from '@luma.gl/constants';
 import { Layer, project32 } from '@deck.gl/core';
-import { Model, Geometry, Texture2D, ProgramManager, Program } from '@luma.gl/core';
-import {assembleShaders} from '@luma.gl/shadertools';
+import {
+  Model,
+  Geometry,
+  Texture2D,
+  ProgramManager,
+  Program
+} from '@luma.gl/core';
+import { assembleShaders } from '@luma.gl/shadertools';
 import vs from './xr-layer-vertex';
 import fs from './xr-layer-fragment';
 
 const defaultProps = {
-  data: null
+  data: null,
+  bounds: { type: 'array', value: [1, 0, 0, 1], compare: true },
+  colorValues: { type: 'object', value: {}, compare: true },
+  sliderValues: { type: 'object', value: {}, compare: true }
 };
 
 export class XRLayer extends Layer {
@@ -30,7 +39,6 @@ export class XRLayer extends Layer {
         noAlloc: true
       }
     });
-
     this.setState({
       numInstances: 1,
       positions: new Float64Array(12)
@@ -54,8 +62,10 @@ export class XRLayer extends Layer {
       if (this.state.model) {
         this.state.model.delete();
       }
+      console.log('updating attributes with gl');
       this.setState({ model: this._getModel(gl) });
       this.getAttributeManager().invalidateAll();
+      console.log('updated attributes with gl');
     }
     if (changeFlags.dataChanged) {
       this.loadTexture(props.data);
@@ -186,8 +196,8 @@ export class XRLayer extends Layer {
         (isInt32 && GL.UNSIGNED_INT)
     };
     const texture = new Texture2D(this.context.gl, {
-      width: this.props.tileSize,
-      height: this.props.tileSize,
+      width: this.props.imageWidth,
+      height: this.props.imageHeight,
       data,
       // we don't want or need mimaps
       mipmaps: false,
