@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.7
+
+### Changed
+ - Remove sort
+
 ## 0.0.6
 
 ### Added
