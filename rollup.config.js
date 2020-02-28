@@ -1,5 +1,7 @@
 // thank you https://github.com/gzuidhof/zarr.js/blob/master/rollup.config.ts
 // for giving me a starting point :)
+
+// We run linting on all files so this one is checked too.
 /* eslint-disable import/no-extraneous-dependencies */
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
