@@ -1,5 +1,5 @@
 import { BaseTileLayer } from '@deck.gl/layers';
-import { COORDINATE_SYSTEM } from 'deck.gl';
+import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import { XRLayer } from '../xr-layer';
 import { tileToScreen, getRasterTileIndices } from './tiling-utils';
 
