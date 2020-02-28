@@ -19,7 +19,7 @@ function getExternals(pkg) {
 }
 
 export default {
-  input: `src/index.js`,
+  input: 'src/index.js',
   output: [
     { file: pkgObj.main, name: libraryName, format: 'umd', sourcemap: true },
     { file: pkgObj.module, format: 'es', sourcemap: true }
