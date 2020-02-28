@@ -1,3 +1,6 @@
+// thank you https://github.com/gzuidhof/zarr.js/blob/master/rollup.config.ts
+// for giving me a starting point :)
+
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
