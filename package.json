@@ -9,7 +9,7 @@
   ],
   "description": "High bit depth, high resolution, many channels, low overhead",
   "scripts": {
-    "build-component": "mkdir dist || rm -r dist && rollup -c rollup.config.js",
+    "build-component": "mkdir dist || rm -r dist && rollup --config",
     "build-site": "mkdir dist || rm -r dist && node_modules/.bin/webpack --config webpack.site.prod.js --mode production",
     "start": "node_modules/.bin/webpack-dev-server --mode development --open --hot"
   },
