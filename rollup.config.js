@@ -12,28 +12,28 @@ const pkg = require('./package.json');
 const libraryName = '@hubmap/vitessce-image-viewer';
 
 function getExternals(pkg) {
-  const {peerDependencies = {}} = pkg;
-  console.log(Object.keys(peerDependencies))
-  return Object.keys(peerDependencies)
+  const { peerDependencies = {} } = pkg;
+  console.log(Object.keys(peerDependencies));
+  return Object.keys(peerDependencies);
 }
 
 export default {
   input: `src/index.js`,
   output: [
     { file: pkg.main, name: libraryName, format: 'umd', sourcemap: true },
-    { file: pkg.module, format: 'es', sourcemap: true },
+    { file: pkg.module, format: 'es', sourcemap: true }
   ],
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external: getExternals(pkg),
   watch: {
-    include: 'src/**',
+    include: 'src/**'
   },
   plugins: [
     // Allow json resolution
     json(),
     babel({
-        exclude: 'node_modules/**',
-        presets: ['@babel/env', '@babel/preset-react']
+      exclude: 'node_modules/**',
+      presets: ['@babel/env', '@babel/preset-react']
     }),
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
     commonjs({
@@ -41,7 +41,7 @@ export default {
         // left-hand side can be an absolute path, a path
         // relative to the current directory, or the name
         // of a module in node_modules
-        'node_modules/geotiff/dist/geotiff.bundle.min.js': [ 'fromUrl', 'Pool' ]
+        'node_modules/geotiff/dist/geotiff.bundle.min.js': ['fromUrl', 'Pool']
       }
     }),
     // Allow node_modules resolution, so you can use 'external' to control
@@ -49,6 +49,6 @@ export default {
     // https://github.com/rollup/rollup-plugin-node-resolve#usage
     resolve(),
     // Resolve source maps to the original source
-    sourceMaps(),
-  ],
+    sourceMaps()
+  ]
 };
