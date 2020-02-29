@@ -1,17 +1,17 @@
 import { BaseTileLayer } from '@deck.gl/layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
+import { ValueError } from 'zarr';
 import { XRLayer } from '../xr-layer';
 import { tileToScreen, getRasterTileIndices } from './tiling-utils';
 
 import { loadZarr, loadTiff } from './data-utils';
-import {
-  padWithDefault,
-  setOrderedValues,
-  DEFAULT_COLOR_OFF,
-  DEFAULT_SLIDER_OFF
-} from './utils';
+import { padWithDefault } from './utils';
 
 const MAX_SLIDERS_AND_CHANNELS = 6;
+const MAX_SLIDER_VALUE = 65535;
+const MAX_COLOR_INTENSITY = 255;
+const DEFAULT_SLIDER_OFF = [MAX_SLIDER_VALUE, MAX_SLIDER_VALUE];
+const DEFAULT_COLOR_OFF = [0, 0, 0];
 
 const defaultProps = {
   ...BaseTileLayer.defaultProps,
@@ -41,26 +41,32 @@ const defaultProps = {
 export class MicroscopyViewerLayerBase extends BaseTileLayer {
   constructor(props) {
     const { sliderValues, colorValues, channelsOn } = props;
-    const orderedChannelNames = Object.keys(sliderValues);
-    const { orderedSliderValues, orderedColorValues } = setOrderedValues(
-      orderedChannelNames,
-      colorValues,
-      sliderValues,
-      channelsOn
+
+    const lengths = [sliderValues.length, colorValues.length];
+    if (lengths.every(l => l !== lengths[0])) {
+      throw ValueError("Inconsistent number of slider values and colors provided");
+    }
+
+    const colors = colorValues.map((color, i) =>
+      channelsOn[i] ? color.map(c => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
+    );
+
+    const sliders = sliderValues.map((slider, i) =>
+      channelsOn[i] ? slider : DEFAULT_SLIDER_OFF
     );
 
     // Need to pad sliders and colors with default values (required by shader)
-    const padSize = MAX_SLIDERS_AND_CHANNELS - orderedChannelNames.length;
+    const padSize = MAX_SLIDERS_AND_CHANNELS - colors.length;
     if (padSize < 0) {
       throw Error('Too many channels specified for shader.');
     }
     const paddedSliderValues = padWithDefault(
-      orderedSliderValues,
+      sliders,
       DEFAULT_SLIDER_OFF,
       padSize
     );
     const paddedColorValues = padWithDefault(
-      orderedColorValues,
+      colors,
       DEFAULT_COLOR_OFF,
       padSize
     );

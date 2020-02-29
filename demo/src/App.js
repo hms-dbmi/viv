@@ -1,81 +1,80 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Slider from '@material-ui/core/Slider';
 import Checkbox from '@material-ui/core/Checkbox';
-import { withStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import { VivViewer } from '../../src';
 import sources from './source-info';
 import './App.css';
 
 const initSourceName = 'zarr';
 
+const useStyles = makeStyles({
+  slider: props => ({
+    color: props.color,
+  }),
+  checkbox: {
+    color: props => props.color,
+    '&$checked': props => ({
+      color: props.color,
+    }),
+    checked: {},
+  },
+});
+
+// const FunctionApp = () => {
+//   const channelNames = Object.keys(sources[initSourceName].channels);
+//   const [colors, setColors] = useState([
+//     [255, 0, 0],
+//     [0, 255, 0],
+//     [0, 0, 255],
+//     [255, 128, 0]
+//   ]);
+//   const [sliderValues, setSliderValues] = useState(Array(channelNames.length).fill([0, 20000]));
+//   const [channelsOn, setChannelsOn] = useState(Array(channelNames.length).fill(true));
+// }
+
 export default class App extends PureComponent {
   constructor(props) {
     super(props);
     this.resize = this.resize.bind(this);
-    const sliderValues = {};
-    const colorValues = {};
-    const sliders = {};
-    const checkboxes = {};
-    const channelsOn = {};
-    const colorOptions = [
+    const channelNames = Object.keys(sources[initSourceName].channels);
+    const colorValues = [
       [255, 0, 0],
       [0, 255, 0],
       [0, 0, 255],
       [255, 128, 0]
     ];
-    Object.keys(sources[initSourceName].channels).forEach((channel, i) => {
-      sliderValues[channel] = [0, 20000];
-      colorValues[channel] = colorOptions[i];
-      channelsOn[channel] = true;
-      sliders[channel] = withStyles({
-        root: {
-          color: `rgb(${colorOptions[i]})`
-        }
-      })(Slider);
-      checkboxes[channel] = withStyles({
-        root: {
-          color: `rgb(${colorOptions[i]})`,
-          '&$checked': {
-            color: colorOptions[i]
-          }
-        },
-        checked: {}
-        // eslint-disable-next-line react/jsx-props-no-spreading
-      })(checkBoxProps => (
-        // eslint-disable-next-line react/jsx-props-no-spreading
-        <Checkbox color="default" {...checkBoxProps} />
-      ));
-    });
+    const sliderValues = Array(channelNames.length).fill([0, 20000]);
+    const channelsOn = Array(channelNames.length).fill(true);
+
     this.state = {
       sliderValues,
       colorValues,
       channelsOn,
+      channelNames,
       viewHeight: window.innerHeight * 0.9,
       viewWidth: window.innerWidth * 0.7,
       sourceName: initSourceName
     };
     this.max = 65535;
-    this.sliders = sliders;
-    this.checkboxes = checkboxes;
     window.addEventListener('resize', this.resize);
   }
 
-  handleSliderChange(event, value, channel) {
-    const channelValue = {};
-    channelValue[channel] = value;
+  handleSliderChange(index, value) {
     this.setState(prevState => {
-      return { sliderValues: { ...prevState.sliderValues, ...channelValue } };
+      const sliderValues = [...prevState.sliderValues];
+      sliderValues[index] = value;
+      return { sliderValues };
     });
-  }
+  };
 
-  toggleChannel(channelName) {
+  toggleChannel(index) {
     this.setState(prevState => {
-      const newChannelsOn = {
-        [channelName]: !prevState.channelsOn[channelName]
-      };
-      return { channelsOn: { ...prevState.channelsOn, ...newChannelsOn } };
+      const channelsOn = [...prevState.channelsOn];
+      channelsOn[index] = !channelsOn[index];
+      return { channelsOn }
     });
   }
 
@@ -95,37 +94,12 @@ export default class App extends PureComponent {
     const {
       sliderValues,
       colorValues,
+      channelNames,
       viewHeight,
       viewWidth,
       channelsOn
     } = this.state;
-    const sliders = Object.keys(this.sliders).map(channel => {
-      const ChannelSlider = this.sliders[channel];
-      const ChannelCheckbox = this.checkboxes[channel];
-      const sliderValue = sliderValues[channel];
-      return (
-        <div key={`container-${channel}`}>
-          <p>{channel}</p>
-          <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
-            <ChannelCheckbox
-              // eslint-disable-next-line no-unused-vars
-              onChange={e => this.toggleChannel(channel)}
-              checked={channelsOn[channel]}
-            />
-            <ChannelSlider
-              style={{ top: '7px' }}
-              value={sliderValue}
-              onChange={(e, v) => this.handleSliderChange(e, v, channel)}
-              valueLabelDisplay="auto"
-              getAriaLabel={() => channel}
-              min={0}
-              max={this.max}
-              orientation="horizontal"
-            />
-          </div>
-        </div>
-      );
-    });
+    console.log(colorValues)
 
     const sourceButtons = Object.keys(sources).map(name => {
       return (
@@ -180,7 +154,31 @@ export default class App extends PureComponent {
           <ButtonGroup color="primary" size="small">
             {sourceButtons}
           </ButtonGroup>
-          {sliders}
+          {channelNames.map((channel, index) => {
+            // const classes  = useStyles({ color: colorValues[index] });
+            return (
+              <div key={`container-${channel}`}>
+                <p>{channel}</p>
+                <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
+                  <Checkbox
+                    // className={classes.checkbox}
+                    onChange={(event) => this.toggleChannel(index)}
+                    checked={channelsOn[channel]}
+                  />
+                  <Slider
+                    // className={classes.slider}
+                    style={{ top: '7px' }}
+                    value={sliderValues[index]}
+                    onChange={(event, value) => this.handleSliderChange(index, value)}
+                    valueLabelDisplay="auto"
+                    getAriaLabel={() => channel}
+                    min={0}
+                    max={this.max}
+                    orientation="horizontal"
+                  />
+                </div>
+              </div>
+          )})}
         </div>
       </div>
     );
