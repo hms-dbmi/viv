@@ -1,9 +1,5 @@
 import React, { useState, useEffect, memo } from 'react';
-import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import Slider from '@material-ui/core/Slider';
-import Checkbox from '@material-ui/core/Checkbox';
-import { withStyles } from '@material-ui/core/styles';
+import { Button, ButtonGroup, Slider, Checkbox, withStyles }  from '@material-ui/core';
 import { VivViewer } from '../../src';
 import sources from './source-info';
 import './App.css';
@@ -13,22 +9,39 @@ const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
 const MIN_ZOOM = -8;
 const DEFAULT_VIEW_CONFIG = { zoom: -5.5, target: [30000, 10000, 0] };
-const INIT_SOURCE_NAME = 'zarr';
-const INIT_COLOR_VALUES = [
+
+const initSourceName = 'zarr';
+const colorValues = [
   [255, 0, 0],
   [0, 255, 0],
   [0, 0, 255],
   [255, 128, 0],
 ];
-const INIT_SLIDER_VALUES = Array(INIT_COLOR_VALUES.length).fill([0, 20000]);
-const INIT_CHANNELS_ON = Array(INIT_COLOR_VALUES.length).fill(true);
+const styledSelectors = colorValues.map(color => {
+  const ColoredSlider = withStyles({
+    root: {
+      color: `rgb(${color})`,
+    }
+  })(Slider);
+  const ColoredCheckbox = withStyles({
+    root: {
+      color: `rgb(${color})`,
+      '&$checked': {
+        color: `rgb(${color})`
+      }
+    },
+    checked: {}
+  })(Checkbox)
+  return [ColoredSlider, ColoredCheckbox]
+})
 
+const initSliderValues = Array(colorValues.length).fill([0, 20000]);
+const initChannelsOn = Array(colorValues.length).fill(true);
 
 const App = () => {
-  const [colorValues] = useState(INIT_COLOR_VALUES); // We can add setter in demo later
-  const [sliderValues, setSliderValues] = useState(INIT_SLIDER_VALUES);
-  const [channelsOn, setChannelsOn] = useState(INIT_CHANNELS_ON);
-  const [sourceName, setSourceName] = useState(INIT_SOURCE_NAME);
+  const [sliderValues, setSliderValues] = useState(initSliderValues);
+  const [channelsOn, setChannelsOn] = useState(initChannelsOn);
+  const [sourceName, setSourceName] = useState(initSourceName);
   const [viewWidth, setViewWidth] = useState(window.innerWidth * 0.7);
   const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.9);
 
@@ -59,6 +72,7 @@ const App = () => {
     });
   }
 
+
   const sourceButtons = Object.keys(sources).map(name => {
     return (
       <Button
@@ -72,27 +86,46 @@ const App = () => {
     );
   });
 
-  const initialViewState = sources[sourceName].initialViewState || DEFAULT_VIEW_CONFIG
-  const source = sources[sourceName];
-  const channelNames = Object.keys(source.channels);
+  const sliders = Object.keys(sources[sourceName].channels).map((channel, i) => {
+    const [ColoredSlider, ColoredCheckbox] = styledSelectors[i];
+    return (
+      <div key={`container-${channel}`}>
+        <p>{channel}</p>
+        <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
+          <ColoredCheckbox
+            onChange={() => toggleChannel(i)}
+            checked={channelsOn[i]}
+          />
+          <ColoredSlider
+            style={{ top: '7px' }}
+            value={sliderValues[i]}
+            onChange={(event, value) => handleSliderChange(i, value)}
+            valueLabelDisplay="auto"
+            getAriaLabel={() => channel}
+            min={MIN_SLIDER_VALUE}
+            max={MAX_SLIDER_VALUE}
+            orientation="horizontal"
+          />
+        </div>
+      </div>
+  )});
 
+  const source = sources[sourceName];
+
+  const initialViewState = sources[sourceName].initialViewState || DEFAULT_VIEW_CONFIG
   return (
     <div>
       <VivViewer
-        /* eslint-disable react/jsx-props-no-spreading */
-        {...{
-          useTiff: source.isTiff,
-          useZarr: source.isZarr,
-          sourceChannels: source.channels,
-          minZoom: MIN_ZOOM,
-          viewHeight,
-          viewWidth,
-          sliderValues,
-          colorValues,
-          channelsOn,
-          initialViewState
-        }}
-        /* eslint-disable react/jsx-props-no-spreading */
+        useTiff={source.isTiff}
+        useZarr={source.isZarr}
+        sourceChannels={source.channels}
+        minZoom={MIN_ZOOM}
+        viewHeight={viewHeight}
+        viewWidth={viewWidth}
+        sliderValues={sliderValues}
+        colorValues={colorValues}
+        channelsOn={channelsOn}
+        initialViewState={initialViewState}
       />
       <div className="slider-container">
         <p>
@@ -113,44 +146,7 @@ const App = () => {
         <ButtonGroup color="primary" size="small">
           {sourceButtons}
         </ButtonGroup>
-        {channelNames.map((channel, index) => {
-          const ColoredSlider = withStyles({
-            root: {
-              color: `rgb(${colorValues[index]})`
-            }
-          })(Slider)
-          const ColoredCheckbox = withStyles({
-            root: {
-              color: `rgb(${colorValues[index]})`,
-              '&$checked': {
-                color: colorValues[index]
-              }
-            },
-            checked: {}
-          })(checkBoxProps => (
-            <Checkbox color="default" {...checkBoxProps} />
-          ));
-          return (
-            <div key={`container-${channel}`}>
-              <p>{channel}</p>
-              <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
-                <ColoredCheckbox
-                  onChange={() => toggleChannel(index)}
-                  checked={channelsOn[index]}
-                />
-                <ColoredSlider
-                  style={{ top: '7px' }}
-                  value={sliderValues[index]}
-                  onChange={(event, value) => handleSliderChange(index, value)}
-                  valueLabelDisplay="auto"
-                  getAriaLabel={() => channel}
-                  min={MIN_SLIDER_VALUE}
-                  max={MAX_SLIDER_VALUE}
-                  orientation="horizontal"
-                />
-              </div>
-            </div>
-        )})}
+        {sliders}
       </div>
     </div>
   );
