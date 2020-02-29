@@ -65,6 +65,7 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
       DEFAULT_SLIDER_OFF,
       padSize
     );
+
     const paddedColorValues = padWithDefault(
       colors,
       DEFAULT_COLOR_OFF,
