@@ -49,6 +49,7 @@ export default class ZarrLoader {
       minZoom,
       scale: this.scale,
       usePool: false,
+      type: 'zarr'
     };
   }
 

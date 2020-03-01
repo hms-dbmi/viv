@@ -14,6 +14,7 @@ export default class TiffPyramidLoader {
   constructor(channelPyramids, channelNames) {
     this.channelPyramids = channelPyramids;
     this.channelNames = channelNames;
+    this.type = 'tiff';
   }
 
   get vivMetadata() {
@@ -23,7 +24,13 @@ export default class TiffPyramidLoader {
     const imageWidth = firstFullImage.ImageWidth;
     const imageHeight = firstFullImage.ImageLength;
     const tileSize = firstFullImage.TileWidth;
-    return { minZoom, imageWidth, imageHeight, tileSize, usePool: true }
+    return {
+      minZoom,
+      imageWidth,
+      imageHeight,
+      tileSize,
+      usePool: true,
+    }
   }
 
   async getTile({ x, y, z, pool }) {

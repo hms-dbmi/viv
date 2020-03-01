@@ -66,11 +66,13 @@ const App = () => {
         isRgb: false,
         dimNames: ["channel", "y", "x"]
       }
+      // Need to do this to clear last loader... probably a better way.
+      setLoader(null);
       const newLoader = await initPyramidLoader(sourceName, config);
-      setLoader(newLoader)
+      setLoader(newLoader);
     }
     initLoader();
-  }, [sourceName])
+  }, [sourceName]);
 
   const handleSliderChange = (index, value) => {
     setSliderValues(prevSliderValues => {
@@ -133,8 +135,6 @@ const App = () => {
     <div>
       {loader ? (
         <VivViewer
-          useTiff={source.isTiff}
-          useZarr={source.isZarr}
           sourceChannels={source.channels}
           loader={loader}
           minZoom={MIN_ZOOM}

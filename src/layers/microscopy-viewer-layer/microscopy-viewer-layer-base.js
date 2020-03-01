@@ -22,9 +22,9 @@ const defaultProps = {
     const {
       bbox: { west, south, east, north }
     } = props.tile;
-    const { sliderValues, data, colorValues } = props;
+    const { sliderValues, data, colorValues, loader } = props;
     const xrl = new XRLayer(props, {
-      id: `XR-Layer-${west}-${south}-${east}-${north}-${props.useTiff}`,
+      id: `XR-Layer-${west}-${south}-${east}-${north}-${loader.type}`,
       pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data,
