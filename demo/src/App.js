@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import { Button, ButtonGroup, Slider, Checkbox, withStyles }  from '@material-ui/core';
-import { VivViewer } from '../../src';
+import { VivViewer, initPyramidLoader } from '../../src';
 import sources from './source-info';
 import './App.css';
 
@@ -44,6 +44,7 @@ const App = () => {
   const [sourceName, setSourceName] = useState(initSourceName);
   const [viewWidth, setViewWidth] = useState(window.innerWidth * 0.7);
   const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.9);
+  const [loader, setLoader] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -55,6 +56,21 @@ const App = () => {
       window.removeEventListener('resize', handleResize);
     };
   });
+
+  useEffect(() => {
+    async function initLoader() {
+      const config = {
+        scale: 1,
+        sourceChannels: sources[sourceName].channels,
+        minZoom: MIN_ZOOM,
+        isRgb: false,
+        dimNames: ["channel", "y", "x"]
+      }
+      const newLoader = await initPyramidLoader(sourceName, config);
+      setLoader(newLoader)
+    }
+    initLoader();
+  }, [sourceName])
 
   const handleSliderChange = (index, value) => {
     setSliderValues(prevSliderValues => {
@@ -115,18 +131,21 @@ const App = () => {
   const initialViewState = sources[sourceName].initialViewState || DEFAULT_VIEW_CONFIG
   return (
     <div>
-      <VivViewer
-        useTiff={source.isTiff}
-        useZarr={source.isZarr}
-        sourceChannels={source.channels}
-        minZoom={MIN_ZOOM}
-        viewHeight={viewHeight}
-        viewWidth={viewWidth}
-        sliderValues={sliderValues}
-        colorValues={colorValues}
-        channelsOn={channelsOn}
-        initialViewState={initialViewState}
-      />
+      {loader ? (
+        <VivViewer
+          useTiff={source.isTiff}
+          useZarr={source.isZarr}
+          sourceChannels={source.channels}
+          loader={loader}
+          minZoom={MIN_ZOOM}
+          viewHeight={viewHeight}
+          viewWidth={viewWidth}
+          sliderValues={sliderValues}
+          colorValues={colorValues}
+          channelsOn={channelsOn}
+          initialViewState={initialViewState}
+        />
+) : null}
       <div className="slider-container">
         <p>
           <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer

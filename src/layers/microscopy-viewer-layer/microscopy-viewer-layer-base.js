@@ -4,7 +4,6 @@ import { ValueError } from 'zarr';
 import { XRLayer } from '../xr-layer';
 import { tileToScreen, getRasterTileIndices } from './tiling-utils';
 
-import { loadZarr, loadTiff } from './data-utils';
 import { padWithDefault } from './utils';
 
 const MAX_SLIDERS_AND_CHANNELS = 6;
@@ -40,7 +39,7 @@ const defaultProps = {
 
 export class MicroscopyViewerLayerBase extends BaseTileLayer {
   constructor(props) {
-    const { sliderValues, colorValues, channelsOn } = props;
+    const { sliderValues, colorValues, channelsOn, loader } = props;
 
     const lengths = [sliderValues.length, colorValues.length];
     if (lengths.every(l => l !== lengths[0])) {
@@ -72,26 +71,7 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
       padSize
     );
 
-    const getZarr = ({ x, y, z }) => {
-      return loadZarr({
-        x,
-        y,
-        z: -1 * z,
-        ...props
-      });
-    };
-    const getTiff = ({ x, y, z }) => {
-      return loadTiff({
-        x,
-        y,
-        z: -1 * z,
-        ...props
-      });
-    };
-    const getTileData =
-      (props.useZarr && getZarr) ||
-      (props.useTiff && getTiff) ||
-      props.getTileData;
+    const getTileData = ({ x, y, z }) => loader.getTile({ x, y, z: -z, ...props } );
     const overrideValuesProps = {
       ...props,
       sliderValues: paddedSliderValues.flat(), // flatten for use on shaders

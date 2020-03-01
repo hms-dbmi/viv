@@ -1,6 +1,6 @@
 import { range } from '../layers/microscopy-viewer-layer/utils';
 
-export class ZarrLoader {
+export default class ZarrLoader {
   constructor(data, isRgb, scale, dimNames) {
     let base;
     if (Array.isArray(data)) {
@@ -42,7 +42,14 @@ export class ZarrLoader {
     const imageWidth =  this._base.shape[this.xIndex];
     const tileSize = this._base.chunks[this.xIndex];
     const minZoom = this.isPyramid ? -this._data.length : 0;
-    return { imageWidth, imageHeight, tileSize, minZoom, scale: this.scale };
+    return {
+      imageWidth,
+      imageHeight,
+      tileSize,
+      minZoom,
+      scale: this.scale,
+      usePool: false,
+    };
   }
 
   setChunkIndex(dimName, index) {
@@ -68,25 +75,25 @@ export class ZarrLoader {
 
     const chunkKey = [...this.chunkIndex];
     chunkKey[this.xIndex] = x;
-    chunkKey[this.xIndex] = y;
+    chunkKey[this.yIndex] = y;
 
     if (this.isRgb) {
       // Return one interleaved TypedArray
       const imageTile = await source.getRawChunk(chunkKey);
-      return imageTile;
+      return imageTile.data;
     }
 
     let tiles;
     // Return Array of TypedArrays
     if (this.channelChunkSize > 1) {
       const tile = await source.getRawChunk(chunkKey);
-      tiles = source._decodeChannels(tile);
+      tiles = this._decodeChannels(tile.data);
     } else {
       const tileRequests = this.channelChunkIndices.map(i => {
         chunkKey[this.channelIndex] = i;
         return this._data.getRawChunk(chunkKey)
       })
-      tiles = await Promise.all(tileRequests);
+      tiles = (await Promise.all(tileRequests)).map(t => t.data);
     }
     return tiles;
   }

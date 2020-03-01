@@ -2,7 +2,6 @@ import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
 import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 import { MicroscopyViewerLayerBase } from './microscopy-viewer-layer-base';
-import { initTiff, initZarr } from './data-utils';
 
 export class MicroscopyViewerLayer extends CompositeLayer {
   initializeState() {
@@ -25,58 +24,29 @@ export class MicroscopyViewerLayer extends CompositeLayer {
   }
 
   updateState() {
-    /* eslint-disable no-bitwise */
-    if (
-      !this.state.connections ||
-      this.props.useTiff ^ this.state.isTiff ||
-      this.props.useZarr ^ this.state.isZarr
-    ) {
-      /* eslint-disable no-bitwise */
-      if (this.props.useTiff) {
-        initTiff({ ...this.props }).then(
-          ({ connections, minZoom, imageWidth, imageHeight, tileSize }) => {
-            this.setState({
-              connections,
-              minZoom,
-              imageWidth,
-              imageHeight,
-              tileSize,
-              pool: new Pool(),
-              isZarr: false,
-              isTiff: true
-            });
-          }
-        );
-      } else {
-        initZarr({ ...this.props }).then(
-          ({ connections, minZoom, imageWidth, imageHeight, tileSize }) => {
-            this.setState({
-              connections,
-              minZoom,
-              imageWidth,
-              imageHeight,
-              tileSize,
-              isZarr: true,
-              isTiff: false
-            });
-          }
-        );
-      }
+    if (this.props.loader) {
+      const { imageWidth, imageHeight, tileSize, minZoom, usePool } = this.props.loader.vivMetadata;
+
+      this.setState({
+        minZoom,
+        imageWidth,
+        imageHeight,
+        tileSize,
+        pool: usePool ? new Pool() : null,
+      });
     }
   }
 
   renderLayers() {
     const {
-      connections,
-      pool,
       imageWidth,
       imageHeight,
       tileSize,
-      minZoom
+      minZoom,
+      pool
     } = this.state;
-    const layers = connections
+    const layers = this.props.loader
       ? new MicroscopyViewerLayerBase({
-          connections,
           pool,
           imageWidth,
           imageHeight,

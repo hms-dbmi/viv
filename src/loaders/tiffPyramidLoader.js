@@ -23,7 +23,7 @@ export default class TiffPyramidLoader {
     const imageWidth = firstFullImage.ImageWidth;
     const imageHeight = firstFullImage.ImageLength;
     const tileSize = firstFullImage.TileWidth;
-    return { minZoom, imageWidth, imageHeight, tileSize }
+    return { minZoom, imageWidth, imageHeight, tileSize, usePool: true }
   }
 
   async getTile({ x, y, z, pool }) {
