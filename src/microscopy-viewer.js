@@ -13,7 +13,7 @@ export class MicroscopyViewer extends PureComponent {
   }
 
   _renderLayers() {
-    const { loader  } = this.props;
+    const { loader } = this.props;
     return new MicroscopyViewerLayer({
       id: `MicroscopyViewerLayer-${loader.type}}`,
       ...this.props

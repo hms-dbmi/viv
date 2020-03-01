@@ -29,8 +29,8 @@ export default class TiffPyramidLoader {
       imageWidth,
       imageHeight,
       tileSize,
-      usePool: true,
-    }
+      usePool: true
+    };
   }
 
   async getTile({ x, y, z, pool }) {

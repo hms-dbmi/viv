@@ -43,11 +43,15 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
 
     const lengths = [sliderValues.length, colorValues.length];
     if (lengths.every(l => l !== lengths[0])) {
-      throw ValueError("Inconsistent number of slider values and colors provided");
+      throw ValueError(
+        'Inconsistent number of slider values and colors provided'
+      );
     }
 
     const colors = colorValues.map((color, i) =>
-      channelsOn[i] ? color.map(c => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
+      channelsOn[i]
+        ? color.map(c => c / MAX_COLOR_INTENSITY)
+        : DEFAULT_COLOR_OFF
     );
 
     const sliders = sliderValues.map((slider, i) =>
@@ -71,7 +75,8 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
       padSize
     );
 
-    const getTileData = ({ x, y, z }) => loader.getTile({ x, y, z: -z, ...props } );
+    const getTileData = ({ x, y, z }) =>
+      loader.getTile({ x, y, z: -z, ...props });
     const overrideValuesProps = {
       ...props,
       sliderValues: paddedSliderValues.flat(), // flatten for use on shaders

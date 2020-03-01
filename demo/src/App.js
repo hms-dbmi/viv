@@ -1,9 +1,14 @@
 import React, { useState, useEffect, memo } from 'react';
-import { Button, ButtonGroup, Slider, Checkbox, withStyles }  from '@material-ui/core';
+import {
+  Button,
+  ButtonGroup,
+  Slider,
+  Checkbox,
+  withStyles
+} from '@material-ui/core';
 import { VivViewer, initPyramidLoader } from '../../src';
 import sources from './source-info';
 import './App.css';
-
 
 const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
@@ -15,12 +20,12 @@ const colorValues = [
   [255, 0, 0],
   [0, 255, 0],
   [0, 0, 255],
-  [255, 128, 0],
+  [255, 128, 0]
 ];
 const styledSelectors = colorValues.map(color => {
   const ColoredSlider = withStyles({
     root: {
-      color: `rgb(${color})`,
+      color: `rgb(${color})`
     }
   })(Slider);
   const ColoredCheckbox = withStyles({
@@ -31,9 +36,9 @@ const styledSelectors = colorValues.map(color => {
       }
     },
     checked: {}
-  })(Checkbox)
-  return [ColoredSlider, ColoredCheckbox]
-})
+  })(Checkbox);
+  return [ColoredSlider, ColoredCheckbox];
+});
 
 const initSliderValues = Array(colorValues.length).fill([0, 20000]);
 const initChannelsOn = Array(colorValues.length).fill(true);
@@ -50,7 +55,7 @@ const App = () => {
     const handleResize = () => {
       setViewWidth(window.innerWidth * 0.7);
       setViewHeight(window.innerHeight * 0.9);
-    }
+    };
     window.addEventListener('resize', handleResize);
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -64,8 +69,8 @@ const App = () => {
         sourceChannels: sources[sourceName].channels,
         minZoom: MIN_ZOOM,
         isRgb: false,
-        dimNames: ["channel", "y", "x"]
-      }
+        dimNames: ['channel', 'y', 'x']
+      };
       // Need to do this to clear last loader... probably a better way.
       setLoader(null);
       const newLoader = await initPyramidLoader(sourceName, config);
@@ -82,14 +87,13 @@ const App = () => {
     });
   };
 
-  const toggleChannel = (index) => {
+  const toggleChannel = index => {
     setChannelsOn(prevChannelsOn => {
       const nextChannelsOn = [...prevChannelsOn];
       nextChannelsOn[index] = !nextChannelsOn[index];
-      return nextChannelsOn
+      return nextChannelsOn;
     });
-  }
-
+  };
 
   const sourceButtons = Object.keys(sources).map(name => {
     return (
@@ -104,33 +108,37 @@ const App = () => {
     );
   });
 
-  const sliders = Object.keys(sources[sourceName].channels).map((channel, i) => {
-    const [ColoredSlider, ColoredCheckbox] = styledSelectors[i];
-    return (
-      <div key={`container-${channel}`}>
-        <p>{channel}</p>
-        <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
-          <ColoredCheckbox
-            onChange={() => toggleChannel(i)}
-            checked={channelsOn[i]}
-          />
-          <ColoredSlider
-            style={{ top: '7px' }}
-            value={sliderValues[i]}
-            onChange={(event, value) => handleSliderChange(i, value)}
-            valueLabelDisplay="auto"
-            getAriaLabel={() => channel}
-            min={MIN_SLIDER_VALUE}
-            max={MAX_SLIDER_VALUE}
-            orientation="horizontal"
-          />
+  const sliders = Object.keys(sources[sourceName].channels).map(
+    (channel, i) => {
+      const [ColoredSlider, ColoredCheckbox] = styledSelectors[i];
+      return (
+        <div key={`container-${channel}`}>
+          <p>{channel}</p>
+          <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
+            <ColoredCheckbox
+              onChange={() => toggleChannel(i)}
+              checked={channelsOn[i]}
+            />
+            <ColoredSlider
+              style={{ top: '7px' }}
+              value={sliderValues[i]}
+              onChange={(event, value) => handleSliderChange(i, value)}
+              valueLabelDisplay="auto"
+              getAriaLabel={() => channel}
+              min={MIN_SLIDER_VALUE}
+              max={MAX_SLIDER_VALUE}
+              orientation="horizontal"
+            />
+          </div>
         </div>
-      </div>
-  )});
+      );
+    }
+  );
 
   const source = sources[sourceName];
 
-  const initialViewState = sources[sourceName].initialViewState || DEFAULT_VIEW_CONFIG
+  const initialViewState =
+    sources[sourceName].initialViewState || DEFAULT_VIEW_CONFIG;
   return (
     <div>
       {loader ? (
@@ -145,12 +153,12 @@ const App = () => {
           channelsOn={channelsOn}
           initialViewState={initialViewState}
         />
-) : null}
+      ) : null}
       <div className="slider-container">
         <p>
           <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer
-          for high bit depth, high resolution, multi-channel images using
-          DeckGL over the hood and WebGL under the hood.
+          for high bit depth, high resolution, multi-channel images using DeckGL
+          over the hood and WebGL under the hood.
         </p>
         <p>
           More information:{' '}
@@ -169,7 +177,7 @@ const App = () => {
       </div>
     </div>
   );
-}
+};
 
 // equivalent to PureComponent
 export default memo(App);

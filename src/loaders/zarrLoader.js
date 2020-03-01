@@ -32,14 +32,14 @@ export default class ZarrLoader {
 
   get _base() {
     if (this.isPyramid) {
-      return this._data[0]
+      return this._data[0];
     }
     return this._data;
   }
 
   get vivMetadata() {
     const imageHeight = this._base.shape[this.yIndex];
-    const imageWidth =  this._base.shape[this.xIndex];
+    const imageWidth = this._base.shape[this.xIndex];
     const tileSize = this._base.chunks[this.xIndex];
     const minZoom = this.isPyramid ? -this._data.length : 0;
     return {
@@ -62,7 +62,9 @@ export default class ZarrLoader {
     } else {
       // Multiple dimension names and indicies provided
       if (dimName.length !== index.length) {
-        throw Error(`Dimension names and indicies must be same length when set together`);
+        throw Error(
+          `Dimension names and indicies must be same length when set together`
+        );
       }
       for (let i = 0; i < dimName.length; i += 1) {
         const dimIndex = this.dimNames.indexOf(dimName);
@@ -92,8 +94,8 @@ export default class ZarrLoader {
     } else {
       const tileRequests = this.channelChunkIndices.map(i => {
         chunkKey[this.channelIndex] = i;
-        return this._data.getRawChunk(chunkKey)
-      })
+        return this._data.getRawChunk(chunkKey);
+      });
       tiles = (await Promise.all(tileRequests)).map(t => t.data);
     }
     return tiles;

@@ -25,26 +25,26 @@ export class MicroscopyViewerLayer extends CompositeLayer {
 
   updateState() {
     if (this.props.loader) {
-      const { imageWidth, imageHeight, tileSize, minZoom, usePool } = this.props.loader.vivMetadata;
+      const {
+        imageWidth,
+        imageHeight,
+        tileSize,
+        minZoom,
+        usePool
+      } = this.props.loader.vivMetadata;
 
       this.setState({
         minZoom,
         imageWidth,
         imageHeight,
         tileSize,
-        pool: usePool ? new Pool() : null,
+        pool: usePool ? new Pool() : null
       });
     }
   }
 
   renderLayers() {
-    const {
-      imageWidth,
-      imageHeight,
-      tileSize,
-      minZoom,
-      pool
-    } = this.state;
+    const { imageWidth, imageHeight, tileSize, minZoom, pool } = this.state;
     const layers = this.props.loader
       ? new MicroscopyViewerLayerBase({
           pool,

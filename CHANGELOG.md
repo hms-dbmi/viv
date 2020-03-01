@@ -9,6 +9,7 @@
 
 ### Changed
  - Remove sort
+ - Extracted data utils to loaders and refactored demo
 
 ## 0.0.6
 
