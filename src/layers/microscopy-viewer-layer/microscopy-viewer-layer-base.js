@@ -1,6 +1,5 @@
 import { BaseTileLayer } from '@deck.gl/layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
-import { ValueError } from 'zarr';
 import { XRLayer } from '../xr-layer';
 import { tileToScreen, getRasterTileIndices } from './tiling-utils';
 
@@ -43,9 +42,7 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
 
     const lengths = [sliderValues.length, colorValues.length];
     if (lengths.every(l => l !== lengths[0])) {
-      throw ValueError(
-        'Inconsistent number of slider values and colors provided'
-      );
+      throw Error('Inconsistent number of slider values and colors provided');
     }
 
     const colors = colorValues.map((color, i) =>
