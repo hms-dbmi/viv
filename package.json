@@ -44,6 +44,7 @@
     "@babel/core": "^7.7.4",
     "@babel/preset-env": "^7.8.3",
     "@babel/preset-react": "^7.8.3",
+    "@deck.gl/test-utils": "^8.1.0-alpha.5",
     "@luma.gl/test-utils": "^8.1.0-alpha",
     "@material-ui/core": "^4.8.3",
     "@probe.gl/test-utils": "^3.2.1",
