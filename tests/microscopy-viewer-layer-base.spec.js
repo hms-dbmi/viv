@@ -1,6 +1,6 @@
+/* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
 import { testLayer } from '@deck.gl/test-utils';
-import GL from '@luma.gl/constants';
 import { MicroscopyViewerLayerBase } from '../src/layers/microscopy-viewer-layer/microscopy-viewer-layer-base';
 
 test('MicroscopyViewerLayerBase#constructor', t => {
@@ -95,25 +95,25 @@ test('MicroscopyViewerLayerBase#constructor', t => {
               [0, 0, 0]
             ],
             'should turn off first channel color'
-          ),
-            t.deepEqual(
-              layer.props.sliderValues,
-              [
-                65535,
-                65535,
-                2,
-                9,
-                65535,
-                65535,
-                65535,
-                65535,
-                65535,
-                65535,
-                65535,
-                65535
-              ],
-              'should turn off first slider'
-            );
+          );
+          t.deepEqual(
+            layer.props.sliderValues,
+            [
+              65535,
+              65535,
+              2,
+              9,
+              65535,
+              65535,
+              65535,
+              65535,
+              65535,
+              65535,
+              65535,
+              65535
+            ],
+            'should turn off first slider'
+          );
         }
       }
     ]

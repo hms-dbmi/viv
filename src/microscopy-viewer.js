@@ -4,10 +4,6 @@ import { OrthographicView } from '@deck.gl/core';
 import { MicroscopyViewerLayer } from './layers';
 
 export class MicroscopyViewer extends PureComponent {
-  constructor(props) {
-    super(props);
-  }
-
   _renderLayers() {
     const { useTiff } = this.props;
     return new MicroscopyViewerLayer({

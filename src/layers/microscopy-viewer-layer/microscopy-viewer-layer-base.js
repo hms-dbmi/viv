@@ -1,5 +1,5 @@
 import { TileLayer } from '@deck.gl/geo-layers';
-import { COORDINATE_SYSTEM } from 'deck.gl';
+import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import { XRLayer } from '../xr-layer';
 
 import { loadZarr, loadTiff } from './data-utils';
@@ -18,7 +18,9 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   maxZoom: 0,
   onViewportLoad: false,
-  onTileError: e => {},
+  // eslint-disable-next-line no-console
+  onTileError: e => console.log(e),
+  // eslint-disable-next-line no-unused-vars
   onTileLoad: e => {},
   renderSubLayers: props => {
     const {

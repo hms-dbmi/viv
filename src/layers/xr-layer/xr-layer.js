@@ -4,14 +4,7 @@
 
 import GL from '@luma.gl/constants';
 import { Layer, project32 } from '@deck.gl/core';
-import {
-  Model,
-  Geometry,
-  Texture2D,
-  ProgramManager,
-  Program
-} from '@luma.gl/core';
-import { assembleShaders } from '@luma.gl/shadertools';
+import { Model, Geometry, Texture2D } from '@luma.gl/core';
 import vs from './xr-layer-vertex';
 import fs from './xr-layer-fragment';
 

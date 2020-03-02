@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
 import { testLayer } from '@deck.gl/test-utils';
 import GL from '@luma.gl/constants';
@@ -21,7 +22,6 @@ test('XRLayer#constructor', t => {
           tileSize,
           data: [data0]
         },
-        onBeforeUpdate({ layer }) {},
         onAfterUpdate({ layer }) {
           t.ok(layer.state, 'should update layer state');
           t.deepEqual(
