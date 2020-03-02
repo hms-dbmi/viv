@@ -27,7 +27,13 @@ start eslint
 node_modules/eslint/bin/eslint.js .
 end eslint
 
+start test
+npm run-script test
+end test
+
 start build
 npm run-script build-component
 npm run-script build-site
 end build
+
+echo 'ALL TESTS PASSED'

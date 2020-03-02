@@ -1,4 +1,4 @@
-import {TileLayer} from '@deck.gl/geo-layers';
+import { TileLayer } from '@deck.gl/geo-layers';
 import { COORDINATE_SYSTEM } from 'deck.gl';
 import { XRLayer } from '../xr-layer';
 
@@ -18,24 +18,27 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   maxZoom: 0,
   onViewportLoad: false,
-  onTileError: (e) => {},
-  onTileLoad: (e) => {},
+  onTileError: e => {},
+  onTileLoad: e => {},
   renderSubLayers: props => {
     const {
-      bbox: {left, top, right, bottom}
+      bbox: { left, top, right, bottom }
     } = props.tile;
-    const inBounds = left >= 0 && right >= 0 && top >= 0 && bottom >= 0
+    const inBounds = left >= 0 && right >= 0 && top >= 0 && bottom >= 0;
     const { sliderValues, data, colorValues } = props;
-    const xrl = data && inBounds && new XRLayer(props, {
-      id: `XR-Layer-${left}-${top}-${right}-${bottom}-${props.useTiff}`,
-      pickable: false,
-      coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-      data,
-      sliderValues,
-      colorValues,
-      bounds: [left, bottom, right, top],
-      visible: true
-    });
+    const xrl =
+      data &&
+      inBounds &&
+      new XRLayer(props, {
+        id: `XR-Layer-${left}-${top}-${right}-${bottom}-${props.useTiff}`,
+        pickable: false,
+        coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+        data,
+        sliderValues,
+        colorValues,
+        bounds: [left, bottom, right, top],
+        visible: true
+      });
     return xrl;
   }
 };

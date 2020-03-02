@@ -16,8 +16,6 @@ export class MicroscopyViewer extends PureComponent {
     });
   }
 
-
-
   render() {
     /* eslint-disable react/destructuring-assignment */
     const views = [

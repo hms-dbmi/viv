@@ -16,10 +16,11 @@ import vs from './xr-layer-vertex';
 import fs from './xr-layer-fragment';
 
 const defaultProps = {
-  data: null,
-  bounds: { type: 'array', value: [1, 0, 0, 1], compare: true },
+  data: { type: 'array', value: [], compare: true },
+  bounds: { type: 'array', value: [], compare: true },
   colorValues: { type: 'object', value: {}, compare: true },
-  sliderValues: { type: 'object', value: {}, compare: true }
+  sliderValues: { type: 'object', value: {}, compare: true },
+  tileSize: { type: 'number', value: 0, compare: true }
 };
 
 export class XRLayer extends Layer {
@@ -29,7 +30,6 @@ export class XRLayer extends Layer {
 
   initializeState() {
     const attributeManager = this.getAttributeManager();
-
     attributeManager.add({
       positions: {
         size: 3,
@@ -62,10 +62,9 @@ export class XRLayer extends Layer {
       if (this.state.model) {
         this.state.model.delete();
       }
-      console.log('updating attributes with gl');
       this.setState({ model: this._getModel(gl) });
+
       this.getAttributeManager().invalidateAll();
-      console.log('updated attributes with gl');
     }
     if (changeFlags.dataChanged) {
       this.loadTexture(props.data);
@@ -196,8 +195,8 @@ export class XRLayer extends Layer {
         (isInt32 && GL.UNSIGNED_INT)
     };
     const texture = new Texture2D(this.context.gl, {
-      width: this.props.imageWidth,
-      height: this.props.imageHeight,
+      width: this.props.tileSize,
+      height: this.props.tileSize,
       data,
       // we don't want or need mimaps
       mipmaps: false,

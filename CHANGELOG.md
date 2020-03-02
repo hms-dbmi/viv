@@ -1,14 +1,22 @@
 # Changelog
 
+## 0.0.9 - In Progress
+
+### Added
+
+- Testing for layers added
+
 ## 0.0.8
 
 ### Changed
- - Update build process to use rolllup
+
+- Update build process to use rolllup
 
 ## 0.0.7
 
 ### Changed
- - Remove sort
+
+- Remove sort
 
 ## 0.0.6
 
