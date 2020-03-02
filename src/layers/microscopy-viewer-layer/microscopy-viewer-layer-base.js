@@ -43,7 +43,7 @@ const defaultProps = {
 export class MicroscopyViewerLayerBase extends TileLayer {
   constructor(props) {
     const { sliderValues, colorValues, channelsOn } = props;
-    const orderedChannelNames = Object.keys(sliderValues).sort();
+    const orderedChannelNames = Object.keys(sliderValues);
     const { orderedSliderValues, orderedColorValues } = setOrderedValues(
       orderedChannelNames,
       colorValues,

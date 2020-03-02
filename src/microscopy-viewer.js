@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
-import { OrthographicView } from 'deck.gl';
+import { OrthographicView } from '@deck.gl/core';
 import { MicroscopyViewerLayer } from './layers';
 
 export class MicroscopyViewer extends PureComponent {
