@@ -13,7 +13,7 @@ module.exports = {
   resolve: {
     // force usage of my luma gl version
     alias: {
-      "@luma.gl": path.resolve(__dirname, 'node_modules/@luma.gl'),
+      '@luma.gl': path.resolve(__dirname, 'node_modules/@luma.gl')
     }
   },
   module: {
