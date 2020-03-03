@@ -160,10 +160,12 @@ export class XRLayer extends Layer {
     if (data instanceof Promise) {
       data
         .then(dataResolved => {
-          dataResolved.forEach(
-            // eslint-disable-next-line no-return-assign
-            (d, i) => (textures[`channel${i}`] = this.dataToTexture(d))
-          );
+          // eslint-disable-next-line  no-unused-expressions
+          dataResolved &&
+            dataResolved.forEach(
+              // eslint-disable-next-line no-return-assign
+              (d, i) => (textures[`channel${i}`] = this.dataToTexture(d))
+            );
         })
         .then(() => this.setState({ textures }));
     } else if (data instanceof Object) {

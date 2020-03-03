@@ -63,8 +63,9 @@ export async function initTiff({ sourceChannels }) {
    * All logic for determining these parameters should be carried out in this util function.
    */
   const minZoom = -1 * resolvedTiffConnections[0].length;
-  const imageWidth = firstFullImage.ImageWidth;
-  const imageHeight = firstFullImage.ImageLength;
+  // Tiff pads the image to the nearest power of 2.
+  const imageWidth = 2 ** Math.ceil(Math.log2(firstFullImage.ImageWidth));
+  const imageHeight = 2 ** Math.ceil(Math.log2(firstFullImage.ImageLength));
   const tileSize = firstFullImage.TileWidth;
 
   return { connections, minZoom, imageWidth, imageHeight, tileSize };

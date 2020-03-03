@@ -36,11 +36,11 @@ uses Google Cloud Storage, which is HTTP2 by default.
 
 There are two components being exported for use:
 
-#### `Viewer`
+#### `VivViewer`
 
 This component is for pure drop-in use without an external `DeckGL` setup.
 
-#### `ViewerLayer`
+#### `VivViewerLayer`
 
 This component can be used with an already existing `DeckGL` setup.
 

@@ -35,3 +35,34 @@ export function setOrderedValues(
   });
   return { orderedSliderValues, orderedColorValues };
 }
+
+export function inTileBounds({
+  x,
+  y,
+  z,
+  imageWidth,
+  imageHeight,
+  tileSize,
+  minZoom
+}) {
+  const xInBounds = x < Math.ceil(imageWidth / (tileSize * 2 ** z)) && x >= 0;
+  const yInBounds = y < Math.ceil(imageHeight / (tileSize * 2 ** z)) && y >= 0;
+  const zInBounds = z >= 0 && z < -minZoom;
+  return xInBounds && yInBounds && zInBounds;
+}
+
+export function cutOffImageBounds({
+  left,
+  bottom,
+  right,
+  top,
+  imageWidth,
+  imageHeight
+}) {
+  return {
+    left: Math.max(0, left),
+    bottom: Math.max(0, Math.min(imageHeight, bottom)),
+    right: Math.max(0, Math.min(imageWidth, right)),
+    top: Math.max(0, top)
+  };
+}

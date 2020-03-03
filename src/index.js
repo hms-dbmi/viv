@@ -1,7 +1,4 @@
-import { MicroscopyViewerLayer } from './layers';
-import { MicroscopyViewer } from './microscopy-viewer';
+import { VivViewerLayer } from './layers';
+import { VivViewer } from './viv-viewer';
 
-export {
-  MicroscopyViewerLayer as VivViewerLayer,
-  MicroscopyViewer as VivViewer
-};
+export { VivViewerLayer, VivViewer };

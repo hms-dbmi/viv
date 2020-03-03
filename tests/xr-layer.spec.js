@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
 import { testLayer } from '@deck.gl/test-utils';
+import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import GL from '@luma.gl/constants';
 import { XRLayer } from '../src/layers/xr-layer';
 
@@ -19,6 +20,9 @@ test('XRLayer#constructor', t => {
           bounds: [2, 4, 16, 8],
           sliderValues: [0, 10],
           colorValues: [0, 1, 1],
+          pickable: false,
+          coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+          id: 'New Layer',
           tileSize,
           data: [data0]
         },

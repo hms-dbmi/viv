@@ -1,11 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
 import { testLayer } from '@deck.gl/test-utils';
-import { MicroscopyViewerLayerBase } from '../src/layers/microscopy-viewer-layer/microscopy-viewer-layer-base';
+import { VivViewerLayerBase } from '../src/layers/viv-viewer-layer/viv-viewer-layer-base';
 
-test('MicroscopyViewerLayerBase#constructor', t => {
+test('VivViewerLayerBase#constructor', t => {
   testLayer({
-    Layer: MicroscopyViewerLayerBase,
+    Layer: VivViewerLayerBase,
     onError: t.notOk,
     testCases: [
       {
@@ -14,8 +14,9 @@ test('MicroscopyViewerLayerBase#constructor', t => {
           sliderValues: { channel0: [0, 10], channel1: [2, 9] },
           colorValues: { channel0: [0, 255, 255], channel1: [255, 0, 255] },
           channelsOn: { channel0: true, channel1: true },
-          useTiff: true,
-          tileSize: 2
+          tileSize: 2,
+          imageWidth: 4,
+          imageHeight: 4
         },
         onAfterUpdate({ layer }) {
           t.deepEqual(
@@ -56,8 +57,9 @@ test('MicroscopyViewerLayerBase#constructor', t => {
           sliderValues: { channel0: [0, 10], channel1: [2, 9] },
           colorValues: { channel0: [0, 0, 255], channel1: [255, 0, 255] },
           channelsOn: { channel0: true, channel1: true },
-          useTiff: true,
-          tileSize: 2
+          tileSize: 2,
+          imageWidth: 4,
+          imageHeight: 4
         },
         onAfterUpdate({ layer }) {
           t.deepEqual(
@@ -80,8 +82,9 @@ test('MicroscopyViewerLayerBase#constructor', t => {
           sliderValues: { channel0: [0, 10], channel1: [2, 9] },
           colorValues: { channel0: [0, 0, 255], channel1: [255, 0, 255] },
           channelsOn: { channel0: false, channel1: true },
-          useTiff: true,
-          tileSize: 2
+          tileSize: 2,
+          imageWidth: 4,
+          imageHeight: 4
         },
         onAfterUpdate({ layer }) {
           t.deepEqual(

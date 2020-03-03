@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { OrthographicView } from '@deck.gl/core';
-import { MicroscopyViewerLayer } from './layers';
+import { VivViewerLayer } from './layers';
 
-export class MicroscopyViewer extends PureComponent {
+export class VivViewer extends PureComponent {
   _renderLayers() {
     const { useTiff } = this.props;
-    return new MicroscopyViewerLayer({
-      id: `MicroscopyViewerLayer-${useTiff ? 'tiff' : 'zarr'}`,
+    return new VivViewerLayer({
+      id: `VivViewerLayer-${useTiff ? 'tiff' : 'zarr'}`,
       ...this.props
     });
   }

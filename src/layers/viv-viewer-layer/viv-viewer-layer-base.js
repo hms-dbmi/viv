@@ -4,6 +4,8 @@ import { XRLayer } from '../xr-layer';
 
 import { loadZarr, loadTiff } from './data-utils';
 import {
+  inTileBounds,
+  cutOffImageBounds,
   padWithDefault,
   setOrderedValues,
   DEFAULT_COLOR_OFF,
@@ -18,36 +20,54 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   maxZoom: 0,
   onViewportLoad: false,
-  // eslint-disable-next-line no-console
-  onTileError: e => console.log(e),
-  // eslint-disable-next-line no-unused-vars
-  onTileLoad: e => {},
+  onTileError: e => console.error(e),
+  onTileLoad: () => {},
+  sliderValues: [],
+  colorValues: [],
   renderSubLayers: props => {
     const {
       bbox: { left, top, right, bottom }
     } = props.tile;
-    const inBounds = left >= 0 && right >= 0 && top >= 0 && bottom >= 0;
-    const { sliderValues, data, colorValues } = props;
+    const {
+      imageWidth,
+      imageHeight,
+      colorValues,
+      sliderValues,
+      data,
+      useZarr
+    } = props;
+    const cutOffBounds = cutOffImageBounds({
+      left,
+      bottom,
+      right,
+      top,
+      imageWidth,
+      imageHeight
+    });
     const xrl =
       data &&
-      inBounds &&
       new XRLayer(props, {
-        id: `XR-Layer-${left}-${top}-${right}-${bottom}-${props.useTiff}`,
+        id: `XR-Layer-${cutOffBounds.left}-${cutOffBounds.top}-${cutOffBounds.right}-${cutOffBounds.bottom}-${useZarr}`,
         pickable: false,
         coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
         data,
         sliderValues,
         colorValues,
-        bounds: [left, bottom, right, top],
+        bounds: [
+          cutOffBounds.left,
+          cutOffBounds.bottom,
+          cutOffBounds.right,
+          cutOffBounds.top
+        ],
         visible: true
       });
     return xrl;
   }
 };
 
-export class MicroscopyViewerLayerBase extends TileLayer {
+export class VivViewerLayerBase extends TileLayer {
   constructor(props) {
-    const { sliderValues, colorValues, channelsOn } = props;
+    const { sliderValues, colorValues, channelsOn, useZarr, useTiff } = props;
     const orderedChannelNames = Object.keys(sliderValues);
     const { orderedSliderValues, orderedColorValues } = setOrderedValues(
       orderedChannelNames,
@@ -73,25 +93,43 @@ export class MicroscopyViewerLayerBase extends TileLayer {
     );
 
     const getZarr = ({ x, y, z }) => {
-      return loadZarr({
-        x,
-        y,
-        z: -1 * z,
-        ...props
-      });
+      if (
+        inTileBounds({
+          x,
+          y,
+          z: -z,
+          ...props
+        })
+      ) {
+        return loadZarr({
+          x,
+          y,
+          z: -1 * z,
+          ...props
+        });
+      }
+      return null;
     };
     const getTiff = ({ x, y, z }) => {
-      return loadTiff({
-        x,
-        y,
-        z: -1 * z,
-        ...props
-      });
+      if (
+        inTileBounds({
+          x,
+          y,
+          z: -z,
+          ...props
+        })
+      ) {
+        return loadTiff({
+          x,
+          y,
+          z: -1 * z,
+          ...props
+        });
+      }
+      return null;
     };
     const getTileData =
-      (props.useZarr && getZarr) ||
-      (props.useTiff && getTiff) ||
-      props.getTileData;
+      (useZarr && getZarr) || (useTiff && getTiff) || props.getTileData;
     const overrideValuesProps = {
       ...props,
       sliderValues: paddedSliderValues.flat(), // flatten for use on shaders
@@ -103,5 +141,5 @@ export class MicroscopyViewerLayerBase extends TileLayer {
   }
 }
 
-MicroscopyViewerLayerBase.layerName = 'MicroscopyViewerLayerBase';
-MicroscopyViewerLayerBase.defaultProps = defaultProps;
+VivViewerLayerBase.layerName = 'VivViewerLayerBase';
+VivViewerLayerBase.defaultProps = defaultProps;
