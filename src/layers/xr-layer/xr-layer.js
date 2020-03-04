@@ -23,34 +23,6 @@ export class XRLayer extends Layer {
     return super.getShaders({ vs, fs, modules: [project32] });
   }
 
-  _updateAttributes(props) {
-    const attributeManager = this.getAttributeManager();
-    if (!attributeManager) {
-      return;
-    }
-
-    // Figure out data length
-    const numInstances = this.getNumInstances(props);
-    const startIndices = this.getStartIndices(props);
-    console.log(props);
-    attributeManager.update({
-      data: props.data,
-      numInstances,
-      startIndices,
-      props,
-      transitions: props.transitions,
-      buffers: props.data.attributes,
-      context: this,
-      // Don't worry about non-attribute props
-      ignoreUnknownAttributes: true
-    });
-
-    const changedAttributes = attributeManager.getChangedAttributes({
-      clearChangedFlags: true
-    });
-    this.updateAttributes(changedAttributes);
-  }
-
   initializeState() {
     const attributeManager = this.getAttributeManager();
     attributeManager.add({
