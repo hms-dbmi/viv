@@ -79,9 +79,7 @@ export function renderSubLayers(props) {
     colorValues,
     sliderValues,
     tileSize,
-    data,
-    tile,
-    useZarr
+    data
   } = props.imageWidth
     ? props
     : props[Object.getOwnPropertySymbols(props)[0]].props;

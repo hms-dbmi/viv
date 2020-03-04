@@ -12,7 +12,7 @@ const defaultProps = {
   pickable: false,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'array', value: [], async: true },
-  bounds: { type: 'array', value: [], compare: true },
+  bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
   tileSize: { type: 'number', value: 0, compare: true }
@@ -159,9 +159,9 @@ export class XRLayer extends Layer {
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex && tex.delete());
     }
-    // eslint-disable-next-line no-return-assign
     if (channelData.length > 0) {
       channelData.forEach(
+        // eslint-disable-next-line no-return-assign
         (d, i) => (textures[`channel${i}`] = this.channelDataToTexture(d))
       );
       this.setState({ textures });

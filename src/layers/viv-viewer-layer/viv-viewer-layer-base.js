@@ -34,22 +34,25 @@ export class VivViewerLayerBase extends TileLayer {
       })
     ) {
       if (useTiff) {
-        return await loadTiff({
+        const tile = loadTiff({
           x,
           y,
           z: -1 * z,
           ...this.props
         });
+        return tile;
       }
       if (useZarr) {
-        return await loadZarr({
+        const tile = loadZarr({
           x,
           y,
           z: -1 * z,
           ...this.props
         });
+        return tile;
       }
-      return await this.props.getTileData({ x, y, z });
+      const tile = this.props.getTileData({ x, y, z });
+      return tile;
     }
     return null;
   }

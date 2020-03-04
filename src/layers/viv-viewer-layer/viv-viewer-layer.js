@@ -4,8 +4,6 @@ import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 import { VivViewerLayerBase } from './viv-viewer-layer-base';
 import { initTiff, initZarr } from './data-utils';
 import {
-  inTileBounds,
-  cutOffImageBounds,
   padWithDefault,
   setOrderedValues,
   DEFAULT_COLOR_OFF,
@@ -76,13 +74,7 @@ export class VivViewerLayer extends CompositeLayer {
   }
 
   _overrideChannelProps() {
-    const {
-      sliderValues,
-      colorValues,
-      channelsOn,
-      useZarr,
-      useTiff
-    } = this.props;
+    const { sliderValues, colorValues, channelsOn } = this.props;
     const orderedChannelNames = Object.keys(sliderValues);
     const { orderedSliderValues, orderedColorValues } = setOrderedValues(
       orderedChannelNames,
