@@ -27,7 +27,7 @@ start eslint
 node_modules/eslint/bin/eslint.js .
 end eslint
 
-if [[ "$CI" = 'true' ]]
+if [[ "$CI" != 'true' ]]
 then
   start test
   npm run-script test
