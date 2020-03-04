@@ -1,23 +1,4 @@
 language: node_js
-dist: precise
-os: linux
-group: stable
-sudo: required
-dist: trusty
-env:
-  - CXX=g++-6
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - g++-6
-    - mesa-utils
-    - xvfb
-    - libgl1-mesa-dri
-    - libglapi-mesa
-    - libosmesa6
-    - libxi-dev
 node_js:
   - 10
 cache:
@@ -27,8 +8,6 @@ cache:
     # Default if "npm ci" were the script, but non-empty, so include it explicitly:
     - ~/.npm
 install:
-  - export DISPLAY=':99.0'
-  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-  - npm install
+  - export CI=true
 script:
   - ./test.sh

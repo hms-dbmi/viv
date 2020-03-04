@@ -27,9 +27,12 @@ start eslint
 node_modules/eslint/bin/eslint.js .
 end eslint
 
-start test
-npm run-script test
-end test
+if [[ "$CI" = 'true' ]]
+then
+  start test
+  npm run-script test
+  end test
+fi
 
 start build
 npm run-script build-component
