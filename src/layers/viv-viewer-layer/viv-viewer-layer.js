@@ -3,6 +3,16 @@ import { CompositeLayer } from '@deck.gl/core';
 import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 import { VivViewerLayerBase } from './viv-viewer-layer-base';
 import { initTiff, initZarr } from './data-utils';
+import {
+  inTileBounds,
+  cutOffImageBounds,
+  padWithDefault,
+  setOrderedValues,
+  DEFAULT_COLOR_OFF,
+  DEFAULT_SLIDER_OFF
+} from './utils';
+
+const MAX_SLIDERS_AND_CHANNELS = 6;
 
 export class VivViewerLayer extends CompositeLayer {
   initializeState() {
@@ -65,6 +75,45 @@ export class VivViewerLayer extends CompositeLayer {
     }
   }
 
+  _overrideChannelProps() {
+    const {
+      sliderValues,
+      colorValues,
+      channelsOn,
+      useZarr,
+      useTiff
+    } = this.props;
+    const orderedChannelNames = Object.keys(sliderValues);
+    const { orderedSliderValues, orderedColorValues } = setOrderedValues(
+      orderedChannelNames,
+      colorValues,
+      sliderValues,
+      channelsOn
+    );
+
+    // Need to pad sliders and colors with default values (required by shader)
+    const padSize = MAX_SLIDERS_AND_CHANNELS - orderedChannelNames.length;
+    if (padSize < 0) {
+      throw Error('Too many channels specified for shader.');
+    }
+    const paddedSliderValues = padWithDefault(
+      orderedSliderValues,
+      DEFAULT_SLIDER_OFF,
+      padSize
+    );
+    const paddedColorValues = padWithDefault(
+      orderedColorValues,
+      DEFAULT_COLOR_OFF,
+      padSize
+    );
+    const overrideValuesProps = {
+      ...this.props,
+      sliderValues: paddedSliderValues.flat(), // flatten for use on shaders
+      colorValues: paddedColorValues
+    };
+    return overrideValuesProps;
+  }
+
   renderLayers() {
     const {
       connections,
@@ -74,6 +123,8 @@ export class VivViewerLayer extends CompositeLayer {
       tileSize,
       minZoom
     } = this.state;
+
+    const layerProps = this._overrideChannelProps();
     const layers = connections
       ? new VivViewerLayerBase({
           connections,
@@ -83,7 +134,7 @@ export class VivViewerLayer extends CompositeLayer {
           tileSize,
           minZoom,
           maxZoom: 0,
-          ...this.getSubLayerProps(this.props)
+          ...this.getSubLayerProps(layerProps)
         })
       : [];
     return layers;

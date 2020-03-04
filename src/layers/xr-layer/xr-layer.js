@@ -3,22 +3,52 @@
 // we live in place for now, hence some of the not-destructuring
 
 import GL from '@luma.gl/constants';
-import { Layer, project32 } from '@deck.gl/core';
+import { COORDINATE_SYSTEM, Layer, project32 } from '@deck.gl/core';
 import { Model, Geometry, Texture2D } from '@luma.gl/core';
 import vs from './xr-layer-vertex';
 import fs from './xr-layer-fragment';
 
 const defaultProps = {
-  data: { type: 'array', value: [], compare: true },
+  pickable: false,
+  coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+  channelData: { type: 'array', value: [], async: true },
   bounds: { type: 'array', value: [], compare: true },
-  colorValues: { type: 'object', value: {}, compare: true },
-  sliderValues: { type: 'object', value: {}, compare: true },
+  colorValues: { type: 'array', value: [], compare: true },
+  sliderValues: { type: 'array', value: [], compare: true },
   tileSize: { type: 'number', value: 0, compare: true }
 };
 
 export class XRLayer extends Layer {
   getShaders() {
     return super.getShaders({ vs, fs, modules: [project32] });
+  }
+
+  _updateAttributes(props) {
+    const attributeManager = this.getAttributeManager();
+    if (!attributeManager) {
+      return;
+    }
+
+    // Figure out data length
+    const numInstances = this.getNumInstances(props);
+    const startIndices = this.getStartIndices(props);
+    console.log(props);
+    attributeManager.update({
+      data: props.data,
+      numInstances,
+      startIndices,
+      props,
+      transitions: props.transitions,
+      buffers: props.data.attributes,
+      context: this,
+      // Don't worry about non-attribute props
+      ignoreUnknownAttributes: true
+    });
+
+    const changedAttributes = attributeManager.getChangedAttributes({
+      clearChangedFlags: true
+    });
+    this.updateAttributes(changedAttributes);
   }
 
   initializeState() {
@@ -59,12 +89,12 @@ export class XRLayer extends Layer {
 
       this.getAttributeManager().invalidateAll();
     }
-    if (changeFlags.dataChanged) {
-      this.loadTexture(props.data);
+    if (props.channelData && props.channelData.length > 0) {
+      if (props.channelData !== oldProps.channelData) {
+        this.loadTexture(props.channelData);
+      }
     }
-
     const attributeManager = this.getAttributeManager();
-
     if (props.bounds !== oldProps.bounds) {
       attributeManager.invalidate('positions');
     }
@@ -146,7 +176,7 @@ export class XRLayer extends Layer {
     }
   }
 
-  loadTexture(data) {
+  loadTexture(channelData) {
     const textures = {
       channel0: null,
       channel2: null,
@@ -157,25 +187,16 @@ export class XRLayer extends Layer {
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex && tex.delete());
     }
-    if (data instanceof Promise) {
-      data
-        .then(dataResolved => {
-          // eslint-disable-next-line  no-unused-expressions
-          dataResolved &&
-            dataResolved.forEach(
-              // eslint-disable-next-line no-return-assign
-              (d, i) => (textures[`channel${i}`] = this.dataToTexture(d))
-            );
-        })
-        .then(() => this.setState({ textures }));
-    } else if (data instanceof Object) {
-      // eslint-disable-next-line no-return-assign
-      data.forEach((d, i) => (textures[`channel${i}`] = this.dataToTexture(d)));
+    // eslint-disable-next-line no-return-assign
+    if (channelData.length > 0) {
+      channelData.forEach(
+        (d, i) => (textures[`channel${i}`] = this.channelDataToTexture(d))
+      );
       this.setState({ textures });
     }
   }
 
-  dataToTexture(data) {
+  channelDataToTexture(data) {
     // eslint-disable-next-line no-nested-ternary
     const isInt8 = data instanceof Uint8Array;
     const isInt16 = data instanceof Uint16Array;

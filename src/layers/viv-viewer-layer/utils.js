@@ -1,3 +1,5 @@
+import { XRLayer } from '../xr-layer';
+
 const MAX_SLIDER_VALUE = 65535;
 const MAX_COLOR_INTENSITY = 255;
 
@@ -65,4 +67,49 @@ export function cutOffImageBounds({
     right: Math.max(0, Math.min(imageWidth, right)),
     top: Math.max(0, top)
   };
+}
+
+export function renderSubLayers(props) {
+  const {
+    bbox: { left, top, right, bottom }
+  } = props.tile;
+  const {
+    imageHeight,
+    imageWidth,
+    colorValues,
+    sliderValues,
+    tileSize,
+    data,
+    tile,
+    useZarr
+  } = props.imageWidth
+    ? props
+    : props[Object.getOwnPropertySymbols(props)[0]].props;
+  // Tests do not pass without this - I do not know how the object changes.
+  const cutOffBounds = cutOffImageBounds({
+    left,
+    bottom,
+    right,
+    top,
+    imageHeight,
+    imageWidth
+  });
+  const xrl =
+    data &&
+    new XRLayer({
+      id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}`,
+      data: null,
+      channelData: data,
+      sliderValues,
+      colorValues,
+      tileSize,
+      bounds: [
+        cutOffBounds.left,
+        cutOffBounds.bottom,
+        cutOffBounds.right,
+        cutOffBounds.top
+      ],
+      visible: true
+    });
+  return xrl;
 }
