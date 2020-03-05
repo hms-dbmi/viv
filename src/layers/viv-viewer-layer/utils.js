@@ -80,9 +80,7 @@ export function renderSubLayers(props) {
     sliderValues,
     tileSize,
     data
-  } = props.imageWidth
-    ? props
-    : props[Object.getOwnPropertySymbols(props)[0]].props;
+  } = props;
   // Tests do not pass without this - I do not know how the object changes.
   const cutOffBounds = cutOffImageBounds({
     left,
@@ -93,6 +91,9 @@ export function renderSubLayers(props) {
     imageWidth
   });
   const xrl =
+    // If image metadata is undefined, do not render this layer.
+    props.imageWidth &&
+    props.imageHeight &&
     data &&
     new XRLayer({
       id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}`,
