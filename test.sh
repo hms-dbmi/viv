@@ -27,6 +27,7 @@ start eslint
 node_modules/eslint/bin/eslint.js .
 end eslint
 
+# Shader compilation does not work on travis.
 if [[ "$CI" != 'true' ]]
 then
   start test
