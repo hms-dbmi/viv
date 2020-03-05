@@ -35,7 +35,7 @@ test('isInTileBounds test', t => {
       tileSize: 2,
       minZoom: -5
     }),
-    '(0,0,0) tile in bounds for imageWidth: 10, imageHeight: 10, tileSize: 2, minZoom: -5'
+    'Tile indices are in bounds given image dimensions'
   );
   t.notOk(
     isInTileBounds({
@@ -47,7 +47,7 @@ test('isInTileBounds test', t => {
       tileSize: 2,
       minZoom: -5
     }),
-    '(0,0,6) tile out of bounds for minZoom: -5'
+    'Tile indices are out of bounds because zoom level is less than minZoom'
   );
   t.notOk(
     isInTileBounds({
@@ -59,7 +59,7 @@ test('isInTileBounds test', t => {
       tileSize: 2,
       minZoom: -5
     }),
-    '(5,5,0) tile out of bounds for imageWidth: 10, imageHeight: 10, tileSize: 2'
+    'Tile indices are out of bounds because tile indices are too big for image dimensions.'
   );
   t.end();
 });
