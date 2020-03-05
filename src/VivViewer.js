@@ -16,8 +16,8 @@ function getTypeIdentifier(useTiff, useZarr) {
 export default class VivViewer extends PureComponent {
   _renderLayers() {
     const { loader } = this.props;
-    return new MicroscopyViewerLayer({
-      id: `MicroscopyViewerLayer-${loader.type}}`,
+    return new VivViewerLayer({
+      id: `VivViewerLayer-${loader.type}}`,
       ...this.props
     });
   }

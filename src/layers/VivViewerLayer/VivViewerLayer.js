@@ -2,12 +2,10 @@ import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
 import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 import VivViewerLayerBase from './VivViewerLayerBase';
-import { initTiff, initZarr } from './data-utils';
 import {
   padWithDefault,
-  setOrderedValues,
   DEFAULT_COLOR_OFF,
-  DEFAULT_SLIDER_OFF
+  MAX_COLOR_INTENSITY
 } from './utils';
 
 const MAX_SLIDERS_AND_CHANNELS = 6;
@@ -47,29 +45,41 @@ export default class VivViewerLayer extends CompositeLayer {
   }
 
   _overrideChannelProps() {
-    const { sliderValues, colorValues, channelsOn } = this.props;
-    const orderedChannelNames = Object.keys(sliderValues);
-    const { orderedSliderValues, orderedColorValues } = setOrderedValues(
-      orderedChannelNames,
-      colorValues,
+    const {
       sliderValues,
-      channelsOn
+      colorValues,
+      channelIsOn,
+      maxSliderValue
+    } = this.props;
+    const lengths = [sliderValues.length, colorValues.length];
+    if (lengths.every(l => l !== lengths[0])) {
+      throw Error('Inconsistent number of slider values and colors provided');
+    }
+
+    const colors = colorValues.map((color, i) =>
+      channelIsOn[i]
+        ? color.map(c => c / MAX_COLOR_INTENSITY)
+        : DEFAULT_COLOR_OFF
+    );
+
+    const sliders = sliderValues.map((slider, i) =>
+      channelIsOn[i] ? slider : [maxSliderValue, maxSliderValue]
     );
 
     // Need to pad sliders and colors with default values (required by shader)
-    const numChannels = orderedChannelNames.length;
-    const padSize = MAX_SLIDERS_AND_CHANNELS - numChannels;
+    const padSize = MAX_SLIDERS_AND_CHANNELS - colors.length;
     if (padSize < 0) {
-      throw Error(`${numChannels} channels passed in, but only 6 are allowed.`);
+      throw Error('Too many channels specified for shader.');
     }
-    const paddedSliderValues = padWithDefault(
-      orderedSliderValues,
-      DEFAULT_SLIDER_OFF,
+
+    const paddedColorValues = padWithDefault(
+      colors,
+      DEFAULT_COLOR_OFF,
       padSize
     );
-    const paddedColorValues = padWithDefault(
-      orderedColorValues,
-      DEFAULT_COLOR_OFF,
+    const paddedSliderValues = padWithDefault(
+      sliders,
+      [maxSliderValue, maxSliderValue],
       padSize
     );
     const overrideValuesProps = {
@@ -81,25 +91,17 @@ export default class VivViewerLayer extends CompositeLayer {
   }
 
   renderLayers() {
-    const {
-      connections,
-      pool,
-      imageWidth,
-      imageHeight,
-      tileSize,
-      minZoom
-    } = this.state;
+    const { imageWidth, imageHeight, tileSize, minZoom } = this.state;
 
     const layerProps = this._overrideChannelProps();
     const layers = this.props.loader
       ? new VivViewerLayerBase({
-          connections,
-          pool,
           imageWidth,
           imageHeight,
           tileSize,
           minZoom,
-          maxZoom: 0,
+          getTileData: ({ x, y, z }) =>
+            this.props.loader.getTile({ x, y, z: -z, ...this.props }),
           ...this.getSubLayerProps(layerProps)
         })
       : [];

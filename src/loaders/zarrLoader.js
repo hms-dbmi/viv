@@ -1,4 +1,4 @@
-import { range } from '../layers/microscopy-viewer-layer/utils';
+import { range } from '../layers/VivViewerLayer/utils';
 
 export default class ZarrLoader {
   constructor(data, isRgb, scale, dimensions) {
