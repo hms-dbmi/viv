@@ -1,15 +1,20 @@
 import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { OrthographicView } from '@deck.gl/core';
-import { VivViewerLayer } from './layers';
+import { VivViewerLayer, StaticImageLayer } from './layers';
 
 export default class VivViewer extends PureComponent {
   _renderLayers() {
     const { loader } = this.props;
-    return new VivViewerLayer({
-      id: `VivViewerLayer-${loader.type}}`,
-      ...this.props
-    });
+    return loader.isPyramid
+      ? new VivViewerLayer({
+          id: `VivViewerLayer-${loader.type}}`,
+          ...this.props
+        })
+      : new StaticImageLayer({
+          id: `StaticImageLayer-${loader.type}}`,
+          ...this.props
+        });
   }
 
   render() {

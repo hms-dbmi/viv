@@ -21,7 +21,9 @@ const colorValues = [
   [255, 0, 0],
   [0, 255, 0],
   [0, 0, 255],
-  [255, 128, 0]
+  [255, 128, 0],
+  [255, 0, 255],
+  [0, 255, 255]
 ];
 const styledSelectors = colorValues.map(color => {
   const ColoredSlider = withStyles({
@@ -68,7 +70,10 @@ function App() {
       const config = {
         channelNames: sources[sourceName].channelNames,
         url: sources[sourceName].url,
-        minZoom: MIN_ZOOM
+        minZoom:
+          typeof sources[sourceName].minZoom === 'number'
+            ? sources[sourceName].minZoom
+            : MIN_ZOOM
       };
       // Need to do this to clear last loader... probably a better way.
       setLoader(null);
@@ -142,9 +147,18 @@ function App() {
           minZoom={MIN_ZOOM}
           viewHeight={viewHeight}
           viewWidth={viewWidth}
-          sliderValues={sliderValues}
-          colorValues={colorValues}
-          channelIsOn={channelIsOn}
+          sliderValues={sliderValues.slice(
+            0,
+            sources[sourceName].channelNames.length
+          )}
+          colorValues={colorValues.slice(
+            0,
+            sources[sourceName].channelNames.length
+          )}
+          channelIsOn={channelIsOn.slice(
+            0,
+            sources[sourceName].channelNames.length
+          )}
           initialViewState={initialViewState}
         />
       ) : null}

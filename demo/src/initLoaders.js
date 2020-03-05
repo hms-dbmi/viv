@@ -1,7 +1,7 @@
 import { createTiffPyramid, createZarrPyramid } from '../../src';
 
 export async function initPyramidLoader(type, { channelNames, url, minZoom }) {
-  if (type === 'zarr') {
+  if (type === 'zarr' || type === 'static') {
     const loader = await createZarrPyramid({
       minZoom,
       rootZarrUrl: url,

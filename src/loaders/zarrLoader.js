@@ -1,4 +1,4 @@
-import { range } from '../layers/VivViewerLayer/utils';
+import { range } from '../layers/utils';
 
 export default class ZarrLoader {
   constructor(data, isRgb, scale, dimensions) {

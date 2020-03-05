@@ -4,6 +4,8 @@ export default class TiffPyramidLoader {
     this.channelNames = channelNames;
     this.pool = pool;
     this.type = 'tiff';
+    // hardcoded for now
+    this.isPyramid = false;
   }
 
   get vivMetadata() {

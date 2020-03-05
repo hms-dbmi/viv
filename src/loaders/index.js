@@ -4,7 +4,7 @@ import { fromUrl, Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 
 import ZarrLoader from './zarrLoader';
 import TiffPyramidLoader from './tiffPyramidLoader';
-import { range } from '../layers/VivViewerLayer/utils';
+import { range } from '../layers/utils';
 
 export async function createZarrPyramid({
   rootZarrUrl,
@@ -20,17 +20,24 @@ export async function createZarrPyramid({
 
   // Not necessary but this is something we should be parsing from metadata
   const maxLevel = -minZoom;
-
-  const zarrStores = range(maxLevel).map(i => {
-    const config = {
-      store: rootZarrUrl,
-      path: `${prefix}/${String(i).padStart(2, '0')}`,
-      mode: 'r'
-    };
-    return openArray(config);
+  if (maxLevel > 0) {
+    const zarrStores = range(maxLevel).map(i => {
+      const config = {
+        store: rootZarrUrl,
+        path: `${prefix}/${String(i).padStart(2, '0')}`,
+        mode: 'r'
+      };
+      return openArray(config);
+    });
+    const connections = await Promise.all(zarrStores);
+    return new ZarrLoader(connections, isRgb, scale, dimensions);
+  }
+  const connection = await openArray({
+    store: rootZarrUrl,
+    path: prefix,
+    mode: 'r'
   });
-  const connections = await Promise.all(zarrStores);
-  return new ZarrLoader(connections, isRgb, scale, dimensions);
+  return new ZarrLoader(connection, isRgb, scale, dimensions);
 }
 
 export async function createTiffPyramid({ channelNames, channelUrls }) {

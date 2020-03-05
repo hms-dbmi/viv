@@ -1,3 +1,3 @@
-import XRLayer from './XRlayer';
+import XRLayer from './XRLayer';
 
 export default XRLayer;
