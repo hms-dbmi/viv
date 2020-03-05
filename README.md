@@ -46,18 +46,13 @@ This component can be used with an already existing `DeckGL` setup.
 
 ## `Viewer` and `ViewerLayer` Properties
 
-##### `useZarr` (Function)
+##### `loader` (Object)
 
-A `useZarr` flag for using the built in zarr functionality. This is currently
-experimental (see [this](IMAGE_RENDERING.md))
+A `loader` is the primary object responsible for returning tile data as well as the required metadata for Viv. We allow loaders to be generic so viv can be used with various sources. A laoader must implement a `getTile` method and have the property `vivMetadata`. We provide the `createZarrPyramid` and `createTiffPyramid` to which are convenience functions for creating instances of valid loaders for these data types.
 
-##### `useTiff` (Function)
+###### `loader.getTile` (Function) **POTENTIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
 
-A flag for using the built-in pyramidal/tiled TIFF fetching functionality.
-
-##### `getTileData` (Function) **POTENTIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
-
-`getTileData` given x, y, z indices of the tile, returns the tile data or a Promise that resolves to the tile data. Alternatively, pass in `useZarr` as true to use `zarr` and our functionality. Otherwise, you can use `useTiff` to make range requests directly against a pyramid/tiled tiff. Look
+`getTile` given x, y, z indices of the tile, returns the tile data or a Promise that resolves to the tile data. Look
 at [this](IMAGE_RENDERING.md) for how the zarr should be laid out.
 
 Receives arguments:
@@ -69,30 +64,20 @@ Receives arguments:
 Returns:
 
 - An array of `[colorData1, ..., colorDataN]` where `colorDataI`
-  is a typed array of a single channel's worth of data. The order must match.
+  is a TypedArray of a single channel's worth of data. The order must match.
 
-A `loadZarr` function is provided to assist and a `loadTiff` function will be coming.  
-They need to be wrapped so in a `getTileData` function that accepts the right arguments
-(as stated above). For now, the `loadZarr` function also accepts:
+###### `loader.vivMetadata` (Object)
 
-- sourceChannels (Array) `[{name:'tilesource1.com'}, {name:'tilesource2.com'}, ... {name:'tilesourceN.com'}]``
-- `tileSize`
-- `x`
-- `y`
-- `z`
-- `imageWidth` The real width of the image
+An object containing the following properties which provide all the data-specific metadata required by Viv to render data tiles.
 
-Returns:
-`[{name:data}, {name:data}, {name:data}]`
+- `imageHeight` (Number) The height of the highest resolution image.
+- `imageWidth` (Number) The width of the highest resolution image.
+- `minZoom` (Number) The number of levels in the image pyramid. If the number of levels is `4`, `minZoom === -4`. This is deck.gl specific.
+- `tileSize` (Number)
 
 ##### `viewHeight` & `viewWidth` (Number) [ONLY NECESSARY FOR `MicrsocopyViewer`]
 
 These control the size of the viewport in your app.
-
-##### `imageHeight` & `imageWidth` (Number)
-
-The height and width of the image you wish to render. They are not necessary
-if you use tiff.
 
 ##### `initialViewState` (object) [ONLY NECESSARY FOR `MicrsocopyViewer`]
 
@@ -101,13 +86,6 @@ An object containing two things
 - `target` (Array) An `[x,y,0]` location in image coordinates of the image. The 0
   represents a hypothetical (and potentially future addition) of a third spatial dimension.
 - `zoom` (Number) The initial zoom level to render the image at
-
-##### `minZoom` & `maxZoom` (Number)
-
-These control the max and min zoom sizes, generally the number of images `n` in your pyramid,
-ranging from `-n` (`minZoom`), the lowest resolution, to `0` (`maxZoom`), the highest resolution. You don't need to
-pass these in (they can be inferred from heigh/width/tile size), although
-if you wish to limit zoom levels, you may.
 
 ##### `sliderValues` (Object)
 
