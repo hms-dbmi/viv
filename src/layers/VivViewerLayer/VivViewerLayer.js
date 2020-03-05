@@ -69,7 +69,7 @@ export default class VivViewerLayer extends CompositeLayer {
     // Need to pad sliders and colors with default values (required by shader)
     const padSize = MAX_SLIDERS_AND_CHANNELS - colors.length;
     if (padSize < 0) {
-      throw Error('Too many channels specified for shader.');
+      throw Error(`${lengths} channels passed in, but only 6 are allowed.`);
     }
 
     const paddedColorValues = padWithDefault(
