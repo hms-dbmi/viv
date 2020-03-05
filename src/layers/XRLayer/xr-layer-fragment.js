@@ -24,7 +24,6 @@ uniform vec3 colorValue3;
 uniform vec3 colorValue4;
 uniform vec3 colorValue5;
 
-
 in vec2 vTexCoord;
 
 out vec4 color;

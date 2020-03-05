@@ -1,10 +1,14 @@
 # Changelog
 
-## 0.0.9
+## 0.0.9 - In Progress
 
 ### Changed
 
 - Extracted data utils to loaders and refactored demo
+
+### Added
+
+- Testing for layers added
 
 ## 0.0.8
 

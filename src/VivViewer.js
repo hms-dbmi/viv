@@ -1,27 +1,25 @@
 import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { OrthographicView } from '@deck.gl/core';
-import { MicroscopyViewerLayer } from './layers';
+import { VivViewerLayer } from './layers';
 
-export class MicroscopyViewer extends PureComponent {
-  constructor(props) {
-    super(props);
-    this._onWebGLInitialized = this._onWebGLInitialized.bind(this);
-    this.state = {
-      gl: null
-    };
+function getTypeIdentifier(useTiff, useZarr) {
+  if (useTiff) {
+    return 'tiff';
   }
+  if (useZarr) {
+    return 'zarr';
+  }
+  return 'other-data';
+}
 
+export default class VivViewer extends PureComponent {
   _renderLayers() {
     const { loader } = this.props;
     return new MicroscopyViewerLayer({
       id: `MicroscopyViewerLayer-${loader.type}}`,
       ...this.props
     });
-  }
-
-  _onWebGLInitialized(gl) {
-    this.setState({ gl });
   }
 
   render() {
@@ -38,9 +36,8 @@ export class MicroscopyViewer extends PureComponent {
     return (
       <DeckGL
         glOptions={{ webgl2: true }}
-        layers={this.state.gl ? this._renderLayers() : []}
+        layers={this._renderLayers()}
         initialViewState={initialViewState}
-        onWebGLInitialized={this._onWebGLInitialized}
         controller
         views={views}
       />

@@ -1,10 +1,5 @@
-import { MicroscopyViewerLayer } from './layers';
-import { MicroscopyViewer } from './microscopy-viewer';
+import { VivViewerLayer } from './layers';
+import VivViewer from './VivViewer';
 import { createTiffPyramid, createZarrPyramid } from './loaders';
 
-export {
-  MicroscopyViewerLayer as VivViewerLayer,
-  MicroscopyViewer as VivViewer,
-  createTiffPyramid,
-  createZarrPyramid
-};
+export { VivViewerLayer, VivViewer, createTiffPyramid, createZarrPyramid };
