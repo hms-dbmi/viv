@@ -1,7 +1,7 @@
 import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
 import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
-import { VivViewerLayerBase } from './viv-viewer-layer-base';
+import VivViewerLayerBase from './VivViewerLayerBase';
 import { initTiff, initZarr } from './data-utils';
 import {
   padWithDefault,
@@ -12,7 +12,7 @@ import {
 
 const MAX_SLIDERS_AND_CHANNELS = 6;
 
-export class VivViewerLayer extends CompositeLayer {
+export default class VivViewerLayer extends CompositeLayer {
   initializeState() {
     this.state = {
       connections: null,
@@ -84,9 +84,10 @@ export class VivViewerLayer extends CompositeLayer {
     );
 
     // Need to pad sliders and colors with default values (required by shader)
-    const padSize = MAX_SLIDERS_AND_CHANNELS - orderedChannelNames.length;
+    const numChannels = orderedChannelNames.length;
+    const padSize = MAX_SLIDERS_AND_CHANNELS - numChannels;
     if (padSize < 0) {
-      throw Error('Too many channels specified for shader.');
+      throw Error(`${numChannels} channels passed in, but only 6 are allowed.`);
     }
     const paddedSliderValues = padWithDefault(
       orderedSliderValues,

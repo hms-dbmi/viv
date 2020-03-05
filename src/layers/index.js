@@ -1,1 +1,1 @@
-export { VivViewerLayer } from './viv-viewer-layer';
+export { default as VivViewerLayer } from './VivViewerLayer';

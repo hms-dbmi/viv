@@ -1,4 +1,4 @@
-import { XRLayer } from '../xr-layer';
+import XRLayer from '../XRLayer';
 
 const MAX_SLIDER_VALUE = 65535;
 const MAX_COLOR_INTENSITY = 255;
@@ -38,7 +38,7 @@ export function setOrderedValues(
   return { orderedSliderValues, orderedColorValues };
 }
 
-export function inTileBounds({
+export function isInTileBounds({
   x,
   y,
   z,
@@ -53,6 +53,11 @@ export function inTileBounds({
   return xInBounds && yInBounds && zInBounds;
 }
 
+/**
+ * cutOffImageBounds cuts of the bounding box of an image at any resolution
+ * to the full resolution cooridnates to prevent stretching/shrinking.
+ * The return value is an object of the new bounds.
+ */
 export function cutOffImageBounds({
   left,
   bottom,
@@ -81,7 +86,6 @@ export function renderSubLayers(props) {
     tileSize,
     data
   } = props;
-  // Tests do not pass without this - I do not know how the object changes.
   const cutOffBounds = cutOffImageBounds({
     left,
     bottom,
@@ -107,8 +111,7 @@ export function renderSubLayers(props) {
         cutOffBounds.bottom,
         cutOffBounds.right,
         cutOffBounds.top
-      ],
-      visible: true
+      ]
     });
   return xrl;
 }

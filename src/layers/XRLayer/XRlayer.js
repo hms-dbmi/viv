@@ -18,7 +18,7 @@ const defaultProps = {
   tileSize: { type: 'number', value: 0, compare: true }
 };
 
-export class XRLayer extends Layer {
+export default class XRLayer extends Layer {
   getShaders() {
     return super.getShaders({ vs, fs, modules: [project32] });
   }
@@ -130,8 +130,7 @@ export class XRLayer extends Layer {
   draw({ uniforms }) {
     const { textures, model } = this.state;
     if (textures && model) {
-      const { sliderValues } = this.props;
-      const { colorValues } = this.props;
+      const { sliderValues, colorValues } = this.props;
       model
         .setUniforms({
           ...uniforms,
@@ -160,16 +159,14 @@ export class XRLayer extends Layer {
       Object.values(this.state.textures).forEach(tex => tex && tex.delete());
     }
     if (channelData.length > 0) {
-      channelData.forEach(
-        // eslint-disable-next-line no-return-assign
-        (d, i) => (textures[`channel${i}`] = this.channelDataToTexture(d))
-      );
+      channelData.forEach(function(d, i) {
+        textures[`channel${i}`] = this.dataToTexture(d);
+      }, this);
       this.setState({ textures });
     }
   }
 
-  channelDataToTexture(data) {
-    // eslint-disable-next-line no-nested-ternary
+  dataToTexture(data) {
     const isInt8 = data instanceof Uint8Array;
     const isInt16 = data instanceof Uint16Array;
     const isInt32 = data instanceof Uint32Array;

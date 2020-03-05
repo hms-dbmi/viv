@@ -2,9 +2,9 @@
 import test from 'tape-catch';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
-import { VivViewerLayerBase } from '../src/layers/viv-viewer-layer/viv-viewer-layer-base';
+import XRLayer from '../src/layers/XRLayer';
 
-test('VivViewerLayerBase', t => {
+test('XRLayer', t => {
   const view = new OrthographicView({
     id: 'ortho',
     controller: true,
@@ -14,21 +14,21 @@ test('VivViewerLayerBase', t => {
     zoom: 0
   });
   const testCases = generateLayerTests({
-    Layer: VivViewerLayerBase,
+    Layer: XRLayer,
     assert: t.ok,
     sampleProps: {
+      bounds: [0, 0, 2, 2],
       sliderValues: [0, 10],
       colorValues: [[0, 1, 1], [], [], [], [], []],
       tileSize: 2,
-      imageWidth: 4,
-      imageHeight: 4
+      channelData: [[0, 2, 1, 2]]
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
   });
   testLayer({
-    Layer: VivViewerLayerBase,
+    Layer: XRLayer,
     testCases,
-    onError: t.notOkimport,
+    onError: t.notOk,
     viewport: view.makeViewport({
       height: 4,
       width: 4,

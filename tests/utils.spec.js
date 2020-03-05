@@ -3,9 +3,9 @@ import test from 'tape-catch';
 import {
   range,
   padWithDefault,
-  inTileBounds,
+  isInTileBounds,
   cutOffImageBounds
-} from '../src/layers/viv-viewer-layer/utils';
+} from '../src/layers/VivViewerLayer/utils';
 
 test('range test', t => {
   const expected = [0, 1, 2];
@@ -24,9 +24,9 @@ test('padWithDefault test', t => {
   t.end();
 });
 
-test('inTileBounds test', t => {
+test('isInTileBounds test', t => {
   t.ok(
-    inTileBounds({
+    isInTileBounds({
       x: 0,
       y: 0,
       z: 0,
@@ -38,7 +38,7 @@ test('inTileBounds test', t => {
     '(0,0,0) tile in bounds for imageWidth: 10, imageHeight: 10, tileSize: 2, minZoom: -5'
   );
   t.notOk(
-    inTileBounds({
+    isInTileBounds({
       x: 0,
       y: 0,
       z: 6,
@@ -50,7 +50,7 @@ test('inTileBounds test', t => {
     '(0,0,6) tile out of bounds for minZoom: -5'
   );
   t.notOk(
-    inTileBounds({
+    isInTileBounds({
       x: 5,
       y: 5,
       z: 0,

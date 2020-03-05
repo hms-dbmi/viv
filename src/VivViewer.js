@@ -3,11 +3,21 @@ import DeckGL from '@deck.gl/react';
 import { OrthographicView } from '@deck.gl/core';
 import { VivViewerLayer } from './layers';
 
-export class VivViewer extends PureComponent {
+function getTypeIdentifier(useTiff, useZarr) {
+  if (useTiff) {
+    return 'tiff';
+  }
+  if (useZarr) {
+    return 'zarr';
+  }
+  return 'other-data';
+}
+
+export default class VivViewer extends PureComponent {
   _renderLayers() {
-    const { useTiff } = this.props;
+    const { useTiff, useZarr } = this.props;
     return new VivViewerLayer({
-      id: `VivViewerLayer-${useTiff ? 'tiff' : 'zarr'}`,
+      id: `VivViewerLayer-${getTypeIdentifier(useTiff, useZarr)}`,
       ...this.props
     });
   }

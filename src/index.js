@@ -1,4 +1,4 @@
 import { VivViewerLayer } from './layers';
-import { VivViewer } from './viv-viewer';
+import VivViewer from './VivViewer';
 
-export { VivViewerLayer, VivViewer };
+export { VivViewer, VivViewerLayer };

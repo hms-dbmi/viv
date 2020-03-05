@@ -2,7 +2,7 @@ import { TileLayer } from '@deck.gl/geo-layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 
 import { loadZarr, loadTiff } from './data-utils';
-import { inTileBounds, renderSubLayers } from './utils';
+import { isInTileBounds, renderSubLayers } from './utils';
 
 const defaultProps = {
   ...TileLayer.defaultProps,
@@ -16,41 +16,31 @@ const defaultProps = {
   minZoom: { type: 'number', value: 0, compare: true },
   maxZoom: { type: 'number', value: 0, compare: true },
   connections: { type: 'object', value: {}, compare: true },
-  pool: { type: 'object', value: {}, compare: true },
+  pool: { type: 'object', value: {}, compare: false },
   renderSubLayers: { type: 'function', value: renderSubLayers, compare: false },
   useZarr: { type: 'boolean', value: false, compare: true },
   useTiff: { type: 'boolean', value: false, compare: true }
 };
 
-export class VivViewerLayerBase extends TileLayer {
+export default class VivViewerLayerBase extends TileLayer {
   async getTileData({ x, y, z }) {
     const { useZarr, useTiff } = this.props;
-    if (
-      inTileBounds({
-        x,
-        y,
-        z: -z,
-        ...this.props
-      })
-    ) {
+    const tileLoadProps = {
+      x,
+      y,
+      z: -z,
+      ...this.props
+    };
+    if (isInTileBounds(tileLoadProps)) {
       if (useTiff) {
-        const tile = loadTiff({
-          x,
-          y,
-          z: -1 * z,
-          ...this.props
-        });
+        const tile = loadTiff(tileLoadProps);
         return tile;
       }
       if (useZarr) {
-        const tile = loadZarr({
-          x,
-          y,
-          z: -1 * z,
-          ...this.props
-        });
+        const tile = loadZarr(tileLoadProps);
         return tile;
       }
+      // If neither zarr or tiff is indicated, use whatever is passed in.
       const tile = this.props.getTileData({ x, y, z });
       return tile;
     }
