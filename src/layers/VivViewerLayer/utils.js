@@ -30,27 +30,6 @@ export function isInTileBounds({
   return xInBounds && yInBounds && zInBounds;
 }
 
-/**
- * cutOffImageBounds cuts of the bounding box of an image at any resolution
- * to the full resolution cooridnates to prevent stretching/shrinking.
- * The return value is an object of the new bounds.
- */
-export function cutOffImageBounds({
-  left,
-  bottom,
-  right,
-  top,
-  imageWidth,
-  imageHeight
-}) {
-  return {
-    left: Math.max(0, left),
-    bottom: Math.max(0, Math.min(imageHeight, bottom)),
-    right: Math.max(0, Math.min(imageWidth, right)),
-    top: Math.max(0, top)
-  };
-}
-
 export function renderSubLayers(props) {
   const {
     bbox: { left, top, right, bottom }
@@ -63,14 +42,6 @@ export function renderSubLayers(props) {
     tileSize,
     data
   } = props;
-  const cutOffBounds = cutOffImageBounds({
-    left,
-    bottom,
-    right,
-    top,
-    imageHeight,
-    imageWidth
-  });
   const xrl =
     // If image metadata is undefined, do not render this layer.
     props.imageWidth &&
@@ -83,12 +54,7 @@ export function renderSubLayers(props) {
       sliderValues,
       colorValues,
       tileSize,
-      bounds: [
-        cutOffBounds.left,
-        cutOffBounds.bottom,
-        cutOffBounds.right,
-        cutOffBounds.top
-      ]
+      bounds: [left, bottom, right, top]
     });
   return xrl;
 }

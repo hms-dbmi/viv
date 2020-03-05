@@ -1,9 +1,9 @@
 import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
-import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 import VivViewerLayerBase from './VivViewerLayerBase';
 import {
   padWithDefault,
+  isInTileBounds,
   DEFAULT_COLOR_OFF,
   MAX_COLOR_INTENSITY
 } from './utils';
@@ -94,14 +94,33 @@ export default class VivViewerLayer extends CompositeLayer {
     const { imageWidth, imageHeight, tileSize, minZoom } = this.state;
 
     const layerProps = this._overrideChannelProps();
+    const getTileData = ({ x, y, z }) => {
+      if (
+        isInTileBounds({
+          x,
+          y,
+          z: -z,
+          imageWidth,
+          imageHeight,
+          minZoom,
+          tileSize
+        })
+      ) {
+        return this.props.loader.getTile({
+          x,
+          y,
+          z: -z
+        });
+      }
+      return null;
+    };
     const layers = this.props.loader
       ? new VivViewerLayerBase({
           imageWidth,
           imageHeight,
           tileSize,
           minZoom,
-          getTileData: ({ x, y, z }) =>
-            this.props.loader.getTile({ x, y, z: -z, ...this.props }),
+          getTileData,
           ...this.getSubLayerProps(layerProps)
         })
       : [];

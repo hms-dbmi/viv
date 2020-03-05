@@ -1,6 +1,6 @@
 import { TileLayer } from '@deck.gl/geo-layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
-import { isInTileBounds, renderSubLayers } from './utils';
+import { renderSubLayers } from './utils';
 
 const defaultProps = {
   ...TileLayer.defaultProps,
