@@ -1,13 +1,11 @@
 import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
-import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 import { MicroscopyViewerLayerBase } from './microscopy-viewer-layer-base';
 
 export class MicroscopyViewerLayer extends CompositeLayer {
   initializeState() {
     this.state = {
       connections: null,
-      pool: null,
       imageWidth: 0,
       imageHeight: 0,
       tileSize: 0,
@@ -27,25 +25,22 @@ export class MicroscopyViewerLayer extends CompositeLayer {
         imageWidth,
         imageHeight,
         tileSize,
-        minZoom,
-        usePool
+        minZoom
       } = this.props.loader.vivMetadata;
 
       this.setState({
         minZoom,
         imageWidth,
         imageHeight,
-        tileSize,
-        pool: usePool ? new Pool() : null
+        tileSize
       });
     }
   }
 
   renderLayers() {
-    const { imageWidth, imageHeight, tileSize, minZoom, pool } = this.state;
+    const { imageWidth, imageHeight, tileSize, minZoom } = this.state;
     const layers = this.props.loader
       ? new MicroscopyViewerLayerBase({
-          pool,
           imageWidth,
           imageHeight,
           tileSize,

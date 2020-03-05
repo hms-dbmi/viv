@@ -1,17 +1,17 @@
 import { openArray } from 'zarr';
 // eslint-disable-next-line import/extensions
-import { fromUrl } from 'geotiff/dist/geotiff.bundle.min.js';
+import { fromUrl, Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 
 import ZarrLoader from './zarrLoader';
 import TiffPyramidLoader from './tiffPyramidLoader';
 import { range } from '../layers/microscopy-viewer-layer/utils';
 
-async function createZarrPyramid({
+export async function createZarrPyramid({
   rootZarrUrl,
   minZoom,
   isRgb,
   scale,
-  dimNames
+  dimensions
 }) {
   // Known issue with how zarr.js does string concatenation for urls
   // The prefix gets chunked off for some reason and must be repeating in the config.
@@ -30,10 +30,10 @@ async function createZarrPyramid({
     return openArray(config);
   });
   const connections = await Promise.all(zarrStores);
-  return new ZarrLoader(connections, isRgb, scale, dimNames);
+  return new ZarrLoader(connections, isRgb, scale, dimensions);
 }
 
-async function createTiffPyramid({ channelNames, channelUrls, pool }) {
+export async function createTiffPyramid({ channelNames, channelUrls }) {
   // Open and resolve all connections asynchronously
   const tiffConnections = channelUrls.map(async url => {
     const tiff = await fromUrl(url);
@@ -44,29 +44,7 @@ async function createTiffPyramid({ channelNames, channelUrls, pool }) {
     const resolvedConnections = await Promise.all(pyramidLevels);
     return resolvedConnections;
   });
+  const pool = new Pool();
   const resolvedTiffConnections = await Promise.all(tiffConnections);
   return new TiffPyramidLoader(resolvedTiffConnections, channelNames, pool);
-}
-
-// eslint-disable-next-line consistent-return
-export async function initPyramidLoader(
-  type,
-  { sourceChannels, minZoom, isRgb, scale, dimNames, pool }
-) {
-  let loader;
-  if (type === 'zarr') {
-    const rootZarrUrl = Object.values(sourceChannels)[0];
-    loader = await createZarrPyramid({
-      rootZarrUrl,
-      minZoom,
-      isRgb,
-      scale,
-      dimNames
-    });
-  } else if (type === 'tiff') {
-    const channelNames = Object.keys(sourceChannels);
-    const channelUrls = Object.values(sourceChannels);
-    loader = await createTiffPyramid({ channelNames, channelUrls, pool });
-  }
-  return loader;
 }

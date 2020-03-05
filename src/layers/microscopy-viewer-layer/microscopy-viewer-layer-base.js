@@ -6,15 +6,14 @@ import { tileToScreen, getRasterTileIndices } from './tiling-utils';
 import { padWithDefault } from './utils';
 
 const MAX_SLIDERS_AND_CHANNELS = 6;
-const MAX_SLIDER_VALUE = 65535;
 const MAX_COLOR_INTENSITY = 255;
-const DEFAULT_SLIDER_OFF = [MAX_SLIDER_VALUE, MAX_SLIDER_VALUE];
 const DEFAULT_COLOR_OFF = [0, 0, 0];
 
 const defaultProps = {
   ...BaseTileLayer.defaultProps,
   pickable: false,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+  maxSliderValue: 65535,
   maxZoom: 0,
   onViewportLoad: false,
   renderSubLayers: props => {
@@ -38,7 +37,13 @@ const defaultProps = {
 
 export class MicroscopyViewerLayerBase extends BaseTileLayer {
   constructor(props) {
-    const { sliderValues, colorValues, channelsOn, loader } = props;
+    const {
+      sliderValues,
+      colorValues,
+      channelIsOn,
+      loader,
+      maxSliderValue
+    } = props;
 
     const lengths = [sliderValues.length, colorValues.length];
     if (lengths.every(l => l !== lengths[0])) {
@@ -46,13 +51,13 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
     }
 
     const colors = colorValues.map((color, i) =>
-      channelsOn[i]
+      channelIsOn[i]
         ? color.map(c => c / MAX_COLOR_INTENSITY)
         : DEFAULT_COLOR_OFF
     );
 
     const sliders = sliderValues.map((slider, i) =>
-      channelsOn[i] ? slider : DEFAULT_SLIDER_OFF
+      channelIsOn[i] ? slider : [maxSliderValue, maxSliderValue]
     );
 
     // Need to pad sliders and colors with default values (required by shader)
@@ -62,7 +67,7 @@ export class MicroscopyViewerLayerBase extends BaseTileLayer {
     }
     const paddedSliderValues = padWithDefault(
       sliders,
-      DEFAULT_SLIDER_OFF,
+      [maxSliderValue, maxSliderValue],
       padSize
     );
 

@@ -6,14 +6,15 @@ import {
   Checkbox,
   withStyles
 } from '@material-ui/core';
-import { VivViewer, initPyramidLoader } from '../../src';
+import { VivViewer } from '../../src';
+import { initPyramidLoader } from './initLoaders';
 import sources from './source-info';
 import './App.css';
 
 const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
 const MIN_ZOOM = -8;
-const DEFAULT_VIEW_CONFIG = { zoom: -5.5, target: [30000, 10000, 0] };
+const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
 
 const initSourceName = 'zarr';
 const colorValues = [
@@ -41,11 +42,11 @@ const styledSelectors = colorValues.map(color => {
 });
 
 const initSliderValues = Array(colorValues.length).fill([0, 20000]);
-const initChannelsOn = Array(colorValues.length).fill(true);
+const initChannelIsOn = Array(colorValues.length).fill(true);
 
-const App = () => {
+function App() {
   const [sliderValues, setSliderValues] = useState(initSliderValues);
-  const [channelsOn, setChannelsOn] = useState(initChannelsOn);
+  const [channelIsOn, setChannelIsOn] = useState(initChannelIsOn);
   const [sourceName, setSourceName] = useState(initSourceName);
   const [viewWidth, setViewWidth] = useState(window.innerWidth * 0.7);
   const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.9);
@@ -65,11 +66,9 @@ const App = () => {
   useEffect(() => {
     async function initLoader() {
       const config = {
-        scale: 1,
-        sourceChannels: sources[sourceName].channels,
-        minZoom: MIN_ZOOM,
-        isRgb: false,
-        dimNames: ['channel', 'y', 'x']
+        channelNames: sources[sourceName].channelNames,
+        url: sources[sourceName].url,
+        minZoom: MIN_ZOOM
       };
       // Need to do this to clear last loader... probably a better way.
       setLoader(null);
@@ -88,7 +87,7 @@ const App = () => {
   };
 
   const toggleChannel = index => {
-    setChannelsOn(prevChannelsOn => {
+    setChannelIsOn(prevChannelsOn => {
       const nextChannelsOn = [...prevChannelsOn];
       nextChannelsOn[index] = !nextChannelsOn[index];
       return nextChannelsOn;
@@ -108,49 +107,44 @@ const App = () => {
     );
   });
 
-  const sliders = Object.keys(sources[sourceName].channels).map(
-    (channel, i) => {
-      const [ColoredSlider, ColoredCheckbox] = styledSelectors[i];
-      return (
-        <div key={`container-${channel}`}>
-          <p>{channel}</p>
-          <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
-            <ColoredCheckbox
-              onChange={() => toggleChannel(i)}
-              checked={channelsOn[i]}
-            />
-            <ColoredSlider
-              style={{ top: '7px' }}
-              value={sliderValues[i]}
-              onChange={(event, value) => handleSliderChange(i, value)}
-              valueLabelDisplay="auto"
-              getAriaLabel={() => channel}
-              min={MIN_SLIDER_VALUE}
-              max={MAX_SLIDER_VALUE}
-              orientation="horizontal"
-            />
-          </div>
+  const sliders = sources[sourceName].channelNames.map((channel, i) => {
+    const [ColoredSlider, ColoredCheckbox] = styledSelectors[i];
+    return (
+      <div key={`container-${channel}`}>
+        <p>{channel}</p>
+        <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
+          <ColoredCheckbox
+            onChange={() => toggleChannel(i)}
+            checked={channelIsOn[i]}
+          />
+          <ColoredSlider
+            style={{ top: '7px' }}
+            value={sliderValues[i]}
+            onChange={(event, value) => handleSliderChange(i, value)}
+            valueLabelDisplay="auto"
+            getAriaLabel={() => channel}
+            min={MIN_SLIDER_VALUE}
+            max={MAX_SLIDER_VALUE}
+            orientation="horizontal"
+          />
         </div>
-      );
-    }
-  );
-
-  const source = sources[sourceName];
+      </div>
+    );
+  });
 
   const initialViewState =
-    sources[sourceName].initialViewState || DEFAULT_VIEW_CONFIG;
+    sources[sourceName].initialViewState || DEFAULT_VIEW_STATE;
   return (
     <div>
       {loader ? (
         <VivViewer
-          sourceChannels={source.channels}
           loader={loader}
           minZoom={MIN_ZOOM}
           viewHeight={viewHeight}
           viewWidth={viewWidth}
           sliderValues={sliderValues}
           colorValues={colorValues}
-          channelsOn={channelsOn}
+          channelIsOn={channelIsOn}
           initialViewState={initialViewState}
         />
       ) : null}
@@ -177,7 +171,7 @@ const App = () => {
       </div>
     </div>
   );
-};
+}
 
 // equivalent to PureComponent
 export default memo(App);

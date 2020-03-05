@@ -1,9 +1,10 @@
 import { MicroscopyViewerLayer } from './layers';
 import { MicroscopyViewer } from './microscopy-viewer';
-import { initPyramidLoader } from './loaders';
+import { createTiffPyramid, createZarrPyramid } from './loaders';
 
 export {
   MicroscopyViewerLayer as VivViewerLayer,
   MicroscopyViewer as VivViewer,
-  initPyramidLoader
+  createTiffPyramid,
+  createZarrPyramid
 };

@@ -1,15 +1,22 @@
 # Changelog
 
+## 0.0.9
+
+### Changed
+
+- Extracted data utils to loaders and refactored demo
+
 ## 0.0.8
 
 ### Changed
- - Update build process to use rolllup
+
+- Update build process to use rolllup
 
 ## 0.0.7
 
 ### Changed
- - Remove sort
- - Extracted data utils to loaders and refactored demo
+
+- Remove sort
 
 ## 0.0.6
 

@@ -1,7 +1,7 @@
 import { range } from '../layers/microscopy-viewer-layer/utils';
 
 export default class ZarrLoader {
-  constructor(data, isRgb, scale, dimNames) {
+  constructor(data, isRgb, scale, dimensions) {
     let base;
     if (Array.isArray(data)) {
       this.isPyramid = true;
@@ -13,15 +13,13 @@ export default class ZarrLoader {
     }
     this._data = data;
     this.scale = scale;
-    this.dimNames = dimNames;
-    this.chunkIndex = Array(dimNames.length).fill(0);
+    this.dimensions = dimensions;
+    this.chunkIndex = Array(base.shape.length).fill(0);
     if (isRgb) {
-      this.isMultiChannel = false;
       this.channelIndex = base.shape.length - 1;
       this.xIndex = base.shape.length - 2;
       this.yIndex = base.shape.length - 3;
     } else {
-      this.isMultiChannel = true;
       this.xIndex = base.shape.length - 1;
       this.yIndex = base.shape.length - 2;
       this.channelIndex = base.shape.length - 3;
@@ -37,6 +35,10 @@ export default class ZarrLoader {
     return this._data;
   }
 
+  get dimNames() {
+    return Object.keys(this.dimensions);
+  }
+
   get vivMetadata() {
     const imageHeight = this._base.shape[this.yIndex];
     const imageWidth = this._base.shape[this.xIndex];
@@ -47,9 +49,7 @@ export default class ZarrLoader {
       imageHeight,
       tileSize,
       minZoom,
-      scale: this.scale,
-      usePool: false,
-      type: 'zarr'
+      scale: this.scale
     };
   }
 
@@ -59,17 +59,14 @@ export default class ZarrLoader {
       // Just change index across one axis
       const i = this.dimNames.indexOf(dimName);
       chunkIndex[i] = index;
-    } else {
-      // Multiple dimension names and indicies provided
-      if (dimName.length !== index.length) {
-        throw Error(
-          `Dimension names and indicies must be same length when set together`
-        );
-      }
-      for (let i = 0; i < dimName.length; i += 1) {
-        const dimIndex = this.dimNames.indexOf(dimName);
-        chunkIndex[dimIndex] = index[i];
-      }
+    } else if (dimName.length !== index.length) {
+      throw Error(
+        `Dimension names and indicies must be same length when set together`
+      );
+    }
+    for (let i = 0; i < dimName.length; i += 1) {
+      const dimIndex = this.dimNames.indexOf(dimName[i]);
+      chunkIndex[dimIndex] = index[i];
     }
   }
 
