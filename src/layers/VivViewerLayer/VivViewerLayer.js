@@ -93,6 +93,7 @@ export default class VivViewerLayer extends CompositeLayer {
   renderLayers() {
     const { imageWidth, imageHeight, tileSize, minZoom } = this.state;
 
+    const { loader } = this.props;
     const layerProps = this._overrideChannelProps();
     const getTileData = ({ x, y, z }) => {
       if (
@@ -106,7 +107,7 @@ export default class VivViewerLayer extends CompositeLayer {
           tileSize
         })
       ) {
-        return this.props.loader.getTile({
+        return loader.getTile({
           x,
           y,
           z: -z
@@ -114,7 +115,7 @@ export default class VivViewerLayer extends CompositeLayer {
       }
       return null;
     };
-    const layers = this.props.loader
+    const layers = loader
       ? new VivViewerLayerBase({
           imageWidth,
           imageHeight,
