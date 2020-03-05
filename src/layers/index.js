@@ -1,1 +1,1 @@
-export { MicroscopyViewerLayer } from './microscopy-viewer-layer';
+export { default as VivViewerLayer } from './VivViewerLayer';

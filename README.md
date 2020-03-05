@@ -32,15 +32,18 @@ development with `zarr`, you should use an [HTTP2 server](https://github.com/Goo
 for best performance. Our demo
 uses Google Cloud Storage, which is HTTP2 by default.
 
+Due to difficulties around compiling shaders on Travis, unit tests and layer lifecycle
+tests are run locally as a pre-push hook. Travis runs a test build, linting, and prettier.
+
 ## Component Library API
 
 There are two components being exported for use:
 
-#### `Viewer`
+#### `VivViewer`
 
 This component is for pure drop-in use without an external `DeckGL` setup.
 
-#### `ViewerLayer`
+#### `VivViewerLayer`
 
 This component can be used with an already existing `DeckGL` setup.
 

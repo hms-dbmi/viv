@@ -41,7 +41,10 @@ export async function initZarr({ sourceChannels, minZoom }) {
   // Somewhat hard coded for now, but good to keep all this logic in the data loaders so we can edit in the future.
   const baseLayer = connections[0]; // shape [4, 36040, 52660]
   // last two dimensions of the 3D array are width and height
-  const [imageHeight, imageWidth] = baseLayer.shape.slice(1);
+  const [unPaddedImageHeight, unPaddedImageWidth] = baseLayer.shape.slice(1);
+  // Zarr padds the array to the nearest power of 2.
+  const imageHeight = 2 ** Math.ceil(Math.log2(unPaddedImageHeight));
+  const imageWidth = 2 ** Math.ceil(Math.log2(unPaddedImageWidth));
   // chunks are [4, 512, 512], grab last dimentsion. Maybe add check for if last two are the same?
   const tileSize = baseLayer.chunks.slice(-1)[0];
 

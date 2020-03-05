@@ -1,10 +1,18 @@
 import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
 import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
-import { MicroscopyViewerLayerBase } from './microscopy-viewer-layer-base';
+import VivViewerLayerBase from './VivViewerLayerBase';
 import { initTiff, initZarr } from './data-utils';
+import {
+  padWithDefault,
+  setOrderedValues,
+  DEFAULT_COLOR_OFF,
+  DEFAULT_SLIDER_OFF
+} from './utils';
 
-export class MicroscopyViewerLayer extends CompositeLayer {
+const MAX_SLIDERS_AND_CHANNELS = 6;
+
+export default class VivViewerLayer extends CompositeLayer {
   initializeState() {
     this.state = {
       connections: null,
@@ -65,6 +73,40 @@ export class MicroscopyViewerLayer extends CompositeLayer {
     }
   }
 
+  _overrideChannelProps() {
+    const { sliderValues, colorValues, channelsOn } = this.props;
+    const orderedChannelNames = Object.keys(sliderValues);
+    const { orderedSliderValues, orderedColorValues } = setOrderedValues(
+      orderedChannelNames,
+      colorValues,
+      sliderValues,
+      channelsOn
+    );
+
+    // Need to pad sliders and colors with default values (required by shader)
+    const numChannels = orderedChannelNames.length;
+    const padSize = MAX_SLIDERS_AND_CHANNELS - numChannels;
+    if (padSize < 0) {
+      throw Error(`${numChannels} channels passed in, but only 6 are allowed.`);
+    }
+    const paddedSliderValues = padWithDefault(
+      orderedSliderValues,
+      DEFAULT_SLIDER_OFF,
+      padSize
+    );
+    const paddedColorValues = padWithDefault(
+      orderedColorValues,
+      DEFAULT_COLOR_OFF,
+      padSize
+    );
+    const overrideValuesProps = {
+      ...this.props,
+      sliderValues: paddedSliderValues.flat(), // flatten for use on shaders
+      colorValues: paddedColorValues
+    };
+    return overrideValuesProps;
+  }
+
   renderLayers() {
     const {
       connections,
@@ -74,8 +116,10 @@ export class MicroscopyViewerLayer extends CompositeLayer {
       tileSize,
       minZoom
     } = this.state;
+
+    const layerProps = this._overrideChannelProps();
     const layers = connections
-      ? new MicroscopyViewerLayerBase({
+      ? new VivViewerLayerBase({
           connections,
           pool,
           imageWidth,
@@ -83,11 +127,11 @@ export class MicroscopyViewerLayer extends CompositeLayer {
           tileSize,
           minZoom,
           maxZoom: 0,
-          ...this.getSubLayerProps(this.props)
+          ...this.getSubLayerProps(layerProps)
         })
       : [];
     return layers;
   }
 }
 
-MicroscopyViewerLayer.layerName = 'MicroscopyViewerLayer';
+VivViewerLayer.layerName = 'VivViewerLayer';

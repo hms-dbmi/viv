@@ -3,23 +3,28 @@
 // we live in place for now, hence some of the not-destructuring
 
 import GL from '@luma.gl/constants';
-import { Layer, project32 } from '@deck.gl/core';
+import { COORDINATE_SYSTEM, Layer, project32 } from '@deck.gl/core';
 import { Model, Geometry, Texture2D } from '@luma.gl/core';
 import vs from './xr-layer-vertex';
 import fs from './xr-layer-fragment';
 
 const defaultProps = {
-  data: null
+  pickable: false,
+  coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+  channelData: { type: 'array', value: [], async: true },
+  bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
+  colorValues: { type: 'array', value: [], compare: true },
+  sliderValues: { type: 'array', value: [], compare: true },
+  tileSize: { type: 'number', value: 0, compare: true }
 };
 
-export class XRLayer extends Layer {
+export default class XRLayer extends Layer {
   getShaders() {
     return super.getShaders({ vs, fs, modules: [project32] });
   }
 
   initializeState() {
     const attributeManager = this.getAttributeManager();
-
     attributeManager.add({
       positions: {
         size: 3,
@@ -29,7 +34,6 @@ export class XRLayer extends Layer {
         noAlloc: true
       }
     });
-
     this.setState({
       numInstances: 1,
       positions: new Float64Array(12)
@@ -54,14 +58,15 @@ export class XRLayer extends Layer {
         this.state.model.delete();
       }
       this.setState({ model: this._getModel(gl) });
+
       this.getAttributeManager().invalidateAll();
     }
-    if (changeFlags.dataChanged) {
-      this.loadTexture(props.data);
+    if (props.channelData && props.channelData.length > 0) {
+      if (props.channelData !== oldProps.channelData) {
+        this.loadTexture(props.channelData);
+      }
     }
-
     const attributeManager = this.getAttributeManager();
-
     if (props.bounds !== oldProps.bounds) {
       attributeManager.invalidate('positions');
     }
@@ -125,8 +130,7 @@ export class XRLayer extends Layer {
   draw({ uniforms }) {
     const { textures, model } = this.state;
     if (textures && model) {
-      const { sliderValues } = this.props;
-      const { colorValues } = this.props;
+      const { sliderValues, colorValues } = this.props;
       model
         .setUniforms({
           ...uniforms,
@@ -143,7 +147,7 @@ export class XRLayer extends Layer {
     }
   }
 
-  loadTexture(data) {
+  loadTexture(channelData) {
     const textures = {
       channel0: null,
       channel2: null,
@@ -154,24 +158,15 @@ export class XRLayer extends Layer {
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex && tex.delete());
     }
-    if (data instanceof Promise) {
-      data
-        .then(dataResolved => {
-          dataResolved.forEach(
-            // eslint-disable-next-line no-return-assign
-            (d, i) => (textures[`channel${i}`] = this.dataToTexture(d))
-          );
-        })
-        .then(() => this.setState({ textures }));
-    } else if (data instanceof Object) {
-      // eslint-disable-next-line no-return-assign
-      data.forEach((d, i) => (textures[`channel${i}`] = this.dataToTexture(d)));
+    if (channelData.length > 0) {
+      channelData.forEach(function(d, i) {
+        textures[`channel${i}`] = this.dataToTexture(d);
+      }, this);
       this.setState({ textures });
     }
   }
 
   dataToTexture(data) {
-    // eslint-disable-next-line no-nested-ternary
     const isInt8 = data instanceof Uint8Array;
     const isInt16 = data instanceof Uint16Array;
     const isInt32 = data instanceof Uint32Array;
