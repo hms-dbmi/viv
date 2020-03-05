@@ -5,7 +5,6 @@ import { MicroscopyViewerLayerBase } from './microscopy-viewer-layer-base';
 export class MicroscopyViewerLayer extends CompositeLayer {
   initializeState() {
     this.state = {
-      connections: null,
       imageWidth: 0,
       imageHeight: 0,
       tileSize: 0,
