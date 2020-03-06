@@ -84,6 +84,8 @@ export function renderSubLayers(props) {
     colorValues,
     sliderValues,
     tileSize,
+    visibility,
+    opacity,
     data
   } = props;
   const cutOffBounds = cutOffImageBounds({
@@ -106,6 +108,8 @@ export function renderSubLayers(props) {
       sliderValues,
       colorValues,
       tileSize,
+      visibility,
+      opacity,
       bounds: [
         cutOffBounds.left,
         cutOffBounds.bottom,

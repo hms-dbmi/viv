@@ -130,17 +130,13 @@ export default class XRLayer extends Layer {
   draw({ uniforms }) {
     const { textures, model } = this.state;
     if (textures && model) {
-      const { sliderValues, colorValues } = this.props;
+      const { sliderValues, colorValues, opacity } = this.props;
       model
         .setUniforms({
           ...uniforms,
-          colorValue0: colorValues[0],
-          colorValue1: colorValues[1],
-          colorValue2: colorValues[2],
-          colorValue3: colorValues[3],
-          colorValue4: colorValues[4],
-          colorValue5: colorValues[5],
+          colorValues,
           sliderValues,
+          opacity,
           ...textures
         })
         .draw();

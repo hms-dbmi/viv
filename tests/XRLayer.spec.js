@@ -19,7 +19,7 @@ test('XRLayer', t => {
     sampleProps: {
       bounds: [0, 0, 2, 2],
       sliderValues: [0, 10],
-      colorValues: [[0, 1, 1], [], [], [], [], []],
+      colorValues: [0, 1, 1],
       tileSize: 2,
       channelData: [[0, 2, 1, 2]]
     },

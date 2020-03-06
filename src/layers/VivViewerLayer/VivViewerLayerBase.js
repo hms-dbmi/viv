@@ -19,7 +19,8 @@ const defaultProps = {
   pool: { type: 'object', value: {}, compare: false },
   renderSubLayers: { type: 'function', value: renderSubLayers, compare: false },
   useZarr: { type: 'boolean', value: false, compare: true },
-  useTiff: { type: 'boolean', value: false, compare: true }
+  useTiff: { type: 'boolean', value: false, compare: true },
+  opacity: { type: 'number', value: 1, compare: true }
 };
 
 export default class VivViewerLayerBase extends TileLayer {

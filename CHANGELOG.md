@@ -2,8 +2,13 @@
 
 ## 0.0.9 - In Progress
 
+### changed
+
+- Clean up shaders
+
 ### Added
 
+- Expose opacity and visibility
 - Testing for layers added
 
 ## 0.0.8

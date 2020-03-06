@@ -18,7 +18,7 @@ test('VivViewerLayerBase', t => {
     assert: t.ok,
     sampleProps: {
       sliderValues: [0, 10],
-      colorValues: [[0, 1, 1], [], [], [], [], []],
+      colorValues: [0, 1, 1],
       tileSize: 2,
       imageWidth: 4,
       imageHeight: 4
