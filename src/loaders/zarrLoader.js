@@ -26,6 +26,7 @@ export default class ZarrLoader {
     }
     this.channelChunkSize = base.chunks[this.channelIndex];
     this.channelChunkIndices = [0];
+    this.type = 'zarr';
   }
 
   get _base() {

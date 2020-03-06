@@ -115,16 +115,14 @@ export default class VivViewerLayer extends CompositeLayer {
       }
       return null;
     };
-    const layers = loader
-      ? new VivViewerLayerBase({
-          imageWidth,
-          imageHeight,
-          tileSize,
-          minZoom,
-          getTileData,
-          ...this.getSubLayerProps(layerProps)
-        })
-      : [];
+    const layers = new VivViewerLayerBase({
+      imageWidth,
+      imageHeight,
+      tileSize,
+      minZoom,
+      getTileData,
+      ...this.getSubLayerProps(layerProps)
+    });
     return layers;
   }
 }
