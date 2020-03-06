@@ -70,6 +70,12 @@ export default class ZarrLoader {
     }
   }
 
+  async getRaster({ z, level }) {
+    const source = this.isPyramid ? this._data[z] : this._data;
+    const { data } = await source.getRaw([level, null, null]);
+    return [new Uint32Array(data)];
+  }
+
   async getTile({ x, y, z }) {
     const source = this.isPyramid ? this._data[z] : this._data;
 

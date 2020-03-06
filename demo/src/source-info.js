@@ -26,15 +26,15 @@ const zarrInfo = {
 };
 
 const rootStaticZarrUrl =
-  'https://vitessce-demo-data.storage.googleapis.com/test-data/codex/codex_z001_r001_x003_y004.zarr';
+  'https://vitessce-data.s3.amazonaws.com/0.0.20/master_release/spraggins/spraggins.ims.zarr';
 
 const staticInfo = {
   initialViewState: {
     zoom: -1,
-    target: [-500, -500]
+    target: [1000, 500]
   },
   minZoom: 0,
-  channelNames: ['Actin', 'CD107a', 'CD11c', 'CD20', 'CD21', 'CD31'],
+  channelNames: ['703.5722'],
   url: rootStaticZarrUrl
 };
 

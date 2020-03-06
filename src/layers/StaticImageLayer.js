@@ -12,7 +12,7 @@ const defaultProps = {
   loader: {
     type: 'object',
     value: {
-      getTile: () => [],
+      getRaster: () => [],
       vivMetadata: { imageHeight: 0, imageWidth: 0 }
     },
     compare: true
@@ -22,7 +22,7 @@ const defaultProps = {
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
     const { loader } = this.props;
-    this.setState({ data: loader.getTile({ x: 0, y: 0, z: 0 }) });
+    this.setState({ data: loader.getRaster({ z: 0, level: 1 }) });
   }
 
   renderLayers() {
