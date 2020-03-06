@@ -21,7 +21,7 @@ To build the demo used for visual testing (seen on `npm start`), run
 ## Publish
 
 To publish the package to npm, the demo site, and bump the version number on github,
-please run `npm version patch`.
+please run `npm version [major | minor | patch]` depending on which you want.
 
 ## Development
 
