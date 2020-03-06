@@ -5,6 +5,7 @@
 ### Added
 
 - Testing for layers added
+- More automated build process
 
 ## 0.0.8
 

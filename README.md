@@ -18,6 +18,11 @@ To build the component, alone via `webpack` use `npm run-script build-component`
 To build the demo used for visual testing (seen on `npm start`), run
 `npm run-script build-site`.
 
+## Publish
+
+To publish the package to npm, the demo site, and bump the version number on github,
+please run `npm version patch`.
+
 ## Development
 
 Please install the [Prettier plug-in](https://prettier.io/docs/en/editors.html)
