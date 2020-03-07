@@ -2,9 +2,10 @@
 
 ## 0.0.9 - In Progress
 
-### changed
+### Changed
 
 - Clean up shaders
+- Extracted data utils to loaders and refactored demo
 
 ### Added
 

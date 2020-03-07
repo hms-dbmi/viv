@@ -1,4 +1,5 @@
 import { VivViewerLayer } from './layers';
 import VivViewer from './VivViewer';
+import { createTiffPyramid, createZarrPyramid } from './loaders';
 
-export { VivViewer, VivViewerLayer };
+export { VivViewerLayer, VivViewer, createTiffPyramid, createZarrPyramid };

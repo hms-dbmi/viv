@@ -1,188 +1,177 @@
-import React, { PureComponent } from 'react';
-import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import Slider from '@material-ui/core/Slider';
-import Checkbox from '@material-ui/core/Checkbox';
-import { withStyles } from '@material-ui/core/styles';
+import React, { useState, useEffect, memo } from 'react';
+import {
+  Button,
+  ButtonGroup,
+  Slider,
+  Checkbox,
+  withStyles
+} from '@material-ui/core';
 import { VivViewer } from '../../src';
+import { initPyramidLoader } from './initLoaders';
 import sources from './source-info';
 import './App.css';
 
+const MIN_SLIDER_VALUE = 0;
+const MAX_SLIDER_VALUE = 65535;
+const MIN_ZOOM = -8;
+const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
+
 const initSourceName = 'zarr';
+const colorValues = [
+  [255, 0, 0],
+  [0, 255, 0],
+  [0, 0, 255],
+  [255, 128, 0]
+];
+const styledSelectors = colorValues.map(color => {
+  const ColoredSlider = withStyles({
+    root: {
+      color: `rgb(${color})`
+    }
+  })(Slider);
+  const ColoredCheckbox = withStyles({
+    root: {
+      color: `rgb(${color})`,
+      '&$checked': {
+        color: `rgb(${color})`
+      }
+    },
+    checked: {}
+  })(Checkbox);
+  return [ColoredSlider, ColoredCheckbox];
+});
 
-export default class App extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.resize = this.resize.bind(this);
-    const sliderValues = {};
-    const colorValues = {};
-    const sliders = {};
-    const checkboxes = {};
-    const channelsOn = {};
-    const colorOptions = [
-      [255, 0, 0],
-      [0, 255, 0],
-      [0, 0, 255],
-      [255, 128, 0]
-    ];
-    Object.keys(sources[initSourceName].channels).forEach((channel, i) => {
-      sliderValues[channel] = [0, 20000];
-      colorValues[channel] = colorOptions[i];
-      channelsOn[channel] = true;
-      sliders[channel] = withStyles({
-        root: {
-          color: `rgb(${colorOptions[i]})`
-        }
-      })(Slider);
-      checkboxes[channel] = withStyles({
-        root: {
-          color: `rgb(${colorOptions[i]})`,
-          '&$checked': {
-            color: colorOptions[i]
-          }
-        },
-        checked: {}
-        // eslint-disable-next-line react/jsx-props-no-spreading
-      })(checkBoxProps => (
-        // eslint-disable-next-line react/jsx-props-no-spreading
-        <Checkbox color="default" {...checkBoxProps} />
-      ));
-    });
-    this.state = {
-      sliderValues,
-      colorValues,
-      channelsOn,
-      viewHeight: window.innerHeight * 0.9,
-      viewWidth: window.innerWidth * 0.7,
-      sourceName: initSourceName
+const initSliderValues = Array(colorValues.length).fill([0, 20000]);
+const initChannelIsOn = Array(colorValues.length).fill(true);
+
+function App() {
+  const [sliderValues, setSliderValues] = useState(initSliderValues);
+  const [channelIsOn, setChannelIsOn] = useState(initChannelIsOn);
+  const [sourceName, setSourceName] = useState(initSourceName);
+  const [viewWidth, setViewWidth] = useState(window.innerWidth * 0.7);
+  const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.9);
+  const [loader, setLoader] = useState(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewWidth(window.innerWidth * 0.7);
+      setViewHeight(window.innerHeight * 0.9);
     };
-    this.max = 65535;
-    this.sliders = sliders;
-    this.checkboxes = checkboxes;
-    window.addEventListener('resize', this.resize);
-  }
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  });
 
-  handleSliderChange(event, value, channel) {
-    const channelValue = {};
-    channelValue[channel] = value;
-    this.setState(prevState => {
-      return { sliderValues: { ...prevState.sliderValues, ...channelValue } };
-    });
-  }
-
-  toggleChannel(channelName) {
-    this.setState(prevState => {
-      const newChannelsOn = {
-        [channelName]: !prevState.channelsOn[channelName]
+  useEffect(() => {
+    async function initLoader() {
+      const config = {
+        channelNames: sources[sourceName].channelNames,
+        url: sources[sourceName].url,
+        minZoom: MIN_ZOOM
       };
-      return { channelsOn: { ...prevState.channelsOn, ...newChannelsOn } };
-    });
-  }
+      // Need to do this to clear last loader... probably a better way.
+      setLoader(null);
+      const newLoader = await initPyramidLoader(sourceName, config);
+      setLoader(newLoader);
+    }
+    initLoader();
+  }, [sourceName]);
 
-  resize() {
-    this.setState({
-      viewHeight: window.innerHeight * 0.9,
-      viewWidth: window.innerWidth * 0.7
+  const handleSliderChange = (index, value) => {
+    setSliderValues(prevSliderValues => {
+      const nextSliderValues = [...prevSliderValues];
+      nextSliderValues[index] = value;
+      return nextSliderValues;
     });
-  }
+  };
 
-  render() {
-    const { sourceName } = this.state;
-    const initialViewState = sources[sourceName].initialViewState || {
-      zoom: -5.5,
-      target: [30000, 10000, 0]
-    };
-    const {
-      sliderValues,
-      colorValues,
-      viewHeight,
-      viewWidth,
-      channelsOn
-    } = this.state;
-    const sliders = Object.keys(this.sliders).map(channel => {
-      const ChannelSlider = this.sliders[channel];
-      const ChannelCheckbox = this.checkboxes[channel];
-      const sliderValue = sliderValues[channel];
-      return (
-        <div key={`container-${channel}`}>
-          <p>{channel}</p>
-          <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
-            <ChannelCheckbox
-              // eslint-disable-next-line no-unused-vars
-              onChange={e => this.toggleChannel(channel)}
-              checked={channelsOn[channel]}
-            />
-            <ChannelSlider
-              style={{ top: '7px' }}
-              value={sliderValue}
-              onChange={(e, v) => this.handleSliderChange(e, v, channel)}
-              valueLabelDisplay="auto"
-              getAriaLabel={() => channel}
-              min={0}
-              max={this.max}
-              orientation="horizontal"
-            />
-          </div>
-        </div>
-      );
+  const toggleChannel = index => {
+    setChannelIsOn(prevChannelsOn => {
+      const nextChannelsOn = [...prevChannelsOn];
+      nextChannelsOn[index] = !nextChannelsOn[index];
+      return nextChannelsOn;
     });
+  };
 
-    const sourceButtons = Object.keys(sources).map(name => {
-      return (
-        <Button
-          variant="contained"
-          key={name}
-          disabled={name === sourceName}
-          onClick={() => {
-            this.setState({ sourceName: name });
-          }}
-        >
-          {name}
-        </Button>
-      );
-    });
-
-    const source = sources[sourceName];
+  const sourceButtons = Object.keys(sources).map(name => {
     return (
-      <div>
-        <VivViewer
-          /* eslint-disable react/jsx-props-no-spreading */
-          {...{
-            useTiff: source.isTiff,
-            useZarr: source.isZarr,
-            sourceChannels: source.channels,
-            minZoom: -8,
-            viewHeight,
-            viewWidth,
-            sliderValues,
-            colorValues,
-            channelsOn,
-            initialViewState
-          }}
-          /* eslint-disable react/jsx-props-no-spreading */
-        />
-        <div className="slider-container">
-          <p>
-            <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer
-            for high bit depth, high resolution, multi-channel images using
-            DeckGL over the hood and WebGL under the hood.
-          </p>
-          <p>
-            More information:{' '}
-            <a href="https://github.com/hubmapconsortium/vitessce-image-viewer">
-              Github
-            </a>
-            ,&nbsp;
-            <a href="https://www.npmjs.com/package/@hubmap/vitessce-image-viewer">
-              NPM
-            </a>
-          </p>
-          <ButtonGroup color="primary" size="small">
-            {sourceButtons}
-          </ButtonGroup>
-          {sliders}
+      <Button
+        variant="contained"
+        key={name}
+        disabled={name === sourceName}
+        onClick={() => setSourceName(name)}
+      >
+        {name}
+      </Button>
+    );
+  });
+
+  const sliders = sources[sourceName].channelNames.map((channel, i) => {
+    const [ColoredSlider, ColoredCheckbox] = styledSelectors[i];
+    return (
+      <div key={`container-${channel}`}>
+        <p>{channel}</p>
+        <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
+          <ColoredCheckbox
+            onChange={() => toggleChannel(i)}
+            checked={channelIsOn[i]}
+          />
+          <ColoredSlider
+            style={{ top: '7px' }}
+            value={sliderValues[i]}
+            onChange={(event, value) => handleSliderChange(i, value)}
+            valueLabelDisplay="auto"
+            getAriaLabel={() => channel}
+            min={MIN_SLIDER_VALUE}
+            max={MAX_SLIDER_VALUE}
+            orientation="horizontal"
+          />
         </div>
       </div>
     );
-  }
+  });
+
+  const initialViewState =
+    sources[sourceName].initialViewState || DEFAULT_VIEW_STATE;
+  return (
+    <div>
+      {loader ? (
+        <VivViewer
+          loader={loader}
+          minZoom={MIN_ZOOM}
+          viewHeight={viewHeight}
+          viewWidth={viewWidth}
+          sliderValues={sliderValues}
+          colorValues={colorValues}
+          channelIsOn={channelIsOn}
+          initialViewState={initialViewState}
+        />
+      ) : null}
+      <div className="slider-container">
+        <p>
+          <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer
+          for high bit depth, high resolution, multi-channel images using DeckGL
+          over the hood and WebGL under the hood.
+        </p>
+        <p>
+          More information:{' '}
+          <a href="https://github.com/hubmapconsortium/vitessce-image-viewer">
+            Github
+          </a>
+          ,&nbsp;
+          <a href="https://www.npmjs.com/package/@hubmap/vitessce-image-viewer">
+            NPM
+          </a>
+        </p>
+        <ButtonGroup color="primary" size="small">
+          {sourceButtons}
+        </ButtonGroup>
+        {sliders}
+      </div>
+    </div>
+  );
 }
+
+// equivalent to PureComponent
+export default memo(App);
