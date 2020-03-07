@@ -2,6 +2,10 @@
 
 ## 0.0.9 - In Progress
 
+### Changed
+
+- Extracted data utils to loaders and refactored demo
+
 ### Added
 
 - Testing for layers added

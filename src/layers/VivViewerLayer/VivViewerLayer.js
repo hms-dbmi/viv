@@ -1,13 +1,11 @@
 import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
-import { Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 import VivViewerLayerBase from './VivViewerLayerBase';
-import { initTiff, initZarr } from './data-utils';
 import {
   padWithDefault,
-  setOrderedValues,
+  isInTileBounds,
   DEFAULT_COLOR_OFF,
-  DEFAULT_SLIDER_OFF
+  MAX_COLOR_INTENSITY
 } from './utils';
 
 const MAX_SLIDERS_AND_CHANNELS = 6;
@@ -15,10 +13,6 @@ const MAX_SLIDERS_AND_CHANNELS = 6;
 export default class VivViewerLayer extends CompositeLayer {
   initializeState() {
     this.state = {
-      connections: null,
-      pool: null,
-      isZarr: false,
-      isTiff: false,
       imageWidth: 0,
       imageHeight: 0,
       tileSize: 0,
@@ -33,70 +27,59 @@ export default class VivViewerLayer extends CompositeLayer {
   }
 
   updateState() {
-    /* eslint-disable no-bitwise */
-    if (
-      !this.state.connections ||
-      this.props.useTiff ^ this.state.isTiff ||
-      this.props.useZarr ^ this.state.isZarr
-    ) {
-      /* eslint-disable no-bitwise */
-      if (this.props.useTiff) {
-        initTiff({ ...this.props }).then(
-          ({ connections, minZoom, imageWidth, imageHeight, tileSize }) => {
-            this.setState({
-              connections,
-              minZoom,
-              imageWidth,
-              imageHeight,
-              tileSize,
-              pool: new Pool(),
-              isZarr: false,
-              isTiff: true
-            });
-          }
-        );
-      } else {
-        initZarr({ ...this.props }).then(
-          ({ connections, minZoom, imageWidth, imageHeight, tileSize }) => {
-            this.setState({
-              connections,
-              minZoom,
-              imageWidth,
-              imageHeight,
-              tileSize,
-              isZarr: true,
-              isTiff: false
-            });
-          }
-        );
-      }
+    if (this.props.loader) {
+      const {
+        imageWidth,
+        imageHeight,
+        tileSize,
+        minZoom
+      } = this.props.loader.vivMetadata;
+
+      this.setState({
+        minZoom,
+        imageWidth,
+        imageHeight,
+        tileSize
+      });
     }
   }
 
   _overrideChannelProps() {
-    const { sliderValues, colorValues, channelsOn } = this.props;
-    const orderedChannelNames = Object.keys(sliderValues);
-    const { orderedSliderValues, orderedColorValues } = setOrderedValues(
-      orderedChannelNames,
-      colorValues,
+    const {
       sliderValues,
-      channelsOn
+      colorValues,
+      channelIsOn,
+      maxSliderValue
+    } = this.props;
+    const lengths = [sliderValues.length, colorValues.length];
+    if (lengths.every(l => l !== lengths[0])) {
+      throw Error('Inconsistent number of slider values and colors provided');
+    }
+
+    const colors = colorValues.map((color, i) =>
+      channelIsOn[i]
+        ? color.map(c => c / MAX_COLOR_INTENSITY)
+        : DEFAULT_COLOR_OFF
+    );
+
+    const sliders = sliderValues.map((slider, i) =>
+      channelIsOn[i] ? slider : [maxSliderValue, maxSliderValue]
     );
 
     // Need to pad sliders and colors with default values (required by shader)
-    const numChannels = orderedChannelNames.length;
-    const padSize = MAX_SLIDERS_AND_CHANNELS - numChannels;
+    const padSize = MAX_SLIDERS_AND_CHANNELS - colors.length;
     if (padSize < 0) {
-      throw Error(`${numChannels} channels passed in, but only 6 are allowed.`);
+      throw Error(`${lengths} channels passed in, but only 6 are allowed.`);
     }
-    const paddedSliderValues = padWithDefault(
-      orderedSliderValues,
-      DEFAULT_SLIDER_OFF,
+
+    const paddedColorValues = padWithDefault(
+      colors,
+      DEFAULT_COLOR_OFF,
       padSize
     );
-    const paddedColorValues = padWithDefault(
-      orderedColorValues,
-      DEFAULT_COLOR_OFF,
+    const paddedSliderValues = padWithDefault(
+      sliders,
+      [maxSliderValue, maxSliderValue],
       padSize
     );
     const overrideValuesProps = {
@@ -108,28 +91,38 @@ export default class VivViewerLayer extends CompositeLayer {
   }
 
   renderLayers() {
-    const {
-      connections,
-      pool,
+    const { imageWidth, imageHeight, tileSize, minZoom } = this.state;
+
+    const { loader } = this.props;
+    const layerProps = this._overrideChannelProps();
+    const getTileData = ({ x, y, z }) => {
+      if (
+        isInTileBounds({
+          x,
+          y,
+          z: -z,
+          imageWidth,
+          imageHeight,
+          minZoom,
+          tileSize
+        })
+      ) {
+        return loader.getTile({
+          x,
+          y,
+          z: -z
+        });
+      }
+      return null;
+    };
+    const layers = new VivViewerLayerBase({
       imageWidth,
       imageHeight,
       tileSize,
-      minZoom
-    } = this.state;
-
-    const layerProps = this._overrideChannelProps();
-    const layers = connections
-      ? new VivViewerLayerBase({
-          connections,
-          pool,
-          imageWidth,
-          imageHeight,
-          tileSize,
-          minZoom,
-          maxZoom: 0,
-          ...this.getSubLayerProps(layerProps)
-        })
-      : [];
+      minZoom,
+      getTileData,
+      ...this.getSubLayerProps(layerProps)
+    });
     return layers;
   }
 }
