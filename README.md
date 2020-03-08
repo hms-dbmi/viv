@@ -111,6 +111,6 @@ that you wish to turn on or off.
 
 This is a number between `0` and `1` for the opacity of the layer.
 
-##### `visibility` (Boolean)
+##### `visible` (Boolean)
 
 This is a boolean for whether or not to display the layer (it still "renders" but is just not visible).
