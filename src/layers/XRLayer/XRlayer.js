@@ -15,7 +15,8 @@ const defaultProps = {
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
-  tileSize: { type: 'number', value: 0, compare: true }
+  tileSize: { type: 'number', value: 0, compare: true },
+  opacity: { type: 'number', value: 1, compare: true }
 };
 
 export default class XRLayer extends Layer {

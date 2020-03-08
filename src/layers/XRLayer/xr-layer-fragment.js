@@ -19,6 +19,9 @@ uniform vec2 sliderValues[6];
 // color
 uniform vec3 colorValues[6];
 
+// opacity
+uniform float opacity;
+
 in vec2 vTexCoord;
 
 out vec4 color;
@@ -72,6 +75,6 @@ void main() {
     rgbCombo += hsv2rgb(hsvCombo);
   }
 
-  color = vec4(rgbCombo, 1.0);
+  color = vec4(rgbCombo, opacity);
 }
 `;

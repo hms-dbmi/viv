@@ -106,3 +106,11 @@ that you wish to map to a full range for displaying,
 Again, this is an object matching the channel names and toggles
 that you wish to turn on or off.
 `{channel1: false, channel2:false, channel3:true}`
+
+##### `opacity` (Number)
+
+This is a number between `0` and `1` for the opacity of the layer.
+
+##### `visibility` (Boolean)
+
+This is a boolean for whether or not to display the layer (it still "renders" but is just not visible).

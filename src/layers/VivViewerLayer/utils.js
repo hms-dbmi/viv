@@ -54,7 +54,9 @@ export function renderSubLayers(props) {
       sliderValues,
       colorValues,
       tileSize,
-      bounds: [left, bottom, right, top]
+      bounds: [left, bottom, right, top],
+      opacity,
+      visibility
     });
   return xrl;
 }
