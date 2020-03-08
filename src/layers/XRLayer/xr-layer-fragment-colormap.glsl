@@ -3,10 +3,13 @@
 precision highp float;
 precision highp int;
 precision highp usampler2D;
- #pragma glslify: magma = require('glsl-colormap/magma')
- #pragma glslify: viridis = require('glsl-colormap/viridis')
- #pragma glslify: turbidity = require('glsl-colormap/turbidity')
- #pragma glslify: hot = require('glsl-colormap/hot')
+#pragma glslify: magma = require('glsl-colormap/magma')
+#pragma glslify: viridis = require('glsl-colormap/viridis')
+#pragma glslify: turbidity = require('glsl-colormap/turbidity')
+#pragma glslify: hot = require('glsl-colormap/hot')
+#pragma glslify: greys = require('glsl-colormap/greys')
+#pragma glslify: rainbow = require('glsl-colormap/rainbow')
+
 
 // our texture
 uniform usampler2D channel0;
