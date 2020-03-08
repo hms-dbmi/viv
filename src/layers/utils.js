@@ -4,6 +4,8 @@ export const DEFAULT_COLOR_OFF = [0, 0, 0];
 
 export const MAX_SLIDERS_AND_CHANNELS = 6;
 
+const MAX_SLIDER_VALUE = 65535;
+
 export function range(len) {
   return [...Array(len).keys()];
 }
@@ -39,13 +41,13 @@ export function overrideChannelProps(props) {
   const paddedColorValues = padWithDefault(colors, DEFAULT_COLOR_OFF, padSize);
   const paddedSliderValues = padWithDefault(
     sliders,
-    [maxSliderValue, maxSliderValue],
+    [maxSliderValue || MAX_SLIDER_VALUE, maxSliderValue || MAX_SLIDER_VALUE],
     padSize
   );
   const overrideValuesProps = {
     ...props,
     sliderValues: paddedSliderValues.flat(), // flatten for use on shaders
-    colorValues: paddedColorValues
+    colorValues: paddedColorValues.flat()
   };
   return overrideValuesProps;
 }

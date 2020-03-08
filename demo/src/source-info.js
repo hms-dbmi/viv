@@ -2,6 +2,7 @@ const rootTIFFUrl =
   'https://vitessce-data.storage.googleapis.com/vanderbilt.images/';
 
 const tiffInfo = {
+  isPublic: true,
   channelNames: [
     'Cy3 - Synaptopodin (glomerular)',
     'Cy5 - THP (thick limb)',
@@ -15,6 +16,7 @@ const rootZarrUrl =
   'https://vitessce-demo-data.storage.googleapis.com/test-data/vanderbilt-data/vanderbilt_mxif_ims.zarr/mxif_pyramid';
 
 const zarrInfo = {
+  isPublic: true,
   isPyramid: true,
   channelNames: [
     'Cy3 - Synaptopodin (glomerular)',
@@ -29,6 +31,7 @@ const rootStaticZarrUrl =
   'https://vitessce-data.s3.amazonaws.com/0.0.20/master_release/spraggins/spraggins.ims.zarr';
 
 const staticInfo = {
+  isPublic: false,
   initialViewState: {
     zoom: -1,
     target: [1000, 500]

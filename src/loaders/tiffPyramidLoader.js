@@ -5,7 +5,7 @@ export default class TiffPyramidLoader {
     this.pool = pool;
     this.type = 'tiff';
     // hardcoded for now
-    this.isPyramid = false;
+    this.isPyramid = true;
   }
 
   get vivMetadata() {

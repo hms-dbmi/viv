@@ -4,10 +4,13 @@
 
 ### Changed
 
+- Clean up shaders
 - Extracted data utils to loaders and refactored demo
 
 ### Added
 
+- StaticImageLayer added for viewing non-tiled images
+- Expose opacity and visibility
 - Testing for layers added
 
 ## 0.0.8

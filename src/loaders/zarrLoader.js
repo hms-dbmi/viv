@@ -1,4 +1,4 @@
-import { range } from '../layers/utils';
+import { range } from '../layers/VivViewerLayer/utils';
 
 export default class ZarrLoader {
   constructor(data, isRgb, scale, dimensions) {
@@ -25,7 +25,8 @@ export default class ZarrLoader {
       this.channelIndex = base.shape.length - 3;
     }
     this.channelChunkSize = base.chunks[this.channelIndex];
-    this.channelChunkIndices = [0];
+    this.dimNames = Object.keys(dimensions);
+    this.type = 'zarr';
   }
 
   get _base() {
@@ -33,10 +34,6 @@ export default class ZarrLoader {
       return this._data[0];
     }
     return this._data;
-  }
-
-  get dimNames() {
-    return Object.keys(this.dimensions);
   }
 
   get vivMetadata() {
@@ -63,17 +60,13 @@ export default class ZarrLoader {
       throw Error(
         `Dimension names and indicies must be same length when set together`
       );
+    } else {
+      for (let i = 0; i < dimName.length; i += 1) {
+        const dimIndex = this.dimNames.indexOf(dimName[i]);
+        chunkIndex[dimIndex] = index[i];
+      }
     }
-    for (let i = 0; i < dimName.length; i += 1) {
-      const dimIndex = this.dimNames.indexOf(dimName[i]);
-      chunkIndex[dimIndex] = index[i];
-    }
-  }
-
-  async getRaster({ z, level }) {
-    const source = this.isPyramid ? this._data[z] : this._data;
-    const { data } = await source.getRaw([level, null, null]);
-    return [new Uint32Array(data)];
+    this.chunkIndex = chunkIndex;
   }
 
   async getTile({ x, y, z }) {
@@ -89,19 +82,18 @@ export default class ZarrLoader {
       return imageTile.data;
     }
 
-    let tiles;
+    const { data } = await source.getRawChunk(chunkKey);
     // Return Array of TypedArrays
     if (this.channelChunkSize > 1) {
-      const tile = await source.getRawChunk(chunkKey);
-      tiles = this._decodeChannels(tile.data);
-    } else {
-      const tileRequests = this.channelChunkIndices.map(i => {
-        chunkKey[this.channelIndex] = i;
-        return this._data.getRawChunk(chunkKey);
-      });
-      tiles = (await Promise.all(tileRequests)).map(t => t.data);
+      return this._decodeChannels(data);
     }
-    return tiles;
+    return [data];
+  }
+
+  async getRaster({ z, level }) {
+    const source = this.isPyramid ? this._data[z] : this._data;
+    const { data } = await source.getRaw([level, null, null]);
+    return [new Uint32Array(data)];
   }
 
   _decodeChannels(chunkData) {

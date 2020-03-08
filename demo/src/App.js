@@ -25,17 +25,17 @@ const colorValues = [
   [255, 0, 255],
   [0, 255, 255]
 ];
-const styledSelectors = colorValues.map(color => {
+const styledSelectors = colorValues.map((_, i) => {
   const ColoredSlider = withStyles({
     root: {
-      color: `rgb(${color})`
+      color: `rgb(${colorValues[i]})`
     }
   })(Slider);
   const ColoredCheckbox = withStyles({
     root: {
-      color: `rgb(${color})`,
+      color: `rgb(${colorValues[i]})`,
       '&$checked': {
-        color: `rgb(${color})`
+        color: `rgb(${colorValues[i]})`
       }
     },
     checked: {}
@@ -98,17 +98,20 @@ function App() {
       return nextChannelsOn;
     });
   };
-
   const sourceButtons = Object.keys(sources).map(name => {
     return (
-      <Button
-        variant="contained"
-        key={name}
-        disabled={name === sourceName}
-        onClick={() => setSourceName(name)}
-      >
-        {name}
-      </Button>
+      // only use isPublic on the deployment
+      // eslint-disable-next-line no-restricted-globals
+      (location.host !== 'viv.vitessce.io' ? sources[name].isPublic : true) && (
+        <Button
+          variant="contained"
+          key={name}
+          disabled={name === sourceName}
+          onClick={() => setSourceName(name)}
+        >
+          {name}
+        </Button>
+      )
     );
   });
 
@@ -157,7 +160,7 @@ function App() {
           )}
           channelIsOn={channelIsOn.slice(
             0,
-            sources[sourceName].channelNames.length
+            sources[initSourceName].channelNames.length
           )}
           initialViewState={initialViewState}
         />

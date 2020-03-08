@@ -11,7 +11,7 @@
   "scripts": {
     "build-component": "mkdir dist || rm -r dist && rollup --config",
     "build-site": "mkdir dist || rm -r dist && node_modules/.bin/webpack --config webpack.site.prod.js --mode production",
-    "test": "browserify tests/*.spec.js -p esmify | tape-run",
+    "test": "browserify tests/*.spec.js -p esmify | tape-run | tap-dot",
     "start": "node_modules/.bin/webpack-dev-server --mode development --open --hot"
   },
   "pre-push": [
@@ -95,6 +95,7 @@
     "rollup": "^1.31.0",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-sourcemaps": "^0.4.2",
+    "tap-dot": "^2.0.0",
     "tape": "4.13.0",
     "tape-catch": "^1.0.6",
     "tape-run": "^6.0.1",
