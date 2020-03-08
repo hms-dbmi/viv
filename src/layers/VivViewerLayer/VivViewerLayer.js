@@ -85,7 +85,7 @@ export default class VivViewerLayer extends CompositeLayer {
     const overrideValuesProps = {
       ...this.props,
       sliderValues: paddedSliderValues.flat(), // flatten for use on shaders
-      colorValues: paddedColorValues
+      colorValues: paddedColorValues.flat()
     };
     return overrideValuesProps;
   }

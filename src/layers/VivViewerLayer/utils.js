@@ -34,7 +34,7 @@ export function renderSubLayers(props) {
   const {
     bbox: { left, top, right, bottom }
   } = props.tile;
-  const { colorValues, sliderValues, tileSize, data } = props;
+  const { colorValues, sliderValues, tileSize, visible, opacity, data } = props;
   const xrl =
     // If image metadata is undefined, do not render this layer.
     props.imageWidth &&
@@ -47,7 +47,9 @@ export function renderSubLayers(props) {
       sliderValues,
       colorValues,
       tileSize,
-      bounds: [left, bottom, right, top]
+      bounds: [left, bottom, right, top],
+      opacity,
+      visible
     });
   return xrl;
 }

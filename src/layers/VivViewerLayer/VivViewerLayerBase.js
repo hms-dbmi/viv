@@ -13,7 +13,8 @@ const defaultProps = {
   imageWidth: { type: 'number', value: 1028, compare: true },
   minZoom: { type: 'number', value: 0, compare: true },
   maxZoom: { type: 'number', value: 0, compare: true },
-  renderSubLayers: { type: 'function', value: renderSubLayers, compare: false }
+  renderSubLayers: { type: 'function', value: renderSubLayers, compare: false },
+  opacity: { type: 'number', value: 1, compare: true }
 };
 
 export default class VivViewerLayerBase extends TileLayer {}
