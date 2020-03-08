@@ -17,9 +17,15 @@ test('StaticImageLayer', t => {
     Layer: StaticImageLayer,
     assert: t.ok,
     sampleProps: {
-      sliderValues: [0, 10],
-      colorValues: [[0, 1, 1], [], [], [], [], []],
-      channelIsOn: [true, false, false, false, false, false],
+      sliderValues: [
+        [0, 10],
+        [0, 10]
+      ],
+      colorValues: [
+        [0, 1, 1],
+        [0, 1, 1]
+      ],
+      channelIsOn: [true, false],
       loader: {
         getTile: () => [0, 0, 0, 0],
         vivMetadata: { imageHeight: 2, imageWidth: 2 }
