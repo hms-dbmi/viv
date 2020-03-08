@@ -163,6 +163,7 @@ function App() {
             sources[initSourceName].channelNames.length
           )}
           initialViewState={initialViewState}
+          colormap={sourceName === 'static' ? 'turbidity' : ''}
         />
       ) : null}
       <div className="slider-container">

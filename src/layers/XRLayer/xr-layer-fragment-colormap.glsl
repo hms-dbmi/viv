@@ -4,6 +4,9 @@ precision highp float;
 precision highp int;
 precision highp usampler2D;
  #pragma glslify: magma = require('glsl-colormap/magma')
+ #pragma glslify: viridis = require('glsl-colormap/viridis')
+ #pragma glslify: turbidity = require('glsl-colormap/turbidity')
+ #pragma glslify: hot = require('glsl-colormap/hot')
 
 // our texture
 uniform usampler2D channel0;
@@ -23,5 +26,5 @@ out vec4 color;
 void main() {
   float intensityValue = (float(texture(channel0, vTexCoord).r) - sliderValues[0]) / sliderValues[1];
 
-  color = magma(intensityValue);
+  color = colormap(intensityValue);
 }

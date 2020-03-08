@@ -9,7 +9,7 @@ const defaultProps = {
   sliderValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
-  colormap: { type: 'boolean', value: false, compare: true },
+  colormap: { type: 'string', value: '', compare: true },
   loader: {
     type: 'object',
     value: {
@@ -27,7 +27,7 @@ export default class StaticImageLayer extends CompositeLayer {
   }
 
   renderLayers() {
-    const { loader, visible, opacity } = this.props;
+    const { loader, visible, opacity, colormap } = this.props;
     const { imageWidth, imageHeight } = loader.vivMetadata;
     const { sliderValues, colorValues } = overrideChannelProps(this.props);
     const { data } = this.state;
@@ -43,7 +43,7 @@ export default class StaticImageLayer extends CompositeLayer {
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       opacity,
       visible,
-      colormap: true
+      colormap
     });
   }
 }

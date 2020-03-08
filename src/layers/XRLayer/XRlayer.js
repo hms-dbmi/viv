@@ -22,9 +22,10 @@ const defaultProps = {
 
 export default class XRLayer extends Layer {
   getShaders() {
+    const { colormap } = this.props;
     return super.getShaders({
       vs,
-      fs: this.props.colormap ? glsl(fsColormap) : fs,
+      fs: colormap ? fsColormap.replace('colormap', colormap) : fs,
       modules: [project32]
     });
   }

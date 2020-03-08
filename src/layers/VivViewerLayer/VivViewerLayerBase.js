@@ -15,7 +15,7 @@ const defaultProps = {
   maxZoom: { type: 'number', value: 0, compare: true },
   renderSubLayers: { type: 'function', value: renderSubLayers, compare: false },
   opacity: { type: 'number', value: 1, compare: true },
-  colormap: { type: 'boolean', value: false, compare: true }
+  colormap: { type: 'string', value: '', compare: true }
 };
 
 export default class VivViewerLayerBase extends TileLayer {}
