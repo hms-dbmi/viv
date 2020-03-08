@@ -4,8 +4,10 @@
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer, project32 } from '@deck.gl/core';
 import { Model, Geometry, Texture2D } from '@luma.gl/core';
-import vs from './xr-layer-vertex';
-import fs from './xr-layer-fragment';
+import glsl from 'glslify';
+import vs from './xr-layer-vertex.glsl';
+import fsColormap from './xr-layer-fragment-colormap.glsl';
+import fs from './xr-layer-fragment.glsl';
 
 const defaultProps = {
   pickable: false,
@@ -20,7 +22,11 @@ const defaultProps = {
 
 export default class XRLayer extends Layer {
   getShaders() {
-    return super.getShaders({ vs, fs, modules: [project32] });
+    return super.getShaders({
+      vs,
+      fs: this.props.colormap ? glsl(fsColormap) : fs,
+      modules: [project32]
+    });
   }
 
   initializeState() {

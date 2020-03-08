@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <script src="node_modules/geotiff/dist/geotiff.bundle.js"></script>
+    <script>
+      const url =
+        'https://vitessce-demo-data.storage.googleapis.com/test-data/multi-channel.ome.tif';
+      (async function() {
+        const tiff = await GeoTIFF.fromUrl(url);
+        console.log(tiff);
+        const image = await tiff.parseFileDirectories();
+        console.log(image);
+        const ifd = image.getFileDirectory();
+        //console.log(ifd.ImageDescription)
+        console.log(ifd);
+        var sMyString = ifd.ImageDescription; //'<a id="a"><b id="b">hey!</b></a>';
+        var oParser = new DOMParser();
+        var oDOM = oParser.parseFromString(sMyString, 'application/xml');
+        // print the name of the root element or error message
+        console.log(
+          oDOM.documentElement.nodeName == 'parsererror'
+            ? 'error while parsing'
+            : oDOM.documentElement.nodeName
+        );
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

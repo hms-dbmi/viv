@@ -102,7 +102,7 @@ function App() {
     return (
       // only use isPublic on the deployment
       // eslint-disable-next-line no-restricted-globals
-      (location.host !== 'viv.vitessce.io' ? sources[name].isPublic : true) && (
+      (location.host === 'viv.vitessce.io' ? sources[name].isPublic : true) && (
         <Button
           variant="contained"
           key={name}

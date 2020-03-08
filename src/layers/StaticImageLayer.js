@@ -9,6 +9,7 @@ const defaultProps = {
   sliderValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
+  colormap: { type: 'boolean', value: false, compare: true },
   loader: {
     type: 'object',
     value: {
@@ -26,21 +27,23 @@ export default class StaticImageLayer extends CompositeLayer {
   }
 
   renderLayers() {
-    const { loader, visible } = this.props;
+    const { loader, visible, opacity } = this.props;
     const { imageWidth, imageHeight } = loader.vivMetadata;
     const { sliderValues, colorValues } = overrideChannelProps(this.props);
     const { data } = this.state;
     return new XRLayer({
       channelData: data,
       bounds: [0, imageHeight, imageWidth, 0],
-      sliderValues,
-      colorValues,
+      sliderValues: sliderValues.slice(0, 2),
+      colorValues: colorValues.slice(0),
       staticImageHeight: imageHeight,
       staticImageWidth: imageWidth,
       id: `XR-Static-Layer-${0}-${imageHeight}-${imageWidth}-${0}`,
       pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-      visible
+      opacity,
+      visible,
+      colormap: true
     });
   }
 }
