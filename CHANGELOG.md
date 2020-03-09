@@ -10,6 +10,7 @@
 ### Added
 
 - StaticImageLayer added for viewing non-tiled images
+- Single channel colormaps for tiled and static
 - Expose opacity and visibility
 - Testing for layers added
 
