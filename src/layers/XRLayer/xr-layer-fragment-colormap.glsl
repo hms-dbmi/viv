@@ -29,5 +29,5 @@ out vec4 color;
 void main() {
   float intensityValue = (float(texture(channelColormap, vTexCoord).r) - sliderValues[0]) / sliderValues[1];
 
-  color = vec4(colormap(intensityValue).xyz, opacity);
+  color = vec4(colormap(min(1.0,intensityValue)).xyz, opacity);
 }
