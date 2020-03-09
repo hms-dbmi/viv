@@ -11,8 +11,10 @@
   "scripts": {
     "build-component": "mkdir dist || rm -r dist && rollup --config",
     "build-site": "mkdir dist || rm -r dist && node_modules/.bin/webpack --config webpack.site.prod.js --mode production",
-    "test": "browserify tests/*.spec.js -p esmify | tape-run | tap-dot",
-    "start": "node_modules/.bin/webpack-dev-server --mode development --open --hot"
+    "test": "browserify tests/*.spec.js -p esmify | tape-run",
+    "start": "node_modules/.bin/webpack-dev-server --mode development --open --hot",
+    "version": "./version.sh",
+    "postversion": "git push && git push --tags"
   },
   "pre-push": [
     "test"
