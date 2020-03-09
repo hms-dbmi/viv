@@ -21,13 +21,12 @@ test('Test zarr non-rgb image loader', async t => {
       y: null,
       x: null
     };
-
     const loader = new ZarrLoader(z, isRgb, scale, dimensions);
     // eslint-disable-next-line prefer-destructuring
     const vivMetadata = loader.vivMetadata;
     t.deepEqual(
       Object.keys(vivMetadata).sort(),
-      ['imageHeight', 'imageWidth', 'minZoom', 'scale', 'tileSize'],
+      ['dtype', 'imageHeight', 'imageWidth', 'minZoom', 'scale', 'tileSize'],
       'Ensure viv-specific keys are returned by object.'
     );
 

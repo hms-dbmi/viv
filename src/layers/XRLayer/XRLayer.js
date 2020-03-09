@@ -4,7 +4,6 @@
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer, project32 } from '@deck.gl/core';
 import { Model, Geometry, Texture2D } from '@luma.gl/core';
-import glsl from 'glslify';
 import vs from './xr-layer-vertex.glsl';
 import fsColormap from './xr-layer-fragment-colormap.glsl';
 import fs from './xr-layer-fragment.glsl';
@@ -17,15 +16,23 @@ const defaultProps = {
   colorValues: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
   tileSize: { type: 'number', value: 0, compare: true },
-  opacity: { type: 'number', value: 1, compare: true }
+  opacity: { type: 'number', value: 1, compare: true },
+  dtype: { type: 'string', value: '<u2', compare: true }
 };
 
 export default class XRLayer extends Layer {
   getShaders() {
-    const { colormap } = this.props;
+    const { colormap, dtype } = this.props;
+    const fragmentShaderColormap = colormap
+      ? fsColormap.replace('colormap', colormap)
+      : fs;
+    const fragmentShaderDtype =
+      dtype === '<f4'
+        ? fragmentShaderColormap.replace(/usampler/g, 'sampler')
+        : fragmentShaderColormap;
     return super.getShaders({
       vs,
-      fs: colormap ? fsColormap.replace('colormap', colormap) : fs,
+      fs: fragmentShaderDtype,
       modules: [project32]
     });
   }
@@ -177,17 +184,23 @@ export default class XRLayer extends Layer {
   }
 
   dataToTexture(data) {
-    const isInt8 = data instanceof Uint8Array;
-    const isInt16 = data instanceof Uint16Array;
-    const isInt32 = data instanceof Uint32Array;
+    const { dtype } = this.props;
+    const isInt8 = dtype === '<u1';
+    const isInt16 = dtype === '<u2';
+    const isInt32 = dtype === '<u4';
+    const isFloat32 = dtype === '<f4';
     const formats = {
       format:
-        (isInt8 && GL.R8UI) || (isInt16 && GL.R16UI) || (isInt32 && GL.R32UI),
-      dataFormat: GL.RED_INTEGER,
+        (isInt8 && GL.R8UI) ||
+        (isInt16 && GL.R16UI) ||
+        (isInt32 && GL.R32UI) ||
+        (isFloat32 && GL.R32F),
+      dataFormat: isInt8 || isInt16 || isInt32 ? GL.RED_INTEGER : GL.RED,
       type:
         (isInt8 && GL.UNSIGNED_BYTE) ||
         (isInt16 && GL.UNSIGNED_SHORT) ||
-        (isInt32 && GL.UNSIGNED_INT)
+        (isInt32 && GL.UNSIGNED_INT) ||
+        (isFloat32 && GL.FLOAT)
     };
     const texture = new Texture2D(this.context.gl, {
       width: this.props.staticImageWidth || this.props.tileSize,

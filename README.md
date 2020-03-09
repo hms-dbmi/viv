@@ -92,6 +92,7 @@ An object containing the following properties which provide all the data-specifi
 - `imageWidth` (Number) The width of the highest resolution image.
 - `minZoom` (Number) The number of levels in the image pyramid. If the number of levels is `4`, `minZoom === -4`. This is deck.gl specific.
 - `tileSize` (Number)
+- `dtype` (String) This is the datatype of the incoming data. One of `<u1` (uint8), `u2` (uint16), `u4` (uint32) or `f4` (float32)
 
 ##### `viewHeight` & `viewWidth` (Number) [ONLY NECESSARY FOR `VivViewer`]
 

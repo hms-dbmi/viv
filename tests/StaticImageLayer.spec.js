@@ -27,8 +27,11 @@ test('StaticImageLayer', t => {
       ],
       channelIsOn: [true, false],
       loader: {
-        getTile: () => [0, 0, 0, 0],
-        vivMetadata: { imageHeight: 2, imageWidth: 2 }
+        getRaster: () => [
+          new Uint32Array([0, 2, 1, 2]),
+          new Uint32Array([1, 2, 1, 2])
+        ],
+        vivMetadata: { imageHeight: 2, imageWidth: 2, dtype: '<u4' }
       }
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)

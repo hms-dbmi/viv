@@ -28,7 +28,7 @@ export default class StaticImageLayer extends CompositeLayer {
 
   renderLayers() {
     const { loader, visible, opacity, colormap } = this.props;
-    const { imageWidth, imageHeight } = loader.vivMetadata;
+    const { imageWidth, imageHeight, dtype } = loader.vivMetadata;
     const { sliderValues, colorValues } = overrideChannelProps(this.props);
     const { data } = this.state;
     return new XRLayer({
@@ -50,6 +50,7 @@ export default class StaticImageLayer extends CompositeLayer {
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       opacity,
       visible,
+      dtype,
       colormap
     });
   }

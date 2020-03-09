@@ -102,17 +102,17 @@
     "tape": "4.13.0",
     "tape-catch": "^1.0.6",
     "tape-run": "^6.0.1",
+    "tap-spec": "^5.0.0",
     "testling": "^1.7.3",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.10.1"
+    "webpack-dev-server": "^3.10.1",
+    "webpack-tape-run": "0.0.7"
   },
   "dependencies": {
     "geotiff": "^1.0.0-beta.6",
     "glsl-colormap": "^1.0.1",
     "glslify": "^7.0.0",
-    "tap-spec": "^5.0.0",
-    "webpack-tape-run": "0.0.7",
     "zarr": "^0.2.2"
   }
 }

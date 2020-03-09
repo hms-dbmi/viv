@@ -41,7 +41,8 @@ export function renderSubLayers(props) {
     visible,
     opacity,
     data,
-    colormap
+    colormap,
+    dtype
   } = props;
   const xrl =
     // If image metadata is undefined, do not render this layer.
@@ -59,6 +60,7 @@ export function renderSubLayers(props) {
       bounds: [left, bottom, right, top],
       opacity,
       visible,
+      dtype,
       colormap
     });
   return xrl;
