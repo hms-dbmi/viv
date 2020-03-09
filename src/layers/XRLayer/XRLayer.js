@@ -156,16 +156,23 @@ export default class XRLayer extends Layer {
       channel2: null,
       channel3: null,
       channel4: null,
-      channel5: null
+      channel5: null,
+      channelColormap: null
     };
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex && tex.delete());
     }
     if (channelData.length > 0) {
-      channelData.forEach(function(d, i) {
-        textures[`channel${i}`] = this.dataToTexture(d);
-      }, this);
-      this.setState({ textures });
+      if (this.props.colormap) {
+        // assume first dimension is the one we want to fetch
+        textures.channelColormap = this.dataToTexture(channelData[0]);
+        this.setState({ textures });
+      } else {
+        channelData.forEach(function(d, i) {
+          textures[`channel${i}`] = this.dataToTexture(d);
+        }, this);
+        this.setState({ textures });
+      }
     }
   }
 

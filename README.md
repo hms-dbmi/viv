@@ -45,7 +45,13 @@ This component is for pure drop-in use without an external `DeckGL` setup.
 
 #### `VivViewerLayer`
 
-This component can be used with an already existing `DeckGL` setup.
+This component can be used with an already existing `DeckGL` setup. It is a tiled image
+layer for viewing high resolution imagery that is tiled and served from a file server
+
+#### `StaticImageLayer`
+
+This component can be used with an already existing `DeckGL` setup. It is meant for
+small images that can be served at once, i.e that are not tiled.
 
 ## `Viewer` and `ViewerLayer` Properties
 
@@ -53,7 +59,7 @@ This component can be used with an already existing `DeckGL` setup.
 
 A `loader` is the primary object responsible for returning tile data as well as the required metadata for Viv. We allow loaders to be generic so viv can be used with various sources. A laoader must implement a `getTile` method and have the property `vivMetadata`. We provide the `createZarrPyramid` and `createTiffPyramid` to which are convenience functions for creating instances of valid loaders for these data types.
 
-###### `loader.getTile` (Function) **POTENTIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
+###### `loader.getTile` (Function, VivViewerLayer) **POTENTIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
 
 `getTile` given x, y, z indices of the tile, returns the tile data or a Promise that resolves to the tile data. Look
 at [this](IMAGE_RENDERING.md) for how the zarr should be laid out.
@@ -69,6 +75,15 @@ Returns:
 - An array of `[colorData1, ..., colorDataN]` where `colorDataI`
   is a TypedArray of a single channel's worth of data. The order must match.
 
+###### `loader.getRaster` (Function, StaticImageLayer) **POTENTIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
+
+This function returns the entire image from the loader's source.
+
+Receives arguments:
+
+- `z` (optional) The z coordinate of the pyramid form which data should be fetched.
+- `level` (optional) The location along a third channel dimension along which data should be fetched.
+
 ###### `loader.vivMetadata` (Object)
 
 An object containing the following properties which provide all the data-specific metadata required by Viv to render data tiles.
@@ -78,11 +93,11 @@ An object containing the following properties which provide all the data-specifi
 - `minZoom` (Number) The number of levels in the image pyramid. If the number of levels is `4`, `minZoom === -4`. This is deck.gl specific.
 - `tileSize` (Number)
 
-##### `viewHeight` & `viewWidth` (Number) [ONLY NECESSARY FOR `MicrsocopyViewer`]
+##### `viewHeight` & `viewWidth` (Number) [ONLY NECESSARY FOR `VivViewer`]
 
 These control the size of the viewport in your app.
 
-##### `initialViewState` (object) [ONLY NECESSARY FOR `MicrsocopyViewer`]
+##### `initialViewState` (object) [ONLY NECESSARY FOR `VivViewer`]
 
 An object containing two things
 
@@ -106,6 +121,11 @@ that you wish to map to a full range for displaying,
 Again, this is an object matching the channel names and toggles
 that you wish to turn on or off.
 `{channel1: false, channel2:false, channel3:true}`
+
+##### `colormap` (String)
+
+This is the map to be used for colors - one of `magma, viridis, turbidity, hot, greys, rainbow`.
+Please open an issue if you want more.
 
 ##### `opacity` (Number)
 

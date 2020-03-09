@@ -52,8 +52,9 @@ export function renderSubLayers(props) {
       id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}`,
       data: null,
       channelData: data,
-      sliderValues,
-      colorValues,
+      // See StaticImageLayer for why this is here.
+      sliderValues: colormap ? sliderValues.slice(0, 2) : sliderValues,
+      colorValues: colormap ? [] : colorValues,
       tileSize,
       bounds: [left, bottom, right, top],
       opacity,

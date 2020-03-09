@@ -12,7 +12,7 @@ precision highp usampler2D;
 
 
 // our texture
-uniform usampler2D channel0;
+uniform usampler2D channelColormap;
 
 // range
 uniform vec2 sliderValues;
@@ -27,7 +27,7 @@ out vec4 color;
 
 
 void main() {
-  float intensityValue = (float(texture(channel0, vTexCoord).r) - sliderValues[0]) / sliderValues[1];
+  float intensityValue = (float(texture(channelColormap, vTexCoord).r) - sliderValues[0]) / sliderValues[1];
 
-  color = colormap(intensityValue);
+  color = vec4(colormap(intensityValue).xyz, opacity);
 }
