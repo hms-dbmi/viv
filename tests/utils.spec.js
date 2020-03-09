@@ -3,8 +3,7 @@ import test from 'tape-catch';
 import {
   range,
   padWithDefault,
-  isInTileBounds,
-  cutOffImageBounds
+  isInTileBounds
 } from '../src/layers/VivViewerLayer/utils';
 
 test('range test', t => {
@@ -60,34 +59,6 @@ test('isInTileBounds test', t => {
       minZoom: -5
     }),
     'Tile indices are out of bounds because tile indices are too big for image dimensions.'
-  );
-  t.end();
-});
-
-test('cutOffImageBounds test', t => {
-  t.deepEqual(
-    cutOffImageBounds({
-      left: 0,
-      bottom: 10,
-      right: 10,
-      top: 0,
-      imageWidth: 5,
-      imageHeight: 5
-    }),
-    { top: 0, left: 0, right: 5, bottom: 5 },
-    'Cut image with positive bounding box to 5x5'
-  );
-  t.deepEqual(
-    cutOffImageBounds({
-      left: -10,
-      bottom: 0,
-      right: 0,
-      top: -10,
-      imageWidth: 5,
-      imageHeight: 5
-    }),
-    { top: 0, left: 0, right: 0, bottom: 0 },
-    "Cut image with negative bounding box to 0's"
   );
   t.end();
 });

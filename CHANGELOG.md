@@ -2,8 +2,14 @@
 
 ## 0.0.9 - In Progress
 
+### Changed
+
+- Clean up shaders
+- Extracted data utils to loaders and refactored demo
+
 ### Added
 
+- Expose opacity and visibility
 - Testing for layers added
 - More automated build process
 
