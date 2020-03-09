@@ -125,8 +125,8 @@ that you wish to turn on or off.
 
 ##### `colormap` (String)
 
-This is the map to be used for colors - one of `magma, viridis, turbidity, hot, greys, rainbow`.
-Please open an issue if you want more.
+This is the map to be used for colors - one of `magma, viridis, turbidity, hot, greys, rainbow` etc.
+For a complete list of currently supported options, go to the [glsl-colormap page](https://github.com/glslify/glsl-colormap). Please open an issue if you want us to implement more.
 
 ##### `opacity` (Number)
 
