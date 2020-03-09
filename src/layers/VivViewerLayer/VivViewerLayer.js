@@ -2,7 +2,7 @@ import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
 import VivViewerLayerBase from './VivViewerLayerBase';
 import { isInTileBounds } from './utils';
-import { overrideChannelProps } from '../utils';
+import { padColorsAndSliders } from '../utils';
 
 export default class VivViewerLayer extends CompositeLayer {
   // see https://github.com/uber/deck.gl/blob/master/docs/api-reference/layer.md#shouldupdatestate
@@ -12,7 +12,13 @@ export default class VivViewerLayer extends CompositeLayer {
   }
 
   renderLayers() {
-    const { loader } = this.props;
+    const {
+      loader,
+      sliderValues,
+      colorValues,
+      channelIsOn,
+      domain
+    } = this.props;
     const {
       imageWidth,
       imageHeight,
@@ -20,7 +26,13 @@ export default class VivViewerLayer extends CompositeLayer {
       minZoom,
       dtype
     } = loader.vivMetadata;
-    const layerProps = overrideChannelProps(this.props);
+    const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
+      sliderValues,
+      colorValues,
+      channelIsOn,
+      domain,
+      dtype
+    });
     const getTileData = ({ x, y, z }) => {
       if (
         isInTileBounds({
@@ -41,14 +53,16 @@ export default class VivViewerLayer extends CompositeLayer {
       }
       return null;
     };
-    const layers = new VivViewerLayerBase({
+    const layers = new VivViewerLayerBase(this.props, {
+      id: `VivViewerLayerBase--${loader.type}`,
       imageWidth,
       imageHeight,
       tileSize,
       minZoom,
       getTileData,
       dtype,
-      ...this.getSubLayerProps(layerProps)
+      colorValues: paddedColorValues,
+      sliderValues: paddedSliderValues
     });
     return layers;
   }

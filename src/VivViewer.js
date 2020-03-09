@@ -12,11 +12,11 @@ export default class VivViewer extends PureComponent {
     // https://github.com/hubmapconsortium/vitessce-image-viewer/issues/107
     return loader.isPyramid
       ? new VivViewerLayer({
-          id: `VivViewerLayer-${loader.type}}`,
+          id: `VivViewerLayer-${loader.type}`,
           ...this.props
         })
       : new StaticImageLayer({
-          id: `StaticImageLayer-${loader.type}}`,
+          id: `StaticImageLayer-${loader.type}`,
           ...this.props
         });
   }

@@ -135,3 +135,7 @@ This is a number between `0` and `1` for the opacity of the layer.
 ##### `visible` (Boolean)
 
 This is a boolean for whether or not to display the layer (it still "renders" but is just not visible).
+
+##### `domain` (Array, optional)
+
+Optionally the max/min of the data you wish to display, if different than what the data type suggests (like 65535 for `uint16`).

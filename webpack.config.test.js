@@ -5,6 +5,7 @@ const WebpackTapeRun = require('webpack-tape-run');
 
 module.exports = {
   target: 'web',
+  devtool: 'source-map',
   entry: ['./tests/index.spec.js'],
   node: {
     fs: 'empty'
@@ -39,8 +40,7 @@ module.exports = {
     new WebpackTapeRun({
       tapeRun: {
         browser: 'electron'
-      },
-      reporter: 'tap-spec'
+      }
     })
   ]
 };

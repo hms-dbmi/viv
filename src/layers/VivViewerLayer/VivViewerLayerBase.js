@@ -16,7 +16,8 @@ const defaultProps = {
   renderSubLayers: { type: 'function', value: renderSubLayers, compare: false },
   opacity: { type: 'number', value: 1, compare: true },
   colormap: { type: 'string', value: '', compare: true },
-  dtype: { type: 'string', value: '<u2', compare: true }
+  dtype: { type: 'string', value: '<u2', compare: true },
+  domain: { type: 'array', value: [], compare: true }
 };
 
 export default class VivViewerLayerBase extends TileLayer {}

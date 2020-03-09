@@ -1,7 +1,7 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import XRLayer from './XRLayer';
 
-import { overrideChannelProps } from './utils';
+import { padColorsAndSliders } from './utils';
 
 const defaultProps = {
   pickable: false,
@@ -10,11 +10,12 @@ const defaultProps = {
   channelIsOn: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   colormap: { type: 'string', value: '', compare: true },
+  domain: { type: 'array', value: [], compare: true },
   loader: {
     type: 'object',
     value: {
       getRaster: () => [],
-      vivMetadata: { imageHeight: 0, imageWidth: 0 }
+      vivMetadata: { imageHeight: 0, imageWidth: 0, dtype: '<u2' }
     },
     compare: true
   }
@@ -27,9 +28,24 @@ export default class StaticImageLayer extends CompositeLayer {
   }
 
   renderLayers() {
-    const { loader, visible, opacity, colormap } = this.props;
+    const {
+      loader,
+      visible,
+      opacity,
+      colormap,
+      sliderValues,
+      colorValues,
+      channelIsOn,
+      domain
+    } = this.props;
     const { imageWidth, imageHeight, dtype } = loader.vivMetadata;
-    const { sliderValues, colorValues } = overrideChannelProps(this.props);
+    const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
+      sliderValues,
+      colorValues,
+      channelIsOn,
+      domain,
+      dtype
+    });
     const { data } = this.state;
     return new XRLayer({
       channelData: data,
@@ -40,9 +56,11 @@ export default class StaticImageLayer extends CompositeLayer {
       // have multiple data slices loaded and
       // simply change the index to get different views.
       // https://github.com/hubmapconsortium/vitessce-image-viewer/issues/109
-      sliderValues: colormap ? sliderValues.slice(0, 2) : sliderValues,
+      sliderValues: colormap
+        ? paddedSliderValues.slice(0, 2)
+        : paddedSliderValues,
       // no need for color in the case of a provided colormap
-      colorValues: colormap ? [] : colorValues,
+      colorValues: colormap ? [] : paddedColorValues,
       staticImageHeight: imageHeight,
       staticImageWidth: imageWidth,
       id: `XR-Static-Layer-${0}-${imageHeight}-${imageWidth}-${0}`,
