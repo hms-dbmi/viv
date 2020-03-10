@@ -32,36 +32,53 @@ export function isInTileBounds({
 
 export function renderSubLayers(props) {
   const {
-    bbox: { left, top, right, bottom }
+    bbox: { left, top, right, bottom },
+    x,
+    y,
+    z
   } = props.tile;
   const {
     colorValues,
     sliderValues,
+    imageWidth,
+    imageHeight,
     tileSize,
+    minZoom,
     visible,
     opacity,
     data,
     colormap,
     dtype
   } = props;
-  const xrl =
-    // If image metadata is undefined, do not render this layer.
-    props.imageWidth &&
-    props.imageHeight &&
-    data &&
-    new XRLayer({
-      id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}`,
-      data: null,
-      channelData: data,
-      // See StaticImageLayer for why this is here.
-      sliderValues: colormap ? sliderValues.slice(0, 2) : sliderValues,
-      colorValues: colormap ? [] : colorValues,
+  if (
+    isInTileBounds({
+      x,
+      y,
+      z: -z,
+      imageWidth,
+      imageHeight,
       tileSize,
-      bounds: [left, bottom, right, top],
-      opacity,
-      visible,
-      dtype,
-      colormap
-    });
-  return xrl;
+      minZoom
+    })
+  ) {
+    const xrl =
+      // If image metadata is undefined, do not render this layer.
+      props.imageWidth &&
+      props.imageHeight &&
+      new XRLayer({
+        id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}`,
+        data: null,
+        channelData: data,
+        // See StaticImageLayer for why this is here.
+        sliderValues: colormap ? sliderValues.slice(0, 2) : sliderValues,
+        colorValues: colormap ? [] : colorValues,
+        tileSize,
+        bounds: [left, bottom, right, top],
+        opacity,
+        visible,
+        dtype,
+        colormap
+      });
+    return xrl;
+  }
 }
