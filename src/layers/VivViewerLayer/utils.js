@@ -36,6 +36,7 @@ export function renderSubLayers(props) {
     x,
     y,
     z
+    // eslint-disable-next-line react/destructuring-assignment
   } = props.tile;
   const {
     colorValues,
@@ -63,8 +64,8 @@ export function renderSubLayers(props) {
   ) {
     const xrl =
       // If image metadata is undefined, do not render this layer.
-      props.imageWidth &&
-      props.imageHeight &&
+      imageWidth &&
+      imageHeight &&
       new XRLayer({
         id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}`,
         data: null,
@@ -81,4 +82,5 @@ export function renderSubLayers(props) {
       });
     return xrl;
   }
+  return null;
 }
