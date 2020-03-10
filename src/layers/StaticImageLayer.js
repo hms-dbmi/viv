@@ -21,6 +21,14 @@ const defaultProps = {
   }
 };
 
+function scaleBounds({ imageWidth, imageHeight, translate, scale }) {
+  const left = translate[0];
+  const top = translate[0];
+  const right = imageWidth * scale + left;
+  const bottom = imageHeight * scale + top;
+  return [left, bottom, right, top];
+}
+
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
     const { loader } = this.props;
@@ -36,6 +44,8 @@ export default class StaticImageLayer extends CompositeLayer {
       sliderValues,
       colorValues,
       channelIsOn,
+      translate = [0, 0],
+      scale = 1,
       domain
     } = this.props;
     const { imageWidth, imageHeight, dtype } = loader.vivMetadata;
@@ -46,11 +56,17 @@ export default class StaticImageLayer extends CompositeLayer {
       domain,
       dtype
     });
+    const bounds = scaleBounds({
+      imageWidth,
+      imageHeight,
+      translate,
+      scale
+    });
     const { data } = this.state;
     return new XRLayer({
       channelData: data,
       data: null,
-      bounds: [0, imageHeight, imageWidth, 0],
+      bounds,
       // Colormaps should only use one sliderValue pair.
       // Going forward, we should have more intricate indexing so we can
       // have multiple data slices loaded and
