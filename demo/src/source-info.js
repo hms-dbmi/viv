@@ -1,5 +1,5 @@
 const rootTIFFUrl =
-  'https://vitessce-data.storage.googleapis.com/vanderbilt.images/';
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/vanderbilt.images/vanderbilt.images/';
 
 const tiffInfo = {
   isPublic: true,
