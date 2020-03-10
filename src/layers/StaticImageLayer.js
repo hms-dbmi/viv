@@ -11,6 +11,8 @@ const defaultProps = {
   colorValues: { type: 'array', value: [], compare: true },
   colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
+  translate: { type: 'array', value: [0, 0], compare: true },
+  scale: { type: 'number', value: 1, compare: true },
   loader: {
     type: 'object',
     value: {
@@ -44,8 +46,8 @@ export default class StaticImageLayer extends CompositeLayer {
       sliderValues,
       colorValues,
       channelIsOn,
-      translate = [0, 0],
-      scale = 1,
+      translate,
+      scale,
       domain
     } = this.props;
     const { imageWidth, imageHeight, dtype } = loader.vivMetadata;

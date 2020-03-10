@@ -144,3 +144,11 @@ This is a boolean for whether or not to display the layer (it still "renders" bu
 ##### `domain` (Array, optional)
 
 Optionally the max/min of the data you wish to display, if different than what the data type suggests (like 65535 for `uint16`).
+
+##### `translate` (Array, optional) [ONLY FOR `StaticImageLayer`]
+
+This is an optional parameter for translating the static image left by `translate[0]` and top by `translate[1]`.
+
+##### `scale` (Number, optional) [ONLY FOR `StaticImageLayer`]
+
+This is an optional parameter for scaling up the size of an image.
