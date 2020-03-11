@@ -1,8 +1,9 @@
-export const MAX_COLOR_INTENSITY = 255;
-
-export const DEFAULT_COLOR_OFF = [0, 0, 0];
-
-export const MAX_SLIDERS_AND_CHANNELS = 6;
+import {
+  MAX_COLOR_INTENSITY,
+  DEFAULT_COLOR_OFF,
+  MAX_SLIDERS_AND_CHANNELS,
+  DTYPE_VALUES
+} from './constants';
 
 export function range(len) {
   return [...Array(len).keys()];
@@ -30,17 +31,7 @@ export function padColorsAndSliders({
   const colors = colorValues.map((color, i) =>
     channelIsOn[i] ? color.map(c => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
   );
-
-  const isInt8 = dtype === '<u1';
-  const isInt16 = dtype === '<u2';
-  const isInt32 = dtype === '<u4';
-  const isFloat32 = dtype === '<f4';
-  const maxSliderValue =
-    (domain && domain[1]) ||
-    (isInt8 && 2 ** 8 - 1) ||
-    (isInt16 && 2 ** 16 - 1) ||
-    (isInt32 && 2 ** 32 - 1) ||
-    (isFloat32 && 2 ** 31 - 1);
+  const maxSliderValue = (domain && domain[1]) || DTYPE_VALUES[dtype].max;
   const sliders = sliderValues.map((slider, i) =>
     channelIsOn[i] ? slider : [maxSliderValue, maxSliderValue]
   );

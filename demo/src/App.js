@@ -25,17 +25,17 @@ const colorValues = [
   [255, 0, 255],
   [0, 255, 255]
 ];
-const styledSelectors = colorValues.map((_, i) => {
+const styledSelectors = colorValues.map(value => {
   const ColoredSlider = withStyles({
     root: {
-      color: `rgb(${colorValues[i]})`
+      color: `rgb(${value})`
     }
   })(Slider);
   const ColoredCheckbox = withStyles({
     root: {
-      color: `rgb(${colorValues[i]})`,
+      color: `rgb(${value})`,
       '&$checked': {
-        color: `rgb(${colorValues[i]})`
+        color: `rgb(${value})`
       }
     },
     checked: {}

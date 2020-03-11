@@ -1,18 +1,7 @@
 import XRLayer from '../XRLayer';
 
-export const MAX_COLOR_INTENSITY = 255;
-
-export const DEFAULT_COLOR_OFF = [0, 0, 0];
-
 export function range(len) {
   return [...Array(len).keys()];
-}
-
-export function padWithDefault(arr, defaultValue, padWidth) {
-  for (let i = 0; i < padWidth; i += 1) {
-    arr.push(defaultValue);
-  }
-  return arr;
 }
 
 export function isInTileBounds({

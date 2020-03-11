@@ -25,7 +25,7 @@ const defaultProps = {
 
 function scaleBounds({ imageWidth, imageHeight, translate, scale }) {
   const left = translate[0];
-  const top = translate[0];
+  const top = translate[1];
   const right = imageWidth * scale + left;
   const bottom = imageHeight * scale + top;
   return [left, bottom, right, top];

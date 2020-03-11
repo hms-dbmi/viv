@@ -7,6 +7,7 @@ import { Model, Geometry, Texture2D } from '@luma.gl/core';
 import vs from './xr-layer-vertex.glsl';
 import fsColormap from './xr-layer-fragment-colormap.glsl';
 import fs from './xr-layer-fragment.glsl';
+import { DTYPE_VALUES } from '../constants';
 
 const defaultProps = {
   pickable: false,
@@ -186,23 +187,7 @@ export default class XRLayer extends Layer {
 
   dataToTexture(data) {
     const { dtype } = this.props;
-    const isInt8 = dtype === '<u1';
-    const isInt16 = dtype === '<u2';
-    const isInt32 = dtype === '<u4';
-    const isFloat32 = dtype === '<f4';
-    const formats = {
-      format:
-        (isInt8 && GL.R8UI) ||
-        (isInt16 && GL.R16UI) ||
-        (isInt32 && GL.R32UI) ||
-        (isFloat32 && GL.R32F),
-      dataFormat: isInt8 || isInt16 || isInt32 ? GL.RED_INTEGER : GL.RED,
-      type:
-        (isInt8 && GL.UNSIGNED_BYTE) ||
-        (isInt16 && GL.UNSIGNED_SHORT) ||
-        (isInt32 && GL.UNSIGNED_INT) ||
-        (isFloat32 && GL.FLOAT)
-    };
+    const { format, dataFormat, type } = DTYPE_VALUES[dtype];
     const texture = new Texture2D(this.context.gl, {
       width: this.props.staticImageWidth || this.props.tileSize,
       height: this.props.staticImageHeight || this.props.tileSize,
@@ -213,10 +198,13 @@ export default class XRLayer extends Layer {
         // NEAREST for integer data
         [GL.TEXTURE_MIN_FILTER]: GL.NEAREST,
         [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
+        // CLAMP_TO_EDGE to remove tile artifacts
         [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
         [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
       },
-      ...formats
+      format,
+      dataFormat,
+      type
     });
     return texture;
   }

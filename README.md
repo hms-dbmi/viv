@@ -56,7 +56,7 @@ layer for viewing high resolution imagery that is tiled and served from a file s
 #### `StaticImageLayer`
 
 This component can be used with an already existing `DeckGL` setup. It is meant for
-small images that can be served at once, i.e that are not tiled.
+small non-pyramidal, i.e that are not tiled.
 
 ## `Viewer` and `ViewerLayer` Properties
 
