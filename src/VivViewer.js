@@ -1,15 +1,24 @@
 import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { OrthographicView } from '@deck.gl/core';
-import { VivViewerLayer } from './layers';
+import { VivViewerLayer, StaticImageLayer } from './layers';
 
 export default class VivViewer extends PureComponent {
   _renderLayers() {
     const { loader } = this.props;
-    return new VivViewerLayer({
-      id: `VivViewerLayer-${loader.type}}`,
-      ...this.props
-    });
+    // For now this is hardcoded but in general we should look at
+    // a proper structure for taking lists of configurations so that
+    // we can handle multiple overlapping layers.
+    // https://github.com/hubmapconsortium/vitessce-image-viewer/issues/107
+    return loader.isPyramid
+      ? new VivViewerLayer({
+          id: `VivViewerLayer-${loader.type}`,
+          ...this.props
+        })
+      : new StaticImageLayer({
+          id: `StaticImageLayer-${loader.type}`,
+          ...this.props
+        });
   }
 
   render() {

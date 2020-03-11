@@ -1,12 +1,13 @@
 /* eslint-disable prefer-destructuring */
 // A lot of this codes inherits paradigms form DeckGL that
 // we live in place for now, hence some of the not-destructuring
-
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer, project32 } from '@deck.gl/core';
 import { Model, Geometry, Texture2D } from '@luma.gl/core';
-import vs from './xr-layer-vertex';
-import fs from './xr-layer-fragment';
+import vs from './xr-layer-vertex.glsl';
+import fsColormap from './xr-layer-fragment-colormap.glsl';
+import fs from './xr-layer-fragment.glsl';
+import { DTYPE_VALUES } from '../constants';
 
 const defaultProps = {
   pickable: false,
@@ -16,12 +17,26 @@ const defaultProps = {
   colorValues: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
   tileSize: { type: 'number', value: 0, compare: true },
-  opacity: { type: 'number', value: 1, compare: true }
+  opacity: { type: 'number', value: 1, compare: true },
+  dtype: { type: 'string', value: '<u2', compare: true },
+  colormap: { type: 'string', value: '', compare: true }
 };
 
 export default class XRLayer extends Layer {
   getShaders() {
-    return super.getShaders({ vs, fs, modules: [project32] });
+    const { colormap, dtype } = this.props;
+    const fragmentShaderColormap = colormap
+      ? fsColormap.replace('colormap', colormap)
+      : fs;
+    const fragmentShaderDtype =
+      dtype === '<f4'
+        ? fragmentShaderColormap.replace(/usampler/g, 'sampler')
+        : fragmentShaderColormap;
+    return super.getShaders({
+      vs,
+      fs: fragmentShaderDtype,
+      modules: [project32]
+    });
   }
 
   initializeState() {
@@ -150,35 +165,32 @@ export default class XRLayer extends Layer {
       channel2: null,
       channel3: null,
       channel4: null,
-      channel5: null
+      channel5: null,
+      channelColormap: null
     };
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex && tex.delete());
     }
     if (channelData.length > 0) {
-      channelData.forEach(function(d, i) {
-        textures[`channel${i}`] = this.dataToTexture(d);
-      }, this);
-      this.setState({ textures });
+      if (this.props.colormap) {
+        // assume first dimension is the one we want to fetch
+        textures.channelColormap = this.dataToTexture(channelData[0]);
+        this.setState({ textures });
+      } else {
+        channelData.forEach(function(d, i) {
+          textures[`channel${i}`] = this.dataToTexture(d);
+        }, this);
+        this.setState({ textures });
+      }
     }
   }
 
   dataToTexture(data) {
-    const isInt8 = data instanceof Uint8Array;
-    const isInt16 = data instanceof Uint16Array;
-    const isInt32 = data instanceof Uint32Array;
-    const formats = {
-      format:
-        (isInt8 && GL.R8UI) || (isInt16 && GL.R16UI) || (isInt32 && GL.R32UI),
-      dataFormat: GL.RED_INTEGER,
-      type:
-        (isInt8 && GL.UNSIGNED_BYTE) ||
-        (isInt16 && GL.UNSIGNED_SHORT) ||
-        (isInt32 && GL.UNSIGNED_INT)
-    };
+    const { dtype } = this.props;
+    const { format, dataFormat, type } = DTYPE_VALUES[dtype];
     const texture = new Texture2D(this.context.gl, {
-      width: this.props.tileSize,
-      height: this.props.tileSize,
+      width: this.props.staticImageWidth || this.props.tileSize,
+      height: this.props.staticImageHeight || this.props.tileSize,
       data,
       // we don't want or need mimaps
       mipmaps: false,
@@ -186,10 +198,13 @@ export default class XRLayer extends Layer {
         // NEAREST for integer data
         [GL.TEXTURE_MIN_FILTER]: GL.NEAREST,
         [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
+        // CLAMP_TO_EDGE to remove tile artifacts
         [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
         [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
       },
-      ...formats
+      format,
+      dataFormat,
+      type
     });
     return texture;
   }

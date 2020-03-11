@@ -37,6 +37,10 @@ export default class ZarrLoader {
   }
 
   get vivMetadata() {
+    const data = this._data;
+    const { dtype } = Array.isArray(data)
+      ? this._data[0].meta
+      : this._data.meta;
     const imageHeight = this._base.shape[this.yIndex];
     const imageWidth = this._base.shape[this.xIndex];
     const tileSize = this._base.chunks[this.xIndex];
@@ -46,6 +50,7 @@ export default class ZarrLoader {
       imageHeight,
       tileSize,
       minZoom,
+      dtype,
       scale: this.scale
     };
   }
@@ -87,6 +92,12 @@ export default class ZarrLoader {
     if (this.channelChunkSize > 1) {
       return this._decodeChannels(data);
     }
+    return [data];
+  }
+
+  async getRaster({ z, level }) {
+    const source = this.isPyramid ? this._data[z] : this._data;
+    const { data } = await source.getRaw([level, null, null]);
     return [data];
   }
 

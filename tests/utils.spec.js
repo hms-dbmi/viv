@@ -1,10 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
-import {
-  range,
-  padWithDefault,
-  isInTileBounds
-} from '../src/layers/VivViewerLayer/utils';
+import { range, isInTileBounds } from '../src/layers/VivViewerLayer/utils';
+import { padWithDefault, padColorsAndSliders } from '../src/layers/utils';
 
 test('range test', t => {
   const expected = [0, 1, 2];
@@ -19,6 +16,131 @@ test('padWithDefault test', t => {
     padWithDefault([3, 4, 5], 2, 2),
     expected,
     "Pad with two's to five places."
+  );
+  t.end();
+});
+
+test('padColorsAndSliders test', t => {
+  const expectedNoDomain = {
+    paddedSliderValues: [0, 5, 0, 5, 255, 255, 255, 255, 255, 255, 255, 255],
+    paddedColorValues: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  };
+  const expectedChannelOff = {
+    paddedSliderValues: [
+      0,
+      5,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255
+    ],
+    paddedColorValues: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  };
+  const expectedDomain = {
+    paddedSliderValues: [
+      0,
+      5,
+      0,
+      5,
+      1000,
+      1000,
+      1000,
+      1000,
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    paddedColorValues: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  };
+  const expected16Bit = {
+    paddedSliderValues: [
+      0,
+      5,
+      0,
+      5,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1
+    ],
+    paddedColorValues: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  };
+
+  t.deepEqual(
+    padColorsAndSliders({
+      sliderValues: [
+        [0, 5],
+        [0, 5]
+      ],
+      colorValues: [
+        [255, 0, 0],
+        [255, 255, 0]
+      ],
+      channelIsOn: [true, true],
+      dtype: '<u1'
+    }),
+    expectedNoDomain,
+    'Pads with no domain provided'
+  );
+  t.deepEqual(
+    padColorsAndSliders({
+      sliderValues: [
+        [0, 5],
+        [0, 5]
+      ],
+      colorValues: [
+        [255, 0, 0],
+        [255, 255, 0]
+      ],
+      channelIsOn: [true, false],
+      dtype: '<u1'
+    }),
+    expectedChannelOff,
+    'Pads with one channel turned off'
+  );
+  t.deepEqual(
+    padColorsAndSliders({
+      sliderValues: [
+        [0, 5],
+        [0, 5]
+      ],
+      colorValues: [
+        [255, 0, 0],
+        [255, 255, 0]
+      ],
+      channelIsOn: [true, true],
+      domain: [0, 1000],
+      dtype: '<u1'
+    }),
+    expectedDomain,
+    'Pads with provided domain value'
+  );
+  t.deepEqual(
+    padColorsAndSliders({
+      sliderValues: [
+        [0, 5],
+        [0, 5]
+      ],
+      colorValues: [
+        [255, 0, 0],
+        [255, 255, 0]
+      ],
+      channelIsOn: [true, true],
+      dtype: '<u2'
+    }),
+    expected16Bit,
+    'Pads with high bit depth'
   );
   t.end();
 });

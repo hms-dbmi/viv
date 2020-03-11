@@ -4,6 +4,8 @@ export default class TiffPyramidLoader {
     this.channelNames = channelNames;
     this.pool = pool;
     this.type = 'tiff';
+    // hardcoded for now
+    this.isPyramid = true;
   }
 
   get vivMetadata() {
@@ -13,11 +15,26 @@ export default class TiffPyramidLoader {
     const imageWidth = firstFullImage.ImageWidth;
     const imageHeight = firstFullImage.ImageLength;
     const tileSize = firstFullImage.TileWidth;
+    const bitsPerSample = firstFullImage.BitsPerSample;
+    let dtype;
+    if (bitsPerSample instanceof Uint8Array) {
+      dtype = '<u1';
+    }
+    if (bitsPerSample instanceof Uint16Array) {
+      dtype = '<u2';
+    }
+    if (bitsPerSample instanceof Uint32Array) {
+      dtype = '<u4';
+    }
+    if (bitsPerSample instanceof Float32Array) {
+      dtype = '<f4';
+    }
     return {
       minZoom,
       imageWidth,
       imageHeight,
-      tileSize
+      tileSize,
+      dtype
     };
   }
 

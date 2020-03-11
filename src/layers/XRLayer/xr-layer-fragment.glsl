@@ -1,9 +1,8 @@
-export default `#version 300 es
+#version 300 es
 #define SHADER_NAME xr-layer-fragment-shader
 precision highp float;
 precision highp int;
 precision highp usampler2D;
-
 
 // our texture
 uniform usampler2D channel0;
@@ -77,4 +76,3 @@ void main() {
 
   color = vec4(rgbCombo, opacity);
 }
-`;

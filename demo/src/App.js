@@ -13,7 +13,7 @@ import './App.css';
 
 const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
-const MIN_ZOOM = -8;
+const MIN_ZOOM = -16;
 const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
 
 const initSourceName = 'zarr';
@@ -21,19 +21,21 @@ const colorValues = [
   [255, 0, 0],
   [0, 255, 0],
   [0, 0, 255],
-  [255, 128, 0]
+  [255, 128, 0],
+  [255, 0, 255],
+  [0, 255, 255]
 ];
-const styledSelectors = colorValues.map(color => {
+const styledSelectors = colorValues.map(value => {
   const ColoredSlider = withStyles({
     root: {
-      color: `rgb(${color})`
+      color: `rgb(${value})`
     }
   })(Slider);
   const ColoredCheckbox = withStyles({
     root: {
-      color: `rgb(${color})`,
+      color: `rgb(${value})`,
       '&$checked': {
-        color: `rgb(${color})`
+        color: `rgb(${value})`
       }
     },
     checked: {}
@@ -68,7 +70,10 @@ function App() {
       const config = {
         channelNames: sources[sourceName].channelNames,
         url: sources[sourceName].url,
-        minZoom: MIN_ZOOM
+        minZoom:
+          typeof sources[sourceName].minZoom === 'number'
+            ? sources[sourceName].minZoom
+            : MIN_ZOOM
       };
       // Need to do this to clear last loader... probably a better way.
       setLoader(null);
@@ -93,17 +98,20 @@ function App() {
       return nextChannelsOn;
     });
   };
-
   const sourceButtons = Object.keys(sources).map(name => {
     return (
-      <Button
-        variant="contained"
-        key={name}
-        disabled={name === sourceName}
-        onClick={() => setSourceName(name)}
-      >
-        {name}
-      </Button>
+      // only use isPublic on the deployment
+      // eslint-disable-next-line no-restricted-globals
+      (location.host === 'viv.vitessce.io' ? sources[name].isPublic : true) && (
+        <Button
+          variant="contained"
+          key={name}
+          disabled={name === sourceName}
+          onClick={() => setSourceName(name)}
+        >
+          {name}
+        </Button>
+      )
     );
   });
 
@@ -142,10 +150,20 @@ function App() {
           minZoom={MIN_ZOOM}
           viewHeight={viewHeight}
           viewWidth={viewWidth}
-          sliderValues={sliderValues}
-          colorValues={colorValues}
-          channelIsOn={channelIsOn}
+          sliderValues={sliderValues.slice(
+            0,
+            sources[sourceName].channelNames.length
+          )}
+          colorValues={colorValues.slice(
+            0,
+            sources[sourceName].channelNames.length
+          )}
+          channelIsOn={channelIsOn.slice(
+            0,
+            sources[initSourceName].channelNames.length
+          )}
           initialViewState={initialViewState}
+          colormap={sourceName === 'static' ? 'viridis' : ''}
         />
       ) : null}
       <div className="slider-container">

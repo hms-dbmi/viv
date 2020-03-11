@@ -8,6 +8,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import babel from 'rollup-plugin-babel';
 import sourceMaps from 'rollup-plugin-sourcemaps';
+import glslify from 'rollup-plugin-glslify';
 
 const pkgObj = require('./package.json');
 
@@ -36,6 +37,7 @@ export default {
       exclude: 'node_modules/**',
       presets: ['@babel/env', '@babel/preset-react']
     }),
+    glslify({ basedir: 'src/layers/XRLayer' }),
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
     commonjs({
       namedExports: {
