@@ -30,17 +30,11 @@ export default class ZarrLoader {
   }
 
   get _base() {
-    if (this.isPyramid) {
-      return this._data[0];
-    }
-    return this._data;
+    return this.isPyramid ? this._data[0] : this._data;
   }
 
   get vivMetadata() {
-    const data = this._data;
-    const { dtype } = Array.isArray(data)
-      ? this._data[0].meta
-      : this._data.meta;
+    const { dtype } = this._base;
     const imageHeight = this._base.shape[this.yIndex];
     const imageWidth = this._base.shape[this.xIndex];
     const tileSize = this._base.chunks[this.xIndex];
