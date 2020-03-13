@@ -13,19 +13,12 @@ export async function createZarrPyramid({
   scale,
   dimensions
 }) {
-  // Known issue with how zarr.js does string concatenation for urls
-  // The prefix gets chunked off for some reason and must be repeating in the config.
-  // https://github.com/gzuidhof/zarr.js/issues/36
-  const prefix = rootZarrUrl.split('/').slice(-1)[0];
-
   // Not necessary but this is something we should be parsing from metadata
   const maxLevel = -minZoom;
   if (maxLevel > 0) {
     const zarrStores = range(maxLevel).map(i => {
       const config = {
-        store: rootZarrUrl,
-        path: `${prefix}/${String(i).padStart(2, '0')}`,
-        mode: 'r'
+        store: `${rootZarrUrl}/${String(i).padStart(2, '0')}`
       };
       return openArray(config);
     });
@@ -33,11 +26,10 @@ export async function createZarrPyramid({
     return new ZarrLoader(connections, isRgb, scale, dimensions);
   }
   const connection = await openArray({
-    store: rootZarrUrl,
-    path: prefix,
-    mode: 'r'
+    store: rootZarrUrl
   });
-  return new ZarrLoader(connection, isRgb, scale, dimensions);
+  const loader = new ZarrLoader(connection, isRgb, scale, dimensions);
+  return loader;
 }
 
 export async function createTiffPyramid({ channelNames, channelUrls }) {

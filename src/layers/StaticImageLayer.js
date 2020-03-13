@@ -24,8 +24,7 @@ const defaultProps = {
 };
 
 function scaleBounds({ imageWidth, imageHeight, translate, scale }) {
-  const left = translate[0];
-  const top = translate[1];
+  const [left, top] = translate;
   const right = imageWidth * scale + left;
   const bottom = imageHeight * scale + top;
   return [left, bottom, right, top];
@@ -34,7 +33,7 @@ function scaleBounds({ imageWidth, imageHeight, translate, scale }) {
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
     const { loader } = this.props;
-    this.setState({ data: loader.getRaster({ z: 0, level: 1 }) });
+    this.setState({ data: loader.getRaster({ z: 0 }) });
   }
 
   renderLayers() {
