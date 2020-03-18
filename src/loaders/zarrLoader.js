@@ -25,7 +25,6 @@ export default class ZarrLoader {
     this.channelChunkSize = base.chunks[this.channelIndex];
     this.dimensions = dimensions;
     this.dimNames = Object.keys(dimensions);
-    this._selections = [Array(base.shape.length).fill(0)];
     this.type = 'zarr';
   }
 
@@ -47,41 +46,6 @@ export default class ZarrLoader {
       dtype,
       scale: this.scale
     };
-  }
-
-  setSelection(selections) {
-    const zarrSelections = [];
-    // eslint-disable-next-line no-restricted-syntax
-    for (const s of selections) {
-      const selection = Array(this._base.shape.length).fill(0);
-      // eslint-disable-next-line no-restricted-syntax
-      for (const [name, index] of s) {
-        const dimKey =
-          typeof name === 'string' ? this.dimNames.indexOf(name) : name;
-
-        if (dimKey === -1) {
-          throw Error(
-            `Dimension with name ${name} does not exist on array with dimensions : ${this.dimNames}`
-          );
-        }
-
-        const dimValue =
-          typeof index === 'string'
-            ? this.dimensions[dimKey].values.indexOf(index)
-            : index;
-
-        if (dimValue === -1) {
-          throw Error(
-            `Dimension '${this.dimNames[dimKey]}' does not contain an entry for ${index}.
-            Index must be one of ${this.dimensions[dimKey].values} or an integer.`
-          );
-        }
-
-        selection[dimKey] = dimValue;
-      }
-      zarrSelections.push(selection);
-    }
-    this._selections = zarrSelections;
   }
 
   setChunkIndex(dimName, index) {
