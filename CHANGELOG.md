@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 - In Progress
+## 0.1.1 - In Progress
 
 ### Changed
 
@@ -10,7 +10,7 @@
 
 - Add `test:watch` to npm scripts.
 
-## 0.0.9
+## 0.1.0
 
 ### Changed
 
