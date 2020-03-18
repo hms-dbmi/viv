@@ -7,13 +7,11 @@
 - Bump `zarr.js` to `v0.2.3`
 - Set raster selection on data loader class
 
-## 0.1.0
-
-### Changed
+### Added
 
 - Add `test:watch` to npm scripts.
 
-## 0.0.9
+## 0.1.0
 
 ### Changed
 
