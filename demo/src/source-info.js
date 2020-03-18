@@ -13,7 +13,7 @@ const tiffInfo = {
 };
 
 const rootZarrUrl =
-  'https://vitessce-demo-data.storage.googleapis.com/test-data/vanderbilt-data/vanderbilt_mxif_ims.zarr/mxif_pyramid';
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/vanderbilt-data/vanderbilt_mxif_ims.zarr/mxif_pyramid/';
 
 const zarrInfo = {
   isPublic: true,
@@ -28,7 +28,7 @@ const zarrInfo = {
 };
 
 const rootStaticZarrUrl =
-  'https://vitessce-data.storage.googleapis.com/0.0.24/master_release/spraggins/spraggins.ims.zarr/spraggins.ims.zarr';
+  'https://vitessce-data.storage.googleapis.com/0.0.24/master_release/spraggins/spraggins.ims.zarr';
 
 const staticInfo = {
   isPublic: false,

@@ -13,7 +13,7 @@ import './App.css';
 
 const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
-const MIN_ZOOM = -16;
+const MIN_ZOOM = -8;
 const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
 
 const initSourceName = 'zarr';
