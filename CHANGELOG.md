@@ -30,7 +30,7 @@
 
 ### Changed
 
-- Update build process to use rolllup
+- Update build process to use rollup
 
 ## 0.0.7
 
