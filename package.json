@@ -115,6 +115,6 @@
   },
   "dependencies": {
     "geotiff": "^1.0.0-beta.6",
-    "zarr": "^0.2.2"
+    "zarr": "^0.2.3"
   }
 }

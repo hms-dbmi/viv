@@ -5,7 +5,6 @@ export default class ZarrLoader {
     let base;
     if (Array.isArray(data)) {
       this.isPyramid = true;
-      this._data = data;
       [base] = data;
     } else {
       this.isPyramid = false;
@@ -13,7 +12,6 @@ export default class ZarrLoader {
     }
     this._data = data;
     this.scale = scale;
-    this.dimensions = dimensions;
     this.chunkIndex = Array(base.shape.length).fill(0);
     if (isRgb) {
       this.channelIndex = base.shape.length - 1;
@@ -25,6 +23,7 @@ export default class ZarrLoader {
       this.channelIndex = base.shape.length - 3;
     }
     this.channelChunkSize = base.chunks[this.channelIndex];
+    this.dimensions = dimensions;
     this.dimNames = Object.keys(dimensions);
     this.type = 'zarr';
   }
@@ -89,9 +88,12 @@ export default class ZarrLoader {
     return [data];
   }
 
-  async getRaster({ z, level }) {
+  async getRaster({ z }) {
     const source = this.isPyramid ? this._data[z] : this._data;
-    const { data } = await source.getRaw([level, null, null]);
+    const selection = [...this.chunkIndex];
+    selection[this.xIndex] = null;
+    selection[this.yIndex] = null;
+    const { data } = await source.getRaw(selection);
     return [data];
   }
 
