@@ -2,6 +2,12 @@
 
 ## In Progress
 
+### Added
+
+### Changed
+
+## 0.1.1
+
 ### Changed
 
 - Update deck.gl build
