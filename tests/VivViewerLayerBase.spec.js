@@ -46,7 +46,8 @@ test('VivViewerLayerBase', t => {
       imageHeight: 4,
       dtype: '<u4',
       // eslint-disable-next-line no-unused-vars
-      getTileData: ({ x, y, z }) => Promise([new Uint32Array([0, 1, 2, 3])])
+      getTileData: ({ x, y, z }) =>
+        new Promise(() => [new Uint32Array([0, 1, 2, 3])])
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
   });

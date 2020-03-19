@@ -28,7 +28,7 @@ const zarrInfo = {
 };
 
 const rootStaticZarrUrl =
-  'https://vitessce-data.storage.googleapis.com/0.0.24/master_release/spraggins/spraggins.ims.zarr/spraggins.ims.zarr';
+  'https://vitessce-data.storage.googleapis.com/0.0.24/master_release/spraggins/spraggins.ims.zarr';
 
 const staticInfo = {
   isPublic: false,
