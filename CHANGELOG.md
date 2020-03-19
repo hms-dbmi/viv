@@ -2,9 +2,9 @@
 
 ## In Progress
 
-### Added
-
 ### Changed
+
+- Fixed shaders' if-then
 
 ## 0.1.1
 
