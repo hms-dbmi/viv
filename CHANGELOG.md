@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.1 - In progress
+## In Progress
 
 ### Changed
 
