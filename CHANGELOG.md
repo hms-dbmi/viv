@@ -2,10 +2,9 @@
 
 ## In Progress
 
-### Added
-
 ### Changed
 
+- Fixed shaders' if-then
 - Changed UMD build name to be valid
 
 ## 0.1.1
