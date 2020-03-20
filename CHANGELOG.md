@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Changed UMD build name to be valid
+
 ## 0.1.1
 
 ### Changed
