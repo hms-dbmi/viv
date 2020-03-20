@@ -177,7 +177,7 @@ export default class XRLayer extends Layer {
         textures.channelColormap = this.dataToTexture(channelData[0]);
         this.setState({ textures });
       } else {
-        channelData.forEach(function(d, i) {
+        channelData.forEach((d, i) => {
           textures[`channel${i}`] = this.dataToTexture(d);
         }, this);
         this.setState({ textures });
