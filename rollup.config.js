@@ -12,8 +12,6 @@ import glslify from 'rollup-plugin-glslify';
 
 const pkgObj = require('./package.json');
 
-const libraryName = '@hubmap/vitessce-image-viewer';
-
 function getExternals(pkg) {
   const { peerDependencies = {} } = pkg;
   return Object.keys(peerDependencies);
@@ -22,7 +20,7 @@ function getExternals(pkg) {
 export default {
   input: 'src/index.js',
   output: [
-    { file: pkgObj.main, name: libraryName, format: 'umd', sourcemap: true },
+    { file: pkgObj.main, name: 'viv', format: 'umd', sourcemap: true },
     { file: pkgObj.module, format: 'es', sourcemap: true }
   ],
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
