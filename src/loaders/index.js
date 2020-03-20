@@ -9,9 +9,9 @@ import { range } from '../layers/VivViewerLayer/utils';
 export async function createZarrPyramid({
   rootZarrUrl,
   minZoom,
-  isRgb,
-  scale,
-  dimensions
+  dimensions,
+  isRgb = false,
+  scale = 1
 }) {
   // Not necessary but this is something we should be parsing from metadata
   const maxLevel = -minZoom;
@@ -32,7 +32,7 @@ export async function createZarrPyramid({
   return loader;
 }
 
-export async function createTiffPyramid({ channelNames, channelUrls }) {
+export async function createTiffPyramid({ channelUrls }) {
   // Open and resolve all connections asynchronously
   const tiffConnections = channelUrls.map(async url => {
     const tiff = await fromUrl(url);
@@ -45,7 +45,7 @@ export async function createTiffPyramid({ channelNames, channelUrls }) {
   });
   const pool = new Pool();
   const resolvedTiffConnections = await Promise.all(tiffConnections);
-  return new TiffPyramidLoader(resolvedTiffConnections, channelNames, pool);
+  return new TiffPyramidLoader(resolvedTiffConnections, pool);
 }
 
 export { ZarrLoader, TiffPyramidLoader };

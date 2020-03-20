@@ -7,8 +7,6 @@ export async function initPyramidLoader(type, { channelNames, url, minZoom }) {
       const loader = await createZarrPyramid({
         minZoom,
         rootZarrUrl: url,
-        isRgb: false,
-        scale: 1,
         dimensions: {
           channel: channelNames,
           y: null,
@@ -21,7 +19,7 @@ export async function initPyramidLoader(type, { channelNames, url, minZoom }) {
       const channelUrls = channelNames.map(
         channel => `${url}${channel}.ome.tiff`
       );
-      const loader = await createTiffPyramid({ channelNames, channelUrls });
+      const loader = await createTiffPyramid({ channelUrls });
       return loader;
     }
     case 'static': {
