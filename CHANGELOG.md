@@ -6,6 +6,8 @@
 
 - Fixed shaders' if-then
 - Changed UMD build name to be valid
+- Provide default args for `scale` and `isRgb` in `createZarrPyramid`.
+- Remove unneeded attributes from `TiffPyramidLoader`.
 
 ## 0.1.1
 

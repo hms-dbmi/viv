@@ -1,7 +1,6 @@
 export default class TiffPyramidLoader {
-  constructor(channelPyramids, channelNames, pool) {
+  constructor(channelPyramids, pool) {
     this.channelPyramids = channelPyramids;
-    this.channelNames = channelNames;
     this.pool = pool;
     this.type = 'tiff';
     // hardcoded for now
