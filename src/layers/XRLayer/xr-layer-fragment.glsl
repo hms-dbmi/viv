@@ -43,14 +43,14 @@ vec3 rgb2hsv(vec3 rgb) {
  	if (Cmax > Cmin) {
  		hsv.y = delta / Cmax;
 
- 		if (rgb.r == Cmax){
+ 		if (rgb.r == Cmax) {
       hsv.x = (rgb.g - rgb.b) / delta;
     }
  		else {
  			if (rgb.g == Cmax){
         hsv.x = 2. + (rgb.b - rgb.r) / delta;
       }
- 			else{
+ 			else {
         hsv.x = 4. + (rgb.r - rgb.g) / delta;
       }
  		}
