@@ -12,8 +12,6 @@ import glslify from 'rollup-plugin-glslify';
 
 const pkgObj = require('./package.json');
 
-const libraryName = '@hubmap/vitessce-image-viewer';
-
 function getExternals(pkg) {
   const { peerDependencies = {} } = pkg;
   return Object.keys(peerDependencies);
