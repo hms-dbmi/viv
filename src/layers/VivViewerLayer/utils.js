@@ -59,7 +59,6 @@ export function renderSubLayers(props) {
         id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}`,
         data: null,
         channelData: data,
-        // See StaticImageLayer for why this is here.
         sliderValues,
         colorValues,
         tileSize,

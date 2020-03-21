@@ -68,13 +68,11 @@ export default class StaticImageLayer extends CompositeLayer {
       channelData: data,
       data: null,
       bounds,
-      // Colormaps should only use one sliderValue pair.
       // Going forward, we should have more intricate indexing so we can
       // have multiple data slices loaded and
-      // simply change the index to get different views.
+      // simply change the index to get different views with colormaps, potentially.
       // https://github.com/hubmapconsortium/vitessce-image-viewer/issues/109
       sliderValues: paddedSliderValues,
-      // no need for color in the case of a provided colormap
       colorValues: paddedColorValues,
       staticImageHeight: imageHeight,
       staticImageWidth: imageWidth,
