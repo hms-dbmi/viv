@@ -195,14 +195,15 @@ function App() {
         <ButtonGroup color="primary" size="small">
           {sourceButtons}
         </ButtonGroup>
-        <br />
-        <Button
-          variant="contained"
-          onClick={() => toggleColormap()}
-          key="colormap"
-        >
-          {COLORMAP}
-        </Button>
+        <div style={{ 'margin-top': '15px', 'margin-bottom': '15px' }}>
+          <Button
+            variant="contained"
+            onClick={() => toggleColormap()}
+            key="colormap"
+          >
+            {colormapOn ? 'Colors' : COLORMAP}
+          </Button>
+        </div>
         {sliders}
       </div>
     </div>
