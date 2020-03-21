@@ -47,7 +47,6 @@ const styledSelectors = colorValues.map(value => {
 
 const initSliderValues = Array(colorValues.length).fill([0, 20000]);
 const initChannelIsOn = Array(colorValues.length).fill(true);
-const initColormaps = Array(colorValues.length).fill('');
 function App() {
   const [sliderValues, setSliderValues] = useState(initSliderValues);
   const [channelIsOn, setChannelIsOn] = useState(initChannelIsOn);

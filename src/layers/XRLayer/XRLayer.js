@@ -148,6 +148,7 @@ export default class XRLayer extends Layer {
     if (textures && model) {
       const { sliderValues, colorValues, opacity, dtype } = this.props;
       const divisor = sliderValues.reduce(
+        // eslint-disable-next-line no-unused-vars
         (total, currentValue, currentIndex, arr) => {
           return DTYPE_VALUES[dtype].max !== currentValue &&
             currentIndex % 2 === 0
