@@ -73,11 +73,9 @@ export default class StaticImageLayer extends CompositeLayer {
       // have multiple data slices loaded and
       // simply change the index to get different views.
       // https://github.com/hubmapconsortium/vitessce-image-viewer/issues/109
-      sliderValues: colormap
-        ? paddedSliderValues.slice(0, 2)
-        : paddedSliderValues,
+      sliderValues: paddedSliderValues,
       // no need for color in the case of a provided colormap
-      colorValues: colormap ? [] : paddedColorValues,
+      colorValues: paddedColorValues,
       staticImageHeight: imageHeight,
       staticImageWidth: imageWidth,
       id: `XR-Static-Layer-${0}-${imageHeight}-${imageWidth}-${0}`,

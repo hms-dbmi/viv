@@ -26,7 +26,7 @@ export default class XRLayer extends Layer {
   getShaders() {
     const { colormap, dtype } = this.props;
     const fragmentShaderColormap = colormap
-      ? fsColormap.replace('colormap', colormap)
+      ? fsColormap.replace('colormapFunction', colormap)
       : fs;
     const fragmentShaderDtype =
       dtype === '<f4'
@@ -146,12 +146,22 @@ export default class XRLayer extends Layer {
   draw({ uniforms }) {
     const { textures, model } = this.state;
     if (textures && model) {
-      const { sliderValues, colorValues, opacity } = this.props;
+      const { sliderValues, colorValues, opacity, dtype } = this.props;
+      const divisor = sliderValues.reduce(
+        (total, currentValue, currentIndex, arr) => {
+          return DTYPE_VALUES[dtype].max !== currentValue &&
+            currentIndex % 2 === 0
+            ? total + 1
+            : total + 0;
+        },
+        0
+      );
       model
         .setUniforms({
           ...uniforms,
           colorValues,
           sliderValues,
+          divisor,
           opacity,
           ...textures
         })
@@ -162,17 +172,16 @@ export default class XRLayer extends Layer {
   loadTexture(channelData) {
     const textures = {
       channel0: null,
+      channel1: null,
       channel2: null,
       channel3: null,
       channel4: null,
-      channel5: null,
-      channelColormap: null
+      channel5: null
     };
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex && tex.delete());
     }
     if (channelData.length > 0) {
-      textures.channelColormap = this.dataToTexture(channelData[0]);
       channelData.forEach((d, i) => {
         textures[`channel${i}`] = this.dataToTexture(d);
       }, this);

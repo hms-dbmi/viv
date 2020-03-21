@@ -3,6 +3,7 @@
 precision highp float;
 precision highp int;
 precision highp usampler2D;
+
 #pragma glslify: jet = require("glsl-colormap/jet")
 #pragma glslify: hsv = require("glsl-colormap/hsv")
 #pragma glslify: hot = require("glsl-colormap/hot")
@@ -50,13 +51,19 @@ precision highp usampler2D;
 
 
 // our texture
-uniform usampler2D channelColormap;
+uniform usampler2D channel0;
+uniform usampler2D channel1;
+uniform usampler2D channel2;
+uniform usampler2D channel3;
+uniform usampler2D channel4;
+uniform usampler2D channel5;
 
 // range
-uniform vec2 sliderValues;
+uniform vec2 sliderValues[6];
 
 // opacity
 uniform float opacity;
+uniform float divisor;
 
 in vec2 vTexCoord;
 
@@ -65,7 +72,17 @@ out vec4 color;
 
 
 void main() {
-  float intensityValue = (float(texture(channelColormap, vTexCoord).r) - sliderValues[0]) / sliderValues[1];
+  float intensityValue0 = (float(texture(channel0, vTexCoord).r) - sliderValues[0][0]) / sliderValues[0][1];
+  float intensityValue1 = (float(texture(channel1, vTexCoord).r) - sliderValues[1][0]) / sliderValues[1][1];
+  float intensityValue2 = (float(texture(channel2, vTexCoord).r) - sliderValues[2][0]) / sliderValues[2][1];
+  float intensityValue3 = (float(texture(channel3, vTexCoord).r) - sliderValues[3][0]) / sliderValues[3][1];
+  float intensityValue4 = (float(texture(channel4, vTexCoord).r) - sliderValues[4][0]) / sliderValues[4][1];
+  float intensityValue5 = (float(texture(channel5, vTexCoord).r) - sliderValues[5][0]) / sliderValues[5][1];
 
-  color = vec4(colormap(min(1.0,intensityValue)).xyz, opacity);
+  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
+  vec4 colorCombo = vec4(0.0);
+  for(int i = 0; i < 6; i++) {
+    colorCombo += colormapFunction(min(1.0,intensityArray[i] / divisor));
+  }
+  color = vec4(colorCombo.xyz, opacity);
 }

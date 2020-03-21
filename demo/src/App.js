@@ -127,20 +127,10 @@ function App() {
 
   const sliders = sources[sourceName].channelNames.map((channel, i) => {
     const [ColoredSlider, ColoredCheckbox] = styledSelectors[i];
-    const ColorMap = (
-      <Button
-        variant="contained"
-        onClick={() => toggleColormap()}
-        key="colormap"
-      >
-        {COLORMAP}
-      </Button>
-    );
     return (
       <div key={`container-${channel}`}>
         <p>{channel}</p>
         <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
-          {i === 0 ? ColorMap : []}
           <ColoredCheckbox
             onChange={() => toggleChannel(i)}
             checked={channelIsOn[i]}
@@ -205,6 +195,14 @@ function App() {
         <ButtonGroup color="primary" size="small">
           {sourceButtons}
         </ButtonGroup>
+        <br />
+        <Button
+          variant="contained"
+          onClick={() => toggleColormap()}
+          key="colormap"
+        >
+          {COLORMAP}
+        </Button>
         {sliders}
       </div>
     </div>
