@@ -68,7 +68,7 @@ export default class XRLayer extends Layer {
 
   updateState({ props, oldProps, changeFlags }) {
     // setup model first
-    if (changeFlags.extensionsChanged) {
+    if (changeFlags.extensionsChanged || props.colormap !== oldProps.colormap) {
       const { gl } = this.context;
       if (this.state.model) {
         this.state.model.delete();
@@ -172,16 +172,11 @@ export default class XRLayer extends Layer {
       Object.values(this.state.textures).forEach(tex => tex && tex.delete());
     }
     if (channelData.length > 0) {
-      if (this.props.colormap) {
-        // assume first dimension is the one we want to fetch
-        textures.channelColormap = this.dataToTexture(channelData[0]);
-        this.setState({ textures });
-      } else {
-        channelData.forEach((d, i) => {
-          textures[`channel${i}`] = this.dataToTexture(d);
-        }, this);
-        this.setState({ textures });
-      }
+      textures.channelColormap = this.dataToTexture(channelData[0]);
+      channelData.forEach((d, i) => {
+        textures[`channel${i}`] = this.dataToTexture(d);
+      }, this);
+      this.setState({ textures });
     }
   }
 

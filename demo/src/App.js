@@ -15,6 +15,7 @@ const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
 const MIN_ZOOM = -8;
 const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
+const COLORMAP = 'viridis';
 
 const initSourceName = 'zarr';
 const colorValues = [
@@ -25,6 +26,7 @@ const colorValues = [
   [255, 0, 255],
   [0, 255, 255]
 ];
+
 const styledSelectors = colorValues.map(value => {
   const ColoredSlider = withStyles({
     root: {
@@ -45,7 +47,7 @@ const styledSelectors = colorValues.map(value => {
 
 const initSliderValues = Array(colorValues.length).fill([0, 20000]);
 const initChannelIsOn = Array(colorValues.length).fill(true);
-
+const initColormaps = Array(colorValues.length).fill('');
 function App() {
   const [sliderValues, setSliderValues] = useState(initSliderValues);
   const [channelIsOn, setChannelIsOn] = useState(initChannelIsOn);
@@ -53,6 +55,7 @@ function App() {
   const [viewWidth, setViewWidth] = useState(window.innerWidth * 0.7);
   const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.9);
   const [loader, setLoader] = useState(null);
+  const [colormapOn, setColormap] = useState('');
 
   useEffect(() => {
     const handleResize = () => {
@@ -98,6 +101,13 @@ function App() {
       return nextChannelsOn;
     });
   };
+
+  const toggleColormap = () => {
+    setColormap(prevColormap => {
+      return prevColormap ? '' : COLORMAP;
+    });
+  };
+
   const sourceButtons = Object.keys(sources).map(name => {
     return (
       // only use isPublic on the deployment
@@ -117,10 +127,20 @@ function App() {
 
   const sliders = sources[sourceName].channelNames.map((channel, i) => {
     const [ColoredSlider, ColoredCheckbox] = styledSelectors[i];
+    const ColorMap = (
+      <Button
+        variant="contained"
+        onClick={() => toggleColormap()}
+        key="colormap"
+      >
+        {COLORMAP}
+      </Button>
+    );
     return (
       <div key={`container-${channel}`}>
         <p>{channel}</p>
         <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
+          {i === 0 ? ColorMap : []}
           <ColoredCheckbox
             onChange={() => toggleChannel(i)}
             checked={channelIsOn[i]}
@@ -163,7 +183,7 @@ function App() {
             sources[initSourceName].channelNames.length
           )}
           initialViewState={initialViewState}
-          colormap={sourceName === 'static' ? 'viridis' : ''}
+          colormap={colormapOn}
         />
       ) : null}
       <div className="slider-container">
