@@ -129,7 +129,7 @@ function App() {
           valueLabelDisplay="auto"
           getAriaLabel={() => 'zStack'}
           min={0}
-          max={loader.SizeZ}
+          max={Math.max(0, loader.SizeZ - 1)}
           style={{
             color: `rgb(${[220, 220, 220]})`,
             top: '7px'
@@ -142,7 +142,7 @@ function App() {
           valueLabelDisplay="auto"
           getAriaLabel={() => 'tStack'}
           min={0}
-          max={loader.SizeT}
+          max={Math.max(0, loader.SizeT - 1)}
           style={{
             color: `rgb(${[220, 220, 220]})`,
             top: '7px'
