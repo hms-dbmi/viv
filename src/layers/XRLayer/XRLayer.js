@@ -26,7 +26,7 @@ export default class XRLayer extends Layer {
   getShaders() {
     const { colormap, dtype } = this.props;
     const fragmentShaderColormap = colormap
-      ? fsColormap.replace('colormap', colormap)
+      ? fsColormap.replace('colormapFunction', colormap)
       : fs;
     const fragmentShaderDtype =
       dtype === '<f4'
@@ -68,7 +68,7 @@ export default class XRLayer extends Layer {
 
   updateState({ props, oldProps, changeFlags }) {
     // setup model first
-    if (changeFlags.extensionsChanged) {
+    if (changeFlags.extensionsChanged || props.colormap !== oldProps.colormap) {
       const { gl } = this.context;
       if (this.state.model) {
         this.state.model.delete();
@@ -162,26 +162,20 @@ export default class XRLayer extends Layer {
   loadTexture(channelData) {
     const textures = {
       channel0: null,
+      channel1: null,
       channel2: null,
       channel3: null,
       channel4: null,
-      channel5: null,
-      channelColormap: null
+      channel5: null
     };
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex && tex.delete());
     }
     if (channelData.length > 0) {
-      if (this.props.colormap) {
-        // assume first dimension is the one we want to fetch
-        textures.channelColormap = this.dataToTexture(channelData[0]);
-        this.setState({ textures });
-      } else {
-        channelData.forEach((d, i) => {
-          textures[`channel${i}`] = this.dataToTexture(d);
-        }, this);
-        this.setState({ textures });
-      }
+      channelData.forEach((d, i) => {
+        textures[`channel${i}`] = this.dataToTexture(d);
+      }, this);
+      this.setState({ textures });
     }
   }
 
