@@ -16,6 +16,7 @@ const MAX_SLIDER_VALUE = 65535;
 const MIN_ZOOM = -8;
 const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
 const COLORMAP = 'viridis';
+const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
 
 const initSourceName = 'zarr';
 const colorValues = [
@@ -26,24 +27,6 @@ const colorValues = [
   [255, 0, 255],
   [0, 255, 255]
 ];
-
-const styledSelectors = colorValues.map(value => {
-  const ColoredSlider = withStyles({
-    root: {
-      color: `rgb(${value})`
-    }
-  })(Slider);
-  const ColoredCheckbox = withStyles({
-    root: {
-      color: `rgb(${value})`,
-      '&$checked': {
-        color: `rgb(${value})`
-      }
-    },
-    checked: {}
-  })(Checkbox);
-  return [ColoredSlider, ColoredCheckbox];
-});
 
 const initSliderValues = Array(colorValues.length).fill([0, 20000]);
 const initChannelIsOn = Array(colorValues.length).fill(true);
@@ -125,23 +108,37 @@ function App() {
   });
 
   const sliders = sources[sourceName].channelNames.map((channel, i) => {
-    const [ColoredSlider, ColoredCheckbox] = styledSelectors[i];
     return (
       <div key={`container-${channel}`}>
         <p>{channel}</p>
         <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
-          <ColoredCheckbox
+          <Checkbox
             onChange={() => toggleChannel(i)}
             checked={channelIsOn[i]}
+            style={{
+              color: `rgb(${
+                colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValues[i]
+              })`,
+              '&$checked': {
+                color: `rgb(${
+                  colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValues[i]
+                })`
+              }
+            }}
           />
-          <ColoredSlider
-            style={{ top: '7px' }}
+          <Slider
             value={sliderValues[i]}
             onChange={(event, value) => handleSliderChange(i, value)}
             valueLabelDisplay="auto"
             getAriaLabel={() => channel}
             min={MIN_SLIDER_VALUE}
             max={MAX_SLIDER_VALUE}
+            style={{
+              color: `rgb(${
+                colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValues[i]
+              })`,
+              top: '7px'
+            }}
             orientation="horizontal"
           />
         </div>
