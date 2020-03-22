@@ -1,11 +1,5 @@
 import React, { useState, useEffect, memo } from 'react';
-import {
-  Button,
-  ButtonGroup,
-  Slider,
-  Checkbox,
-  withStyles
-} from '@material-ui/core';
+import { Button, ButtonGroup, Slider, Checkbox } from '@material-ui/core';
 import { VivViewer } from '../../src';
 import { initPyramidLoader } from './initLoaders';
 import sources from './source-info';
