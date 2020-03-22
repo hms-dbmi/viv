@@ -4,6 +4,8 @@ import { fromUrl, Pool } from 'geotiff/dist/geotiff.bundle.min.js';
 
 import ZarrLoader from './zarrLoader';
 import TiffPyramidLoader from './tiffPyramidLoader';
+import TiffLoader from './tiffLoader';
+
 import { range } from '../layers/VivViewerLayer/utils';
 
 export async function createZarrPyramid({
@@ -48,4 +50,11 @@ export async function createTiffPyramid({ channelUrls }) {
   return new TiffPyramidLoader(resolvedTiffConnections, pool);
 }
 
-export { ZarrLoader, TiffPyramidLoader };
+export async function createTiffLoader({ url }) {
+  const tiff = await fromUrl(url);
+  tiff.fileDirectories = await tiff.parseFileDirectories();
+  const pool = new Pool();
+  return new TiffLoader(tiff, pool);
+}
+
+export { ZarrLoader, TiffPyramidLoader, TiffLoader };

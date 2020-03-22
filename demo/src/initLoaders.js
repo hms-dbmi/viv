@@ -1,5 +1,10 @@
 import { openArray } from 'zarr';
-import { createTiffPyramid, createZarrPyramid, ZarrLoader } from '../../src';
+import {
+  createTiffPyramid,
+  createZarrPyramid,
+  ZarrLoader,
+  createTiffLoader
+} from '../../src';
 
 export async function initPyramidLoader(type, { channelNames, url, minZoom }) {
   switch (type) {
@@ -34,6 +39,10 @@ export async function initPyramidLoader(type, { channelNames, url, minZoom }) {
       };
       const loader = new ZarrLoader(connection, isRgb, scale, dimensions);
       loader.setChunkIndex('mz', 1);
+      return loader;
+    }
+    case 'static tiff': {
+      const loader = await createTiffLoader({ url });
       return loader;
     }
     default:

@@ -7,7 +7,7 @@ import {
   withStyles
 } from '@material-ui/core';
 import { VivViewer } from '../../src';
-import { initPyramidLoader } from './initLoaders';
+import { initPyramidLoader, initTiffLoader } from './initLoaders';
 import sources from './source-info';
 import './App.css';
 

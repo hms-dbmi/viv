@@ -41,8 +41,27 @@ const staticInfo = {
   url: rootStaticZarrUrl
 };
 
+const rootStaticTiffUrl =
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/codex/antigen.ome.tiff';
+
+const staticTiffInfo = {
+  isPublic: false,
+  initialViewState: {
+    zoom: -1,
+    target: [1000, 500]
+  },
+  channelNames: [
+    'Cy3 - Synaptopodin (glomerular)',
+    'Cy5 - THP (thick limb)',
+    'DAPI - Hoescht (nuclei)',
+    'FITC - Laminin (basement membrane)'
+  ],
+  url: rootStaticTiffUrl
+};
+
 export default {
   zarr: zarrInfo,
   tiff: tiffInfo,
-  static: staticInfo
+  static: staticInfo,
+  'static tiff': staticTiffInfo
 };
