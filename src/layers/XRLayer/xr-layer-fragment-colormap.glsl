@@ -80,9 +80,9 @@ void main() {
   float intensityValue5 = (float(texture(channel5, vTexCoord).r) - sliderValues[5][0]) / sliderValues[5][1];
 
   float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
-  vec4 colorCombo = vec4(0.0);
+  float intensityCombo = 0.0;
   for(int i = 0; i < 6; i++) {
-    colorCombo += colormapFunction(min(1.0,intensityArray[i] / divisor));
+    intensityCombo += max(0.0,intensityArray[i]);
   }
-  color = vec4(colorCombo.xyz, opacity);
+  color = vec4(colormapFunction(min(1.0,intensityCombo)).xyz, opacity);
 }

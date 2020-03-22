@@ -194,7 +194,7 @@ function App() {
         <ButtonGroup color="primary" size="small">
           {sourceButtons}
         </ButtonGroup>
-        <div style={{ 'margin-top': '15px', 'margin-bottom': '15px' }}>
+        <div style={{ marginTop: '15px', marginBottom: '15px' }}>
           <Button
             variant="contained"
             onClick={() => toggleColormap()}

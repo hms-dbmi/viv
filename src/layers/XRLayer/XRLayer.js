@@ -146,26 +146,12 @@ export default class XRLayer extends Layer {
   draw({ uniforms }) {
     const { textures, model } = this.state;
     if (textures && model) {
-      const { sliderValues, colorValues, opacity, dtype } = this.props;
-      // To prevent an overload of colors in the color map, we divide the intesities
-      // by the number that are turned on (i.e those with a slider range that is not
-      // [max,max])
-      const divisor = sliderValues.reduce(
-        // eslint-disable-next-line no-unused-vars
-        (total, currentValue, currentIndex, arr) => {
-          return DTYPE_VALUES[dtype].max !== currentValue &&
-            currentIndex % 2 === 0
-            ? total + 1
-            : total + 0;
-        },
-        0
-      );
+      const { sliderValues, colorValues, opacity } = this.props;
       model
         .setUniforms({
           ...uniforms,
           colorValues,
           sliderValues,
-          divisor,
           opacity,
           ...textures
         })
