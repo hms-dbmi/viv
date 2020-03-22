@@ -32,6 +32,8 @@ function App() {
   const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.9);
   const [loader, setLoader] = useState(null);
   const [colormapOn, setColormap] = useState('');
+  const [zStack, setZStack] = useState(0);
+  const [tStack, setTStack] = useState(0);
 
   useEffect(() => {
     const handleResize = () => {
@@ -84,6 +86,24 @@ function App() {
     });
   };
 
+  const sliderSetZstack = value => {
+    loader.fetchIndex = loader.fetchIndex.map(index => {
+      const newIndex = { ...index };
+      newIndex.z = value;
+      return newIndex;
+    });
+    setZStack(value);
+  };
+
+  const sliderSetTstack = value => {
+    loader.fetchIndex = loader.fetchIndex.map(index => {
+      const newIndex = { ...index };
+      newIndex.t = value;
+      return newIndex;
+    });
+    setTStack(value);
+  };
+
   const sourceButtons = Object.keys(sources).map(name => {
     return (
       // only use isPublic on the deployment
@@ -100,6 +120,39 @@ function App() {
       )
     );
   });
+  const stackControllers =
+    loader && sourceName === 'static tiff' && loader.SizeT && loader.SizeZ ? (
+      <div>
+        <Slider
+          value={zStack}
+          onChange={(event, value) => sliderSetZstack(value)}
+          valueLabelDisplay="auto"
+          getAriaLabel={() => 'zStack'}
+          min={0}
+          max={loader.SizeZ}
+          style={{
+            color: `rgb(${[220, 220, 220]})`,
+            top: '7px'
+          }}
+          orientation="horizontal"
+        />
+        <Slider
+          value={tStack}
+          onChange={(event, value) => sliderSetTstack(value)}
+          valueLabelDisplay="auto"
+          getAriaLabel={() => 'tStack'}
+          min={0}
+          max={loader.SizeT}
+          style={{
+            color: `rgb(${[220, 220, 220]})`,
+            top: '7px'
+          }}
+          orientation="horizontal"
+        />
+      </div>
+    ) : (
+      []
+    );
 
   const sliders = sources[sourceName].channelNames.map((channel, i) => {
     return (
@@ -195,6 +248,7 @@ function App() {
           </Button>
         </div>
         {sliders}
+        {stackControllers}
       </div>
     </div>
   );

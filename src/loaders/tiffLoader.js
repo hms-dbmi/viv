@@ -18,7 +18,7 @@ export default class TiffLoader {
     this.minZoom = -1 * this.OMEXML.getNumberOfImages();
     this.SizeC = this.OMEXML.SizeC;
     this.channelNames = this.OMEXML.getChannelNames();
-    this.dimensionOrder = this.OMEXML.DimensionOrder;
+    this.DimensionOrder = this.OMEXML.DimensionOrder;
     this.imageWidth = this.OMEXML.SizeX;
     this.imageHeight = this.OMEXML.SizeY;
     // this is spatial z, not to be confused with pyramidal z below in getTile
@@ -54,14 +54,6 @@ export default class TiffLoader {
     };
   }
 
-  set fetchIndex(indicies) {
-    indicies.forEach(index => this.addIndex(index));
-  }
-
-  get fetchIndex() {
-    return this.fetchIndex;
-  }
-
   // z and t are both numbers while c should be a channel name
   addIndex({ z, c, t }) {
     if (this.fetchIndex.length < MAX_SLIDERS_AND_CHANNELS) {
@@ -87,10 +79,10 @@ export default class TiffLoader {
     const cIndex = this.channelNames.indexOf(c);
     switch (this.DimensionOrder) {
       case 'XYZCT': {
-        return t * this.SizeZ * this.sizeC + cIndex * this.SizeZ + z;
+        return t * this.SizeZ * this.SizeC + cIndex * this.SizeZ + z;
       }
       case 'XYZTC': {
-        return cIndex * this.SizeZ * this.sizeT + t * this.SizeZ + z;
+        return cIndex * this.SizeZ * this.SizeT + t * this.SizeZ + z;
       }
       case 'XYCTZ': {
         return z * this.SizeC * this.SizeT + t * this.SizeC + cIndex;
@@ -108,7 +100,7 @@ export default class TiffLoader {
   }
 
   async getTile({ x, y, z }) {
-    const tileRequests = this.fetchIndex.map(async (index, i) => {
+    const tileRequests = this.fetchIndex.map(async index => {
       const imageIndex = this._getIFDIndex(index);
       const image = await this.tiff.getImage(imageIndex);
       return this._getChannel({ image, x, y });
@@ -120,8 +112,9 @@ export default class TiffLoader {
   async getRaster() {
     // hardcoded
     const rasters = await Promise.all(
-      range(4).map(async i => {
-        const image = await this.tiff.getImage(i + 20);
+      this.fetchIndex.map(async index => {
+        const imageIndex = this._getIFDIndex(index);
+        const image = await this.tiff.getImage(imageIndex);
         const raster = await image.readRasters();
         return raster[0];
       })

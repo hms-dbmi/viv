@@ -43,6 +43,12 @@ export async function initPyramidLoader(type, { channelNames, url, minZoom }) {
     }
     case 'static tiff': {
       const loader = await createTiffLoader({ url });
+      loader.fetchIndex = [
+        { z: 0, t: 0, c: loader.channelNames[0] },
+        { z: 0, t: 0, c: loader.channelNames[1] },
+        { z: 0, t: 0, c: loader.channelNames[2] },
+        { z: 0, t: 0, c: loader.channelNames[3] }
+      ];
       return loader;
     }
     default:

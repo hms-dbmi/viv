@@ -16,23 +16,23 @@ export default class OMEXML {
   }
 
   get SizeZ() {
-    return this.Pixels['@_SizeZ'];
+    return Number.parseInt(this.Pixels['@_SizeZ']);
   }
 
   get SizeT() {
-    return this.Pixels['@_SizeT'];
+    return Number.parseInt(this.Pixels['@_SizeT']);
   }
 
   get SizeC() {
-    return this.Pixels['@_SizeC'];
+    return Number.parseInt(this.Pixels['@_SizeC']);
   }
 
   get SizeX() {
-    return this.Pixels['@_SizeX'];
+    return Number.parseInt(this.Pixels['@_SizeX']);
   }
 
   get SizeY() {
-    return this.Pixels['@_SizeY'];
+    return Number.parseInt(this.Pixels['@_SizeY']);
   }
 
   get DimensionOrder() {
