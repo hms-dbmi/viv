@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Generalize colormaps to multichannel maps
+
 ## 0.1.3
 
 ### Added
