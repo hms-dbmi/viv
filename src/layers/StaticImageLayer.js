@@ -36,6 +36,17 @@ export default class StaticImageLayer extends CompositeLayer {
     this.setState({ data: loader.getRaster({ z: 0 }) });
   }
 
+  updateState({ changeFlags }) {
+    const { propsChanged } = changeFlags;
+    if (
+      typeof propsChanged === 'string' &&
+      propsChanged.includes('props.loader')
+    ) {
+      const { loader } = this.props;
+      this.setState({ data: loader.getRaster({ z: 0 }) });
+    }
+  }
+
   renderLayers() {
     const {
       loader,
@@ -66,7 +77,6 @@ export default class StaticImageLayer extends CompositeLayer {
     const { data } = this.state;
     return new XRLayer({
       channelData: data,
-      data: null,
       bounds,
       // Going forward, we should have more intricate indexing so we can
       // have multiple data slices loaded and
