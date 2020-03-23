@@ -62,7 +62,10 @@ export default class VivViewerLayer extends CompositeLayer {
       getTileData,
       dtype,
       colorValues: paddedColorValues,
-      sliderValues: paddedSliderValues
+      sliderValues: paddedSliderValues,
+      updateTriggers: {
+        getTileData: [loader]
+      }
     });
     return layers;
   }

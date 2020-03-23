@@ -42,6 +42,7 @@ export default class StaticImageLayer extends CompositeLayer {
       typeof propsChanged === 'string' &&
       propsChanged.includes('props.loader')
     ) {
+      // Only fetch new data to render if loader has changed
       const { loader } = this.props;
       this.setState({ data: loader.getRaster({ z: 0 }) });
     }
