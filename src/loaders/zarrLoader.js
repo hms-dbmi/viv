@@ -88,8 +88,10 @@ export default class ZarrLoader {
     return [data];
   }
 
-  async getRaster({ z }) {
-    const source = this.isPyramid ? this._data[z] : this._data;
+  async getRaster() {
+    const source = this.isPyramid
+      ? this._data[this._data.length - 1]
+      : this._data;
     const selection = [...this.chunkIndex];
     selection[this.xIndex] = null;
     selection[this.yIndex] = null;

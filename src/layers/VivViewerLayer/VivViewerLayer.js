@@ -1,8 +1,10 @@
 import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
 import VivViewerLayerBase from './VivViewerLayerBase';
+import StaticImageLayer from '../StaticImageLayer';
 import { isInTileBounds } from './utils';
 import { padColorsAndSliders } from '../utils';
+import { ZarrLoader } from '../../loaders';
 
 export default class VivViewerLayer extends CompositeLayer {
   // see https://github.com/uber/deck.gl/blob/master/docs/api-reference/layer.md#shouldupdatestate
@@ -53,17 +55,25 @@ export default class VivViewerLayer extends CompositeLayer {
       }
       return null;
     };
-    const layers = new VivViewerLayerBase(this.props, {
-      id: `VivViewerLayerBase--${loader.type}`,
-      imageWidth,
-      imageHeight,
-      tileSize,
-      minZoom,
-      getTileData,
-      dtype,
-      colorValues: paddedColorValues,
-      sliderValues: paddedSliderValues
-    });
+    const layers = [
+      new StaticImageLayer(this.props, {
+        id: `StaticImageLayer-${loader.type}`,
+        scale: 2 ** (-minZoom - 1),
+        imageHeight: tileSize,
+        imageWidth: tileSize
+      }),
+      new VivViewerLayerBase(this.props, {
+        id: `VivViewerLayerBase--${loader.type}`,
+        imageWidth,
+        imageHeight,
+        tileSize,
+        minZoom,
+        getTileData,
+        dtype,
+        colorValues: paddedColorValues,
+        sliderValues: paddedSliderValues
+      })
+    ];
     return layers;
   }
 }
