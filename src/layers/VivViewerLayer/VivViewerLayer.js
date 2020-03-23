@@ -19,7 +19,8 @@ export default class VivViewerLayer extends CompositeLayer {
       sliderValues,
       colorValues,
       channelIsOn,
-      domain
+      domain,
+      opacity
     } = this.props;
     const {
       imageWidth,
@@ -44,7 +45,8 @@ export default class VivViewerLayer extends CompositeLayer {
           imageWidth,
           imageHeight,
           minZoom,
-          tileSize
+          tileSize,
+          opacity
         })
       ) {
         return loader.getTile({
@@ -55,25 +57,26 @@ export default class VivViewerLayer extends CompositeLayer {
       }
       return null;
     };
-    const layers = [
-      new StaticImageLayer(this.props, {
-        id: `StaticImageLayer-${loader.type}`,
-        scale: 2 ** (-minZoom - 1),
-        imageHeight: tileSize,
-        imageWidth: tileSize
-      }),
-      new VivViewerLayerBase(this.props, {
-        id: `VivViewerLayerBase--${loader.type}`,
-        imageWidth,
-        imageHeight,
-        tileSize,
-        minZoom,
-        getTileData,
-        dtype,
-        colorValues: paddedColorValues,
-        sliderValues: paddedSliderValues
-      })
-    ];
+    const tiledLayer = new VivViewerLayerBase(this.props, {
+      id: `VivViewerLayerBase--${loader.type}`,
+      imageWidth,
+      imageHeight,
+      tileSize,
+      minZoom,
+      getTileData,
+      dtype,
+      colorValues: paddedColorValues,
+      sliderValues: paddedSliderValues,
+      refinementStrategy: opacity === 1 ? 'best-available' : 'never'
+    });
+    const baseLayer = new StaticImageLayer(this.props, {
+      id: `StaticImageLayer-${loader.type}`,
+      scale: 2 ** (-minZoom - 1),
+      imageHeight: tileSize,
+      imageWidth: tileSize,
+      visible: opacity === 1 || minZoom > this.context.viewport.zoom
+    });
+    const layers = [baseLayer, tiledLayer];
     return layers;
   }
 }
