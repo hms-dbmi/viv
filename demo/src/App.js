@@ -32,6 +32,7 @@ function App() {
   const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.9);
   const [loader, setLoader] = useState(null);
   const [colormapOn, setColormap] = useState('');
+  const [mzIndex, setMZIndex] = useState(0);
 
   useEffect(() => {
     const handleResize = () => {
@@ -82,6 +83,11 @@ function App() {
     setColormap(prevColormap => {
       return prevColormap ? '' : COLORMAP;
     });
+  };
+
+  const sliderSetMZIndex = value => {
+    loader.setChunkIndex('mz', value);
+    setMZIndex(value);
   };
 
   const sourceButtons = Object.keys(sources).map(name => {
@@ -140,6 +146,33 @@ function App() {
     );
   });
 
+  let stackControllers;
+  switch (sourceName) {
+    case 'static': {
+      loader && loader._data.meta
+        ? (stackControllers = (
+          <div style={{ width: '100%', position: 'relative' }}>
+            <p>MZ</p>
+            <Slider
+              value={mzIndex}
+              onChange={(event, value) => sliderSetMZIndex(value)}
+              valueLabelDisplay="auto"
+              getAriaLabel={() => 'mzIndex'}
+              min={0}
+              max={loader._data.meta.shape[0]}
+              style={{
+                  color: `rgb(${[220, 220, 220]})`,
+                  top: '7px',
+                  marginLeft: '16px'
+                }}
+              orientation="horizontal"
+            />
+          </div>
+          ))
+        : [];
+    }
+  }
+
   const initialViewState =
     sources[sourceName].initialViewState || DEFAULT_VIEW_STATE;
   return (
@@ -195,6 +228,7 @@ function App() {
           </Button>
         </div>
         {sliders}
+        {stackControllers}
       </div>
     </div>
   );

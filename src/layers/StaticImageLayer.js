@@ -33,7 +33,27 @@ function scaleBounds({ imageWidth, imageHeight, translate, scale }) {
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
     const { loader } = this.props;
-    this.setState({ data: loader.getRaster({ z: 0 }) });
+    this.setState({
+      data: loader.getRaster({ z: 0 }),
+      chunkIndex: loader.chunkIndex
+    });
+  }
+
+  updateState() {
+    const { loader } = this.props;
+    this.state.chunkIndex !== loader.chunkIndex &&
+      this.setState({
+        data: loader.getRaster({ z: 0 }),
+        chunkIndex: loader.chunkIndex
+      });
+  }
+
+  shouldUpdateState(args) {
+    const shouldUpdateState = super.shouldUpdateState(args);
+    return (
+      shouldUpdateState ||
+      this.state.chunkIndex !== this.props.loader.chunkIndex
+    );
   }
 
   renderLayers() {
