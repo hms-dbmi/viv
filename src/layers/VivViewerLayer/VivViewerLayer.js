@@ -63,6 +63,9 @@ export default class VivViewerLayer extends CompositeLayer {
       dtype,
       colorValues: paddedColorValues,
       sliderValues: paddedSliderValues,
+      // TileLayer checks `changeFlags.updateTriggersChanged.getTileData` to see if tile cache
+      // needs to be re-created. We want to trigger this behavior if the loader changes.
+      // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
       updateTriggers: {
         getTileData: [loader]
       }
