@@ -24,7 +24,7 @@ export default class TiffLoader {
     // this is spatial z, not to be confused with pyramidal z below in getTile
     this.SizeZ = this.OMEXML.SizeZ;
     this.SizeT = this.OMEXML.SizeT;
-    this.fetchIndex = [];
+    this.chunkIndex = [];
     this.isPyramid = !!this.minZoom;
     const type = this.OMEXML.Type;
     // this.tileSize = firstImage.getTileWidth();
@@ -56,8 +56,8 @@ export default class TiffLoader {
 
   // z and t are both numbers while c should be a channel name
   addIndex({ z, c, t }) {
-    if (this.fetchIndex.length < MAX_SLIDERS_AND_CHANNELS) {
-      this.fetchIndex.push({ z, c, t });
+    if (this.chunkIndex.length < MAX_SLIDERS_AND_CHANNELS) {
+      this.chunkIndex.push({ z, c, t });
     } else {
       throw new Error(
         `Index is at full capacity and cannot accept ${{ z, c, t }}`
@@ -67,9 +67,9 @@ export default class TiffLoader {
 
   // z and t are both numbers while c should be a channel name
   removeIndex({ z, c, t }) {
-    const index = this.fetchIndex.indexOf({ z, c, t });
+    const index = this.chunkIndex.indexOf({ z, c, t });
     if (index > -1) {
-      this.fetchIndex.splice(this.fetchIndex.indexOf({ z, c, t }), 1);
+      this.chunkIndex.splice(this.chunkIndex.indexOf({ z, c, t }), 1);
     } else {
       throw new Error(`${{ z, c, t }} is not in index`);
     }
@@ -100,7 +100,7 @@ export default class TiffLoader {
   }
 
   async getTile({ x, y, z }) {
-    const tileRequests = this.fetchIndex.map(async index => {
+    const tileRequests = this.chunkIndex.map(async index => {
       const imageIndex = this._getIFDIndex(index);
       const image = await this.tiff.getImage(imageIndex);
       return this._getChannel({ image, x, y });
@@ -112,7 +112,7 @@ export default class TiffLoader {
   async getRaster() {
     // hardcoded
     const rasters = await Promise.all(
-      this.fetchIndex.map(async index => {
+      this.chunkIndex.map(async index => {
         const imageIndex = this._getIFDIndex(index);
         const image = await this.tiff.getImage(imageIndex);
         const raster = await image.readRasters();

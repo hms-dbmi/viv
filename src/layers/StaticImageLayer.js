@@ -35,16 +35,16 @@ export default class StaticImageLayer extends CompositeLayer {
     const { loader } = this.props;
     this.setState({
       data: loader.getRaster({ z: 0 }),
-      fetchIndex: loader.fetchIndex
+      chunkIndex: loader.chunkIndex
     });
   }
 
   updateState() {
     const { loader } = this.props;
-    this.state.fetchIndex !== loader.fetchIndex &&
+    this.state.chunkIndex !== loader.chunkIndex &&
       this.setState({
         data: loader.getRaster({ z: 0 }),
-        fetchIndex: loader.fetchIndex
+        chunkIndex: loader.chunkIndex
       });
   }
 
@@ -52,7 +52,7 @@ export default class StaticImageLayer extends CompositeLayer {
     const shouldUpdateState = super.shouldUpdateState(args);
     return (
       shouldUpdateState ||
-      this.state.fetchIndex !== this.props.loader.fetchIndex
+      this.state.chunkIndex !== this.props.loader.chunkIndex
     );
   }
 
