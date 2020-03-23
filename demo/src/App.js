@@ -138,9 +138,10 @@ function App() {
           </div>
           ))
         : [];
+      break;
     }
     case 'static': {
-      loader && loader._data.meta
+      loader && loader._data && loader._data.meta
         ? (stackControllers = (
           <div>
             <Slider
@@ -159,10 +160,25 @@ function App() {
           </div>
           ))
         : [];
+      break;
     }
   }
 
-  const sliders = sources[sourceName].channelNames.map((channel, i) => {
+  let channelNames;
+  switch (sourceName) {
+    case 'static tiff': {
+      loader && loader.tiff
+        ? (channelNames = loader.chunkIndex.map(index => index.c))
+        : (channelNames = sources[sourceName].channelNames);
+      break;
+    }
+    default: {
+      channelNames = sources[sourceName].channelNames;
+      break;
+    }
+  }
+  console.log(channelNames);
+  const sliders = channelNames.map((channel, i) => {
     return (
       <div key={`container-${channel}`}>
         <p>{channel}</p>
