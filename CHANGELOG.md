@@ -4,7 +4,7 @@
 
 ### Added
 
-- Add background image for nicer loading and temp fix for minZoom issue
+- Add background image for nicer loading and temporary fix for minZoom issue
 - Add getRaster to TiffPyramidLoader
 
 ### Changed
