@@ -62,7 +62,7 @@ small non-pyramidal, i.e that are not tiled.
 
 ##### `loader` (Object)
 
-A `loader` is the primary object responsible for returning tile data as well as the required metadata for Viv. We allow loaders to be generic so viv can be used with various sources. A laoader must implement a `getTile` method and have the property `vivMetadata`. We provide the `createZarrPyramid` and `createTiffPyramid` to which are convenience functions for creating instances of valid loaders for these data types.
+A `loader` is the primary object responsible for returning tile data as well as the required metadata for Viv. We allow loaders to be generic so viv can be used with various sources. A loader must implement a `getTile` method as well as a `getRaster` method and have the property `vivMetadata`. We provide the `createZarrPyramid` and `createTiffPyramid` to which are convenience functions for creating instances of valid loaders for these data types. Those contained in this repo are experimental and subject to change with a stronger formalization being developed [here](https://github.com/hubmapconsortium/vitessce-image-loader)
 
 ###### `loader.getTile` (Function, VivViewerLayer) **POTENTIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
 
@@ -86,8 +86,7 @@ This function returns the entire image from the loader's source.
 
 Receives arguments:
 
-- `z` (optional) The z coordinate of the pyramid form which data should be fetched.
-- `level` (optional) The location along a third channel dimension along which data should be fetched.
+- `z` (optional) The z coordinate of the pyramid form which data should be fetched, if needed.
 
 ###### `loader.vivMetadata` (Object)
 

@@ -33,7 +33,8 @@ function scaleBounds({ imageWidth, imageHeight, translate, scale }) {
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
     const { loader } = this.props;
-    this.setState({ data: loader.getRaster({ z: 0 }) });
+    const { minZoom } = loader.vivMetadata;
+    this.setState({ data: loader.getRaster({ z: -minZoom - 1 }) });
   }
 
   updateState({ changeFlags }) {
@@ -44,7 +45,8 @@ export default class StaticImageLayer extends CompositeLayer {
     ) {
       // Only fetch new data to render if loader has changed
       const { loader } = this.props;
-      this.setState({ data: loader.getRaster({ z: 0 }) });
+      const { minZoom } = loader.vivMetadata;
+      this.setState({ data: loader.getRaster({ z: -minZoom - 1 }) });
     }
   }
 
@@ -61,7 +63,10 @@ export default class StaticImageLayer extends CompositeLayer {
       scale,
       domain
     } = this.props;
-    const { imageWidth, imageHeight, dtype } = loader.vivMetadata;
+    const { dtype } = loader.vivMetadata;
+    const imageHeight =
+      this.props.imageHeight || loader.vivMetadata.imageHeight;
+    const imageWidth = this.props.imageWidth || loader.vivMetadata.imageWidth;
     const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
       sliderValues,
       colorValues,

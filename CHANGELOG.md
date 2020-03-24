@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add background image for nicer loading and temp fix for minZoom issue
+
 ### Changed
 
 - Generalize colormaps to multichannel maps

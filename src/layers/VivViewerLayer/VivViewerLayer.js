@@ -1,6 +1,7 @@
 import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
 import VivViewerLayerBase from './VivViewerLayerBase';
+import StaticImageLayer from '../StaticImageLayer';
 import { isInTileBounds } from './utils';
 import { padColorsAndSliders } from '../utils';
 
@@ -17,7 +18,8 @@ export default class VivViewerLayer extends CompositeLayer {
       sliderValues,
       colorValues,
       channelIsOn,
-      domain
+      domain,
+      opacity
     } = this.props;
     const {
       imageWidth,
@@ -42,7 +44,8 @@ export default class VivViewerLayer extends CompositeLayer {
           imageWidth,
           imageHeight,
           minZoom,
-          tileSize
+          tileSize,
+          opacity
         })
       ) {
         return loader.getTile({
@@ -53,7 +56,7 @@ export default class VivViewerLayer extends CompositeLayer {
       }
       return null;
     };
-    const layers = new VivViewerLayerBase(this.props, {
+    const tiledLayer = new VivViewerLayerBase(this.props, {
       id: `VivViewerLayerBase--${loader.type}`,
       imageWidth,
       imageHeight,
@@ -63,6 +66,9 @@ export default class VivViewerLayer extends CompositeLayer {
       dtype,
       colorValues: paddedColorValues,
       sliderValues: paddedSliderValues,
+      // We want a no-overlap caching strategy with an opacity < 1 to prevent
+      // multiple rendered sublayers (some of which have been cached) from overlapping
+      refinementStrategy: opacity === 1 ? 'best-available' : 'no-overlap',
       // TileLayer checks `changeFlags.updateTriggersChanged.getTileData` to see if tile cache
       // needs to be re-created. We want to trigger this behavior if the loader changes.
       // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
@@ -70,6 +76,18 @@ export default class VivViewerLayer extends CompositeLayer {
         getTileData: [loader]
       }
     });
+    // This gives us a background image and also solves the current
+    // minZoom funny business.  We don't use it for the background if we have an opacity
+    // paramteter set to anything but 1, but we always use it for situations where
+    // we are zoomed out too far.
+    const baseLayer = new StaticImageLayer(this.props, {
+      id: `StaticImageLayer-${loader.type}`,
+      scale: 2 ** (-minZoom - 1),
+      imageHeight: tileSize,
+      imageWidth: tileSize,
+      visible: opacity === 1 || minZoom > this.context.viewport.zoom
+    });
+    const layers = [baseLayer, tiledLayer];
     return layers;
   }
 }
