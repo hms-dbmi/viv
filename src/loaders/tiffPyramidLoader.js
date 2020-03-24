@@ -46,6 +46,16 @@ export default class TiffPyramidLoader {
     return tiles;
   }
 
+  async getRaster({ z }) {
+    const rasterRequests = this.channelPyramids.map(async channelPyramid => {
+      const image = channelPyramid[z];
+      const raster = await image.readRasters();
+      return raster[0];
+    });
+    const rasters = await Promise.all(rasterRequests);
+    return rasters;
+  }
+
   async _getChannel({ image, x, y }) {
     const tile = await image.getTileOrStrip(x, y, 0, this.pool);
     const is8Bits = image.fileDirectory.BitsPerSample[0] === 8;

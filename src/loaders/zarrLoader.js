@@ -93,7 +93,13 @@ export default class ZarrLoader {
     const selection = [...this.chunkIndex];
     selection[this.xIndex] = null;
     selection[this.yIndex] = null;
+    if (this.isPyramid) {
+      selection[this.channelIndex] = null;
+    }
     const { data } = await source.getRaw(selection);
+    if (this.channelChunkSize > 1) {
+      return this._decodeChannels(data);
+    }
     return [data];
   }
 

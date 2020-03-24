@@ -4,6 +4,9 @@
 
 ### Added
 
+- Add background image for nicer loading and temporary fix for minZoom issue
+- Add getRaster to TiffPyramidLoader
+
 ### Changed
 
 - Generalize colormaps to multichannel maps
