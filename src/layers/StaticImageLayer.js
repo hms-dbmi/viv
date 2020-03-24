@@ -33,7 +33,8 @@ function scaleBounds({ imageWidth, imageHeight, translate, scale }) {
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
     const { loader } = this.props;
-    this.setState({ data: loader.getRaster() });
+    const { minZoom } = loader.vivMetadata;
+    this.setState({ data: loader.getRaster({ z: -minZoom - 1 }) });
   }
 
   renderLayers() {
