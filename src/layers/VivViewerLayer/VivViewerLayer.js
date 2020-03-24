@@ -4,7 +4,6 @@ import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
 import { isInTileBounds } from './utils';
 import { padColorsAndSliders } from '../utils';
-import { ZarrLoader } from '../../loaders';
 
 export default class VivViewerLayer extends CompositeLayer {
   // see https://github.com/uber/deck.gl/blob/master/docs/api-reference/layer.md#shouldupdatestate
@@ -67,7 +66,9 @@ export default class VivViewerLayer extends CompositeLayer {
       dtype,
       colorValues: paddedColorValues,
       sliderValues: paddedSliderValues,
-      refinementStrategy: opacity === 1 ? 'best-available' : 'never',
+      // We want a no-overlap caching strategy with an opacity < 1 to prevent
+      // multiple rendered sublayers (some of which have been cached) from overlapping
+      refinementStrategy: opacity === 1 ? 'best-available' : 'no-overlap',
       // TileLayer checks `changeFlags.updateTriggersChanged.getTileData` to see if tile cache
       // needs to be re-created. We want to trigger this behavior if the loader changes.
       // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
