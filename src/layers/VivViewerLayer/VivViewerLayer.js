@@ -76,8 +76,9 @@ export default class VivViewerLayer extends CompositeLayer {
       }
     });
     // This gives us a background image and also solves the current
-    // minZoom funny business.  We don't use it for backgruond if we have an opacity
-    // paramteter set to anything but 1, but we always use it for minZoom situations.
+    // minZoom funny business.  We don't use it for the background if we have an opacity
+    // paramteter set to anything but 1, but we always use it for situations where
+    // we are zoomed out too far.
     const baseLayer = new StaticImageLayer(this.props, {
       id: `StaticImageLayer-${loader.type}`,
       scale: 2 ** (-minZoom - 1),
