@@ -7,6 +7,7 @@
 ### Changed
 
 - Generalize colormaps to multichannel maps
+- Add flags to check for loader change and rerender.
 
 ## 0.1.3
 
