@@ -44,6 +44,22 @@ export default class OMEXML {
     return this.Pixels['@_Type'];
   }
 
+  get PhysicalSizeYUnit(){
+    return this.Pixels['@_PhysicalSizeYUnit']
+  }
+
+  get PhysicalSizeXUnit() {
+    return this.Pixels['@_PhysicalSizeXUnit']
+  }
+
+  get PhysicalSizeY() {
+    return this.Pixels['@_PhysicalSizeY']
+  }
+
+  get PhysicalSizeX() {
+    return this.Pixels['@_PhysicalSizeX']
+  }
+
   getChannelNames() {
     return this.Pixels.Channel.map(channel => channel['@_Name']);
   }
