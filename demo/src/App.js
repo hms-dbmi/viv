@@ -87,16 +87,30 @@ function App() {
   };
 
   const sliderSetZstack = value => {
-    loader.chunkIndex = loader.chunkIndex.map(index => {
-      const newIndex = { ...index };
-      newIndex.z = value;
-      return newIndex;
+    setLoader(prevLoader => {
+      const nextLoader = Object.assign(
+        Object.create(Object.getPrototypeOf(prevLoader)),
+        prevLoader
+      );
+      nextLoader.chunkIndex = nextLoader.chunkIndex.map(index => {
+        const newIndex = { ...index };
+        newIndex.z = value;
+        return newIndex;
+      });
+      return nextLoader;
     });
     setZStack(value);
   };
 
   const sliderSetMZIndex = value => {
-    loader.setChunkIndex('mz', value);
+    setLoader(prevLoader => {
+      const nextLoader = Object.assign(
+        Object.create(Object.getPrototypeOf(prevLoader)),
+        prevLoader
+      );
+      nextLoader.setChunkIndex('mz', value);
+      return nextLoader;
+    });
     setMZIndex(value);
   };
 
@@ -177,7 +191,6 @@ function App() {
       break;
     }
   }
-  console.log(channelNames);
   const sliders = channelNames.map((channel, i) => {
     return (
       <div key={`container-${channel}`}>
