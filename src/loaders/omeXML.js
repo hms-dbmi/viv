@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 import parser from 'fast-xml-parser';
 
 export default class OMEXML {

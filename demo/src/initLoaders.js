@@ -3,7 +3,7 @@ import {
   createTiffPyramid,
   createZarrPyramid,
   ZarrLoader,
-  createTiffLoader
+  createOMETiffLoader
 } from '../../src';
 
 export async function initPyramidLoader(type, { channelNames, url, minZoom }) {
@@ -42,7 +42,7 @@ export async function initPyramidLoader(type, { channelNames, url, minZoom }) {
       return loader;
     }
     case 'static tiff': {
-      const loader = await createTiffLoader({ url });
+      const loader = await createOMETiffLoader({ url });
       loader.chunkIndex = [
         { z: 0, t: 0, c: loader.channelNames[4] },
         { z: 0, t: 0, c: loader.channelNames[5] },

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo } from 'react';
 import { Button, ButtonGroup, Slider, Checkbox } from '@material-ui/core';
 import { VivViewer } from '../../src';
-import { initPyramidLoader, initTiffLoader } from './initLoaders';
+import { initPyramidLoader } from './initLoaders';
 import sources from './source-info';
 import './App.css';
 
@@ -131,6 +131,7 @@ function App() {
     );
   });
   let stackControllers;
+  /* eslint-disable no-unused-expressions */
   switch (sourceName) {
     case 'static tiff': {
       loader && loader.SizeT && loader.SizeZ
@@ -176,9 +177,14 @@ function App() {
         : [];
       break;
     }
+    default:{
+      stackControllers = []
+    }
   }
+/* eslint-disable no-unused-expressions */
 
   let channelNames;
+/* eslint-disable no-unused-expressions */
   switch (sourceName) {
     case 'static tiff': {
       loader && loader.tiff
@@ -191,6 +197,7 @@ function App() {
       break;
     }
   }
+/* eslint-disable no-unused-expressions */
   const sliders = channelNames.map((channel, i) => {
     return (
       <div key={`container-${channel}`}>

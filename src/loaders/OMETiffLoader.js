@@ -1,17 +1,10 @@
 import OMEXML from './omeXML';
-import { range } from '../layers/VivViewerLayer/utils';
 import { MAX_SLIDERS_AND_CHANNELS } from '../layers/constants';
 
-export default class TiffLoader {
+export default class OMETiffLoader {
   constructor(tiff, pool) {
     this.pool = pool;
     this.tiff = tiff;
-    const options = {
-      ignoreAttributes: false,
-      attributeNamePrefix: '@_',
-      trimValues: true,
-      allowBooleanAttributes: true
-    };
     // get first image's description, which contains OMEXML
     const { ImageDescription } = tiff.fileDirectories[0][0];
     this.OMEXML = new OMEXML(ImageDescription);
@@ -28,16 +21,16 @@ export default class TiffLoader {
     this.isPyramid = !!this.minZoom;
     const type = this.OMEXML.Type;
     // this.tileSize = firstImage.getTileWidth();
-    if (type == 'uint8') {
+    if (type === 'uint8') {
       this.dtype = '<u1';
     }
-    if (type == 'uint16') {
+    if (type === 'uint16') {
       this.dtype = '<u2';
     }
-    if (type == 'uint32') {
+    if (type === 'uint32') {
       this.dtype = '<u4';
     }
-    if (type == 'float32') {
+    if (type === 'float32') {
       this.dtype = '<f4';
     }
   }
@@ -96,13 +89,16 @@ export default class TiffLoader {
       case 'XYTZC': {
         return cIndex * this.SizeT * this.SizeZ + z * this.SizeT + t;
       }
+      default:{
+        throw new Error('Dimension order is required for OMETIFF')
+      }
     }
   }
 
   async getTile({ x, y, z }) {
     const tileRequests = this.chunkIndex.map(async index => {
       const imageIndex = this._getIFDIndex(index);
-      const image = await this.tiff.getImage(imageIndex);
+      const image = await this.tiff.getImage(imageIndex + z);
       return this._getChannel({ image, x, y });
     });
     const tiles = await Promise.all(tileRequests);
