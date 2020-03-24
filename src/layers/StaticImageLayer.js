@@ -37,6 +37,19 @@ export default class StaticImageLayer extends CompositeLayer {
     this.setState({ data: loader.getRaster({ z: -minZoom - 1 }) });
   }
 
+  updateState({ changeFlags }) {
+    const { propsChanged } = changeFlags;
+    if (
+      typeof propsChanged === 'string' &&
+      propsChanged.includes('props.loader')
+    ) {
+      // Only fetch new data to render if loader has changed
+      const { loader } = this.props;
+      const { minZoom } = loader.vivMetadata;
+      this.setState({ data: loader.getRaster({ z: -minZoom - 1 }) });
+    }
+  }
+
   renderLayers() {
     const {
       loader,
@@ -70,12 +83,7 @@ export default class StaticImageLayer extends CompositeLayer {
     const { data } = this.state;
     return new XRLayer({
       channelData: data,
-      data: null,
       bounds,
-      // Going forward, we should have more intricate indexing so we can
-      // have multiple data slices loaded and
-      // simply change the index to get different views with colormaps, potentially.
-      // https://github.com/hubmapconsortium/vitessce-image-viewer/issues/109
       sliderValues: paddedSliderValues,
       colorValues: paddedColorValues,
       staticImageHeight: imageHeight,
