@@ -9,8 +9,9 @@
 
 ### Changed
 
-- Generalize colormaps to multichannel maps
+- Generalize colormaps to multichannel maps.
 - Add flags to check for loader change and rerender.
+- Remove minZoom from loaders and make loaders provide `onTileError`.
 
 ## 0.1.3
 
