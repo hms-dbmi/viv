@@ -17,7 +17,8 @@ const defaultProps = {
     type: 'object',
     value: {
       getRaster: () => [],
-      vivMetadata: { imageHeight: 0, imageWidth: 0, dtype: '<u2' }
+      getRasterSize: () => ({ imageWidth: 0, imageHeight: 0 }),
+      dtype: '<u2'
     },
     compare: true
   },

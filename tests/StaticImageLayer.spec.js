@@ -31,7 +31,8 @@ test('StaticImageLayer', t => {
           new Uint32Array([0, 2, 1, 2]),
           new Uint32Array([1, 2, 1, 2])
         ],
-        vivMetadata: { imageHeight: 2, imageWidth: 2, dtype: '<u4' }
+        dtype: '<u4',
+        getRasterSize: () => ({ imageHeight: 2, imageWidth: 2 })
       }
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
