@@ -18,7 +18,8 @@ export default class VivViewerLayer extends CompositeLayer {
       colorValues,
       channelIsOn,
       domain,
-      opacity
+      opacity,
+      onTileError
     } = this.props;
     const { tileSize, numLevels, dtype } = loader;
     const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
@@ -52,7 +53,7 @@ export default class VivViewerLayer extends CompositeLayer {
       updateTriggers: {
         getTileData: [loader]
       },
-      onTileError: loader.onTileError
+      onTileError: onTileError || loader.onTileError
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity

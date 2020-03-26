@@ -5,11 +5,14 @@ export default class ZarrLoader {
     let base;
     if (Array.isArray(data)) {
       this.isPyramid = true;
+      this.numLevels = data.length;
       [base] = data;
     } else {
       this.isPyramid = false;
       base = data;
     }
+    const { dtype } = base;
+    this.dtype = dtype;
     this._data = data;
     this.scale = scale;
     this.chunkIndex = Array(base.shape.length).fill(0);
@@ -25,27 +28,12 @@ export default class ZarrLoader {
     this.channelChunkSize = base.chunks[this.channelIndex];
     this.dimensions = dimensions;
     this.dimNames = Object.keys(dimensions);
+    this.tileSize = base.chunks[this.xIndex];
     this.type = 'zarr';
   }
 
   get _base() {
     return this.isPyramid ? this._data[0] : this._data;
-  }
-
-  get vivMetadata() {
-    const { dtype } = this._base;
-    const imageHeight = this._base.shape[this.yIndex];
-    const imageWidth = this._base.shape[this.xIndex];
-    const tileSize = this._base.chunks[this.xIndex];
-    const minZoom = this.isPyramid ? -this._data.length : 0;
-    return {
-      imageWidth,
-      imageHeight,
-      tileSize,
-      minZoom,
-      dtype,
-      scale: this.scale
-    };
   }
 
   setChunkIndex(dimName, index) {
@@ -101,6 +89,24 @@ export default class ZarrLoader {
       return this._decodeChannels(data);
     }
     return [data];
+  }
+
+  getRasterSize({ z }) {
+    const source = z ? this._data[z] : this._base;
+    const imageHeight = source.shape[this.yIndex];
+    const imageWidth = source.shape[this.xIndex];
+    return { imageHeight, imageWidth };
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  onTileError(err) {
+    // Handle zarr-specific tile Errors
+    // Will check with `err instanceof BoundCheckError` when merged
+    // https://github.com/gzuidhof/zarr.js/issues/47
+    if (!err.message.includes('RangeError')) {
+      // Rethrow error if something other than tile being requested is out of bounds.
+      throw err;
+    }
   }
 
   _decodeChannels(chunkData) {

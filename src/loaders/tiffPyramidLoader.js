@@ -5,15 +5,9 @@ export default class TiffPyramidLoader {
     this.type = 'tiff';
     // hardcoded for now
     this.isPyramid = true;
-  }
 
-  get vivMetadata() {
-    // Get other properties for viewer
-    const firstFullImage = this.channelPyramids[0][0].fileDirectory;
-    const minZoom = -1 * this.channelPyramids[0].length;
-    const imageWidth = firstFullImage.ImageWidth;
-    const imageHeight = firstFullImage.ImageLength;
-    const tileSize = firstFullImage.TileWidth;
+    this.numLevels = channelPyramids[0].length;
+    const firstFullImage = channelPyramids[0][0].fileDirectory;
     const bitsPerSample = firstFullImage.BitsPerSample;
     let dtype;
     if (bitsPerSample instanceof Uint8Array) {
@@ -28,16 +22,22 @@ export default class TiffPyramidLoader {
     if (bitsPerSample instanceof Float32Array) {
       dtype = '<f4';
     }
-    return {
-      minZoom,
-      imageWidth,
-      imageHeight,
-      tileSize,
-      dtype
-    };
+    this.dtype = dtype;
+    this.tileSize = firstFullImage.TileWidth;
   }
 
   async getTile({ x, y, z }) {
+    /*
+     * Geotiff's API wraps indicies while fetch fetching tiles, meaning that if
+     * x or y tile coordinates are beyond the width/height of the image,
+     * the tiles to the left or top are fetched. This makes sense for the
+     * geospatial case (since a globe wraps) but not for our planar images.
+     *
+     * Here we check if a tile is within bounds before requesting tile data.
+     */
+
+    if (!this._tileInBounds({ x, y, z })) return null;
+
     const tileRequests = this.channelPyramids.map(channelPyramid => {
       const image = channelPyramid[z];
       return this._getChannel({ image, x, y });
@@ -56,6 +56,13 @@ export default class TiffPyramidLoader {
     return rasters;
   }
 
+  getRasterSize({ z }) {
+    const image = this.channelPyramids[0][z];
+    const imageWidth = image.getWidth();
+    const imageHeight = image.getHeight();
+    return { imageWidth, imageHeight };
+  }
+
   async _getChannel({ image, x, y }) {
     const tile = await image.getTileOrStrip(x, y, 0, this.pool);
     const is8Bits = image.fileDirectory.BitsPerSample[0] === 8;
@@ -66,5 +73,25 @@ export default class TiffPyramidLoader {
       (is16Bits && new Uint16Array(tile.data)) ||
       (is32Bits && new Uint32Array(tile.data));
     return data;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  onTileError(err) {
+    // Handle geotiff-specific tile errors
+    console.error(err);
+  }
+
+  _tileInBounds({ x, y, z }) {
+    const firstFullImage = this.channelPyramids[0][0];
+    const minZoom = -1 * this.channelPyramids[0].length;
+    const width = firstFullImage.getWidth();
+    const height = firstFullImage.getHeight();
+    const tileSize = firstFullImage.getTileWidth();
+
+    const xInBounds = x < Math.ceil(width / (tileSize * 2 ** z)) && x >= 0;
+    const yInBounds = y < Math.ceil(height / (tileSize * 2 ** z)) && y >= 0;
+    const zInBounds = z >= 0 && z < -minZoom;
+
+    return xInBounds && yInBounds && zInBounds;
   }
 }
