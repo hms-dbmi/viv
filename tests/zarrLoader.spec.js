@@ -21,21 +21,14 @@ test('Test zarr non-rgb image loader', async t => {
     x: null
   };
   const loader = new ZarrLoader(z, isRgb, scale, dimensions);
-  // eslint-disable-next-line prefer-destructuring
-  const vivMetadata = loader.vivMetadata;
-  t.deepEqual(
-    Object.keys(vivMetadata).sort(),
-    ['dtype', 'imageHeight', 'imageWidth', 'minZoom', 'scale', 'tileSize'],
-    'Ensure viv-specific keys are returned by object.'
-  );
+  const { dtype, numLevels, tileSize } = loader;
+  t.equal(dtype, '<i4', 'Correct dtype');
+  t.equal(numLevels, 1, 'Correct number of levels');
+  t.equal(tileSize, 100, 'Correct tile size');
 
   let [tile] = await loader.getTile({ x: 0, y: 0 });
   t.equal(tile[10], 42, 'Fetch first tile and make sure correct value.');
-  t.equal(
-    tile.length,
-    vivMetadata.tileSize * vivMetadata.tileSize,
-    'Ensure correct tile sizes.'
-  );
+  t.equal(tile.length, tileSize * tileSize, 'Ensure correct tile sizes.');
 
   loader.setChunkIndex('channel', 1);
   [tile] = await loader.getTile({ x: 0, y: 0 });

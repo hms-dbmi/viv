@@ -9,6 +9,7 @@ export default class ZarrLoader {
       [base] = data;
     } else {
       this.isPyramid = false;
+      this.numLevels = 1;
       base = data;
     }
     const { dtype } = base;

@@ -1,3 +1,5 @@
+import { isInTileBounds } from './utils';
+
 export default class TiffPyramidLoader {
   constructor(channelPyramids, pool) {
     this.channelPyramids = channelPyramids;
@@ -83,15 +85,17 @@ export default class TiffPyramidLoader {
 
   _tileInBounds({ x, y, z }) {
     const firstFullImage = this.channelPyramids[0][0];
-    const minZoom = -1 * this.channelPyramids[0].length;
     const width = firstFullImage.getWidth();
     const height = firstFullImage.getHeight();
-    const tileSize = firstFullImage.getTileWidth();
-
-    const xInBounds = x < Math.ceil(width / (tileSize * 2 ** z)) && x >= 0;
-    const yInBounds = y < Math.ceil(height / (tileSize * 2 ** z)) && y >= 0;
-    const zInBounds = z >= 0 && z < -minZoom;
-
-    return xInBounds && yInBounds && zInBounds;
+    const { tileSize, numLevels } = this;
+    return isInTileBounds({
+      x,
+      y,
+      z,
+      width,
+      height,
+      tileSize,
+      numLevels
+    });
   }
 }
