@@ -1,7 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
-import { range, isInTileBounds } from '../src/layers/VivViewerLayer/utils';
+import { range } from '../src/layers/VivViewerLayer/utils';
 import { padWithDefault, padColorsAndSliders } from '../src/layers/utils';
+import { isInTileBounds } from '../src/loaders/utils';
 
 test('range test', t => {
   const expected = [0, 1, 2];
@@ -151,10 +152,10 @@ test('isInTileBounds test', t => {
       x: 0,
       y: 0,
       z: 0,
-      imageWidth: 10,
-      imageHeight: 10,
+      width: 10,
+      height: 10,
       tileSize: 2,
-      minZoom: -5
+      numLevels: 5
     }),
     'Tile indices are in bounds given image dimensions'
   );
@@ -163,10 +164,10 @@ test('isInTileBounds test', t => {
       x: 0,
       y: 0,
       z: 6,
-      imageWidth: 10,
-      imageHeight: 10,
+      width: 10,
+      height: 10,
       tileSize: 2,
-      minZoom: -5
+      numLevels: 5
     }),
     'Tile indices are out of bounds because zoom level is less than minZoom'
   );
@@ -175,10 +176,10 @@ test('isInTileBounds test', t => {
       x: 5,
       y: 5,
       z: 0,
-      imageWidth: 10,
-      imageHeight: 10,
+      width: 10,
+      height: 10,
       tileSize: 2,
-      minZoom: -5
+      numLevels: 5
     }),
     'Tile indices are out of bounds because tile indices are too big for image dimensions.'
   );
