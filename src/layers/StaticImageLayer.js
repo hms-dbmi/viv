@@ -20,7 +20,8 @@ const defaultProps = {
       vivMetadata: { imageHeight: 0, imageWidth: 0, dtype: '<u2' }
     },
     compare: true
-  }
+  },
+  z: { type: 'number', value: 0, compare: true }
 };
 
 function scaleBounds({ imageWidth, imageHeight, translate, scale }) {
@@ -32,9 +33,11 @@ function scaleBounds({ imageWidth, imageHeight, translate, scale }) {
 
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
-    const { loader } = this.props;
-    const { minZoom } = loader.vivMetadata;
-    this.setState({ data: loader.getRaster({ z: -minZoom - 1 }) });
+    const { loader, z } = this.props;
+    this.setState({
+      data: loader.getRaster({ z }),
+      z
+    });
   }
 
   updateState({ changeFlags }) {
@@ -44,9 +47,8 @@ export default class StaticImageLayer extends CompositeLayer {
       propsChanged.includes('props.loader')
     ) {
       // Only fetch new data to render if loader has changed
-      const { loader } = this.props;
-      const { minZoom } = loader.vivMetadata;
-      this.setState({ data: loader.getRaster({ z: -minZoom - 1 }) });
+      const { loader, z } = this.props;
+      this.setState({ data: loader.getRaster({ z }) });
     }
   }
 
@@ -61,12 +63,11 @@ export default class StaticImageLayer extends CompositeLayer {
       channelIsOn,
       translate,
       scale,
-      domain
+      domain,
+      z
     } = this.props;
-    const { dtype } = loader.vivMetadata;
-    const imageHeight =
-      this.props.imageHeight || loader.vivMetadata.imageHeight;
-    const imageWidth = this.props.imageWidth || loader.vivMetadata.imageWidth;
+
+    const { dtype } = loader;
     const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
       sliderValues,
       colorValues,
@@ -74,20 +75,22 @@ export default class StaticImageLayer extends CompositeLayer {
       domain,
       dtype
     });
+
+    const { data } = this.state;
+    const { imageWidth, imageHeight } = loader.getRasterSize({ z });
     const bounds = scaleBounds({
       imageWidth,
       imageHeight,
       translate,
       scale
     });
-    const { data } = this.state;
     return new XRLayer({
       channelData: data,
       bounds,
       sliderValues: paddedSliderValues,
       colorValues: paddedColorValues,
-      staticImageHeight: imageHeight,
-      staticImageWidth: imageWidth,
+      height: imageHeight,
+      width: imageWidth,
       id: `XR-Static-Layer-${0}-${imageHeight}-${imageWidth}-${0}`,
       pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,

@@ -2,7 +2,6 @@ import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
-import { isInTileBounds } from './utils';
 import { padColorsAndSliders } from '../utils';
 
 export default class VivViewerLayer extends CompositeLayer {
@@ -21,13 +20,7 @@ export default class VivViewerLayer extends CompositeLayer {
       domain,
       opacity
     } = this.props;
-    const {
-      imageWidth,
-      imageHeight,
-      tileSize,
-      minZoom,
-      dtype
-    } = loader.vivMetadata;
+    const { tileSize, numLevels, dtype } = loader;
     const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
       sliderValues,
       colorValues,
@@ -36,34 +29,18 @@ export default class VivViewerLayer extends CompositeLayer {
       dtype
     });
     const getTileData = ({ x, y, z }) => {
-      if (
-        isInTileBounds({
-          x,
-          y,
-          z: -z,
-          imageWidth,
-          imageHeight,
-          minZoom,
-          tileSize,
-          opacity
-        })
-      ) {
-        return loader.getTile({
-          x,
-          y,
-          z: -z
-        });
-      }
-      return null;
+      return loader.getTile({
+        x,
+        y,
+        z: -z
+      });
     };
     const tiledLayer = new VivViewerLayerBase(this.props, {
       id: `VivViewerLayerBase--${loader.type}`,
-      imageWidth,
-      imageHeight,
       tileSize,
-      minZoom,
       getTileData,
       dtype,
+      minZoom: -(numLevels - 1),
       colorValues: paddedColorValues,
       sliderValues: paddedSliderValues,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
@@ -74,7 +51,8 @@ export default class VivViewerLayer extends CompositeLayer {
       // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
       updateTriggers: {
         getTileData: [loader]
-      }
+      },
+      onTileError: loader.onTileError
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity
@@ -82,10 +60,9 @@ export default class VivViewerLayer extends CompositeLayer {
     // we are zoomed out too far.
     const baseLayer = new StaticImageLayer(this.props, {
       id: `StaticImageLayer-${loader.type}`,
-      scale: 2 ** (-minZoom - 1),
-      imageHeight: tileSize,
-      imageWidth: tileSize,
-      visible: opacity === 1 || minZoom > this.context.viewport.zoom
+      scale: 2 ** (numLevels - 1),
+      visible: opacity === 1 || -numLevels > this.context.viewport.zoom,
+      z: numLevels - 1
     });
     const layers = [baseLayer, tiledLayer];
     return layers;
