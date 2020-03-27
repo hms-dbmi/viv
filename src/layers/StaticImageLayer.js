@@ -70,7 +70,10 @@ export default class StaticImageLayer extends CompositeLayer {
     } = this.props;
 
     const { dtype } = loader;
-    const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
+    const {
+      paddedSliderValues,
+      paddedColorValues
+    } = padColorsAndSliders({
       sliderValues,
       colorValues,
       channelIsOn,
@@ -79,7 +82,9 @@ export default class StaticImageLayer extends CompositeLayer {
     });
 
     const { data } = this.state;
-    const { imageWidth, imageHeight } = loader.getRasterSize({ z });
+    const { imageWidth, imageHeight } = loader.getRasterSize({
+      z
+    });
     const bounds = scaleBounds({
       imageWidth,
       imageHeight,
