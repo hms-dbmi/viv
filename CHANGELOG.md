@@ -12,6 +12,7 @@
 - Generalize colormaps to multichannel maps.
 - Add flags to check for loader change and rerender.
 - Remove minZoom from loaders and make loaders provide `onTileError`.
+- Wrap `channelData` in `StaticImageLayer` in Promise.
 
 ## 0.1.3
 
