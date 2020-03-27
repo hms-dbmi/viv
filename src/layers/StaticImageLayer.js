@@ -84,10 +84,10 @@ export default class StaticImageLayer extends CompositeLayer {
       scale
     });
 
-    if (!(data && width && height)) return null;
+    if (!(width && height)) return null;
 
     return new XRLayer({
-      channelData: data,
+      channelData: Promise.resolve(data),
       bounds,
       sliderValues: paddedSliderValues,
       colorValues: paddedColorValues,
