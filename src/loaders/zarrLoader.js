@@ -79,6 +79,8 @@ export default class ZarrLoader {
 
   async getRaster({ z }) {
     const source = this.isPyramid ? this._data[z] : this._data;
+    const height = source.shape[this.yIndex];
+    const width = source.shape[this.xIndex];
     const selection = [...this.chunkIndex];
     selection[this.xIndex] = null;
     selection[this.yIndex] = null;
@@ -87,16 +89,9 @@ export default class ZarrLoader {
     }
     const { data } = await source.getRaw(selection);
     if (this.channelChunkSize > 1) {
-      return this._decodeChannels(data);
+      return { data: this._decodeChannels(data), width, height };
     }
-    return [data];
-  }
-
-  getRasterSize({ z }) {
-    const source = z ? this._data[z] : this._base;
-    const imageHeight = source.shape[this.yIndex];
-    const imageWidth = source.shape[this.xIndex];
-    return { imageHeight, imageWidth };
+    return { data: [data], width, height };
   }
 
   // eslint-disable-next-line class-methods-use-this

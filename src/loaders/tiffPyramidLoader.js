@@ -49,20 +49,15 @@ export default class TiffPyramidLoader {
   }
 
   async getRaster({ z }) {
+    const width = this.channelPyramids[0][z].getWidth();
+    const height = this.channelPyramids[0][z].getHeight();
     const rasterRequests = this.channelPyramids.map(async channelPyramid => {
       const image = channelPyramid[z];
       const raster = await image.readRasters();
       return raster[0];
     });
-    const rasters = await Promise.all(rasterRequests);
-    return rasters;
-  }
-
-  getRasterSize({ z }) {
-    const image = this.channelPyramids[0][z];
-    const imageWidth = image.getWidth();
-    const imageHeight = image.getHeight();
-    return { imageWidth, imageHeight };
+    const data = await Promise.all(rasterRequests);
+    return { data, width, height };
   }
 
   async _getChannel({ image, x, y }) {
