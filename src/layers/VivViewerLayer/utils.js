@@ -17,7 +17,8 @@ export function renderSubLayers(props) {
     opacity,
     data,
     colormap,
-    dtype
+    dtype,
+    id
   } = props;
 
   // Only render in positive coorinate system
@@ -26,7 +27,7 @@ export function renderSubLayers(props) {
   }
 
   return new XRLayer({
-    id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}`,
+    id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}-${id}`,
     bounds: [left, bottom, right, top],
     width: tileSize,
     height: tileSize,

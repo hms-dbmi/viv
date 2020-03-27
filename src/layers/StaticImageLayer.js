@@ -65,7 +65,8 @@ export default class StaticImageLayer extends CompositeLayer {
       translate,
       scale,
       domain,
-      z
+      z,
+      id
     } = this.props;
 
     const { dtype } = loader;
@@ -92,7 +93,7 @@ export default class StaticImageLayer extends CompositeLayer {
       colorValues: paddedColorValues,
       height: imageHeight,
       width: imageWidth,
-      id: `XR-Static-Layer-${0}-${imageHeight}-${imageWidth}-${0}`,
+      id: `XR-Static-Layer-${0}-${imageHeight}-${imageWidth}-${0}-${z}-${id}`,
       pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       opacity,

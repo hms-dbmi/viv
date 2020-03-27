@@ -19,10 +19,14 @@ export default class VivViewerLayer extends CompositeLayer {
       channelIsOn,
       domain,
       opacity,
-      onTileError
+      onTileError,
+      id
     } = this.props;
     const { tileSize, numLevels, dtype } = loader;
-    const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
+    const {
+      paddedSliderValues,
+      paddedColorValues
+    } = padColorsAndSliders({
       sliderValues,
       colorValues,
       channelIsOn,
@@ -37,7 +41,7 @@ export default class VivViewerLayer extends CompositeLayer {
       });
     };
     const tiledLayer = new VivViewerLayerBase(this.props, {
-      id: `VivViewerLayerBase--${loader.type}`,
+      id: `Tiled-Image-${id}`,
       tileSize,
       getTileData,
       dtype,
@@ -46,7 +50,8 @@ export default class VivViewerLayer extends CompositeLayer {
       sliderValues: paddedSliderValues,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
       // multiple rendered sublayers (some of which have been cached) from overlapping
-      refinementStrategy: opacity === 1 ? 'best-available' : 'no-overlap',
+      refinementStrategy:
+        opacity === 1 ? 'best-available' : 'no-overlap',
       // TileLayer checks `changeFlags.updateTriggersChanged.getTileData` to see if tile cache
       // needs to be re-created. We want to trigger this behavior if the loader changes.
       // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
@@ -60,9 +65,10 @@ export default class VivViewerLayer extends CompositeLayer {
     // paramteter set to anything but 1, but we always use it for situations where
     // we are zoomed out too far.
     const baseLayer = new StaticImageLayer(this.props, {
-      id: `StaticImageLayer-${loader.type}`,
+      id: `Background-Image-${id}`,
       scale: 2 ** (numLevels - 1),
-      visible: opacity === 1 || -numLevels > this.context.viewport.zoom,
+      visible:
+        opacity === 1 || -numLevels > this.context.viewport.zoom,
       z: numLevels - 1
     });
     const layers = [baseLayer, tiledLayer];
