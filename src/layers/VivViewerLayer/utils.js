@@ -25,7 +25,6 @@ export function renderSubLayers(props) {
   if ([left, top, right, bottom].some(v => v < 0)) {
     return null;
   }
-
   return new XRLayer({
     id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}-${id}`,
     bounds: [left, bottom, right, top],

@@ -5,11 +5,6 @@ import StaticImageLayer from '../StaticImageLayer';
 import { padColorsAndSliders } from '../utils';
 
 export default class VivViewerLayer extends CompositeLayer {
-  // see https://github.com/uber/deck.gl/blob/master/docs/api-reference/layer.md#shouldupdatestate
-  // eslint-disable-next-line class-methods-use-this
-  shouldUpdateState({ changeFlags }) {
-    return changeFlags.somethingChanged;
-  }
 
   renderLayers() {
     const {
@@ -58,7 +53,7 @@ export default class VivViewerLayer extends CompositeLayer {
       updateTriggers: {
         getTileData: [loader]
       },
-      onTileError: onTileError || loader.onTileError
+      onTileError: onTileError || loader.onTileError,
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity
@@ -68,7 +63,7 @@ export default class VivViewerLayer extends CompositeLayer {
       id: `Background-Image-${id}`,
       scale: 2 ** (numLevels - 1),
       visible:
-        opacity === 1 || -numLevels > this.context.viewport.zoom,
+        (opacity === 1 || -numLevels > this.context.viewport.zoom),      
       z: numLevels - 1
     });
     const layers = [baseLayer, tiledLayer];

@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { OrthographicView } from '@deck.gl/core';
+import {PolygonLayer} from '@deck.gl/layers'
 import { VivViewerLayer, StaticImageLayer } from './layers';
 
 export default class VivViewer extends PureComponent {
@@ -65,6 +66,7 @@ _renderLayers() {
     ? [
         new VivViewerLayer({
           id: `${loader.type}-detail`,
+          viewportId: 'detail',
           ...this.props
         }),
         new StaticImageLayer(this.props, {

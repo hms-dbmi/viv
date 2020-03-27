@@ -15,10 +15,27 @@ const defaultProps = {
   opacity: { type: 'number', value: 1, compare: true },
   colormap: { type: 'string', value: '', compare: true },
   dtype: { type: 'string', value: '<u2', compare: true },
-  domain: { type: 'array', value: [], compare: true }
+  domain: { type: 'array', value: [], compare: true },
+  viewportId: { type: 'string', value: '', compare: true }
 };
 
-export default class VivViewerLayerBase extends TileLayer {}
+export default class VivViewerLayerBase extends TileLayer {
+
+  // These functions allow us to controls which viewport gets to update the Tileset2D.
+  // This is a uniquely TileLayer issue since it updates based on viewport updates thanks
+  // to it's ability to handle zoom-pan loading.  Essentially, with a picture-in-picture,
+  // this prevents it from detecting the update of some other viewport that is unwanted.
+  shouldUpdateState({changeFlags}) {
+    return (
+      this.props.viewportId && changeFlags.somethingChanged &&
+      this.context.viewport.id === this.props.viewportId
+    );
+  }
+
+  _updateTileset() {
+    this.props.viewportId && this.context.viewport.id === this.props.viewportId && super._updateTileset();
+  }
+}
 
 VivViewerLayerBase.layerName = 'VivViewerLayerBase';
 VivViewerLayerBase.defaultProps = defaultProps;
