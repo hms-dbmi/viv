@@ -16,25 +16,27 @@ const defaultProps = {
   loader: {
     type: 'object',
     value: {
-      getRaster: () => [],
-      vivMetadata: { imageHeight: 0, imageWidth: 0, dtype: '<u2' }
+      getRaster: async () => ({ data: [], height: 0, width: 0 }),
+      dtype: '<u2'
     },
     compare: true
-  }
+  },
+  z: { type: 'number', value: 0, compare: true }
 };
 
-function scaleBounds({ imageWidth, imageHeight, translate, scale }) {
+function scaleBounds({ width, height, translate, scale }) {
   const [left, top] = translate;
-  const right = imageWidth * scale + left;
-  const bottom = imageHeight * scale + top;
+  const right = width * scale + left;
+  const bottom = height * scale + top;
   return [left, bottom, right, top];
 }
 
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
-    const { loader } = this.props;
-    const { minZoom } = loader.vivMetadata;
-    this.setState({ data: loader.getRaster({ z: -minZoom - 1 }) });
+    const { loader, z } = this.props;
+    loader.getRaster({ z }).then(({ data, width, height }) => {
+      this.setState({ data, width, height });
+    });
   }
 
   updateState({ changeFlags }) {
@@ -44,9 +46,10 @@ export default class StaticImageLayer extends CompositeLayer {
       propsChanged.includes('props.loader')
     ) {
       // Only fetch new data to render if loader has changed
-      const { loader } = this.props;
-      const { minZoom } = loader.vivMetadata;
-      this.setState({ data: loader.getRaster({ z: -minZoom - 1 }) });
+      const { loader, z } = this.props;
+      loader.getRaster({ z }).then(({ data, width, height }) => {
+        this.setState({ data, width, height });
+      });
     }
   }
 
@@ -63,10 +66,8 @@ export default class StaticImageLayer extends CompositeLayer {
       scale,
       domain
     } = this.props;
-    const { dtype } = loader.vivMetadata;
-    const imageHeight =
-      this.props.imageHeight || loader.vivMetadata.imageHeight;
-    const imageWidth = this.props.imageWidth || loader.vivMetadata.imageWidth;
+
+    const { dtype } = loader;
     const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
       sliderValues,
       colorValues,
@@ -74,23 +75,27 @@ export default class StaticImageLayer extends CompositeLayer {
       domain,
       dtype
     });
+
+    const { data, width, height } = this.state;
     const bounds = scaleBounds({
-      imageWidth,
-      imageHeight,
+      width,
+      height,
       translate,
       scale
     });
-    const { data } = this.state;
+
+    if (!(data && width && height)) return null;
+
     return new XRLayer({
       channelData: data,
       bounds,
       sliderValues: paddedSliderValues,
       colorValues: paddedColorValues,
-      staticImageHeight: imageHeight,
-      staticImageWidth: imageWidth,
-      id: `XR-Static-Layer-${0}-${imageHeight}-${imageWidth}-${0}`,
+      id: `XR-Static-Layer-${0}-${width}-${height}-${0}`,
       pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+      width,
+      height,
       opacity,
       visible,
       dtype,
