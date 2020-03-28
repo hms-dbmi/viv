@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { OrthographicView } from '@deck.gl/core';
-import {PolygonLayer} from '@deck.gl/layers'
 import { VivViewerLayer, StaticImageLayer } from './layers';
+import OverviewLayer from './layers/OverviewLayer';
 
 export default class VivViewer extends PureComponent {
 constructor(props) {
@@ -18,7 +18,7 @@ constructor(props) {
       overview: {
         ...initialViewState,
         target: [imageWidth / 2, imageHeight / 2, 0],
-        zoom: -1.1 * (numLevels - 1),
+        zoom: -(numLevels - 1),
         id: 'overview'
       }
     }
@@ -49,19 +49,30 @@ _onViewStateChange({ viewId, viewState }) {
     newViewState.overview = {
       ...viewState,
       target: [imageWidth / 2, imageHeight / 2, 0],
-      zoom: -1.1 * (numLevels - 1)
+      zoom: -(numLevels - 1)
     };
     this.setState({ viewState: newViewState });
   }
 }
 
 _renderLayers() {
-  const { loader } = this.props;
+  const { loader, viewHeight, viewWidth } = this.props;
+  const { viewState } = this.state
   // For now this is hardcoded but in general we should look at
   // a proper structure for taking lists of configurations so that
   // we can handle multiple overlapping layers.
   // https://github.com/hubmapconsortium/vitessce-image-viewer/issues/107
-  const { numLevels } = loader;
+  const viewport = new OrthographicView().makeViewport({
+    viewState: viewState.detail,
+    height: viewHeight,
+    width: viewWidth
+  });
+  const boundingBox = [
+    viewport.unproject([0, 0]),
+    viewport.unproject([viewport.width, 0]),
+    viewport.unproject([viewport.width, viewport.height]),
+    viewport.unproject([0, viewport.height]),
+  ];
   return loader.isPyramid
     ? [
         new VivViewerLayer({
@@ -69,10 +80,10 @@ _renderLayers() {
           viewportId: 'detail',
           ...this.props
         }),
-        new StaticImageLayer(this.props, {
+        new OverviewLayer(this.props, {
           id: `${loader.type}-overview`,
-          scale: 2 ** (numLevels - 1),
-          z: numLevels - 1
+          boundingBox,
+          ...this.props
         })
       ]
     : new StaticImageLayer({
@@ -83,6 +94,11 @@ _renderLayers() {
 
 render() {
   /* eslint-disable react/destructuring-assignment */
+  const { loader } = this.props;
+  const { numLevels } = loader;
+  const { imageWidth, imageHeight } = loader.getRasterSize({
+    z: 0
+  });
   const views = [
     new OrthographicView({
       id: 'detail',
@@ -93,10 +109,10 @@ render() {
     new OrthographicView({
       id: 'overview',
       controller: false,
-      height: this.props.viewHeight / 5,
-      width: this.props.viewWidth / 5,
-      x: this.props.viewWidth - this.props.viewWidth / 5,
-      y: this.props.viewHeight - this.props.viewHeight / 5,
+      height: imageHeight >> (numLevels - 1),
+      width: imageWidth >> (numLevels - 1),
+      x: this.props.viewWidth - (imageWidth >> (numLevels - 1)),
+      y: this.props.viewHeight - (imageHeight >> (numLevels - 1)),
       clear: true
     })
   ];
