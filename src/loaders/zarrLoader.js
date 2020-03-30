@@ -112,17 +112,6 @@ export default class ZarrLoader {
     return { imageHeight, imageWidth };
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  onTileError(err) {
-    // Handle zarr-specific tile Errors
-    // Will check with `err instanceof BoundCheckError` when merged
-    // https://github.com/gzuidhof/zarr.js/issues/47
-    if (!err.message.includes('RangeError')) {
-      // Rethrow error if something other than tile being requested is out of bounds.
-      throw err;
-    }
-  }
-
   _decodeChannels(chunkData) {
     // Used for multichannel images where channels are in same chunk.
     // Separates single TypedArray into multiple channel views.
