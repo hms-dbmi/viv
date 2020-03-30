@@ -32,6 +32,7 @@ function App() {
   const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.9);
   const [loader, setLoader] = useState(null);
   const [colormapOn, setColormap] = useState('');
+  const [overviewOn, setOverview] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -81,6 +82,12 @@ function App() {
   const toggleColormap = () => {
     setColormap(prevColormap => {
       return prevColormap ? '' : COLORMAP;
+    });
+  };
+
+  const toggleOverview = () => {
+    setOverview(prevOverviewOn => {
+      return !prevOverviewOn;
     });
   };
 
@@ -164,6 +171,7 @@ function App() {
           )}
           initialViewState={initialViewState}
           colormap={colormapOn}
+          overviewOn={overviewOn}
         />
       ) : null}
       <div className="slider-container">
@@ -194,6 +202,19 @@ function App() {
             {colormapOn ? 'Colors' : COLORMAP}
           </Button>
         </div>
+        {loader && loader.isPyramid ? (
+          <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+            <Button
+              variant="contained"
+              onClick={() => toggleOverview()}
+              key="overview"
+            >
+              {overviewOn ? 'Remove Overview' : 'Show Overview'}
+            </Button>
+          </div>
+        ) : (
+          []
+        )}
         {sliders}
       </div>
     </div>

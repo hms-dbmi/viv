@@ -65,38 +65,42 @@ _onViewStateChange({ viewId, viewState }) {
 // we can handle multiple overlapping layers.
 // https://github.com/hubmapconsortium/vitessce-image-viewer/issues/107
 _renderLayers() {
-  const { loader } = this.props;
+  const { loader, overviewOn } = this.props;
   if (loader.isPyramid) {
-    const { viewHeight, viewWidth } = this.props;
-    const { viewState } = this.state;
-    const viewport = new OrthographicView().makeViewport({
-      // From the current `detail` viewState, we need its projection matrix (actually the inverse).
-      viewState: viewState.detail,
-      height: viewHeight,
-      width: viewWidth
-    });
-    // Use the inverse of the projection matrix to map screen to the view space.
-    const boundingBox = [
-      viewport.unproject([0, 0]),
-      viewport.unproject([viewport.width, 0]),
-      viewport.unproject([viewport.width, viewport.height]),
-      viewport.unproject([0, viewport.height])
-    ];
-    return [
-        new VivViewerLayer({
-          id: `${loader.type}-detail`,
-          // Because TileLayer is unique in updating on viewport changes,
-          // it needs to be aware of what viewport it is rendering in -
-          // layerFilter only handles `draw` calls.
-          viewportId: 'detail',
-          ...this.props
-        }),
+    const layers = [new VivViewerLayer({
+      id: `${loader.type}-detail`,
+      // Because TileLayer is unique in updating on viewport changes,
+      // it needs to be aware of what viewport it is rendering in -
+      // layerFilter only handles `draw` calls.
+      viewportId: 'detail',
+      ...this.props
+    })]
+    if (overviewOn) {
+      const { viewHeight, viewWidth } = this.props;
+      const { viewState } = this.state;
+      const viewport = new OrthographicView().makeViewport({
+        // From the current `detail` viewState, we need its projection matrix (actually the inverse).
+        viewState: viewState.detail,
+        height: viewHeight,
+        width: viewWidth
+      });
+      // Use the inverse of the projection matrix to map screen to the view space.
+      const boundingBox = [
+        viewport.unproject([0, 0]),
+        viewport.unproject([viewport.width, 0]),
+        viewport.unproject([viewport.width, viewport.height]),
+        viewport.unproject([0, viewport.height])
+      ];
+      layers.push(
         new OverviewLayer(this.props, {
           id: `${loader.type}-overview`,
           boundingBox,
           ...this.props
         })
-      ]
+      );
+      return layers;
+    }
+    return layers
   }
   
   return new StaticImageLayer({
@@ -107,7 +111,7 @@ _renderLayers() {
 
 render() {
   /* eslint-disable react/destructuring-assignment */
-  const { loader } = this.props;
+  const { loader, overviewOn } = this.props;
   const { numLevels } = loader;
   const { imageWidth, imageHeight } = loader.getRasterSize({
     z: 0
@@ -120,7 +124,7 @@ render() {
       width: this.props.viewWidth
     })
   ];
-  if(loader.isPyramid){
+  if (loader.isPyramid && overviewOn) {
     /* eslint-disable no-bitwise */
     views.push(
       new OrthographicView({
