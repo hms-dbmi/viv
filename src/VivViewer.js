@@ -123,8 +123,8 @@ render() {
       // some investigation into padding - look at the tiff vs zarr maps.
       height: imageHeight >> (numLevels - 1),
       width: imageWidth >> (numLevels - 1),
-      x: this.props.viewWidth - (imageWidth >> (numLevels - 1)),
-      y: this.props.viewHeight - (imageHeight >> (numLevels - 1)),
+      x: this.props.viewWidth - (imageWidth >> (numLevels - 1)) - 25,
+      y: this.props.viewHeight - (imageHeight >> (numLevels - 1)) - 25,
       clear: true
     })
   ];
