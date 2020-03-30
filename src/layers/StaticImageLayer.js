@@ -77,16 +77,14 @@ export default class StaticImageLayer extends CompositeLayer {
       domain,
       dtype
     });
-
     const { data, width, height } = this.state;
+    if (!(width && height)) return null;
     const bounds = scaleBounds({
       width,
       height,
       translate,
       scale
     });
-
-    if (!(width && height)) return null;
 
     return new XRLayer({
       channelData: Promise.resolve(data),
