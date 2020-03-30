@@ -102,6 +102,11 @@ An object containing the following properties which provide all the data-specifi
 
 These control the size of the viewport in your app.
 
+##### `overviewOn` (boolean) [ONLY NECESSARY FOR `VivViewer`]
+
+This is a controller for whether or not you have an overview (picture-in-picture).  This only works
+with `loader.isPyramid` set to `true`.
+
 ##### `initialViewState` (object) [ONLY NECESSARY FOR `VivViewer`]
 
 An object containing two things
