@@ -97,7 +97,7 @@ _renderLayers() {
         })
       ]
     : new StaticImageLayer({
-        id: `StaticImageLayer-${loader.type}`,
+        id: `StaticImageLayer-${loader.type}-detail`,
         ...this.props
       });
 }
@@ -115,19 +115,23 @@ render() {
       controller: true,
       height: this.props.viewHeight,
       width: this.props.viewWidth
-    }),
-    new OrthographicView({
-      id: 'overview',
-      controller: false,
-      // There's probably a better way to do this, but I think there needs to be
-      // some investigation into padding - look at the tiff vs zarr maps.
-      height: imageHeight >> (numLevels - 1),
-      width: imageWidth >> (numLevels - 1),
-      x: this.props.viewWidth - (imageWidth >> (numLevels - 1)) - 25,
-      y: this.props.viewHeight - (imageHeight >> (numLevels - 1)) - 25,
-      clear: true
     })
   ];
+  if(loader.isPyramid){
+    views.push(
+      new OrthographicView({
+        id: 'overview',
+        controller: false,
+        // There's probably a better way to do this, but I think there needs to be
+        // some investigation into padding - look at the tiff vs zarr maps.
+        height: imageHeight >> (numLevels - 1),
+        width: imageWidth >> (numLevels - 1),
+        x: this.props.viewWidth - (imageWidth >> (numLevels - 1)) - 25,
+        y: this.props.viewHeight - (imageHeight >> (numLevels - 1)) - 25,
+        clear: true
+      })
+    );
+  }
   return (
     <DeckGL
       glOptions={{ webgl2: true }}
