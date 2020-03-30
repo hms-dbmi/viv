@@ -4,12 +4,7 @@ import StaticImageLayer from './StaticImageLayer';
 
 export default class OverviewLayer extends CompositeLayer {
   renderLayers() {
-    const {
-      loader,
-      id,
-      boundingBox,
-      boundingBoxColor
-    } = this.props;
+    const { loader, id, boundingBox, boundingBoxColor } = this.props;
     const { numLevels } = loader;
     const { imageWidth, imageHeight } = loader.getRasterSize({
       z: 0
@@ -32,12 +27,14 @@ export default class OverviewLayer extends CompositeLayer {
     const viewportOutline = new PolygonLayer({
       id: `viewport-outline-${id}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-      data: [[
-        [0, 0],
-        [ imageWidth, 0],
-        [ imageWidth,  imageHeight],
-        [0,  imageHeight]
-      ]],
+      data: [
+        [
+          [0, 0],
+          [imageWidth, 0],
+          [imageWidth, imageHeight],
+          [0, imageHeight]
+        ]
+      ],
       getPolygon: f => f,
       filled: false,
       stroked: true,

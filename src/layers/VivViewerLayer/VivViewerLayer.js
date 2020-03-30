@@ -5,7 +5,6 @@ import StaticImageLayer from '../StaticImageLayer';
 import { padColorsAndSliders } from '../utils';
 
 export default class VivViewerLayer extends CompositeLayer {
-
   renderLayers() {
     const {
       loader,
@@ -18,7 +17,6 @@ export default class VivViewerLayer extends CompositeLayer {
       viewportId,
       onTileError,
       id
-
     } = this.props;
     const { tileSize, numLevels, dtype } = loader;
     const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
@@ -65,8 +63,11 @@ export default class VivViewerLayer extends CompositeLayer {
     const baseLayer = new StaticImageLayer(this.props, {
       id: `Background-Image-${id}`,
       scale: 2 ** (numLevels - 1),
-      visible: opacity === 1 || (-numLevels > this.context.viewport.zoom && this.context.viewport.id === viewportId),
-      z: numLevels - 1,
+      visible:
+        opacity === 1 ||
+        (-numLevels > this.context.viewport.zoom &&
+          this.context.viewport.id === viewportId),
+      z: numLevels - 1
     });
     const layers = [baseLayer, tiledLayer];
     return layers;
