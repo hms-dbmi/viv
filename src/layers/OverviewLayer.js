@@ -11,7 +11,8 @@ export default class OverviewLayer extends CompositeLayer {
       boundingBoxColor,
       boundingBoxOutlineWidth,
       viewportOutlineColor,
-      viewportOutlineWidth
+      viewportOutlineWidth,
+      overviewScale
     } = this.props;
     const { numLevels } = loader;
     const { width, height } = loader.getRasterSize({
@@ -19,7 +20,7 @@ export default class OverviewLayer extends CompositeLayer {
     });
     const overview = new StaticImageLayer(this.props, {
       id: `viewport-${id}`,
-      scale: 2 ** (numLevels - 1),
+      scale: 2 ** (numLevels - 1) * overviewScale,
       z: numLevels - 1
     });
     const boundingBoxOutline = new PolygonLayer({
@@ -38,9 +39,9 @@ export default class OverviewLayer extends CompositeLayer {
       data: [
         [
           [0, 0],
-          [width, 0],
-          [width, height],
-          [0, height]
+          [width * overviewScale, 0],
+          [width * overviewScale, height * overviewScale],
+          [0, height * overviewScale]
         ]
       ],
       getPolygon: f => f,

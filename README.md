@@ -123,8 +123,7 @@ It necessarily takes in
 
 Optionally, you can also provide:
 
-- `height` (deafult is inferred from `loader`) The size of the overview viewport
-- `width` (deafult is inferred from `loader`) The size of the overview viewport
+- `overviewScale` (default `1`) This is a scaling parameter for how large the viewport should be.
 - `overviewLocation` (deafult `'bottom-right'`) One of bottom-right, bottom-left, top-left, or top-right
 - `offset` (default is `25`) How far from the boundary of the detailed view the overview should be.
 - `id` (default is `'overview'`, checked within `VivViewer` as such) This is used for matching layers to veiwports.

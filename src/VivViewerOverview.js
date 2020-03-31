@@ -7,14 +7,13 @@ export default class VivViewerOverview {
     viewHeight,
     loader,
     offset = 25,
-    height = 0,
-    width = 0,
     overviewLocation = 'bottom-right',
     id = 'overview',
     boundingBoxColor = [255, 0, 0],
     boundingBoxOutlineWidth = 50,
     viewportOutlineColor = [255, 192, 204],
-    viewportOutlineWidth = 400
+    viewportOutlineWidth = 400,
+    overviewScale = 1
   }) {
     const { numLevels } = loader;
     const rasterSize = loader.getRasterSize({
@@ -24,10 +23,14 @@ export default class VivViewerOverview {
     this.viewWidth = viewWidth;
     this.viewHeight = viewHeight;
     this.id = id;
+    this.overviewScale = overviewScale;
+    this._numLevels = numLevels;
     // These are the pixel-space height and width
     /* eslint-disable no-bitwise */
-    this.height = height || rasterSize.height >> (numLevels - 1);
-    this.width = width || rasterSize.width >> (numLevels - 1);
+    this.height = (rasterSize.height * overviewScale) >> (numLevels - 1);
+    this.width = (rasterSize.width * overviewScale) >> (numLevels - 1);
+    this.imageHeight = rasterSize.height;
+    this.imageWidth = rasterSize.width;
     /* eslint-disable no-bitwise */
     this.overviewLocation = overviewLocation;
     this.boundingBoxColor = boundingBoxColor;
@@ -37,19 +40,21 @@ export default class VivViewerOverview {
   }
 
   _makeBoundingBox(viewState) {
-    const { viewHeight, viewWidth } = this;
+    const { viewHeight, viewWidth, overviewScale } = this;
     const viewport = new OrthographicView().makeViewport({
       // From the current `detail` viewState, we need its projection matrix (actually the inverse).
-      viewState: viewState.detail,
+      viewState,
       height: viewHeight,
       width: viewWidth
     });
     // Use the inverse of the projection matrix to map screen to the view space.
     return [
-      viewport.unproject([0, 0]),
-      viewport.unproject([viewport.width, 0]),
-      viewport.unproject([viewport.width, viewport.height]),
-      viewport.unproject([0, viewport.height])
+      viewport.unproject([0, 0]).map(e => e * overviewScale),
+      viewport.unproject([viewport.width, 0]).map(e => e * overviewScale),
+      viewport
+        .unproject([viewport.width, viewport.height])
+        .map(e => e * overviewScale),
+      viewport.unproject([0, viewport.height]).map(e => e * overviewScale)
     ];
   }
 
@@ -105,6 +110,20 @@ export default class VivViewerOverview {
     });
   }
 
+  getViewState(viewState) {
+    const { imageWidth, imageHeight, overviewScale, _numLevels, id } = this;
+    return {
+      ...viewState,
+      id,
+      target: [
+        (imageWidth * overviewScale) / 2,
+        (imageHeight * overviewScale) / 2,
+        0
+      ],
+      zoom: -(_numLevels - 1)
+    };
+  }
+
   getLayer({ viewState, props }) {
     const boundingBox = this._makeBoundingBox(viewState);
     const {
@@ -112,7 +131,8 @@ export default class VivViewerOverview {
       boundingBoxColor,
       boundingBoxOutlineWidth,
       viewportOutlineColor,
-      viewportOutlineWidth
+      viewportOutlineWidth,
+      overviewScale
     } = this;
     const { loader } = props;
     return new OverviewLayer(props, {
@@ -122,6 +142,7 @@ export default class VivViewerOverview {
       boundingBoxOutlineWidth,
       viewportOutlineColor,
       viewportOutlineWidth,
+      overviewScale,
       ...props
     });
   }

@@ -6,21 +6,11 @@ import { VivViewerLayer, StaticImageLayer } from './layers';
 export default class VivViewer extends PureComponent {
   constructor(props) {
     super(props);
-    const { initialViewState, loader } = this.props;
-    const { numLevels } = loader;
-    const { width, height } = loader.getRasterSize({
-      z: 0
-    });
+    const { initialViewState, overview } = this.props;
     this.state = {
       viewState: {
         detail: { ...initialViewState, id: 'detail' },
-        overview: {
-          ...initialViewState,
-          // The overview should be centered in view space coordinates.
-          target: [width / 2, height / 2, 0],
-          zoom: -(numLevels - 1),
-          id: 'overview'
-        }
+        overview: overview ? overview.getViewState(initialViewState) : null
       }
     };
     this._onViewStateChange = this._onViewStateChange.bind(this);
@@ -43,19 +33,27 @@ export default class VivViewer extends PureComponent {
     // Save the view state and trigger rerender
     // only for changes to the `detail` view
     if (viewId === 'detail') {
-      const { loader } = this.props;
-      const { numLevels } = loader;
-      const { height, width } = loader.getRasterSize({
-        z: 0
-      });
+      const { overview } = this.props;
       const newViewState = {};
       newViewState.detail = viewState;
-      newViewState.overview = {
-        ...viewState,
-        target: [width / 2, height / 2, 0],
-        zoom: -(numLevels - 1)
-      };
+      newViewState.overview = overview
+        ? overview.getViewState(viewState)
+        : null;
       this.setState({ viewState: newViewState });
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { overview } = this.props;
+    if (prevProps.overview !== overview) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState(prevState => {
+        const newViewState = { ...prevState.viewState };
+        newViewState.overview = overview
+          ? overview.getViewState(prevState.viewState.detail)
+          : null;
+        return { viewState: newViewState };
+      });
     }
   }
 
@@ -78,7 +76,9 @@ export default class VivViewer extends PureComponent {
         })
       ];
       if (overview) {
-        layers.push(overview.getLayer({ viewState, props: this.props }));
+        layers.push(
+          overview.getLayer({ viewState: viewState.detail, props: this.props })
+        );
         return layers;
       }
       return layers;
