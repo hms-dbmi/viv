@@ -52,9 +52,9 @@ export async function createTiffPyramid({ channelUrls }) {
 
 export async function createOMETiffLoader({ url }) {
   const tiff = await fromUrl(url);
-  tiff.fileDirectories = await tiff.parseFileDirectories();
+  const firstImage = await tiff.getImage(0);
   const pool = new Pool();
-  return new OMETiffLoader(tiff, pool);
+  return new OMETiffLoader(tiff, pool, firstImage);
 }
 
 export { ZarrLoader, TiffPyramidLoader, OMETiffLoader };

@@ -2,21 +2,17 @@ import OMEXML from './omeXML';
 import { MAX_SLIDERS_AND_CHANNELS } from '../layers/constants';
 
 export default class OMETiffLoader {
-  constructor(tiff, pool) {
+  constructor(tiff, pool, firstImage) {
     this.pool = pool;
     this.tiff = tiff;
     // get first image's description, which contains OMEXML
-    const { ImageDescription } = tiff.fileDirectories[0][0];
+    const { ImageDescription } = firstImage.fileDirectory;
     this.OMEXML = new OMEXML(ImageDescription);
     this.minZoom = -1 * this.OMEXML.getNumberOfImages();
-    this.SizeC = this.OMEXML.SizeC;
     this.channelNames = this.OMEXML.getChannelNames();
-    this.DimensionOrder = this.OMEXML.DimensionOrder;
     this.imageWidth = this.OMEXML.SizeX;
     this.imageHeight = this.OMEXML.SizeY;
     // this is spatial z, not to be confused with pyramidal z below in getTile
-    this.SizeZ = this.OMEXML.SizeZ;
-    this.SizeT = this.OMEXML.SizeT;
     this.chunkIndex = [];
     this.isPyramid = !!this.minZoom;
     const type = this.OMEXML.Type;
@@ -70,27 +66,28 @@ export default class OMETiffLoader {
 
   _getIFDIndex({ z, c, t }) {
     const cIndex = this.channelNames.indexOf(c);
-    switch (this.DimensionOrder) {
+    const { SizeZ, SizeT, SizeC, DimensionOrder } = this.OMEXML;
+    switch (DimensionOrder) {
       case 'XYZCT': {
-        return t * this.SizeZ * this.SizeC + cIndex * this.SizeZ + z;
+        return t * SizeZ * SizeC + cIndex * SizeZ + z;
       }
       case 'XYZTC': {
-        return cIndex * this.SizeZ * this.SizeT + t * this.SizeZ + z;
+        return cIndex * SizeZ * SizeT + t * SizeZ + z;
       }
       case 'XYCTZ': {
-        return z * this.SizeC * this.SizeT + t * this.SizeC + cIndex;
+        return z * SizeC * SizeT + t * SizeC + cIndex;
       }
       case 'XYCZT': {
-        return t * this.SizeC * this.SizeZ + z * this.SizeC + cIndex;
+        return t * SizeC * SizeZ + z * SizeC + cIndex;
       }
       case 'XYTCZ': {
-        return z * this.SizeT * this.SizeC + cIndex * this.SizeT + t;
+        return z * SizeT * SizeC + cIndex * SizeT + t;
       }
       case 'XYTZC': {
-        return cIndex * this.SizeT * this.SizeZ + z * this.SizeT + t;
+        return cIndex * SizeT * SizeZ + z * SizeT + t;
       }
-      default:{
-        throw new Error('Dimension order is required for OMETIFF')
+      default: {
+        throw new Error('Dimension order is required for OMETIFF');
       }
     }
   }

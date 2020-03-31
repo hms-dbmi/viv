@@ -13,55 +13,22 @@ export default class OMEXML {
     const { Pixels } = this.metadataOMEXML.Image.length
       ? this.metadataOMEXML.Image[0]
       : this.metadataOMEXML.Image;
-    this.Pixels = Pixels;
-  }
-
-  get SizeZ() {
-    return Number.parseInt(this.Pixels['@_SizeZ']);
-  }
-
-  get SizeT() {
-    return Number.parseInt(this.Pixels['@_SizeT']);
-  }
-
-  get SizeC() {
-    return Number.parseInt(this.Pixels['@_SizeC']);
-  }
-
-  get SizeX() {
-    return Number.parseInt(this.Pixels['@_SizeX']);
-  }
-
-  get SizeY() {
-    return Number.parseInt(this.Pixels['@_SizeY']);
-  }
-
-  get DimensionOrder() {
-    return this.Pixels['@_DimensionOrder'];
-  }
-
-  get Type() {
-    return this.Pixels['@_Type'];
-  }
-
-  get PhysicalSizeYUnit(){
-    return this.Pixels['@_PhysicalSizeYUnit']
-  }
-
-  get PhysicalSizeXUnit() {
-    return this.Pixels['@_PhysicalSizeXUnit']
-  }
-
-  get PhysicalSizeY() {
-    return this.Pixels['@_PhysicalSizeY']
-  }
-
-  get PhysicalSizeX() {
-    return this.Pixels['@_PhysicalSizeX']
+    this._Pixels = Pixels;
+    this.SizeZ = Number.parseInt(Pixels['@_SizeZ']);
+    this.SizeT = Number.parseInt(Pixels['@_SizeT']);
+    this.SizeC = Number.parseInt(Pixels['@_SizeC']);
+    this.SizeX = Number.parseInt(Pixels['@_SizeX']);
+    this.SizeY = Number.parseInt(Pixels['@_SizeY']);
+    this.DimensionOrder = Pixels['@_DimensionOrder'];
+    this.Type = Pixels['@_Type'];
+    this.PhysicalSizeYUnit = Pixels['@_PhysicalSizeYUnit'];
+    this.PhysicalSizeXUnit = Pixels['@_PhysicalSizeXUnit'];
+    this.PhysicalSizeY = Pixels['@_PhysicalSizeY'];
+    this.PhysicalSizeX = Pixels['@_PhysicalSizeX'];
   }
 
   getChannelNames() {
-    return this.Pixels.Channel.map(channel => channel['@_Name']);
+    return this._Pixels.Channel.map(channel => channel['@_Name']);
   }
 
   getNumberOfImages() {

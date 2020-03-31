@@ -134,23 +134,23 @@ function App() {
   /* eslint-disable no-unused-expressions */
   switch (sourceName) {
     case 'static tiff': {
-      loader && loader.SizeT && loader.SizeZ
+      loader && loader.OMEXML
         ? (stackControllers = (
-          <div>
-            <Slider
-              value={zStack}
-              onChange={(event, value) => sliderSetZstack(value)}
-              valueLabelDisplay="auto"
-              getAriaLabel={() => 'zStack'}
-              min={0}
-              max={Math.max(0, loader.SizeZ - 1)}
-              style={{
+            <div>
+              <Slider
+                value={zStack}
+                onChange={(event, value) => sliderSetZstack(value)}
+                valueLabelDisplay="auto"
+                getAriaLabel={() => 'zStack'}
+                min={0}
+                max={Math.max(0, loader.OMEXML.SizeZ - 1)}
+                style={{
                   color: `rgb(${[220, 220, 220]})`,
                   top: '7px'
                 }}
-              orientation="horizontal"
-            />
-          </div>
+                orientation="horizontal"
+              />
+            </div>
           ))
         : [];
       break;
@@ -158,33 +158,33 @@ function App() {
     case 'static': {
       loader && loader._data && loader._data.meta
         ? (stackControllers = (
-          <div>
-            <Slider
-              value={mzIndex}
-              onChange={(event, value) => sliderSetMZIndex(value)}
-              valueLabelDisplay="auto"
-              getAriaLabel={() => 'mzIndex'}
-              min={0}
-              max={loader._data.meta.shape[0]}
-              style={{
+            <div>
+              <Slider
+                value={mzIndex}
+                onChange={(event, value) => sliderSetMZIndex(value)}
+                valueLabelDisplay="auto"
+                getAriaLabel={() => 'mzIndex'}
+                min={0}
+                max={loader._data.meta.shape[0]}
+                style={{
                   color: `rgb(${[220, 220, 220]})`,
                   top: '7px'
                 }}
-              orientation="horizontal"
-            />
-          </div>
+                orientation="horizontal"
+              />
+            </div>
           ))
         : [];
       break;
     }
-    default:{
-      stackControllers = []
+    default: {
+      stackControllers = [];
     }
   }
-/* eslint-disable no-unused-expressions */
+  /* eslint-disable no-unused-expressions */
 
   let channelNames;
-/* eslint-disable no-unused-expressions */
+  /* eslint-disable no-unused-expressions */
   switch (sourceName) {
     case 'static tiff': {
       loader && loader.tiff
@@ -197,7 +197,7 @@ function App() {
       break;
     }
   }
-/* eslint-disable no-unused-expressions */
+  /* eslint-disable no-unused-expressions */
   const sliders = channelNames.map((channel, i) => {
     return (
       <div key={`container-${channel}`}>
