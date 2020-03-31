@@ -62,9 +62,9 @@ export default class TiffPyramidLoader {
 
   getRasterSize({ z }) {
     const image = this.channelPyramids[0][z];
-    const imageWidth = image.getWidth();
-    const imageHeight = image.getHeight();
-    return { imageWidth, imageHeight };
+    const height = image.getWidth();
+    const width = image.getHeight();
+    return { width, height };
   }
 
   async _getChannel({ image, x, y }) {

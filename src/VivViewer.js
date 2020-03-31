@@ -2,14 +2,13 @@ import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { OrthographicView } from '@deck.gl/core';
 import { VivViewerLayer, StaticImageLayer } from './layers';
-import OverviewLayer from './layers/OverviewLayer';
 
 export default class VivViewer extends PureComponent {
   constructor(props) {
     super(props);
     const { initialViewState, loader } = this.props;
     const { numLevels } = loader;
-    const { imageWidth, imageHeight } = loader.getRasterSize({
+    const { width, height } = loader.getRasterSize({
       z: 0
     });
     this.state = {
@@ -18,7 +17,7 @@ export default class VivViewer extends PureComponent {
         overview: {
           ...initialViewState,
           // The overview should be centered in view space coordinates.
-          target: [imageWidth / 2, imageHeight / 2, 0],
+          target: [width / 2, height / 2, 0],
           zoom: -(numLevels - 1),
           id: 'overview'
         }
@@ -46,14 +45,14 @@ export default class VivViewer extends PureComponent {
     if (viewId === 'detail') {
       const { loader } = this.props;
       const { numLevels } = loader;
-      const { imageWidth, imageHeight } = loader.getRasterSize({
+      const { height, width } = loader.getRasterSize({
         z: 0
       });
       const newViewState = {};
       newViewState.detail = viewState;
       newViewState.overview = {
         ...viewState,
-        target: [imageWidth / 2, imageHeight / 2, 0],
+        target: [width / 2, height / 2, 0],
         zoom: -(numLevels - 1)
       };
       this.setState({ viewState: newViewState });
@@ -65,7 +64,8 @@ export default class VivViewer extends PureComponent {
   // we can handle multiple overlapping layers.
   // https://github.com/hubmapconsortium/vitessce-image-viewer/issues/107
   _renderLayers() {
-    const { loader, overviewOn } = this.props;
+    const { loader, overview } = this.props;
+    const { viewState } = this.state;
     if (loader.isPyramid) {
       const layers = [
         new VivViewerLayer({
@@ -77,29 +77,8 @@ export default class VivViewer extends PureComponent {
           ...this.props
         })
       ];
-      if (overviewOn) {
-        const { viewHeight, viewWidth } = this.props;
-        const { viewState } = this.state;
-        const viewport = new OrthographicView().makeViewport({
-          // From the current `detail` viewState, we need its projection matrix (actually the inverse).
-          viewState: viewState.detail,
-          height: viewHeight,
-          width: viewWidth
-        });
-        // Use the inverse of the projection matrix to map screen to the view space.
-        const boundingBox = [
-          viewport.unproject([0, 0]),
-          viewport.unproject([viewport.width, 0]),
-          viewport.unproject([viewport.width, viewport.height]),
-          viewport.unproject([0, viewport.height])
-        ];
-        layers.push(
-          new OverviewLayer(this.props, {
-            id: `${loader.type}-overview`,
-            boundingBox,
-            ...this.props
-          })
-        );
+      if (overview) {
+        layers.push(overview.getLayer({ viewState, props: this.props }));
         return layers;
       }
       return layers;
@@ -113,11 +92,7 @@ export default class VivViewer extends PureComponent {
 
   render() {
     /* eslint-disable react/destructuring-assignment */
-    const { loader, overviewOn } = this.props;
-    const { numLevels } = loader;
-    const { imageWidth, imageHeight } = loader.getRasterSize({
-      z: 0
-    });
+    const { loader, overview } = this.props;
     const views = [
       new OrthographicView({
         id: 'detail',
@@ -126,22 +101,9 @@ export default class VivViewer extends PureComponent {
         width: this.props.viewWidth
       })
     ];
-    if (loader.isPyramid && overviewOn) {
-      /* eslint-disable no-bitwise */
-      views.push(
-        new OrthographicView({
-          id: 'overview',
-          controller: false,
-          // There's probably a better way to do this, but I think there needs to be
-          // some investigation into padding - look at the tiff vs zarr maps.
-          height: imageHeight >> (numLevels - 1),
-          width: imageWidth >> (numLevels - 1),
-          x: this.props.viewWidth - (imageWidth >> (numLevels - 1)) - 25,
-          y: this.props.viewHeight - (imageHeight >> (numLevels - 1)) - 25,
-          clear: true
-        })
-      );
-      /* eslint-disable no-bitwise */
+
+    if (loader.isPyramid && overview) {
+      views.push(overview.getView());
     }
     return (
       <DeckGL

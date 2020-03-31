@@ -107,9 +107,9 @@ export default class ZarrLoader {
 
   getRasterSize({ z }) {
     const source = z ? this._data[z] : this._base;
-    const imageHeight = source.shape[this.yIndex];
-    const imageWidth = source.shape[this.xIndex];
-    return { imageHeight, imageWidth };
+    const height = source.shape[this.yIndex];
+    const width = source.shape[this.xIndex];
+    return { height, width };
   }
 
   _decodeChannels(chunkData) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import { Button, ButtonGroup, Slider, Checkbox } from '@material-ui/core';
-import { VivViewer } from '../../src';
+import { VivViewer, VivViewerOverview } from '../../src';
 import { initPyramidLoader } from './initLoaders';
 import sources from './source-info';
 import './App.css';
@@ -11,6 +11,7 @@ const MIN_ZOOM = -8;
 const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
 const COLORMAP = 'viridis';
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
+const OFFSET = 25;
 
 const initSourceName = 'zarr';
 const colorValues = [
@@ -171,7 +172,16 @@ function App() {
           )}
           initialViewState={initialViewState}
           colormap={colormapOn}
-          overviewOn={overviewOn}
+          overview={
+            overviewOn
+              ? new VivViewerOverview({
+                  viewWidth,
+                  viewHeight,
+                  loader,
+                  offset: OFFSET
+                })
+              : null
+          }
         />
       ) : null}
       <div className="slider-container">

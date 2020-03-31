@@ -88,6 +88,16 @@ Receives arguments:
 
 - `z` (optional) The z coordinate of the pyramid form which data should be fetched, if needed.
 
+###### `loader.getRasterSize` (Function, StaticImageLayer) **POTENTIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
+
+This function returns the size of an image (optionally at a given zoom level of a pyramid)
+
+Receives arguments:
+
+- `z` (optional) The z coordinate of the pyramid form which data should be fetched, if needed.
+
+This returns `{height,width}`.
+
 ###### `loader.vivMetadata` (Object)
 
 An object containing the following properties which provide all the data-specific metadata required by Viv to render data tiles.
@@ -102,10 +112,26 @@ An object containing the following properties which provide all the data-specifi
 
 These control the size of the viewport in your app.
 
-##### `overviewOn` (boolean) [ONLY NECESSARY FOR `VivViewer`]
+##### `overview` (Object, `VivViewerOverview`) [ONLY NECESSARY FOR `VivViewer`]
 
-This is a controller for whether or not you have an overview (picture-in-picture).  This only works
-with `loader.isPyramid` set to `true`.
+This is a props for a controller for an overview (picture-in-picture). It is exported as the `VivViewerOverview` object.
+It necessarily takes in
+
+- `viewWidth` (See above)
+- `viewHeight` (See above)
+- `loader` (See above)
+
+Optionally, you can also provide:
+
+- `height` (deafult is inferred from `loader`) The size of the overview viewport
+- `width` (deafult is inferred from `loader`) The size of the overview viewport
+- `overviewLocation` (deafult `'bottom-right'`) One of bottom-right, bottom-left, top-left, or top-right
+- `offset` (default is `25`) How far from the boundary of the detailed view the overview should be.
+- `id` (default is `'overview'`, checked within `VivViewer` as such) This is used for matching layers to veiwports.
+- `boundingBoxColor` (default is `[255, 0, 0]`, red) The color of the bounding box
+- `boundingBoxOutlineWidth` (default is `50`) The size of the bounding box outline
+- `viewportOutlineColor` (default is `[255, 192, 204]`, pink) The color of the overview box
+- `viewportOutlineWidth` (default is `400`) The size of the overview box
 
 ##### `initialViewState` (object) [ONLY NECESSARY FOR `VivViewer`]
 

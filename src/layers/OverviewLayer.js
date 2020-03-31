@@ -4,9 +4,17 @@ import StaticImageLayer from './StaticImageLayer';
 
 export default class OverviewLayer extends CompositeLayer {
   renderLayers() {
-    const { loader, id, boundingBox, boundingBoxColor } = this.props;
+    const {
+      loader,
+      id,
+      boundingBox,
+      boundingBoxColor,
+      boundingBoxOutlineWidth,
+      viewportOutlineColor,
+      viewportOutlineWidth
+    } = this.props;
     const { numLevels } = loader;
-    const { imageWidth, imageHeight } = loader.getRasterSize({
+    const { width, height } = loader.getRasterSize({
       z: 0
     });
     const overview = new StaticImageLayer(this.props, {
@@ -21,8 +29,8 @@ export default class OverviewLayer extends CompositeLayer {
       getPolygon: f => f,
       filled: false,
       stroked: true,
-      getLineColor: boundingBoxColor || [255, 0, 0],
-      getLineWidth: 50
+      getLineColor: boundingBoxColor,
+      getLineWidth: boundingBoxOutlineWidth
     });
     const viewportOutline = new PolygonLayer({
       id: `viewport-outline-${id}`,
@@ -30,16 +38,16 @@ export default class OverviewLayer extends CompositeLayer {
       data: [
         [
           [0, 0],
-          [imageWidth, 0],
-          [imageWidth, imageHeight],
-          [0, imageHeight]
+          [width, 0],
+          [width, height],
+          [0, height]
         ]
       ],
       getPolygon: f => f,
       filled: false,
       stroked: true,
-      getLineColor: [255, 192, 204],
-      getLineWidth: 400
+      getLineColor: viewportOutlineColor,
+      getLineWidth: viewportOutlineWidth
     });
     const layers = [overview, boundingBoxOutline, viewportOutline];
     return layers;
