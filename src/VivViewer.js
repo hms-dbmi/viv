@@ -76,9 +76,7 @@ export default class VivViewer extends PureComponent {
         })
       ];
       if (overview) {
-        layers.push(
-          overview.getLayer({ viewState: viewState.detail, props: this.props })
-        );
+        layers.push(overview.getLayer({ viewState, props: this.props }));
         return layers;
       }
       return layers;
