@@ -23,15 +23,14 @@ export default class VivViewerOverview {
     this.viewWidth = viewWidth;
     this.viewHeight = viewHeight;
     this.id = id;
-    this.overviewScale = overviewScale;
     this._numLevels = numLevels;
     // These are the pixel-space height and width
-    /* eslint-disable no-bitwise */
-    this.height = (rasterSize.height * overviewScale) >> (numLevels - 1);
-    this.width = (rasterSize.width * overviewScale) >> (numLevels - 1);
+    this.width = viewWidth * overviewScale;
+    this.height = this.width * (rasterSize.height / rasterSize.width);
+    // This is the ratio of the "zoomed out" image to the width of the viewport
+    this.overviewScale = (2 ** (numLevels - 1) / rasterSize.width) * this.width;
     this.imageHeight = rasterSize.height;
     this.imageWidth = rasterSize.width;
-    /* eslint-disable no-bitwise */
     this.overviewLocation = overviewLocation;
     this.boundingBoxColor = boundingBoxColor;
     this.boundingBoxOutlineWidth = boundingBoxOutlineWidth;
@@ -142,8 +141,7 @@ export default class VivViewerOverview {
       boundingBoxOutlineWidth,
       viewportOutlineColor,
       viewportOutlineWidth,
-      overviewScale,
-      ...props
+      overviewScale
     });
   }
 }
