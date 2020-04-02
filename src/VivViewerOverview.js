@@ -48,13 +48,11 @@ export default class VivViewerOverview {
     });
     // Use the inverse of the projection matrix to map screen to the view space.
     return [
-      viewport.unproject([0, 0]).map(e => e * overviewScale),
-      viewport.unproject([viewport.width, 0]).map(e => e * overviewScale),
-      viewport
-        .unproject([viewport.width, viewport.height])
-        .map(e => e * overviewScale),
-      viewport.unproject([0, viewport.height]).map(e => e * overviewScale)
-    ];
+      viewport.unproject([0, 0]),
+      viewport.unproject([viewport.width, 0]),
+      viewport.unproject([viewport.width, viewport.height]),
+      viewport.unproject([0, viewport.height])
+    ].map(coord => coord.map(e => e * overviewScale));
   }
 
   _getOverviewOffsets() {
