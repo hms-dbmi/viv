@@ -2,16 +2,34 @@ import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { OrthographicView } from '@deck.gl/core';
 import { VivViewerLayer, StaticImageLayer } from './layers';
+import VivViewerOverview from './VivViewerOverview';
 
 export default class VivViewer extends PureComponent {
   constructor(props) {
     super(props);
-    const { initialViewState, overview } = this.props;
+    const {
+      initialViewState,
+      overview,
+      viewWidth,
+      viewHeight,
+      loader
+    } = this.props;
+    const vivOverview = overview
+      ? new VivViewerOverview({
+          ...overview,
+          viewWidth,
+          viewHeight,
+          loader,
+          offset: overview.offset,
+          overviewScale: overview.scale
+        })
+      : null;
     this.state = {
       viewState: {
         detail: { ...initialViewState, id: 'detail' },
-        overview: overview ? overview.getViewState(initialViewState) : null
-      }
+        overview: overview ? vivOverview.getViewState(initialViewState) : null
+      },
+      overview: vivOverview
     };
     this._onViewStateChange = this._onViewStateChange.bind(this);
     this.layerFilter = this.layerFilter.bind(this);
@@ -33,7 +51,7 @@ export default class VivViewer extends PureComponent {
     // Save the view state and trigger rerender
     // only for changes to the `detail` view
     if (viewId === 'detail') {
-      const { overview } = this.props;
+      const { overview } = this.state;
       const newViewState = {};
       newViewState.detail = viewState;
       newViewState.overview = overview
@@ -44,15 +62,23 @@ export default class VivViewer extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    const { overview } = this.props;
+    const { overview, viewWidth, viewHeight, loader } = this.props;
     if (prevProps.overview !== overview) {
+      const vivOverview = new VivViewerOverview({
+        ...overview,
+        viewWidth,
+        viewHeight,
+        loader,
+        offset: overview.offset,
+        overviewScale: overview.scale
+      });
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState(prevState => {
         const newViewState = { ...prevState.viewState };
-        newViewState.overview = overview
-          ? overview.getViewState(prevState.viewState.detail)
-          : null;
-        return { viewState: newViewState };
+        newViewState.overview = vivOverview.getViewState(
+          prevState.viewState.detail
+        );
+        return { viewState: newViewState, overview: vivOverview };
       });
     }
   }
@@ -62,8 +88,8 @@ export default class VivViewer extends PureComponent {
   // we can handle multiple overlapping layers.
   // https://github.com/hubmapconsortium/vitessce-image-viewer/issues/107
   _renderLayers() {
-    const { loader, overview } = this.props;
-    const { viewState } = this.state;
+    const { loader } = this.props;
+    const { viewState, overview } = this.state;
     if (loader.isPyramid) {
       const layers = [
         new VivViewerLayer({
@@ -92,7 +118,9 @@ export default class VivViewer extends PureComponent {
 
   render() {
     /* eslint-disable react/destructuring-assignment */
-    const { loader, overview } = this.props;
+    const { loader } = this.props;
+    const { overview } = this.state;
+
     const views = [
       new OrthographicView({
         id: 'detail',

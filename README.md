@@ -112,20 +112,17 @@ An object containing the following properties which provide all the data-specifi
 
 These control the size of the viewport in your app.
 
-##### `overview` (Object, `VivViewerOverview`) [ONLY NECESSARY FOR `VivViewer`]
+##### `overview` (Object) [ONLY NECESSARY FOR `VivViewer`]
 
-This is a props for a controller for an overview (picture-in-picture). It is exported as the `VivViewerOverview` object.
+This is a props for a controller for an overview (picture-in-picture).
 It necessarily takes in
 
-- `viewWidth` (See above)
-- `viewHeight` (See above)
-- `loader` (See above)
+- `scale` (default `1`) This is a scaling parameter for how large the viewport should be relative to the detailed one.
+- `offset` (default is `25`) How far from the boundary of the detailed view the overview should be.
 
 Optionally, you can also provide:
 
-- `overviewScale` (default `1`) This is a scaling parameter for how large the viewport should be.
 - `overviewLocation` (deafult `'bottom-right'`) One of bottom-right, bottom-left, top-left, or top-right
-- `offset` (default is `25`) How far from the boundary of the detailed view the overview should be.
 - `id` (default is `'overview'`, checked within `VivViewer` as such) This is used for matching layers to veiwports.
 - `boundingBoxColor` (default is `[255, 0, 0]`, red) The color of the bounding box
 - `boundingBoxOutlineWidth` (default is `50`) The size of the bounding box outline

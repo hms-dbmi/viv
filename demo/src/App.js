@@ -174,16 +174,12 @@ function App() {
           colormap={colormapOn}
           overview={
             overviewOn
-              ? new VivViewerOverview({
-                  viewWidth,
-                  viewHeight,
-                  loader,
+              ? {
                   offset: OFFSET,
-                  overviewScale: 0.2
-                })
+                  scale: 0.2
+                }
               : null
           }
-          overviewScale={0.2}
         />
       ) : null}
       <div className="slider-container">
