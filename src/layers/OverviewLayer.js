@@ -27,66 +27,59 @@ const defaultProps = {
   boundingBoxColor: { type: 'array', value: [255, 0, 0], compare: true },
   boundingBoxOutlineWidth: { type: 'number', value: 10, compare: true },
   viewportOutlineColor: { type: 'array', value: [0, 255, 0], compare: true },
-  viewportOutlineWidth: { type: 'number', value: 10, compare: true }
+  viewportOutlineWidth: { type: 'number', value: 10, compare: true },
+  overviewScale: { type: 'number', value: 1, compare: true }
 };
-
-function calculateScaleAndTranslate(boundingBoxOverview, width, height) {
-  const translate = boundingBoxOverview[0];
-  const scale = Math.max(
-    (boundingBoxOverview[2][0] - boundingBoxOverview[0][0]) / width,
-    (boundingBoxOverview[2][1] - boundingBoxOverview[0][1]) / height
-  );
-  return { scale, translate };
-}
 
 export default class OverviewLayer extends CompositeLayer {
   renderLayers() {
     const {
       loader,
       id,
-      boundingBoxDetail,
-      boundingBoxOverview,
+      boundingBox,
       boundingBoxColor,
       boundingBoxOutlineWidth,
       viewportOutlineColor,
-      viewportOutlineWidth
+      viewportOutlineWidth,
+      overviewScale
     } = this.props;
     const { numLevels } = loader;
     const { width, height } = loader.getRasterSize({
-      z: numLevels - 1
+      z: 0
     });
-    const { scale, translate } = calculateScaleAndTranslate(
-      boundingBoxOverview,
-      width,
-      height
-    );
     const overview = new StaticImageLayer(this.props, {
       id: `viewport-${id}`,
-      scale,
-      translate,
+      scale: 2 ** (numLevels - 1) * overviewScale,
       z: numLevels - 1
     });
     const boundingBoxOutline = new PolygonLayer({
       id: `bounding-box-overview-${id}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-      data: [boundingBoxDetail],
+      data: [boundingBox],
       getPolygon: f => f,
       filled: false,
       stroked: true,
       getLineColor: boundingBoxColor,
       getLineWidth: boundingBoxOutlineWidth
     });
-    // const viewportOutline = new PolygonLayer({
-    //   id: `viewport-outline-${id}`,
-    //   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-    //   data: [boundingBoxOverview],
-    //   getPolygon: f => f,
-    //   filled: false,
-    //   stroked: true,
-    //   getLineColor: viewportOutlineColor,
-    //   getLineWidth: viewportOutlineWidth
-    // });
-    const layers = [overview, boundingBoxOutline];
+    const viewportOutline = new PolygonLayer({
+      id: `viewport-outline-${id}`,
+      coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+      data: [
+        [
+          [0, 0],
+          [width * overviewScale, 0],
+          [width * overviewScale, height * overviewScale],
+          [0, height * overviewScale]
+        ]
+      ],
+      getPolygon: f => f,
+      filled: false,
+      stroked: true,
+      getLineColor: viewportOutlineColor,
+      getLineWidth: viewportOutlineWidth
+    });
+    const layers = [overview, boundingBoxOutline, viewportOutline];
     return layers;
   }
 }

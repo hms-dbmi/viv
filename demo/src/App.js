@@ -179,11 +179,11 @@ function App() {
                   viewHeight,
                   loader,
                   offset: OFFSET,
-                  overviewScale: 0.2
+                  overviewScale: 0.7
                 })
               : null
           }
-          overviewScale={0.2}
+          overviewScale={0.7}
         />
       ) : null}
       <div className="slider-container">
