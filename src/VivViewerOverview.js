@@ -64,7 +64,6 @@ export default class VivViewerOverview {
       viewHeight,
       overviewLocation
     } = this;
-    /* eslint-disable no-bitwise */
     switch (overviewLocation) {
       case 'bottom-right': {
         return [
@@ -84,12 +83,10 @@ export default class VivViewerOverview {
       }
       default: {
         throw new Error(
-           `overviewLocation prop needs to be one of ['bottom-right', 'top-right', 'top-left', 'bottom-left']`
-``
+          `overviewLocation prop needs to be one of ['bottom-right', 'top-right', 'top-left', 'bottom-left']```
         );
       }
     }
-    /* eslint-disable no-bitwise */
   }
 
   getView() {
