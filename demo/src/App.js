@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import { Button, ButtonGroup, Slider, Checkbox } from '@material-ui/core';
-import { VivViewer, VivViewerOverview } from '../../src';
+import { VivViewer } from '../../src';
 import { initPyramidLoader } from './initLoaders';
 import sources from './source-info';
 import './App.css';
