@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.1.4
+
+### Added
+
 - Add background image for nicer loading and temporary fix for minZoom issue
 - Add getRaster to TiffPyramidLoader
 - Picture-in-picture overview layer
