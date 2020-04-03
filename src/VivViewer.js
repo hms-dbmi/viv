@@ -64,22 +64,33 @@ export default class VivViewer extends PureComponent {
   componentDidUpdate(prevProps) {
     const { overview, viewWidth, viewHeight, loader } = this.props;
     if (prevProps.overview !== overview) {
-      const vivOverview = new VivViewerOverview({
-        ...overview,
-        viewWidth,
-        viewHeight,
-        loader,
-        offset: overview.offset,
-        overviewScale: overview.scale
-      });
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState(prevState => {
-        const newViewState = { ...prevState.viewState };
-        newViewState.overview = vivOverview.getViewState(
-          prevState.viewState.detail
-        );
-        return { viewState: newViewState, overview: vivOverview };
-      });
+      if (overview) {
+        // Overview is turned on.
+        const vivOverview = new VivViewerOverview({
+          ...overview,
+          viewWidth,
+          viewHeight,
+          loader,
+          offset: overview.offset,
+          overviewScale: overview.scale
+        });
+        // eslint-disable-next-line react/no-did-update-set-state
+        this.setState(prevState => {
+          const newViewState = { ...prevState.viewState };
+          newViewState.overview = vivOverview.getViewState(
+            prevState.viewState.detail
+          );
+          return { viewState: newViewState, overview: vivOverview };
+        });
+      } else {
+        // Overview is turned off.
+        // eslint-disable-next-line react/no-did-update-set-state
+        this.setState(prevState => {
+          const newViewState = { ...prevState.viewState };
+          newViewState.overview = null;
+          return { viewState: newViewState, overview: null };
+        });
+      }
     }
   }
 
