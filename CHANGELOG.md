@@ -14,6 +14,7 @@
 - Add flags to check for loader change and rerender.
 - Remove minZoom from loaders and make loaders provide `onTileError`.
 - Wrap `channelData` in `StaticImageLayer` in Promise.
+- Allow no `viewportId` parameter
 
 ## 0.1.3
 

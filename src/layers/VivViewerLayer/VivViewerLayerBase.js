@@ -27,6 +27,9 @@ export default class VivViewerLayerBase extends TileLayer {
 
   // This prevents the overview layer from rendering its tile in the detail view
   _updateTileset() {
+    if (!this.props.viewportId) {
+      super._updateTileset();
+    }
     if (
       this.props.viewportId &&
       this.context.viewport.id === this.props.viewportId
