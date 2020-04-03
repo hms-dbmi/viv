@@ -83,7 +83,7 @@ export default class VivViewerOverview {
       }
       default: {
         throw new Error(
-          `overviewLocation prop needs to be one of ['bottom-right', 'top-right', 'top-left', 'bottom-left']```
+          `overviewLocation prop needs to be one of ['bottom-right', 'top-right', 'top-left', 'bottom-left']`
         );
       }
     }
