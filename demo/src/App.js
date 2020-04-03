@@ -11,7 +11,7 @@ const MIN_ZOOM = -8;
 const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
 const COLORMAP = 'viridis';
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
-const OFFSET = 25;
+const MARGIN = 25;
 
 const initSourceName = 'zarr';
 const colorValues = [
@@ -175,7 +175,7 @@ function App() {
           overview={
             overviewOn
               ? {
-                  offset: OFFSET,
+                  margin: MARGIN,
                   scale: 0.2
                 }
               : null

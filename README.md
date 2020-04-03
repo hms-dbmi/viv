@@ -118,7 +118,7 @@ This is a props for a controller for an overview (picture-in-picture).
 It necessarily takes in
 
 - `scale` (default `1`) This is a scaling parameter for how large the viewport should be relative to the detailed one.
-- `offset` (default is `25`) How far from the boundary of the detailed view the overview should be.
+- `margin` (default is `25`) How far from the boundary of the detailed view the overview should be.
 
 Optionally, you can also provide:
 

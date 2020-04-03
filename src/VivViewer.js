@@ -20,7 +20,7 @@ export default class VivViewer extends PureComponent {
           viewWidth,
           viewHeight,
           loader,
-          offset: overview.offset,
+          margin: overview.margin,
           overviewScale: overview.scale
         })
       : null;
@@ -71,7 +71,7 @@ export default class VivViewer extends PureComponent {
           viewWidth,
           viewHeight,
           loader,
-          offset: overview.offset,
+          margin: overview.margin,
           overviewScale: overview.scale
         });
         // eslint-disable-next-line react/no-did-update-set-state

@@ -6,7 +6,7 @@ export default class VivViewerOverview {
     viewWidth,
     viewHeight,
     loader,
-    offset = 25,
+    margin = 25,
     overviewLocation = 'bottom-right',
     id = 'overview',
     boundingBoxColor = [255, 0, 0],
@@ -19,7 +19,7 @@ export default class VivViewerOverview {
     const rasterSize = loader.getRasterSize({
       z: 0
     });
-    this.offset = offset;
+    this.margin = margin;
     this.viewWidth = viewWidth;
     this.viewHeight = viewHeight;
     this.id = id;
@@ -55,11 +55,11 @@ export default class VivViewerOverview {
     ].map(coord => coord.map(e => e * overviewScale));
   }
 
-  _getOverviewOffsets() {
+  _getOverviewMargins() {
     const {
       height,
       width,
-      offset,
+      margin,
       viewWidth,
       viewHeight,
       overviewLocation
@@ -67,19 +67,19 @@ export default class VivViewerOverview {
     switch (overviewLocation) {
       case 'bottom-right': {
         return [
-          // offset is the offset from the corner
-          viewWidth - width - offset,
-          viewHeight - height - offset
+          // margin is the margin from the corner
+          viewWidth - width - margin,
+          viewHeight - height - margin
         ];
       }
       case 'top-right': {
-        return [viewWidth - width - offset, offset];
+        return [viewWidth - width - margin, margin];
       }
       case 'top-left': {
-        return [offset, offset];
+        return [margin, margin];
       }
       case 'bottom-left': {
-        return [offset, viewHeight - height - offset];
+        return [margin, viewHeight - height - margin];
       }
       default: {
         throw new Error(
@@ -91,7 +91,7 @@ export default class VivViewerOverview {
 
   getView() {
     const { height, width, overviewLocation, id } = this;
-    const [overviewXOffset, overviewYOffset] = this._getOverviewOffsets(
+    const [overviewXMargin, overviewYMargin] = this._getOverviewMargins(
       overviewLocation
     );
     return new OrthographicView({
@@ -99,8 +99,8 @@ export default class VivViewerOverview {
       controller: false,
       height,
       width,
-      x: overviewXOffset,
-      y: overviewYOffset,
+      x: overviewXMargin,
+      y: overviewYMargin,
       clear: true
     });
   }
