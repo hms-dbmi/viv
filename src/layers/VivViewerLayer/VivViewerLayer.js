@@ -66,7 +66,7 @@ export default class VivViewerLayer extends CompositeLayer {
       visible:
         opacity === 1 ||
         (-numLevels > this.context.viewport.zoom &&
-          this.context.viewport.id === viewportId),
+          (!viewportId || this.context.viewport.id === viewportId)),
       z: numLevels - 1
     });
     const layers = [baseLayer, tiledLayer];
