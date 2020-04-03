@@ -105,6 +105,13 @@ export default class ZarrLoader {
     }
   }
 
+  getRasterSize({ z }) {
+    const source = z ? this._data[z] : this._base;
+    const height = source.shape[this.yIndex];
+    const width = source.shape[this.xIndex];
+    return { height, width };
+  }
+
   _decodeChannels(chunkData) {
     // Used for multichannel images where channels are in same chunk.
     // Separates single TypedArray into multiple channel views.

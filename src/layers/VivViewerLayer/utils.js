@@ -17,16 +17,15 @@ export function renderSubLayers(props) {
     opacity,
     data,
     colormap,
-    dtype
+    dtype,
+    id
   } = props;
-
   // Only render in positive coorinate system
   if ([left, top, right, bottom].some(v => v < 0)) {
     return null;
   }
-
-  return new XRLayer({
-    id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}`,
+  const xrl = new XRLayer({
+    id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}-${id}`,
     bounds: [left, bottom, right, top],
     width: tileSize,
     height: tileSize,
@@ -38,4 +37,5 @@ export function renderSubLayers(props) {
     dtype,
     colormap
   });
+  return xrl;
 }

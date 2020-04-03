@@ -64,7 +64,9 @@ export default class StaticImageLayer extends CompositeLayer {
       channelIsOn,
       translate,
       scale,
-      domain
+      domain,
+      z,
+      id
     } = this.props;
 
     const { dtype } = loader;
@@ -75,8 +77,8 @@ export default class StaticImageLayer extends CompositeLayer {
       domain,
       dtype
     });
-
     const { data, width, height } = this.state;
+    if (!(width && height)) return null;
     const bounds = scaleBounds({
       width,
       height,
@@ -84,14 +86,12 @@ export default class StaticImageLayer extends CompositeLayer {
       scale
     });
 
-    if (!(width && height)) return null;
-
     return new XRLayer({
       channelData: Promise.resolve(data),
       bounds,
       sliderValues: paddedSliderValues,
       colorValues: paddedColorValues,
-      id: `XR-Static-Layer-${0}-${width}-${height}-${0}`,
+      id: `XR-Static-Layer-${0}-${height}-${width}-${0}-${z}-${id}`,
       pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       width,

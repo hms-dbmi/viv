@@ -60,6 +60,13 @@ export default class TiffPyramidLoader {
     return { data, width, height };
   }
 
+  getRasterSize({ z }) {
+    const image = this.channelPyramids[0][z];
+    const height = image.getWidth();
+    const width = image.getHeight();
+    return { width, height };
+  }
+
   async _getChannel({ image, x, y }) {
     const tile = await image.getTileOrStrip(x, y, 0, this.pool);
     const is8Bits = image.fileDirectory.BitsPerSample[0] === 8;

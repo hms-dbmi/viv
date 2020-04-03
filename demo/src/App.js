@@ -11,6 +11,7 @@ const MIN_ZOOM = -8;
 const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
 const COLORMAP = 'viridis';
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
+const MARGIN = 25;
 
 const initSourceName = 'zarr';
 const colorValues = [
@@ -32,6 +33,7 @@ function App() {
   const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.9);
   const [loader, setLoader] = useState(null);
   const [colormapOn, setColormap] = useState('');
+  const [overviewOn, setOverview] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -81,6 +83,12 @@ function App() {
   const toggleColormap = () => {
     setColormap(prevColormap => {
       return prevColormap ? '' : COLORMAP;
+    });
+  };
+
+  const toggleOverview = () => {
+    setOverview(prevOverviewOn => {
+      return !prevOverviewOn;
     });
   };
 
@@ -164,6 +172,14 @@ function App() {
           )}
           initialViewState={initialViewState}
           colormap={colormapOn}
+          overview={
+            overviewOn
+              ? {
+                  margin: MARGIN,
+                  scale: 0.2
+                }
+              : null
+          }
         />
       ) : null}
       <div className="slider-container">
@@ -194,6 +210,19 @@ function App() {
             {colormapOn ? 'Colors' : COLORMAP}
           </Button>
         </div>
+        {loader && loader.isPyramid ? (
+          <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+            <Button
+              variant="contained"
+              onClick={() => toggleOverview()}
+              key="overview"
+            >
+              {overviewOn ? 'Remove Overview' : 'Show Overview'}
+            </Button>
+          </div>
+        ) : (
+          []
+        )}
         {sliders}
       </div>
     </div>

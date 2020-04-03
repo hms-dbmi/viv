@@ -5,12 +5,6 @@ import StaticImageLayer from '../StaticImageLayer';
 import { padColorsAndSliders } from '../utils';
 
 export default class VivViewerLayer extends CompositeLayer {
-  // see https://github.com/uber/deck.gl/blob/master/docs/api-reference/layer.md#shouldupdatestate
-  // eslint-disable-next-line class-methods-use-this
-  shouldUpdateState({ changeFlags }) {
-    return changeFlags.somethingChanged;
-  }
-
   renderLayers() {
     const {
       loader,
@@ -19,7 +13,10 @@ export default class VivViewerLayer extends CompositeLayer {
       channelIsOn,
       domain,
       opacity,
-      onTileError
+      colormap,
+      viewportId,
+      onTileError,
+      id
     } = this.props;
     const { tileSize, numLevels, dtype } = loader;
     const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
@@ -36,8 +33,8 @@ export default class VivViewerLayer extends CompositeLayer {
         z: -z
       });
     };
-    const tiledLayer = new VivViewerLayerBase(this.props, {
-      id: `VivViewerLayerBase--${loader.type}`,
+    const tiledLayer = new VivViewerLayerBase({
+      id: `Tiled-Image-${id}`,
       tileSize,
       getTileData,
       dtype,
@@ -53,16 +50,23 @@ export default class VivViewerLayer extends CompositeLayer {
       updateTriggers: {
         getTileData: [loader]
       },
-      onTileError: onTileError || loader.onTileError
+      onTileError: onTileError || loader.onTileError,
+      opacity,
+      domain,
+      colormap,
+      viewportId
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity
     // paramteter set to anything but 1, but we always use it for situations where
     // we are zoomed out too far.
     const baseLayer = new StaticImageLayer(this.props, {
-      id: `StaticImageLayer-${loader.type}`,
+      id: `Background-Image-${id}`,
       scale: 2 ** (numLevels - 1),
-      visible: opacity === 1 || -numLevels > this.context.viewport.zoom,
+      visible:
+        opacity === 1 ||
+        (-numLevels > this.context.viewport.zoom &&
+          this.context.viewport.id === viewportId),
       z: numLevels - 1
     });
     const layers = [baseLayer, tiledLayer];
