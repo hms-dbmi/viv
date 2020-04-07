@@ -24,9 +24,10 @@
 .slider-container {
   right: 0;
   top: 0;
-  width: 25%;
+  width: 20%;
   position: absolute;
-  margin: 2em;
+  padding: 1.5em;
+  background: rgba(0, 0, 0, 0.6);
 }
 
 .slider-container p {

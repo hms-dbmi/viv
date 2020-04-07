@@ -1,13 +1,12 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, memo, useReducer } from 'react';
 import { Button, ButtonGroup, Slider, Checkbox } from '@material-ui/core';
 import { VivViewer } from '../../src';
-import { initPyramidLoader } from './initLoaders';
 import sources from './source-info';
 import './App.css';
+import { createLoader, useWindowSize } from './utils';
 
 const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
-const MIN_ZOOM = -8;
 const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
 const COLORMAP = 'viridis';
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
@@ -15,51 +14,45 @@ const MARGIN = 25;
 
 const initSourceName = 'zarr';
 const colorValues = [
-  [255, 0, 0],
-  [0, 255, 0],
   [0, 0, 255],
+  [0, 255, 0],
+  [255, 0, 0],
   [255, 128, 0],
   [255, 0, 255],
   [0, 255, 255]
 ];
 
-const initSliderValues = Array(colorValues.length).fill([0, 20000]);
-const initChannelIsOn = Array(colorValues.length).fill(true);
 function App() {
-  const [sliderValues, setSliderValues] = useState(initSliderValues);
-  const [channelIsOn, setChannelIsOn] = useState(initChannelIsOn);
-  const [sourceName, setSourceName] = useState(initSourceName);
-  const [viewWidth, setViewWidth] = useState(window.innerWidth * 0.7);
-  const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.9);
+  const [sliderValues, setSliderValues] = useState(null);
+  const [channelIsOn, setChannelIsOn] = useState(null);
+  const [channelNames, setChannelNames] = useState(null);
+  const [loaderSelection, setLoaderSelection] = useState(null);
   const [loader, setLoader] = useState(null);
-  const [colormapOn, setColormap] = useState('');
-  const [overviewOn, setOverview] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setViewWidth(window.innerWidth * 0.7);
-      setViewHeight(window.innerHeight * 0.9);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  });
+  const [sourceName, setSourceName] = useState(initSourceName);
+  const [colormapOn, toggleColormap] = useReducer(v => !v, false);
+  const [overviewOn, toggleOverview] = useReducer(v => !v, false);
+  const viewSize = useWindowSize();
 
   useEffect(() => {
     async function initLoader() {
-      const config = {
-        channelNames: sources[sourceName].channelNames,
-        url: sources[sourceName].url,
-        minZoom:
-          typeof sources[sourceName].minZoom === 'number'
-            ? sources[sourceName].minZoom
-            : MIN_ZOOM
-      };
-      // Need to do this to clear last loader... probably a better way.
       setLoader(null);
-      const newLoader = await initPyramidLoader(sourceName, config);
-      setLoader(newLoader);
+      const sourceInfo = sources[sourceName];
+      const nextLoader = await createLoader(sourceName, sourceInfo);
+      if (typeof nextLoader.serializeSelection === 'function') {
+        const { selection } = sourceInfo;
+        const serialized = nextLoader.serializeSelection(selection);
+        setLoaderSelection(serialized);
+        setSliderValues(Array(selection.length).fill([0, 20000]));
+        setChannelIsOn(Array(selection.length).fill(true));
+        setChannelNames(selection.map(d => (d.channel ? d.channel : d.mz)));
+      } else {
+        const { dimensions } = sourceInfo;
+        const channels = dimensions[0].values;
+        setSliderValues(Array(channels.length).fill([0, 20000]));
+        setChannelIsOn(Array(channels.length).fill(true));
+        setChannelNames(channels);
+      }
+      setLoader(nextLoader);
     }
     initLoader();
   }, [sourceName]);
@@ -80,18 +73,6 @@ function App() {
     });
   };
 
-  const toggleColormap = () => {
-    setColormap(prevColormap => {
-      return prevColormap ? '' : COLORMAP;
-    });
-  };
-
-  const toggleOverview = () => {
-    setOverview(prevOverviewOn => {
-      return !prevOverviewOn;
-    });
-  };
-
   const sourceButtons = Object.keys(sources).map(name => {
     return (
       // only use isPublic on the deployment
@@ -109,74 +90,72 @@ function App() {
     );
   });
 
-  const sliders = sources[sourceName].channelNames.map((channel, i) => {
-    return (
-      <div key={`container-${channel}`}>
-        <p>{channel}</p>
-        <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
-          <Checkbox
-            onChange={() => toggleChannel(i)}
-            checked={channelIsOn[i]}
-            style={{
-              color: `rgb(${
-                colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValues[i]
-              })`,
-              '&$checked': {
-                color: `rgb(${
-                  colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValues[i]
-                })`
-              }
-            }}
-          />
-          <Slider
-            value={sliderValues[i]}
-            onChange={(event, value) => handleSliderChange(i, value)}
-            valueLabelDisplay="auto"
-            getAriaLabel={() => channel}
-            min={MIN_SLIDER_VALUE}
-            max={MAX_SLIDER_VALUE}
-            style={{
-              color: `rgb(${
-                colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValues[i]
-              })`,
-              top: '7px'
-            }}
-            orientation="horizontal"
-          />
-        </div>
-      </div>
-    );
-  });
+  const sliders = channelNames
+    ? channelNames.map((channel, i) => {
+        return (
+          <div key={`container-${channel}`}>
+            <p>{channel}</p>
+            <div
+              style={{ width: '100%', display: 'flex', position: 'relative' }}
+            >
+              <Checkbox
+                onChange={() => toggleChannel(i)}
+                checked={channelIsOn[i]}
+                style={{
+                  color: `rgb(${
+                    colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValues[i]
+                  })`,
+                  '&$checked': {
+                    color: `rgb(${
+                      colormapOn
+                        ? COLORMAP_SLIDER_CHECKBOX_COLOR
+                        : colorValues[i]
+                    })`
+                  }
+                }}
+              />
+              <Slider
+                value={sliderValues[i]}
+                onChange={(event, value) => handleSliderChange(i, value)}
+                valueLabelDisplay="auto"
+                getAriaLabel={() => channel}
+                min={MIN_SLIDER_VALUE}
+                max={MAX_SLIDER_VALUE}
+                style={{
+                  color: `rgb(${
+                    colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValues[i]
+                  })`,
+                  top: '7px'
+                }}
+                orientation="horizontal"
+              />
+            </div>
+          </div>
+        );
+      })
+    : null;
 
   const initialViewState =
     sources[sourceName].initialViewState || DEFAULT_VIEW_STATE;
   return (
     <div>
-      {loader ? (
+      {loader && channelNames && channelIsOn && sliderValues && colorValues ? (
         <VivViewer
           loader={loader}
-          minZoom={MIN_ZOOM}
-          viewHeight={viewHeight}
-          viewWidth={viewWidth}
-          sliderValues={sliderValues.slice(
-            0,
-            sources[sourceName].channelNames.length
-          )}
-          colorValues={colorValues.slice(
-            0,
-            sources[sourceName].channelNames.length
-          )}
-          channelIsOn={channelIsOn.slice(
-            0,
-            sources[initSourceName].channelNames.length
-          )}
+          viewHeight={viewSize.height}
+          viewWidth={viewSize.width}
+          sliderValues={sliderValues}
+          colorValues={colorValues.slice(0, channelNames.length)}
+          channelIsOn={channelIsOn}
+          loaderSelection={loaderSelection}
           initialViewState={initialViewState}
-          colormap={colormapOn}
+          colormap={colormapOn && COLORMAP}
           overview={
             overviewOn
               ? {
                   margin: MARGIN,
-                  scale: 0.2
+                  scale: 0.2,
+                  position: 'bottom-left'
                 }
               : null
           }
@@ -202,21 +181,13 @@ function App() {
           {sourceButtons}
         </ButtonGroup>
         <div style={{ marginTop: '15px', marginBottom: '15px' }}>
-          <Button
-            variant="contained"
-            onClick={() => toggleColormap()}
-            key="colormap"
-          >
+          <Button variant="contained" onClick={toggleColormap} key="colormap">
             {colormapOn ? 'Colors' : COLORMAP}
           </Button>
         </div>
         {loader && loader.isPyramid ? (
           <div style={{ marginTop: '15px', marginBottom: '15px' }}>
-            <Button
-              variant="contained"
-              onClick={() => toggleOverview()}
-              key="overview"
-            >
+            <Button variant="contained" onClick={toggleOverview} key="overview">
               {overviewOn ? 'Remove Overview' : 'Show Overview'}
             </Button>
           </div>
