@@ -49,16 +49,12 @@ export default class VivViewer extends PureComponent {
 
   _onViewStateChange({ viewId, viewState }) {
     // Save the view state and trigger rerender
-    // only for changes to the `detail` view
-    if (viewId === 'detail') {
-      const { overview } = this.state;
-      const newViewState = {};
-      newViewState.detail = viewState;
-      newViewState.overview = overview
-        ? overview.getViewState(viewState)
-        : null;
-      this.setState({ viewState: newViewState });
-    }
+    // const { overview } = this.state;
+    this.setState(prevState => {
+      const newState = { ...prevState };
+      newState.viewState = { ...newState.viewState, [viewId]: viewState };
+      return newState;
+    });
   }
 
   componentDidUpdate(prevProps) {

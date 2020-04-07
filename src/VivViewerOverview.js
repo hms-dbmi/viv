@@ -1,7 +1,8 @@
 import { OrthographicView } from '@deck.gl/core';
 import { OverviewLayer } from './layers';
+import VivViewport from './VivViewport';
 
-export default class VivViewerOverview {
+export default class VivViewerOverview extends VivViewport {
   constructor({
     viewWidth,
     viewHeight,
@@ -19,14 +20,13 @@ export default class VivViewerOverview {
     const rasterSize = loader.getRasterSize({
       z: 0
     });
+    const width = viewWidth * overviewScale;
+    const height = width * (rasterSize.height / rasterSize.width);
+    super({ id, height, width });
     this.margin = margin;
     this.viewWidth = viewWidth;
     this.viewHeight = viewHeight;
-    this.id = id;
     this._numLevels = numLevels;
-    // These are the pixel-space height and width
-    this.width = viewWidth * overviewScale;
-    this.height = this.width * (rasterSize.height / rasterSize.width);
     // This is the ratio of the "zoomed out" image to the width of the viewport
     this.overviewScale = (2 ** (numLevels - 1) / rasterSize.width) * this.width;
     this.imageHeight = rasterSize.height;
@@ -38,7 +38,7 @@ export default class VivViewerOverview {
     this.viewportOutlineWidth = viewportOutlineWidth;
   }
 
-  _makeBoundingBox(viewState) {
+  makeBoundingBox(viewState) {
     const { viewHeight, viewWidth, overviewScale } = this;
     const viewport = new OrthographicView().makeViewport({
       // From the current `detail` viewState, we need its projection matrix (actually the inverse).
@@ -120,7 +120,7 @@ export default class VivViewerOverview {
   }
 
   getLayer({ viewState, props }) {
-    const boundingBox = this._makeBoundingBox(viewState);
+    const boundingBox = this.makeBoundingBox(viewState);
     const {
       id,
       boundingBoxColor,
