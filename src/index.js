@@ -1,12 +1,12 @@
 import { VivViewerLayer, StaticImageLayer } from './layers';
 import VivViewer from './VivViewer';
-import VivViewport from './VivViewport';
+import VivView from './VivView';
 import { createTiffPyramid, createZarrPyramid, ZarrLoader } from './loaders';
 
 export {
   VivViewerLayer,
   VivViewer,
-  VivViewport,
+  VivView,
   StaticImageLayer,
   ZarrLoader,
   createTiffPyramid,

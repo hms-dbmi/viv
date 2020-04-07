@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { OrthographicView } from '@deck.gl/core';
 import { VivViewerLayer, StaticImageLayer } from './layers';
-import VivViewerOverview from './VivViewerOverview';
+import OverviewView from './OverviewView';
 
 export default class VivViewer extends PureComponent {
   constructor(props) {
@@ -15,7 +15,7 @@ export default class VivViewer extends PureComponent {
       loader
     } = this.props;
     const vivOverview = overview
-      ? new VivViewerOverview({
+      ? new OverviewView({
           ...overview,
           viewWidth,
           viewHeight,
@@ -62,7 +62,7 @@ export default class VivViewer extends PureComponent {
     if (prevProps.overview !== overview) {
       if (overview) {
         // Overview is turned on.
-        const vivOverview = new VivViewerOverview({
+        const vivOverview = new OverviewView({
           ...overview,
           viewWidth,
           viewHeight,

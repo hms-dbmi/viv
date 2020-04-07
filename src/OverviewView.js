@@ -1,8 +1,8 @@
 import { OrthographicView } from '@deck.gl/core';
+import VivView from './VivView';
 import { OverviewLayer } from './layers';
-import VivViewport from './VivViewport';
 
-export default class VivViewerOverview extends VivViewport {
+export default class OverviewView extends VivView {
   constructor({
     viewWidth,
     viewHeight,

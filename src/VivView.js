@@ -8,7 +8,7 @@ import { OrthographicView } from '@deck.gl/core';
  * @param {string} x The x location on the screen for the current view
  * @param {string} y The y location on the screen for the current view
  */
-export default class VivViewport {
+export default class VivView {
   constructor({ id, height, width, x = 0, y = 0 }) {
     this.width = width;
     this.height = height;
@@ -61,8 +61,10 @@ export default class VivViewport {
    * @param {viewState} Object The viewState for all current viewports
    * @returns {viewState} The viewState for this viewport
    */
-  // eslint-disable-next-line class-methods-use-this,no-unused-vars
-  getViewState(viewState) {}
+  // eslint-disable-next-line class-methods-use-this
+  getViewState(viewState) {
+    return viewState;
+  }
 
   /**
    * Create a layer for the given viewport.
