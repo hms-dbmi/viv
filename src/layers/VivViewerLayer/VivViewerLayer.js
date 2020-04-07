@@ -1,5 +1,4 @@
 import { CompositeLayer } from '@deck.gl/core';
-// eslint-disable-next-line import/extensions
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
 import { padColorsAndSliders } from '../utils';
@@ -11,6 +10,7 @@ export default class VivViewerLayer extends CompositeLayer {
       sliderValues,
       colorValues,
       channelIsOn,
+      loaderSelection,
       domain,
       opacity,
       colormap,
@@ -26,12 +26,19 @@ export default class VivViewerLayer extends CompositeLayer {
       domain,
       dtype
     });
-    const getTileData = ({ x, y, z }) => {
-      return loader.getTile({
+    const getTileData = async ({ x, y, z }) => {
+      const { data, width, height } = await loader.getTile({
         x,
         y,
-        z: -z
+        z: -z,
+        loaderSelection
       });
+      if (width !== tileSize || height !== tileSize) {
+        throw Error(
+          `Tile data  { width: ${width}, height: ${height} } does not match tilesize: ${tileSize}`
+        );
+      }
+      return data;
     };
     const tiledLayer = new VivViewerLayerBase({
       id: `Tiled-Image-${id}`,

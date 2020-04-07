@@ -21,7 +21,6 @@ export default class ZarrLoader {
     this.translate = translate;
     this.isRgb = isRgb || guessRgb(base.shape);
     this.dimensions = dimensions;
-    this._dimLookup = dimensions.map(({ name }, i) => ({ [name]: i }));
     this._defaultSelection = [Array(dimensions.legnth).fill(0)];
 
     this._data = data;
@@ -46,9 +45,9 @@ export default class ZarrLoader {
     return this.isPyramid ? this._data[0] : this._data;
   }
 
-  async getTile({ x, y, z, loaderSelections }) {
+  async getTile({ x, y, z, loaderSelection }) {
     const source = this._getSource(z);
-    const selections = loaderSelections || this._defaultSelection;
+    const selections = loaderSelection || this._defaultSelection;
     const dataRequests = selections.map(async key => {
       const chunkKey = [...key];
       chunkKey[this._yIndex] = y;
@@ -60,9 +59,9 @@ export default class ZarrLoader {
     return { data, width: this.tileSize, height: this.tileSize };
   }
 
-  async getRaster({ z, loaderSelections }) {
+  async getRaster({ z, loaderSelection }) {
     const source = this._getSource(z);
-    const selections = loaderSelections || this._defaultSelection;
+    const selections = loaderSelection || this._defaultSelection;
     const dataRequests = selections.map(async key => {
       const chunkKey = [...key];
       chunkKey[this._yIndex] = null;
@@ -96,54 +95,56 @@ export default class ZarrLoader {
     return { height, width };
   }
 
-  formatSelections(loaderSelections) {
-    const selections = Array.isArray(loaderSelections)
-      ? loaderSelections
-      : [loaderSelections];
+  serializeSelection(loaderSelectionObjs) {
+    // Wrap selection in array if only one is provided
+    const selectionObjs = Array.isArray(loaderSelectionObjs)
+      ? loaderSelectionObjs
+      : [loaderSelectionObjs];
 
-    const normedSelections = selections.map(this._normalizeSelection);
-    return normedSelections;
+    const serialized = selectionObjs.map(obj => this._serialize(obj));
+    return serialized;
   }
 
   _getSource(z) {
     return typeof z === 'number' && this.isPyramid ? this._data[z] : this._data;
   }
 
-  _normalizeSelection(selectionObj) {
-    const loaderSelection = Array(this.dimensions.length).fill(0);
-    Object.entries(selectionObj).forEach(([dimName, dimValue]) => {
+  _serialize(selectionObj) {
+    const serializedSelection = Array(this.dimensions.length).fill(0);
+    const dimFields = this.dimensions.map(d => d.field);
+    Object.entries(selectionObj).forEach(([key, val]) => {
       // Get index of named dimension in zarr array
-      const dimIndex = this._dimLookup[dimName];
+      const dimIndex = dimFields.indexOf(key);
       if (dimIndex === undefined) {
         throw Error(
-          `Dimension '${dimName}' does not exist on array with dimensions :
-          ${Object.keys(this._dimLookup)}`
+          `Dimension '${key}' does not exist on array with dimensions :
+          ${dimFields}`
         );
       }
       // Get position of index along dimension axis
       let valueIndex;
-      const { name, type, values } = this.dimensions[dimIndex];
-      if (typeof dimValue === 'number') {
+      const { field, type, values } = this.dimensions[dimIndex];
+      if (typeof val === 'number') {
         // Assign index directly, regardless of dimension type
-        valueIndex = dimValue;
+        valueIndex = val;
       } else if (type === 'ordinal' || type === 'nominal') {
         // Lookup index if categorical dimension type.
         // This is slower if dimension is large; setting directly is preferred.
-        valueIndex = values.indexOf(dimValue);
+        valueIndex = values.indexOf(val);
       } else {
         // Cannot use string value for dimension that is 'quantitative' or 'temporal', must set directly.
         throw Error(
-          `The value '${dimValue}' is invalid for dimension of type ${type}`
+          `The value '${val}' is invalid for dimension of type ${type}`
         );
       }
 
       if (valueIndex < 0 || valueIndex > this.base.shape[dimIndex]) {
         // Ensure desired index is within the bounds of the dimension
-        throw Error(`Dimension ${name} does not contain index ${valueIndex}.`);
+        throw Error(`Dimension ${field} does not contain index ${valueIndex}.`);
       }
 
-      loaderSelection[dimIndex] = valueIndex;
+      serializedSelection[dimIndex] = valueIndex;
     });
-    return loaderSelection;
+    return serializedSelection;
   }
 }

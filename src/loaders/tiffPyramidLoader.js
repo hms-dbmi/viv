@@ -44,8 +44,8 @@ export default class TiffPyramidLoader {
       const image = channelPyramid[z];
       return this._getChannel({ image, x, y });
     });
-    const tiles = await Promise.all(tileRequests);
-    return tiles;
+    const data = await Promise.all(tileRequests);
+    return { data, width: this.tileSize, height: this.tileSize };
   }
 
   async getRaster({ z }) {

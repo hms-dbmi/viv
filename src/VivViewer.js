@@ -128,16 +128,15 @@ export default class VivViewer extends PureComponent {
   }
 
   render() {
-    /* eslint-disable react/destructuring-assignment */
-    const { loader } = this.props;
-    const { overview } = this.state;
+    const { loader, viewHeight, viewWidth } = this.props;
+    const { overview, viewState } = this.state;
 
     const views = [
       new OrthographicView({
         id: 'detail',
         controller: true,
-        height: this.props.viewHeight,
-        width: this.props.viewWidth
+        height: viewHeight,
+        width: viewWidth
       })
     ];
 
@@ -151,9 +150,8 @@ export default class VivViewer extends PureComponent {
         layers={this._renderLayers()}
         onViewStateChange={this._onViewStateChange}
         views={views}
-        viewState={this.state.viewState}
+        viewState={viewState}
       />
     );
-    /* eslint-disable react/destructuring-assignment */
   }
 }
