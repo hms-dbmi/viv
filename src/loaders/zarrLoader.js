@@ -1,5 +1,4 @@
-import { range } from '../layers/VivViewerLayer/utils';
-import { guessRgb, normalizeLoaderSelection } from './utils';
+import { guessRgb } from './utils';
 
 export default class ZarrLoader {
   constructor({
@@ -22,6 +21,8 @@ export default class ZarrLoader {
     this.translate = translate;
     this.isRgb = isRgb || guessRgb(base.shape);
     this.dimensions = dimensions;
+    this._dimLookup = dimensions.map(({ name }, i) => ({ [name]: i }));
+    this._defaultSelection = [Array(dimensions.legnth).fill(0)];
 
     this._data = data;
     if (this.isRgb) {
@@ -47,7 +48,8 @@ export default class ZarrLoader {
 
   async getTile({ x, y, z, loaderSelections }) {
     const source = this._getSource(z);
-    const dataRequests = loaderSelections.map(async key => {
+    const selections = loaderSelections || this._defaultSelection;
+    const dataRequests = selections.map(async key => {
       const chunkKey = [...key];
       chunkKey[this._yIndex] = y;
       chunkKey[this._xIndex] = x;
@@ -60,7 +62,8 @@ export default class ZarrLoader {
 
   async getRaster({ z, loaderSelections }) {
     const source = this._getSource(z);
-    const dataRequests = loaderSelections.map(async key => {
+    const selections = loaderSelections || this._defaultSelection;
+    const dataRequests = selections.map(async key => {
       const chunkKey = [...key];
       chunkKey[this._yIndex] = null;
       chunkKey[this._xIndex] = null;
@@ -88,12 +91,12 @@ export default class ZarrLoader {
 
   getRasterSize({ z }) {
     const source = this._getSource(z);
-    const height = source.shape[this.yIndex];
-    const width = source.shape[this.xIndex];
+    const height = source.shape[this._yIndex];
+    const width = source.shape[this._xIndex];
     return { height, width };
   }
 
-  getLoaderSelection(loaderSelections) {
+  formatSelections(loaderSelections) {
     const selections = Array.isArray(loaderSelections)
       ? loaderSelections
       : [loaderSelections];
@@ -108,34 +111,39 @@ export default class ZarrLoader {
 
   _normalizeSelection(selectionObj) {
     const loaderSelection = Array(this.dimensions.length).fill(0);
-    const dimNames = this.dimensions.map(d => d.name);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [dimName, dimValue] of selectionObj.entries()) {
-      const dimIndex = dimNames.indexOf(dimName);
-
-      if (dimIndex < 0) {
+    Object.entries(selectionObj).forEach(([dimName, dimValue]) => {
+      // Get index of named dimension in zarr array
+      const dimIndex = this._dimLookup[dimName];
+      if (dimIndex === undefined) {
         throw Error(
-          `Dimension '${dimName}' does not exist on array with dimensions : ${dimNames}`
+          `Dimension '${dimName}' does not exist on array with dimensions :
+          ${Object.keys(this._dimLookup)}`
+        );
+      }
+      // Get position of index along dimension axis
+      let valueIndex;
+      const { name, type, values } = this.dimensions[dimIndex];
+      if (typeof dimValue === 'number') {
+        // Assign index directly, regardless of dimension type
+        valueIndex = dimValue;
+      } else if (type === 'ordinal' || type === 'nominal') {
+        // Lookup index if categorical dimension type.
+        // This is slower if dimension is large; setting directly is preferred.
+        valueIndex = values.indexOf(dimValue);
+      } else {
+        // Cannot use string value for dimension that is 'quantitative' or 'temporal', must set directly.
+        throw Error(
+          `The value '${dimValue}' is invalid for dimension of type ${type}`
         );
       }
 
-      let valueIndex;
-      const { name, type, values } = this.dimensions[dimIndex];
-      if (
-        typeof dimValue === 'string' &&
-        (type === 'ordinal' || type === 'nominal')
-      ) {
-        valueIndex = values.indexof(dimValue);
-      } else {
-        valueIndex = dimValue;
-      }
-
-      if (valueIndex < 0) {
+      if (valueIndex < 0 || valueIndex > this.base.shape[dimIndex]) {
+        // Ensure desired index is within the bounds of the dimension
         throw Error(`Dimension ${name} does not contain index ${valueIndex}.`);
       }
 
       loaderSelection[dimIndex] = valueIndex;
-    }
+    });
     return loaderSelection;
   }
 }
