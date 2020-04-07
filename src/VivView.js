@@ -2,16 +2,17 @@ import { OrthographicView } from '@deck.gl/core';
 
 /**
  * This class generates a layer and a view for use in the VivViewer
- * @param {number} width The width of the viewport
- * @param {number} height The height of the viewport.
+ * @param {number} viewState The viewState object
  * @param {string} id The id for the current view
  * @param {string} x The x location on the screen for the current view
  * @param {string} y The y location on the screen for the current view
  */
 export default class VivView {
-  constructor({ id, height, width, x = 0, y = 0 }) {
+  constructor({ viewState, x = 0, y = 0 }) {
+    const { height, width, id } = viewState;
     this.width = width;
     this.height = height;
+    this.initViewState = viewState;
     this.id = id;
     this.x = x;
     this.y = y;
@@ -22,16 +23,14 @@ export default class VivView {
    * @param {viewState} Object The viewState for all current viewports
    * @returns {View} The DeckGL View for this viewport
    */
-  makeBoundingBox(viewState) {
-    const { height, width, id } = this;
-    const viewport = this.getView().makeViewport({
+  static makeBoundingBox(viewState) {
+    const viewport = new OrthographicView().makeViewport({
       // From the current `detail` viewState, we need its projection matrix (actually the inverse).
-      viewState: viewState[id],
-      height,
-      width
+      viewState,
+      height: viewState.height,
+      width: viewState.width
     });
     // Use the inverse of the projection matrix to map screen to the view space.
-    // 3D use case takes more coordinates...maybe we need a way to figure that our
     return [
       viewport.unproject([0, 0]),
       viewport.unproject([viewport.width, 0]),
@@ -39,6 +38,12 @@ export default class VivView {
       viewport.unproject([0, viewport.height])
     ];
   }
+
+  /**
+   * Set the x and y of the current view.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  setXY() {}
 
   /**
    * Create a view for the given viewport.
@@ -63,7 +68,8 @@ export default class VivView {
    */
   // eslint-disable-next-line class-methods-use-this
   getViewState(viewState) {
-    return viewState;
+    const { id } = this;
+    return viewState.id === id ? viewState : null;
   }
 
   /**

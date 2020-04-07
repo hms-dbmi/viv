@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import { Button, ButtonGroup, Slider, Checkbox } from '@material-ui/core';
-import { VivViewer } from '../../src';
+import { VivViewer, OverviewView, DetailView } from '../../src';
 import { initPyramidLoader } from './initLoaders';
 import sources from './source-info';
 import './App.css';
@@ -11,7 +11,6 @@ const MIN_ZOOM = -8;
 const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
 const COLORMAP = 'viridis';
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
-const MARGIN = 25;
 
 const initSourceName = 'zarr';
 const colorValues = [
@@ -148,38 +147,69 @@ function App() {
     );
   });
 
-  const initialViewState =
-    sources[sourceName].initialViewState || DEFAULT_VIEW_STATE;
+  const initialViewState = [
+    {
+      ...(sources[sourceName].initialViewState || DEFAULT_VIEW_STATE),
+      height: viewHeight,
+      width: viewWidth,
+      id: 'detail'
+    }
+  ];
+  const detailProps = {
+    loader,
+    sliderValues: sliderValues.slice(
+      0,
+      sources[sourceName].channelNames.length
+    ),
+    colorValues: colorValues.slice(0, sources[sourceName].channelNames.length),
+    channelIsOn: channelIsOn.slice(
+      0,
+      sources[initSourceName].channelNames.length
+    ),
+    colormap: colormapOn
+  };
+  const layerProps = [detailProps];
+  const detail = new DetailView({ viewState: initialViewState[0] });
+  const views = [detail];
+  if (overviewOn) {
+    initialViewState.push({ ...initialViewState[0], id: 'overview' });
+    const overview = new OverviewView({
+      viewState: initialViewState[1],
+      loader,
+      detailHeight: initialViewState[0].height,
+      detailWidth: initialViewState[0].width,
+      overviewScale: 0.2
+    });
+    const overviewProps = {
+      loader,
+      sliderValues: sliderValues.slice(
+        0,
+        sources[sourceName].channelNames.length
+      ),
+      colorValues: colorValues.slice(
+        0,
+        sources[sourceName].channelNames.length
+      ),
+      channelIsOn: channelIsOn.slice(
+        0,
+        sources[initSourceName].channelNames.length
+      ),
+      colormap: colormapOn,
+      boundingBoxColor: [255, 0, 0],
+      boundingBoxOutlineWidth: 50,
+      viewportOutlineColor: [255, 192, 204],
+      viewportOutlineWidth: 400
+    };
+    views.push(overview);
+    layerProps.push(overviewProps);
+  }
   return (
     <div>
       {loader ? (
         <VivViewer
-          loader={loader}
-          minZoom={MIN_ZOOM}
-          viewHeight={viewHeight}
-          viewWidth={viewWidth}
-          sliderValues={sliderValues.slice(
-            0,
-            sources[sourceName].channelNames.length
-          )}
-          colorValues={colorValues.slice(
-            0,
-            sources[sourceName].channelNames.length
-          )}
-          channelIsOn={channelIsOn.slice(
-            0,
-            sources[initSourceName].channelNames.length
-          )}
-          initialViewState={initialViewState}
-          colormap={colormapOn}
-          overview={
-            overviewOn
-              ? {
-                  margin: MARGIN,
-                  scale: 0.2
-                }
-              : null
-          }
+          layerProps={layerProps}
+          initViewState={initialViewState}
+          views={views}
         />
       ) : null}
       <div className="slider-container">

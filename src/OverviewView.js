@@ -4,82 +4,67 @@ import { OverviewLayer } from './layers';
 
 export default class OverviewView extends VivView {
   constructor({
-    viewWidth,
-    viewHeight,
+    viewState,
     loader,
+    detailHeight,
+    detailWidth,
+    overviewScale,
     margin = 25,
-    overviewLocation = 'bottom-right',
-    id = 'overview',
-    boundingBoxColor = [255, 0, 0],
-    boundingBoxOutlineWidth = 50,
-    viewportOutlineColor = [255, 192, 204],
-    viewportOutlineWidth = 400,
-    overviewScale = 1
+    overviewLocation = 'bottom-right'
   }) {
+    super({ viewState });
+    this.margin = margin;
+    this.loader = loader;
+    this.overviewLocation = overviewLocation;
+    this.detailHeight = detailHeight;
+    this.detailWidth = detailWidth;
+    this.setHeightWidthScale({ detailWidth, overviewScale });
+    this.setXY();
+  }
+
+  setHeightWidthScale({ detailWidth, overviewScale }) {
+    const { loader } = this;
     const { numLevels } = loader;
     const rasterSize = loader.getRasterSize({
       z: 0
     });
-    const width = viewWidth * overviewScale;
-    const height = width * (rasterSize.height / rasterSize.width);
-    super({ id, height, width });
-    this.margin = margin;
-    this.viewWidth = viewWidth;
-    this.viewHeight = viewHeight;
-    this._numLevels = numLevels;
-    // This is the ratio of the "zoomed out" image to the width of the viewport
+    const heightWidthRatio = rasterSize.height / rasterSize.width;
+    this.width = detailWidth * overviewScale;
+    this.height = this.width * heightWidthRatio;
     this.overviewScale = (2 ** (numLevels - 1) / rasterSize.width) * this.width;
-    this.imageHeight = rasterSize.height;
-    this.imageWidth = rasterSize.width;
-    this.overviewLocation = overviewLocation;
-    this.boundingBoxColor = boundingBoxColor;
-    this.boundingBoxOutlineWidth = boundingBoxOutlineWidth;
-    this.viewportOutlineColor = viewportOutlineColor;
-    this.viewportOutlineWidth = viewportOutlineWidth;
+    this._imageWidth = rasterSize.width;
+    this._imageHeight = rasterSize.height;
   }
 
-  makeBoundingBox(viewState) {
-    const { overviewScale } = this;
-    const viewport = new OrthographicView().makeViewport({
-      // From the current `detail` viewState, we need its projection matrix (actually the inverse).
-      viewState,
-      height: viewState.height,
-      width: viewState.width
-    });
-    // Use the inverse of the projection matrix to map screen to the view space.
-    return [
-      viewport.unproject([0, 0]),
-      viewport.unproject([viewport.width, 0]),
-      viewport.unproject([viewport.width, viewport.height]),
-      viewport.unproject([0, viewport.height])
-    ].map(coord => coord.map(e => e * overviewScale));
-  }
-
-  _getOverviewMargins() {
+  setXY() {
     const {
       height,
       width,
       margin,
-      viewWidth,
-      viewHeight,
-      overviewLocation
+      overviewLocation,
+      detailWidth,
+      detailHeight
     } = this;
     switch (overviewLocation) {
       case 'bottom-right': {
-        return [
-          // margin is the margin from the corner
-          viewWidth - width - margin,
-          viewHeight - height - margin
-        ];
+        this.x = detailWidth - width - margin;
+        this.y = detailHeight - height - margin;
+        break;
       }
       case 'top-right': {
-        return [viewWidth - width - margin, margin];
+        this.x = detailWidth - width - margin;
+        this.y = margin;
+        break;
       }
       case 'top-left': {
-        return [margin, margin];
+        this.x = margin;
+        this.y = margin;
+        break;
       }
       case 'bottom-left': {
-        return [margin, viewHeight - height - margin];
+        this.x = margin;
+        this.y = detailHeight - height - margin;
+        break;
       }
       default: {
         throw new Error(
@@ -89,54 +74,43 @@ export default class OverviewView extends VivView {
     }
   }
 
-  getView() {
-    const { height, width, overviewLocation, id } = this;
-    const [overviewXMargin, overviewYMargin] = this._getOverviewMargins(
-      overviewLocation
-    );
+  getDeckGlView() {
+    // Hardcoded to use the detail id
+    const { x, y, id, height, width } = this;
     return new OrthographicView({
       id,
       controller: false,
       height,
       width,
-      x: overviewXMargin,
-      y: overviewYMargin,
+      x,
+      y,
       clear: true
     });
   }
 
   getViewState(viewState) {
-    const { imageWidth, imageHeight, overviewScale, _numLevels, id } = this;
+    const { _imageWidth, _imageHeight, overviewScale, id, loader } = this;
+    const { numLevels } = loader;
     return {
       ...viewState,
       id,
       target: [
-        (imageWidth * overviewScale) / 2,
-        (imageHeight * overviewScale) / 2,
+        (_imageWidth * overviewScale) / 2,
+        (_imageHeight * overviewScale) / 2,
         0
       ],
-      zoom: -(_numLevels - 1)
+      zoom: -(numLevels - 1)
     };
   }
 
   getLayer({ viewState, props }) {
-    const boundingBox = this.makeBoundingBox(viewState);
-    const {
-      id,
-      boundingBoxColor,
-      boundingBoxOutlineWidth,
-      viewportOutlineColor,
-      viewportOutlineWidth,
-      overviewScale
-    } = this;
-    const { loader } = props;
+    const { id, overviewScale, loader } = this;
+    const boundingBox = VivView.makeBoundingBox(viewState.detail).map(coords =>
+      coords.map(e => e * overviewScale)
+    );
     return new OverviewLayer(props, {
       id: `${loader.type}-${id}`,
       boundingBox,
-      boundingBoxColor,
-      boundingBoxOutlineWidth,
-      viewportOutlineColor,
-      viewportOutlineWidth,
       overviewScale
     });
   }
