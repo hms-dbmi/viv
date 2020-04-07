@@ -27,9 +27,16 @@
   width: 20%;
   position: absolute;
   padding: 1.5em;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 0 0 0 1em;
 }
 
 .slider-container p {
   color: white;
+}
+
+.menu-toggle {
+  right: 1em;
+  top: 1em;
+  position: absolute;
 }

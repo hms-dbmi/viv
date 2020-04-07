@@ -38,7 +38,9 @@ export default class TiffPyramidLoader {
      * Here we check if a tile is within bounds before requesting tile data.
      */
 
-    if (!this._tileInBounds({ x, y, z })) return null;
+    if (!this._tileInBounds({ x, y, z })) {
+      return { data: null, width: this.tileSize, height: this.tileSize };
+    }
 
     const tileRequests = this.channelPyramids.map(channelPyramid => {
       const image = channelPyramid[z];

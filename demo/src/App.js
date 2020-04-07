@@ -8,11 +8,15 @@ import { createLoader, useWindowSize } from './utils';
 const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
 const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
-const COLORMAP = 'viridis';
+const DEFAULT_COLORMAP = 'viridis';
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
-const MARGIN = 25;
+const DEFAULT_OVERVIEW = {
+  margin: 25,
+  scale: 0.2,
+  position: 'bottom-left'
+};
 
-const initSourceName = 'zarr';
+const initSourceName = 'tiff';
 const colorValues = [
   [0, 0, 255],
   [0, 255, 0],
@@ -31,6 +35,7 @@ function App() {
   const [sourceName, setSourceName] = useState(initSourceName);
   const [colormapOn, toggleColormap] = useReducer(v => !v, false);
   const [overviewOn, toggleOverview] = useReducer(v => !v, false);
+  const [controllerOn, toggleController] = useReducer(v => !v, true);
   const viewSize = useWindowSize();
 
   useEffect(() => {
@@ -135,11 +140,10 @@ function App() {
       })
     : null;
 
-  const initialViewState =
-    sources[sourceName].initialViewState || DEFAULT_VIEW_STATE;
+  const { initialViewState, isPyramid } = sources[sourceName];
   return (
-    <div>
-      {loader && channelNames && channelIsOn && sliderValues && colorValues ? (
+    <>
+      {loader && channelNames && channelIsOn && sliderValues && colorValues && (
         <VivViewer
           loader={loader}
           viewHeight={viewSize.height}
@@ -148,55 +152,47 @@ function App() {
           colorValues={colorValues.slice(0, channelNames.length)}
           channelIsOn={channelIsOn}
           loaderSelection={loaderSelection}
-          initialViewState={initialViewState}
-          colormap={colormapOn && COLORMAP}
-          overview={
-            overviewOn
-              ? {
-                  margin: MARGIN,
-                  scale: 0.2,
-                  position: 'bottom-left'
-                }
-              : null
-          }
+          initialViewState={initialViewState || DEFAULT_VIEW_STATE}
+          colormap={colormapOn && DEFAULT_COLORMAP}
+          overview={overviewOn && DEFAULT_OVERVIEW}
         />
-      ) : null}
-      <div className="slider-container">
-        <p>
-          <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer
-          for high bit depth, high resolution, multi-channel images using DeckGL
-          over the hood and WebGL under the hood.
-        </p>
-        <p>
-          More information:{' '}
-          <a href="https://github.com/hubmapconsortium/vitessce-image-viewer">
-            Github
-          </a>
-          ,&nbsp;
-          <a href="https://www.npmjs.com/package/@hubmap/vitessce-image-viewer">
-            NPM
-          </a>
-        </p>
-        <ButtonGroup color="primary" size="small">
-          {sourceButtons}
-        </ButtonGroup>
-        <div style={{ marginTop: '15px', marginBottom: '15px' }}>
-          <Button variant="contained" onClick={toggleColormap} key="colormap">
-            {colormapOn ? 'Colors' : COLORMAP}
-          </Button>
+      )}
+      {controllerOn && (
+        <div className="slider-container">
+          <p>
+            <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer
+            for high bit depth, high resolution, multi-channel images using
+            DeckGL over the hood and WebGL under the hood.
+          </p>
+          <p>
+            More information:{' '}
+            <a href="https://github.com/hubmapconsortium/vitessce-image-viewer">
+              Github
+            </a>
+            ,&nbsp;
+            <a href="https://www.npmjs.com/package/@hubmap/vitessce-image-viewer">
+              NPM
+            </a>
+          </p>
+          <ButtonGroup color="primary" size="small">
+            {sourceButtons}
+          </ButtonGroup>
+          <br />
+          <button onClick={toggleColormap} type="button">
+            {colormapOn ? 'Colors' : DEFAULT_COLORMAP}
+          </button>
+          {isPyramid && (
+            <button onClick={toggleOverview} type="button">
+              {overviewOn ? 'Show' : 'Hide'} Overview
+            </button>
+          )}
+          {sliders}
         </div>
-        {loader && loader.isPyramid ? (
-          <div style={{ marginTop: '15px', marginBottom: '15px' }}>
-            <Button variant="contained" onClick={toggleOverview} key="overview">
-              {overviewOn ? 'Remove Overview' : 'Show Overview'}
-            </Button>
-          </div>
-        ) : (
-          []
-        )}
-        {sliders}
-      </div>
-    </div>
+      )}
+      <button className="menu-toggle" type="button" onClick={toggleController}>
+        {controllerOn ? 'Hide' : 'Show'} Controller
+      </button>
+    </>
   );
 }
 
