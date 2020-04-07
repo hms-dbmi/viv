@@ -70,9 +70,7 @@ export default class VivViewer extends PureComponent {
           ...overview,
           viewWidth,
           viewHeight,
-          loader,
-          margin: overview.margin,
-          overviewScale: overview.scale
+          loader
         });
         // eslint-disable-next-line react/no-did-update-set-state
         this.setState(prevState => {
