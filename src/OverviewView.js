@@ -39,12 +39,12 @@ export default class OverviewView extends VivView {
   }
 
   makeBoundingBox(viewState) {
-    const { viewHeight, viewWidth, overviewScale } = this;
+    const { overviewScale } = this;
     const viewport = new OrthographicView().makeViewport({
       // From the current `detail` viewState, we need its projection matrix (actually the inverse).
       viewState,
-      height: viewHeight,
-      width: viewWidth
+      height: viewState.height,
+      width: viewState.width
     });
     // Use the inverse of the projection matrix to map screen to the view space.
     return [

@@ -44,7 +44,7 @@ export default class VivView {
    * Create a view for the given viewport.
    * @returns {View} The DeckGL View for this viewport
    */
-  getView() {
+  getDeckGlView() {
     const { height, width, id, x, y } = this;
     return new OrthographicView({
       id,
