@@ -50,4 +50,4 @@ Second, **_we make use of [HTTP2](https://en.wikipedia.org/wiki/HTTP/2)_** to sp
 - **[Bioformats](https://docs.openmicroscopy.org/bio-formats/6.0.1/users/comlinetools/conversion.html)** provides pyramid-writing capabilities for `OME-TIFF` files. With these, you should configure `Viv` to use `geotiff.js`.
 - **[Libvips](https://github.com/libvips/libvips)** is another, perhaps lower level, library that can be of service for similar needs.
 - **[img2zarr](https://github.com/hubmapconsortium/img2zarr)** is a work in progress for creating zarr-pyramids using **[dask](https://github.com/dask/dask)** for efficient memory management during pyramid creation. It is still under development, so use this more as a sample of how to work with data and not as a ready-built solution.
-- **[vitessce-data](https://github.com/hubmapconsortium/vitessce-data/blob/master/python/tile_zarr_base.py)** also contains similar code for writing azarr pyramids.
+- **[vitessce-data](https://github.com/hubmapconsortium/vitessce-data/blob/master/python/tile_zarr_base.py)** also contains similar code for writing zarr pyramids.
