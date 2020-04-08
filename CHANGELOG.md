@@ -4,7 +4,12 @@
 
 ### Added
 
+- Add `loaderSelection` as prop for `VivViewerLayer`. This parameter is passed to `loader.getTile` and `loader.getRaster` in addtion to `x`, `y` and `z`.
+
 ### Changed
+
+- Refactored demo to allow various channels and change selection.
+- Use reducer for handling channel state in Demo.
 
 ## 0.1.4
 
