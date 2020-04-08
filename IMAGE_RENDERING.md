@@ -26,13 +26,15 @@ To tackle this **_we look to [WebGL](https://developer.mozilla.org/en-US/docs/We
 
 #### 2. Serving Data Efficiently
 
-Most high resolution tiling image viewing systems rely on `jpeg` files, which can obtain 10:1 compression ratios with imperceptible loss of quality, to serve the image tiles. The `jpeg` files are very small and therefore there is minimal bottleneck with network requests. However, this file type/compression scheme is [not an easy option](https://caniuse.com/#feat=jpegxr) (realistically) for more than 8 bits of data per channel in current browsers (they do not ship with the decompression algorithm for more than 8 bit data), nor is it clear that we wish to lose any precision in what is essentially a scientific measurement. The other popular image file type, `png`, achieves considerably worse compression (around 2:1) but is lossless.
+Most high resolution tiling image viewing systems rely on `jpeg` files, which can obtain 10:1 compression ratios with imperceptible loss of quality, to serve the image tiles. The `jpeg` files are very small and therefore there is minimal bottleneck with network requests. However, this file type/compression scheme is [not an easy option](https://caniuse.com/#feat=jpegxr) at this moment for more than 8 bits of data per channel in current browsers as they do not ship with the decompression algorithm for more than 8 bit data. However libraries like [zarr.js](https://github.com/gzuidhof/zarr.js) and [geotiff.js](https://github.com/geotiffjs/geotiff.js) could eventually use [an implementation](https://github.com/mozilla/pdf.js/blob/fa4b431091c51a82315dce7da7b848cc6498bcea/src/core/jpg.js) to decode said data. It also it clear that we wish to lose any precision in what is essentially a scientific measurement. The other popular image file type, `png`, achieves considerably worse compression (around 2:1) but is lossless.
 
 Our approach to solving this is twofold.
 
-First, we **_store the image in a compressed, "raw" format_** that can be decoded in the browser. For this, we currently use [zarr](https://zarr.readthedocs.io/en/stable/) with [zarr.js](https://github.com/gzuidhof/zarr.js). **Zarr** essentially stores matrices of data using the same algorithm as png (`DEFLATE`) but very flexibly, in that the data can be of any size, in any shape. For our purposes, it is best to store the data as flattened image tiles, which can then be read in the client by **Zarr.js**. Taking a step back to see why this is necessary, let us note that **WebGL** uses flat arrays and offset parameters to know how to scan the data so it can be passed down to the shaders - therefore pre-flattening the data before it reaches the client will result in best performance. Thus, we flatten each image array of the pyramid in `tileSize x tileSize` passes over the data using [numpy](https://numpy.org/) and then store this in a **Zarr** file folder for efficient use. For example, if you have a `1028x1028x3` image with `tileSize` equal to 128, the data would be converted into a `10 x 10 x 128 x 128 x 3` numpy array (i.e the top `128x128` entries of the original image becomes a block, then the next `128x128` entries and so forth), and then flattened in [row-major order](https://en.wikipedia.org/wiki/Row-_and_column-major_order) to be served to the client. Another advantage to this is that we can store each channel separately, thereby making our individual requests smaller and our application better an switching channels on and off- to render one channel, you only have to request one channel's worth of data, instead of requesting all 3 (or 4) channels needed in a "normal" image format.
+First, we **_store the image in a compressed, "raw" format_** that can be decoded in the browser. For this client-side work, we currently use **zarr** with **[zarr.js](https://github.com/gzuidhof/zarr.js)** and **[geotiff.js](https://github.com/geotiffjs/geotiff.js)**.
 
-Second, **_we make use of [HTTP2](https://en.wikipedia.org/wiki/HTTP/2)_** to speed up the requests. Even though the requests are not particularly large (normally far less than 500kb per tile with a `512x512` tile size, 8bits of data), there are many of them and in normal HTTP, they block one another after a certain point. **HTTP2** more or less circumvents this blocking problem, essentially reducing the time needed to make a request by the number of requests made. A possible extension of this is to use [gRPC](https://en.wikipedia.org/wiki/GRPC) (which uses **HTTP2** under the hood together with [Protobuf](https://en.wikipedia.org/wiki/Protocol_Buffers)) but for now, **HTTP2** alone works well enough.
+**[zarr](https://zarr.readthedocs.io/en/stable/)** essentially stores matrices of data in chunks using a variety of compression methods but very flexibly, in that the data can be of "any size", in "any shape". In other words, **zarr** stores n-dimensional chunks of the matrix in compressed file blobs, each flattened in row major order (this is basically how `numpy` stores data interally in memory as well, I believe). Taking a step back to see why this is helpful, let us note that **WebGL** uses flat arrays and offset parameters to know how to scan the data so it can be passed down to the shaders - therefore **zarr**'s internal use of flattened data before it reaches the client results in very good performance. Thus, we store each image array of the pyramid in `tileSize x tileSize` passes over the data using [numpy](https://numpy.org/) and then store this in a **zarr** file folder for efficient use. For example, if you have a `1028x1028x3` image with `tileSize` equal to 128, you could think of the data as being converted into a `10 x 10 x 128 x 128 x 3` matrix (i.e the top `128x128` entries of the original image becomes a block, then the next `128x128` entries and so forth), and then stored in [row-major order](https://en.wikipedia.org/wiki/Row-_and_column-major_order) to be served to the client. Thus you could request tile `A x B` and, in one request, get the `A x B`th chunk of size `128 x 128 x 3`, already flattened. Another advantage to this is that we can store each channel separately, thereby making our individual requests smaller and our application better an switching channels on and off- to render one channel, you only have to request one channel's worth of data, instead of requesting all channels needed in a "normal" image format. `TIFF` files are stored somehwat similarly but rather using the `tiff` file format so all the data lives in one file and then **geotiff.js** makes range requests to get a tiles' worth of flattened image data. All this is to say, if you have a method that can store image data in a way that the client can efficiently request a tile's worth of data in one request, you can use that as the "backend" for this project (for example, if you had a `javascript` `hdf5` reader, you could probably use that!).
+
+Second, **_we make use of [HTTP2](https://en.wikipedia.org/wiki/HTTP/2)_** to speed up the requests. Even though the requests are not particularly large (normally far less than 2MB per tile with a `512x512` tile size, 16bits of data), there are many of them and in normal HTTP, they block one another after a certain point. **HTTP2** more or less circumvents this blocking problem, essentially reducing the time needed to make a request by the number of requests made. A possible extension of this is to use [gRPC](https://en.wikipedia.org/wiki/GRPC) (which uses **HTTP2** under the hood together with [Protobuf](https://en.wikipedia.org/wiki/Protocol_Buffers)) but for now, **HTTP2** alone works well enough.
 
 ## Pitfalls of other routes
 
@@ -43,61 +45,9 @@ Second, **_we make use of [HTTP2](https://en.wikipedia.org/wiki/HTTP/2)_** to sp
   1. The **OpenEXR** format appears to only support three different data types (16 and 32 bit floats, and 32 bit unsigned integers), which means we probably have to kludge our data a bit and will need two different image-serving systems if we get 8-bit data; granted, making an image pyramid requires **_some_** loss of precision anyway (it is essentially a [statistical process](<https://en.wikipedia.org/wiki/Pyramid_(image_processing)>)), so getting from native integers in the OME-TIFF to floating point is not the end of the world, but will likely require we lose precision.
   2. One of the lossy compression schemes it supports is lossy in so far as it just lops of the least significant 8 bits of data (scroll down to the data compression sections [here](https://www.openexr.com/documentation/TechnicalIntroduction.pdf)). The others, while less hacky in this sense, do not even work for 32 bit data
 
-## Our Solution (at a high level)
+## Helpful Libraries for Data Processing
 
-**INPUT:** An OME-TIFF file with an arbitrary number of channels and up to 32 bits of range per channel per image. There may be many `Z` (physical space) and `T` (time) image planes in each OME-TIFF so we describe the pipeline per image per channel . These first siz steps are only for using **Zarr**. If you wish to use direct tiff access, the original image needs only be run through the pyramid/tiling scheme provided by libvips, and then a client side library can be employed.
-
-1. On a server with enough RAM, in **python**, read the image into memory as an **numpy** array, a `rows x columns x channels` matrix and then take only one of the channels yielding a `rows x columns` matrix.
-2. Create an image pyramid using **scikit-image**.
-3. For each layer in the pyramid, pad the sides so the number of `rows` and `columns` is an even multiple of the `tileSize`.
-4. Convert each layer in the pyramid into a `(height // tileSize) x (width // tileSize) x tileSize x tileSize` array, thereby making essentially making the first two matrix dimensions indices for each tile.
-5. Flatten this new array in **row-major-order** thereby preserving the "tile" structure.
-6. Write the entire array into a **zarr** file with chunk size `tileSize * tileSize`(i.e each individual compressed file contains a flattened tile of one channel).
-
-Then the browser can go through the following steps to get a channel of an OME-TIFF and render it:
-
-1. Over an **HTTP2** connection, fetch the needed tiles stored as a compressed **zarr** array (or directly as TIFF chunks). That is, for tile index `x` and `y` fetch the (flattened) data spanning from `x * tileSize * tileSize * (width // tileSize) + y * tileSize * tileSize` to `x * tileSize * tileSize * (width // tileSize) + (y + 1) * tileSize * tileSize`
-2. Decompress the data and pass it into the proper **DeckGL** `TileLayer` to be passed down to the shaders, along the with color that will represent the channel as well as the range of values to map down to the `0` to `1` range of the shaders.
-3. Once the data is on the shaders, map the values down and render.
-
-While the pipeline is rather simple, **DeckGL** and **HTTP2** are doing a lot of leg work here. This would simply not be possible to do quickly without these libraries.
-
-Here is a small script for rendering the images in **zarr**:
-
-```python
-import numpy as np
-from apeer_ometiff_library import io
-from skimage.transform import pyramid_gaussian
-import zarr
-import random
-import math
-from numcodecs import Zlib
-filename = ""
-(array, omexml) = io.read_ometiff(filename)
-# index the array to only get what you need to create the pyramid
-# this example is a multichannel so we index out the first four dimensions
-# to only get CWH
-array = array[0][0][0][0]
-pyramid_list = []
-# iterate over however many dimensions you need
-for arr in array:
-    pyramid_list += [np.asarray(list(tuple(pyramid_gaussian(arr, downscale=2))))]
-j= 0
-tile_size = 256
-for pyramid in pyramid_list:
-    i = 0
-    for p in pyramid:
-        padded = np.pad(p, pad_width = [(0, math.ceil(p.shape[0] / tile_size) * tile_size - p.shape[0]), (0, math.ceil(p.shape[1] / tile_size) * tile_size - p.shape[1])], constant_values=0)
-        padded = padded.reshape(padded.shape[0]//tile_size, tile_size, padded.shape[1]//tile_size, tile_size).swapaxes(1, 2)
-        padded_reshape_flatten = padded.ravel()
-        padded_reshape_shape = padded.shape
-        del padded
-        # name it as you wish, probably more helpful than numbers to channels
-        z = zarr.open(f"img_pyramid/channel_{j}/pyramid_{i}.zarr", shape=list(padded_reshape_flatten.shape), chunks=(tile_size*tile_size,), compressor=Zlib(level=1), dtype='<u2')
-        z.attrs['height'] = padded_reshape_shape[0]
-        z.attrs['width'] = padded_reshape_shape[1]
-        print(z)
-        z[:,] = padded_reshape_flatten
-        i = i + 1
-    j = j + 1
-```
+- **[Bioformats](https://docs.openmicroscopy.org/bio-formats/6.0.1/users/comlinetools/conversion.html)** provides pyramid-writing capabilities for `OME-TIFF` files. With these, you should configure `Viv` to use `geotiff.js`.
+- **[Libvips](https://github.com/libvips/libvips)** is another, perhaps lower level, library that can be of service for similar needs.
+- **[img2zarr](https://github.com/hubmapconsortium/img2zarr)** is a work in progress for creating zarr-pyramids using **[dask](https://github.com/dask/dask)** for efficient memory management during pyramid creation. It is still under development, so use this more as a sample of how to work with data and not as a ready-built solution.
+- **[vitessce-data](https://github.com/hubmapconsortium/vitessce-data/blob/master/python/tile_zarr_base.py)** also contains similar code for writing azarr pyramids.
