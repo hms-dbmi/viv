@@ -5,32 +5,37 @@ const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
 
+const style = { width: '100%', display: 'flex', position: 'relative' };
+
 function ChannelController({
-  channel,
-  channelOn,
+  name,
+  isOn,
   sliderValue,
-  channelOptions,
   colorValue,
-  handleChannelChange,
-  colormapOn = false
+  colormapOn,
+  channelOptions,
+  handleChange
 }) {
   return (
     <>
       <select
-        value={channel}
-        key={channel}
-        onChange={e => handleChannelChange('CHANGE_CHANNEL', e.target.value)}
+        value={name}
+        onChange={e => handleChange('CHANGE_CHANNEL_DROPDOWN', e.target.value)}
       >
-        {channelOptions.map((name, j) => (
-          <option key={name} value={j}>
-            {name}
-          </option>
-        ))}
+        {channelOptions ? (
+          channelOptions.map(opt => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))
+        ) : (
+          <option disabled>{name}</option>
+        )}
       </select>
-      <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
+      <div style={style}>
         <Checkbox
-          onChange={() => handleChannelChange('TOGGLE_ON')}
-          checked={channelOn}
+          onChange={() => handleChange('TOGGLE_ON')}
+          checked={isOn}
           style={{
             color: `rgb(${
               colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValue
@@ -44,11 +49,9 @@ function ChannelController({
         />
         <Slider
           value={sliderValue}
-          onChange={(event, value) =>
-            handleChannelChange('CHANGE_SLIDER', value)
-          }
+          onChange={(event, value) => handleChange('CHANGE_SLIDER', value)}
           valueLabelDisplay="auto"
-          getAriaLabel={() => channel}
+          getAriaLabel={() => `${name}-${colorValue}-${sliderValue}`}
           min={MIN_SLIDER_VALUE}
           max={MAX_SLIDER_VALUE}
           style={{

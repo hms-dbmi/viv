@@ -29,6 +29,10 @@
   padding: 1.5em;
   background: rgba(0, 0, 0, 0.75);
   border-radius: 0 0 0 1em;
+  color: white;
+  display: flex;
+  justify-content: start;
+  flex-direction: column;
 }
 
 .slider-container p {

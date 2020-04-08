@@ -13,7 +13,7 @@ const basePyramidInfo = {
   ],
   isPublic: true,
   isPyramid: true,
-  selection: channelNames.map(name => ({ channel: name }))
+  selections: channelNames.map(name => ({ channel: name }))
 };
 
 const tiffInfo = {
@@ -90,7 +90,7 @@ const staticInfo = {
     { field: 'y', type: 'quantitative', values: null },
     { field: 'x', type: 'quantitative', values: null }
   ],
-  selection: [{ mz: '703.5722' }, { mz: '721.4766' }]
+  selections: [{ mz: '703.5722' }, { mz: '721.4766' }]
 };
 
 export default {

@@ -61,9 +61,12 @@ export function useWindowSize(scaleWidth = 1, scaleHeight = 1) {
 export function channelsReducer(state, { index, value, type }) {
   switch (type) {
     case 'CHANGE_CHANNEL': {
+      const { name, selection } = value;
       const names = [...state.names];
-      names[index] = value;
-      return { ...state, names };
+      const selections = [...state.selections];
+      names[index] = name;
+      selections[index] = selection;
+      return { ...state, names, selections };
     }
     case 'CHANGE_COLOR': {
       const colors = [...state.colors];
