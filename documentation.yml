@@ -1,6 +1,7 @@
 toc:
 - name: React Components
 - VivViewer
+- name: Classes
 - VivView
 - OverviewView
 - DetailView
