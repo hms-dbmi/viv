@@ -3,9 +3,15 @@ import { Button, ButtonGroup } from '@material-ui/core';
 import { VivViewer } from '../../src';
 import sources from './source-info';
 import './App.css';
-import { createLoader, useWindowSize, channelsReducer } from './utils';
+import {
+  createLoader,
+  useWindowSize,
+  channelsReducer,
+  hexToRgb
+} from './utils';
 import ChannelController from './ChannelController';
 
+const MAX_CHANNELS = 6;
 const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
 const DEFAULT_OVERVIEW = { margin: 25, scale: 0.15, position: 'bottom-left' };
 const COLORMAP_OPTIONS = [
@@ -38,6 +44,7 @@ function App() {
   const [colormap, setColormap] = useState('');
   const [overviewOn, toggleOverview] = useReducer(v => !v, false);
   const [controllerOn, toggleController] = useReducer(v => !v, true);
+  const [channelColor, setChannelColor] = useState('#ff0000');
   const viewSize = useWindowSize();
 
   useEffect(() => {
@@ -80,6 +87,15 @@ function App() {
     }
   };
 
+  const handleChannelAdd = () => {
+    const [channelDim] = sources[sourceName].dimensions;
+    const name = channelDim.values[0];
+    dispatch({
+      type: 'ADD_CHANNEL',
+      value: { name, selection: [0, 0, 0], color: hexToRgb(channelColor) }
+    });
+  };
+
   const sourceButtons = Object.keys(sources).map(name => {
     return (
       // only use isPublic on the deployment
@@ -104,7 +120,8 @@ function App() {
     return (
       <ChannelController
         name={names[i]}
-        channelOptions={selections.length > 0 && dimensions[0].values}
+        channelOptions={dimensions[0].values}
+        disableOptions={sourceName === 'tiff'}
         isOn={isOn[i]}
         sliderValue={sliders[i]}
         colorValue={colors[i]}
@@ -166,12 +183,25 @@ function App() {
               ))}
             </select>
           </label>
+          {channelControllers}
           {isPyramid && (
             <button onClick={toggleOverview} type="button">
               {overviewOn ? 'Hide' : 'Show'} Overview
             </button>
           )}
-          {channelControllers}
+          <button
+            type="button"
+            disabled={ids.length === MAX_CHANNELS || sourceName === 'tiff'}
+            onClick={handleChannelAdd}
+          >
+            Add Channel
+          </button>
+          <input
+            type="color"
+            value={channelColor}
+            onChange={e => setChannelColor(e.target.value)}
+            disabled={sourceName === 'tiff'}
+          />
         </div>
       )}
       <button className="menu-toggle" type="button" onClick={toggleController}>

@@ -83,9 +83,26 @@ export function channelsReducer(state, { index, value, type }) {
       isOn[index] = !isOn[index];
       return { ...state, isOn };
     }
-    // case 'ADD_CHANNEL': {
-
-    // }
+    case 'ADD_CHANNEL': {
+      const { name, selection, color } = value;
+      const nextState = { ...state };
+      nextState.names.push(name);
+      nextState.selections.push(selection);
+      nextState.colors.push(color);
+      nextState.isOn.push(true);
+      nextState.sliders.push([0, 20000]);
+      nextState.ids.push(String(Math.random()));
+      return nextState;
+    }
+    case 'REMOVE_CHANNEL': {
+      const names = state.names.filter((_, i) => i !== index);
+      const sliders = state.sliders.filter((_, i) => i !== index);
+      const colors = state.colors.filter((_, i) => i !== index);
+      const isOn = state.isOn.filter((_, i) => i !== index);
+      const ids = state.ids.filter((_, i) => i !== index);
+      const selections = state.selections.filter((_, i) => i !== index);
+      return { names, sliders, colors, isOn, ids, selections };
+    }
     case 'RESET_CHANNELS': {
       const { names, selections = [] } = value;
       const n = names.length;
@@ -101,4 +118,10 @@ export function channelsReducer(state, { index, value, type }) {
     default:
       throw new Error();
   }
+}
+
+export function hexToRgb(hex) {
+  // https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result.map(d => parseInt(d, 16)).slice(1);
 }

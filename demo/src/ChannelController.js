@@ -5,7 +5,7 @@ const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
 
-const style = { width: '100%', display: 'flex', position: 'relative' };
+const style = { display: 'flex', position: 'relative' };
 
 function ChannelController({
   name,
@@ -14,24 +14,28 @@ function ChannelController({
   colorValue,
   colormapOn,
   channelOptions,
-  handleChange
+  handleChange,
+  disableOptions = false
 }) {
   return (
     <>
-      <select
-        value={name}
-        onChange={e => handleChange('CHANGE_CHANNEL_DROPDOWN', e.target.value)}
-      >
-        {channelOptions ? (
-          channelOptions.map(opt => (
-            <option key={opt} value={opt}>
+      <div style={style}>
+        <select
+          value={name}
+          onChange={e =>
+            handleChange('CHANGE_CHANNEL_DROPDOWN', e.target.value)
+          }
+        >
+          {channelOptions.map(opt => (
+            <option disabled={disableOptions} key={opt} value={opt}>
               {opt}
             </option>
-          ))
-        ) : (
-          <option disabled>{name}</option>
-        )}
-      </select>
+          ))}
+        </select>
+        <button type="button" onClick={() => handleChange('REMOVE_CHANNEL')}>
+          Remove
+        </button>
+      </div>
       <div style={style}>
         <Checkbox
           onChange={() => handleChange('TOGGLE_ON')}
