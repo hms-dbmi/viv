@@ -12,17 +12,14 @@ function ChannelController({
   channelOptions,
   colorValue,
   handleChannelChange,
-  handleSliderChange,
-  handleChannelToggle,
-  handleColorChange,
   colormapOn = false
 }) {
   return (
     <>
       <select
-        defaultValue={channel}
+        value={channel}
         key={channel}
-        onChange={handleChannelChange}
+        onChange={e => handleChannelChange('CHANGE_CHANNEL', e.target.value)}
       >
         {channelOptions.map((name, j) => (
           <option key={name} value={j}>
@@ -32,7 +29,7 @@ function ChannelController({
       </select>
       <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
         <Checkbox
-          onChange={handleChannelToggle}
+          onChange={() => handleChannelChange('TOGGLE_ON')}
           checked={channelOn}
           style={{
             color: `rgb(${
@@ -47,7 +44,9 @@ function ChannelController({
         />
         <Slider
           value={sliderValue}
-          onChange={(event, value) => handleSliderChange(value)}
+          onChange={(event, value) =>
+            handleChannelChange('CHANGE_SLIDER', value)
+          }
           valueLabelDisplay="auto"
           getAriaLabel={() => channel}
           min={MIN_SLIDER_VALUE}
