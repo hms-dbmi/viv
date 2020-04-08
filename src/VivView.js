@@ -19,8 +19,8 @@ export default class VivView {
   }
 
   /**
-   * Create a boudning box for the viewport and passed-in viewState.
-   * @param {viewState} Object The viewState for all current viewports
+   * Create a boudning box from a viewport based on passed-in viewState.
+   * @param {viewState} Object The viewState for a certain viewport
    * @returns {View} The DeckGL View for this viewport
    */
   static makeBoundingBox(viewState) {
@@ -40,8 +40,8 @@ export default class VivView {
   }
 
   /**
-   * Create a view for the given viewport.
-   * @returns {View} The DeckGL View for this viewport
+   * Create a DeckGL view based on this class.
+   * @returns {View} The DeckGL View for this class.
    */
   getDeckGlView() {
     const { height, width, id, x, y } = this;
@@ -56,9 +56,9 @@ export default class VivView {
   }
 
   /**
-   * Create a viewState for the given viewport.
-   * @param {ViewState} Object The viewState for all current viewports
-   * @returns {ViewState} The viewState for this viewport
+   * Create a viewState for this class, checking the id to make sure this class and veiwState match.
+   * @param {ViewState} Object A viewState object.
+   * @returns {ViewState} The viewState for this class.
    */
   // eslint-disable-next-line class-methods-use-this
   getViewState(viewState) {
@@ -67,9 +67,9 @@ export default class VivView {
   }
 
   /**
-   * Create a layer for the given viewport.
-   * @param {ViewState} Object The viewStates for all current viewports
-   * @param {number} props The props for this viewport
+   * Create a layer for this instance.
+   * @param {ViewState} Object The viewStates for all current views.
+   * @param {number} props The props for this instnace
    * @returns {Layer} Instance of a layer
    */
   // eslint-disable-next-line class-methods-use-this,no-unused-vars
