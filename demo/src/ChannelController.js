@@ -22,9 +22,7 @@ function ChannelController({
       <div style={style}>
         <select
           value={name}
-          onChange={e =>
-            handleChange('CHANGE_CHANNEL_DROPDOWN', e.target.value)
-          }
+          onChange={e => handleChange('CHANGE_CHANNEL', e.target.value)}
         >
           {channelOptions.map(opt => (
             <option disabled={disableOptions} key={opt} value={opt}>

@@ -70,7 +70,7 @@ function App() {
   }, [sourceName]);
 
   const handleControllerChange = (index, type, value) => {
-    if (type === 'CHANGE_CHANNEL_DROPDOWN') {
+    if (type === 'CHANGE_CHANNEL') {
       const [channelDim] = sources[sourceName].dimensions;
       const { field, values } = channelDim;
       const dimIndex = values.indexOf(value);
@@ -78,7 +78,7 @@ function App() {
         [field]: dimIndex
       });
       dispatch({
-        type: 'CHANGE_CHANNEL',
+        type,
         index,
         value: { name: values[dimIndex], selection: serialized }
       });
