@@ -2,6 +2,16 @@ import { OrthographicView } from '@deck.gl/core';
 import VivView from './VivView';
 import { OverviewLayer } from './layers';
 
+/**
+ * This class generates a OverviewLayer and a view for use in the VivViewer as an overview to a Detailview (they must be used in conjection)
+ * @param {Object} viewState The viewState object.
+ * @param {Object} loader The loader, used for inferring zoom level.
+ * @param {number} detailHeight The height of the detail view.
+ * @param {number} detailWidth The width of the detail view.
+ * @param {number} overviewScale The scale of this viewport relative to the detail.
+ * @param {number} margin The margin to be offset from the the corner of the other viewport.
+ * @param {string} overviewLocation The location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."
+ * */
 export default class OverviewView extends VivView {
   constructor({
     viewState,
@@ -18,11 +28,11 @@ export default class OverviewView extends VivView {
     this.overviewLocation = overviewLocation;
     this.detailHeight = detailHeight;
     this.detailWidth = detailWidth;
-    this.setHeightWidthScale({ detailWidth, overviewScale });
-    this.setXY();
+    this._setHeightWidthScale({ detailWidth, overviewScale });
+    this._setXY();
   }
 
-  setHeightWidthScale({ detailWidth, overviewScale }) {
+  _setHeightWidthScale({ detailWidth, overviewScale }) {
     const { loader } = this;
     const { numLevels } = loader;
     const rasterSize = loader.getRasterSize({
@@ -36,7 +46,10 @@ export default class OverviewView extends VivView {
     this._imageHeight = rasterSize.height;
   }
 
-  setXY() {
+  /**
+   * Set the x and y of the current view.
+   */
+  _setXY() {
     const {
       height,
       width,
@@ -75,7 +88,6 @@ export default class OverviewView extends VivView {
   }
 
   getDeckGlView() {
-    // Hardcoded to use the detail id
     const { x, y, id, height, width } = this;
     return new OrthographicView({
       id,
@@ -89,6 +101,7 @@ export default class OverviewView extends VivView {
   }
 
   getViewState(viewState) {
+    // Scale the view as the overviewScale changes with screen resizing.
     const { _imageWidth, _imageHeight, overviewScale, id, loader } = this;
     const { numLevels } = loader;
     return {
@@ -105,6 +118,7 @@ export default class OverviewView extends VivView {
 
   getLayer({ viewState, props }) {
     const { id, overviewScale, loader } = this;
+    // Scale the bounding box.
     const boundingBox = VivView.makeBoundingBox(viewState.detail).map(coords =>
       coords.map(e => e * overviewScale)
     );

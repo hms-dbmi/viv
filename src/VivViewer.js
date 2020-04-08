@@ -1,6 +1,12 @@
 import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 
+/**
+ * This class handles rendering the various views within the DeckGL contenxt.
+ * @param {Array} layerProps The props for the layers in each view.
+ * @param {Array} initViewState The initial view states for each view.
+ * @param {VivView} views The various VivViews to render.
+ * */
 export default class VivViewer extends PureComponent {
   constructor(props) {
     super(props);
@@ -16,9 +22,14 @@ export default class VivViewer extends PureComponent {
     this.layerFilter = this.layerFilter.bind(this);
   }
 
-  // This prevents only the `draw` call of a layer from firing,
-  // but not other layer lifecycle methods.  Nonetheless, it is
-  // still useful.
+  /**
+   * This prevents only the `draw` call of a layer from firing,
+   * but not other layer lifecycle methods.  Nonetheless, it is
+   * still useful.
+   * @param {Layer} layer The layer being updated.
+   * @param {Viewport} viewport The viewport being updated.
+   * @returns {boolean} Whether or not this layer should be drawn in this viewport
+   */
   // eslint-disable-next-line class-methods-use-this
   layerFilter({ layer, viewport }) {
     if (layer.id.includes(viewport.id)) {
@@ -28,6 +39,9 @@ export default class VivViewer extends PureComponent {
     return false;
   }
 
+  /**
+   * This updates the viewState as a callback to the viewport changing in DeckGL.
+   */
   _onViewStateChange({ viewId, viewState }) {
     // Save the view state and trigger rerender
     // const { overview } = this.state;
@@ -67,10 +81,9 @@ export default class VivViewer extends PureComponent {
     }
   }
 
-  // For now this is hardcoded but in general we should look at
-  // a proper structure for taking lists of configurations so that
-  // we can handle multiple overlapping layers.
-  // https://github.com/hubmapconsortium/vitessce-image-viewer/issues/107
+  /**
+   * This renders the layers in the DeckGL context.
+   */
   _renderLayers() {
     const { viewState } = this.state;
     const { views, layerProps } = this.props;

@@ -31,6 +31,19 @@ function scaleBounds({ width, height, translate, scale }) {
   return [left, bottom, right, top];
 }
 
+/**
+ * This layer wraps XRLayer and generates a static image
+ * @param {Array} sliderValues The list of [min, max] values for each channe to control rendering.
+ * @param {Array} colorValues The list of [r, g, b] values for each channel.
+ * @param {Array} channelIsOn The list of boolean values for each channel for whether or not it is visible.
+ * @param {number} opacity The opacity of the layer.
+ * @param {string} colormap A string indicating a colormap (default: '')
+ * @param {Array} domain An override for the possible max/min values (i.e something different than 65535 for uint16/'<u2')
+ * @param {string} viewportId The id for the current view
+ * @param {Array} translate A translate transformation to be applied to the bounds after sfcaling
+ * @param {number} scale A scaling factor for this layer to be used against the dimensions of the loader's `getRaster`
+ * @param {Object} loader The loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`
+ */
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
     const { loader, z } = this.props;

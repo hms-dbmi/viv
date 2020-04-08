@@ -1,9 +1,9 @@
 toc:
 - name: React Components
 - VivViewer
-- VivViewport
-- OverviewViewport
-- DetailViewport
+- VivView
+- OverviewView
+- DetailView
 - name: Layers
 - VivViewerLayer
 - StaticImageLayer

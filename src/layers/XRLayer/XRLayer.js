@@ -22,7 +22,15 @@ const defaultProps = {
   colormap: { type: 'string', value: '', compare: true }
 };
 
+/**
+ * This layer serves as the workhorse of the project, handling all the rendering.  Much of it is
+ * adapted from BitmapLayer in DeckGL.
+ */
 export default class XRLayer extends Layer {
+  /**
+   * This function chooses a shader (colormapping or not) and
+   * replaces `usampler` with `sampler` if the data is not an unsigned integer
+   */
   getShaders() {
     const { colormap, dtype } = this.props;
     const fragmentShaderColormap = colormap
@@ -39,6 +47,9 @@ export default class XRLayer extends Layer {
     });
   }
 
+  /**
+   * This function initializes the internal state.
+   */
   initializeState() {
     const attributeManager = this.getAttributeManager();
     attributeManager.add({
@@ -58,6 +69,9 @@ export default class XRLayer extends Layer {
     attributeManager.remove('instancePickingColors');
   }
 
+  /**
+   * This function finalizes state by clearing all textures from the WebGL context
+   */
   finalizeState() {
     super.finalizeState();
 
@@ -66,6 +80,10 @@ export default class XRLayer extends Layer {
     }
   }
 
+  /**
+   * This function updates state by retriggering model creation (shader compilation and attribute binding)
+   * and loading any textures that need be loading.
+   */
   updateState({ props, oldProps, changeFlags }) {
     // setup model first
     if (changeFlags.extensionsChanged || props.colormap !== oldProps.colormap) {
@@ -88,6 +106,9 @@ export default class XRLayer extends Layer {
     }
   }
 
+  /**
+   * This function creates the luma.gl model.
+   */
   _getModel(gl) {
     if (!gl) {
       return null;
@@ -112,6 +133,9 @@ export default class XRLayer extends Layer {
     });
   }
 
+  /**
+   * This function generates view positions for use as a vec3 in the shader
+   */
   calculatePositions(attributes) {
     const { positions } = this.state;
     const { bounds } = this.props;
@@ -143,6 +167,9 @@ export default class XRLayer extends Layer {
     attributes.value = positions;
   }
 
+  /**
+   * This function runs the shaders and draws to the canvas
+   */
   draw({ uniforms }) {
     const { textures, model } = this.state;
     if (textures && model) {
@@ -159,6 +186,9 @@ export default class XRLayer extends Layer {
     }
   }
 
+  /**
+   * This function loads all textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
+   */
   loadTexture(channelData) {
     const textures = {
       channel0: null,
@@ -179,6 +209,9 @@ export default class XRLayer extends Layer {
     }
   }
 
+  /**
+   * This function creates textures from the data
+   */
   dataToTexture(data) {
     const { dtype, width, height } = this.props;
     const { format, dataFormat, type } = DTYPE_VALUES[dtype];

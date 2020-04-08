@@ -19,13 +19,16 @@ const defaultProps = {
   viewportId: { type: 'string', value: '', compare: true }
 };
 
+/**
+ * This layer serves as a proxy of sorts to the rendering done in renderSubLayers, reacting to viewport changes in a custom manner.
+ */
 export default class VivViewerLayerBase extends TileLayer {
-  // This function allows us to controls which viewport gets to update the Tileset2D.
-  // This is a uniquely TileLayer issue since it updates based on viewport updates thanks
-  // to it's ability to handle zoom-pan loading.  Essentially, with a picture-in-picture,
-  // this prevents it from detecting the update of some other viewport that is unwanted.
-
-  // This prevents the overview layer from rendering its tile in the detail view
+  /**
+   * This function allows us to controls which viewport gets to update the Tileset2D.
+   * This is a uniquely TileLayer issue since it updates based on viewport updates thanks
+   * to it's ability to handle zoom-pan loading.  Essentially, with a picture-in-picture,
+   * this prevents it from detecting the update of some other viewport that is unwanted.
+   */
   _updateTileset() {
     if (!this.props.viewportId) {
       super._updateTileset();

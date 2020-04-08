@@ -40,12 +40,6 @@ export default class VivView {
   }
 
   /**
-   * Set the x and y of the current view.
-   */
-  // eslint-disable-next-line class-methods-use-this
-  setXY() {}
-
-  /**
    * Create a view for the given viewport.
    * @returns {View} The DeckGL View for this viewport
    */
@@ -63,8 +57,8 @@ export default class VivView {
 
   /**
    * Create a viewState for the given viewport.
-   * @param {viewState} Object The viewState for all current viewports
-   * @returns {viewState} The viewState for this viewport
+   * @param {ViewState} Object The viewState for all current viewports
+   * @returns {ViewState} The viewState for this viewport
    */
   // eslint-disable-next-line class-methods-use-this
   getViewState(viewState) {
@@ -74,7 +68,7 @@ export default class VivView {
 
   /**
    * Create a layer for the given viewport.
-   * @param {viewState} Object The viewState for all current viewports
+   * @param {ViewState} Object The viewState for all current viewports
    * @param {number} props The props for this viewport
    * @returns {Layer} Instance of a layer
    */

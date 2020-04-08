@@ -155,7 +155,7 @@ function App() {
       id: 'detail'
     }
   ];
-  const detailProps = {
+  const props = {
     loader,
     sliderValues: sliderValues.slice(
       0,
@@ -168,7 +168,7 @@ function App() {
     ),
     colormap: colormapOn
   };
-  const layerProps = [detailProps];
+  const layerProps = [props];
   const detail = new DetailView({ viewState: initialViewState[0] });
   const views = [detail];
   if (overviewOn && loader && sourceName !== 'static') {
@@ -180,28 +180,8 @@ function App() {
       detailWidth: initialViewState[0].width,
       overviewScale: 0.2
     });
-    const overviewProps = {
-      loader,
-      sliderValues: sliderValues.slice(
-        0,
-        sources[sourceName].channelNames.length
-      ),
-      colorValues: colorValues.slice(
-        0,
-        sources[sourceName].channelNames.length
-      ),
-      channelIsOn: channelIsOn.slice(
-        0,
-        sources[initSourceName].channelNames.length
-      ),
-      colormap: colormapOn,
-      boundingBoxColor: [255, 0, 0],
-      boundingBoxOutlineWidth: 50,
-      viewportOutlineColor: [255, 192, 204],
-      viewportOutlineWidth: 400
-    };
     views.push(overview);
-    layerProps.push(overviewProps);
+    layerProps.push(props);
   }
   return (
     <div>
