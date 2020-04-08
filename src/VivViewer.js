@@ -32,7 +32,7 @@ export default class VivViewer extends PureComponent {
    */
   // eslint-disable-next-line class-methods-use-this
   layerFilter({ layer, viewport }) {
-    if (layer.id.includes(viewport.id)) {
+    if (layer.id.includes(`-${viewport.id}#`)) {
       // Draw the static layer in the overview
       return true;
     }
@@ -73,7 +73,9 @@ export default class VivViewer extends PureComponent {
         views.forEach(view => {
           newState.viewState = {
             ...newState.viewState,
-            [view.id]: view.getViewState(prevState.viewState[view.id])
+            [view.id]: view.getViewState(
+              prevState.viewState[view.id] || view.initViewState
+            )
           };
         });
         return newState;

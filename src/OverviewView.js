@@ -123,7 +123,7 @@ export default class OverviewView extends VivView {
       coords.map(e => e * overviewScale)
     );
     return new OverviewLayer(props, {
-      id: `${loader.type}-${id}`,
+      id: `${loader.type}-${id}#`,
       boundingBox,
       overviewScale
     });

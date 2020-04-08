@@ -9,7 +9,7 @@ export default class DetailView extends VivView {
     const { loader } = props;
     const { id } = this;
     return new VivViewerLayer(props, {
-      id: `${loader.type}-${id}`,
+      id: `${loader.type}-${id}#`,
       viewportId: id
     });
   }
