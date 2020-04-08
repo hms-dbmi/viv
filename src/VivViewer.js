@@ -4,19 +4,20 @@ import DeckGL from '@deck.gl/react';
 /**
  * This class handles rendering the various views within the DeckGL contenxt.
  * @param {Array} layerProps The props for the layers in each view.
- * @param {Array} initViewState The initial view states for each view.
+ * @param {Array} viewStates The initial view states for each view.
  * @param {VivView} views The various VivViews to render.
  * */
 export default class VivViewer extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      viewState: {}
+      viewStates: {}
     };
-    const { viewState } = this.state;
-    const { views, initViewState } = this.props;
+    const { viewStates } = this.state;
+    const { views } = this.props;
     views.forEach((view, i) => {
-      viewState[view.id] = view.getViewState(initViewState[i]);
+      // eslint-disable-next-line react/destructuring-assignment
+      viewStates[view.id] = view.getViewState(this.props.viewStates[i]);
     });
     this._onViewStateChange = this._onViewStateChange.bind(this);
     this.layerFilter = this.layerFilter.bind(this);
@@ -40,7 +41,8 @@ export default class VivViewer extends PureComponent {
   }
 
   /**
-   * This updates the viewState as a callback to the viewport changing in DeckGL.
+   * This updates the viewState as a callback to the viewport changing in DeckGL
+   * (hence the need for storing viewState in state).
    */
   _onViewStateChange({ viewId, viewState }) {
     // Save the view state and trigger rerender
@@ -49,33 +51,37 @@ export default class VivViewer extends PureComponent {
     this.setState(prevState => {
       const newState = { ...prevState };
       views.forEach(view => {
-        newState.viewState = {
-          ...newState.viewState,
+        newState.viewStates = {
+          ...newState.viewStates,
           [view.id]:
             view.getViewState({ ...viewState, id: viewId }) ||
-            prevState.viewState[view.id]
+            prevState.viewStates[view.id]
         };
       });
       return newState;
     });
   }
 
+  /**
+   * This updates the viewStates' height and width with the newest height and
+   * width on any call where the viewStates changes (i.e resize events),
+   * using the previous state (falling back on the view's initial state) for target x and y, zoom level etc.
+   */
   componentDidUpdate(prevProps) {
-    const { views, viweWidth, viewHeight } = this.props;
-    if (
-      prevProps.views !== views ||
-      prevProps.viweWidth !== viweWidth ||
-      prevProps.viewHeight !== viewHeight
-    ) {
+    const { views, viewStates } = this.props;
+    if (prevProps.views !== views || prevProps.viewStates !== viewStates) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState(prevState => {
         const newState = { ...prevState };
-        views.forEach(view => {
-          newState.viewState = {
-            ...newState.viewState,
-            [view.id]: view.getViewState(
-              prevState.viewState[view.id] || view.initViewState
-            )
+        views.forEach((view, i) => {
+          const { height, width } = viewStates[i];
+          newState.viewStates = {
+            ...newState.viewStates,
+            [view.id]: view.getViewState({
+              ...(prevState.viewStates[view.id] || view.initialViewState),
+              height,
+              width
+            })
           };
         });
         return newState;
@@ -87,10 +93,10 @@ export default class VivViewer extends PureComponent {
    * This renders the layers in the DeckGL context.
    */
   _renderLayers() {
-    const { viewState } = this.state;
+    const { viewStates } = this.state;
     const { views, layerProps } = this.props;
     return views.map((view, i) =>
-      view.getLayer({ viewState, props: layerProps[i] })
+      view.getLayer({ viewStates, props: layerProps[i] })
     );
   }
 
@@ -105,7 +111,7 @@ export default class VivViewer extends PureComponent {
         layers={this._renderLayers()}
         onViewStateChange={this._onViewStateChange}
         views={deckGLViews}
-        viewState={this.state.viewState}
+        viewState={this.state.viewStates}
       />
     );
     /* eslint-disable react/destructuring-assignment */

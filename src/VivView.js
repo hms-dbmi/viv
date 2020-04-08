@@ -68,10 +68,10 @@ export default class VivView {
 
   /**
    * Create a layer for the given viewport.
-   * @param {ViewState} Object The viewState for all current viewports
+   * @param {ViewState} Object The viewStates for all current viewports
    * @param {number} props The props for this viewport
    * @returns {Layer} Instance of a layer
    */
   // eslint-disable-next-line class-methods-use-this,no-unused-vars
-  getLayer({ viewState, props }) {}
+  getLayer({ viewStates, props }) {}
 }

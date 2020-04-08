@@ -101,11 +101,21 @@ export default class OverviewView extends VivView {
   }
 
   getViewState(viewState) {
-    // Scale the view as the overviewScale changes with screen resizing.
-    const { _imageWidth, _imageHeight, overviewScale, id, loader } = this;
+    // Scale the view as the overviewScale changes with screen resizing - basically, do not react to any view state changes.
+    const {
+      _imageWidth,
+      _imageHeight,
+      overviewScale,
+      id,
+      loader,
+      height,
+      width
+    } = this;
     const { numLevels } = loader;
     return {
       ...viewState,
+      height,
+      width,
       id,
       target: [
         (_imageWidth * overviewScale) / 2,
@@ -116,10 +126,10 @@ export default class OverviewView extends VivView {
     };
   }
 
-  getLayer({ viewState, props }) {
+  getLayer({ viewStates, props }) {
     const { id, overviewScale, loader } = this;
     // Scale the bounding box.
-    const boundingBox = VivView.makeBoundingBox(viewState.detail).map(coords =>
+    const boundingBox = VivView.makeBoundingBox(viewStates.detail).map(coords =>
       coords.map(e => e * overviewScale)
     );
     return new OverviewLayer(props, {

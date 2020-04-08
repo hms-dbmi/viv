@@ -147,14 +147,12 @@ function App() {
     );
   });
 
-  const initialViewState = [
-    {
-      ...(sources[sourceName].initialViewState || DEFAULT_VIEW_STATE),
-      height: viewHeight,
-      width: viewWidth,
-      id: 'detail'
-    }
-  ];
+  const viewState = {
+    ...(sources[sourceName].initialViewState || DEFAULT_VIEW_STATE),
+    height: viewHeight,
+    width: viewWidth,
+    id: 'detail'
+  };
   const props = {
     loader,
     sliderValues: sliderValues.slice(
@@ -168,27 +166,31 @@ function App() {
     ),
     colormap: colormapOn
   };
-  const layerProps = [props];
-  const detail = new DetailView({ viewState: initialViewState[0] });
+  const detail = new DetailView({ viewState });
   const views = [detail];
+  const layerProps = [props];
+  const viewStates = [viewState];
+
   if (overviewOn && loader && sourceName !== 'static') {
-    initialViewState.push({ ...initialViewState[0], id: 'overview' });
+    const overviewViewState = { ...viewState, id: 'overview' };
     const overview = new OverviewView({
-      viewState: initialViewState[1],
+      viewState: overviewViewState,
       loader,
-      detailHeight: initialViewState[0].height,
-      detailWidth: initialViewState[0].width,
+      detailHeight: viewState.height,
+      detailWidth: viewState.width,
       overviewScale: 0.2
     });
+    viewStates.push(overviewViewState);
     views.push(overview);
     layerProps.push(props);
   }
+
   return (
     <div>
       {loader ? (
         <VivViewer
           layerProps={layerProps}
-          initViewState={initialViewState}
+          viewStates={viewStates}
           views={views}
         />
       ) : null}
