@@ -167,7 +167,7 @@ function App() {
           <ButtonGroup color="primary" size="small">
             {sourceButtons}
           </ButtonGroup>
-          <br />
+          &nbsp;
           <label htmlFor="colormap-select">
             Colormap:
             <select
@@ -183,6 +183,7 @@ function App() {
               ))}
             </select>
           </label>
+          &nbsp;
           {channelControllers}
           {isPyramid && (
             <button onClick={toggleOverview} type="button">
