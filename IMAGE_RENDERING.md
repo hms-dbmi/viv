@@ -1,4 +1,4 @@
-# Microscopy Image rendering
+# Image rendering in Viv
 
 **Author's (Ilan's) note**: This is my understanding of the problem and our solutions. If I am mistaken, please feel free to make a pull request. I had literally no background in imaging or rendering before taking this on, but continue to be exhilarated as problems and solutions present themselves.
 
