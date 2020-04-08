@@ -47,18 +47,19 @@ export default class VivViewer extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    const { views } = this.props;
-    if (prevProps.views !== views) {
+    const { views, viweWidth, viewHeight } = this.props;
+    if (
+      prevProps.views !== views ||
+      prevProps.viweWidth !== viweWidth ||
+      prevProps.viewHeight !== viewHeight
+    ) {
       this.setState(prevState => {
         const newState = { ...prevState };
         views.forEach(view => {
-          const prevIds = prevProps.views.map(v => v.id);
-          if (prevIds.indexOf(view.id) === -1) {
-            newState.viewState = {
-              ...newState.viewState,
-              [view.id]: view.getViewState()
-            };
-          }
+          newState.viewState = {
+            ...newState.viewState,
+            [view.id]: view.getViewState(prevState.viewState[view.id])
+          };
         });
         return newState;
       });
@@ -80,7 +81,6 @@ export default class VivViewer extends PureComponent {
   render() {
     /* eslint-disable react/destructuring-assignment */
     const { views } = this.props;
-
     const deckGLViews = views.map(view => view.getDeckGlView());
     return (
       <DeckGL

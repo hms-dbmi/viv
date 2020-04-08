@@ -171,7 +171,7 @@ function App() {
   const layerProps = [detailProps];
   const detail = new DetailView({ viewState: initialViewState[0] });
   const views = [detail];
-  if (overviewOn) {
+  if (overviewOn && loader && sourceName !== 'static') {
     initialViewState.push({ ...initialViewState[0], id: 'overview' });
     const overview = new OverviewView({
       viewState: initialViewState[1],
