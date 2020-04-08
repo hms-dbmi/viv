@@ -34,7 +34,7 @@ export default class VivViewer extends PureComponent {
     const { views } = this.props;
     this.setState(prevState => {
       const newState = { ...prevState };
-      views.map(view => {
+      views.forEach(view => {
         newState.viewState = {
           ...newState.viewState,
           [view.id]:
@@ -53,6 +53,7 @@ export default class VivViewer extends PureComponent {
       prevProps.viweWidth !== viweWidth ||
       prevProps.viewHeight !== viewHeight
     ) {
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState(prevState => {
         const newState = { ...prevState };
         views.forEach(view => {

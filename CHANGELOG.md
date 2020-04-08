@@ -6,6 +6,8 @@
 
 ### Changed
 
+-Refactored VivViewer to take in arbitrary views/layers
+
 ## 0.1.4
 
 ### Added
