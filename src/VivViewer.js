@@ -4,6 +4,17 @@ import { OrthographicView } from '@deck.gl/core';
 import { VivViewerLayer, StaticImageLayer } from './layers';
 import VivViewerOverview from './VivViewerOverview';
 
+// Taken from https://stackoverflow.com/a/31732310/8060591
+function checkIsSafari() {
+  return (
+    navigator.vendor &&
+    navigator.vendor.indexOf('Apple') > -1 &&
+    navigator.userAgent &&
+    navigator.userAgent.indexOf('CriOS') === -1 &&
+    navigator.userAgent.indexOf('FxiOS') === -1
+  );
+}
+
 export default class VivViewer extends PureComponent {
   constructor(props) {
     super(props);
@@ -144,7 +155,7 @@ export default class VivViewer extends PureComponent {
     if (loader.isPyramid && overview) {
       views.push(overview.getView());
     }
-    return (
+    return !checkIsSafari() ? (
       <DeckGL
         glOptions={{ webgl2: true }}
         layerFilter={this.layerFilter}
@@ -153,6 +164,13 @@ export default class VivViewer extends PureComponent {
         views={views}
         viewState={this.state.viewState}
       />
+    ) : (
+      <div>
+        {' '}
+        <p style={{ color: 'red', margin: '15px' }}>
+          Viv does not work with Safari. Please use Chrome or Firefox.
+        </p>
+      </div>
     );
     /* eslint-disable react/destructuring-assignment */
   }

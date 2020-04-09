@@ -4,6 +4,8 @@
 
 ### Added
 
+- Display warning for Safari users
+
 ### Changed
 
 ## 0.1.4
