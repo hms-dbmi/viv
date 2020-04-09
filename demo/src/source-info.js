@@ -59,9 +59,23 @@ const staticTiffInfo = {
   url: rootStaticTiffUrl
 };
 
+const rootRGBTiffUrl =
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/tumor_001.tif';
+
+const rgbTiffInfo = {
+  isPublic: false,
+  initialViewState: {
+    zoom: -6,
+    target: [30000, 10000]
+  },
+  channelNames: [],
+  url: rootRGBTiffUrl
+};
+
 export default {
   zarr: zarrInfo,
   tiff: tiffInfo,
   static: staticInfo,
-  'static tiff': staticTiffInfo
+  'static tiff': staticTiffInfo,
+  rgb: rgbTiffInfo
 };

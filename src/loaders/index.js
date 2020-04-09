@@ -1,7 +1,6 @@
 import { openArray } from 'zarr';
 // eslint-disable-next-line import/extensions
-import { fromUrl, Pool } from 'geotiff/dist/geotiff.bundle.min.js';
-
+import { fromUrl, Pool } from 'geotiff';
 import ZarrLoader from './zarrLoader';
 import TiffPyramidLoader from './tiffPyramidLoader';
 import OMETiffLoader from './OMETiffLoader';
@@ -52,6 +51,7 @@ export async function createTiffPyramid({ channelUrls }) {
 
 export async function createOMETiffLoader({ url }) {
   const tiff = await fromUrl(url);
+  tiff.firstIFDOffset = 16
   const firstImage = await tiff.getImage(0);
   const pool = new Pool();
   return new OMETiffLoader(tiff, pool, firstImage);

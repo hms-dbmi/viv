@@ -51,6 +51,10 @@ export async function initPyramidLoader(type, { channelNames, url, minZoom }) {
       ];
       return loader;
     }
+    case 'rgb': {
+      const loader = await createOMETiffLoader({ url });
+      return loader;
+    }
     default:
       throw Error(`Pyramid type (${type}) is not supported`);
   }
