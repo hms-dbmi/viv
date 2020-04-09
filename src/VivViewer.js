@@ -165,11 +165,8 @@ export default class VivViewer extends PureComponent {
         viewState={this.state.viewState}
       />
     ) : (
-      <div>
-        {' '}
-        <p style={{ color: 'red', margin: '15px' }}>
-          Viv does not work with Safari. Please use Chrome or Firefox.
-        </p>
+      <div className="viv-error">
+        <p>Viv does not work with Safari. Please use Chrome or Firefox.</p>
       </div>
     );
     /* eslint-disable react/destructuring-assignment */
