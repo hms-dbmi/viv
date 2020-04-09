@@ -180,11 +180,11 @@ export default class XRLayer extends Layer {
   }
 
   dataToTexture(data) {
-    const { dtype } = this.props;
+    const { dtype, width, height } = this.props;
     const { format, dataFormat, type } = DTYPE_VALUES[dtype];
     const texture = new Texture2D(this.context.gl, {
-      width: this.props.staticImageWidth || this.props.tileSize,
-      height: this.props.staticImageHeight || this.props.tileSize,
+      width,
+      height,
       data,
       // we don't want or need mimaps
       mipmaps: false,

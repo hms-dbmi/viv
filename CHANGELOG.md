@@ -4,13 +4,23 @@
 
 ### Added
 
+### Changed
+
+## 0.1.4
+
+### Added
+
 - Add background image for nicer loading and temporary fix for minZoom issue
 - Add getRaster to TiffPyramidLoader
+- Picture-in-picture overview layer
 
 ### Changed
 
-- Generalize colormaps to multichannel maps
+- Generalize colormaps to multichannel maps.
 - Add flags to check for loader change and rerender.
+- Remove minZoom from loaders and make loaders provide `onTileError`.
+- Wrap `channelData` in `StaticImageLayer` in Promise.
+- Allow no `viewportId` parameter
 
 ## 0.1.3
 

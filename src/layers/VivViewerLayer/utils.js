@@ -4,71 +4,38 @@ export function range(len) {
   return [...Array(len).keys()];
 }
 
-export function isInTileBounds({
-  x,
-  y,
-  z,
-  imageWidth,
-  imageHeight,
-  tileSize,
-  minZoom
-}) {
-  const xInBounds = x < Math.ceil(imageWidth / (tileSize * 2 ** z)) && x >= 0;
-  const yInBounds = y < Math.ceil(imageHeight / (tileSize * 2 ** z)) && y >= 0;
-  const zInBounds = z >= 0 && z < -minZoom;
-  return xInBounds && yInBounds && zInBounds;
-}
-
 export function renderSubLayers(props) {
   const {
-    bbox: { left, top, right, bottom },
-    x,
-    y,
-    z
-    // eslint-disable-next-line react/destructuring-assignment
+    bbox: { left, top, right, bottom }
   } = props.tile;
+
   const {
     colorValues,
     sliderValues,
-    imageWidth,
-    imageHeight,
     tileSize,
-    minZoom,
     visible,
     opacity,
     data,
     colormap,
-    dtype
+    dtype,
+    id
   } = props;
-  if (
-    isInTileBounds({
-      x,
-      y,
-      z: -z,
-      imageWidth,
-      imageHeight,
-      tileSize,
-      minZoom
-    })
-  ) {
-    const xrl =
-      // If image metadata is undefined, do not render this layer.
-      imageWidth &&
-      imageHeight &&
-      new XRLayer({
-        id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}`,
-        data: null,
-        channelData: data,
-        sliderValues,
-        colorValues,
-        tileSize,
-        bounds: [left, bottom, right, top],
-        opacity,
-        visible,
-        dtype,
-        colormap
-      });
-    return xrl;
+  // Only render in positive coorinate system
+  if ([left, top, right, bottom].some(v => v < 0)) {
+    return null;
   }
-  return null;
+  const xrl = new XRLayer({
+    id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}-${id}`,
+    bounds: [left, bottom, right, top],
+    width: tileSize,
+    height: tileSize,
+    channelData: data,
+    sliderValues,
+    colorValues,
+    opacity,
+    visible,
+    dtype,
+    colormap
+  });
+  return xrl;
 }

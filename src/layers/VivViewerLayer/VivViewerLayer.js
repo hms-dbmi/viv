@@ -2,16 +2,9 @@ import { CompositeLayer } from '@deck.gl/core';
 // eslint-disable-next-line import/extensions
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
-import { isInTileBounds } from './utils';
 import { padColorsAndSliders } from '../utils';
 
 export default class VivViewerLayer extends CompositeLayer {
-  // see https://github.com/uber/deck.gl/blob/master/docs/api-reference/layer.md#shouldupdatestate
-  // eslint-disable-next-line class-methods-use-this
-  shouldUpdateState({ changeFlags }) {
-    return changeFlags.somethingChanged;
-  }
-
   renderLayers() {
     const {
       loader,
@@ -19,15 +12,13 @@ export default class VivViewerLayer extends CompositeLayer {
       colorValues,
       channelIsOn,
       domain,
-      opacity
+      opacity,
+      colormap,
+      viewportId,
+      onTileError,
+      id
     } = this.props;
-    const {
-      imageWidth,
-      imageHeight,
-      tileSize,
-      minZoom,
-      dtype
-    } = loader.vivMetadata;
+    const { tileSize, numLevels, dtype } = loader;
     const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
       sliderValues,
       colorValues,
@@ -36,34 +27,18 @@ export default class VivViewerLayer extends CompositeLayer {
       dtype
     });
     const getTileData = ({ x, y, z }) => {
-      if (
-        isInTileBounds({
-          x,
-          y,
-          z: -z,
-          imageWidth,
-          imageHeight,
-          minZoom,
-          tileSize,
-          opacity
-        })
-      ) {
-        return loader.getTile({
-          x,
-          y,
-          z: -z
-        });
-      }
-      return null;
+      return loader.getTile({
+        x,
+        y,
+        z: -z
+      });
     };
-    const tiledLayer = new VivViewerLayerBase(this.props, {
-      id: `VivViewerLayerBase--${loader.type}`,
-      imageWidth,
-      imageHeight,
+    const tiledLayer = new VivViewerLayerBase({
+      id: `Tiled-Image-${id}`,
       tileSize,
-      minZoom,
       getTileData,
       dtype,
+      minZoom: -(numLevels - 1),
       colorValues: paddedColorValues,
       sliderValues: paddedSliderValues,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
@@ -74,18 +49,25 @@ export default class VivViewerLayer extends CompositeLayer {
       // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
       updateTriggers: {
         getTileData: [loader]
-      }
+      },
+      onTileError: onTileError || loader.onTileError,
+      opacity,
+      domain,
+      colormap,
+      viewportId
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity
     // paramteter set to anything but 1, but we always use it for situations where
     // we are zoomed out too far.
     const baseLayer = new StaticImageLayer(this.props, {
-      id: `StaticImageLayer-${loader.type}`,
-      scale: 2 ** (-minZoom - 1),
-      imageHeight: tileSize,
-      imageWidth: tileSize,
-      visible: opacity === 1 || minZoom > this.context.viewport.zoom
+      id: `Background-Image-${id}`,
+      scale: 2 ** (numLevels - 1),
+      visible:
+        opacity === 1 ||
+        (-numLevels > this.context.viewport.zoom &&
+          (!viewportId || this.context.viewport.id === viewportId)),
+      z: numLevels - 1
     });
     const layers = [baseLayer, tiledLayer];
     return layers;
