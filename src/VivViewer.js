@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
+import { getVivId } from './utils';
 
 /**
  * This class handles rendering the various views within the DeckGL contenxt.
@@ -15,9 +16,8 @@ export default class VivViewer extends PureComponent {
     };
     const { viewStates } = this.state;
     const { views } = this.props;
-    views.forEach((view, i) => {
-      // eslint-disable-next-line react/destructuring-assignment
-      viewStates[view.id] = view.getViewState(this.props.viewStates[i]);
+    views.forEach(view => {
+      viewStates[view.id] = view.getViewState(view.initialViewState);
     });
     this._onViewStateChange = this._onViewStateChange.bind(this);
     this.layerFilter = this.layerFilter.bind(this);
@@ -33,11 +33,7 @@ export default class VivViewer extends PureComponent {
    */
   // eslint-disable-next-line class-methods-use-this
   layerFilter({ layer, viewport }) {
-    if (layer.id.includes(`-${viewport.id}#`)) {
-      // Draw the static layer in the overview
-      return true;
-    }
-    return false;
+    return layer.id.includes(getVivId(viewport.id));
   }
 
   /**
@@ -68,13 +64,22 @@ export default class VivViewer extends PureComponent {
    * using the previous state (falling back on the view's initial state) for target x and y, zoom level etc.
    */
   componentDidUpdate(prevProps) {
-    const { views, viewStates } = this.props;
-    if (prevProps.views !== views || prevProps.viewStates !== viewStates) {
+    const { views } = this.props;
+    if (
+      views.some(
+        (view, i) =>
+          prevProps.views[i] !== view ||
+          view.initialViewState.height !==
+            prevProps.views[i].initialViewState.height ||
+          view.initialViewState.width !==
+            prevProps.views[i].initialViewState.width
+      )
+    ) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState(prevState => {
         const newState = { ...prevState };
-        views.forEach((view, i) => {
-          const { height, width } = viewStates[i];
+        views.forEach(view => {
+          const { height, width } = view.initialViewState;
           newState.viewStates = {
             ...newState.viewStates,
             [view.id]: view.getViewState({

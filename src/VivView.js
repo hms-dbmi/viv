@@ -2,41 +2,20 @@ import { OrthographicView } from '@deck.gl/core';
 
 /**
  * This class generates a layer and a view for use in the VivViewer
- * @param {number} viewState The viewState object
+ * @param {Object} viewState The viewState object
  * @param {string} id The id for the current view
- * @param {string} x The x location on the screen for the current view
- * @param {string} y The y location on the screen for the current view
+ * @param {number} x The x (top-left) location on the screen for the current view
+ * @param {number} y The y (top-left) location on the screen for the current view
  */
 export default class VivView {
-  constructor({ viewState, x = 0, y = 0 }) {
-    const { height, width, id } = viewState;
+  constructor({ initialViewState, x = 0, y = 0 }) {
+    const { height, width, id } = initialViewState;
     this.width = width;
     this.height = height;
-    this.initViewState = viewState;
+    this.initialViewState = initialViewState;
     this.id = id;
     this.x = x;
     this.y = y;
-  }
-
-  /**
-   * Create a boudning box from a viewport based on passed-in viewState.
-   * @param {viewState} Object The viewState for a certain viewport
-   * @returns {View} The DeckGL View for this viewport
-   */
-  static makeBoundingBox(viewState) {
-    const viewport = new OrthographicView().makeViewport({
-      // From the current `detail` viewState, we need its projection matrix (actually the inverse).
-      viewState,
-      height: viewState.height,
-      width: viewState.width
-    });
-    // Use the inverse of the projection matrix to map screen to the view space.
-    return [
-      viewport.unproject([0, 0]),
-      viewport.unproject([viewport.width, 0]),
-      viewport.unproject([viewport.width, viewport.height]),
-      viewport.unproject([0, viewport.height])
-    ];
   }
 
   /**
@@ -58,7 +37,7 @@ export default class VivView {
   /**
    * Create a viewState for this class, checking the id to make sure this class and veiwState match.
    * @param {ViewState} Object A viewState object.
-   * @returns {ViewState} The viewState for this class.
+   * @returns {ViewState} The viewState for this class (or null by default if the ids do not match).
    */
   // eslint-disable-next-line class-methods-use-this
   getViewState(viewState) {

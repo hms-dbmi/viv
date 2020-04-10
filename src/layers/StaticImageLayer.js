@@ -98,7 +98,6 @@ export default class StaticImageLayer extends CompositeLayer {
       translate,
       scale
     });
-
     return new XRLayer({
       channelData: Promise.resolve(data),
       bounds,

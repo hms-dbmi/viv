@@ -166,34 +166,26 @@ function App() {
     ),
     colormap: colormapOn
   };
-  const detail = new DetailView({ viewState });
+  const detail = new DetailView({ initialViewState: viewState });
   const views = [detail];
   const layerProps = [props];
-  const viewStates = [viewState];
 
   if (overviewOn && loader && sourceName !== 'static') {
     const overviewViewState = { ...viewState, id: 'overview' };
     const overview = new OverviewView({
-      viewState: overviewViewState,
+      initialViewState: overviewViewState,
       loader,
       detailHeight: viewState.height,
       detailWidth: viewState.width,
-      overviewScale: 0.2
+      scale: 0.2
     });
-    viewStates.push(overviewViewState);
     views.push(overview);
     layerProps.push(props);
   }
 
   return (
     <div>
-      {loader ? (
-        <VivViewer
-          layerProps={layerProps}
-          viewStates={viewStates}
-          views={views}
-        />
-      ) : null}
+      {loader ? <VivViewer layerProps={layerProps} views={views} /> : null}
       <div className="slider-container">
         <p>
           <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer

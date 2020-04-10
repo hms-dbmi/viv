@@ -1,6 +1,7 @@
 import { OrthographicView } from '@deck.gl/core';
 import VivView from './VivView';
 import { OverviewLayer } from './layers';
+import { makeBoundingBox, getVivId } from './utils';
 
 /**
  * This class generates a OverviewLayer and a view for use in the VivViewer as an overview to a Detailview (they must be used in conjection)
@@ -8,57 +9,50 @@ import { OverviewLayer } from './layers';
  * @param {Object} loader The loader, used for inferring zoom level.
  * @param {number} detailHeight The height of the detail view.
  * @param {number} detailWidth The width of the detail view.
- * @param {number} overviewScale The scale of this viewport relative to the detail.
+ * @param {number} scale The scale of this viewport relative to the detail.
  * @param {number} margin The margin to be offset from the the corner of the other viewport.
- * @param {string} overviewLocation The location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."
+ * @param {string} position The location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."
  * */
 export default class OverviewView extends VivView {
   constructor({
-    viewState,
+    initialViewState,
     loader,
     detailHeight,
     detailWidth,
-    overviewScale,
+    scale,
     margin = 25,
-    overviewLocation = 'bottom-right'
+    position = 'bottom-right'
   }) {
-    super({ viewState });
+    super({ initialViewState });
     this.margin = margin;
     this.loader = loader;
-    this.overviewLocation = overviewLocation;
+    this.position = position;
     this.detailHeight = detailHeight;
     this.detailWidth = detailWidth;
-    this._setHeightWidthScale({ detailWidth, overviewScale });
+    this._setHeightWidthScale({ detailWidth, scale });
     this._setXY();
   }
 
-  _setHeightWidthScale({ detailWidth, overviewScale }) {
+  _setHeightWidthScale({ detailWidth, scale }) {
     const { loader } = this;
     const { numLevels } = loader;
-    const rasterSize = loader.getRasterSize({
+    const { width: rasterWidth, height: rasterHeight } = loader.getRasterSize({
       z: 0
     });
-    const heightWidthRatio = rasterSize.height / rasterSize.width;
-    this.width = detailWidth * overviewScale;
+    const heightWidthRatio = rasterHeight / rasterWidth;
+    this.width = detailWidth * scale;
     this.height = this.width * heightWidthRatio;
-    this.overviewScale = (2 ** (numLevels - 1) / rasterSize.width) * this.width;
-    this._imageWidth = rasterSize.width;
-    this._imageHeight = rasterSize.height;
+    this.scale = (2 ** (numLevels - 1) / rasterWidth) * this.width;
+    this._imageWidth = rasterWidth;
+    this._imageHeight = rasterHeight;
   }
 
   /**
-   * Set the x and y of the current view.
+   * Set the x and y (top left corner) of this overview relative to the detail.
    */
   _setXY() {
-    const {
-      height,
-      width,
-      margin,
-      overviewLocation,
-      detailWidth,
-      detailHeight
-    } = this;
-    switch (overviewLocation) {
+    const { height, width, margin, position, detailWidth, detailHeight } = this;
+    switch (position) {
       case 'bottom-right': {
         this.x = detailWidth - width - margin;
         this.y = detailHeight - height - margin;
@@ -105,7 +99,7 @@ export default class OverviewView extends VivView {
     const {
       _imageWidth,
       _imageHeight,
-      overviewScale,
+      scale,
       id,
       loader,
       height,
@@ -117,25 +111,21 @@ export default class OverviewView extends VivView {
       height,
       width,
       id,
-      target: [
-        (_imageWidth * overviewScale) / 2,
-        (_imageHeight * overviewScale) / 2,
-        0
-      ],
+      target: [(_imageWidth * scale) / 2, (_imageHeight * scale) / 2, 0],
       zoom: -(numLevels - 1)
     };
   }
 
   getLayer({ viewStates, props }) {
-    const { id, overviewScale, loader } = this;
+    const { id, scale, loader } = this;
     // Scale the bounding box.
-    const boundingBox = VivView.makeBoundingBox(viewStates.detail).map(coords =>
-      coords.map(e => e * overviewScale)
+    const boundingBox = makeBoundingBox(viewStates.detail).map(coords =>
+      coords.map(e => e * scale)
     );
     return new OverviewLayer(props, {
-      id: `${loader.type}-${id}#`,
+      id: loader.type + getVivId(id),
       boundingBox,
-      overviewScale
+      overviewScale: scale
     });
   }
 }
