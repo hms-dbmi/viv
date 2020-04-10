@@ -1,6 +1,6 @@
 import { OrthographicView } from '@deck.gl/core';
 import VivView from './VivView';
-import { OverviewLayer } from './layers';
+import { OverviewLayer } from '../layers';
 import { makeBoundingBox, getVivId } from './utils';
 
 /**

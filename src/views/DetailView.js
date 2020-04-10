@@ -1,4 +1,4 @@
-import { VivViewerLayer } from './layers';
+import { VivViewerLayer } from '../layers';
 import VivView from './VivView';
 import { getVivId } from './utils';
 

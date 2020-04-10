@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
-import { getVivId } from './utils';
+import { getVivId } from '../views/utils';
 
 /**
  * This class handles rendering the various views within the DeckGL contenxt.
