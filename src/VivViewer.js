@@ -5,7 +5,7 @@ import { VivViewerLayer, StaticImageLayer } from './layers';
 import VivViewerOverview from './VivViewerOverview';
 
 // Taken from https://stackoverflow.com/a/31732310/8060591
-function checkIsSafari() {
+function isSafari() {
   return (
     navigator.vendor &&
     navigator.vendor.indexOf('Apple') > -1 &&
@@ -155,7 +155,7 @@ export default class VivViewer extends PureComponent {
     if (loader.isPyramid && overview) {
       views.push(overview.getView());
     }
-    return !checkIsSafari() ? (
+    return !isSafari() ? (
       <DeckGL
         glOptions={{ webgl2: true }}
         layerFilter={this.layerFilter}
@@ -166,7 +166,10 @@ export default class VivViewer extends PureComponent {
       />
     ) : (
       <div className="viv-error">
-        <p>Viv does not work with Safari. Please use Chrome or Firefox.</p>
+        <p>
+          Safari does not support WebGL2, which Viv requires. Please use Chrome
+          or Firefox.
+        </p>
       </div>
     );
     /* eslint-disable react/destructuring-assignment */
