@@ -9,9 +9,11 @@ import { makeBoundingBox, getVivId } from './utils';
  * @param {Object} loader The loader, used for inferring zoom level.
  * @param {number} detailHeight The height of the detail view.
  * @param {number} detailWidth The width of the detail view.
- * @param {number} scale The scale of this viewport relative to the detail.
- * @param {number} margin The margin to be offset from the the corner of the other viewport.
- * @param {string} position The location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."
+ * @param {number} scale The scale of this viewport relative to the detail. Default is .2.
+ * @param {number} margin The margin to be offset from the the corner of the other viewport. Default is 25.
+ * @param {string} position The location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."  Default is 'bottom-right'.
+ * @param {number} minimumWidth The absolute lower bound for how small the viewport should scale. Default is 150.
+ * @param {number} maximumWidth The absolute upper bound for how large the viewport should scale. Default is 350.
  * */
 export default class OverviewView extends VivView {
   constructor({
@@ -19,9 +21,11 @@ export default class OverviewView extends VivView {
     loader,
     detailHeight,
     detailWidth,
-    scale,
+    scale = 0.2,
     margin = 25,
-    position = 'bottom-right'
+    position = 'bottom-right',
+    minimumWidth = 150,
+    maximumWidth = 350
   }) {
     super({ initialViewState });
     this.margin = margin;
@@ -29,18 +33,29 @@ export default class OverviewView extends VivView {
     this.position = position;
     this.detailHeight = detailHeight;
     this.detailWidth = detailWidth;
-    this._setHeightWidthScale({ detailWidth, scale });
+    this._setHeightWidthScale({
+      detailWidth,
+      scale,
+      minimumWidth,
+      maximumWidth
+    });
     this._setXY();
   }
 
-  _setHeightWidthScale({ detailWidth, scale }) {
+  /**
+   * Set the image-pixel scale and height and width based on detail view.
+   */
+  _setHeightWidthScale({ detailWidth, scale, minimumWidth, maximumWidth }) {
     const { loader } = this;
     const { numLevels } = loader;
     const { width: rasterWidth, height: rasterHeight } = loader.getRasterSize({
       z: 0
     });
     const heightWidthRatio = rasterHeight / rasterWidth;
-    this.width = detailWidth * scale;
+    this.width = Math.min(
+      maximumWidth,
+      Math.max(detailWidth * scale, minimumWidth)
+    );
     this.height = this.width * heightWidthRatio;
     this.scale = (2 ** (numLevels - 1) / rasterWidth) * this.width;
     this._imageWidth = rasterWidth;
@@ -117,9 +132,13 @@ export default class OverviewView extends VivView {
   }
 
   getLayer({ viewStates, props }) {
+    const { detail } = viewStates;
+    if (!detail) {
+      throw new Error('Overview requires a viewState with id detail');
+    }
     const { id, scale, loader } = this;
     // Scale the bounding box.
-    const boundingBox = makeBoundingBox(viewStates.detail).map(coords =>
+    const boundingBox = makeBoundingBox(detail).map(coords =>
       coords.map(e => e * scale)
     );
     return new OverviewLayer(props, {

@@ -10,18 +10,18 @@ detailViewArguments.initialViewState.id = id;
 
 generateViewTests(DetailView, detailViewArguments);
 
-test(`DetailView layer test`, t => {
+test(`DetailView layer type and props check`, t => {
   const view = new DetailView(detailViewArguments);
   const loader = { type: 'loads' };
   const layer = view.getLayer({ props: { loader } });
   t.ok(
     layer instanceof VivViewerLayer,
-    'Detail layer should be VivViewerLayer'
+    'DetailView layer should be VivViewerLayer.'
   );
   t.equal(
     layer.props.viewportId,
     view.id,
-    'DetailView id should be passed down to layer as ViewportId'
+    'DetailView id should be passed down to layer as ViewportId.'
   );
   t.end();
 });

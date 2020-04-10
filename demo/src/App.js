@@ -176,8 +176,7 @@ function App() {
       initialViewState: overviewViewState,
       loader,
       detailHeight: viewState.height,
-      detailWidth: viewState.width,
-      scale: 0.2
+      detailWidth: viewState.width
     });
     views.push(overview);
     layerProps.push(props);
