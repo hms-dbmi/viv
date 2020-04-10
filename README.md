@@ -40,6 +40,17 @@ uses Google Cloud Storage, which is HTTP2 by default.
 Due to difficulties around compiling shaders on Travis, unit tests and layer lifecycle
 tests are run locally as a pre-push hook. Travis runs a test build, linting, and prettier.
 
+## Browser Support
+
+Currently Safari lacks full WebGL2 support. The `Viv` component will display an error. To override the styling, add something like
+
+```css
+.viv-error p {
+  color: red;
+  margin: 15px;
+}
+```
+
 ## Component Library API
 
 There are two components being exported for use:
