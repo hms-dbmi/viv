@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-
 import { createTiffPyramid, createZarrLoader } from '../../src';
-import { range } from '../../src/layers/VivViewerLayer/utils';
 
 const DEFAULT_COLOR_PALLETE = [
   [0, 0, 255],
   [0, 255, 0],
   [255, 0, 0],
+  [255, 255, 0],
   [255, 128, 0],
   [255, 0, 255],
   [0, 255, 255]
@@ -21,9 +20,12 @@ export async function createLoader(type, infoObj) {
     case 'tiff': {
       const { url, dimensions } = infoObj;
       const channelNames = dimensions[0].values;
-      const channelUrls = channelNames.map(
-        channel => `${url}/${channel}.ome.tiff`
-      );
+      const channelUrls = channelNames.map(channel => {
+        // TODO : Need to fix name is source Hoechst is misspelled
+        const typoFixedChannel =
+          channel.slice(0, 4) === 'DAPI' ? 'DAPI - Hoescht (nuclei)' : channel;
+        return `${url}/${typoFixedChannel}.ome.tiff`;
+      });
       const loader = await createTiffPyramid({ channelUrls });
       return loader;
     }
@@ -36,6 +38,16 @@ export async function createLoader(type, infoObj) {
   }
 }
 
+export function hexToRgb(hex) {
+  // https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result.map(d => parseInt(d, 16)).slice(1);
+}
+
+export function range(length) {
+  return [...Array(length).keys()];
+}
+
 export function useWindowSize(scaleWidth = 1, scaleHeight = 1) {
   function getSize() {
     return {
@@ -43,9 +55,7 @@ export function useWindowSize(scaleWidth = 1, scaleHeight = 1) {
       height: window.innerHeight * scaleHeight
     };
   }
-
   const [windowSize, setWindowSize] = useState(getSize());
-
   useEffect(() => {
     const handleResize = () => {
       setWindowSize(getSize());
@@ -118,10 +128,4 @@ export function channelsReducer(state, { index, value, type }) {
     default:
       throw new Error();
   }
-}
-
-export function hexToRgb(hex) {
-  // https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result.map(d => parseInt(d, 16)).slice(1);
 }
