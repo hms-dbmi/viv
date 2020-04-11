@@ -36,12 +36,15 @@ First, we **_store the image in a compressed, chunked (i.e tiled), "raw" format_
 
 Second, we believe that **_[HTTP2](https://en.wikipedia.org/wiki/HTTP/2)_** can help speed up the requests. Even though the requests are not particularly large (normally far less than 2MB per tile with a `512x512` tile size, 16bits of data), there are many of them and in normal HTTP, they block one another after a certain point. **HTTP2** more or less circumvents this blocking problem. A possible extension of this is to use [gRPC](https://en.wikipedia.org/wiki/GRPC) (which uses **HTTP2** under the hood together with [Protobuf](https://en.wikipedia.org/wiki/Protocol_Buffers)) but for now, **HTTP2** alone works well enough. We have not tested this too much officially, but we use **GCS** and **s3** for our applications, and they perform comparably, with a slight edge to **GCS** potentially. Below you will find a very rough side-by-side comparison of **s3** vs **GCS**. THe first image is the first request for to the zarr store for image data, and the second image is the last.
 
-####s3####
-![alt text](s3FirstRequest.png)
-![alt text](s3FinalRequest.png)
-####GCS####
-![alt text](GCSFirstRequest.png)
-![alt text](GCSFinalRequest.png)
+#### s3
+
+<img src="s3FirstRequest.png" width="300"/>
+<img src="s3FinalRequest.png" width="300"/>
+
+#### GCS
+
+<img src="GCSFirstRequest.png" width="300"/>
+<img src="GCSFinalRequest.png" width="300"/>
 
 ## Pitfalls of other routes
 
