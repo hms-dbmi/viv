@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import { Button, ButtonGroup, Slider, Checkbox } from '@material-ui/core';
-import { VivViewer, OverviewView, DetailView } from '../../src';
+import { OverviewDetailViewer } from '../../src';
 import { initPyramidLoader } from './initLoaders';
 import sources from './source-info';
 import './App.css';
@@ -147,44 +147,35 @@ function App() {
     );
   });
 
-  const viewState = {
+  const initialViewState = {
     ...(sources[sourceName].initialViewState || DEFAULT_VIEW_STATE),
     height: viewHeight,
     width: viewWidth,
     id: 'detail'
   };
-  const props = {
-    loader,
-    sliderValues: sliderValues.slice(
-      0,
-      sources[sourceName].channelNames.length
-    ),
-    colorValues: colorValues.slice(0, sources[sourceName].channelNames.length),
-    channelIsOn: channelIsOn.slice(
-      0,
-      sources[initSourceName].channelNames.length
-    ),
-    colormap: colormapOn
-  };
-  const detail = new DetailView({ initialViewState: viewState });
-  const views = [detail];
-  const layerProps = [props];
-
-  if (overviewOn && loader && sourceName !== 'static') {
-    const overviewViewState = { ...viewState, id: 'overview' };
-    const overview = new OverviewView({
-      initialViewState: overviewViewState,
-      loader,
-      detailHeight: viewState.height,
-      detailWidth: viewState.width
-    });
-    views.push(overview);
-    layerProps.push(props);
-  }
 
   return (
     <div>
-      {loader ? <VivViewer layerProps={layerProps} views={views} /> : null}
+      {loader ? (
+        <OverviewDetailViewer
+          loader={loader}
+          sliderValues={sliderValues.slice(
+            0,
+            sources[sourceName].channelNames.length
+          )}
+          colorValues={colorValues.slice(
+            0,
+            sources[sourceName].channelNames.length
+          )}
+          channelIsOn={channelIsOn.slice(
+            0,
+            sources[initSourceName].channelNames.length
+          )}
+          initialViewState={initialViewState}
+          colormap={colormapOn}
+          overviewOn={overviewOn}
+        />
+      ) : null}
       <div className="slider-container">
         <p>
           <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer

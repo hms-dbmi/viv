@@ -65,6 +65,8 @@ export default class VivViewer extends PureComponent {
    */
   componentDidUpdate(prevProps) {
     const { views } = this.props;
+    // Update internal viewState on view changes as well as height and width changes.
+    // Maybe we should add x/y too?
     if (
       views.some(
         (view, i) =>
