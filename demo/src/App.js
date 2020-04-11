@@ -1,15 +1,28 @@
-import React, { useState, useEffect, memo, useReducer } from 'react';
-import { Button, ButtonGroup } from '@material-ui/core';
+import React, { useState, useEffect, useReducer } from 'react';
+import {
+  Button,
+  Box,
+  Grid,
+  Select,
+  InputLabel,
+  FormControl,
+  IconButton,
+  Tooltip
+} from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
+
 import { VivViewer } from '../../src';
 import sources from './source-info';
-import './App.css';
 import {
   createLoader,
-  useWindowSize,
+  hexToRgb,
   channelsReducer,
-  hexToRgb
+  useWindowSize
 } from './utils';
-import ChannelController from './ChannelController';
+import ChannelController from './components/ChannelController';
+import Description from './components/Description';
+import Menu from './components/Menu';
 
 const MAX_CHANNELS = 6;
 const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
@@ -28,24 +41,66 @@ const COLORMAP_OPTIONS = [
 ];
 
 const initSourceName = 'zarr';
-const initChannelState = {
-  sliders: [],
-  colors: [],
-  selections: [],
-  names: [],
-  ids: [],
-  isOn: []
-};
+
+const ColorSelector = ({ colormap, handleColormapChange }) => (
+  <FormControl fullWidth>
+    <InputLabel htmlFor="colormap-select">Colormap</InputLabel>
+    <Select
+      native
+      onChange={e => handleColormapChange(e.target.value)}
+      value={colormap}
+      inputProps={{
+        name: 'colormap',
+        id: 'colormap-select'
+      }}
+    >
+      <option aria-label="None" value="" />
+      {COLORMAP_OPTIONS.map(name => (
+        <option key={name} value={name}>
+          {name}
+        </option>
+      ))}
+    </Select>
+  </FormControl>
+);
+
+const SourceSelector = ({ source, sourceOptions, handleChange }) => (
+  <FormControl fullWidth>
+    <InputLabel htmlFor="data-source-select">Data Source</InputLabel>
+    <Select
+      native
+      onChange={e => handleChange(e.target.value)}
+      value={source}
+      inputProps={{
+        name: 'data-source',
+        id: 'data-source-select'
+      }}
+    >
+      {sourceOptions.map(opt => (
+        <option key={opt} value={opt}>
+          {opt}
+        </option>
+      ))}
+    </Select>
+  </FormControl>
+);
 
 function App() {
-  const [channels, dispatch] = useReducer(channelsReducer, initChannelState);
+  const [channels, dispatch] = useReducer(channelsReducer, {
+    sliders: [],
+    colors: [],
+    selections: [],
+    names: [],
+    ids: [],
+    isOn: []
+  });
+  const viewSize = useWindowSize();
   const [loader, setLoader] = useState(null);
   const [sourceName, setSourceName] = useState(initSourceName);
   const [colormap, setColormap] = useState('');
   const [overviewOn, toggleOverview] = useReducer(v => !v, false);
   const [controllerOn, toggleController] = useReducer(v => !v, true);
   const [channelColor, setChannelColor] = useState('#ff0000');
-  const viewSize = useWindowSize();
 
   useEffect(() => {
     async function changeLoader() {
@@ -67,7 +122,7 @@ function App() {
       setLoader(nextLoader);
     }
     changeLoader();
-  }, [sourceName]);
+  }, [sourceName, dispatch]);
 
   const handleControllerChange = (index, type, value) => {
     if (type === 'CHANGE_CHANNEL') {
@@ -96,39 +151,28 @@ function App() {
     });
   };
 
-  const sourceButtons = Object.keys(sources).map(name => {
-    return (
-      // only use isPublic on the deployment
-      // eslint-disable-next-line no-restricted-globals
-      (location.host === 'viv.vitessce.io' ? sources[name].isPublic : true) && (
-        <Button
-          variant="contained"
-          key={name}
-          disabled={name === sourceName}
-          onClick={() => setSourceName(name)}
-        >
-          {name}
-        </Button>
-      )
-    );
-  });
+  const sourceOptions = Object.keys(sources).filter(name =>
+    // only use isPublic on the deployment
+    // eslint-disable-next-line no-restricted-globals
+    location.host === 'viv.vitessce.io' ? sources[name].isPublic : true
+  );
 
   const { initialViewState, isPyramid, dimensions } = sources[sourceName];
   const { names, colors, sliders, isOn, ids, selections } = channels;
-
   const channelControllers = ids.map((id, i) => {
     return (
-      <ChannelController
-        name={names[i]}
-        channelOptions={dimensions[0].values}
-        disableOptions={sourceName === 'tiff'}
-        isOn={isOn[i]}
-        sliderValue={sliders[i]}
-        colorValue={colors[i]}
-        handleChange={(type, value) => handleControllerChange(i, type, value)}
-        colormapOn={colormap.length > 0}
-        key={`channel-controller-${names[i]}-${id}`}
-      />
+      <Grid key={`channel-controller-${names[i]}-${id}`} item>
+        <ChannelController
+          name={names[i]}
+          channelOptions={dimensions[0].values}
+          disableOptions={sourceName === 'tiff'}
+          isOn={isOn[i]}
+          sliderValue={sliders[i]}
+          colorValue={colors[i]}
+          handleChange={(type, value) => handleControllerChange(i, type, value)}
+          colormapOn={colormap.length > 0}
+        />
+      </Grid>
     );
   });
   return (
@@ -148,69 +192,71 @@ function App() {
         />
       )}
       {controllerOn && (
-        <div className="slider-container">
-          <p>
-            <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer
-            for high bit depth, high resolution, multi-channel images using
-            DeckGL over the hood and WebGL under the hood.
-          </p>
-          <p>
-            More information:{' '}
-            <a href="https://github.com/hubmapconsortium/vitessce-image-viewer">
-              Github
-            </a>
-            ,&nbsp;
-            <a href="https://www.npmjs.com/package/@hubmap/vitessce-image-viewer">
-              NPM
-            </a>
-          </p>
-          <ButtonGroup color="primary" size="small">
-            {sourceButtons}
-          </ButtonGroup>
-          &nbsp;
-          <label htmlFor="colormap-select">
-            Colormap:
-            <select
-              onChange={e => setColormap(e.target.value)}
-              value={colormap}
-              id="colormap-select"
-            >
-              <option value="">None</option>
-              {COLORMAP_OPTIONS.map(name => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </label>
-          &nbsp;
+        <Menu maxHeight={viewSize.height}>
+          <Grid container>
+            <Grid item xs={11}>
+              <Description />
+            </Grid>
+          </Grid>
+          <Grid container justify="space-between">
+            <Grid item xs={8}>
+              <SourceSelector
+                sourceOptions={sourceOptions}
+                source={sourceName}
+                handleChange={setSourceName}
+              />
+            </Grid>
+            <Grid item>
+              <ColorSelector
+                colormap={colormap}
+                handleColormapChange={setColormap}
+              />
+            </Grid>
+          </Grid>
           {channelControllers}
-          {isPyramid && (
-            <button onClick={toggleOverview} type="button">
-              {overviewOn ? 'Hide' : 'Show'} Overview
-            </button>
-          )}
-          <button
-            type="button"
+          <Button
             disabled={ids.length === MAX_CHANNELS || sourceName === 'tiff'}
             onClick={handleChannelAdd}
+            fullWidth
+            variant="outlined"
+            style={{ borderStyle: 'dashed' }}
+            startIcon={<AddIcon />}
+            size="small"
           >
             Add Channel
-          </button>
-          <input
-            type="color"
-            value={channelColor}
-            onChange={e => setChannelColor(e.target.value)}
-            disabled={sourceName === 'tiff'}
-          />
-        </div>
+          </Button>
+          <Button
+            disabled={!isPyramid}
+            onClick={toggleOverview}
+            variant="outlined"
+            size="small"
+            fullWidth
+          >
+            {overviewOn ? 'Hide' : 'Show'} Picture-In-Picture
+          </Button>
+        </Menu>
       )}
-      <button className="menu-toggle" type="button" onClick={toggleController}>
-        {controllerOn ? 'Hide' : 'Show'} Controller
-      </button>
+      <Box position="absolute" right={0} top={0} m={2}>
+        {controllerOn ? (
+          <Tooltip title="Hide" aria-label="hide-controls">
+            <IconButton color="default" size="small" onClick={toggleController}>
+              <RemoveIcon />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <Button
+            variant="outlined"
+            color="default"
+            size="small"
+            endIcon={<AddIcon />}
+            onClick={toggleController}
+            aria-label="show-controls"
+          >
+            Show Controls
+          </Button>
+        )}
+      </Box>
     </>
   );
 }
-
-// equivalent to PureComponent
-export default memo(App);
+export default App;

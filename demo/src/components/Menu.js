@@ -7,6 +7,10 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
   root: {
+    height: props => `${props.maxHeight - 20}px`,
+    overflowY: 'auto'
+  },
+  paper: {
     flexGrow: 1,
     padding: theme.spacing(2),
     backgroundColor: 'rgba(0, 0, 0, 0.75)',
@@ -17,11 +21,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function Menu({ children }) {
-  const classes = useStyles();
+function Menu({ children, ...props }) {
+  const classes = useStyles(props);
   return (
-    <Box position="absolute" right={0} top={0} width="350px" m={1}>
-      <Paper className={classes.root}>
+    <Box
+      position="absolute"
+      right={0}
+      top={0}
+      width="350px"
+      m={1}
+      className={classes.root}
+    >
+      <Paper className={classes.paper}>
         <Grid
           container
           direction="column"

@@ -6,6 +6,18 @@ import { makeStyles } from '@material-ui/core/styles';
 const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
+// const DEFAULT_COLOR_PALLETE = [
+//   [0, 0, 255],
+//   [0, 255, 0],
+//   [255, 0, 0],
+//   [255, 255, 0],
+//   [255, 128, 0],
+//   [255, 0, 255],
+//   [0, 255, 255],
+//   [255, 255, 255]
+// ];
+
+const toRgb = arr => `rgb(${arr})`;
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -26,9 +38,7 @@ function ChannelController({
   handleChange,
   disableOptions = false
 }) {
-  const rgb = `rgb(${
-    colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValue
-  })`;
+  const rgb = toRgb(colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValue);
   const classes = useStyles();
   return (
     <Grid
