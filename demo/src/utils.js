@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { createTiffPyramid, createZarrLoader } from '../../src';
 
-const DEFAULT_COLOR_PALLETE = [
+export const DEFAULT_COLOR_PALLETE = [
   [0, 0, 255],
   [0, 255, 0],
   [255, 0, 0],
   [255, 255, 0],
   [255, 128, 0],
   [255, 0, 255],
-  [0, 255, 255]
+  [0, 255, 255],
+  [255, 255, 255]
 ];
 
 export async function createLoader(type, infoObj) {
@@ -81,6 +82,8 @@ export function channelsReducer(state, { index, value, type }) {
     case 'CHANGE_COLOR': {
       const colors = [...state.colors];
       colors[index] = value;
+      console.log('in colors!');
+      console.log(colors);
       return { ...state, colors };
     }
     case 'CHANGE_SLIDER': {

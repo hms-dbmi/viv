@@ -1,30 +1,25 @@
 import React from 'react';
-import { Slider, Checkbox, Grid, Select, IconButton } from '@material-ui/core';
-import CloseOutlinedIcon from '@material-ui/icons/ClearOutlined';
+import { Slider, Checkbox, Grid, Select } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+
+import ChannelOptions from './ChannelOptions';
 
 const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
-// const DEFAULT_COLOR_PALLETE = [
-//   [0, 0, 255],
-//   [0, 255, 0],
-//   [255, 0, 0],
-//   [255, 255, 0],
-//   [255, 128, 0],
-//   [255, 0, 255],
-//   [0, 255, 255],
-//   [255, 255, 255]
-// ];
 
-const toRgb = arr => `rgb(${arr})`;
+const toRgb = (on, arr) => {
+  const color = on ? COLORMAP_SLIDER_CHECKBOX_COLOR : arr;
+  return `rgb(${color})`;
+};
 
 const useStyles = makeStyles(theme => ({
-  icon: {
-    color: theme.palette.text.primary
-  },
   root: {
     paddingTop: theme.spacing(1)
+  },
+  icon: {
+    color: theme.palette.text.primary,
+    marginTop: '4px'
   }
 }));
 
@@ -38,7 +33,7 @@ function ChannelController({
   handleChange,
   disableOptions = false
 }) {
-  const rgb = toRgb(colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValue);
+  const rgbColor = toRgb(colormapOn, colorValue);
   const classes = useStyles();
   return (
     <Grid
@@ -49,7 +44,7 @@ function ChannelController({
       className={classes.root}
     >
       <Grid container direction="row" justify="space-between">
-        <Grid item xs={10}>
+        <Grid item xs={11}>
           <Select
             native
             value={name}
@@ -63,42 +58,35 @@ function ChannelController({
           </Select>
         </Grid>
         <Grid item>
-          <IconButton
-            className={classes.icon}
-            aria-label="Remove channel"
-            size="small"
-            onClick={() => handleChange('REMOVE_CHANNEL')}
-          >
-            <CloseOutlinedIcon size="small" />
-          </IconButton>
+          <ChannelOptions handleChange={handleChange} />
         </Grid>
       </Grid>
-      <Grid container direction="row" justify="space-between">
-        <Grid item>
+      <Grid container direction="row" justify="flex-start">
+        <Grid item xs={2}>
           <Checkbox
             onChange={() => handleChange('TOGGLE_ON')}
             checked={isOn}
             style={{
-              color: rgb,
+              color: rgbColor,
               '&$checked': {
-                color: rgb
+                color: rgbColor
               }
             }}
           />
         </Grid>
-        <Grid item xs={10}>
+        <Grid item xs={9}>
           <Slider
             value={sliderValue}
-            onChange={(event, value) => handleChange('CHANGE_SLIDER', value)}
+            onChange={(e, v) => handleChange('CHANGE_SLIDER', v)}
             valueLabelDisplay="auto"
             getAriaLabel={() => `${name}-${colorValue}-${sliderValue}`}
             min={MIN_SLIDER_VALUE}
             max={MAX_SLIDER_VALUE}
-            style={{
-              color: rgb,
-              top: '7px'
-            }}
             orientation="horizontal"
+            style={{
+              color: rgbColor,
+              marginTop: '7px'
+            }}
           />
         </Grid>
       </Grid>

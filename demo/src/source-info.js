@@ -13,7 +13,8 @@ const basePyramidInfo = {
   ],
   isPublic: true,
   isPyramid: true,
-  selections: channelNames.map(name => ({ channel: name }))
+  selections: channelNames.map(name => ({ channel: name })),
+  description: 'Multiplex immunofloures'
 };
 
 const tiffInfo = {

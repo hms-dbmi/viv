@@ -5,12 +5,9 @@ import {
   Grid,
   Select,
   InputLabel,
-  FormControl,
-  IconButton,
-  Tooltip
+  FormControl
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
-import RemoveIcon from '@material-ui/icons/Remove';
 
 import { VivViewer } from '../../src';
 import sources from './source-info';
@@ -21,8 +18,8 @@ import {
   useWindowSize
 } from './utils';
 import ChannelController from './components/ChannelController';
-import Description from './components/Description';
 import Menu from './components/Menu';
+import MenuToggle from './components/MenuToggle';
 
 const MAX_CHANNELS = 6;
 const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
@@ -193,20 +190,15 @@ function App() {
       )}
       {controllerOn && (
         <Menu maxHeight={viewSize.height}>
-          <Grid container>
-            <Grid item xs={11}>
-              <Description />
-            </Grid>
-          </Grid>
           <Grid container justify="space-between">
-            <Grid item xs={8}>
+            <Grid item xs={7}>
               <SourceSelector
                 sourceOptions={sourceOptions}
                 source={sourceName}
                 handleChange={setSourceName}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={4}>
               <ColorSelector
                 colormap={colormap}
                 handleColormapChange={setColormap}
@@ -237,24 +229,7 @@ function App() {
         </Menu>
       )}
       <Box position="absolute" right={0} top={0} m={2}>
-        {controllerOn ? (
-          <Tooltip title="Hide" aria-label="hide-controls">
-            <IconButton color="default" size="small" onClick={toggleController}>
-              <RemoveIcon />
-            </IconButton>
-          </Tooltip>
-        ) : (
-          <Button
-            variant="outlined"
-            color="default"
-            size="small"
-            endIcon={<AddIcon />}
-            onClick={toggleController}
-            aria-label="show-controls"
-          >
-            Show Controls
-          </Button>
-        )}
+        <MenuToggle on={controllerOn} toggle={toggleController} />
       </Box>
     </>
   );
