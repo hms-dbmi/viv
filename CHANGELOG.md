@@ -8,6 +8,8 @@
 
 ### Changed
 
+- Update the IMAGE_RENDERING doc
+
 ## 0.1.4
 
 ### Added

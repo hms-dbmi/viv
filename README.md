@@ -2,7 +2,7 @@
 
 A viewer for high bit depth, high resolution, multi-channel images using DeckGL
 over the hood and WebGL under the hood. To learn more about the "theory" behind
-this, look at [this](IMAGE_RENDERING.md). To really make this sing, you need to
+this, look at [this](image_rendering_docs/IMAGE_RENDERING.md). To really make this sing, you need to
 use an http2 server in production (s3 is passable, though).
 
 ## Using this in your project
@@ -78,7 +78,7 @@ A `loader` is the primary object responsible for returning tile data as well as 
 ###### `loader.getTile` (Function, VivViewerLayer) **POTENTIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
 
 `getTile` given x, y, z indices of the tile, returns the tile data or a Promise that resolves to the tile data. Look
-at [this](IMAGE_RENDERING.md) for how the zarr should be laid out.
+at [this](image_rendering_docs/IMAGE_RENDERING.md) for how the zarr should be laid out.
 
 Receives arguments:
 
