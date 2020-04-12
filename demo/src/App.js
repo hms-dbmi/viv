@@ -1,233 +1,190 @@
-import React, { useState, useEffect, memo } from 'react';
-import { Button, ButtonGroup, Slider, Checkbox } from '@material-ui/core';
+import React, { useState, useEffect, useReducer } from 'react';
+
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Grid from '@material-ui/core/Grid';
+import AddIcon from '@material-ui/icons/Add';
+
 import { VivViewer } from '../../src';
-import { initPyramidLoader } from './initLoaders';
 import sources from './source-info';
-import './App.css';
+import { createLoader, channelsReducer, useWindowSize } from './utils';
 
-const MIN_SLIDER_VALUE = 0;
-const MAX_SLIDER_VALUE = 65535;
-const MIN_ZOOM = -8;
-const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
-const COLORMAP = 'viridis';
-const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
-const MARGIN = 25;
+import ChannelController from './components/ChannelController';
+import Menu from './components/Menu';
+import MenuToggle from './components/MenuToggle';
+import ColormapSelect from './components/ColormapSelect';
+import SourceSelect from './components/SourceSelect';
 
-const initSourceName = 'zarr';
-const colorValues = [
-  [255, 0, 0],
-  [0, 255, 0],
-  [0, 0, 255],
-  [255, 128, 0],
-  [255, 0, 255],
-  [0, 255, 255]
-];
+import {
+  MAX_CHANNELS,
+  DEFAULT_VIEW_STATE,
+  DEFAULT_OVERVIEW
+} from './constants';
 
-const initSliderValues = Array(colorValues.length).fill([0, 20000]);
-const initChannelIsOn = Array(colorValues.length).fill(true);
+const initialChannels = {
+  sliders: [],
+  colors: [],
+  selections: [],
+  names: [],
+  ids: [],
+  isOn: []
+};
+
 function App() {
-  const [sliderValues, setSliderValues] = useState(initSliderValues);
-  const [channelIsOn, setChannelIsOn] = useState(initChannelIsOn);
-  const [sourceName, setSourceName] = useState(initSourceName);
-  const [viewWidth, setViewWidth] = useState(window.innerWidth * 0.7);
-  const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.9);
+  const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
+  const viewSize = useWindowSize();
   const [loader, setLoader] = useState(null);
-  const [colormapOn, setColormap] = useState('');
-  const [overviewOn, setOverview] = useState(false);
+  const [sourceName, setSourceName] = useState('zarr');
+  const [colormap, setColormap] = useState('');
+  const [overviewOn, toggleOverview] = useReducer(v => !v, false);
+  const [controllerOn, toggleController] = useReducer(v => !v, true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const handleResize = () => {
-      setViewWidth(window.innerWidth * 0.7);
-      setViewHeight(window.innerHeight * 0.9);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  });
-
-  useEffect(() => {
-    async function initLoader() {
-      const config = {
-        channelNames: sources[sourceName].channelNames,
-        url: sources[sourceName].url,
-        minZoom:
-          typeof sources[sourceName].minZoom === 'number'
-            ? sources[sourceName].minZoom
-            : MIN_ZOOM
-      };
-      // Need to do this to clear last loader... probably a better way.
-      setLoader(null);
-      const newLoader = await initPyramidLoader(sourceName, config);
-      setLoader(newLoader);
+    async function changeLoader() {
+      setIsLoading(true);
+      const sourceInfo = sources[sourceName];
+      const nextLoader = await createLoader(sourceName, sourceInfo);
+      if (typeof nextLoader.serializeSelection === 'function') {
+        // TODO: Once tiff loader is ready, we won't need this if block.
+        const { selections, dimensions } = sourceInfo;
+        const serialized = nextLoader.serializeSelection(selections);
+        const names = selections.map(sel => sel[dimensions[0].field]);
+        dispatch({
+          type: 'RESET_CHANNELS',
+          value: { names, selections: serialized }
+        });
+      } else {
+        const names = sourceInfo.dimensions[0].values;
+        dispatch({ type: 'RESET_CHANNELS', value: { names } });
+      }
+      setLoader(nextLoader);
+      setIsLoading(false);
     }
-    initLoader();
+    changeLoader();
   }, [sourceName]);
 
-  const handleSliderChange = (index, value) => {
-    setSliderValues(prevSliderValues => {
-      const nextSliderValues = [...prevSliderValues];
-      nextSliderValues[index] = value;
-      return nextSliderValues;
+  /*
+   * Handles updating state for each channel controller.
+   * Is is too heavy weight to store each channel as an object in state,
+   * so we store the individual viv props (colorValues, sliderValues, etc)
+   * in separate arrays. We use the ordering of the channels in the menu to make
+   * update state very responsive (but dispatching the index of the channel)
+   */
+  const handleControllerChange = (index, type, value) => {
+    if (type === 'CHANGE_CHANNEL') {
+      const [channelDim] = sources[sourceName].dimensions;
+      const { field, values } = channelDim;
+      const dimIndex = values.indexOf(value);
+      const [serialized] = loader.serializeSelection({
+        [field]: dimIndex
+      });
+      dispatch({
+        type,
+        index,
+        value: { name: values[dimIndex], selection: serialized }
+      });
+    } else {
+      dispatch({ type, index, value });
+    }
+  };
+
+  const handleChannelAdd = () => {
+    const [channelDim] = sources[sourceName].dimensions;
+    dispatch({
+      type: 'ADD_CHANNEL',
+      value: { name: channelDim.values[0], selection: [0, 0, 0] }
     });
   };
 
-  const toggleChannel = index => {
-    setChannelIsOn(prevChannelsOn => {
-      const nextChannelsOn = [...prevChannelsOn];
-      nextChannelsOn[index] = !nextChannelsOn[index];
-      return nextChannelsOn;
-    });
-  };
-
-  const toggleColormap = () => {
-    setColormap(prevColormap => {
-      return prevColormap ? '' : COLORMAP;
-    });
-  };
-
-  const toggleOverview = () => {
-    setOverview(prevOverviewOn => {
-      return !prevOverviewOn;
-    });
-  };
-
-  const sourceButtons = Object.keys(sources).map(name => {
+  const { initialViewState, isPyramid, dimensions } = sources[sourceName];
+  const { names, colors, sliders, isOn, ids, selections } = channels;
+  const channelControllers = ids.map((id, i) => {
     return (
-      // only use isPublic on the deployment
-      // eslint-disable-next-line no-restricted-globals
-      (location.host === 'viv.vitessce.io' ? sources[name].isPublic : true) && (
-        <Button
-          variant="contained"
-          key={name}
-          disabled={name === sourceName}
-          onClick={() => setSourceName(name)}
-        >
-          {name}
-        </Button>
-      )
+      <Grid key={`channel-controller-${names[i]}-${id}`} item>
+        <ChannelController
+          name={names[i]}
+          channelOptions={dimensions[0].values}
+          disableOptions={sourceName === 'tiff'}
+          isOn={isOn[i]}
+          sliderValue={sliders[i]}
+          colorValue={colors[i]}
+          handleChange={(type, value) => handleControllerChange(i, type, value)}
+          colormapOn={colormap.length > 0}
+        />
+      </Grid>
     );
   });
-
-  const sliders = sources[sourceName].channelNames.map((channel, i) => {
-    return (
-      <div key={`container-${channel}`}>
-        <p>{channel}</p>
-        <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
-          <Checkbox
-            onChange={() => toggleChannel(i)}
-            checked={channelIsOn[i]}
-            style={{
-              color: `rgb(${
-                colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValues[i]
-              })`,
-              '&$checked': {
-                color: `rgb(${
-                  colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValues[i]
-                })`
-              }
-            }}
-          />
-          <Slider
-            value={sliderValues[i]}
-            onChange={(event, value) => handleSliderChange(i, value)}
-            valueLabelDisplay="auto"
-            getAriaLabel={() => channel}
-            min={MIN_SLIDER_VALUE}
-            max={MAX_SLIDER_VALUE}
-            style={{
-              color: `rgb(${
-                colormapOn ? COLORMAP_SLIDER_CHECKBOX_COLOR : colorValues[i]
-              })`,
-              top: '7px'
-            }}
-            orientation="horizontal"
-          />
-        </div>
-      </div>
-    );
-  });
-
-  const initialViewState =
-    sources[sourceName].initialViewState || DEFAULT_VIEW_STATE;
   return (
-    <div>
-      {loader ? (
+    <>
+      {!isLoading && (
         <VivViewer
           loader={loader}
-          minZoom={MIN_ZOOM}
-          viewHeight={viewHeight}
-          viewWidth={viewWidth}
-          sliderValues={sliderValues.slice(
-            0,
-            sources[sourceName].channelNames.length
-          )}
-          colorValues={colorValues.slice(
-            0,
-            sources[sourceName].channelNames.length
-          )}
-          channelIsOn={channelIsOn.slice(
-            0,
-            sources[initSourceName].channelNames.length
-          )}
-          initialViewState={initialViewState}
-          colormap={colormapOn}
-          overview={
-            overviewOn
-              ? {
-                  margin: MARGIN,
-                  scale: 0.2
-                }
-              : null
-          }
+          viewHeight={viewSize.height}
+          viewWidth={viewSize.width}
+          sliderValues={sliders}
+          colorValues={colors}
+          channelIsOn={isOn}
+          loaderSelection={selections}
+          initialViewState={initialViewState || DEFAULT_VIEW_STATE}
+          colormap={colormap.length > 0 && colormap}
+          overview={overviewOn && DEFAULT_OVERVIEW}
         />
-      ) : null}
-      <div className="slider-container">
-        <p>
-          <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer
-          for high bit depth, high resolution, multi-channel images using DeckGL
-          over the hood and WebGL under the hood.
-        </p>
-        <p>
-          More information:{' '}
-          <a href="https://github.com/hubmapconsortium/vitessce-image-viewer">
-            Github
-          </a>
-          ,&nbsp;
-          <a href="https://www.npmjs.com/package/@hubmap/vitessce-image-viewer">
-            NPM
-          </a>
-        </p>
-        <ButtonGroup color="primary" size="small">
-          {sourceButtons}
-        </ButtonGroup>
-        <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+      )}
+      {controllerOn && (
+        <Menu maxHeight={viewSize.height}>
+          <Grid container justify="space-between">
+            <Grid item xs={6}>
+              <SourceSelect
+                value={sourceName}
+                handleChange={setSourceName}
+                disabled={isLoading}
+              />
+            </Grid>
+            <Grid item xs={5}>
+              <ColormapSelect
+                value={colormap}
+                handleChange={setColormap}
+                disabled={isLoading}
+              />
+            </Grid>
+          </Grid>
+          {!isLoading ? (
+            channelControllers
+          ) : (
+            <Grid container justify="center">
+              <CircularProgress />
+            </Grid>
+          )}
           <Button
-            variant="contained"
-            onClick={() => toggleColormap()}
-            key="colormap"
+            disabled={
+              ids.length === MAX_CHANNELS || sourceName === 'tiff' || isLoading
+            }
+            onClick={handleChannelAdd}
+            fullWidth
+            variant="outlined"
+            style={{ borderStyle: 'dashed' }}
+            startIcon={<AddIcon />}
+            size="small"
           >
-            {colormapOn ? 'Colors' : COLORMAP}
+            Add Channel
           </Button>
-        </div>
-        {loader && loader.isPyramid ? (
-          <div style={{ marginTop: '15px', marginBottom: '15px' }}>
-            <Button
-              variant="contained"
-              onClick={() => toggleOverview()}
-              key="overview"
-            >
-              {overviewOn ? 'Remove Overview' : 'Show Overview'}
-            </Button>
-          </div>
-        ) : (
-          []
-        )}
-        {sliders}
-      </div>
-    </div>
+          <Button
+            disabled={!isPyramid || isLoading}
+            onClick={toggleOverview}
+            variant="outlined"
+            size="small"
+            fullWidth
+          >
+            {overviewOn ? 'Hide' : 'Show'} Picture-In-Picture
+          </Button>
+        </Menu>
+      )}
+      <Box position="absolute" right={0} top={0} m={2}>
+        <MenuToggle on={controllerOn} toggle={toggleController} />
+      </Box>
+    </>
   );
 }
-
-// equivalent to PureComponent
-export default memo(App);
+export default App;

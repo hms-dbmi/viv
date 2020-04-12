@@ -7,13 +7,13 @@ export default class VivViewerOverview {
     viewHeight,
     loader,
     margin = 25,
-    overviewLocation = 'bottom-right',
+    scale = 1,
+    position = 'bottom-right',
     id = 'overview',
     boundingBoxColor = [255, 0, 0],
     boundingBoxOutlineWidth = 50,
     viewportOutlineColor = [255, 192, 204],
-    viewportOutlineWidth = 400,
-    overviewScale = 1
+    viewportOutlineWidth = 400
   }) {
     const { numLevels } = loader;
     const rasterSize = loader.getRasterSize({
@@ -25,13 +25,13 @@ export default class VivViewerOverview {
     this.id = id;
     this._numLevels = numLevels;
     // These are the pixel-space height and width
-    this.width = viewWidth * overviewScale;
+    this.width = viewWidth * scale;
     this.height = this.width * (rasterSize.height / rasterSize.width);
     // This is the ratio of the "zoomed out" image to the width of the viewport
     this.overviewScale = (2 ** (numLevels - 1) / rasterSize.width) * this.width;
     this.imageHeight = rasterSize.height;
     this.imageWidth = rasterSize.width;
-    this.overviewLocation = overviewLocation;
+    this.position = position;
     this.boundingBoxColor = boundingBoxColor;
     this.boundingBoxOutlineWidth = boundingBoxOutlineWidth;
     this.viewportOutlineColor = viewportOutlineColor;
@@ -56,15 +56,8 @@ export default class VivViewerOverview {
   }
 
   _getOverviewMargins() {
-    const {
-      height,
-      width,
-      margin,
-      viewWidth,
-      viewHeight,
-      overviewLocation
-    } = this;
-    switch (overviewLocation) {
+    const { height, width, margin, viewWidth, viewHeight, position } = this;
+    switch (position) {
       case 'bottom-right': {
         return [
           // margin is the margin from the corner
