@@ -6,10 +6,11 @@ import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
+import LensIcon from '@material-ui/icons/Lens';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import { DEFAULT_COLOR_PALLETE } from '../utils';
+import { COLOR_PALLETE } from '../constants';
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -19,47 +20,63 @@ const useStyles = makeStyles(theme => ({
     width: '70px',
     height: '40px',
     display: 'flex',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     alignItems: 'center',
     flexWrap: 'wrap'
   },
   colorBlock: {
-    width: '15px',
-    height: '15px',
-    borderStyle: 'solid rgba(0, 0, 0, 0.75)'
+    padding: '3px',
+    width: '16px',
+    height: '16px'
   },
   menu: {
     width: '70px',
     textAlign: 'center'
+  },
+  button: {
+    width: '17px',
+    height: '17px'
+  },
+  colorMenuItem: {
+    '&:hover': {
+      backgroundColor: 'transparent'
+    },
+    paddingLeft: '2px',
+    paddingRight: '2px'
+  },
+  menuItem: {
+    paddingLeft: '2px',
+    paddingRight: '2px'
   }
 }));
 
 const ColorPalette = ({ handleChange }) => {
   const classes = useStyles();
   return (
-    <div className={classes.colorRow}>
-      {DEFAULT_COLOR_PALLETE.map(color => {
+    <div className={classes.colorRow} aria-label="color-swatch">
+      {COLOR_PALLETE.map(color => {
         return (
-          <div
-            className={classes.colorBlock}
-            style={{ backgroundColor: `rgb(${color})` }}
-            key={color}
-            onClick={() => handleChange(color)}
-          />
+          <IconButton className={classes.colorBlock}>
+            <LensIcon
+              fontSize="small"
+              style={{ color: `rgb(${color})` }}
+              key={color}
+              onClick={() => handleChange(color)}
+              className={classes.button}
+            />
+          </IconButton>
         );
       })}
     </div>
   );
 };
 
-// handleChange('REMOVE_CHANNEL')
 function ChannelOptions({ handleChange }) {
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
   const classes = useStyles();
 
   const handleColorSelect = color => {
-    toggle();
     handleChange('CHANGE_COLOR', color);
   };
 
@@ -87,10 +104,10 @@ function ChannelOptions({ handleChange }) {
         <Paper className={classes.paper}>
           <ClickAwayListener onClickAway={toggle}>
             <MenuList id="channel-options">
-              <MenuItem dense onClick={handleRemove}>
+              <MenuItem dense disableGutters onClick={handleRemove}>
                 <span className={classes.menu}>Remove</span>
               </MenuItem>
-              <MenuItem dense>
+              <MenuItem dense disableGutters className={classes.colorMenuItem}>
                 <ColorPalette handleChange={handleColorSelect} />
               </MenuItem>
             </MenuList>

@@ -1,16 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createTiffPyramid, createZarrLoader } from '../../src';
 
-export const DEFAULT_COLOR_PALLETE = [
-  [0, 0, 255],
-  [0, 255, 0],
-  [255, 0, 0],
-  [255, 255, 0],
-  [255, 128, 0],
-  [255, 0, 255],
-  [0, 255, 255],
-  [255, 255, 255]
-];
+import { COLOR_PALLETE } from './constants';
 
 export async function createLoader(type, infoObj) {
   switch (type) {
@@ -82,8 +73,6 @@ export function channelsReducer(state, { index, value, type }) {
     case 'CHANGE_COLOR': {
       const colors = [...state.colors];
       colors[index] = value;
-      console.log('in colors!');
-      console.log(colors);
       return { ...state, colors };
     }
     case 'CHANGE_SLIDER': {
@@ -97,11 +86,11 @@ export function channelsReducer(state, { index, value, type }) {
       return { ...state, isOn };
     }
     case 'ADD_CHANNEL': {
-      const { name, selection, color } = value;
+      const { name, selection } = value;
       const nextState = { ...state };
       nextState.names.push(name);
       nextState.selections.push(selection);
-      nextState.colors.push(color);
+      nextState.colors.push([255, 255, 255]); // white
       nextState.isOn.push(true);
       nextState.sliders.push([0, 20000]);
       nextState.ids.push(String(Math.random()));
@@ -123,7 +112,7 @@ export function channelsReducer(state, { index, value, type }) {
         names,
         selections,
         sliders: Array(n).fill([0, 20000]),
-        colors: range(n).map(i => DEFAULT_COLOR_PALLETE[i]),
+        colors: range(n).map(i => COLOR_PALLETE[i]),
         isOn: Array(n).fill(true),
         ids: range(n).map(() => String(Math.random()))
       };

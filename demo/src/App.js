@@ -8,38 +8,26 @@ import {
   FormControl
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 import { VivViewer } from '../../src';
 import sources from './source-info';
-import {
-  createLoader,
-  hexToRgb,
-  channelsReducer,
-  useWindowSize
-} from './utils';
+import { createLoader, channelsReducer, useWindowSize } from './utils';
 import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
 import MenuToggle from './components/MenuToggle';
 
-const MAX_CHANNELS = 6;
-const DEFAULT_VIEW_STATE = { zoom: -5.5, target: [30000, 10000, 0] };
-const DEFAULT_OVERVIEW = { margin: 25, scale: 0.15, position: 'bottom-left' };
-const COLORMAP_OPTIONS = [
-  'viridis',
-  'greys',
-  'magma',
-  'jet',
-  'hot',
-  'bone',
-  'copper',
-  'summer',
-  'density',
-  'inferno'
-];
+import {
+  MAX_CHANNELS,
+  DEFAULT_VIEW_STATE,
+  DEFAULT_OVERVIEW,
+  COLORMAP_OPTIONS
+} from './constants';
 
 const initSourceName = 'zarr';
 
-const ColorSelector = ({ colormap, handleColormapChange }) => (
+const ColorSelector = ({ colormap, handleColormapChange, disabled }) => (
   <FormControl fullWidth>
     <InputLabel htmlFor="colormap-select">Colormap</InputLabel>
     <Select
@@ -50,6 +38,7 @@ const ColorSelector = ({ colormap, handleColormapChange }) => (
         name: 'colormap',
         id: 'colormap-select'
       }}
+      disabled={disabled}
     >
       <option aria-label="None" value="" />
       {COLORMAP_OPTIONS.map(name => (
@@ -61,7 +50,7 @@ const ColorSelector = ({ colormap, handleColormapChange }) => (
   </FormControl>
 );
 
-const SourceSelector = ({ source, sourceOptions, handleChange }) => (
+const SourceSelector = ({ source, sourceOptions, handleChange, disabled }) => (
   <FormControl fullWidth>
     <InputLabel htmlFor="data-source-select">Data Source</InputLabel>
     <Select
@@ -72,6 +61,7 @@ const SourceSelector = ({ source, sourceOptions, handleChange }) => (
         name: 'data-source',
         id: 'data-source-select'
       }}
+      disabled={disabled}
     >
       {sourceOptions.map(opt => (
         <option key={opt} value={opt}>
@@ -97,7 +87,6 @@ function App() {
   const [colormap, setColormap] = useState('');
   const [overviewOn, toggleOverview] = useReducer(v => !v, false);
   const [controllerOn, toggleController] = useReducer(v => !v, true);
-  const [channelColor, setChannelColor] = useState('#ff0000');
 
   useEffect(() => {
     async function changeLoader() {
@@ -141,10 +130,9 @@ function App() {
 
   const handleChannelAdd = () => {
     const [channelDim] = sources[sourceName].dimensions;
-    const name = channelDim.values[0];
     dispatch({
       type: 'ADD_CHANNEL',
-      value: { name, selection: [0, 0, 0], color: hexToRgb(channelColor) }
+      value: { name: channelDim.values[0], sselection: [0, 0, 0] }
     });
   };
 
@@ -196,18 +184,28 @@ function App() {
                 sourceOptions={sourceOptions}
                 source={sourceName}
                 handleChange={setSourceName}
+                disabled={!loader}
               />
             </Grid>
             <Grid item xs={4}>
               <ColorSelector
                 colormap={colormap}
                 handleColormapChange={setColormap}
+                disabled={!loader}
               />
             </Grid>
           </Grid>
-          {channelControllers}
+          {loader ? (
+            channelControllers
+          ) : (
+            <Grid container justify="center">
+              <CircularProgress />
+            </Grid>
+          )}
           <Button
-            disabled={ids.length === MAX_CHANNELS || sourceName === 'tiff'}
+            disabled={
+              ids.length === MAX_CHANNELS || sourceName === 'tiff' || !loader
+            }
             onClick={handleChannelAdd}
             fullWidth
             variant="outlined"
@@ -218,7 +216,7 @@ function App() {
             Add Channel
           </Button>
           <Button
-            disabled={!isPyramid}
+            disabled={!isPyramid || !loader}
             onClick={toggleOverview}
             variant="outlined"
             size="small"
