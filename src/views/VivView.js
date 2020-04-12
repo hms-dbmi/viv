@@ -40,7 +40,7 @@ export default class VivView {
    * @returns {ViewState} The viewState for this class (or null by default if the ids do not match).
    */
   // eslint-disable-next-line class-methods-use-this
-  getViewState({ viewState }) {
+  filterViewState({ viewState }) {
     const { id } = this;
     return viewState.id === id ? viewState : null;
   }

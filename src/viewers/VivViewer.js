@@ -17,7 +17,7 @@ export default class VivViewer extends PureComponent {
     const { viewStates } = this.state;
     const { views } = this.props;
     views.forEach(view => {
-      viewStates[view.id] = view.getViewState({
+      viewStates[view.id] = view.filterViewState({
         viewState: view.initialViewState
       });
     });
@@ -52,7 +52,7 @@ export default class VivViewer extends PureComponent {
         newState.viewStates = {
           ...newState.viewStates,
           [view.id]:
-            view.getViewState({
+            view.filterViewState({
               viewState: { ...viewState, id: viewId },
               oldViewState,
               currentViewState: prevState.viewStates[view.id]
@@ -89,7 +89,7 @@ export default class VivViewer extends PureComponent {
           const { height, width } = view.initialViewState;
           newState.viewStates = {
             ...newState.viewStates,
-            [view.id]: view.getViewState({
+            [view.id]: view.filterViewState({
               viewState: {
                 ...(prevState.viewStates[view.id] || view.initialViewState),
                 height,

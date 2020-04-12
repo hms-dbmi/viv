@@ -59,13 +59,13 @@ test(`OverviewView respects minimumWidth and maximumWidth.`, t => {
 
 test(`OverviewView maintains viewState.`, t => {
   const view = new OverviewView(overviewViewArguments);
-  const viewState1 = view.getViewState({
+  const viewState1 = view.filterViewState({
     height: 10,
     width: 10,
     target: [0, 0, 0],
     zoom: 0
   });
-  const viewState2 = view.getViewState({
+  const viewState2 = view.filterViewState({
     height: 15,
     width: 20,
     target: [0, 0, 0],

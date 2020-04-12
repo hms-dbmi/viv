@@ -109,7 +109,7 @@ export default class OverviewView extends VivView {
     });
   }
 
-  getViewState({ viewState }) {
+  filterViewState({ viewState }) {
     // Scale the view as the overviewScale changes with screen resizing - basically, do not react to any view state changes.
     const {
       _imageWidth,

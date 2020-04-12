@@ -28,7 +28,7 @@ export default class LinkedDetailView extends VivView {
     this.viewportOutlineWidth = viewportOutlineWidth;
   }
 
-  getViewState({ viewState, oldViewState, currentViewState }) {
+  filterViewState({ viewState, oldViewState, currentViewState }) {
     const { id: viewStateId } = viewState;
     const { id, linkedIds, panLock, zoomLock } = this;
     const thisViewState = { ...currentViewState };
