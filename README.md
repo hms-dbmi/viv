@@ -2,7 +2,7 @@
 
 A viewer for high bit depth, high resolution, multi-channel images using DeckGL
 over the hood and WebGL under the hood. To learn more about the "theory" behind
-this, look at [this](IMAGE_RENDERING.md). To really make this sing, you need to
+this, look at [this](image_rendering_docs/IMAGE_RENDERING.md). To really make this sing, you need to
 use an http2 server in production (s3 is passable, though).
 
 ## Using this in your project
@@ -40,6 +40,17 @@ uses Google Cloud Storage, which is HTTP2 by default.
 Due to difficulties around compiling shaders on Travis, unit tests and layer lifecycle
 tests are run locally as a pre-push hook. Travis runs a test build, linting, and prettier.
 
+## Browser Support
+
+Currently Safari lacks full WebGL2 support. The `Viv` component will display an error. To override the styling, add something like
+
+```css
+.viv-error p {
+  color: red;
+  margin: 15px;
+}
+```
+
 ## Component Library API
 
 There are two components being exported for use:
@@ -67,7 +78,7 @@ A `loader` is the primary object responsible for returning tile data as well as 
 ###### `loader.getTile` (Function, VivViewerLayer) **POTENTIAL FUTURE BREAKING CHANGES WITH NEW FEATURES**
 
 `getTile` given x, y, z indices of the tile, returns the tile data or a Promise that resolves to the tile data. Look
-at [this](IMAGE_RENDERING.md) for how the zarr should be laid out.
+at [this](image_rendering_docs/IMAGE_RENDERING.md) for how the zarr should be laid out.
 
 Receives arguments:
 

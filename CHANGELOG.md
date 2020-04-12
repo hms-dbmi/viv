@@ -4,9 +4,12 @@
 
 ### Added
 
+- Display warning for Safari users
+
 ### Changed
 
--Refactored VivViewer to take in arbitrary views/layers
+- Refactored VivViewer to take in arbitrary views/layers
+- Update the IMAGE_RENDERING doc
 
 ## 0.1.4
 

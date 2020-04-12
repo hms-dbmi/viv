@@ -2,6 +2,17 @@ import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { getVivId } from '../views/utils';
 
+// Taken from https://stackoverflow.com/a/31732310/8060591
+function isSafari() {
+  return (
+    navigator.vendor &&
+    navigator.vendor.indexOf('Apple') > -1 &&
+    navigator.userAgent &&
+    navigator.userAgent.indexOf('CriOS') === -1 &&
+    navigator.userAgent.indexOf('FxiOS') === -1
+  );
+}
+
 /**
  * This class handles rendering the various views within the DeckGL contenxt.
  * @param {Array} layerProps The props for the layers in each view.
@@ -125,7 +136,7 @@ export default class VivViewer extends PureComponent {
       deckGLViews[0] = deckGLViews[1];
       deckGLViews[1] = hold;
     }
-    return (
+    return !isSafari() ? (
       <DeckGL
         glOptions={{ webgl2: true }}
         layerFilter={this.layerFilter}
@@ -134,6 +145,13 @@ export default class VivViewer extends PureComponent {
         views={deckGLViews}
         viewState={this.state.viewStates}
       />
+    ) : (
+      <div className="viv-error">
+        <p>
+          Safari does not support WebGL2, which Viv requires. Please use Chrome
+          or Firefox.
+        </p>
+      </div>
     );
     /* eslint-disable react/destructuring-assignment */
   }
