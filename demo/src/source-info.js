@@ -19,13 +19,13 @@ const basePyramidInfo = {
 const tiffInfo = {
   url: `https://vitessce-demo-data.storage.googleapis.com/test-data/vanderbilt.images/vanderbilt.images`,
   ...basePyramidInfo,
-  description: 'Kidney mIF (OME-TIFF)'
+  description: 'Kidney mxIF (OME-TIFF)'
 };
 
 const zarrInfo = {
   url: `https://vitessce-data.storage.googleapis.com/0.0.25/master_release/spraggins/spraggins.mxif.zarr`,
   ...basePyramidInfo,
-  description: 'Kidney mIF (zarr)'
+  description: 'Kidney mxIF (zarr)'
 };
 
 const staticInfo = {
