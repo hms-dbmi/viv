@@ -6,7 +6,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import AddIcon from '@material-ui/icons/Add';
 
-import { LinkedDetailViewer } from '../../src';
+import { LinkedDetailViewer, OverviewDetailViewer } from '../../src';
 import sources from './source-info';
 import { createLoader, channelsReducer, useWindowSize } from './utils';
 
@@ -37,8 +37,11 @@ function App() {
   const [loader, setLoader] = useState(null);
   const [sourceName, setSourceName] = useState('zarr');
   const [colormap, setColormap] = useState('');
+  const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
   const [overviewOn, toggleOverview] = useReducer(v => !v, false);
   const [controllerOn, toggleController] = useReducer(v => !v, true);
+  const [zoomLock, toggleZoomLock] = useReducer(v => !v, true);
+  const [panLock, togglePanLock] = useReducer(v => !v, true);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -118,22 +121,39 @@ function App() {
   });
   return (
     <>
-      {!isLoading && (
-        <LinkedDetailViewer
-          loader={loader}
-          sliderValues={sliders}
-          colorValues={colors}
-          channelIsOn={isOn}
-          loaderSelection={selections}
-          initialViewState={{
-            ...(initialViewState || DEFAULT_VIEW_STATE),
-            height: viewSize.height,
-            width: viewSize.width * 0.5
-          }}
-          colormap={colormap.length > 0 && colormap}
-          overview={overviewOn && DEFAULT_OVERVIEW}
-        />
-      )}
+      {!isLoading &&
+        (useLinkedView ? (
+          <LinkedDetailViewer
+            loader={loader}
+            sliderValues={sliders}
+            colorValues={colors}
+            channelIsOn={isOn}
+            loaderSelection={selections}
+            initialViewState={{
+              ...(initialViewState || DEFAULT_VIEW_STATE),
+              height: viewSize.height,
+              width: viewSize.width * 0.5
+            }}
+            colormap={colormap.length > 0 && colormap}
+            zoomLock={zoomLock}
+            panLock={panLock}
+          />
+        ) : (
+          <OverviewDetailViewer
+            loader={loader}
+            sliderValues={sliders}
+            colorValues={colors}
+            channelIsOn={isOn}
+            loaderSelection={selections}
+            initialViewState={{
+              ...(initialViewState || DEFAULT_VIEW_STATE),
+              height: viewSize.height,
+              width: viewSize.width
+            }}
+            colormap={colormap.length > 0 && colormap}
+            overview={overviewOn && DEFAULT_OVERVIEW}
+          />
+        ))}
       {controllerOn && (
         <Menu maxHeight={viewSize.height}>
           <Grid container justify="space-between">
@@ -174,13 +194,45 @@ function App() {
           </Button>
           <Button
             disabled={!isPyramid || isLoading}
-            onClick={toggleOverview}
+            onClick={toggleLinkedView}
             variant="outlined"
             size="small"
             fullWidth
           >
-            {overviewOn ? 'Hide' : 'Show'} Picture-In-Picture
+            {useLinkedView ? 'Overview' : 'Linked'}
           </Button>
+          {!useLinkedView ? (
+            <Button
+              disabled={!isPyramid || isLoading}
+              onClick={toggleOverview}
+              variant="outlined"
+              size="small"
+              fullWidth
+            >
+              {overviewOn ? 'Hide' : 'Show'} Picture-In-Picture
+            </Button>
+          ) : (
+            <>
+              <Button
+                disabled={!isPyramid || isLoading}
+                onClick={toggleZoomLock}
+                variant="outlined"
+                size="small"
+                fullWidth
+              >
+                {zoomLock ? 'Unlock' : 'Lock'} Zoom
+              </Button>
+              <Button
+                disabled={!isPyramid || isLoading}
+                onClick={togglePanLock}
+                variant="outlined"
+                size="small"
+                fullWidth
+              >
+                {panLock ? 'Unlock' : 'Lock'} Pan
+              </Button>
+            </>
+          )}
         </Menu>
       )}
       <Box position="absolute" right={0} top={0} m={2}>
