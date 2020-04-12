@@ -5,11 +5,13 @@
 ### Added
 
 - Add `loaderSelection` as prop for `VivViewerLayer`. This parameter is passed to `loader.getTile` and `loader.getRaster` in addtion to `x`, `y` and `z`.
+- Display warning for Safari users
 
 ### Changed
 
 - Refactored demo to allow various channels and change selection.
 - Use reducer for handling channel state in Demo.
+- Update the IMAGE_RENDERING doc
 
 ## 0.1.4
 

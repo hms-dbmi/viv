@@ -7,3 +7,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: black;
 }
+
+.viv-error p {
+  color: red;
+  margin: 15px;
+}
