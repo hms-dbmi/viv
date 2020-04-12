@@ -8,7 +8,9 @@ import { COLORMAP_OPTIONS } from '../constants';
 function ColormapSelect({ value, handleChange, disabled }) {
   return (
     <FormControl fullWidth>
-      <InputLabel htmlFor="colormap-select">Colormap</InputLabel>
+      <InputLabel htmlFor="colormap-select">
+        {value === '' ? 'Use' : null} Colormap
+      </InputLabel>
       <Select
         native
         onChange={e => handleChange(e.target.value)}

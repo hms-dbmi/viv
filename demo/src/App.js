@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { Button, Box, Grid } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
+
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import AddIcon from '@material-ui/icons/Add';
 
 import { VivViewer } from '../../src';
 import sources from './source-info';
@@ -124,14 +128,14 @@ function App() {
       {controllerOn && (
         <Menu maxHeight={viewSize.height}>
           <Grid container justify="space-between">
-            <Grid item xs={7}>
+            <Grid item xs={6}>
               <SourceSelect
                 value={sourceName}
                 handleChange={setSourceName}
                 disabled={isLoading}
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={5}>
               <ColormapSelect
                 value={colormap}
                 handleChange={setColormap}

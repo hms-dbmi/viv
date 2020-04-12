@@ -13,18 +13,19 @@ const basePyramidInfo = {
   ],
   isPublic: true,
   isPyramid: true,
-  selections: channelNames.map(name => ({ channel: name })),
-  description: 'Multiplex immunofloures'
+  selections: channelNames.map(name => ({ channel: name }))
 };
 
 const tiffInfo = {
   url: `https://vitessce-demo-data.storage.googleapis.com/test-data/vanderbilt.images/vanderbilt.images`,
-  ...basePyramidInfo
+  ...basePyramidInfo,
+  description: 'Kidney mIF (OME-TIFF)'
 };
 
 const zarrInfo = {
   url: `https://vitessce-data.storage.googleapis.com/0.0.25/master_release/spraggins/spraggins.mxif.zarr`,
-  ...basePyramidInfo
+  ...basePyramidInfo,
+  description: 'Kidney mIF (zarr)'
 };
 
 const staticInfo = {
@@ -91,7 +92,8 @@ const staticInfo = {
     { field: 'y', type: 'quantitative', values: null },
     { field: 'x', type: 'quantitative', values: null }
   ],
-  selections: [{ mz: '703.5722' }, { mz: '721.4766' }]
+  selections: [{ mz: '703.5722' }, { mz: '721.4766' }],
+  description: 'Kidney IMS (zarr)'
 };
 
 export default {

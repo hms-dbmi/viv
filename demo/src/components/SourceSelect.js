@@ -5,11 +5,13 @@ import Select from '@material-ui/core/Select';
 
 import sources from '../source-info';
 
-const SOURCE_OPTIONS = Object.keys(sources).filter(name =>
-  // only use isPublic on the deployment
-  // eslint-disable-next-line no-restricted-globals
-  location.host === 'viv.vitessce.io' ? sources[name].isPublic : true
-);
+const SOURCE_OPTIONS = Object.entries(sources)
+  .filter(([key, info]) =>
+    // only use isPublic on the deployment
+    // eslint-disable-next-line no-restricted-globals
+    location.host === 'viv.vitessce.io' ? info.isPublic : true
+  )
+  .map(([key, info]) => ({ name: key, description: info.description }));
 
 function SourceSelect({ value, handleChange, disabled }) {
   return (
@@ -25,11 +27,13 @@ function SourceSelect({ value, handleChange, disabled }) {
         }}
         disabled={disabled}
       >
-        {SOURCE_OPTIONS.map(opt => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
+        {SOURCE_OPTIONS.map(({ name, description }) => {
+          return (
+            <option key={name} value={name}>
+              {description}
+            </option>
+          );
+        })}
       </Select>
     </FormControl>
   );
