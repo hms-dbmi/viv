@@ -44,7 +44,6 @@ export default class VivViewer extends PureComponent {
    */
   _onViewStateChange({ viewId, viewState, oldViewState }) {
     // Save the view state and trigger rerender
-    // const { overview } = this.state;
     const { views } = this.props;
     this.setState(prevState => {
       const newState = { ...prevState };
@@ -118,6 +117,14 @@ export default class VivViewer extends PureComponent {
     /* eslint-disable react/destructuring-assignment */
     const { views } = this.props;
     const deckGLViews = views.map(view => view.getDeckGlView());
+    // DeckGL seems to use the first view more than the second for updates
+    // so this forces it to use each more evenly.
+    if (Math.random() > 0.5) {
+      const hold = deckGLViews[0];
+      // eslint-disable-next-line prefer-destructuring
+      deckGLViews[0] = deckGLViews[1];
+      deckGLViews[1] = hold;
+    }
     return (
       <DeckGL
         glOptions={{ webgl2: true }}

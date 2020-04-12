@@ -25,7 +25,7 @@ export function renderSubLayers(props) {
     return null;
   }
   const xrl = new XRLayer({
-    id: `XRLayer-left${left}-top${top}-right${right}-bottom${bottom}-${id}`,
+    id: `XRLayer-${left}-${top}-${right}-${bottom}-${id}`,
     bounds: [left, bottom, right, top],
     width: tileSize,
     height: tileSize,
