@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.1.5
+
+### Added
+
 - Add `loaderSelection` as prop for `VivViewerLayer`. This parameter is passed to `loader.getTile` and `loader.getRaster` in addtion to `x`, `y` and `z`.
 - Display warning for Safari users
 
