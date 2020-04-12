@@ -9,8 +9,9 @@
 
 ### Changed
 
-- Refactored demo to allow various channels and change selection.
-- Use reducer for handling channel state in Demo.
+- Refactored demo to allow various channels and change selection
+- Use reducer for handling channel state in Demo
+- Use Material UI for demo components, and showcase all viv features
 - Update the IMAGE_RENDERING doc
 
 ## 0.1.4
