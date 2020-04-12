@@ -47,6 +47,7 @@ function App() {
       const sourceInfo = sources[sourceName];
       const nextLoader = await createLoader(sourceName, sourceInfo);
       if (typeof nextLoader.serializeSelection === 'function') {
+        // TODO: Once tiff loader is ready, we won't need this if block.
         const { selections, dimensions } = sourceInfo;
         const serialized = nextLoader.serializeSelection(selections);
         const names = selections.map(sel => sel[dimensions[0].field]);
@@ -64,6 +65,13 @@ function App() {
     changeLoader();
   }, [sourceName]);
 
+  /*
+   * Handles updating state for each channel controller.
+   * Is is too heavy weight to store each channel as an object in state,
+   * so we store the individual viv props (colorValues, sliderValues, etc)
+   * in separate arrays. We use the ordering of the channels in the menu to make
+   * update state very responsive (but dispatching the index of the channel)
+   */
   const handleControllerChange = (index, type, value) => {
     if (type === 'CHANGE_CHANNEL') {
       const [channelDim] = sources[sourceName].dimensions;

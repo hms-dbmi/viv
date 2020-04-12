@@ -63,6 +63,7 @@ export function useWindowSize(scaleWidth = 1, scaleHeight = 1) {
 export function channelsReducer(state, { index, value, type }) {
   switch (type) {
     case 'CHANGE_CHANNEL': {
+      // Changes name and selection for channel by index
       const { name, selection } = value;
       const names = [...state.names];
       const selections = [...state.selections];
@@ -71,21 +72,25 @@ export function channelsReducer(state, { index, value, type }) {
       return { ...state, names, selections };
     }
     case 'CHANGE_COLOR': {
+      // Changes color for individual channel by index
       const colors = [...state.colors];
       colors[index] = value;
       return { ...state, colors };
     }
     case 'CHANGE_SLIDER': {
+      // Changes slider for individual channel by index
       const sliders = [...state.sliders];
       sliders[index] = value;
       return { ...state, sliders };
     }
     case 'TOGGLE_ON': {
+      // Toggles invidiual channel on and off by index
       const isOn = [...state.isOn];
       isOn[index] = !isOn[index];
       return { ...state, isOn };
     }
     case 'ADD_CHANNEL': {
+      // Adds an additional channel
       const { name, selection } = value;
       const names = [...state.names, name];
       const selections = [...state.selections, selection];
@@ -96,6 +101,7 @@ export function channelsReducer(state, { index, value, type }) {
       return { names, selections, colors, isOn, sliders, ids };
     }
     case 'REMOVE_CHANNEL': {
+      // Remove a single channel by index
       const names = state.names.filter((_, i) => i !== index);
       const sliders = state.sliders.filter((_, i) => i !== index);
       const colors = state.colors.filter((_, i) => i !== index);
@@ -105,6 +111,7 @@ export function channelsReducer(state, { index, value, type }) {
       return { names, sliders, colors, isOn, ids, selections };
     }
     case 'RESET_CHANNELS': {
+      // Clears current channels and sets with new defaults
       const { names, selections = [] } = value;
       const n = names.length;
       return {
