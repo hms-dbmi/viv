@@ -17,7 +17,9 @@ export default class VivViewer extends PureComponent {
     const { viewStates } = this.state;
     const { views } = this.props;
     views.forEach(view => {
-      viewStates[view.id] = view.getViewState(view.initialViewState);
+      viewStates[view.id] = view.getViewState({
+        viewState: view.initialViewState
+      });
     });
     this._onViewStateChange = this._onViewStateChange.bind(this);
     this.layerFilter = this.layerFilter.bind(this);
@@ -40,7 +42,7 @@ export default class VivViewer extends PureComponent {
    * This updates the viewState as a callback to the viewport changing in DeckGL
    * (hence the need for storing viewState in state).
    */
-  _onViewStateChange({ viewId, viewState }) {
+  _onViewStateChange({ viewId, viewState, oldViewState }) {
     // Save the view state and trigger rerender
     // const { overview } = this.state;
     const { views } = this.props;
@@ -50,8 +52,11 @@ export default class VivViewer extends PureComponent {
         newState.viewStates = {
           ...newState.viewStates,
           [view.id]:
-            view.getViewState({ ...viewState, id: viewId }) ||
-            prevState.viewStates[view.id]
+            view.getViewState({
+              viewState: { ...viewState, id: viewId },
+              oldViewState,
+              currentViewState: prevState.viewStates[view.id]
+            }) || prevState.viewStates[view.id]
         };
       });
       return newState;
@@ -85,9 +90,11 @@ export default class VivViewer extends PureComponent {
           newState.viewStates = {
             ...newState.viewStates,
             [view.id]: view.getViewState({
-              ...(prevState.viewStates[view.id] || view.initialViewState),
-              height,
-              width
+              viewState: {
+                ...(prevState.viewStates[view.id] || view.initialViewState),
+                height,
+                width
+              }
             })
           };
         });

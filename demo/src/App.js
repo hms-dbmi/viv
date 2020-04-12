@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import { Button, ButtonGroup, Slider, Checkbox } from '@material-ui/core';
-import { OverviewDetailViewer } from '../../src';
+import { OverviewDetailViewer, LinkedDetailViewer } from '../../src';
 import { initPyramidLoader } from './initLoaders';
 import sources from './source-info';
 import './App.css';
@@ -28,16 +28,16 @@ function App() {
   const [sliderValues, setSliderValues] = useState(initSliderValues);
   const [channelIsOn, setChannelIsOn] = useState(initChannelIsOn);
   const [sourceName, setSourceName] = useState(initSourceName);
-  const [viewWidth, setViewWidth] = useState(window.innerWidth * 0.7);
-  const [viewHeight, setViewHeight] = useState(window.innerHeight * 0.9);
+  const [viewWidth, setViewWidth] = useState(window.innerWidth * 0.5);
+  const [viewHeight, setViewHeight] = useState(window.innerHeight);
   const [loader, setLoader] = useState(null);
   const [colormapOn, setColormap] = useState('');
-  const [overviewOn, setOverview] = useState(false);
+  const [overviewOn, setOverview] = useState(true);
 
   useEffect(() => {
     const handleResize = () => {
-      setViewWidth(window.innerWidth * 0.7);
-      setViewHeight(window.innerHeight * 0.9);
+      setViewWidth(window.innerWidth * 0.5);
+      setViewHeight(window.innerHeight);
     };
     window.addEventListener('resize', handleResize);
     return () => {
@@ -157,7 +157,7 @@ function App() {
   return (
     <div>
       {loader ? (
-        <OverviewDetailViewer
+        <LinkedDetailViewer
           loader={loader}
           sliderValues={sliderValues.slice(
             0,

@@ -26,7 +26,7 @@ export default class VivViewerLayerBase extends TileLayer {
   /**
    * This function allows us to controls which viewport gets to update the Tileset2D.
    * This is a uniquely TileLayer issue since it updates based on viewport updates thanks
-   * to it's ability to handle zoom-pan loading.  Essentially, with a picture-in-picture,
+   * to its ability to handle zoom-pan loading.  Essentially, with a picture-in-picture,
    * this prevents it from detecting the update of some other viewport that is unwanted.
    */
   _updateTileset() {
@@ -34,8 +34,11 @@ export default class VivViewerLayerBase extends TileLayer {
       super._updateTileset();
     }
     if (
-      this.props.viewportId &&
-      this.context.viewport.id === this.props.viewportId
+      (this.props.viewportId &&
+        this.context.viewport.id === this.props.viewportId) ||
+      // I don't know why, but DeckGL doesn't recognize multiple views on the first pass
+      // so we force update on the first pass by checking if there is a viewport in the tileset
+      !this.state.tileset._viewport
     ) {
       super._updateTileset();
     }
