@@ -45,6 +45,14 @@ export default class ZarrLoader {
     return this.isPyramid ? this._data[0] : this._data;
   }
 
+  /**
+   * Returns image tiles at tile-position (x, y) at pyramidal level z.
+   * @param {number} x positive integer
+   * @param {number} y positive integer
+   * @param {number} z positive integer (0 === highest zoom level)
+   * @param {Array} loaderSelection, Array of number Arrays specifying channel selections
+   * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize)
+   */
   async getTile({ x, y, z, loaderSelection }) {
     const source = this._getSource(z);
     const selections = loaderSelection || this._defaultSelection;
@@ -59,6 +67,12 @@ export default class ZarrLoader {
     return { data, width: this.tileSize, height: this.tileSize };
   }
 
+  /**
+   * Returns full image panes (at level z if pyramid)
+   * @param {number} z positive integer (0 === highest zoom level)
+   * @param {Array} loaderSelection, Array of number Arrays specifying channel selections
+   * @returns {Object} data: TypedArray[], width: number, height: number
+   */
   async getRaster({ z, loaderSelection }) {
     const source = this._getSource(z);
     const selections = loaderSelection || this._defaultSelection;
@@ -77,6 +91,10 @@ export default class ZarrLoader {
     return { data, width, height };
   }
 
+  /**
+   * Handles `onTileError` within deck.gl
+   * @param {Error} err Error thrown in tile layer
+   */
   // eslint-disable-next-line class-methods-use-this
   onTileError(err) {
     // Handle zarr-specific tile Errors
@@ -88,6 +106,11 @@ export default class ZarrLoader {
     }
   }
 
+  /**
+   * Returns image width and height (at pyramid level z) without fetching data
+   * @param {number} z positive integer (0 === highest zoom level)
+   * @returns {Object} width: number, height: number
+   */
   getRasterSize({ z }) {
     const source = this._getSource(z);
     const height = source.shape[this._yIndex];
@@ -95,6 +118,21 @@ export default class ZarrLoader {
     return { height, width };
   }
 
+  /**
+   * Converts Array of loader selection objects into zarr-specific selection
+   *
+   * Ex.
+   *  const loaderSelectionObj = [
+   *     { time: 1, channel: 'a' },
+   *     { time: 1, channel: 'b' }
+   *  ];
+   *  const serialized = loader.serializeSelection(loaderSelectionObj);
+   *  console.log(serialized);
+   *  // [[1, 0, 0, 0], [1, 1, 0, 0]]
+   *
+   * @param {Array || Object} loaderSelectionObjs Human-interpretable array of desired selection objects
+   * @returns {Array} number[][], zarr-specific selections to be passed to to viv as loaderSelections
+   */
   serializeSelection(loaderSelectionObjs) {
     // Wrap selection in array if only one is provided
     const selectionObjs = Array.isArray(loaderSelectionObjs)
