@@ -9,7 +9,7 @@ const defaultProps = {
   sliderValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
-  serializedSelection: { type: 'array', value: undefined, compare: true },
+  loaderSelection: { type: 'array', value: undefined, compare: true },
   colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
   translate: { type: 'array', value: [0, 0], compare: true },
