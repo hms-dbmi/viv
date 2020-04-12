@@ -1,96 +1,46 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import {
-  Button,
-  Box,
-  Grid,
-  Select,
-  InputLabel,
-  FormControl
-} from '@material-ui/core';
+import { Button, Box, Grid } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import LinearProgress from '@material-ui/core/LinearProgress';
 
 import { VivViewer } from '../../src';
 import sources from './source-info';
 import { createLoader, channelsReducer, useWindowSize } from './utils';
+
 import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
 import MenuToggle from './components/MenuToggle';
+import ColormapSelect from './components/ColormapSelect';
+import SourceSelect from './components/SourceSelect';
 
 import {
   MAX_CHANNELS,
   DEFAULT_VIEW_STATE,
-  DEFAULT_OVERVIEW,
-  COLORMAP_OPTIONS
+  DEFAULT_OVERVIEW
 } from './constants';
 
-const initSourceName = 'zarr';
-
-const ColorSelector = ({ colormap, handleColormapChange, disabled }) => (
-  <FormControl fullWidth>
-    <InputLabel htmlFor="colormap-select">Colormap</InputLabel>
-    <Select
-      native
-      onChange={e => handleColormapChange(e.target.value)}
-      value={colormap}
-      inputProps={{
-        name: 'colormap',
-        id: 'colormap-select'
-      }}
-      disabled={disabled}
-    >
-      <option aria-label="None" value="" />
-      {COLORMAP_OPTIONS.map(name => (
-        <option key={name} value={name}>
-          {name}
-        </option>
-      ))}
-    </Select>
-  </FormControl>
-);
-
-const SourceSelector = ({ source, sourceOptions, handleChange, disabled }) => (
-  <FormControl fullWidth>
-    <InputLabel htmlFor="data-source-select">Data Source</InputLabel>
-    <Select
-      native
-      onChange={e => handleChange(e.target.value)}
-      value={source}
-      inputProps={{
-        name: 'data-source',
-        id: 'data-source-select'
-      }}
-      disabled={disabled}
-    >
-      {sourceOptions.map(opt => (
-        <option key={opt} value={opt}>
-          {opt}
-        </option>
-      ))}
-    </Select>
-  </FormControl>
-);
+const initialChannels = {
+  sliders: [],
+  colors: [],
+  selections: [],
+  names: [],
+  ids: [],
+  isOn: []
+};
 
 function App() {
-  const [channels, dispatch] = useReducer(channelsReducer, {
-    sliders: [],
-    colors: [],
-    selections: [],
-    names: [],
-    ids: [],
-    isOn: []
-  });
+  const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
   const viewSize = useWindowSize();
   const [loader, setLoader] = useState(null);
-  const [sourceName, setSourceName] = useState(initSourceName);
+  const [sourceName, setSourceName] = useState('zarr');
   const [colormap, setColormap] = useState('');
   const [overviewOn, toggleOverview] = useReducer(v => !v, false);
   const [controllerOn, toggleController] = useReducer(v => !v, true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function changeLoader() {
-      setLoader(null);
+      setIsLoading(true);
       const sourceInfo = sources[sourceName];
       const nextLoader = await createLoader(sourceName, sourceInfo);
       if (typeof nextLoader.serializeSelection === 'function') {
@@ -106,9 +56,10 @@ function App() {
         dispatch({ type: 'RESET_CHANNELS', value: { names } });
       }
       setLoader(nextLoader);
+      setIsLoading(false);
     }
     changeLoader();
-  }, [sourceName, dispatch]);
+  }, [sourceName]);
 
   const handleControllerChange = (index, type, value) => {
     if (type === 'CHANGE_CHANNEL') {
@@ -132,15 +83,9 @@ function App() {
     const [channelDim] = sources[sourceName].dimensions;
     dispatch({
       type: 'ADD_CHANNEL',
-      value: { name: channelDim.values[0], sselection: [0, 0, 0] }
+      value: { name: channelDim.values[0], selection: [0, 0, 0] }
     });
   };
-
-  const sourceOptions = Object.keys(sources).filter(name =>
-    // only use isPublic on the deployment
-    // eslint-disable-next-line no-restricted-globals
-    location.host === 'viv.vitessce.io' ? sources[name].isPublic : true
-  );
 
   const { initialViewState, isPyramid, dimensions } = sources[sourceName];
   const { names, colors, sliders, isOn, ids, selections } = channels;
@@ -162,7 +107,7 @@ function App() {
   });
   return (
     <>
-      {loader && (
+      {!isLoading && (
         <VivViewer
           loader={loader}
           viewHeight={viewSize.height}
@@ -180,22 +125,21 @@ function App() {
         <Menu maxHeight={viewSize.height}>
           <Grid container justify="space-between">
             <Grid item xs={7}>
-              <SourceSelector
-                sourceOptions={sourceOptions}
-                source={sourceName}
+              <SourceSelect
+                value={sourceName}
                 handleChange={setSourceName}
-                disabled={!loader}
+                disabled={isLoading}
               />
             </Grid>
             <Grid item xs={4}>
-              <ColorSelector
-                colormap={colormap}
-                handleColormapChange={setColormap}
-                disabled={!loader}
+              <ColormapSelect
+                value={colormap}
+                handleChange={setColormap}
+                disabled={isLoading}
               />
             </Grid>
           </Grid>
-          {loader ? (
+          {!isLoading ? (
             channelControllers
           ) : (
             <Grid container justify="center">
@@ -204,7 +148,7 @@ function App() {
           )}
           <Button
             disabled={
-              ids.length === MAX_CHANNELS || sourceName === 'tiff' || !loader
+              ids.length === MAX_CHANNELS || sourceName === 'tiff' || isLoading
             }
             onClick={handleChannelAdd}
             fullWidth
@@ -216,7 +160,7 @@ function App() {
             Add Channel
           </Button>
           <Button
-            disabled={!isPyramid || !loader}
+            disabled={!isPyramid || isLoading}
             onClick={toggleOverview}
             variant="outlined"
             size="small"

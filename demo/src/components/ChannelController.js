@@ -1,5 +1,10 @@
 import React from 'react';
-import { Slider, Checkbox, Grid, Select } from '@material-ui/core';
+
+import Checkbox from '@material-ui/core/Checkbox';
+import Grid from '@material-ui/core/Grid';
+import Slider from '@material-ui/core/Slider';
+import Select from '@material-ui/core/Select';
+
 import { makeStyles } from '@material-ui/core/styles';
 
 import ChannelOptions from './ChannelOptions';
