@@ -6,6 +6,7 @@ import Select from '@material-ui/core/Select';
 import sources from '../source-info';
 
 const SOURCE_OPTIONS = Object.entries(sources)
+  // eslint-disable-next-line no-unused-vars
   .filter(([key, info]) =>
     // only use isPublic on the deployment
     // eslint-disable-next-line no-restricted-globals

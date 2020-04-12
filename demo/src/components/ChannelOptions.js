@@ -11,7 +11,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import ColorPalette from './ColorPalette';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   paper: {
     backgroundColor: 'rgba(0, 0, 0, 0.75)'
   },

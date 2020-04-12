@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { COLOR_PALLETE } from '../constants';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   container: {
     width: '70px',
     height: '40px',
