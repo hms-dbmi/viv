@@ -1,5 +1,4 @@
 import { CompositeLayer } from '@deck.gl/core';
-// eslint-disable-next-line import/extensions
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
 import { padColorsAndSliders } from '../utils';
@@ -23,6 +22,7 @@ export default class VivViewerLayer extends CompositeLayer {
       sliderValues,
       colorValues,
       channelIsOn,
+      loaderSelection,
       domain,
       opacity,
       colormap,
@@ -38,12 +38,19 @@ export default class VivViewerLayer extends CompositeLayer {
       domain,
       dtype
     });
-    const getTileData = ({ x, y, z }) => {
-      return loader.getTile({
+    const getTileData = async ({ x, y, z }) => {
+      const { data, width, height } = await loader.getTile({
         x,
         y,
-        z: -z
+        z: -z,
+        loaderSelection
       });
+      if (width !== tileSize || height !== tileSize) {
+        throw Error(
+          `Tile data  { width: ${width}, height: ${height} } does not match tilesize: ${tileSize}`
+        );
+      }
+      return data;
     };
     const tiledLayer = new VivViewerLayerBase({
       id: `Tiled-Image-${id}`,
@@ -60,7 +67,7 @@ export default class VivViewerLayer extends CompositeLayer {
       // needs to be re-created. We want to trigger this behavior if the loader changes.
       // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
       updateTriggers: {
-        getTileData: [loader]
+        getTileData: [loader, loaderSelection]
       },
       onTileError: onTileError || loader.onTileError,
       opacity,

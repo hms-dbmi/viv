@@ -9,6 +9,7 @@ const defaultProps = {
   sliderValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
+  loaderSelection: { type: 'array', value: undefined, compare: true },
   colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
   translate: { type: 'array', value: [0, 0], compare: true },
@@ -46,8 +47,8 @@ function scaleBounds({ width, height, translate, scale }) {
  */
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
-    const { loader, z } = this.props;
-    loader.getRaster({ z }).then(({ data, width, height }) => {
+    const { loader, z, loaderSelection } = this.props;
+    loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) => {
       this.setState({ data, width, height });
     });
   }
@@ -59,10 +60,12 @@ export default class StaticImageLayer extends CompositeLayer {
       propsChanged.includes('props.loader')
     ) {
       // Only fetch new data to render if loader has changed
-      const { loader, z } = this.props;
-      loader.getRaster({ z }).then(({ data, width, height }) => {
-        this.setState({ data, width, height });
-      });
+      const { loader, z, loaderSelection } = this.props;
+      loader
+        .getRaster({ z, loaderSelection })
+        .then(({ data, width, height }) => {
+          this.setState({ data, width, height });
+        });
     }
   }
 

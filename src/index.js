@@ -1,7 +1,7 @@
 import { VivViewerLayer, StaticImageLayer } from './layers';
 import { VivViewer, OverviewDetailViewer, LinkedDetailViewer } from './viewers';
 import { VivView, OverviewView, DetailView, LinkedDetailView } from './views';
-import { createTiffPyramid, createZarrPyramid, ZarrLoader } from './loaders';
+import { createTiffPyramid, createZarrLoader, ZarrLoader } from './loaders';
 
 export {
   VivViewerLayer,
@@ -15,5 +15,5 @@ export {
   StaticImageLayer,
   ZarrLoader,
   createTiffPyramid,
-  createZarrPyramid
+  createZarrLoader
 };

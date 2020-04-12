@@ -12,7 +12,8 @@ export default class OverviewDetailViewer extends PureComponent {
       initialViewState,
       colormap,
       overview,
-      overviewOn
+      overviewOn,
+      loaderSelection
     } = this.props;
     const detailViewState = { ...initialViewState, id: 'detail' };
     const detailView = new DetailView({ initialViewState: detailViewState });
@@ -21,6 +22,7 @@ export default class OverviewDetailViewer extends PureComponent {
       sliderValues,
       colorValues,
       channelIsOn,
+      loaderSelection,
       colormap
     };
     const views = [detailView];

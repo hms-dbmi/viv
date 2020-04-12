@@ -12,6 +12,7 @@ export default class LinkedDetailViewer extends PureComponent {
       initialViewState,
       colormap,
       panLock,
+      loaderSelection,
       zoomLock
     } = this.props;
     const detailViewLeft = new LinkedDetailView({
@@ -32,6 +33,7 @@ export default class LinkedDetailViewer extends PureComponent {
       sliderValues,
       colorValues,
       channelIsOn,
+      loaderSelection,
       colormap
     };
     const views = [detailViewRight, detailViewLeft];
