@@ -66,15 +66,17 @@ export function generateViewTests(ViewType, args, linkedViewIds = []) {
       // endow linked views with some properties
       viewStates[id] = defaultArguments.initialViewState;
     });
-    const layer = view.getLayer({
-      props: { loader: { type: 'loads' } },
+    const layers = view.getLayers({
+      props: { loader: { type: 'loads', isPyramid: true } },
       viewStates
     });
-    layer &&
-      t.ok(
-        layer.id.includes(getVivId(view.id)),
-        "Layer should include view's id as returned by getVivId."
-      );
+    layers &&
+      layers.forEach(layer => {
+        t.ok(
+          layer.id.includes(getVivId(view.id)),
+          "Layer should include view's id as returned by getVivId."
+        );
+      });
     t.end();
   });
 }

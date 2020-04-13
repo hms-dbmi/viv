@@ -120,7 +120,7 @@ export default class VivViewer extends PureComponent {
     const { viewStates } = this.state;
     const { views, layerProps } = this.props;
     return views.map((view, i) =>
-      view.getLayer({ viewStates, props: layerProps[i] })
+      view.getLayers({ viewStates, props: layerProps[i] })
     );
   }
 

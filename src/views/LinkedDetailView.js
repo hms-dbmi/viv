@@ -85,7 +85,7 @@ export default class LinkedDetailView extends VivView {
         };
   }
 
-  getLayer({ props, viewStates }) {
+  getLayers({ props, viewStates }) {
     const { loader } = props;
     const { id, viewportOutlineColor, viewportOutlineWidth } = this;
     const thisViewState = viewStates[id];

@@ -6,20 +6,21 @@ import { VivViewerLayer } from '../../src/layers';
 
 const id = 'detail';
 const detailViewArguments = { ...defaultArguments };
+detailViewArguments.initialViewState = { ...defaultArguments.initialViewState };
 detailViewArguments.initialViewState.id = id;
 
 generateViewTests(DetailView, detailViewArguments);
 
 test(`DetailView layer type and props check`, t => {
   const view = new DetailView(detailViewArguments);
-  const loader = { type: 'loads' };
-  const layer = view.getLayer({ props: { loader } });
+  const loader = { type: 'loads', isPyramid: true };
+  const layers = view.getLayers({ props: { loader } });
   t.ok(
-    layer instanceof VivViewerLayer,
+    layers[0] instanceof VivViewerLayer,
     'DetailView layer should be VivViewerLayer.'
   );
   t.equal(
-    layer.props.viewportId,
+    layers[0].props.viewportId,
     view.id,
     'DetailView id should be passed down to layer as ViewportId.'
   );

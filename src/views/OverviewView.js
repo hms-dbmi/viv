@@ -131,7 +131,7 @@ export default class OverviewView extends VivView {
     };
   }
 
-  getLayer({ viewStates, props }) {
+  getLayers({ viewStates, props }) {
     const { detail } = viewStates;
     if (!detail) {
       throw new Error('Overview requires a viewState with id detail');
@@ -141,10 +141,11 @@ export default class OverviewView extends VivView {
     const boundingBox = makeBoundingBox(detail).map(coords =>
       coords.map(e => e * scale)
     );
-    return new OverviewLayer(props, {
+    const overviewLayer = new OverviewLayer(props, {
       id: loader.type + getVivId(id),
       boundingBox,
       overviewScale: scale
     });
+    return [overviewLayer];
   }
 }

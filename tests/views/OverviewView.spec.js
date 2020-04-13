@@ -18,14 +18,18 @@ const overviewViewArguments = {
   detailHeight: 1000,
   detailWidth: 500
 };
-overviewViewArguments.initialViewState.id = id;
+overviewViewArguments.initialViewState = {
+  ...defaultArguments.initialViewState
+};
+overviewViewArguments.initialViewState.id = 'overview';
+
 const linkedViewIds = ['detail'];
 
 generateViewTests(OverviewView, overviewViewArguments, linkedViewIds);
 
 test(`OverviewView layer type check.`, t => {
   const view = new OverviewView(overviewViewArguments);
-  const layer = view.getLayer({
+  const layers = view.getLayers({
     props: { loader },
     viewStates: {
       [id]: overviewViewArguments.initialViewState,
@@ -33,7 +37,7 @@ test(`OverviewView layer type check.`, t => {
     }
   });
   t.ok(
-    layer instanceof OverviewLayer,
+    layers[0] instanceof OverviewLayer,
     'OverviewView layer should be OverviewLayer.'
   );
   t.end();

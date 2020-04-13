@@ -6,10 +6,10 @@ import { getVivId } from './utils';
  * This class generates a VivViewerLayer and a view for use in the VivViewer as a detailed view.
  * */
 export default class DetailView extends VivView {
-  getLayer({ props }) {
+  getLayers({ props }) {
     const { loader } = props;
     const { id } = this;
-    return loader.isPyramid
+    const layer = loader.isPyramid
       ? new VivViewerLayer(props, {
           id: loader.type + getVivId(id),
           viewportId: id
@@ -18,5 +18,6 @@ export default class DetailView extends VivView {
           id: loader.type + getVivId(id),
           viewportId: id
         });
+    return [layer];
   }
 }
