@@ -103,7 +103,9 @@ const VivViewer = ({ layerProps, views, randomize }) => {
   if (randomize) {
     const random = Math.random();
     const holdFirstElement = deckGLViews[0];
-    const randomizedIndex = Math.round(random * views.length);
+    // weight has to go to 1.5 because we use Math.round()
+    const randomWieghted = random * 1.49;
+    const randomizedIndex = Math.round(randomWieghted * (views.length - 1));
     deckGLViews[0] = deckGLViews[randomizedIndex];
     deckGLViews[randomizedIndex] = holdFirstElement;
   }
