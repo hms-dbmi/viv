@@ -4,7 +4,12 @@
 
 ### Added
 
+- New classes for views/viewers
+- Zoom/pan lock buttons and linked views in demo
+
 ### Changed
+
+- Refactored VivViewer to take in arbitrary views/layers
 
 ## 0.1.5
 
@@ -15,7 +20,6 @@
 
 ### Changed
 
-- Refactored VivViewer to take in arbitrary views/layers
 - Refactored demo to allow various channels and change selection
 - Use reducer for handling channel state in Demo
 - Use Material UI for demo components, and showcase all viv features
