@@ -76,7 +76,13 @@ export default class LinkedDetailView extends VivView {
           height: viewState.height,
           width: viewState.width
         }
-      : null;
+      : {
+          id,
+          target: currentViewState.target,
+          zoom: currentViewState.zoom,
+          height: currentViewState.height,
+          width: currentViewState.width
+        };
   }
 
   getLayer({ props, viewStates }) {
