@@ -1,44 +1,44 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import VivViewer from './VivViewer';
 import { DetailView, OverviewView } from '../views';
 
-export default class OverviewDetailViewer extends PureComponent {
-  render() {
-    const {
+const OverviewDetailViewer = props => {
+  const {
+    loader,
+    sliderValues,
+    colorValues,
+    channelIsOn,
+    initialViewState,
+    colormap,
+    overview,
+    overviewOn,
+    loaderSelection
+  } = props;
+  const detailViewState = { ...initialViewState, id: 'detail' };
+  const detailView = new DetailView({ initialViewState: detailViewState });
+  const layerConfig = {
+    loader,
+    sliderValues,
+    colorValues,
+    channelIsOn,
+    loaderSelection,
+    colormap
+  };
+  const views = [detailView];
+  const layerProps = [layerConfig];
+  if (overviewOn && loader) {
+    const overviewViewState = { ...initialViewState, id: 'overview' };
+    const overviewView = new OverviewView({
+      initialViewState: overviewViewState,
       loader,
-      sliderValues,
-      colorValues,
-      channelIsOn,
-      initialViewState,
-      colormap,
-      overview,
-      overviewOn,
-      loaderSelection
-    } = this.props;
-    const detailViewState = { ...initialViewState, id: 'detail' };
-    const detailView = new DetailView({ initialViewState: detailViewState });
-    const props = {
-      loader,
-      sliderValues,
-      colorValues,
-      channelIsOn,
-      loaderSelection,
-      colormap
-    };
-    const views = [detailView];
-    const layerProps = [props];
-    if (overviewOn && loader) {
-      const overviewViewState = { ...initialViewState, id: 'overview' };
-      const overviewView = new OverviewView({
-        initialViewState: overviewViewState,
-        loader,
-        detailHeight: initialViewState.height,
-        detailWidth: initialViewState.width,
-        ...overview
-      });
-      views.push(overviewView);
-      layerProps.push(props);
-    }
-    return loader ? <VivViewer layerProps={layerProps} views={views} /> : null;
+      detailHeight: initialViewState.height,
+      detailWidth: initialViewState.width,
+      ...overview
+    });
+    views.push(overviewView);
+    layerProps.push(layerConfig);
   }
-}
+  return loader ? <VivViewer layerProps={layerProps} views={views} /> : null;
+};
+
+export default OverviewDetailViewer;
