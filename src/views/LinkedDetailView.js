@@ -1,7 +1,7 @@
 import { PolygonLayer } from '@deck.gl/layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 
-import { VivViewerLayer } from '../layers';
+import { VivViewerLayer, StaticImageLayer } from '../layers';
 import VivView from './VivView';
 import { getVivId, makeBoundingBox } from './utils';
 
@@ -84,10 +84,15 @@ export default class LinkedDetailView extends VivView {
     const { id, viewportOutlineColor, viewportOutlineWidth } = this;
     const thisViewState = viewStates[id];
     const boundingBox = makeBoundingBox(thisViewState);
-    const tiledLayer = new VivViewerLayer(props, {
-      id: loader.type + getVivId(id),
-      viewportId: id
-    });
+    const detailLayer = loader.isPyramid
+      ? new VivViewerLayer(props, {
+          id: loader.type + getVivId(id),
+          viewportId: id
+        })
+      : new StaticImageLayer(props, {
+          id: loader.type + getVivId(id),
+          viewportId: id
+        });
     const border = new PolygonLayer({
       id: `viewport-outline-${loader.type + getVivId(id)}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
@@ -98,6 +103,6 @@ export default class LinkedDetailView extends VivView {
       getLineColor: viewportOutlineColor,
       getLineWidth: viewportOutlineWidth * 2 ** -thisViewState.zoom
     });
-    return [tiledLayer, border];
+    return [detailLayer, border];
   }
 }

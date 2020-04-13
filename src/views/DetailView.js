@@ -1,4 +1,4 @@
-import { VivViewerLayer } from '../layers';
+import { VivViewerLayer, StaticImageLayer } from '../layers';
 import VivView from './VivView';
 import { getVivId } from './utils';
 
@@ -9,9 +9,14 @@ export default class DetailView extends VivView {
   getLayer({ props }) {
     const { loader } = props;
     const { id } = this;
-    return new VivViewerLayer(props, {
-      id: loader.type + getVivId(id),
-      viewportId: id
-    });
+    return loader.isPyramid
+      ? new VivViewerLayer(props, {
+          id: loader.type + getVivId(id),
+          viewportId: id
+        })
+      : new StaticImageLayer(props, {
+          id: loader.type + getVivId(id),
+          viewportId: id
+        });
   }
 }
