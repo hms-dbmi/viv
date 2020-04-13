@@ -38,6 +38,8 @@ export default class LinkedDetailViewer extends PureComponent {
     };
     const views = [detailViewRight, detailViewLeft];
     const layerProps = [{ ...props }, { ...props }];
-    return loader ? <VivViewer layerProps={layerProps} views={views} /> : null;
+    return loader ? (
+      <VivViewer layerProps={layerProps} views={views} randomize />
+    ) : null;
   }
 }

@@ -31,25 +31,52 @@ export default class LinkedDetailView extends VivView {
   filterViewState({ viewState, oldViewState, currentViewState }) {
     const { id: viewStateId } = viewState;
     const { id, linkedIds, panLock, zoomLock } = this;
-    const thisViewState = { ...currentViewState };
     if (
       oldViewState &&
       linkedIds.indexOf(viewStateId) !== -1 &&
       (zoomLock || panLock)
     ) {
+      const thisViewState = {
+        height: currentViewState.height,
+        width: currentViewState.width,
+        target: [],
+        zoom: null
+      };
+      const [currentX, currentY] = currentViewState.target;
       if (zoomLock) {
         const dZoom = viewState.zoom - oldViewState.zoom;
-        thisViewState.zoom += dZoom;
+        thisViewState.zoom = currentViewState.zoom + dZoom;
+      } else {
+        thisViewState.zoom = currentViewState.zoom;
       }
       if (panLock) {
-        const dx = viewState.target[0] - oldViewState.target[0];
-        const dy = viewState.target[1] - oldViewState.target[1];
-        thisViewState.target[0] += dx;
-        thisViewState.target[1] += dy;
+        const [oldX, oldY] = oldViewState.target;
+        const [newX, newY] = viewState.target;
+        const dx = newX - oldX;
+        const dy = newY - oldY;
+        thisViewState.target.push(currentX + dx);
+        thisViewState.target.push(currentY + dy);
+      } else {
+        thisViewState.target.push(currentX);
+        thisViewState.target.push(currentY);
       }
-      return thisViewState;
+      return {
+        id,
+        target: thisViewState.target,
+        zoom: thisViewState.zoom,
+        height: thisViewState.height,
+        width: thisViewState.width
+      };
     }
-    return viewState.id === id ? viewState : null;
+    return viewState.id === id
+      ? {
+          id,
+          target: viewState.target,
+          zoom: viewState.zoom,
+          height: viewState.height,
+          width: viewState.width
+        }
+      : null;
   }
 
   getLayer({ props, viewStates }) {

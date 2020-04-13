@@ -151,7 +151,8 @@ function App() {
               width: viewSize.width
             }}
             colormap={colormap.length > 0 && colormap}
-            overview={overviewOn && DEFAULT_OVERVIEW}
+            overview={DEFAULT_OVERVIEW}
+            overviewOn={overviewOn}
           />
         ))}
       {controllerOn && (

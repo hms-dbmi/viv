@@ -57,19 +57,18 @@ export default class VivViewer extends PureComponent {
     // Save the view state and trigger rerender
     const { views } = this.props;
     this.setState(prevState => {
-      const newState = { ...prevState };
+      const newState = {};
+      const viewStates = {};
       views.forEach(view => {
-        newState.viewStates = {
-          ...newState.viewStates,
-          [view.id]:
-            view.filterViewState({
-              viewState: { ...viewState, id: viewId },
-              oldViewState,
-              currentViewState: prevState.viewStates[view.id]
-            }) || prevState.viewStates[view.id]
-        };
+        const currentViewState = prevState.viewStates[view.id];
+        viewStates[view.id] = view.filterViewState({
+          viewState: { ...viewState, id: viewId },
+          oldViewState,
+          currentViewState
+        });
       });
-      return newState;
+      newState.viewStates = viewStates;
+      return { ...newState };
     });
   }
 
@@ -94,21 +93,22 @@ export default class VivViewer extends PureComponent {
     ) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState(prevState => {
-        const newState = { ...prevState };
+        const newState = {};
+        const viewStates = {};
         views.forEach(view => {
           const { height, width } = view.initialViewState;
-          newState.viewStates = {
-            ...newState.viewStates,
-            [view.id]: view.filterViewState({
-              viewState: {
-                ...(prevState.viewStates[view.id] || view.initialViewState),
-                height,
-                width
-              }
-            })
-          };
+          const currentViewState = prevState.viewStates[view.id];
+          viewStates[view.id] = view.filterViewState({
+            viewState: {
+              ...(currentViewState || view.initialViewState),
+              height,
+              width,
+              id: view.id
+            }
+          });
         });
-        return newState;
+        newState.viewStates = viewStates;
+        return { ...newState };
       });
     }
   }
@@ -126,15 +126,20 @@ export default class VivViewer extends PureComponent {
 
   render() {
     /* eslint-disable react/destructuring-assignment */
-    const { views } = this.props;
+    const { views, randomize } = this.props;
+    const { viewStates } = this.state;
     const deckGLViews = views.map(view => view.getDeckGlView());
     // DeckGL seems to use the first view more than the second for updates
-    // so this forces it to use each more evenly.
-    if (Math.random() > 0.5) {
-      const hold = deckGLViews[0];
-      // eslint-disable-next-line prefer-destructuring
-      deckGLViews[0] = deckGLViews[1];
-      deckGLViews[1] = hold;
+    // so this forces it to use the others more evenly.  This isn't perfect,
+    // but I am not sure what else to do.  The DeckGL render hooks don't help,
+    // but maybe useEffect() would help?  This works, so I'm going to leave it
+    // for now.
+    if (randomize) {
+      const random = Math.random();
+      const holdFirstElement = deckGLViews[0];
+      const randomizedIndex = Math.round(random * views.length);
+      deckGLViews[0] = deckGLViews[randomizedIndex];
+      deckGLViews[randomizedIndex] = holdFirstElement;
     }
     return !isSafari() ? (
       <DeckGL
@@ -143,7 +148,7 @@ export default class VivViewer extends PureComponent {
         layers={this._renderLayers()}
         onViewStateChange={this._onViewStateChange}
         views={deckGLViews}
-        viewState={this.state.viewStates}
+        viewState={viewStates}
       />
     ) : (
       <div className="viv-error">
