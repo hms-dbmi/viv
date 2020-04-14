@@ -2,7 +2,7 @@ Here are two snippets to help get you started with our higher-level components. 
 
 #### `SideBySideViewer`
 
-````javascript
+```javascript
 import { createZarrLoader, SideBySideViewer } from '@hubmap/vitessce-image-viewer';
 
 const loader = await createZarrLoader({
@@ -38,12 +38,12 @@ const linkedDetailViewer = <SideBySideViewer
   colormap={colormap.length > 0 && colormap}
   zoomLock={zoomLock}
   panLock={panLock}
-/>```
-````
+/>
+```
 
 #### `PictureInPictureViewer`
 
-````javascript
+```javascript
 import { createZarrLoader, PictureInPictureViewer } from '@hubmap/vitessce-image-viewer';
 
 const channelNames = [
@@ -93,5 +93,5 @@ const PictureInPictureViewer = <PictureInPictureViewer
   colormap={colormap.length > 0 && colormap}
   overview={overview}
   overviewOn={overviewOn}
-/>```
-````
+/>
+```
