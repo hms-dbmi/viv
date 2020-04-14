@@ -2,9 +2,9 @@
 import test from 'tape-catch';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
-import VivViewerLayerBase from '../src/layers/VivViewerLayer/VivViewerLayerBase';
+import XRLayer from '../../src/layers/XRLayer';
 
-test('VivViewerLayerBase', t => {
+test('XRLayer', t => {
   const view = new OrthographicView({
     id: 'ortho',
     controller: true,
@@ -14,9 +14,10 @@ test('VivViewerLayerBase', t => {
     zoom: 0
   });
   const testCases = generateLayerTests({
-    Layer: VivViewerLayerBase,
+    Layer: XRLayer,
     assert: t.ok,
     sampleProps: {
+      bounds: [0, 0, 2, 2],
       sliderValues: [0, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
       colorValues: [
         0,
@@ -42,19 +43,15 @@ test('VivViewerLayerBase', t => {
         0
       ],
       tileSize: 2,
-      imageWidth: 4,
-      imageHeight: 4,
-      dtype: '<u4',
-      // eslint-disable-next-line no-unused-vars
-      getTileData: ({ x, y, z }) =>
-        new Promise(() => [new Uint32Array([0, 1, 2, 3])])
+      channelData: [new Uint32Array([0, 2, 1, 2])],
+      dtype: '<u4'
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
   });
   testLayer({
-    Layer: VivViewerLayerBase,
+    Layer: XRLayer,
     testCases,
-    onError: t.notOkimport,
+    onError: t.notOk,
     viewport: view.makeViewport({
       height: 4,
       width: 4,

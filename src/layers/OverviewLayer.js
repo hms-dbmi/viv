@@ -25,12 +25,27 @@ const defaultProps = {
     compare: true
   },
   boundingBoxColor: { type: 'array', value: [255, 0, 0], compare: true },
-  boundingBoxOutlineWidth: { type: 'number', value: 10, compare: true },
-  viewportOutlineColor: { type: 'array', value: [0, 255, 0], compare: true },
-  viewportOutlineWidth: { type: 'number', value: 10, compare: true },
+  boundingBoxOutlineWidth: { type: 'number', value: 50, compare: true },
+  viewportOutlineColor: { type: 'array', value: [255, 190, 0], compare: true },
+  viewportOutlineWidth: { type: 'number', value: 400, compare: true },
   overviewScale: { type: 'number', value: 1, compare: true }
 };
 
+/**
+ * This layer wraps a StaticImageLayer as an overview, as well as a bounding box of the detail view and a polygon boundary for the view
+ * @param {Object} props
+ * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
+ * @param {Array} props.colorValues List of [r, g, b] values for each channel.
+ * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @param {number} props.opacity Opacity of the layer.
+ * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
+ * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
+ * @param {Array} props.boundingBoxColor [r, g, b] color of the bounding box (default: [255, 0, 0]).
+ * @param {number} props.boundingBoxOutlineWidth Width of the bounding box (default: 50).
+ * @param {Array} props.viewportOutlineColor [r, g, b] color of the outline (default: [255, 190, 0]).
+ * @param {number} props.viewportOutlineWidth Viewport outline width (default: 400).
+ */
 export default class OverviewLayer extends CompositeLayer {
   renderLayers() {
     const {

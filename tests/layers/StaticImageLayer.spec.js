@@ -2,9 +2,9 @@
 import test from 'tape-catch';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
-import XRLayer from '../src/layers/XRLayer';
+import StaticImageLayer from '../../src/layers/StaticImageLayer';
 
-test('XRLayer', t => {
+test('StaticImageLayer', t => {
   const view = new OrthographicView({
     id: 'ortho',
     controller: true,
@@ -14,44 +14,33 @@ test('XRLayer', t => {
     zoom: 0
   });
   const testCases = generateLayerTests({
-    Layer: XRLayer,
+    Layer: StaticImageLayer,
     assert: t.ok,
     sampleProps: {
-      bounds: [0, 0, 2, 2],
-      sliderValues: [0, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-      colorValues: [
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+      sliderValues: [
+        [0, 10],
+        [0, 10]
       ],
-      tileSize: 2,
-      channelData: [new Uint32Array([0, 2, 1, 2])],
-      dtype: '<u4'
+      colorValues: [
+        [0, 1, 1],
+        [0, 1, 1]
+      ],
+      channelIsOn: [true, false],
+      loader: {
+        getRaster: async () => ({
+          data: [new Uint32Array([0, 2, 1, 2]), new Uint32Array([1, 2, 1, 2])],
+          width: 2,
+          height: 2
+        }),
+        dtype: '<u4'
+      }
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
   });
   testLayer({
-    Layer: XRLayer,
+    Layer: StaticImageLayer,
     testCases,
-    onError: t.notOk,
+    onError: t.notOkimport,
     viewport: view.makeViewport({
       height: 4,
       width: 4,

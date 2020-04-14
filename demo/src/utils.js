@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createTiffPyramid, createZarrLoader } from '../../src';
 
-import { COLOR_PALLETE } from './constants';
+import { COLOR_PALLETE, INITIAL_SLIDER_VALUE } from './constants';
 
 export async function createLoader(type, infoObj) {
   switch (type) {
@@ -96,7 +96,7 @@ export function channelsReducer(state, { index, value, type }) {
       const selections = [...state.selections, selection];
       const colors = [...state.colors, [255, 255, 255]];
       const isOn = [...state.isOn, true];
-      const sliders = [...state.sliders, [0, 20000]];
+      const sliders = [...state.sliders, INITIAL_SLIDER_VALUE];
       const ids = [...state.ids, String(Math.random())];
       return { names, selections, colors, isOn, sliders, ids };
     }
@@ -117,7 +117,7 @@ export function channelsReducer(state, { index, value, type }) {
       return {
         names,
         selections,
-        sliders: Array(n).fill([0, 20000]),
+        sliders: Array(n).fill(INITIAL_SLIDER_VALUE),
         colors: range(n).map(i => COLOR_PALLETE[i]),
         isOn: Array(n).fill(true),
         ids: range(n).map(() => String(Math.random()))

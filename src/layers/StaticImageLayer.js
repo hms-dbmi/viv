@@ -32,6 +32,20 @@ function scaleBounds({ width, height, translate, scale }) {
   return [left, bottom, right, top];
 }
 
+/**
+ * This layer wraps XRLayer and generates a static image
+ * @param {Object} props
+ * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
+ * @param {Array} props.colorValues List of [r, g, b] values for each channel.
+ * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @param {number} props.opacity Opacity of the layer.
+ * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
+ * @param {string} props.viewportId Id for the current view.
+ * @param {Array} props.translate Translate transformation to be applied to the bounds after scaling.
+ * @param {number} props.scale Scaling factor for this layer to be used against the dimensions of the loader's `getRaster`.
+ * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
+ */
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
     const { loader, z, loaderSelection } = this.props;
@@ -88,7 +102,6 @@ export default class StaticImageLayer extends CompositeLayer {
       translate,
       scale
     });
-
     return new XRLayer({
       channelData: Promise.resolve(data),
       bounds,

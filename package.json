@@ -15,7 +15,8 @@
     "test": "mkdir test_dist || rm -r test_dist && node_modules/.bin/webpack --config webpack.config.test.js --mode development",
     "test:watch": "npm run test -- --watch",
     "version": "./version.sh",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "docs": "mkdir -p dist/docs || rm -r dist/docs && mkdir -p dist/docs && documentation build src/** -f html --config documentation.yml --shallow -o dist/docs"
   },
   "pre-push": [
     "test"
@@ -77,6 +78,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "browserify": "^16.5.0",
     "css-loader": "^3.4.2",
+    "documentation": "^12.1.4",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-config-prettier": "^6.10.0",
