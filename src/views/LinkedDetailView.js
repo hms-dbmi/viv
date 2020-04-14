@@ -6,8 +6,8 @@ import VivView from './VivView';
 import { getVivId, makeBoundingBox } from './utils';
 
 /**
- * This class generates a VivViewerLayer and a view for use in the SideBySideViewer.
- * It is linked with its other views as controlled by `linkedIds` and `panLock` parameters.
+ * This class generates a VivViewerLayer and a view for use in the LinkedDetailViewer.
+ * It is linked with its other views as controlled by `linkedIds`, `zoomLock`, and `panLock` parameters.
  * */
 export default class LinkedDetailView extends VivView {
   constructor({

@@ -1,13 +1,26 @@
 toc:
+- name: Introduction
+  file: README.md
+- name: Example Usage
+  file: SAMPLES.md
 - name: React Components
+- OverviewDetailViewer
+- LinkedDetailViewer
 - VivViewer
 - name: Classes
 - VivView
 - OverviewView
 - DetailView
+- LinkedDetailView
+- makeBoundingBox
 - name: Layers
 - VivViewerLayer
 - StaticImageLayer
 - name: Layers (Internal)
 - XRLayer
 - OverviewLayer
+- VivViewerLayerBase
+- name: Loaders (Internal)
+- ZarrLoader
+- name: Overview Of Viv Image Rendering
+  file: image_rendering_docs/IMAGE_RENDERING.md

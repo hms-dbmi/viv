@@ -14,7 +14,7 @@ function isSafari() {
 }
 
 /**
- * This class handles rendering the various views within the DeckGL contenxt.
+ * This component handles rendering the various views within the DeckGL contenxt.
  * @param {Array} layerProps The props for the layers in each view.
  * @param {Array} randomize Wgether or not to randomize which view goes first (for dynamic rendering).
  * @param {VivView} views The various VivViews to render.

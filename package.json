@@ -16,7 +16,7 @@
     "test:watch": "npm run test -- --watch",
     "version": "./version.sh",
     "postversion": "git push && git push --tags",
-    "docs": "mkdir -p dist/docs || rm -r dist/docs documentation build src/** -f html -o docs --config documentation.yml --shallow -o dist/docs"
+    "docs": "mkdir -p dist/docs || rm -r dist/docs && mkdir -p dist/docs && documentation build src/** -f html --config documentation.yml --shallow -o dist/docs"
   },
   "pre-push": [
     "test"

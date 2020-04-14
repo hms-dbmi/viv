@@ -1,5 +1,8 @@
 import { guessRgb } from './utils';
 
+/**
+ * This class serves as a wrapper for fetching zarr data from a file server.
+ * */
 export default class ZarrLoader {
   constructor({
     data,
