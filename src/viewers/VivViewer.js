@@ -57,7 +57,6 @@ export default class VivViewer extends PureComponent {
     // Save the view state and trigger rerender
     const { views } = this.props;
     this.setState(prevState => {
-      const newState = {};
       const viewStates = {};
       views.forEach(view => {
         const currentViewState = prevState.viewStates[view.id];
@@ -67,8 +66,7 @@ export default class VivViewer extends PureComponent {
           currentViewState
         });
       });
-      newState.viewStates = viewStates;
-      return { ...newState };
+      return { viewStates };
     });
   }
 
@@ -93,7 +91,6 @@ export default class VivViewer extends PureComponent {
     ) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState(prevState => {
-        const newState = {};
         const viewStates = {};
         views.forEach(view => {
           const { height, width } = view.initialViewState;
@@ -107,8 +104,7 @@ export default class VivViewer extends PureComponent {
             }
           });
         });
-        newState.viewStates = viewStates;
-        return { ...newState };
+        return { viewStates };
       });
     }
   }
