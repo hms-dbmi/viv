@@ -3,10 +3,11 @@ import { OrthographicView } from '@deck.gl/core';
 
 /**
  * This class generates a layer and a view for use in the VivViewer
- * @param {Object} viewState The viewState object
- * @param {string} id The id for the current view
- * @param {number} x The x (top-left) location on the screen for the current view
- * @param {number} y The y (top-left) location on the screen for the current view
+ * @param {Object} args
+ * @param {Object} args.viewState ViewState object
+ * @param {string} args.id Id for the current view
+ * @param {number} args.x X (top-left) location on the screen for the current view
+ * @param {number} args.y Y (top-left) location on the screen for the current view
  */
 export default class VivView {
   constructor({ initialViewState, x = 0, y = 0 }) {
@@ -37,10 +38,10 @@ export default class VivView {
 
   /**
    * Create a viewState for this class, checking the id to make sure this class and veiwState match.
-   * @param {ViewState} Object A viewState object.
-   * @returns {ViewState} The viewState for this class (or null by default if the ids do not match).
+   * @param {Object} args
+   * @param {ViewState} args.ViewState ViewState object.
+   * @returns {ViewState} ViewState for this class (or null by default if the ids do not match).
    */
-  // eslint-disable-next-line class-methods-use-this
   filterViewState({ viewState }) {
     const { id } = this;
     return viewState.id === id ? viewState : null;
@@ -48,8 +49,9 @@ export default class VivView {
 
   /**
    * Create a layer for this instance.
-   * @param {ViewState} Object The viewStates for all current views.
-   * @param {number} props The props for this instance.
+   * @param {Object} args
+   * @param {ViewState} args.viewStates ViewStates for all current views.
+   * @param {number} args.props Props for this instance.
    * @returns {Layer} Instance of a layer.
    */
   // eslint-disable-next-line class-methods-use-this,no-unused-vars

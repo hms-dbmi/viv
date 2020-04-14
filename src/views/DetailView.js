@@ -11,11 +11,11 @@ export default class DetailView extends VivView {
     const { id } = this;
     const layer = loader.isPyramid
       ? new VivViewerLayer(props, {
-          id: loader.type + getVivId(id),
+          id: `${loader.type}${getVivId(id)}`,
           viewportId: id
         })
       : new StaticImageLayer(props, {
-          id: loader.type + getVivId(id),
+          id: `${loader.type}${getVivId(id)}`,
           viewportId: id
         });
     return [layer];

@@ -1,8 +1,8 @@
 toc:
 - name: Introduction
   file: README.md
-- name: Example Usage
-  file: SAMPLES.md
+- name: Getting Started
+  file: docs/SAMPLES.md
 - name: React Components
 - OverviewDetailViewer
 - LinkedDetailViewer
@@ -23,4 +23,4 @@ toc:
 - name: Loaders (Internal)
 - ZarrLoader
 - name: Overview Of Viv Image Rendering
-  file: image_rendering_docs/IMAGE_RENDERING.md
+  file: docs/IMAGE_RENDERING.md

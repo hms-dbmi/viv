@@ -14,7 +14,7 @@ you might combine our layer with your own.
 
 ### Build
 
-To build the component, alone via `webpack` use `npm run-script build-component`.
+To build the component alone via `webpack` use `npm run-script build-component`.
 To build the demo used for visual testing (seen on `npm start`), run
 `npm run-script build-site`.
 
@@ -37,7 +37,7 @@ development with `zarr`, you should use an [HTTP2 server](https://github.com/Goo
 for best performance. Our demo
 uses Google Cloud Storage, which is HTTP2 by default.
 
-Due to difficulties around compiling shaders on Travis, unit tests and layer lifecycle
+Due to [difficulties](https://github.com/hubmapconsortium/vitessce-image-viewer/issues/103) around compiling shaders on Travis, unit tests and layer lifecycle
 tests are run locally as a pre-push hook. Travis runs a test build, linting, and prettier.
 
 ### Browser Support
@@ -53,4 +53,4 @@ Currently Safari lacks full WebGL2 support. The `Viv` component will display an 
 
 ### Documentation
 
-Please navigate to [viv.vitessce.io/docs](viv.vitessce.io/docs) to see full documenation.
+Please navigate to [viv.vitessce.io/docs](https://viv.vitessce.io/docs) to see full documenation.

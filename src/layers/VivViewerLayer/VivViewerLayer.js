@@ -5,17 +5,18 @@ import { padColorsAndSliders } from '../utils';
 
 /**
  * This layer generates a VivViewerLayer (tiled) and a StaticImageLayer (background for the tiled layer)
- * @param {Array} sliderValues The list of [min, max] values for each channe to control rendering.
- * @param {Array} colorValues The list of [r, g, b] values for each channel.
- * @param {Array} channelIsOn The list of boolean values for each channel for whether or not it is visible.
- * @param {number} opacity The opacity of the layer.
- * @param {string} colormap A string indicating a colormap (default: '').
- * @param {Array} domain An override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
- * @param {string} viewportId The id for the current view.
- * @param {Object} loader The loader to be used for fetching data.  It must implement/return `getTile`, `dtype`, `numLevels`, and `tileSize`, and `getRaster`.
- * @param {Array} loaderSelection The selection to be used for fetching data.
- * @param {String} id The unique identifier for this layer.
- * @param {String} onTileError A custom override for handle tile fetching errors.
+ * @param {Object} props
+ * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @param {Array} props.colorValues List of [r, g, b] values for each channel.
+ * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @param {number} props.opacity Opacity of the layer.
+ * @param {string} props.colormap String indicating a colormap (default: '').
+ * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
+ * @param {string} props.viewportId Id for the current view.
+ * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getTile`, `dtype`, `numLevels`, and `tileSize`, and `getRaster`.
+ * @param {Array} props.loaderSelection Selection to be used for fetching data.
+ * @param {String} props.id Unique identifier for this layer.
+ * @param {String} props.onTileError Custom override for handle tile fetching errors.
  */
 
 export default class VivViewerLayer extends CompositeLayer {

@@ -1,30 +1,20 @@
+Here are two snippets to help get you started with our higher-level components. For a more complete example of using these higher level components, look at the source code of the demo [here](https://github.com/hubmapconsortium/vitessce-image-viewer/blob/master/demo/src/App.js), or look at the source code of the library [here](https://github.com/hubmapconsortium/vitessce-image-viewer/tree/master/src) for building your own components with custom `VivViews` or custom `deck.gl` layers.
+
 #### `LinkedDetailViewer`
 
 ````javascript
 import { createZarrLoader, LinkedDetailViewer } from '@hubmap/vitessce-image-viewer';
 
-const channelNames = [
-  'DAPI - Hoechst (nuclei)',
-  'FITC - Laminin (basement membrane)',
-  'Cy3 - Synaptopodin (glomerular)',
-  'Cy5 - THP (thick limb)'
-];
-
-const basePyramidInfo = {
+const loader = await createZarrLoader({
+  url: `https://vitessce-data.storage.googleapis.com/0.0.25/master_release/spraggins/spraggins.mxif.zarr`,
   dimensions: [
-    { field: 'channel', type: 'nominal', values: channelNames },
+    { field: 'channel', type: 'nominal',  values: ['DAPI', 'FITC', 'Cy3', 'Cy5'] },
     { field: 'y', type: 'quantitative', values: null },
     { field: 'x', type: 'quantitative', values: null }
   ],
-  isPublic: true,
-  isPyramid: true,
-  selections: channelNames.map(name => ({ channel: name }))
-};
-const zarrInfo = {
-  url: `https://vitessce-data.storage.googleapis.com/0.0.25/master_release/spraggins/spraggins.mxif.zarr`,
-  ...basePyramidInfo,
-};
-const loader = await createZarrLoader(zarrInfo);
+  isPyramid: true
+});
+
 const sliders = [[0,2000], [0,2000]]
 const colors = [[255, 0, 0], [0, 255, 0]]
 const isOn = [true, false]
@@ -38,7 +28,7 @@ const initialViewState = {
 const colormap = ''
 const panLock = true
 const zoomLock = false
-<LinkedDetailViewer
+const linkedDetailViewer = <LinkedDetailViewer
   loader={loader}
   sliderValues={sliders}
   colorValues={colors}
@@ -93,7 +83,7 @@ const overview = {
   boundingBoxColor: [0, 0, 255]
 }
 const overviewOn = true
-<OverviewDetailViewer
+const OverviewDetailViewer = <OverviewDetailViewer
   loader={loader}
   sliderValues={sliders}
   colorValues={colors}

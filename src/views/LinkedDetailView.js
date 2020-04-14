@@ -8,6 +8,16 @@ import { getVivId, makeBoundingBox } from './utils';
 /**
  * This class generates a VivViewerLayer and a view for use in the LinkedDetailViewer.
  * It is linked with its other views as controlled by `linkedIds`, `zoomLock`, and `panLock` parameters.
+ * @param {Object} args
+ * @param {Object} args.viewState ViewState object
+ * @param {string} args.id Id for the current view
+ * @param {number} args.x X (top-left) location on the screen for the current view
+ * @param {number} args.y Y (top-left) location on the screen for the current view
+ * @param {Array} args.linkedIds Ids of the other views to which this could be locked via zoom/pan.
+ * @param {Boolean} args.panLock Whether or not we lock pan.
+ * @param {Boolean} args.zoomLock Whether or not we lock zoom.
+ * @param {Array} args.viewportOutlineColor Outline color of the border (default [255, 190, 0])
+ * @param {number} args.viewportOutlineWidth Default outline width (default 10)
  * */
 export default class LinkedDetailView extends VivView {
   constructor({
@@ -92,15 +102,15 @@ export default class LinkedDetailView extends VivView {
     const boundingBox = makeBoundingBox(thisViewState);
     const detailLayer = loader.isPyramid
       ? new VivViewerLayer(props, {
-          id: loader.type + getVivId(id),
+          id: `${loader.type}${getVivId(id)}`,
           viewportId: id
         })
       : new StaticImageLayer(props, {
-          id: loader.type + getVivId(id),
+          id: `${loader.type}${getVivId(id)}`,
           viewportId: id
         });
     const border = new PolygonLayer({
-      id: `viewport-outline-${loader.type + getVivId(id)}`,
+      id: `viewport-outline-${loader.type}${getVivId(id)}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [boundingBox],
       getPolygon: f => f,

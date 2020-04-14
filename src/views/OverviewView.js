@@ -5,15 +5,16 @@ import { makeBoundingBox, getVivId } from './utils';
 
 /**
  * This class generates a OverviewLayer and a view for use in the VivViewer as an overview to a Detailview (they must be used in conjection)
- * @param {Object} viewState The viewState object.
- * @param {Object} loader The loader, used for inferring zoom level.
- * @param {number} detailHeight The height of the detail view.
- * @param {number} detailWidth The width of the detail view.
- * @param {number} scale The scale of this viewport relative to the detail. Default is .2.
- * @param {number} margin The margin to be offset from the the corner of the other viewport. Default is 25.
- * @param {string} position The location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."  Default is 'bottom-right'.
- * @param {number} minimumWidth The absolute lower bound for how small the viewport should scale. Default is 150.
- * @param {number} maximumWidth The absolute upper bound for how large the viewport should scale. Default is 350.
+ * @param {Object} args
+ * @param {Object} args.viewState ViewState object.
+ * @param {Object} props.loader Loader to be used for inferring zoom level and fetching data.  It must have the properies `dtype`, `numLevels`, and `tileSize` and implement `getTile` and `getRaster`.
+ * @param {number} args.detailHeight Height of the detail view.
+ * @param {number} args.detailWidth Width of the detail view.
+ * @param {number} args.scale Scale of this viewport relative to the detail. Default is .2.
+ * @param {number} args.margin Margin to be offset from the the corner of the other viewport. Default is 25.
+ * @param {string} args.position Location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."  Default is 'bottom-right'.
+ * @param {number} args.minimumWidth Absolute lower bound for how small the viewport should scale. Default is 150.
+ * @param {number} args.maximumWidth Absolute upper bound for how large the viewport should scale. Default is 350.
  * */
 export default class OverviewView extends VivView {
   constructor({
@@ -142,7 +143,7 @@ export default class OverviewView extends VivView {
       coords.map(e => e * scale)
     );
     const overviewLayer = new OverviewLayer(props, {
-      id: loader.type + getVivId(id),
+      id: `${loader.type}${getVivId(id)}`,
       boundingBox,
       overviewScale: scale
     });

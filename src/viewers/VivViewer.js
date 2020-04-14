@@ -15,9 +15,10 @@ function isSafari() {
 
 /**
  * This component handles rendering the various views within the DeckGL contenxt.
- * @param {Array} layerProps The props for the layers in each view.
- * @param {Array} randomize Wgether or not to randomize which view goes first (for dynamic rendering).
- * @param {VivView} views The various VivViews to render.
+ * @param {Object} props
+ * @param {Array} props.layerProps  Props for the layers in each view.
+ * @param {Array} props.randomize Whether or not to randomize which view goes first (for dynamic rendering).
+ * @param {VivView} props.views Various VivViews to render.
  * */
 export default class VivViewer extends PureComponent {
   constructor(props) {
@@ -40,8 +41,8 @@ export default class VivViewer extends PureComponent {
    * This prevents only the `draw` call of a layer from firing,
    * but not other layer lifecycle methods.  Nonetheless, it is
    * still useful.
-   * @param {Layer} layer The layer being updated.
-   * @param {Viewport} viewport The viewport being updated.
+   * @param {Layer} layer Layer being updated.
+   * @param {Viewport} viewport Viewport being updated.
    * @returns {boolean} Whether or not this layer should be drawn in this viewport.
    */
   // eslint-disable-next-line class-methods-use-this

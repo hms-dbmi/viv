@@ -34,16 +34,17 @@ function scaleBounds({ width, height, translate, scale }) {
 
 /**
  * This layer wraps XRLayer and generates a static image
- * @param {Array} sliderValues The list of [min, max] values for each channe to control rendering.
- * @param {Array} colorValues The list of [r, g, b] values for each channel.
- * @param {Array} channelIsOn The list of boolean values for each channel for whether or not it is visible.
- * @param {number} opacity The opacity of the layer.
- * @param {string} colormap A string indicating a colormap (default: '').
- * @param {Array} domain An override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
- * @param {string} viewportId The id for the current view.
- * @param {Array} translate A translate transformation to be applied to the bounds after scaling.
- * @param {number} scale A scaling factor for this layer to be used against the dimensions of the loader's `getRaster`.
- * @param {Object} loader The loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
+ * @param {Object} props
+ * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @param {Array} props.colorValues List of [r, g, b] values for each channel.
+ * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @param {number} props.opacity Opacity of the layer.
+ * @param {string} props.colormap String indicating a colormap (default: '').
+ * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
+ * @param {string} props.viewportId Id for the current view.
+ * @param {Array} props.translate Translate transformation to be applied to the bounds after scaling.
+ * @param {number} props.scale Scaling factor for this layer to be used against the dimensions of the loader's `getRaster`.
+ * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
  */
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
