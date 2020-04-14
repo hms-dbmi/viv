@@ -122,7 +122,7 @@ function App() {
   return (
     <>
       {!isLoading &&
-        (useLinkedView ? (
+        (useLinkedView && isPyramid ? (
           <LinkedDetailViewer
             loader={loader}
             sliderValues={sliders}

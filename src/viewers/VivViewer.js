@@ -75,38 +75,35 @@ export default class VivViewer extends PureComponent {
    * width on any call where the viewStates changes (i.e resize events),
    * using the previous state (falling back on the view's initial state) for target x and y, zoom level etc.
    */
-  componentDidUpdate(prevProps) {
-    const { views } = this.props;
+  static getDerivedStateFromProps(props, prevState) {
+    const { views } = props;
     // Update internal viewState on view changes as well as height and width changes.
     // Maybe we should add x/y too?
     if (
       views.some(
-        (view, i) =>
-          prevProps.views[i] !== view ||
+        view =>
+          !prevState.viewStates[view.id] ||
           view.initialViewState.height !==
-            prevProps.views[i].initialViewState.height ||
-          view.initialViewState.width !==
-            prevProps.views[i].initialViewState.width
+            prevState.viewStates[view.id].height ||
+          view.initialViewState.width !== prevState.viewStates[view.id].width
       )
     ) {
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState(prevState => {
-        const viewStates = {};
-        views.forEach(view => {
-          const { height, width } = view.initialViewState;
-          const currentViewState = prevState.viewStates[view.id];
-          viewStates[view.id] = view.filterViewState({
-            viewState: {
-              ...(currentViewState || view.initialViewState),
-              height,
-              width,
-              id: view.id
-            }
-          });
+      const viewStates = {};
+      views.forEach(view => {
+        const { height, width } = view.initialViewState;
+        const currentViewState = prevState.viewStates[view.id];
+        viewStates[view.id] = view.filterViewState({
+          viewState: {
+            ...(currentViewState || view.initialViewState),
+            height,
+            width,
+            id: view.id
+          }
         });
-        return { viewStates };
       });
+      return { viewStates };
     }
+    return prevState;
   }
 
   /**
