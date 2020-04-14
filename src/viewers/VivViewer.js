@@ -42,7 +42,7 @@ export default class VivViewer extends PureComponent {
    * still useful.
    * @param {Layer} layer The layer being updated.
    * @param {Viewport} viewport The viewport being updated.
-   * @returns {boolean} Whether or not this layer should be drawn in this viewport
+   * @returns {boolean} Whether or not this layer should be drawn in this viewport.
    */
   // eslint-disable-next-line class-methods-use-this
   layerFilter({ layer, viewport }) {
@@ -54,7 +54,7 @@ export default class VivViewer extends PureComponent {
    * (hence the need for storing viewState in state).
    */
   _onViewStateChange({ viewId, viewState, oldViewState }) {
-    // Save the view state and trigger rerender
+    // Save the view state and trigger rerender.
     const { views } = this.props;
     this.setState(prevState => {
       const viewStates = {};
@@ -136,7 +136,7 @@ export default class VivViewer extends PureComponent {
     if (randomize) {
       const random = Math.random();
       const holdFirstElement = deckGLViews[0];
-      // weight has to go to 1.5 because we use Math.round()
+      // weight has to go to 1.5 because we use Math.round().
       const randomWieghted = random * 1.49;
       const randomizedIndex = Math.round(randomWieghted * (views.length - 1));
       deckGLViews[0] = deckGLViews[randomizedIndex];

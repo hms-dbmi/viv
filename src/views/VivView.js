@@ -49,8 +49,8 @@ export default class VivView {
   /**
    * Create a layer for this instance.
    * @param {ViewState} Object The viewStates for all current views.
-   * @param {number} props The props for this instnace
-   * @returns {Layer} Instance of a layer
+   * @param {number} props The props for this instance.
+   * @returns {Layer} Instance of a layer.
    */
   // eslint-disable-next-line class-methods-use-this,no-unused-vars
   getLayers({ viewStates, props }) {}

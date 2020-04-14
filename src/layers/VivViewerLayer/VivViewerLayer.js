@@ -9,9 +9,9 @@ import { padColorsAndSliders } from '../utils';
  * @param {Array} colorValues The list of [r, g, b] values for each channel.
  * @param {Array} channelIsOn The list of boolean values for each channel for whether or not it is visible.
  * @param {number} opacity The opacity of the layer.
- * @param {string} colormap A string indicating a colormap (default: '')
- * @param {Array} domain An override for the possible max/min values (i.e something different than 65535 for uint16/'<u2')
- * @param {string} viewportId The id for the current view
+ * @param {string} colormap A string indicating a colormap (default: '').
+ * @param {Array} domain An override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
+ * @param {string} viewportId The id for the current view.
  * @param {Object} loader The loader to be used for fetching data.  It must implement/return `getTile`, `dtype`, `numLevels`, and `tileSize`, and `getRaster`.
  * @param {Array} loaderSelection The selection to be used for fetching data.
  * @param {String} id The unique identifier for this layer.

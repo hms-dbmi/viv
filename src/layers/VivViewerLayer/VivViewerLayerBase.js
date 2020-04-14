@@ -37,7 +37,7 @@ export default class VivViewerLayerBase extends TileLayer {
       (this.props.viewportId &&
         this.context.viewport.id === this.props.viewportId) ||
       // I don't know why, but DeckGL doesn't recognize multiple views on the first pass
-      // so we force update on the first pass by checking if there is a viewport in the tileset
+      // so we force update on the first pass by checking if there is a viewport in the tileset.
       !this.state.tileset._viewport
     ) {
       super._updateTileset();

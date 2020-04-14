@@ -5,8 +5,8 @@ export function getVivId(id) {
 }
 /**
  * Create a boudning box from a viewport based on passed-in viewState.
- * @param {viewState} Object The viewState for a certain viewport
- * @returns {View} The DeckGL View for this viewport
+ * @param {viewState} Object The viewState for a certain viewport.
+ * @returns {View} The DeckGL View for this viewport.
  */
 export function makeBoundingBox(viewState) {
   const viewport = new OrthographicView().makeViewport({

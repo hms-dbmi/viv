@@ -7,7 +7,7 @@ import { LinkedDetailView } from '../views';
  * @param {Array} sliderValues The list of [min, max] values for each channe to control rendering.
  * @param {Array} colorValues The list of [r, g, b] values for each channel.
  * @param {Array} channelIsOn The list of boolean values for each channel for whether or not it is visible.
- * @param {string} colormap A string indicating a colormap (default: '')
+ * @param {string} colormap A string indicating a colormap (default: '').
  * @param {Object} loader The loader to be used for fetching data.  It must implement/return `getTile`, `dtype`, `numLevels`, and `tileSize`, and `getRaster`.
  * @param {Array} loaderSelection The selection to be used for fetching data.
  * @param {Boolean} zoomLock Whether or not lock the zooms of the two views.
