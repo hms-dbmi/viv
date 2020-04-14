@@ -1,6 +1,6 @@
 import React from 'react';
 import VivViewer from './VivViewer';
-import { LinkedDetailView } from '../views';
+import { SideBySideView } from '../views';
 
 /**
  * This component provides a side-by-side VivViewer with linked zoom/pan.
@@ -14,7 +14,7 @@ import { LinkedDetailView } from '../views';
  * @param {Boolean} props.zoomLock Whether or not lock the zooms of the two views.
  * @param {Boolean} props.panLock Whether or not lock the pans of the two views.
  */
-const LinkedDetailViewer = props => {
+const SideBySideViewer = props => {
   const {
     loader,
     sliderValues,
@@ -26,13 +26,13 @@ const LinkedDetailViewer = props => {
     loaderSelection,
     zoomLock
   } = props;
-  const detailViewLeft = new LinkedDetailView({
+  const detailViewLeft = new SideBySideView({
     initialViewState: { ...initialViewState, id: 'left' },
     linkedIds: ['right'],
     panLock,
     zoomLock
   });
-  const detailViewRight = new LinkedDetailView({
+  const detailViewRight = new SideBySideView({
     initialViewState: { ...initialViewState, id: 'right' },
     x: initialViewState.width,
     linkedIds: ['left'],
@@ -54,4 +54,4 @@ const LinkedDetailViewer = props => {
   ) : null;
 };
 
-export default LinkedDetailViewer;
+export default SideBySideViewer;

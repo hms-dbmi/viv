@@ -5,13 +5,14 @@ toc:
   file: docs/SAMPLES.md
 - name: React Components
 - OverviewDetailViewer
-- LinkedDetailViewer
+- SideBySideViewer
 - VivViewer
 - name: Classes
 - VivView
 - OverviewView
 - DetailView
-- LinkedDetailView
+- SideBySideView
+- name: Utility Methods
 - makeBoundingBox
 - name: Layers
 - VivViewerLayer

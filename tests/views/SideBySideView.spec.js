@@ -2,14 +2,14 @@
 import test from 'tape-catch';
 import { PolygonLayer } from '@deck.gl/layers';
 
-import { LinkedDetailView } from '../../src/views';
+import { SideBySideView } from '../../src/views';
 import { generateViewTests, defaultArguments } from './VivView.spec';
 import { VivViewerLayer } from '../../src/layers';
 
-generateViewTests(LinkedDetailView, defaultArguments);
+generateViewTests(SideBySideView, defaultArguments);
 
-test(`LinkedDetailView layer type and props check`, t => {
-  const view = new LinkedDetailView(defaultArguments);
+test(`SideBySideView layer type and props check`, t => {
+  const view = new SideBySideView(defaultArguments);
   const loader = { type: 'loads', isPyramid: true };
   const layers = view.getLayers({
     props: { loader },
@@ -19,26 +19,26 @@ test(`LinkedDetailView layer type and props check`, t => {
   });
   t.ok(
     layers[0] instanceof VivViewerLayer,
-    'LinkedDetailView layer should be VivViewerLayer.'
+    'SideBySideView layer should be VivViewerLayer.'
   );
   t.ok(
     layers[1] instanceof PolygonLayer,
-    'LinkedDetailView layer should be VivViewerLayer.'
+    'SideBySideView layer should be VivViewerLayer.'
   );
   t.equal(
     layers[0].props.viewportId,
     view.id,
-    'LinkedDetailView id should be passed down to layer as ViewportId.'
+    'SideBySideView id should be passed down to layer as ViewportId.'
   );
   t.end();
 });
 
 const generateZoomLockTest = (panLock, zoomLock) => {
-  test(`LinkedDetailView ${panLock ? 'with' : 'without'} pan and ${
+  test(`SideBySideView ${panLock ? 'with' : 'without'} pan and ${
     zoomLock ? 'with' : 'without'
   } zoom lock.`, t => {
     const linkedId = 'bar';
-    const view = new LinkedDetailView({
+    const view = new SideBySideView({
       ...defaultArguments,
       panLock,
       zoomLock,

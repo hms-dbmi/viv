@@ -6,7 +6,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import AddIcon from '@material-ui/icons/Add';
 
-import { LinkedDetailViewer, OverviewDetailViewer } from '../../src';
+import { SideBySideViewer, OverviewDetailViewer } from '../../src';
 import sources from './source-info';
 import { createLoader, channelsReducer, useWindowSize } from './utils';
 
@@ -123,7 +123,7 @@ function App() {
     <>
       {!isLoading &&
         (useLinkedView && isPyramid ? (
-          <LinkedDetailViewer
+          <SideBySideViewer
             loader={loader}
             sliderValues={sliders}
             colorValues={colors}
@@ -152,7 +152,7 @@ function App() {
             }}
             colormap={colormap.length > 0 && colormap}
             overview={DEFAULT_OVERVIEW}
-            overviewOn={overviewOn}
+            overviewOn={overviewOn && isPyramid}
           />
         ))}
       {controllerOn && (
@@ -194,25 +194,24 @@ function App() {
             Add Channel
           </Button>
           <Button
-            disabled={!isPyramid || isLoading}
+            disabled={!isPyramid || isLoading || useLinkedView}
+            onClick={toggleOverview}
+            variant="outlined"
+            size="small"
+            fullWidth
+          >
+            {overviewOn ? 'Hide' : 'Show'} Picture-In-Picture
+          </Button>
+          <Button
+            disabled={!isPyramid || isLoading || overviewOn}
             onClick={toggleLinkedView}
             variant="outlined"
             size="small"
             fullWidth
           >
-            {useLinkedView ? 'Overview' : 'Linked'}
+            {useLinkedView ? 'Hide' : 'Show'} Side-by-Side
           </Button>
-          {!useLinkedView ? (
-            <Button
-              disabled={!isPyramid || isLoading}
-              onClick={toggleOverview}
-              variant="outlined"
-              size="small"
-              fullWidth
-            >
-              {overviewOn ? 'Hide' : 'Show'} Picture-In-Picture
-            </Button>
-          ) : (
+          {useLinkedView && (
             <>
               <Button
                 disabled={!isPyramid || isLoading}

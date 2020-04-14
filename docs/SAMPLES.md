@@ -1,9 +1,9 @@
 Here are two snippets to help get you started with our higher-level components. For a more complete example of using these higher level components, look at the source code of the demo [here](https://github.com/hubmapconsortium/vitessce-image-viewer/blob/master/demo/src/App.js), or look at the source code of the library [here](https://github.com/hubmapconsortium/vitessce-image-viewer/tree/master/src) for building your own components with custom `VivViews` or custom `deck.gl` layers.
 
-#### `LinkedDetailViewer`
+#### `SideBySideViewer`
 
 ````javascript
-import { createZarrLoader, LinkedDetailViewer } from '@hubmap/vitessce-image-viewer';
+import { createZarrLoader, SideBySideViewer } from '@hubmap/vitessce-image-viewer';
 
 const loader = await createZarrLoader({
   url: `https://vitessce-data.storage.googleapis.com/0.0.25/master_release/spraggins/spraggins.mxif.zarr`,
@@ -28,7 +28,7 @@ const initialViewState = {
 const colormap = ''
 const panLock = true
 const zoomLock = false
-const linkedDetailViewer = <LinkedDetailViewer
+const linkedDetailViewer = <SideBySideViewer
   loader={loader}
   sliderValues={sliders}
   colorValues={colors}
