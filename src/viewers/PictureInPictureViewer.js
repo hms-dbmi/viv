@@ -16,7 +16,7 @@ import { DetailView, OverviewView } from '../views';
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
  */
 
-const OverviewDetailViewer = props => {
+const PictureInPictureViewer = props => {
   const {
     loader,
     sliderValues,
@@ -55,4 +55,4 @@ const OverviewDetailViewer = props => {
   return loader ? <VivViewer layerProps={layerProps} views={views} /> : null;
 };
 
-export default OverviewDetailViewer;
+export default PictureInPictureViewer;

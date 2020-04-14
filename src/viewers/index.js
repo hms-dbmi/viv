@@ -1,3 +1,3 @@
 export { default as VivViewer } from './VivViewer';
-export { default as OverviewDetailViewer } from './OverviewDetailViewer';
+export { default as PictureInPictureViewer } from './PictureInPictureViewer';
 export { default as SideBySideViewer } from './SideBySideViewer';

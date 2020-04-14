@@ -41,10 +41,10 @@ const linkedDetailViewer = <SideBySideViewer
 />```
 ````
 
-#### `OverviewDetailViewer`
+#### `PictureInPictureViewer`
 
 ````javascript
-import { createZarrLoader, OverviewDetailViewer } from '@hubmap/vitessce-image-viewer';
+import { createZarrLoader, PictureInPictureViewer } from '@hubmap/vitessce-image-viewer';
 
 const channelNames = [
   'DAPI - Hoechst (nuclei)',
@@ -83,7 +83,7 @@ const overview = {
   boundingBoxColor: [0, 0, 255]
 }
 const overviewOn = true
-const OverviewDetailViewer = <OverviewDetailViewer
+const PictureInPictureViewer = <PictureInPictureViewer
   loader={loader}
   sliderValues={sliders}
   colorValues={colors}

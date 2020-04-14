@@ -6,7 +6,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import AddIcon from '@material-ui/icons/Add';
 
-import { SideBySideViewer, OverviewDetailViewer } from '../../src';
+import { SideBySideViewer, PictureInPictureViewer } from '../../src';
 import sources from './source-info';
 import { createLoader, channelsReducer, useWindowSize } from './utils';
 
@@ -139,7 +139,7 @@ function App() {
             panLock={panLock}
           />
         ) : (
-          <OverviewDetailViewer
+          <PictureInPictureViewer
             loader={loader}
             sliderValues={sliders}
             colorValues={colors}

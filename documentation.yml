@@ -4,7 +4,7 @@ toc:
 - name: Getting Started
   file: docs/SAMPLES.md
 - name: React Components
-- OverviewDetailViewer
+- PictureInPictureViewer
 - SideBySideViewer
 - VivViewer
 - name: Classes
