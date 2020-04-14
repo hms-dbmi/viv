@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.1.6
+
+### Added
+
 - New classes for views/viewers
 - Zoom/pan lock buttons and linked views in demo
 
