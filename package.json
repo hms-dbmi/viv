@@ -118,6 +118,7 @@
   },
   "dependencies": {
     "geotiff": "^1.0.0-beta.6",
+    "js-quantities": "^1.7.5",
     "zarr": "^0.2.3"
   }
 }

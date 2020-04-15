@@ -1,6 +1,7 @@
 import { CompositeLayer } from '@deck.gl/core';
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
+import ScaleBarLayer from '../ScaleBarLayer';
 import { padColorsAndSliders } from '../utils';
 
 /**
@@ -92,7 +93,11 @@ export default class VivViewerLayer extends CompositeLayer {
           (!viewportId || this.context.viewport.id === viewportId)),
       z: numLevels - 1
     });
-    const layers = [baseLayer, tiledLayer];
+    const scaleBarLayer = new ScaleBarLayer(this.props, {
+      id: `Scale-bar-layer-${id}`,
+      physicalSizeXUnit: '0.325 µm'
+    });
+    const layers = [baseLayer, tiledLayer, scaleBarLayer];
     return layers;
   }
 }
