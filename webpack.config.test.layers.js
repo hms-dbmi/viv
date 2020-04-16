@@ -4,19 +4,14 @@ const path = require('path');
 const WebpackTapeRun = require('webpack-tape-run');
 
 module.exports = {
-  target: 'web',
   devtool: 'source-map',
-  entry: ['./tests/index.spec.js'],
+  entry: ['./tests/layers/index.spec.js'],
   node: {
     fs: 'empty'
   },
   output: {
     path: path.resolve(__dirname, './test_dist'),
     filename: 'test.js'
-  },
-  resolve: {
-    modules: ['node_modules'],
-    extensions: ['*', '.js']
   },
   module: {
     rules: [

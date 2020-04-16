@@ -1,8 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
-import { DetailView } from '../../src/views';
+import { DetailView } from '../../../src/views';
 import { generateViewTests, defaultArguments } from './VivView.spec';
-import { VivViewerLayer } from '../../src/layers';
+import { VivViewerLayer } from '../../../src/layers';
 
 const id = 'detail';
 const detailViewArguments = { ...defaultArguments };

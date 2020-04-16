@@ -2,7 +2,7 @@
 import test from 'tape-catch';
 
 import { zeros, NestedArray } from 'zarr';
-import { ZarrLoader } from '../../src/loaders';
+import { ZarrLoader } from '../../../src/loaders';
 
 test('Test zarr non-rgb image loader', async t => {
   const z = await zeros([2, 500, 250], {
