@@ -12,3 +12,8 @@ export function isInTileBounds({
   const zInBounds = z >= 0 && z < numLevels;
   return xInBounds && yInBounds && zInBounds;
 }
+
+export function guessRgb(shape) {
+  const lastDimSize = shape[shape.length - 1];
+  return shape.length > 2 && (lastDimSize === 3 || lastDimSize === 4);
+}

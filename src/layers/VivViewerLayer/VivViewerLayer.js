@@ -1,8 +1,23 @@
 import { CompositeLayer } from '@deck.gl/core';
-// eslint-disable-next-line import/extensions
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
 import { padColorsAndSliders } from '../utils';
+
+/**
+ * This layer generates a VivViewerLayer (tiled) and a StaticImageLayer (background for the tiled layer)
+ * @param {Object} props
+ * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
+ * @param {Array} props.colorValues List of [r, g, b] values for each channel.
+ * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @param {number} props.opacity Opacity of the layer.
+ * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
+ * @param {string} props.viewportId Id for the current view.
+ * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getTile`, `dtype`, `numLevels`, and `tileSize`, and `getRaster`.
+ * @param {Array} props.loaderSelection Selection to be used for fetching data.
+ * @param {String} props.id Unique identifier for this layer.
+ * @param {String} props.onTileError Custom override for handle tile fetching errors.
+ */
 
 export default class VivViewerLayer extends CompositeLayer {
   renderLayers() {
@@ -11,6 +26,7 @@ export default class VivViewerLayer extends CompositeLayer {
       sliderValues,
       colorValues,
       channelIsOn,
+      loaderSelection,
       domain,
       opacity,
       colormap,
@@ -26,12 +42,19 @@ export default class VivViewerLayer extends CompositeLayer {
       domain,
       dtype
     });
-    const getTileData = ({ x, y, z }) => {
-      return loader.getTile({
+    const getTileData = async ({ x, y, z }) => {
+      const { data, width, height } = await loader.getTile({
         x,
         y,
-        z: -z
+        z: -z,
+        loaderSelection
       });
+      if (width !== tileSize || height !== tileSize) {
+        throw Error(
+          `Tile data  { width: ${width}, height: ${height} } does not match tilesize: ${tileSize}`
+        );
+      }
+      return data;
     };
     const tiledLayer = new VivViewerLayerBase({
       id: `Tiled-Image-${id}`,
@@ -48,7 +71,7 @@ export default class VivViewerLayer extends CompositeLayer {
       // needs to be re-created. We want to trigger this behavior if the loader changes.
       // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
       updateTriggers: {
-        getTileData: [loader]
+        getTileData: [loader, loaderSelection]
       },
       onTileError: onTileError || loader.onTileError,
       opacity,

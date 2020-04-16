@@ -8,7 +8,7 @@ body {
   background-color: black;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.viv-error p {
+  color: red;
+  margin: 15px;
 }

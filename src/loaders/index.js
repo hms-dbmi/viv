@@ -7,30 +7,33 @@ import OMETiffLoader from './OMETiffLoader';
 
 import { range } from '../layers/VivViewerLayer/utils';
 
-export async function createZarrPyramid({
-  rootZarrUrl,
-  minZoom,
+export async function createZarrLoader({
+  url,
   dimensions,
-  isRgb = false,
-  scale = 1
+  isPyramid,
+  isRgb,
+  scale,
+  translate
 }) {
-  // Not necessary but this is something we should be parsing from metadata
-  const maxLevel = -minZoom;
-  if (maxLevel > 0) {
-    const zarrStores = range(maxLevel).map(i => {
-      const config = {
-        store: `${rootZarrUrl}/${String(i).padStart(2, '0')}`
-      };
-      return openArray(config);
-    });
-    const connections = await Promise.all(zarrStores);
-    return new ZarrLoader(connections, isRgb, scale, dimensions);
+  let data;
+  if (isPyramid) {
+    const metadataUrl = `${url}${url.slice(-1) === '/' ? '' : '/'}.zmetadata`;
+    const response = await fetch(metadataUrl);
+    const { metadata } = await response.json();
+    const paths = Object.keys(metadata)
+      .filter(metaKey => metaKey.includes('.zarray'))
+      .map(arrMetaKeys => arrMetaKeys.slice(0, -7));
+    data = Promise.all(paths.map(path => openArray({ store: url, path })));
+  } else {
+    data = openArray({ store: url });
   }
-  const connection = await openArray({
-    store: rootZarrUrl
+  return new ZarrLoader({
+    data: await data,
+    dimensions,
+    scale,
+    translate,
+    isRgb
   });
-  const loader = new ZarrLoader(connection, isRgb, scale, dimensions);
-  return loader;
 }
 
 export async function createTiffPyramid({ channelUrls }) {

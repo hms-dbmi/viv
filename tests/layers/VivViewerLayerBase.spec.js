@@ -2,9 +2,9 @@
 import test from 'tape-catch';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
-import StaticImageLayer from '../src/layers/StaticImageLayer';
+import VivViewerLayerBase from '../../src/layers/VivViewerLayer/VivViewerLayerBase';
 
-test('StaticImageLayer', t => {
+test('VivViewerLayerBase', t => {
   const view = new OrthographicView({
     id: 'ortho',
     controller: true,
@@ -14,31 +14,45 @@ test('StaticImageLayer', t => {
     zoom: 0
   });
   const testCases = generateLayerTests({
-    Layer: StaticImageLayer,
+    Layer: VivViewerLayerBase,
     assert: t.ok,
     sampleProps: {
-      sliderValues: [
-        [0, 10],
-        [0, 10]
-      ],
+      sliderValues: [0, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
       colorValues: [
-        [0, 1, 1],
-        [0, 1, 1]
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
       ],
-      channelIsOn: [true, false],
-      loader: {
-        getRaster: async () => ({
-          data: [new Uint32Array([0, 2, 1, 2]), new Uint32Array([1, 2, 1, 2])],
-          width: 2,
-          height: 2
-        }),
-        dtype: '<u4'
-      }
+      tileSize: 2,
+      imageWidth: 4,
+      imageHeight: 4,
+      dtype: '<u4',
+      // eslint-disable-next-line no-unused-vars
+      getTileData: ({ x, y, z }) =>
+        new Promise(() => [new Uint32Array([0, 1, 2, 3])])
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
   });
   testLayer({
-    Layer: StaticImageLayer,
+    Layer: VivViewerLayerBase,
     testCases,
     onError: t.notOkimport,
     viewport: view.makeViewport({

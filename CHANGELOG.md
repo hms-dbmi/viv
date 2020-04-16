@@ -6,6 +6,31 @@
 
 ### Changed
 
+## 0.1.6
+
+### Added
+
+- New classes for views/viewers
+- Zoom/pan lock buttons and linked views in demo
+
+### Changed
+
+- Refactored VivViewer to take in arbitrary views/layers
+
+## 0.1.5
+
+### Added
+
+- Add `loaderSelection` as prop for `VivViewerLayer`. This parameter is passed to `loader.getTile` and `loader.getRaster` in addtion to `x`, `y` and `z`.
+- Display warning for Safari users
+
+### Changed
+
+- Refactored demo to allow various channels and change selection
+- Use reducer for handling channel state in Demo
+- Use Material UI for demo components, and showcase all viv features
+- Update the IMAGE_RENDERING doc
+
 ## 0.1.4
 
 ### Added
