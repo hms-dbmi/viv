@@ -16,6 +16,7 @@
 ### Changed
 
 - Refactored VivViewer to take in arbitrary views/layers
+- Check for `loader.getRaster` in `VivViewerLayer` before rendering `StaticImageLayer` base
 
 ## 0.1.5
 
