@@ -2,35 +2,6 @@ import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { LineLayer } from '@deck.gl/layers';
 import * as Qty from 'js-quantities';
 
-const defaultProps = {
-  pickable: false,
-  loader: {
-    type: 'object',
-    value: {
-      getRaster: async () => ({ data: [], height: 0, width: 0 }),
-      getRasterSize: () => ({ height: 0, width: 0 }),
-      dtype: '<u2'
-    },
-    compare: true
-  },
-  id: { type: 'string', value: '', compare: true },
-  boundingBox: {
-    type: 'array',
-    value: [
-      [0, 0],
-      [0, 1],
-      [1, 1],
-      [1, 0]
-    ],
-    compare: true
-  },
-  boundingBoxColor: { type: 'array', value: [255, 0, 0], compare: true },
-  boundingBoxOutlineWidth: { type: 'number', value: 50, compare: true },
-  viewportOutlineColor: { type: 'array', value: [255, 190, 0], compare: true },
-  viewportOutlineWidth: { type: 'number', value: 400, compare: true },
-  overviewScale: { type: 'number', value: 1, compare: true }
-};
-
 /**
  * This layer creates a dynamically sizing scale bar using three PolygonLayers.
  * @param {Object} props
@@ -80,4 +51,3 @@ export default class ScaleBarLayer extends CompositeLayer {
 }
 
 ScaleBarLayer.layerName = 'ScaleBarLayer';
-ScaleBarLayer.defaultProps = defaultProps;
