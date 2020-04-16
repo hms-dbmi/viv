@@ -1,22 +1,34 @@
 import OMEXML from './omeXML';
-import { MAX_SLIDERS_AND_CHANNELS } from '../layers/constants';
+import { isInTileBounds } from './utils';
+
+function getOffsets(omexml) {
+  const { metadataOMEXML } = omexml;
+  if (!metadataOMEXML['ns2:StructuredAnnotations']) {
+    return '[]';
+  }
+  const annotation =
+    metadataOMEXML['ns2:StructuredAnnotations']['ns2:XMLAnnotation'][
+      'ns2:Value'
+    ]['ns3:OriginalMetadata'];
+  return annotation['ns3:Key'] === 'IFD_Offsets' ? annotation['ns3:Value'] : [];
+}
 
 export default class OMETiffLoader {
-  constructor(tiff, pool, firstImage) {
+  constructor(tiff, pool, firstImage, omexmlString, offsets) {
     this.pool = pool;
     this.tiff = tiff;
+    this.type = 'ome-tiff';
     // get first image's description, which contains OMEXML
-    const { ImageDescription } = firstImage.fileDirectory;
-    this.OMEXML = new OMEXML(ImageDescription);
-    this.minZoom = -1 * this.OMEXML.getNumberOfImages();
-    this.channelNames = this.OMEXML.getChannelNames();
-    this.imageWidth = this.OMEXML.SizeX;
-    this.imageHeight = this.OMEXML.SizeY;
-    // this is spatial z, not to be confused with pyramidal z below in getTile
-    this.chunkIndex = [];
-    this.isPyramid = !!this.minZoom;
-    const type = this.OMEXML.Type;
-    // this.tileSize = firstImage.getTileWidth();
+    this.omexml = new OMEXML(omexmlString);
+    this.offsets = offsets || JSON.parse(getOffsets(this.omexml));
+    this.numLevels = this.omexml.getNumberOfImages();
+    this.channelNames = this.omexml.getChannelNames();
+    console.log(this.channelNames);
+    this.width = this.omexml.SizeX;
+    this.height = this.omexml.SizeY;
+    this.tileSize = firstImage.getTileWidth();
+    this.isPyramid = !!this.numLevels;
+    const type = this.omexml.Type;
     if (type === 'uint8') {
       this.dtype = '<u1';
     }
@@ -31,60 +43,27 @@ export default class OMETiffLoader {
     }
   }
 
-  get vivMetadata() {
-    // Get other properties for viewer
-    const { minZoom, imageWidth, imageHeight, tileSize, dtype } = this;
-    return {
-      minZoom,
-      imageWidth,
-      imageHeight,
-      tileSize,
-      dtype
-    };
-  }
-
-  // z and t are both numbers while c should be a channel name
-  addIndex({ z, c, t }) {
-    if (this.chunkIndex.length < MAX_SLIDERS_AND_CHANNELS) {
-      this.chunkIndex.push({ z, c, t });
-    } else {
-      throw new Error(
-        `Index is at full capacity and cannot accept ${{ z, c, t }}`
-      );
-    }
-  }
-
-  // z and t are both numbers while c should be a channel name
-  removeIndex({ z, c, t }) {
-    const index = this.chunkIndex.indexOf({ z, c, t });
-    if (index > -1) {
-      this.chunkIndex.splice(this.chunkIndex.indexOf({ z, c, t }), 1);
-    } else {
-      throw new Error(`${{ z, c, t }} is not in index`);
-    }
-  }
-
-  _getIFDIndex({ z, c, t }) {
-    const cIndex = this.channelNames.indexOf(c);
-    const { SizeZ, SizeT, SizeC, DimensionOrder } = this.OMEXML;
+  _getIFDIndex({ z = 0, channel, time = 0 }) {
+    const channelndex = this.channelNames.indexOf(channel);
+    const { SizeZ, SizeT, SizeC, DimensionOrder } = this.omexml;
     switch (DimensionOrder) {
       case 'XYZCT': {
-        return t * SizeZ * SizeC + cIndex * SizeZ + z;
+        return time * SizeZ * SizeC + channelndex * SizeZ + z;
       }
       case 'XYZTC': {
-        return cIndex * SizeZ * SizeT + t * SizeZ + z;
+        return channelndex * SizeZ * SizeT + time * SizeZ + z;
       }
       case 'XYCTZ': {
-        return z * SizeC * SizeT + t * SizeC + cIndex;
+        return z * SizeC * SizeT + time * SizeC + channelndex;
       }
       case 'XYCZT': {
-        return t * SizeC * SizeZ + z * SizeC + cIndex;
+        return time * SizeC * SizeZ + z * SizeC + channelndex;
       }
       case 'XYTCZ': {
-        return z * SizeT * SizeC + cIndex * SizeT + t;
+        return z * SizeT * SizeC + channelndex * SizeT + time;
       }
       case 'XYTZC': {
-        return cIndex * SizeT * SizeZ + z * SizeT + t;
+        return channelndex * SizeT * SizeZ + z * SizeT + time;
       }
       default: {
         throw new Error('Dimension order is required for OMETIFF');
@@ -92,27 +71,70 @@ export default class OMETiffLoader {
     }
   }
 
-  async getTile({ x, y, z }) {
-    const tileRequests = this.chunkIndex.map(async index => {
-      const imageIndex = this._getIFDIndex(index);
-      const image = await this.tiff.getImage(imageIndex + z);
+  /**
+   * Handles `onTileError` within deck.gl
+   * @param {Error} err Error thrown in tile layer
+   */
+  // eslint-disable-next-line class-methods-use-this
+  onTileError(err) {
+    console.error(err);
+  }
+
+  async getTile({ x, y, z, loaderSelection }) {
+    if (!this._tileInBounds({ x, y, z })) {
+      return { data: null, width: this.tileSize, height: this.tileSize };
+    }
+    const { tiff, offsets } = this;
+    const tileRequests = loaderSelection.map(async index => {
+      const { SizeZ, SizeT, SizeC } = this.omexml;
+      const pyramidIndex = z * SizeZ * SizeT * SizeC + index;
+
+      if (!tiff.ifdRequests[pyramidIndex] && offsets) {
+        tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
+          offsets[pyramidIndex]
+        );
+      }
+      // Offset by resolution of the pyramid, `z * SizeZ * SizeT * SizeC`
+      const image = await tiff.getImage(pyramidIndex);
       return this._getChannel({ image, x, y });
     });
     const tiles = await Promise.all(tileRequests);
-    return tiles;
+    return { data: tiles, width: this.tileSize, height: this.tileSize };
   }
 
-  async getRaster() {
-    // hardcoded
+  async getRaster({ z = 0, loaderSelection }) {
+    const { tiff, offsets, omexml } = this;
+    const { SizeZ, SizeT, SizeC } = omexml;
     const rasters = await Promise.all(
-      this.chunkIndex.map(async index => {
-        const imageIndex = this._getIFDIndex(index);
-        const image = await this.tiff.getImage(imageIndex);
+      loaderSelection.map(async index => {
+        const pyramidIndex = z * SizeZ * SizeT * SizeC + index;
+        if (!tiff.ifdRequests[pyramidIndex] && offsets) {
+          tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
+            offsets[pyramidIndex]
+          );
+        }
+        const image = await tiff.getImage(pyramidIndex);
         const raster = await image.readRasters();
         return raster[0];
       })
     );
-    return rasters;
+    // Get first selection size as proxy for image size.
+    const image = await tiff.getImage(
+      z * SizeZ * SizeT * SizeC + loaderSelection[0]
+    );
+    const width = image.getWidth();
+    const height = image.getHeight();
+    return { data: rasters, width, height };
+  }
+
+  // This information is inferrable from the provided omexml.
+  // This is only used by the OverviewLayer for inferring the box size.
+  // It is NOT the actual pixel-size but rather the image size
+  // without any padding.
+  getRasterSize({ z }) {
+    const { width, height } = this;
+    // eslint-disable-next-line no-bitwise
+    return { height: (height >> z) - 2, width: (width >> z) - 2 };
   }
 
   async _getChannel({ image, x, y }) {
@@ -125,5 +147,32 @@ export default class OMETiffLoader {
       (is16Bits && new Uint16Array(tile.data)) ||
       (is32Bits && new Uint32Array(tile.data));
     return data;
+  }
+
+  serializeSelection(loaderSelectionObjs) {
+    // Wrap selection in array if only one is provided
+    const selectionObjs = Array.isArray(loaderSelectionObjs)
+      ? loaderSelectionObjs
+      : [loaderSelectionObjs];
+    const serialized = selectionObjs.map(obj => this._serialize(obj));
+    return serialized;
+  }
+
+  _serialize(selectionObj) {
+    const serializedSelection = this._getIFDIndex(selectionObj);
+    return serializedSelection;
+  }
+
+  _tileInBounds({ x, y, z }) {
+    const { width, height, tileSize, numLevels } = this;
+    return isInTileBounds({
+      x,
+      y,
+      z,
+      width,
+      height,
+      tileSize,
+      numLevels
+    });
   }
 }

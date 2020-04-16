@@ -41,8 +41,7 @@ export async function createTiffPyramid({ channelUrls }) {
   const tiffConnections = channelUrls.map(async url => {
     const tiff = await fromUrl(url);
     // Get the first image and check its size.
-    const pyramid = await tiff.parseFileDirectories();
-    const maxLevel = pyramid.length;
+    const maxLevel = await tiff.getImageCount();
     const pyramidLevels = range(maxLevel).map(i => tiff.getImage(i));
     const resolvedConnections = await Promise.all(pyramidLevels);
     return resolvedConnections;
@@ -54,10 +53,15 @@ export async function createTiffPyramid({ channelUrls }) {
 
 export async function createOMETiffLoader({ url }) {
   const tiff = await fromUrl(url);
-  tiff.firstIFDOffset = 16
   const firstImage = await tiff.getImage(0);
+  const res = await fetch(url.replace(/tif(f?)/gi, 'xml'));
   const pool = new Pool();
-  return new OMETiffLoader(tiff, pool, firstImage);
+  if (res.status !== 404) {
+    const omexmlString = await res.text();
+    return new OMETiffLoader(tiff, pool, firstImage, omexmlString);
+  }
+  const omexmlString = firstImage.fileDirectory.ImageDescription;
+  return new OMETiffLoader(tiff, pool, firstImage, omexmlString);
 }
 
 export { ZarrLoader, TiffPyramidLoader, OMETiffLoader };

@@ -1,5 +1,5 @@
 const channelNames = [
-  'DAPI - Hoechst (nuclei)',
+  'DAPI - Hoescht (nuclei)',
   'FITC - Laminin (basement membrane)',
   'Cy3 - Synaptopodin (glomerular)',
   'Cy5 - THP (thick limb)'
@@ -97,40 +97,53 @@ const staticInfo = {
 };
 
 const rootStaticTiffUrl =
-  'https://vitessce-demo-data.storage.googleapis.com/test-data/codex/antigen.ome.tiff';
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/antigen_exprs.ome.tiff';
 
 const staticTiffInfo = {
-  isPublic: false,
+  url: rootStaticTiffUrl,
+  dimensions: [
+    {
+      field: 'channel',
+      type: 'nominal',
+      values: [
+        'Actin',
+        'CD107a',
+        'CD11c',
+        'CD20',
+        'CD21',
+        'CD31',
+        'CD3e',
+        'CD4',
+        'CD45',
+        'CD45RO',
+        'CD68',
+        'CD8',
+        'DAPI_2',
+        'E_CAD',
+        'Histone_H3',
+        'Ki67',
+        'Pan_CK',
+        'Podoplanin'
+      ]
+    },
+    { field: 'y', type: 'quantitative', values: null },
+    { field: 'x', type: 'quantitative', values: null },
+    { field: 'time', type: 'number', values: null },
+    { field: 'z', type: 'number', values: null }
+  ],
   initialViewState: {
     zoom: -1,
     target: [1000, 500]
   },
-  channelNames: [
-    'Cy3 - Synaptopodin (glomerular)',
-    'Cy5 - THP (thick limb)',
-    'DAPI - Hoescht (nuclei)',
-    'FITC - Laminin (basement membrane)'
-  ],
-  url: rootStaticTiffUrl
-};
-
-const rootRGBTiffUrl =
-  'https://vitessce-demo-data.storage.googleapis.com/test-data/tumor_001.tif';
-
-const rgbTiffInfo = {
   isPublic: false,
-  initialViewState: {
-    zoom: -6,
-    target: [30000, 10000]
-  },
-  channelNames: [],
-  url: rootRGBTiffUrl
+  isPyramid: false,
+  selections: [],
+  description: 'static tiff'
 };
 
 export default {
   zarr: zarrInfo,
   tiff: tiffInfo,
   static: staticInfo,
-  'static tiff': staticTiffInfo,
-  rgb: rgbTiffInfo
+  'static tiff': staticTiffInfo
 };

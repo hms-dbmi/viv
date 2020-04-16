@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
-import { createTiffPyramid, createZarrLoader } from '../../src';
+import {
+  createTiffPyramid,
+  createZarrLoader,
+  createOMETiffLoader
+} from '../../src';
 
 import { COLOR_PALLETE, INITIAL_SLIDER_VALUE } from './constants';
 
@@ -23,6 +27,12 @@ export async function createLoader(type, infoObj) {
     }
     case 'static': {
       const loader = await createZarrLoader(infoObj);
+      return loader;
+    }
+    case 'static tiff': {
+      const { url } = infoObj;
+
+      const loader = await createOMETiffLoader({ url });
       return loader;
     }
     default:
