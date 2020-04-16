@@ -81,7 +81,7 @@ function App() {
       const { field, values } = channelDim;
       const dimIndex = values.indexOf(value);
       const [serialized] = loader.serializeSelection({
-        [field]: dimIndex
+        [field]: value
       });
       dispatch({
         type,
@@ -94,10 +94,14 @@ function App() {
   };
 
   const handleChannelAdd = () => {
-    const [channelDim] = sources[sourceName].dimensions;
+    const { dimensions, selections } = sources[sourceName];
+    const [channelDim] = dimensions;
     dispatch({
       type: 'ADD_CHANNEL',
-      value: { name: channelDim.values[0], selection: [0, 0, 0] }
+      value: {
+        name: channelDim.values[0],
+        selection: loader.serializeSelection([selections[0]])
+      }
     });
   };
 

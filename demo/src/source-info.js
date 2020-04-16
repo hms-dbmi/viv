@@ -137,7 +137,9 @@ const staticTiffInfo = {
   },
   isPublic: false,
   isPyramid: false,
-  selections: [],
+  selections: ['DAPI_2', 'E_CAD', 'Histone_H3', 'Ki67'].map(channel => {
+    return { channel, time: 0, z: 0 };
+  }),
   description: 'static tiff'
 };
 

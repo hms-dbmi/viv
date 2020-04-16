@@ -23,7 +23,6 @@ export default class OMETiffLoader {
     this.offsets = offsets || JSON.parse(getOffsets(this.omexml));
     this.numLevels = this.omexml.getNumberOfImages();
     this.channelNames = this.omexml.getChannelNames();
-    console.log(this.channelNames);
     this.width = this.omexml.SizeX;
     this.height = this.omexml.SizeY;
     this.tileSize = firstImage.getTileWidth();
@@ -43,6 +42,13 @@ export default class OMETiffLoader {
     }
   }
 
+  /**
+   * Returns an IFD index for a given loader selection.
+   * @param {number} z Z axis selection.
+   * @param {number} time Time axis selection.
+   * @param {String} channel Channel axis selection.
+   * @returns {number} IFD index.
+   */
   _getIFDIndex({ z = 0, channel, time = 0 }) {
     const channelndex = this.channelNames.indexOf(channel);
     const { SizeZ, SizeT, SizeC, DimensionOrder } = this.omexml;
@@ -80,9 +86,21 @@ export default class OMETiffLoader {
     console.error(err);
   }
 
+  /**
+   * Returns image tiles at tile-position (x, y) at pyramidal level z.
+   * @param {number} x positive integer
+   * @param {number} y positive integer
+   * @param {number} z positive integer (0 === highest zoom level)
+   * @param {Array} loaderSelection, Array of number Arrays specifying channel selections
+   * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize)
+   */
   async getTile({ x, y, z, loaderSelection }) {
     if (!this._tileInBounds({ x, y, z })) {
-      return { data: null, width: this.tileSize, height: this.tileSize };
+      return {
+        data: null,
+        width: this.tileSize,
+        height: this.tileSize
+      };
     }
     const { tiff, offsets } = this;
     const tileRequests = loaderSelection.map(async index => {
@@ -99,9 +117,19 @@ export default class OMETiffLoader {
       return this._getChannel({ image, x, y });
     });
     const tiles = await Promise.all(tileRequests);
-    return { data: tiles, width: this.tileSize, height: this.tileSize };
+    return {
+      data: tiles,
+      width: this.tileSize,
+      height: this.tileSize
+    };
   }
 
+  /**
+   * Returns full image panes (at level z if pyramid)
+   * @param {number} z positive integer (0 === highest zoom level)
+   * @param {Array} loaderSelection, Array of number Arrays specifying channel selections
+   * @returns {Object} data: TypedArray[], width: number, height: number
+   */
   async getRaster({ z = 0, loaderSelection }) {
     const { tiff, offsets, omexml } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
@@ -127,14 +155,23 @@ export default class OMETiffLoader {
     return { data: rasters, width, height };
   }
 
-  // This information is inferrable from the provided omexml.
-  // This is only used by the OverviewLayer for inferring the box size.
-  // It is NOT the actual pixel-size but rather the image size
-  // without any padding.
+  /**
+   * Returns image width and height (at pyramid level z) without fetching data.
+   * This information is inferrable from the provided omexml.
+   * This is only used by the OverviewLayer for inferring the box size.
+   * It is NOT the actual pixel-size but rather the image size
+   * without any padding.
+   * @param {number} z positive integer (0 === highest zoom level)
+   * @returns {Object} width: number, height: number
+   */
   getRasterSize({ z }) {
     const { width, height } = this;
-    // eslint-disable-next-line no-bitwise
-    return { height: (height >> z) - 2, width: (width >> z) - 2 };
+    /* eslint-disable no-bitwise */
+    return {
+      height: (height >> z) - 2,
+      width: (width >> z) - 2
+    };
+    /* eslint-disable no-bitwise */
   }
 
   async _getChannel({ image, x, y }) {
@@ -149,6 +186,21 @@ export default class OMETiffLoader {
     return data;
   }
 
+  /**
+   * Converts Array of loader selection objects into an IFD index.
+   *
+   * Ex.
+   *  const loaderSelectionObj = [
+   *     { time: 1, channel: 'a', z: 0 },
+   *     { time: 1, channel: 'b', z: 0 }
+   *  ];
+   *  const serialized = loader.serializeSelection(loaderSelectionObj);
+   *  console.log(serialized);
+   *  // 4, 5
+   *
+   * @param {Array || Object} loaderSelectionObjs Human-interpretable array of desired selection objects
+   * @returns {Array} number[][], IFD indices for selecting an image of the tiff.
+   */
   serializeSelection(loaderSelectionObjs) {
     // Wrap selection in array if only one is provided
     const selectionObjs = Array.isArray(loaderSelectionObjs)
