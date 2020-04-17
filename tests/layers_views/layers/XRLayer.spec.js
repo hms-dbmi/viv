@@ -2,7 +2,7 @@
 import test from 'tape-catch';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
-import XRLayer from '../../src/layers/XRLayer';
+import XRLayer from '../../../src/layers/XRLayer';
 
 test('XRLayer', t => {
   const view = new OrthographicView({

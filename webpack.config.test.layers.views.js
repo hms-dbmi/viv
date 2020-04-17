@@ -5,7 +5,7 @@ const WebpackTapeRun = require('webpack-tape-run');
 
 module.exports = {
   devtool: 'source-map',
-  entry: ['./tests/layers/index.spec.js'],
+  entry: ['./tests/layers_views/index.spec.js'],
   node: {
     fs: 'empty'
   },

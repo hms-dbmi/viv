@@ -2,7 +2,7 @@
 import test from 'tape-catch';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
-import VivViewerLayerBase from '../../src/layers/VivViewerLayer/VivViewerLayerBase';
+import VivViewerLayerBase from '../../../src/layers/VivViewerLayer/VivViewerLayerBase';
 
 test('VivViewerLayerBase', t => {
   const view = new OrthographicView({
