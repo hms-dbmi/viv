@@ -35,7 +35,7 @@ function App() {
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
   const viewSize = useWindowSize();
   const [loader, setLoader] = useState(null);
-  const [sourceName, setSourceName] = useState('static tiff');
+  const [sourceName, setSourceName] = useState('zarr');
   const [colormap, setColormap] = useState('');
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
   const [overviewOn, toggleOverview] = useReducer(v => !v, false);

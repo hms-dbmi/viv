@@ -1,5 +1,5 @@
 const channelNames = [
-  'DAPI - Hoescht (nuclei)',
+  'DAPI - Hoechst (nuclei)',
   'FITC - Laminin (basement membrane)',
   'Cy3 - Synaptopodin (glomerular)',
   'Cy5 - THP (thick limb)'
