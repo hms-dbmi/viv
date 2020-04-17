@@ -174,7 +174,7 @@ function App() {
             </Grid>
           </Grid>
           {!isLoading ? (
-            channelControllers
+            <Grid container>{channelControllers}</Grid>
           ) : (
             <Grid container justify="center">
               <CircularProgress />

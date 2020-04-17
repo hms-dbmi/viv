@@ -83,15 +83,18 @@ export default class VivViewerLayer extends CompositeLayer {
     // minZoom funny business.  We don't use it for the background if we have an opacity
     // paramteter set to anything but 1, but we always use it for situations where
     // we are zoomed out too far.
-    const baseLayer = new StaticImageLayer(this.props, {
-      id: `Background-Image-${id}`,
-      scale: 2 ** (numLevels - 1),
-      visible:
-        opacity === 1 ||
-        (-numLevels > this.context.viewport.zoom &&
-          (!viewportId || this.context.viewport.id === viewportId)),
-      z: numLevels - 1
-    });
+    const implementsGetRaster = typeof loader.getRaster === 'function';
+    const baseLayer =
+      implementsGetRaster &&
+      new StaticImageLayer(this.props, {
+        id: `Background-Image-${id}`,
+        scale: 2 ** (numLevels - 1),
+        visible:
+          opacity === 1 ||
+          (-numLevels > this.context.viewport.zoom &&
+            (!viewportId || this.context.viewport.id === viewportId)),
+        z: numLevels - 1
+      });
     const layers = [baseLayer, tiledLayer];
     return layers;
   }
