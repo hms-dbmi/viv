@@ -12,14 +12,14 @@
     "build-component": "mkdir dist || rm -r dist && rollup --config",
     "build-site": "mkdir dist || rm -r dist && node_modules/.bin/webpack --config webpack.config.js --mode production",
     "start": "node_modules/.bin/webpack-dev-server --mode development --open --hot",
-    "test": "mkdir test_dist || rm -r test_dist && node_modules/.bin/webpack --config webpack.config.test.js --mode development",
+    "test:layers": "mkdir test_dist || rm -r test_dist && node_modules/.bin/webpack --config webpack.config.test.layers.js --mode development",
     "test:watch": "npm run test -- --watch",
     "version": "./version.sh",
     "postversion": "git push && git push --tags",
     "docs": "mkdir -p dist/docs || rm -r dist/docs && mkdir -p dist/docs && documentation build src/** -f html --config documentation.yml --shallow -o dist/docs"
   },
   "pre-push": [
-    "test"
+    "test:layers"
   ],
   "repository": {
     "type": "git",
