@@ -50,26 +50,35 @@ export default class OMETiffLoader {
    * @returns {number} IFD index.
    */
   _getIFDIndex({ z = 0, channel, time = 0 }) {
-    const channelndex = this.channelNames.indexOf(channel);
+    let channelIndex;
+    if (this.channelNames.every(v => !v)) {
+      // Without names, enforce a numeric channel indexing scheme
+      console.warn(
+        'There are no channel names in the OMEXML.  Please use numeric indexing'
+      );
+      channelIndex = channel;
+    } else {
+      channelIndex = this.channelNames.indexOf(channel);
+    }
     const { SizeZ, SizeT, SizeC, DimensionOrder } = this.omexml;
     switch (DimensionOrder) {
       case 'XYZCT': {
-        return time * SizeZ * SizeC + channelndex * SizeZ + z;
+        return time * SizeZ * SizeC + channelIndex * SizeZ + z;
       }
       case 'XYZTC': {
-        return channelndex * SizeZ * SizeT + time * SizeZ + z;
+        return channelIndex * SizeZ * SizeT + time * SizeZ + z;
       }
       case 'XYCTZ': {
-        return z * SizeC * SizeT + time * SizeC + channelndex;
+        return z * SizeC * SizeT + time * SizeC + channelIndex;
       }
       case 'XYCZT': {
-        return time * SizeC * SizeZ + z * SizeC + channelndex;
+        return time * SizeC * SizeZ + z * SizeC + channelIndex;
       }
       case 'XYTCZ': {
-        return z * SizeT * SizeC + channelndex * SizeT + time;
+        return z * SizeT * SizeC + channelIndex * SizeT + time;
       }
       case 'XYTZC': {
-        return channelndex * SizeT * SizeZ + z * SizeT + time;
+        return channelIndex * SizeT * SizeZ + z * SizeT + time;
       }
       default: {
         throw new Error('Dimension order is required for OMETIFF');

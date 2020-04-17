@@ -13,8 +13,12 @@ import glslify from 'rollup-plugin-glslify';
 const pkgObj = require('./package.json');
 
 function getExternals(pkg) {
-  const { peerDependencies = {} } = pkg;
-  return Object.keys(peerDependencies);
+  const { devDependencies = {}, dependencies = {} } = pkg;
+  const externals = Object.keys(devDependencies)
+    .concat(Object.keys(dependencies))
+    .filter(p => p !== 'geotiff');
+  // We only bundle geotiff because of threads.js
+  return externals;
 }
 
 export default {
@@ -33,18 +37,12 @@ export default {
     json(),
     babel({
       exclude: 'node_modules/**',
-      presets: ['@babel/env', '@babel/preset-react']
+      presets: ['@babel/env', '@babel/preset-react'],
+      runtimeHelpers: true
     }),
     glslify({ basedir: 'src/layers/XRLayer' }),
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
-    commonjs({
-      namedExports: {
-        // left-hand side can be an absolute path, a path
-        // relative to the current directory, or the name
-        // of a module in node_modules
-        'node_modules/geotiff/dist/geotiff.bundle.min.js': ['fromUrl', 'Pool']
-      }
-    }),
+    commonjs(),
     // Allow node_modules resolution, so you can use 'external' to control
     // which external modules to include in the bundle
     // https://github.com/rollup/rollup-plugin-node-resolve#usage

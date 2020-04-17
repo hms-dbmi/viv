@@ -4,29 +4,42 @@ import { expect } from 'chai';
 import { zeros, NestedArray } from 'zarr';
 import ZarrLoader from '../../src/loaders/zarrLoader';
 
-describe('Test zarr non-rgb image loader', async () => {
-  const z = await zeros([2, 500, 250], {
-    chunks: [1, 100, 100],
-    dtype: '<i4'
-  });
-  await z.set([0, null, null], 42);
-  await z.set([1, 0, null], NestedArray.arange(250));
-  await z.set([0, null, 2], 1);
-  const dimensions = [
-    { field: 'channel', type: 'nominal', values: ['a', 'b'] },
-    { field: 'y', type: 'quantitative', values: null },
-    { field: 'x', type: 'quantitative', values: null }
-  ];
-  const loader = new ZarrLoader({ data: z, dimensions });
-  const { dtype, numLevels, tileSize } = loader;
-
-  it('Properties test', () => {
+describe('Test zarr non-rgb image loader', () => {
+  it('Properties test', async () => {
+    const z = await zeros([2, 500, 250], {
+      chunks: [1, 100, 100],
+      dtype: '<i4'
+    });
+    await z.set([0, null, null], 42);
+    await z.set([1, 0, null], NestedArray.arange(250));
+    await z.set([0, null, 2], 1);
+    const dimensions = [
+      { field: 'channel', type: 'nominal', values: ['a', 'b'] },
+      { field: 'y', type: 'quantitative', values: null },
+      { field: 'x', type: 'quantitative', values: null }
+    ];
+    const loader = new ZarrLoader({ data: z, dimensions });
+    const { dtype, numLevels, tileSize } = loader;
     expect(dtype).to.equal('<i4');
     expect(numLevels).to.equal(1);
     expect(tileSize).to.equal(100);
   });
 
   it('getTile tests', async () => {
+    const z = await zeros([2, 500, 250], {
+      chunks: [1, 100, 100],
+      dtype: '<i4'
+    });
+    await z.set([0, null, null], 42);
+    await z.set([1, 0, null], NestedArray.arange(250));
+    await z.set([0, null, 2], 1);
+    const dimensions = [
+      { field: 'channel', type: 'nominal', values: ['a', 'b'] },
+      { field: 'y', type: 'quantitative', values: null },
+      { field: 'x', type: 'quantitative', values: null }
+    ];
+    const loader = new ZarrLoader({ data: z, dimensions });
+    const { tileSize } = loader;
     let res = await loader.getTile({ x: 0, y: 0 });
     expect(res.data[0][10]).to.equal(42);
     expect(res.data[0].length).to.equal(tileSize * tileSize);
@@ -38,37 +51,36 @@ describe('Test zarr non-rgb image loader', async () => {
   });
 });
 
-describe('Test zarr pyramid', async () => {
-  const z0 = await zeros([4, 100, 150], {
-    chunks: [1, 10, 10],
-    dtype: '<i4'
-  });
-  await z0.set(null, 0);
+describe('Test zarr pyramid', () => {
+  it('Pyramid tiles have correct dimensions', async () => {
+    const z0 = await zeros([4, 100, 150], {
+      chunks: [1, 10, 10],
+      dtype: '<i4'
+    });
+    await z0.set(null, 0);
 
-  const z1 = await zeros([4, 50, 75], {
-    chunks: [1, 10, 10],
-    dtype: '<i4'
-  });
-  await z1.set(null, 1);
+    const z1 = await zeros([4, 50, 75], {
+      chunks: [1, 10, 10],
+      dtype: '<i4'
+    });
+    await z1.set(null, 1);
 
-  const z2 = await zeros([4, 25, 38], {
-    chunks: [1, 10, 10],
-    dtype: '<i4'
-  });
-  await z2.set(null, 2);
+    const z2 = await zeros([4, 25, 38], {
+      chunks: [1, 10, 10],
+      dtype: '<i4'
+    });
+    await z2.set(null, 2);
 
-  const dimensions = [
-    { field: 'channel', type: 'ordinal', values: ['r', 'g', 'b', 'a'] },
-    { field: 'y', type: 'quantitative', values: null },
-    { field: 'x', type: 'quantitative', values: null }
-  ];
+    const dimensions = [
+      { field: 'channel', type: 'ordinal', values: ['r', 'g', 'b', 'a'] },
+      { field: 'y', type: 'quantitative', values: null },
+      { field: 'x', type: 'quantitative', values: null }
+    ];
 
-  const loader = new ZarrLoader({ data: [z0, z1, z2], dimensions });
-  const { data: baseTiles } = await loader.getTile({ x: 0, y: 0, z: 0 });
-  const { data: level1Tiles } = await loader.getTile({ x: 0, y: 0, z: 1 });
-  const { data: level2Tiles } = await loader.getTile({ x: 0, y: 0, z: 2 });
-
-  it('Pyramid tiles have correct dimensions', () => {
+    const loader = new ZarrLoader({ data: [z0, z1, z2], dimensions });
+    const { data: baseTiles } = await loader.getTile({ x: 0, y: 0, z: 0 });
+    const { data: level1Tiles } = await loader.getTile({ x: 0, y: 0, z: 1 });
+    const { data: level2Tiles } = await loader.getTile({ x: 0, y: 0, z: 2 });
     expect([
       baseTiles.length,
       level1Tiles.length,
