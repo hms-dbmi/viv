@@ -4,6 +4,8 @@
 
 ### Added
 
+- OMETiffLoader for reading ome-tiff files directly
+
 ### Changed
 
 ## 0.1.6
