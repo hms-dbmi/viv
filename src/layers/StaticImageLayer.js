@@ -85,7 +85,6 @@ export default class StaticImageLayer extends CompositeLayer {
       z,
       id
     } = this.props;
-
     const { dtype } = loader;
     const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
       sliderValues,

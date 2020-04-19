@@ -35,6 +35,12 @@ export async function createLoader(type, infoObj) {
       const loader = await createOMETiffLoader({ url });
       return loader;
     }
+    case 'ome tiff': {
+      const { url } = infoObj;
+
+      const loader = await createOMETiffLoader({ url });
+      return loader;
+    }
     default:
       throw Error(`Pyramid type (${type}) is not supported`);
   }
