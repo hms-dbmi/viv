@@ -132,11 +132,10 @@ export default class OMETiffLoader {
       return this._getChannel({ image, x, y });
     });
     const tiles = await Promise.all(tileRequests);
-    const { ImageWidth, ImageLength } = image.fileDirectory;
     return {
       data: tiles,
-      width: Math.min(ImageWidth, tileSize),
-      height: Math.min(ImageLength, tileSize)
+      width: tileSize,
+      height: tileSize
     };
   }
 
