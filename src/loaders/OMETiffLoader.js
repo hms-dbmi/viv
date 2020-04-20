@@ -1,6 +1,8 @@
 import OMEXML from './omeXML';
 import { isInTileBounds } from './utils';
 
+// Credit to https://github.com/zbjornson/node-bswap/blob/master/bswap.js for the implementation.
+// I could not get this to import, and it doesn't appear anyone else can judging by the "Used by" on github.
 function flip16(info) {
   const flipper = new Uint8Array(info.buffer, info.byteOffset, info.length * 2);
   const len = flipper.length;
@@ -8,6 +10,57 @@ function flip16(info) {
     const t = flipper[i];
     flipper[i] = flipper[i + 1];
     flipper[i + 1] = t;
+  }
+}
+
+function flip32(info) {
+  const flipper = new Uint8Array(info.buffer, info.byteOffset, info.length * 4);
+  const len = flipper.length;
+  for (let i = 0; i < len; i += 4) {
+    let t = flipper[i];
+    flipper[i] = flipper[i + 3];
+    flipper[i + 3] = t;
+    t = flipper[i + 1];
+    flipper[i + 1] = flipper[i + 2];
+    flipper[i + 2] = t;
+  }
+}
+
+function flip64(info) {
+  const flipper = new Uint8Array(info.buffer, info.byteOffset, info.length * 8);
+  const len = flipper.length;
+  for (let i = 0; i < len; i += 8) {
+    let t = flipper[i];
+    flipper[i] = flipper[i + 7];
+    flipper[i + 7] = t;
+    t = flipper[i + 1];
+    flipper[i + 1] = flipper[i + 6];
+    flipper[i + 6] = t;
+    t = flipper[i + 2];
+    flipper[i + 2] = flipper[i + 5];
+    flipper[i + 5] = t;
+    t = flipper[i + 3];
+    flipper[i + 3] = flipper[i + 4];
+    flipper[i + 4] = t;
+  }
+}
+
+function flipEndianness(arr) {
+  switch (arr.BYTES_PER_ELEMENT) {
+    case 1:
+      // no op
+      return;
+    case 2:
+      flip16(arr);
+      break;
+    case 4:
+      flip32(arr);
+      break;
+    case 8:
+      flip64(arr);
+      break;
+    default:
+      throw new Error('Invalid input');
   }
 }
 
@@ -177,7 +230,6 @@ export default class OMETiffLoader {
     );
     const width = image.getWidth();
     const height = image.getHeight();
-    console.log({ data: rasters, width, height });
     return { data: rasters, width, height };
   }
 
@@ -212,7 +264,7 @@ export default class OMETiffLoader {
     // Javascript needs little endian byteorder, so we flip if the data is not.
     // eslint-disable-next-line no-unused-expressions
     if (!image.littleEndian) {
-      flip16(data);
+      flipEndianness(data);
     }
     return data;
   }

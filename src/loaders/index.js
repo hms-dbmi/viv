@@ -4,8 +4,6 @@ import { fromUrl, Pool } from 'geotiff';
 import ZarrLoader from './zarrLoader';
 import OMETiffLoader from './OMETiffLoader';
 
-import { range } from '../layers/VivViewerLayer/utils';
-
 export async function createZarrLoader({
   url,
   dimensions,
@@ -38,17 +36,11 @@ export async function createZarrLoader({
 export async function createOMETiffLoader({ url }) {
   const tiff = await fromUrl(url);
   const firstImage = await tiff.getImage(0);
-  const res = await fetch(url.replace(/ome.tif(f?)/gi, 'json'));
-  const offsets = await res.json();
+  const res = await fetch(url.replace(/ome.tif(f?)/gi, 'offsets.json'));
+  const offsets = res.status !== 404 ? await res.json() : [];
   const pool = new Pool();
   const omexmlString = firstImage.fileDirectory.ImageDescription;
-  return new OMETiffLoader(
-    tiff,
-    pool,
-    firstImage,
-    omexmlString,
-    offsets.offsetValues
-  );
+  return new OMETiffLoader(tiff, pool, firstImage, omexmlString, offsets);
 }
 
 export { ZarrLoader, OMETiffLoader };

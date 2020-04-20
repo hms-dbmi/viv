@@ -1,9 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  createTiffPyramid,
-  createZarrLoader,
-  createOMETiffLoader
-} from '../../src';
+import { createZarrLoader, createOMETiffLoader } from '../../src';
 
 import { COLOR_PALLETE, INITIAL_SLIDER_VALUE } from './constants';
 
