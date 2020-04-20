@@ -1,7 +1,12 @@
 import { VivViewerLayer, StaticImageLayer } from './layers';
 import { VivViewer, PictureInPictureViewer, SideBySideViewer } from './viewers';
 import { VivView, OverviewView, DetailView, SideBySideView } from './views';
-import { createZarrLoader, ZarrLoader, createOMETiffLoader } from './loaders';
+import {
+  createZarrLoader,
+  ZarrLoader,
+  createOMETiffLoader,
+  OMETiffLoader
+} from './loaders';
 
 export {
   VivViewerLayer,
@@ -14,6 +19,7 @@ export {
   DetailView,
   StaticImageLayer,
   ZarrLoader,
+  OMETiffLoader,
   createOMETiffLoader,
   createZarrLoader
 };
