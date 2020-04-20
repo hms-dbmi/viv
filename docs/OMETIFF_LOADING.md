@@ -13,7 +13,7 @@ const loader = await createOMETiffLoader({ url });
 A bit is going on under the hood here, though. Here are some of those things:
 
 1. First and foremost, if the `tiff` has many channels, then you will need to provide the offsets to each IFD.  
-   The `createOMETiffLoader` function is very opinionated and expects to find them at the same url as the `tiff` except that `ome.tiff` is replaced by `offsets.json` i.e `https://vitessce-demo-data.storage.googleapis.com/test-data/deflate_no_legacy/spraggins.bioformats.raw2ometiff.offsets.json`. To get this information, you may use [this docker container](https://hub.docker.com/r/hubmap/portal-container-ome-tiff-offsets) and push the output to the url. Please use `v0.0.2` or later.
+   The `createOMETiffLoader` function is very opinionated and expects to find them at the same url as the `tiff` except that `ome.tiff` is replaced by `offsets.json` i.e `https://vitessce-demo-data.storage.googleapis.com/test-data/deflate_no_legacy/spraggins.bioformats.raw2ometiff.offsets.json`. To get this information, you may use [this docker container](https://hub.docker.com/r/hubmap/portal-container-ome-tiff-offsets) and push the output to the url.
 
 2. Related to the above, if your `tiff` is a pyramid from `bioformats`, then there are two potential routes:
 
