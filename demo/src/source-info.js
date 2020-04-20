@@ -172,7 +172,7 @@ const remoteBFTiff = {
     .map(channel => {
       return { channel, time: 0, z: 0 };
     }),
-  description: 'bf tiff'
+  description: 'Tonsil Legacy Bioformats Pyramid Tiff'
 };
 
 export default {
