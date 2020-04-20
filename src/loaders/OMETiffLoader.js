@@ -64,6 +64,9 @@ function flipEndianness(arr) {
   }
 }
 
+/**
+ * This class serves as a wrapper for fetching tiff data from a file server.
+ * */
 export default class OMETiffLoader {
   constructor(tiff, pool, firstImage, omexmlString, offsets) {
     this.pool = pool;
