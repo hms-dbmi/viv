@@ -56,7 +56,6 @@ export async function createOMETiffLoader({ url }) {
   const firstImage = await tiff.getImage(0);
   const res = await fetch(url.replace(/ome.tif(f?)/gi, 'json'));
   const offsets = await res.json();
-  console.log(url.replace(/ome.tif(f?)/gi, 'json'));
   const pool = new Pool();
   const omexmlString = firstImage.fileDirectory.ImageDescription;
   return new OMETiffLoader(

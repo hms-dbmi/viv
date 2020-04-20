@@ -43,18 +43,13 @@ export default class VivViewerLayer extends CompositeLayer {
       dtype
     });
     const getTileData = async ({ x, y, z }) => {
-      const { data, width, height } = await loader.getTile({
+      const tile = await loader.getTile({
         x,
         y,
         z: -z,
         loaderSelection
       });
-      if (width !== tileSize || height !== tileSize) {
-        throw Error(
-          `Tile data  { width: ${width}, height: ${height} } does not match tilesize: ${tileSize}`
-        );
-      }
-      return data;
+      return tile;
     };
     const tiledLayer = new VivViewerLayerBase({
       id: `Tiled-Image-${id}`,

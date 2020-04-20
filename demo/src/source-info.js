@@ -1,3 +1,5 @@
+import { range } from '../../src/layers/VivViewerLayer/utils';
+
 const channelNames = [
   'DAPI - Hoechst (nuclei)',
   'FITC - Laminin (basement membrane)',
@@ -181,10 +183,41 @@ const omeTiffInfo = {
   description: 'ome tiff'
 };
 
+const remoteBFTiffUrl =
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/TONSIL-1_40X.ome.tif';
+
+const remoteBFTiff = {
+  url: remoteBFTiffUrl,
+  initialViewState: {
+    zoom: -3,
+    target: [5000, 5000]
+  },
+  dimensions: [
+    {
+      field: 'channel',
+      type: 'nominal',
+      values: range(47).map(i => `Channel ${i}`)
+    },
+    { field: 'y', type: 'quantitative', values: null },
+    { field: 'x', type: 'quantitative', values: null },
+    { field: 'time', type: 'number', values: null },
+    { field: 'z', type: 'number', values: null }
+  ],
+  isPublic: false,
+  isPyramid: false,
+  selections: range(4)
+    .map(i => `Channel ${i}`)
+    .map(channel => {
+      return { channel, time: 0, z: 0 };
+    }),
+  description: 'bf tiff'
+};
+
 export default {
   zarr: zarrInfo,
   tiff: tiffInfo,
   static: staticInfo,
   'static tiff': staticTiffInfo,
-  'ome tiff': omeTiffInfo
+  'ome tiff': omeTiffInfo,
+  'bf tiff': remoteBFTiff
 };

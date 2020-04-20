@@ -102,15 +102,13 @@ export default class StaticImageLayer extends CompositeLayer {
       scale
     });
     return new XRLayer({
-      channelData: Promise.resolve(data),
+      channelData: Promise.resolve({ data, width, height }),
       bounds,
       sliderValues: paddedSliderValues,
       colorValues: paddedColorValues,
       id: `XR-Static-Layer-${0}-${height}-${width}-${0}-${z}-${id}`,
       pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-      width,
-      height,
       opacity,
       visible,
       dtype,

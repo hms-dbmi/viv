@@ -8,11 +8,9 @@ export function renderSubLayers(props) {
   const {
     bbox: { left, top, right, bottom }
   } = props.tile;
-
   const {
     colorValues,
     sliderValues,
-    tileSize,
     visible,
     opacity,
     data,
@@ -27,8 +25,6 @@ export function renderSubLayers(props) {
   const xrl = new XRLayer({
     id: `XRLayer-${left}-${top}-${right}-${bottom}-${id}`,
     bounds: [left, bottom, right, top],
-    width: tileSize,
-    height: tileSize,
     channelData: data,
     sliderValues,
     colorValues,
