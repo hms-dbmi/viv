@@ -95,24 +95,24 @@
     "webpack-tape-run": "0.0.7"
   },
   "dependencies": {
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
     "@deck.gl/core": "^8.1.0",
-    "@deck.gl/layers": "^8.1.0",
     "@deck.gl/geo-layers": "^8.1.0",
+    "@deck.gl/layers": "^8.1.0",
     "@deck.gl/mesh-layers": "^8.1.0",
     "@deck.gl/react": "^8.1.0",
+    "geotiff": "git+https://github.com/ilan-gold/geotiff.js.git#master",
     "@loaders.gl/core": "^2.0.2",
     "@loaders.gl/loader-utils": "^2.0.2",
     "@luma.gl/constants": "^8.1.0",
     "@luma.gl/core": "^8.1.0",
     "@luma.gl/shadertools": "^8.1.0",
     "@mapbox/vector-tile": "^1.3.1",
-    "nebula.gl": "^0.17.1",
-    "math.gl": "^3.1.3",
-    "pbf": "^3.2.1",
     "fast-xml-parser": "^3.16.0",
-    "geotiff": "git+https://github.com/ilan-gold/geotiff.js.git#master",
+    "math.gl": "^3.1.3",
+    "nebula.gl": "^0.17.1",
+    "pbf": "^3.2.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
     "zarr": "^0.2.3"
   }
 }

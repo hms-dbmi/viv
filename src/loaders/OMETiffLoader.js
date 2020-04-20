@@ -68,8 +68,8 @@ function flipEndianness(arr) {
  * This class serves as a wrapper for fetching tiff data from a file server.
  * */
 export default class OMETiffLoader {
-  constructor(tiff, pool, firstImage, omexmlString, offsets) {
-    this.pool = pool;
+  constructor(tiff, poolOrDecoder, firstImage, omexmlString, offsets) {
+    this.poolOrDecoder = poolOrDecoder;
     this.tiff = tiff;
     this.type = 'ome-tiff';
     // get first image's description, which contains OMEXML
@@ -202,7 +202,13 @@ export default class OMETiffLoader {
    * @returns {Object} data: TypedArray[], width: number, height: number
    */
   async getRaster({ z, loaderSelection }) {
-    const { tiff, offsets, omexml, isLegacyBioFormatsPyramid } = this;
+    const {
+      tiff,
+      offsets,
+      omexml,
+      isLegacyBioFormatsPyramid,
+      poolOrDecoder
+    } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const rasters = await Promise.all(
       loaderSelection.map(async index => {
@@ -223,7 +229,7 @@ export default class OMETiffLoader {
         }
         const image = await tiff.getImage(pyramidIndex);
         // Flips bits for us for endianness.
-        const raster = await image.readRasters();
+        const raster = await image.readRasters({ pool: poolOrDecoder });
         return raster[0];
       })
     );
@@ -256,7 +262,7 @@ export default class OMETiffLoader {
   }
 
   async _getChannel({ image, x, y }) {
-    const tile = await image.getTileOrStrip(x, y, 0, this.pool);
+    const tile = await image.getTileOrStrip(x, y, 0, this.poolOrDecoder);
     const is8Bits = image.fileDirectory.BitsPerSample[0] === 8;
     const is16Bits = image.fileDirectory.BitsPerSample[0] === 16;
     const is32Bits = image.fileDirectory.BitsPerSample[0] === 32;

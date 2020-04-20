@@ -1,6 +1,6 @@
 import { openArray } from 'zarr';
 // eslint-disable-next-line import/extensions
-import { fromUrl, Pool } from 'geotiff';
+import { fromUrl, Pool, getDecoder } from 'geotiff';
 import ZarrLoader from './zarrLoader';
 import OMETiffLoader from './OMETiffLoader';
 
@@ -33,14 +33,14 @@ export async function createZarrLoader({
   });
 }
 
-export async function createOMETiffLoader({ url }) {
+export async function createOMETiffLoader({ url, noThreads }) {
   const tiff = await fromUrl(url);
   const firstImage = await tiff.getImage(0);
   const res = await fetch(url.replace(/ome.tif(f?)/gi, 'offsets.json'));
   const offsets = res.status !== 404 ? await res.json() : [];
-  const pool = new Pool();
+  const poolOrDecoder = noThreads ? getDecoder(firstImage.fileDirectory) : new Pool();
   const omexmlString = firstImage.fileDirectory.ImageDescription;
-  return new OMETiffLoader(tiff, pool, firstImage, omexmlString, offsets);
+  return new OMETiffLoader(tiff, poolOrDecoder, firstImage, omexmlString, offsets);
 }
 
 export { ZarrLoader, OMETiffLoader };
