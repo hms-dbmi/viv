@@ -166,7 +166,7 @@ const remoteBFTiff = {
     { field: 'z', type: 'number', values: null }
   ],
   isPublic: false,
-  isPyramid: false,
+  isPyramid: true,
   selections: range(4)
     .map(i => `Channel ${i}`)
     .map(channel => {

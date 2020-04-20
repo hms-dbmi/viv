@@ -195,7 +195,14 @@ function App() {
             Add Channel
           </Button>
           <Button
-            disabled={!isPyramid || isLoading || useLinkedView}
+            disabled={
+              !isPyramid ||
+              isLoading ||
+              useLinkedView ||
+              // Bioformats getRaster calls are a bit sketchy.
+              // see: https://github.com/hubmapconsortium/vitessce-image-viewer/issues/144
+              sourceName === 'bf tiff'
+            }
             onClick={toggleOverview}
             variant="outlined"
             size="small"
