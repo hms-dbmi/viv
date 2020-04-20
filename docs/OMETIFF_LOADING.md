@@ -28,3 +28,5 @@ A bit is going on under the hood here, though. Here are some of those things:
 bioformats2raw input.ome.tif output.n5 --resolutions $REASONABLE_RESOLUTION --tile_width 512 --tile_height 512
 raw2ometiff output.n5 output.ome.tif --compression=zlib
 ```
+
+A final note: Viv uses [geotiff.js](https://github.com/geotiffjs/geotiff.js) for fetching data. It a great package and is very fast, thanks to its use of web workers via [threads.js](https://github.com/andywer/threads.js). However, this means that your application needs to handle this as it entails code splitting. Anecdotally, this should work out of the box (more-or-less) with [parcel](https://github.com/parcel-bundler/parcel) and via the [threads-plugin](https://github.com/andywer/threads-plugin) for webpack (which is what the demo uses). We will be opening an issue to disable the use of workers soon and bypass this, although performance will suffer as decoding data will block the ui thread.

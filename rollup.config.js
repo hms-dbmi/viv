@@ -9,15 +9,15 @@ import json from '@rollup/plugin-json';
 import babel from 'rollup-plugin-babel';
 import sourceMaps from 'rollup-plugin-sourcemaps';
 import glslify from 'rollup-plugin-glslify';
+import replace from '@rollup/plugin-replace';
 
 const pkgObj = require('./package.json');
 
 function getExternals(pkg) {
   const { devDependencies = {}, dependencies = {} } = pkg;
-  const externals = Object.keys(devDependencies)
-    .concat(Object.keys(dependencies))
-    .filter(p => p !== 'geotiff');
-  // We only bundle geotiff because of threads.js
+  const externals = Object.keys(devDependencies).concat(
+    Object.keys(dependencies)
+  );
   return externals;
 }
 
@@ -47,6 +47,14 @@ export default {
     // which external modules to include in the bundle
     // https://github.com/rollup/rollup-plugin-node-resolve#usage
     resolve(),
+    replace({
+      delimiters: ['', ''],
+      values: {
+        "require('readable-stream/transform')": "require('stream').Transform",
+        'require("readable-stream/transform")': 'require("stream").Transform',
+        'readable-stream': 'stream'
+      }
+    }),
     // Resolve source maps to the original source
     sourceMaps()
   ]
