@@ -13,37 +13,14 @@ export async function createLoader(type, infoObj) {
       const loader = await createZarrLoader(infoObj);
       return loader;
     }
-    case 'tiff': {
-      const { url, dimensions } = infoObj;
-      const channelNames = dimensions[0].values;
-      const channelUrls = channelNames.map(channel => {
-        // TODO : Need to fix name is source Hoechst is misspelled
-        const typoFixedChannel =
-          channel.slice(0, 4) === 'DAPI' ? 'DAPI - Hoescht (nuclei)' : channel;
-        return `${url}/${typoFixedChannel}.ome.tiff`;
-      });
-      const loader = await createTiffPyramid({ channelUrls });
-      return loader;
-    }
     case 'static': {
       const loader = await createZarrLoader(infoObj);
       return loader;
     }
-    case 'static tiff': {
+    case 'static tiff':
+    case 'bf tiff':
+    case 'tiff': {
       const { url } = infoObj;
-
-      const loader = await createOMETiffLoader({ url });
-      return loader;
-    }
-    case 'ome tiff': {
-      const { url } = infoObj;
-
-      const loader = await createOMETiffLoader({ url });
-      return loader;
-    }
-    case 'bf tiff': {
-      const { url } = infoObj;
-
       const loader = await createOMETiffLoader({ url });
       return loader;
     }

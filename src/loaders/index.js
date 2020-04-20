@@ -1,8 +1,7 @@
 import { openArray } from 'zarr';
 // eslint-disable-next-line import/extensions
-import { fromUrl, Pool, fromFile } from 'geotiff';
+import { fromUrl, Pool } from 'geotiff';
 import ZarrLoader from './zarrLoader';
-import TiffPyramidLoader from './tiffPyramidLoader';
 import OMETiffLoader from './OMETiffLoader';
 
 import { range } from '../layers/VivViewerLayer/utils';
@@ -36,21 +35,6 @@ export async function createZarrLoader({
   });
 }
 
-export async function createTiffPyramid({ channelUrls }) {
-  // Open and resolve all connections asynchronously
-  const tiffConnections = channelUrls.map(async url => {
-    const tiff = await fromUrl(url);
-    // Get the first image and check its size.
-    const maxLevel = await tiff.getImageCount();
-    const pyramidLevels = range(maxLevel).map(i => tiff.getImage(i));
-    const resolvedConnections = await Promise.all(pyramidLevels);
-    return resolvedConnections;
-  });
-  const pool = new Pool();
-  const resolvedTiffConnections = await Promise.all(tiffConnections);
-  return new TiffPyramidLoader(resolvedTiffConnections, pool);
-}
-
 export async function createOMETiffLoader({ url }) {
   const tiff = await fromUrl(url);
   const firstImage = await tiff.getImage(0);
@@ -67,4 +51,4 @@ export async function createOMETiffLoader({ url }) {
   );
 }
 
-export { ZarrLoader, TiffPyramidLoader, OMETiffLoader };
+export { ZarrLoader, OMETiffLoader };

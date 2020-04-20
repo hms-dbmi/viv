@@ -35,7 +35,7 @@ function App() {
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
   const viewSize = useWindowSize();
   const [loader, setLoader] = useState(null);
-  const [sourceName, setSourceName] = useState('ome tiff');
+  const [sourceName, setSourceName] = useState('tiff');
   const [colormap, setColormap] = useState('');
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
   const [overviewOn, toggleOverview] = useReducer(v => !v, false);
@@ -113,7 +113,6 @@ function App() {
         <ChannelController
           name={names[i]}
           channelOptions={dimensions[0].values}
-          disableOptions={sourceName === 'tiff'}
           isOn={isOn[i]}
           sliderValue={sliders[i]}
           colorValue={colors[i]}
@@ -185,9 +184,7 @@ function App() {
             </Grid>
           )}
           <Button
-            disabled={
-              ids.length === MAX_CHANNELS || sourceName === 'tiff' || isLoading
-            }
+            disabled={ids.length === MAX_CHANNELS || isLoading}
             onClick={handleChannelAdd}
             fullWidth
             variant="outlined"

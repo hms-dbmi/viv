@@ -19,7 +19,7 @@ const basePyramidInfo = {
 };
 
 const tiffInfo = {
-  url: `https://vitessce-demo-data.storage.googleapis.com/test-data/vanderbilt.images/vanderbilt.images`,
+  url: `https://vitessce-demo-data.storage.googleapis.com/test-data/deflate_no_legacy/spraggins.bioformats.raw2ometiff.ome.tif`,
   ...basePyramidInfo,
   description: 'Kidney mxIF (OME-TIFF)'
 };
@@ -145,44 +145,6 @@ const staticTiffInfo = {
   description: 'static tiff'
 };
 
-const rootomeTiffUrl =
-  'https://vitessce-demo-data.storage.googleapis.com/test-data/deflate_no_legacy/spraggins.bioformats.raw2ometiff.ome.tif';
-
-const omeTiffInfo = {
-  url: rootomeTiffUrl,
-  initialViewState: {
-    zoom: -6,
-    target: [10000, 10000]
-  },
-  dimensions: [
-    {
-      field: 'channel',
-      type: 'nominal',
-      values: [
-        'DAPI - Hoescht (nuclei)',
-        'FITC - Laminin (basement membrane)',
-        'Cy3 - Synaptopodin (glomerular)',
-        'Cy5 - THP (thick limb)'
-      ]
-    },
-    { field: 'y', type: 'quantitative', values: null },
-    { field: 'x', type: 'quantitative', values: null },
-    { field: 'time', type: 'number', values: null },
-    { field: 'z', type: 'number', values: null }
-  ],
-  isPublic: false,
-  isPyramid: false,
-  selections: [
-    'DAPI - Hoescht (nuclei)',
-    'FITC - Laminin (basement membrane)',
-    'Cy3 - Synaptopodin (glomerular)',
-    'Cy5 - THP (thick limb)'
-  ].map(channel => {
-    return { channel, time: 0, z: 0 };
-  }),
-  description: 'ome tiff'
-};
-
 const remoteBFTiffUrl =
   'https://vitessce-demo-data.storage.googleapis.com/test-data/TONSIL-1_40X.ome.tif';
 
@@ -218,6 +180,5 @@ export default {
   tiff: tiffInfo,
   static: staticInfo,
   'static tiff': staticTiffInfo,
-  'ome tiff': omeTiffInfo,
   'bf tiff': remoteBFTiff
 };

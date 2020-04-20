@@ -177,6 +177,7 @@ export default class OMETiffLoader {
     );
     const width = image.getWidth();
     const height = image.getHeight();
+    console.log({ data: rasters, width, height });
     return { data: rasters, width, height };
   }
 
