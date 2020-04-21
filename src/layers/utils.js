@@ -3,7 +3,7 @@ import {
   DEFAULT_COLOR_OFF,
   MAX_SLIDERS_AND_CHANNELS,
   DTYPE_VALUES
-} from './constants';
+} from '../constants';
 
 export function range(len) {
   return [...Array(len).keys()];

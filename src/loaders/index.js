@@ -1,10 +1,8 @@
 import { openArray } from 'zarr';
 // eslint-disable-next-line import/extensions
-import { fromUrl, Pool } from 'geotiff/dist/geotiff.bundle.min.js';
-
+import { fromUrl, Pool, getDecoder } from 'geotiff';
 import ZarrLoader from './zarrLoader';
-import TiffPyramidLoader from './tiffPyramidLoader';
-import { range } from '../layers/VivViewerLayer/utils';
+import OMETiffLoader from './OMETiffLoader';
 
 export async function createZarrLoader({
   url,
@@ -35,20 +33,20 @@ export async function createZarrLoader({
   });
 }
 
-export async function createTiffPyramid({ channelUrls }) {
-  // Open and resolve all connections asynchronously
-  const tiffConnections = channelUrls.map(async url => {
-    const tiff = await fromUrl(url);
-    // Get the first image and check its size.
-    const pyramid = await tiff.parseFileDirectories();
-    const maxLevel = pyramid.length;
-    const pyramidLevels = range(maxLevel).map(i => tiff.getImage(i));
-    const resolvedConnections = await Promise.all(pyramidLevels);
-    return resolvedConnections;
+export async function createOMETiffLoader({ url, noThreads, offsets }) {
+  const tiff = await fromUrl(url);
+  const firstImage = await tiff.getImage(0);
+  const poolOrDecoder = noThreads
+    ? getDecoder(firstImage.fileDirectory)
+    : new Pool();
+  const omexmlString = firstImage.fileDirectory.ImageDescription;
+  return new OMETiffLoader({
+    tiff,
+    poolOrDecoder,
+    firstImage,
+    omexmlString,
+    offsets
   });
-  const pool = new Pool();
-  const resolvedTiffConnections = await Promise.all(tiffConnections);
-  return new TiffPyramidLoader(resolvedTiffConnections, pool);
 }
 
-export { ZarrLoader, TiffPyramidLoader };
+export { ZarrLoader, OMETiffLoader };

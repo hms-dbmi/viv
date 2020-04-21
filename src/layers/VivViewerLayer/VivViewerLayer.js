@@ -34,7 +34,14 @@ export default class VivViewerLayer extends CompositeLayer {
       onTileError,
       id
     } = this.props;
-    const { tileSize, numLevels, dtype } = loader;
+    const {
+      tileSize,
+      numLevels,
+      dtype,
+      width,
+      height,
+      isBioFormats6Pyramid
+    } = loader;
     const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
       sliderValues,
       colorValues,
@@ -43,18 +50,20 @@ export default class VivViewerLayer extends CompositeLayer {
       dtype
     });
     const getTileData = async ({ x, y, z }) => {
-      const { data, width, height } = await loader.getTile({
+      const tile = await loader.getTile({
         x,
         y,
         z: -z,
         loaderSelection
       });
-      if (width !== tileSize || height !== tileSize) {
-        throw Error(
-          `Tile data  { width: ${width}, height: ${height} } does not match tilesize: ${tileSize}`
-        );
+      if (tile) {
+        if (tile.width !== tileSize || tile.height !== tileSize) {
+          console.warn(
+            `Tile data  { width: ${tile.width}, height: ${tile.height} } does not match tilesize: ${tileSize}`
+          );
+        }
       }
-      return data;
+      return tile;
     };
     const tiledLayer = new VivViewerLayerBase({
       id: `Tiled-Image-${id}`,
@@ -77,7 +86,11 @@ export default class VivViewerLayer extends CompositeLayer {
       opacity,
       domain,
       colormap,
-      viewportId
+      viewportId,
+      width,
+      height,
+      // Needed for misreported metadata.
+      isBioFormats6Pyramid
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity

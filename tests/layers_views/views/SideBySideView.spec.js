@@ -2,9 +2,9 @@
 import test from 'tape-catch';
 import { PolygonLayer } from '@deck.gl/layers';
 
-import { SideBySideView } from '../../src/views';
+import { SideBySideView } from '../../../src/views';
 import { generateViewTests, defaultArguments } from './VivView.spec';
-import { VivViewerLayer } from '../../src/layers';
+import { VivViewerLayer } from '../../../src/layers';
 
 generateViewTests(SideBySideView, defaultArguments);
 

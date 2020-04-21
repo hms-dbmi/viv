@@ -16,7 +16,7 @@ import { getVivId, makeBoundingBox } from './utils';
  * @param {Array} args.linkedIds Ids of the other views to which this could be locked via zoom/pan.
  * @param {Boolean} args.panLock Whether or not we lock pan.
  * @param {Boolean} args.zoomLock Whether or not we lock zoom.
- * @param {Array} args.viewportOutlineColor Outline color of the border (default [255, 190, 0])
+ * @param {Array} args.viewportOutlineColor Outline color of the border (default [255, 255, 255])
  * @param {number} args.viewportOutlineWidth Default outline width (default 10)
  * */
 export default class SideBySideView extends VivView {
@@ -27,7 +27,7 @@ export default class SideBySideView extends VivView {
     linkedIds = [],
     panLock = true,
     zoomLock = true,
-    viewportOutlineColor = [255, 190, 0],
+    viewportOutlineColor = [255, 255, 255],
     viewportOutlineWidth = 10
   }) {
     super({ initialViewState, x, y });

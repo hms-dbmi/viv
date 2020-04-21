@@ -1,8 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
-import { range } from '../../src/layers/VivViewerLayer/utils';
-import { padWithDefault, padColorsAndSliders } from '../../src/layers/utils';
-import { isInTileBounds } from '../../src/loaders/utils';
+import { range } from '../../../src/layers/VivViewerLayer/utils';
+import { padWithDefault, padColorsAndSliders } from '../../../src/layers/utils';
+import { isInTileBounds } from '../../../src/loaders/utils';
 
 test('range test', t => {
   const expected = [0, 1, 2];

@@ -1,8 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
 
-import { VivView } from '../../src/views';
-import { getVivId } from '../../src/views/utils';
+import { VivView } from '../../../src/views';
+import { getVivId } from '../../../src/views/utils';
 
 export const defaultArguments = {
   initialViewState: {

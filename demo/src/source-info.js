@@ -1,3 +1,5 @@
+import { range } from '../../src/layers/VivViewerLayer/utils';
+
 const channelNames = [
   'DAPI - Hoechst (nuclei)',
   'FITC - Laminin (basement membrane)',
@@ -17,7 +19,7 @@ const basePyramidInfo = {
 };
 
 const tiffInfo = {
-  url: `https://vitessce-demo-data.storage.googleapis.com/test-data/vanderbilt.images/vanderbilt.images`,
+  url: `https://vitessce-demo-data.storage.googleapis.com/test-data/deflate_no_legacy/spraggins.bioformats.raw2ometiff.ome.tif`,
   ...basePyramidInfo,
   description: 'Kidney mxIF (OME-TIFF)'
 };
@@ -96,8 +98,124 @@ const staticInfo = {
   description: 'Kidney IMS (zarr)'
 };
 
+const rootStaticTiffUrl =
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/antigen_exprs.ome.tiff';
+
+const staticTiffInfo = {
+  url: rootStaticTiffUrl,
+  dimensions: [
+    {
+      field: 'channel',
+      type: 'nominal',
+      values: [
+        'Actin',
+        'CD107a',
+        'CD11c',
+        'CD20',
+        'CD21',
+        'CD31',
+        'CD3e',
+        'CD4',
+        'CD45',
+        'CD45RO',
+        'CD68',
+        'CD8',
+        'DAPI_2',
+        'E_CAD',
+        'Histone_H3',
+        'Ki67',
+        'Pan_CK',
+        'Podoplanin'
+      ]
+    },
+    { field: 'y', type: 'quantitative', values: null },
+    { field: 'x', type: 'quantitative', values: null },
+    { field: 'time', type: 'number', values: null },
+    { field: 'z', type: 'number', values: null }
+  ],
+  initialViewState: {
+    zoom: -1,
+    target: [1000, 500]
+  },
+  isPublic: false,
+  isPyramid: false,
+  selections: ['DAPI_2', 'E_CAD', 'Histone_H3', 'Ki67'].map(channel => {
+    return { channel, time: 0, z: 0 };
+  }),
+  description: 'CODEX Tile'
+};
+
+const remoteBFTiffUrl =
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/TONSIL-1_40X.ome.tif';
+
+const remoteBFTiff = {
+  url: remoteBFTiffUrl,
+  initialViewState: {
+    zoom: -3,
+    target: [5000, 5000]
+  },
+  dimensions: [
+    {
+      field: 'channel',
+      type: 'nominal',
+      values: range(47).map(i => `Channel ${i}`)
+    },
+    { field: 'y', type: 'quantitative', values: null },
+    { field: 'x', type: 'quantitative', values: null },
+    { field: 'time', type: 'number', values: null },
+    { field: 'z', type: 'number', values: null }
+  ],
+  isPublic: false,
+  isPyramid: true,
+  selections: range(4)
+    .map(i => `Channel ${i}`)
+    .map(channel => {
+      return { channel, time: 0, z: 0 };
+    }),
+  description: 'Tonsil Legacy Bioformats Pyramid Tiff'
+};
+
+const remoteTiffUrl2 =
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/VAN0003-LK-32-21-AF_preIMS_registered.pyramid.ome.tiff ';
+
+const remoteTiff2 = {
+  url: remoteTiffUrl2,
+  initialViewState: {
+    zoom: -5,
+    target: [30000, 30000]
+  },
+  dimensions: [
+    {
+      field: 'channel',
+      type: 'nominal',
+      values: [
+        'DAPI - autofluorescence',
+        'eGFP - autofluorescence',
+        'dsRed - autofluorescence'
+      ]
+    },
+    { field: 'y', type: 'quantitative', values: null },
+    { field: 'x', type: 'quantitative', values: null },
+    { field: 'time', type: 'number', values: null },
+    { field: 'z', type: 'number', values: null }
+  ],
+  isPublic: false,
+  isPyramid: true,
+  selections: [
+    'DAPI - autofluorescence',
+    'eGFP - autofluorescence',
+    'dsRed - autofluorescence'
+  ].map(channel => {
+    return { channel, time: 0, z: 0 };
+  }),
+  description: 'VAN0003-LK-32-21 Donor Image'
+};
+
 export default {
   zarr: zarrInfo,
   tiff: tiffInfo,
-  static: staticInfo
+  static: staticInfo,
+  'static tiff': staticTiffInfo,
+  'bf tiff': remoteBFTiff,
+  'tiff 2': remoteTiff2
 };
