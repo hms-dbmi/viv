@@ -82,7 +82,7 @@ export default class OMETiffLoader {
     const { SubIFDs } = firstImage.fileDirectory;
     this.numLevels =
       this.omexml.getNumberOfImages() || (SubIFDs && SubIFDs.length);
-    this.isLegacyBioFormatsPyramid = !SubIFDs;
+    this.isBioFormats6Pyramid = SubIFDs;
     this.isPyramid = !!this.numLevels;
     const type = this.omexml.Type;
     if (type === 'uint8') {
@@ -164,13 +164,13 @@ export default class OMETiffLoader {
     if (!this._tileInBounds({ x, y, z })) {
       return null;
     }
-    const { tiff, offsets, isLegacyBioFormatsPyramid, omexml, tileSize } = this;
+    const { tiff, offsets, isBioFormats6Pyramid, omexml, tileSize } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const pyramidOffset = z * SizeZ * SizeT * SizeC;
     let image;
     const tileRequests = loaderSelection.map(async index => {
       const pyramidIndex = pyramidOffset + index;
-      if (isLegacyBioFormatsPyramid) {
+      if (!isBioFormats6Pyramid) {
         if (offsets) {
           tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
             offsets[pyramidIndex]
@@ -188,10 +188,14 @@ export default class OMETiffLoader {
       return this._getChannel({ image, x, y });
     });
     const tiles = await Promise.all(tileRequests);
+    const { ImageLength } = image.fileDirectory;
     return {
       data: tiles,
       width: tileSize,
-      height: tileSize
+      height:
+        tiles[0].length === tileSize ** 2
+          ? tileSize
+          : Math.min(tileSize, ImageLength - y * tileSize)
     };
   }
 
@@ -202,18 +206,12 @@ export default class OMETiffLoader {
    * @returns {Object} data: TypedArray[], width: number, height: number
    */
   async getRaster({ z, loaderSelection }) {
-    const {
-      tiff,
-      offsets,
-      omexml,
-      isLegacyBioFormatsPyramid,
-      poolOrDecoder
-    } = this;
+    const { tiff, offsets, omexml, isBioFormats6Pyramid, poolOrDecoder } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const rasters = await Promise.all(
       loaderSelection.map(async index => {
         const pyramidIndex = z * SizeZ * SizeT * SizeC + index;
-        if (isLegacyBioFormatsPyramid) {
+        if (!isBioFormats6Pyramid) {
           if (offsets) {
             tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
               offsets[pyramidIndex]

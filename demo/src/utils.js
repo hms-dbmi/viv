@@ -15,6 +15,7 @@ export async function createLoader(type, infoObj) {
     }
     case 'static tiff':
     case 'bf tiff':
+    case 'tiff 2':
     case 'tiff': {
       const { url } = infoObj;
       const loader = await createOMETiffLoader({ url });

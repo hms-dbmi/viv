@@ -175,10 +175,47 @@ const remoteBFTiff = {
   description: 'Tonsil Legacy Bioformats Pyramid Tiff'
 };
 
+const remoteTiffUrl2 =
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/VAN0003-LK-32-21-AF_preIMS_registered.pyramid.ome.tiff ';
+
+const remoteTiff2 = {
+  url: remoteTiffUrl2,
+  initialViewState: {
+    zoom: -5,
+    target: [30000, 30000]
+  },
+  dimensions: [
+    {
+      field: 'channel',
+      type: 'nominal',
+      values: [
+        'DAPI - autofluorescence',
+        'eGFP - autofluorescence',
+        'dsRed - autofluorescence'
+      ]
+    },
+    { field: 'y', type: 'quantitative', values: null },
+    { field: 'x', type: 'quantitative', values: null },
+    { field: 'time', type: 'number', values: null },
+    { field: 'z', type: 'number', values: null }
+  ],
+  isPublic: false,
+  isPyramid: true,
+  selections: [
+    'DAPI - autofluorescence',
+    'eGFP - autofluorescence',
+    'dsRed - autofluorescence'
+  ].map(channel => {
+    return { channel, time: 0, z: 0 };
+  }),
+  description: 'VAN0003-LK-32-21 Donor Image'
+};
+
 export default {
   zarr: zarrInfo,
   tiff: tiffInfo,
   static: staticInfo,
   'static tiff': staticTiffInfo,
-  'bf tiff': remoteBFTiff
+  'bf tiff': remoteBFTiff,
+  'tiff 2': remoteTiff2
 };
