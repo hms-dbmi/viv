@@ -4,7 +4,7 @@ import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
 import ScaleBarLayer from '../../../src/layers/StaticImageLayer';
 
-test('StaticImageLayer', t => {
+test('ScaleBarLayer', t => {
   const view = new OrthographicView({
     id: 'ortho',
     controller: true,
