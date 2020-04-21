@@ -96,7 +96,6 @@ export default class SideBySideView extends VivView {
 
   getLayers({ props, viewStates }) {
     const { loader } = props;
-    const { omexml } = loader;
     const { id, viewportOutlineColor, viewportOutlineWidth } = this;
     const thisViewState = viewStates[id];
     const boundingBox = makeBoundingBox(thisViewState);
@@ -119,14 +118,17 @@ export default class SideBySideView extends VivView {
       getLineColor: viewportOutlineColor,
       getLineWidth: viewportOutlineWidth * 2 ** -thisViewState.zoom
     });
-    const scaleBarLayer = omexml
-      ? new ScaleBarLayer({
-          boundingBox,
-          id: getVivId(id),
-          zoom: thisViewState.zoom,
-          loader
-        })
-      : null;
+    const { PhysicalSizeXUnit, PhysicalSizeX } = loader;
+    const scaleBarLayer =
+      PhysicalSizeXUnit && PhysicalSizeX
+        ? new ScaleBarLayer({
+            boundingBox,
+            id: getVivId(id),
+            loader,
+            PhysicalSizeXUnit,
+            PhysicalSizeX
+          })
+        : null;
     return [detailLayer, border, scaleBarLayer];
   }
 }

@@ -8,7 +8,6 @@ import { getVivId, makeBoundingBox } from './utils';
 export default class DetailView extends VivView {
   getLayers({ props, viewStates }) {
     const { loader } = props;
-    const { omexml } = loader;
     const { id } = this;
     const thisViewState = viewStates[id];
     const boundingBox = makeBoundingBox(thisViewState);
@@ -21,14 +20,17 @@ export default class DetailView extends VivView {
           id: `${loader.type}${getVivId(id)}`,
           viewportId: id
         });
-    const scaleBarLayer = omexml
-      ? new ScaleBarLayer({
-          boundingBox,
-          id: getVivId(id),
-          zoom: thisViewState.zoom,
-          loader
-        })
-      : null;
+    const { PhysicalSizeXUnit, PhysicalSizeX } = loader;
+    const scaleBarLayer =
+      PhysicalSizeXUnit && PhysicalSizeX
+        ? new ScaleBarLayer({
+            boundingBox,
+            id: getVivId(id),
+            loader,
+            PhysicalSizeXUnit,
+            PhysicalSizeX
+          })
+        : null;
     return [layer, scaleBarLayer];
   }
 }

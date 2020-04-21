@@ -22,13 +22,15 @@ export default class OMEXML {
     this.DimensionOrder = Pixels['@_DimensionOrder'];
     this.Type = Pixels['@_Type'];
     const PhysicalSizeYUnit = Pixels['@_PhysicalSizeYUnit'];
-    this.PhysicalSizeYUnit = PhysicalSizeYUnit.includes('µm')
-      ? 'µm'
-      : this.PhysicalSizeXUnit;
+    this.PhysicalSizeYUnit =
+      PhysicalSizeYUnit && PhysicalSizeYUnit.includes('µm')
+        ? 'µm'
+        : this.PhysicalSizeXUnit;
     const PhysicalSizeXUnit = Pixels['@_PhysicalSizeXUnit'];
-    this.PhysicalSizeXUnit = PhysicalSizeXUnit.includes('µm')
-      ? 'µm'
-      : this.PhysicalSizeXUnit;
+    this.PhysicalSizeXUnit =
+      PhysicalSizeXUnit && PhysicalSizeXUnit.includes('µm')
+        ? 'µm'
+        : this.PhysicalSizeXUnit;
     this.PhysicalSizeY = Pixels['@_PhysicalSizeY'];
     this.PhysicalSizeX = Pixels['@_PhysicalSizeX'];
   }

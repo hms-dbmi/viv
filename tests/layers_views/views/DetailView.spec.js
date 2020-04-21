@@ -2,7 +2,7 @@
 import test from 'tape-catch';
 import { DetailView } from '../../../src/views';
 import { generateViewTests, defaultArguments } from './VivView.spec';
-import { VivViewerLayer } from '../../../src/layers';
+import { VivViewerLayer, ScaleBarLayer } from '../../../src/layers';
 
 const id = 'detail';
 const detailViewArguments = { ...defaultArguments };
@@ -14,9 +14,17 @@ generateViewTests(DetailView, detailViewArguments);
 test(`DetailView layer type and props check`, t => {
   const view = new DetailView(detailViewArguments);
   const loader = { type: 'loads', isPyramid: true };
-  const layers = view.getLayers({ props: { loader } });
+  const layers = view.getLayers({
+    props: {
+      loader: { ...loader, PhysicalSizeXUnit: 'cm', PhysicalSizeX: 0.5 }
+    }
+  });
   t.ok(
     layers[0] instanceof VivViewerLayer,
+    'DetailView layer should be VivViewerLayer.'
+  );
+  t.ok(
+    layers[1] instanceof ScaleBarLayer,
     'DetailView layer should be VivViewerLayer.'
   );
   t.equal(
