@@ -33,22 +33,20 @@ export async function createZarrLoader({
   });
 }
 
-export async function createOMETiffLoader({ url, noThreads }) {
+export async function createOMETiffLoader({ url, noThreads, offsets }) {
   const tiff = await fromUrl(url);
   const firstImage = await tiff.getImage(0);
-  const res = await fetch(url.replace(/ome.tif(f?)/gi, 'offsets.json'));
-  const offsets = res.status !== 404 ? await res.json() : [];
   const poolOrDecoder = noThreads
     ? getDecoder(firstImage.fileDirectory)
     : new Pool();
   const omexmlString = firstImage.fileDirectory.ImageDescription;
-  return new OMETiffLoader(
+  return new OMETiffLoader({
     tiff,
     poolOrDecoder,
     firstImage,
     omexmlString,
     offsets
-  );
+  });
 }
 
 export { ZarrLoader, OMETiffLoader };

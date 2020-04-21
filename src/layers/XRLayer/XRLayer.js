@@ -7,7 +7,7 @@ import { Model, Geometry, Texture2D } from '@luma.gl/core';
 import vs from './xr-layer-vertex.glsl';
 import fsColormap from './xr-layer-fragment-colormap.glsl';
 import fs from './xr-layer-fragment.glsl';
-import { DTYPE_VALUES } from '../constants';
+import { DTYPE_VALUES } from '../../constants';
 
 const defaultProps = {
   pickable: false,

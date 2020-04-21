@@ -64,8 +64,13 @@ function App() {
       }
       setLoader(nextLoader);
       setIsLoading(false);
+      // Bioformats pyramid has a broken getRaster call.
+      if (sourceName === 'bf tiff' && overviewOn) {
+        toggleOverview();
+      }
     }
     changeLoader();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceName]);
 
   /*

@@ -1,8 +1,9 @@
 import OMEXML from './omeXML';
 import { isInTileBounds } from './utils';
-
+import { DTYPE_VALUES } from '../constants';
 // Credit to https://github.com/zbjornson/node-bswap/blob/master/bswap.js for the implementation.
 // I could not get this to import, and it doesn't appear anyone else can judging by the "Used by" on github.
+// We need this for handling the endianness returned by geotiff since it only returns bytes.
 function flip16(info) {
   const flipper = new Uint8Array(info.buffer, info.byteOffset, info.length * 2);
   const len = flipper.length;
@@ -68,7 +69,7 @@ function flipEndianness(arr) {
  * This class serves as a wrapper for fetching tiff data from a file server.
  * */
 export default class OMETiffLoader {
-  constructor(tiff, poolOrDecoder, firstImage, omexmlString, offsets) {
+  constructor({ tiff, poolOrDecoder, firstImage, omexmlString, offsets }) {
     this.poolOrDecoder = poolOrDecoder;
     this.tiff = tiff;
     this.type = 'ome-tiff';
@@ -83,8 +84,11 @@ export default class OMETiffLoader {
     this.numLevels =
       this.omexml.getNumberOfImages() || (SubIFDs && SubIFDs.length);
     this.isBioFormats6Pyramid = SubIFDs;
-    this.isPyramid = !!this.numLevels;
+    this.isPyramid = this.numLevels > 1;
+
     const type = this.omexml.Type;
+    // We use zarr's internal format.  It encodes endiannes, but we leave it little for now
+    // since javascript is little endian.
     if (type === 'uint8') {
       this.dtype = '<u1';
     }
@@ -170,6 +174,8 @@ export default class OMETiffLoader {
     let image;
     const tileRequests = loaderSelection.map(async index => {
       const pyramidIndex = pyramidOffset + index;
+      // We need to put the request for parsing the file directory into this array.
+      // This allows us to get tiff pages directly based on offset without parsing everything.
       if (!isBioFormats6Pyramid) {
         if (offsets) {
           tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
@@ -211,6 +217,8 @@ export default class OMETiffLoader {
     const rasters = await Promise.all(
       loaderSelection.map(async index => {
         const pyramidIndex = z * SizeZ * SizeT * SizeC + index;
+        // We need to put the request for parsing the file directory into this array.
+        // This allows us to get tiff pages directly based on offset without parsing everything.
         if (!isBioFormats6Pyramid) {
           if (offsets) {
             tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
@@ -260,14 +268,10 @@ export default class OMETiffLoader {
   }
 
   async _getChannel({ image, x, y }) {
+    const { dtype } = this;
+    const { TypedArray } = DTYPE_VALUES[dtype];
     const tile = await image.getTileOrStrip(x, y, 0, this.poolOrDecoder);
-    const is8Bits = image.fileDirectory.BitsPerSample[0] === 8;
-    const is16Bits = image.fileDirectory.BitsPerSample[0] === 16;
-    const is32Bits = image.fileDirectory.BitsPerSample[0] === 32;
-    const data =
-      (is8Bits && new Uint8Array(tile.data)) ||
-      (is16Bits && new Uint16Array(tile.data)) ||
-      (is32Bits && new Uint32Array(tile.data));
+    const data = new TypedArray(tile.data);
     // Javascript needs little endian byteorder, so we flip if the data is not.
     // eslint-disable-next-line no-unused-expressions
     if (!image.littleEndian) {

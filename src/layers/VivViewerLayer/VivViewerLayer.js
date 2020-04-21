@@ -56,6 +56,13 @@ export default class VivViewerLayer extends CompositeLayer {
         z: -z,
         loaderSelection
       });
+      if (tile) {
+        if (tile.width !== tileSize || tile.height !== tileSize) {
+          console.warn(
+            `Tile data  { width: ${tile.width}, height: ${tile.height} } does not match tilesize: ${tileSize}`
+          );
+        }
+      }
       return tile;
     };
     const tiledLayer = new VivViewerLayerBase({

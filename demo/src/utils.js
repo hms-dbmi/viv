@@ -13,12 +13,15 @@ export async function createLoader(type, infoObj) {
       const loader = await createZarrLoader(infoObj);
       return loader;
     }
+    // These all resolve to the 'tiff' case.
     case 'static tiff':
     case 'bf tiff':
     case 'tiff 2':
     case 'tiff': {
       const { url } = infoObj;
-      const loader = await createOMETiffLoader({ url });
+      const res = await fetch(url.replace(/ome.tif(f?)/gi, 'offsets.json'));
+      const offsets = res.status !== 404 ? await res.json() : [];
+      const loader = await createOMETiffLoader({ url, offsets });
       return loader;
     }
     default:

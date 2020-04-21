@@ -10,13 +10,13 @@ describe('Test multi-channel input', () => {
     const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
     const firstImage = await tiff.getImage();
     const { ImageDescription: omexmlString } = firstImage.fileDirectory;
-    const loader = new OMETiffLoader(
+    const loader = new OMETiffLoader({
       tiff,
-      { decode: () => new Promise([]) },
+      poolOrDecoder: { decode: () => new Promise([]) },
       firstImage,
       omexmlString,
-      [8, 2712, 4394]
-    );
+      offsets: [8, 2712, 4394]
+    });
     const { width, height, isPyramid, offsets } = loader;
     expect(width).to.equal(439);
     expect(height).to.equal(167);
@@ -28,13 +28,13 @@ describe('Test multi-channel input', () => {
     const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
     const firstImage = await tiff.getImage();
     const { ImageDescription: omexmlString } = firstImage.fileDirectory;
-    const loader = new OMETiffLoader(
+    const loader = new OMETiffLoader({
       tiff,
-      { decode: () => new Promise([]) },
+      poolOrDecoder: { decode: () => new Promise([]) },
       firstImage,
       omexmlString,
-      [8, 2712, 4394]
-    );
+      offsets: [8, 2712, 4394]
+    });
     const selection = loader.serializeSelection([{ channel: 1 }]);
 
     expect(selection).to.deep.equal([1]);
