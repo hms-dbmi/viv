@@ -1,29 +1,30 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { LineLayer, TextLayer } from '@deck.gl/layers';
+import { range } from './utils';
 
 function getPosition(boundingBox, position) {
   const viewLength = boundingBox[2][0] - boundingBox[0][0];
   switch (position) {
     case 'bottom-right': {
       const yCoord =
-        boundingBox[2][1] - (boundingBox[2][1] - boundingBox[0][1]) * 0.07;
-      const xLeftCoord = boundingBox[2][0] - viewLength * 0.07;
+        boundingBox[2][1] - (boundingBox[2][1] - boundingBox[0][1]) * 0.085;
+      const xLeftCoord = boundingBox[2][0] - viewLength * 0.085;
       return [yCoord, xLeftCoord];
     }
     case 'top-right': {
-      const yCoord = (boundingBox[2][1] - boundingBox[0][1]) * 0.07;
-      const xLeftCoord = boundingBox[2][0] - viewLength * 0.07;
+      const yCoord = (boundingBox[2][1] - boundingBox[0][1]) * 0.085;
+      const xLeftCoord = boundingBox[2][0] - viewLength * 0.085;
       return [yCoord, xLeftCoord];
     }
     case 'top-left': {
-      const yCoord = (boundingBox[2][1] - boundingBox[0][1]) * 0.07;
-      const xLeftCoord = viewLength * 0.07;
+      const yCoord = (boundingBox[2][1] - boundingBox[0][1]) * 0.085;
+      const xLeftCoord = viewLength * 0.085;
       return [yCoord, xLeftCoord];
     }
     case 'bottom-left': {
       const yCoord =
-        boundingBox[2][1] - (boundingBox[2][1] - boundingBox[0][1]) * 0.07;
-      const xLeftCoord = viewLength * 0.07;
+        boundingBox[2][1] - (boundingBox[2][1] - boundingBox[0][1]) * 0.085;
+      const xLeftCoord = viewLength * 0.085;
       return [yCoord, xLeftCoord];
     }
     default: {
@@ -51,11 +52,14 @@ const defaultProps = {
 
 /**
  * This layer creates a scale bar using three LineLayers and a TextLayer.
+ * Looks like: |--------| made up of three LineLayers (left tick, right tick, center length bar) and the bottom TextLayer
+ *                2cm
  * @param {Object} props
  * @param {String} props.PhysicalSizeXUnit Physical unit size per pixel at full resolution.
  * @param {Number} props.PhysicalSizeX Physical size of a pixel.
  * @param {Array} props.boundingBox Boudnign box of the view in which this should render.
  * @param {id} props.id Id from the parent layer.
+ * @param {number} props.zoom Zoom of this layer.
  * @param {id} props.position Location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."  Default is 'bottom-right'.
  */
 export default class ScaleBarLayer extends CompositeLayer {
@@ -65,11 +69,17 @@ export default class ScaleBarLayer extends CompositeLayer {
       boundingBox,
       PhysicalSizeXUnit,
       PhysicalSizeX,
-      position
+      position,
+      zoom
     } = this.props;
     const viewLength = boundingBox[2][0] - boundingBox[0][0];
     const barLength = viewLength * 0.05;
-    const barHeight = (boundingBox[2][1] - boundingBox[0][1]) * 0.005;
+    // This is a good heuristic for stopping the bar tick marks from getting too small
+    // and/or the text squishing up into the bar.
+    const barHeight = Math.max(
+      2 ** (-zoom + 1.5),
+      (boundingBox[2][1] - boundingBox[0][1]) * 0.007
+    );
     const numUnits = barLength * PhysicalSizeX;
     const [yCoord, xLeftCoord] = getPosition(boundingBox, position);
     const lengthBar = new LineLayer({
@@ -125,9 +135,12 @@ export default class ScaleBarLayer extends CompositeLayer {
       ],
       getColor: [220, 220, 220, 255],
       getSize: 11,
+      sizeUnits: 'meters',
+      sizeScale: 2 ** -zoom,
       characterSet: [
         ...PhysicalSizeXUnit.split(''),
-        ...String(numUnits).split('')
+        ...range(10).map(i => String(i)),
+        '.'
       ]
     });
     return [lengthBar, tickBoundsLeft, tickBoundsRight, textLayer];

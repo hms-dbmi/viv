@@ -28,7 +28,8 @@ export default class DetailView extends VivView {
             id: getVivId(id),
             loader,
             PhysicalSizeXUnit,
-            PhysicalSizeX
+            PhysicalSizeX,
+            zoom: thisViewState.zoom
           })
         : null;
     return [layer, scaleBarLayer];

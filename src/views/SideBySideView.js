@@ -126,7 +126,8 @@ export default class SideBySideView extends VivView {
             id: getVivId(id),
             loader,
             PhysicalSizeXUnit,
-            PhysicalSizeX
+            PhysicalSizeX,
+            zoom: thisViewState.zoom
           })
         : null;
     return [detailLayer, border, scaleBarLayer];
