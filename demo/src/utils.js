@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { createTiffPyramid, createZarrLoader } from '../../src';
+import { createZarrLoader, createOMETiffLoader } from '../../src';
 
 import { COLOR_PALLETE, INITIAL_SLIDER_VALUE } from './constants';
 
@@ -9,20 +9,19 @@ export async function createLoader(type, infoObj) {
       const loader = await createZarrLoader(infoObj);
       return loader;
     }
-    case 'tiff': {
-      const { url, dimensions } = infoObj;
-      const channelNames = dimensions[0].values;
-      const channelUrls = channelNames.map(channel => {
-        // TODO : Need to fix name is source Hoechst is misspelled
-        const typoFixedChannel =
-          channel.slice(0, 4) === 'DAPI' ? 'DAPI - Hoescht (nuclei)' : channel;
-        return `${url}/${typoFixedChannel}.ome.tiff`;
-      });
-      const loader = await createTiffPyramid({ channelUrls });
-      return loader;
-    }
     case 'static': {
       const loader = await createZarrLoader(infoObj);
+      return loader;
+    }
+    // These all resolve to the 'tiff' case.
+    case 'static tiff':
+    case 'bf tiff':
+    case 'tiff 2':
+    case 'tiff': {
+      const { url } = infoObj;
+      const res = await fetch(url.replace(/ome.tif(f?)/gi, 'offsets.json'));
+      const offsets = res.status !== 404 ? await res.json() : [];
+      const loader = await createOMETiffLoader({ url, offsets });
       return loader;
     }
     default:

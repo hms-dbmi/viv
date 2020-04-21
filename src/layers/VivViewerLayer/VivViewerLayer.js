@@ -1,7 +1,6 @@
 import { CompositeLayer } from '@deck.gl/core';
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
-import ScaleBarLayer from '../ScaleBarLayer';
 import { padColorsAndSliders } from '../utils';
 
 /**
@@ -35,7 +34,14 @@ export default class VivViewerLayer extends CompositeLayer {
       onTileError,
       id
     } = this.props;
-    const { tileSize, numLevels, dtype } = loader;
+    const {
+      tileSize,
+      numLevels,
+      dtype,
+      width,
+      height,
+      isBioFormats6Pyramid
+    } = loader;
     const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
       sliderValues,
       colorValues,
@@ -44,18 +50,20 @@ export default class VivViewerLayer extends CompositeLayer {
       dtype
     });
     const getTileData = async ({ x, y, z }) => {
-      const { data, width, height } = await loader.getTile({
+      const tile = await loader.getTile({
         x,
         y,
         z: -z,
         loaderSelection
       });
-      if (width !== tileSize || height !== tileSize) {
-        throw Error(
-          `Tile data  { width: ${width}, height: ${height} } does not match tilesize: ${tileSize}`
-        );
+      if (tile) {
+        if (tile.width !== tileSize || tile.height !== tileSize) {
+          console.warn(
+            `Tile data  { width: ${tile.width}, height: ${tile.height} } does not match tilesize: ${tileSize}`
+          );
+        }
       }
-      return data;
+      return tile;
     };
     const tiledLayer = new VivViewerLayerBase({
       id: `Tiled-Image-${id}`,
@@ -78,26 +86,29 @@ export default class VivViewerLayer extends CompositeLayer {
       opacity,
       domain,
       colormap,
-      viewportId
+      viewportId,
+      width,
+      height,
+      // Needed for misreported metadata.
+      isBioFormats6Pyramid
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity
     // paramteter set to anything but 1, but we always use it for situations where
     // we are zoomed out too far.
-    const baseLayer = new StaticImageLayer(this.props, {
-      id: `Background-Image-${id}`,
-      scale: 2 ** (numLevels - 1),
-      visible:
-        opacity === 1 ||
-        (-numLevels > this.context.viewport.zoom &&
-          (!viewportId || this.context.viewport.id === viewportId)),
-      z: numLevels - 1
-    });
-    const scaleBarLayer = new ScaleBarLayer(this.props, {
-      id: `Scale-bar-layer-${id}`,
-      physicalSizeXUnit: '0.325 µm'
-    });
-    const layers = [baseLayer, tiledLayer, scaleBarLayer];
+    const implementsGetRaster = typeof loader.getRaster === 'function';
+    const baseLayer =
+      implementsGetRaster &&
+      new StaticImageLayer(this.props, {
+        id: `Background-Image-${id}`,
+        scale: 2 ** (numLevels - 1),
+        visible:
+          opacity === 1 ||
+          (-numLevels > this.context.viewport.zoom &&
+            (!viewportId || this.context.viewport.id === viewportId)),
+        z: numLevels - 1
+      });
+    const layers = [baseLayer, tiledLayer];
     return layers;
   }
 }

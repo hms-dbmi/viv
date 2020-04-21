@@ -11,24 +11,28 @@ export const DTYPE_VALUES = {
     format: GL.R8UI,
     dataFormat: GL.RED_INTEGER,
     type: GL.UNSIGNED_BYTE,
-    max: 2 ** 8 - 1
+    max: 2 ** 8 - 1,
+    TypedArray: Uint8Array
   },
   '<u2': {
     format: GL.R16UI,
     dataFormat: GL.RED_INTEGER,
     type: GL.UNSIGNED_SHORT,
-    max: 2 ** 16 - 1
+    max: 2 ** 16 - 1,
+    TypedArray: Uint16Array
   },
   '<u4': {
     format: GL.R32UI,
     dataFormat: GL.RED_INTEGER,
     type: GL.UNSIGNED_INT,
-    max: 2 ** 32 - 1
+    max: 2 ** 32 - 1,
+    TypedArray: Uint32Array
   },
   '<f4': {
     format: GL.R32F,
     dataFormat: GL.RED,
     type: GL.FLOAT,
-    max: 2 ** 31 - 1
+    max: 2 ** 31 - 1,
+    TypedArray: Float32Array
   }
 };

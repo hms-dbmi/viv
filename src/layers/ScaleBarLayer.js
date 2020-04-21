@@ -9,29 +9,17 @@ import * as Qty from 'js-quantities';
  * @param {string} props.position Location of the physicalUnitXSize bar - one of "bottom-right", "top-right", "top-left", "bottom-left."  Default is 'bottom-right'.
  */
 export default class ScaleBarLayer extends CompositeLayer {
-  // This Layer reacts to viewport changes.
-  // eslint-disable-next-line class-methods-use-this
-  shouldUpdateState({ changeFlags }) {
-    return changeFlags.viewportChanged;
-  }
-
   renderLayers() {
-    const { physicalSizeXUnit, id } = this.props;
-    const { viewport } = this.context;
-    const boundingBox = [
-      viewport.unproject([0, 0]),
-      viewport.unproject([viewport.width, 0]),
-      viewport.unproject([viewport.width, viewport.height]),
-      viewport.unproject([0, viewport.height])
-    ];
+    const { loader, id, boundingBox, zoom } = this.props;
+    const { PhysicalSizeXUnit, PhysicalSizeX } = loader;
     const yCoord =
       boundingBox[2][1] - (boundingBox[2][1] - boundingBox[0][1]) * 0.1;
     const xLeftCoord =
       boundingBox[2][0] - (boundingBox[2][0] - boundingBox[0][0]) * 0.1;
     const numUnits =
-      Qty(physicalSizeXUnit).scalar *
+      Qty(PhysicalSizeX + PhysicalSizeXUnit).scalar *
       ((boundingBox[2][0] - boundingBox[0][0]) * 0.1) *
-      2 ** -viewport.zoom;
+      2 ** -zoom;
     const lengthBar = new LineLayer({
       id: `scale-bar-length-${id}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,

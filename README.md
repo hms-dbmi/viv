@@ -53,4 +53,4 @@ Currently Safari lacks full WebGL2 support. The `Viv` component will display an 
 
 ### Documentation
 
-Please navigate to [viv.vitessce.io/docs](https://viv.vitessce.io/docs) to see full documenation.
+Please navigate to [viv.vitessce.io/docs](http://viv.vitessce.io/docs) to see full documenation.

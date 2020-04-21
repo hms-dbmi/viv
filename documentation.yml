@@ -3,11 +3,13 @@ toc:
   file: README.md
 - name: Getting Started
   file: docs/SAMPLES.md
-- name: React Components
+- name: OME-TIFF Loading
+  file: docs/OMETIFF_LOADING.md
+- name: Viewers (React Components)
 - PictureInPictureViewer
 - SideBySideViewer
 - VivViewer
-- name: Classes
+- name: Views
 - VivView
 - OverviewView
 - DetailView
@@ -17,11 +19,12 @@ toc:
 - name: Layers
 - VivViewerLayer
 - StaticImageLayer
+- name: Loaders
+- ZarrLoader
+- OMETiffLoader
 - name: Layers (Internal)
 - XRLayer
 - OverviewLayer
 - VivViewerLayerBase
-- name: Loaders (Internal)
-- ZarrLoader
 - name: Overview Of Viv Image Rendering
   file: docs/IMAGE_RENDERING.md

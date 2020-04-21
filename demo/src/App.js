@@ -35,7 +35,7 @@ function App() {
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
   const viewSize = useWindowSize();
   const [loader, setLoader] = useState(null);
-  const [sourceName, setSourceName] = useState('zarr');
+  const [sourceName, setSourceName] = useState('tiff');
   const [colormap, setColormap] = useState('');
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
   const [overviewOn, toggleOverview] = useReducer(v => !v, false);
@@ -64,8 +64,13 @@ function App() {
       }
       setLoader(nextLoader);
       setIsLoading(false);
+      // Bioformats pyramid has a broken getRaster call.
+      if (sourceName === 'bf tiff' && overviewOn) {
+        toggleOverview();
+      }
     }
     changeLoader();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceName]);
 
   /*
@@ -81,7 +86,7 @@ function App() {
       const { field, values } = channelDim;
       const dimIndex = values.indexOf(value);
       const [serialized] = loader.serializeSelection({
-        [field]: dimIndex
+        [field]: value
       });
       dispatch({
         type,
@@ -94,10 +99,14 @@ function App() {
   };
 
   const handleChannelAdd = () => {
-    const [channelDim] = sources[sourceName].dimensions;
+    const { dimensions, selections } = sources[sourceName];
+    const [channelDim] = dimensions;
     dispatch({
       type: 'ADD_CHANNEL',
-      value: { name: channelDim.values[0], selection: [0, 0, 0] }
+      value: {
+        name: channelDim.values[0],
+        selection: loader.serializeSelection([selections[0]])
+      }
     });
   };
 
@@ -109,7 +118,6 @@ function App() {
         <ChannelController
           name={names[i]}
           channelOptions={dimensions[0].values}
-          disableOptions={sourceName === 'tiff'}
           isOn={isOn[i]}
           sliderValue={sliders[i]}
           colorValue={colors[i]}
@@ -174,16 +182,14 @@ function App() {
             </Grid>
           </Grid>
           {!isLoading ? (
-            channelControllers
+            <Grid container>{channelControllers}</Grid>
           ) : (
             <Grid container justify="center">
               <CircularProgress />
             </Grid>
           )}
           <Button
-            disabled={
-              ids.length === MAX_CHANNELS || sourceName === 'tiff' || isLoading
-            }
+            disabled={ids.length === MAX_CHANNELS || isLoading}
             onClick={handleChannelAdd}
             fullWidth
             variant="outlined"
@@ -194,7 +200,14 @@ function App() {
             Add Channel
           </Button>
           <Button
-            disabled={!isPyramid || isLoading || useLinkedView}
+            disabled={
+              !isPyramid ||
+              isLoading ||
+              useLinkedView ||
+              // Bioformats getRaster calls are a bit sketchy.
+              // see: https://github.com/hubmapconsortium/vitessce-image-viewer/issues/144
+              sourceName === 'bf tiff'
+            }
             onClick={toggleOverview}
             variant="outlined"
             size="small"

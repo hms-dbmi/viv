@@ -2,7 +2,7 @@
 import test from 'tape-catch';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
-import XRLayer from '../../src/layers/XRLayer';
+import XRLayer from '../../../src/layers/XRLayer';
 
 test('XRLayer', t => {
   const view = new OrthographicView({
@@ -43,7 +43,11 @@ test('XRLayer', t => {
         0
       ],
       tileSize: 2,
-      channelData: [new Uint32Array([0, 2, 1, 2])],
+      channelData: {
+        data: [new Uint32Array([0, 2, 1, 2])],
+        width: 2,
+        height: 2
+      },
       dtype: '<u4'
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)

@@ -1,8 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
-import { OverviewView } from '../../src/views';
+import { OverviewView } from '../../../src/views';
 import { generateViewTests, defaultArguments } from './VivView.spec';
-import { OverviewLayer } from '../../src/layers';
+import { OverviewLayer } from '../../../src/layers';
 
 const id = 'overview';
 const loader = {

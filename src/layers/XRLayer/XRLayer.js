@@ -7,12 +7,12 @@ import { Model, Geometry, Texture2D } from '@luma.gl/core';
 import vs from './xr-layer-vertex.glsl';
 import fsColormap from './xr-layer-fragment-colormap.glsl';
 import fs from './xr-layer-fragment.glsl';
-import { DTYPE_VALUES } from '../constants';
+import { DTYPE_VALUES } from '../../constants';
 
 const defaultProps = {
   pickable: false,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-  channelData: { type: 'array', value: [], async: true },
+  channelData: { type: 'array', value: {}, async: true },
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
@@ -95,10 +95,8 @@ export default class XRLayer extends Layer {
 
       this.getAttributeManager().invalidateAll();
     }
-    if (props.channelData && props.channelData.length > 0) {
-      if (props.channelData !== oldProps.channelData) {
-        this.loadTexture(props.channelData);
-      }
+    if (props.channelData !== oldProps.channelData) {
+      this.loadTexture(props.channelData);
     }
     const attributeManager = this.getAttributeManager();
     if (props.bounds !== oldProps.bounds) {
@@ -201,9 +199,17 @@ export default class XRLayer extends Layer {
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex && tex.delete());
     }
-    if (channelData.length > 0) {
-      channelData.forEach((d, i) => {
-        textures[`channel${i}`] = this.dataToTexture(d);
+    if (
+      channelData &&
+      Object.keys(channelData).length > 0 &&
+      channelData.data
+    ) {
+      channelData.data.forEach((d, i) => {
+        textures[`channel${i}`] = this.dataToTexture(
+          d,
+          channelData.width,
+          channelData.height
+        );
       }, this);
       this.setState({ textures });
     }
@@ -212,8 +218,8 @@ export default class XRLayer extends Layer {
   /**
    * This function creates textures from the data
    */
-  dataToTexture(data) {
-    const { dtype, width, height } = this.props;
+  dataToTexture(data, width, height) {
+    const { dtype } = this.props;
     const { format, dataFormat, type } = DTYPE_VALUES[dtype];
     const texture = new Texture2D(this.context.gl, {
       width,

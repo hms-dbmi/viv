@@ -1,10 +1,9 @@
 import { PolygonLayer } from '@deck.gl/layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 
-import { VivViewerLayer, StaticImageLayer } from '../layers';
+import { VivViewerLayer, StaticImageLayer, ScaleBarLayer } from '../layers';
 import VivView from './VivView';
 import { getVivId, makeBoundingBox } from './utils';
-
 /**
  * This class generates a VivViewerLayer and a view for use in the SideBySideViewer.
  * It is linked with its other views as controlled by `linkedIds`, `zoomLock`, and `panLock` parameters.
@@ -16,7 +15,7 @@ import { getVivId, makeBoundingBox } from './utils';
  * @param {Array} args.linkedIds Ids of the other views to which this could be locked via zoom/pan.
  * @param {Boolean} args.panLock Whether or not we lock pan.
  * @param {Boolean} args.zoomLock Whether or not we lock zoom.
- * @param {Array} args.viewportOutlineColor Outline color of the border (default [255, 190, 0])
+ * @param {Array} args.viewportOutlineColor Outline color of the border (default [255, 255, 255])
  * @param {number} args.viewportOutlineWidth Default outline width (default 10)
  * */
 export default class SideBySideView extends VivView {
@@ -27,7 +26,7 @@ export default class SideBySideView extends VivView {
     linkedIds = [],
     panLock = true,
     zoomLock = true,
-    viewportOutlineColor = [255, 190, 0],
+    viewportOutlineColor = [255, 255, 255],
     viewportOutlineWidth = 10
   }) {
     super({ initialViewState, x, y });
@@ -97,6 +96,7 @@ export default class SideBySideView extends VivView {
 
   getLayers({ props, viewStates }) {
     const { loader } = props;
+    const { omexml } = loader;
     const { id, viewportOutlineColor, viewportOutlineWidth } = this;
     const thisViewState = viewStates[id];
     const boundingBox = makeBoundingBox(thisViewState);
@@ -119,6 +119,14 @@ export default class SideBySideView extends VivView {
       getLineColor: viewportOutlineColor,
       getLineWidth: viewportOutlineWidth * 2 ** -thisViewState.zoom
     });
-    return [detailLayer, border];
+    const scaleBarLayer = omexml
+      ? new ScaleBarLayer({
+          boundingBox,
+          id: getVivId(id),
+          zoom: thisViewState.zoom,
+          loader
+        })
+      : null;
+    return [detailLayer, border, scaleBarLayer];
   }
 }

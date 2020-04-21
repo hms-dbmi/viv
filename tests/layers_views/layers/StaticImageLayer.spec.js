@@ -2,7 +2,7 @@
 import test from 'tape-catch';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
-import StaticImageLayer from '../../src/layers/StaticImageLayer';
+import StaticImageLayer from '../../../src/layers/StaticImageLayer';
 
 test('StaticImageLayer', t => {
   const view = new OrthographicView({

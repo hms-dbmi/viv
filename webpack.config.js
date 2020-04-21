@@ -2,6 +2,7 @@
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ThreadsPlugin = require('threads-plugin');
 
 module.exports = {
   devtool: 'source-map',
@@ -67,6 +68,7 @@ module.exports = {
     http: 'empty'
   },
   plugins: [
+    new ThreadsPlugin(),
     new HtmlWebPackPlugin({
       hash: true,
       filename: 'index.html', // target html
