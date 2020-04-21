@@ -22,6 +22,7 @@ export default class OMEXML {
     this.DimensionOrder = Pixels['@_DimensionOrder'];
     this.Type = Pixels['@_Type'];
     const PhysicalSizeYUnit = Pixels['@_PhysicalSizeYUnit'];
+    // This µ character is not well handled - I got odd behavior but this solves it.
     this.PhysicalSizeYUnit =
       PhysicalSizeYUnit && PhysicalSizeYUnit.includes('µm')
         ? 'µm'

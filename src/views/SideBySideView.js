@@ -122,12 +122,11 @@ export default class SideBySideView extends VivView {
     const scaleBarLayer =
       PhysicalSizeXUnit && PhysicalSizeX
         ? new ScaleBarLayer({
-            boundingBox,
             id: getVivId(id),
             loader,
             PhysicalSizeXUnit,
             PhysicalSizeX,
-            zoom: thisViewState.zoom
+            viewState: thisViewState
           })
         : null;
     return [detailLayer, border, scaleBarLayer];

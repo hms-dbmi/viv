@@ -1,6 +1,7 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { LineLayer, TextLayer } from '@deck.gl/layers';
 import { range } from './utils';
+import { makeBoundingBox } from '../views/utils';
 
 function getPosition(boundingBox, position) {
   const viewLength = boundingBox[2][0] - boundingBox[0][0];
@@ -35,14 +36,9 @@ function getPosition(boundingBox, position) {
 
 const defaultProps = {
   pickable: false,
-  boundingBox: {
-    type: 'array',
-    value: [
-      [0, 0],
-      [1, 0],
-      [1, 1],
-      [1, 0]
-    ],
+  viewState: {
+    type: 'object',
+    value: { zoom: 0, target: [0, 0, 0] },
     compare: true
   },
   PhysicalSizeXUnit: { type: 'string', value: '', compare: true },
@@ -58,19 +54,20 @@ const defaultProps = {
  * @param {Number} props.PhysicalSizeX Physical size of a pixel.
  * @param {Array} props.boundingBox Boudning box of the view in which this should render.
  * @param {id} props.id Id from the parent layer.
- * @param {number} props.zoom Zoom of this layer.
- * @param {id} props.position Location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."  Default is 'bottom-right'.
+ * @param {ViewState} props.viewState The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
+ * https://github.com/visgl/deck.gl/issues/4504
  */
 export default class ScaleBarLayer extends CompositeLayer {
   renderLayers() {
     const {
       id,
-      boundingBox,
       PhysicalSizeXUnit,
       PhysicalSizeX,
       position,
-      zoom
+      viewState
     } = this.props;
+    const boundingBox = makeBoundingBox(viewState);
+    const { zoom } = viewState;
     const viewLength = boundingBox[2][0] - boundingBox[0][0];
     const barLength = viewLength * 0.05;
     // This is a good heuristic for stopping the bar tick marks from getting too small

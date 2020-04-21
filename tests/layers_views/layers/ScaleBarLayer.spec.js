@@ -17,12 +17,7 @@ test('ScaleBarLayer', t => {
     Layer: ScaleBarLayer,
     assert: t.ok,
     sampleProps: {
-      boundingBox: [
-        [0, 0],
-        [2, 0],
-        [2, 2],
-        [0, 2]
-      ],
+      viewState: { target: [2, 2, 0], zoom: 0, width: 4, height: 4 },
       PhysicalSizeXUnit: 'cm',
       PhysicalSizeX: 1,
       position: 'bottom-left'
