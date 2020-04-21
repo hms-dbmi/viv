@@ -52,12 +52,11 @@ const defaultProps = {
 
 /**
  * This layer creates a scale bar using three LineLayers and a TextLayer.
- * Looks like: |--------| made up of three LineLayers (left tick, right tick, center length bar) and the bottom TextLayer
- *                2cm
+ * Looks like: |--------| made up of three LineLayers (left tick, right tick, center length bar) and a bottom TextLayer
  * @param {Object} props
  * @param {String} props.PhysicalSizeXUnit Physical unit size per pixel at full resolution.
  * @param {Number} props.PhysicalSizeX Physical size of a pixel.
- * @param {Array} props.boundingBox Boudnign box of the view in which this should render.
+ * @param {Array} props.boundingBox Boudning box of the view in which this should render.
  * @param {id} props.id Id from the parent layer.
  * @param {number} props.zoom Zoom of this layer.
  * @param {id} props.position Location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."  Default is 'bottom-right'.
