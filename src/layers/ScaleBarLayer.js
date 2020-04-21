@@ -1,6 +1,5 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { LineLayer, TextLayer } from '@deck.gl/layers';
-import * as Qty from 'js-quantities';
 
 /**
  * This layer creates a dynamically sizing scale bar using three PolygonLayers.
@@ -10,13 +9,7 @@ import * as Qty from 'js-quantities';
  */
 export default class ScaleBarLayer extends CompositeLayer {
   renderLayers() {
-    const {
-      loader,
-      id,
-      boundingBox,
-      PhysicalSizeXUnit,
-      PhysicalSizeX
-    } = this.props;
+    const { id, boundingBox, PhysicalSizeXUnit, PhysicalSizeX } = this.props;
     const viewLength = boundingBox[2][0] - boundingBox[0][0];
     const yCoord =
       boundingBox[2][1] - (boundingBox[2][1] - boundingBox[0][1]) * 0.07;

@@ -5,6 +5,7 @@
 ### Added
 
 - OMETiffLoader for reading ome-tiff files directly
+- Add scale bar (only for OMEXML for now)
 
 ### Changed
 

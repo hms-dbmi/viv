@@ -14,6 +14,12 @@ test(`SideBySideView layer type and props check`, t => {
   const layers = view.getLayers({
     props: {
       loader: { ...loader, PhysicalSizeXUnit: 'cm', PhysicalSizeX: 0.5 }
+    },
+    viewStates: {
+      foo: {
+        target: [0, 0, 0],
+        zoom: 0
+      }
     }
   });
   t.ok(
