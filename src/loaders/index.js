@@ -1,6 +1,7 @@
 import { openArray } from 'zarr';
 // eslint-disable-next-line import/extensions
-import { fromUrl, Pool, getDecoder } from 'geotiff';
+import { fromUrl, getDecoder } from 'geotiff';
+import Pool from './Pool';
 import ZarrLoader from './zarrLoader';
 import OMETiffLoader from './OMETiffLoader';
 

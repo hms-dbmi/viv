@@ -1,5 +1,3 @@
 {
   "presets": ["@babel/preset-env", "@babel/preset-react"],
-  // This is used for threads.js.
-  "plugins": ["@babel/plugin-transform-runtime"]
 }

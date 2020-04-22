@@ -9,15 +9,16 @@ import json from '@rollup/plugin-json';
 import babel from 'rollup-plugin-babel';
 import sourceMaps from 'rollup-plugin-sourcemaps';
 import glslify from 'rollup-plugin-glslify';
+import webWorkerLoader from 'rollup-plugin-web-worker-loader';
 import replace from '@rollup/plugin-replace';
 
 const pkgObj = require('./package.json');
 
 function getExternals(pkg) {
   const { devDependencies = {}, dependencies = {} } = pkg;
-  const externals = Object.keys(devDependencies).concat(
-    Object.keys(dependencies)
-  );
+  const externals = Object.keys(devDependencies)
+    .concat(Object.keys(dependencies))
+    .filter(e => e !== 'geotiff');
   return externals;
 }
 
@@ -36,9 +37,12 @@ export default {
     // Allow json resolution
     json(),
     babel({
-      exclude: 'node_modules/**',
-      presets: ['@babel/env', '@babel/preset-react'],
-      runtimeHelpers: true
+      exclude: /node_modules(?!\/geotiff)\/.*/,
+      babelrc: false,
+      presets: [
+        ['@babel/env', { loose: true, modules: false }],
+        '@babel/preset-react'
+      ]
     }),
     glslify({ basedir: 'src/layers/XRLayer' }),
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
@@ -54,6 +58,9 @@ export default {
         'require("readable-stream/transform")': 'require("stream").Transform',
         'readable-stream': 'stream'
       }
+    }),
+    webWorkerLoader({
+      pattern: /worker-loader!(.+)/
     }),
     // Resolve source maps to the original source
     sourceMaps()
