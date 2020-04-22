@@ -23,6 +23,8 @@ export default class OMEXML {
     this.Type = Pixels['@_Type'];
     const PhysicalSizeYUnit = Pixels['@_PhysicalSizeYUnit'];
     // This µ character is not well handled - I got odd behavior but this solves it.
+    // There was a prepended character so now I just look for µm to be included
+    // and use only µm if it is found.
     this.PhysicalSizeYUnit =
       PhysicalSizeYUnit && PhysicalSizeYUnit.includes('µm')
         ? 'µm'

@@ -18,8 +18,8 @@ test('ScaleBarLayer', t => {
     assert: t.ok,
     sampleProps: {
       viewState: { target: [2, 2, 0], zoom: 0, width: 4, height: 4 },
-      PhysicalSizeXUnit: 'cm',
-      PhysicalSizeX: 1,
+      unit: 'cm',
+      size: 1,
       position: 'bottom-left'
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)

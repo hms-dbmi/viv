@@ -97,8 +97,10 @@ export default class SideBySideView extends VivView {
   getLayers({ props, viewStates }) {
     const { loader } = props;
     const { id, viewportOutlineColor, viewportOutlineWidth } = this;
-    const thisViewState = viewStates[id];
-    const boundingBox = makeBoundingBox(thisViewState);
+    const layerViewState = viewStates[id];
+    const boundingBox = makeBoundingBox(layerViewState);
+    const layers = [];
+
     const detailLayer = loader.isPyramid
       ? new VivViewerLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
@@ -108,6 +110,8 @@ export default class SideBySideView extends VivView {
           id: `${loader.type}${getVivId(id)}`,
           viewportId: id
         });
+    layers.push(detailLayer);
+
     const border = new PolygonLayer({
       id: `viewport-outline-${loader.type}${getVivId(id)}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
@@ -116,19 +120,25 @@ export default class SideBySideView extends VivView {
       filled: false,
       stroked: true,
       getLineColor: viewportOutlineColor,
-      getLineWidth: viewportOutlineWidth * 2 ** -thisViewState.zoom
+      getLineWidth: viewportOutlineWidth * 2 ** -layerViewState.zoom
     });
-    const { PhysicalSizeXUnit, PhysicalSizeX } = loader;
-    const scaleBarLayer =
-      PhysicalSizeXUnit && PhysicalSizeX
-        ? new ScaleBarLayer({
-            id: getVivId(id),
-            loader,
-            PhysicalSizeXUnit,
-            PhysicalSizeX,
-            viewState: thisViewState
-          })
-        : null;
-    return [detailLayer, border, scaleBarLayer];
+    layers.push(border);
+
+    const { physicalSizes } = loader;
+    if (physicalSizes) {
+      const { x } = physicalSizes;
+      const { unit, value } = x;
+      layers.push(
+        new ScaleBarLayer({
+          id: getVivId(id),
+          loader,
+          unit,
+          size: value,
+          viewState: layerViewState
+        })
+      );
+    }
+
+    return layers;
   }
 }

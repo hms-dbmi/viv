@@ -9,8 +9,10 @@ export default class DetailView extends VivView {
   getLayers({ props, viewStates }) {
     const { loader } = props;
     const { id } = this;
-    const thisViewState = viewStates[id];
-    const layer = loader.isPyramid
+    const layerViewState = viewStates[id];
+    const layers = [];
+
+    const detailLayer = loader.isPyramid
       ? new VivViewerLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
           viewportId: id
@@ -19,17 +21,23 @@ export default class DetailView extends VivView {
           id: `${loader.type}${getVivId(id)}`,
           viewportId: id
         });
-    const { PhysicalSizeXUnit, PhysicalSizeX } = loader;
-    const scaleBarLayer =
-      PhysicalSizeXUnit && PhysicalSizeX
-        ? new ScaleBarLayer({
-            id: getVivId(id),
-            loader,
-            PhysicalSizeXUnit,
-            PhysicalSizeX,
-            viewState: thisViewState
-          })
-        : null;
-    return [layer, scaleBarLayer];
+    layers.push(detailLayer);
+
+    const { physicalSizes } = loader;
+    if (physicalSizes) {
+      const { x } = physicalSizes;
+      const { unit, value } = x;
+      layers.push(
+        new ScaleBarLayer({
+          id: getVivId(id),
+          loader,
+          unit,
+          size: value,
+          viewState: layerViewState
+        })
+      );
+    }
+
+    return layers;
   }
 }

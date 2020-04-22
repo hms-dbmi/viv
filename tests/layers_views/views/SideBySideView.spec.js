@@ -13,7 +13,7 @@ test(`SideBySideView layer type and props check`, t => {
   const loader = { type: 'loads', isPyramid: true };
   const layers = view.getLayers({
     props: {
-      loader: { ...loader, PhysicalSizeXUnit: 'cm', PhysicalSizeX: 0.5 }
+      loader: { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } } }
     },
     viewStates: {
       foo: {
