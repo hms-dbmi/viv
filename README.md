@@ -5,13 +5,6 @@ over the hood and WebGL under the hood. To learn more about the "theory" behind
 this, look at [this](image_rendering_docs/IMAGE_RENDERING.md). To really make this sing, you need to
 use an http2 server in production (s3 is passable, though).
 
-### Using this in your project
-
-In the interest of keeping this app as lightweight and extensible as possible,
-there are no dependencies except for peer dependencies, which you will need to specify in your project.
-The reason for this is primarily to support export external DeckGL setups so that
-you might combine our layer with your own.
-
 ### Build
 
 To build the component alone via `webpack` use `npm run-script build-component`.

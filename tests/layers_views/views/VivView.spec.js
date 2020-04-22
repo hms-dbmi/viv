@@ -72,10 +72,11 @@ export function generateViewTests(ViewType, args, linkedViewIds = []) {
     });
     layers &&
       layers.forEach(layer => {
-        t.ok(
-          layer.id.includes(getVivId(view.id)),
-          "Layer should include view's id as returned by getVivId."
-        );
+        layer &&
+          t.ok(
+            layer.id.includes(getVivId(view.id)),
+            "Layer should include view's id as returned by getVivId."
+          );
       });
     t.end();
   });

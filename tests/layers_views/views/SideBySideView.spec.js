@@ -4,7 +4,7 @@ import { PolygonLayer } from '@deck.gl/layers';
 
 import { SideBySideView } from '../../../src/views';
 import { generateViewTests, defaultArguments } from './VivView.spec';
-import { VivViewerLayer } from '../../../src/layers';
+import { VivViewerLayer, ScaleBarLayer } from '../../../src/layers';
 
 generateViewTests(SideBySideView, defaultArguments);
 
@@ -12,9 +12,14 @@ test(`SideBySideView layer type and props check`, t => {
   const view = new SideBySideView(defaultArguments);
   const loader = { type: 'loads', isPyramid: true };
   const layers = view.getLayers({
-    props: { loader },
+    props: {
+      loader: { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } } }
+    },
     viewStates: {
-      foo: defaultArguments.initialViewState
+      foo: {
+        target: [0, 0, 0],
+        zoom: 0
+      }
     }
   });
   t.ok(
@@ -24,6 +29,10 @@ test(`SideBySideView layer type and props check`, t => {
   t.ok(
     layers[1] instanceof PolygonLayer,
     'SideBySideView layer should be VivViewerLayer.'
+  );
+  t.ok(
+    layers[2] instanceof ScaleBarLayer,
+    'DetailView layer should be VivViewerLayer.'
   );
   t.equal(
     layers[0].props.viewportId,

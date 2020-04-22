@@ -75,6 +75,16 @@ export default class OMETiffLoader {
     this.type = 'ome-tiff';
     // get first image's description, which contains OMEXML
     this.omexml = new OMEXML(omexmlString);
+    this.physicalSizes = {
+      x: {
+        value: this.omexml.PhysicalSizeX,
+        unit: this.omexml.PhysicalSizeXUnit
+      },
+      y: {
+        value: this.omexml.PhysicalSizeY,
+        unit: this.omexml.PhysicalSizeYUnit
+      }
+    };
     this.offsets = offsets || [];
     this.channelNames = this.omexml.getChannelNames();
     this.width = this.omexml.SizeX;

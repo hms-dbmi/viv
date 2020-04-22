@@ -21,8 +21,19 @@ export default class OMEXML {
     this.SizeY = Number.parseInt(Pixels['@_SizeY']);
     this.DimensionOrder = Pixels['@_DimensionOrder'];
     this.Type = Pixels['@_Type'];
-    this.PhysicalSizeYUnit = Pixels['@_PhysicalSizeYUnit'];
-    this.PhysicalSizeXUnit = Pixels['@_PhysicalSizeXUnit'];
+    const PhysicalSizeYUnit = Pixels['@_PhysicalSizeYUnit'];
+    // This µ character is not well handled - I got odd behavior but this solves it.
+    // There was a prepended character so now I just look for µm to be included
+    // and use only µm if it is found.
+    this.PhysicalSizeYUnit =
+      PhysicalSizeYUnit && PhysicalSizeYUnit.includes('µm')
+        ? 'µm'
+        : this.PhysicalSizeXUnit;
+    const PhysicalSizeXUnit = Pixels['@_PhysicalSizeXUnit'];
+    this.PhysicalSizeXUnit =
+      PhysicalSizeXUnit && PhysicalSizeXUnit.includes('µm')
+        ? 'µm'
+        : this.PhysicalSizeXUnit;
     this.PhysicalSizeY = Pixels['@_PhysicalSizeY'];
     this.PhysicalSizeX = Pixels['@_PhysicalSizeX'];
   }

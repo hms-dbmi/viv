@@ -1,4 +1,4 @@
-import { VivViewerLayer, StaticImageLayer } from './layers';
+import { VivViewerLayer, StaticImageLayer, ScaleBarLayer } from './layers';
 import { VivViewer, PictureInPictureViewer, SideBySideViewer } from './viewers';
 import { VivView, OverviewView, DetailView, SideBySideView } from './views';
 import {
@@ -9,6 +9,7 @@ import {
 } from './loaders';
 
 export {
+  ScaleBarLayer,
   VivViewerLayer,
   VivViewer,
   VivView,

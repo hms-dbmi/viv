@@ -1,10 +1,9 @@
 import { PolygonLayer } from '@deck.gl/layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 
-import { VivViewerLayer, StaticImageLayer } from '../layers';
+import { VivViewerLayer, StaticImageLayer, ScaleBarLayer } from '../layers';
 import VivView from './VivView';
 import { getVivId, makeBoundingBox } from './utils';
-
 /**
  * This class generates a VivViewerLayer and a view for use in the SideBySideViewer.
  * It is linked with its other views as controlled by `linkedIds`, `zoomLock`, and `panLock` parameters.
@@ -98,8 +97,10 @@ export default class SideBySideView extends VivView {
   getLayers({ props, viewStates }) {
     const { loader } = props;
     const { id, viewportOutlineColor, viewportOutlineWidth } = this;
-    const thisViewState = viewStates[id];
-    const boundingBox = makeBoundingBox(thisViewState);
+    const layerViewState = viewStates[id];
+    const boundingBox = makeBoundingBox(layerViewState);
+    const layers = [];
+
     const detailLayer = loader.isPyramid
       ? new VivViewerLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
@@ -109,6 +110,8 @@ export default class SideBySideView extends VivView {
           id: `${loader.type}${getVivId(id)}`,
           viewportId: id
         });
+    layers.push(detailLayer);
+
     const border = new PolygonLayer({
       id: `viewport-outline-${loader.type}${getVivId(id)}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
@@ -117,8 +120,27 @@ export default class SideBySideView extends VivView {
       filled: false,
       stroked: true,
       getLineColor: viewportOutlineColor,
-      getLineWidth: viewportOutlineWidth * 2 ** -thisViewState.zoom
+      getLineWidth: viewportOutlineWidth * 2 ** -layerViewState.zoom
     });
-    return [detailLayer, border];
+    layers.push(border);
+
+    const { physicalSizes } = loader;
+    if (physicalSizes) {
+      const { x } = physicalSizes;
+      const { unit, value } = x;
+      if (unit && value) {
+        layers.push(
+          new ScaleBarLayer({
+            id: getVivId(id),
+            loader,
+            unit,
+            size: value,
+            viewState: layerViewState
+          })
+        );
+      }
+    }
+
+    return layers;
   }
 }

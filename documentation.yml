@@ -19,6 +19,7 @@ toc:
 - name: Layers
 - VivViewerLayer
 - StaticImageLayer
+- ScaleBarLayer
 - name: Loaders
 - ZarrLoader
 - OMETiffLoader
