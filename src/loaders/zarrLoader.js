@@ -136,7 +136,7 @@ export default class ZarrLoader {
     if (Array.isArray(selection)) return [...selection];
 
     const serialized = Array(this.dimensions.length).fill(0);
-    for (const [dimName, value] of Object.entries(selection)) {
+    Object.entries(selection).forEach(([dimName, value]) => {
       if (!this._dimIndices.has(dimName)) {
         throw Error(
           `Dimension "${dimName}" does not exist on loader.
@@ -169,7 +169,7 @@ export default class ZarrLoader {
           );
         }
       }
-    }
+    });
     return serialized;
   }
 }
