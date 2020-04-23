@@ -69,8 +69,8 @@ function flipEndianness(arr) {
  * This class serves as a wrapper for fetching tiff data from a file server.
  * */
 export default class OMETiffLoader {
-  constructor({ tiff, poolOrDecoder, firstImage, omexmlString, offsets }) {
-    this.poolOrDecoder = poolOrDecoder;
+  constructor({ tiff, pool, firstImage, omexmlString, offsets }) {
+    this.pool = pool;
     this.tiff = tiff;
     this.type = 'ome-tiff';
     // get first image's description, which contains OMEXML
@@ -222,7 +222,7 @@ export default class OMETiffLoader {
    * @returns {Object} data: TypedArray[], width: number, height: number
    */
   async getRaster({ z, loaderSelection }) {
-    const { tiff, offsets, omexml, isBioFormats6Pyramid, poolOrDecoder } = this;
+    const { tiff, offsets, omexml, isBioFormats6Pyramid, pool } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const rasters = await Promise.all(
       loaderSelection.map(async index => {
@@ -245,7 +245,7 @@ export default class OMETiffLoader {
         }
         const image = await tiff.getImage(pyramidIndex);
         // Flips bits for us for endianness.
-        const raster = await image.readRasters({ pool: poolOrDecoder });
+        const raster = await image.readRasters({ pool: pool });
         return raster[0];
       })
     );
@@ -280,7 +280,7 @@ export default class OMETiffLoader {
   async _getChannel({ image, x, y }) {
     const { dtype } = this;
     const { TypedArray } = DTYPE_VALUES[dtype];
-    const tile = await image.getTileOrStrip(x, y, 0, this.poolOrDecoder);
+    const tile = await image.getTileOrStrip(x, y, 0, this.pool);
     const data = new TypedArray(tile.data);
     // Javascript needs little endian byteorder, so we flip if the data is not.
     // eslint-disable-next-line no-unused-expressions

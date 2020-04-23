@@ -12,7 +12,7 @@ describe('Test multi-channel input', () => {
     const { ImageDescription: omexmlString } = firstImage.fileDirectory;
     const loader = new OMETiffLoader({
       tiff,
-      poolOrDecoder: { decode: () => new Promise([]) },
+      pool: { decode: () => new Promise([]) },
       firstImage,
       omexmlString,
       offsets: [8, 2712, 4394]
@@ -30,7 +30,7 @@ describe('Test multi-channel input', () => {
     const { ImageDescription: omexmlString } = firstImage.fileDirectory;
     const loader = new OMETiffLoader({
       tiff,
-      poolOrDecoder: { decode: () => new Promise([]) },
+      pool: { decode: () => new Promise([]) },
       firstImage,
       omexmlString,
       offsets: [8, 2712, 4394]
