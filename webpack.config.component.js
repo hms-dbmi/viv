@@ -5,6 +5,7 @@ const nodeExternals = require('webpack-node-externals');
 const baseConifg = {
   devtool: 'source-map',
   entry: './src/index.js',
+  // Bundle geotiff so we can use workers with its code.
   externals: [nodeExternals({ whitelist: 'geotiff' })],
   module: {
     rules: [
