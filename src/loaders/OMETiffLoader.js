@@ -245,7 +245,7 @@ export default class OMETiffLoader {
         }
         const image = await tiff.getImage(pyramidIndex);
         // Flips bits for us for endianness.
-        const raster = await image.readRasters({ pool: pool });
+        const raster = await image.readRasters({ pool });
         return raster[0];
       })
     );
