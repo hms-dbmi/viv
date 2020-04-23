@@ -4,6 +4,8 @@
 
 ### Added
 
+- Remove threads.js and use WebWorkers.
+
 ### Changed
 
 ## 0.1.7

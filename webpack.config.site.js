@@ -2,7 +2,6 @@
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const ThreadsPlugin = require('threads-plugin');
 
 module.exports = {
   devtool: 'source-map',
@@ -13,6 +12,17 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /viv\.worker\.js$/,
+        use: {
+          loader: 'worker-loader',
+          options: {
+            name: '[hash].decoder.worker.js',
+            inline: true,
+            fallback: false
+          }
+        }
+      },
       {
         test: /\.(glsl|frag|vert)$/,
         use: [require.resolve('raw-loader'), require.resolve('glslify-loader')]
@@ -68,7 +78,6 @@ module.exports = {
     http: 'empty'
   },
   plugins: [
-    new ThreadsPlugin(),
     new HtmlWebPackPlugin({
       hash: true,
       filename: 'index.html', // target html
