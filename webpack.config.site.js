@@ -13,7 +13,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\viv\.worker\.js$/,
+        test: /viv\.worker\.js$/,
         use: {
           loader: 'worker-loader',
           options: {

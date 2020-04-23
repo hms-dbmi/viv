@@ -1,4 +1,6 @@
-import {getTiffDecoder} from './decoder';
+/* eslint-disable no-restricted-globals */
+
+import { getTiffDecoder } from './decoder';
 
 function decode(self, fileDirectory, buffer) {
   const decoder = getTiffDecoder(fileDirectory);

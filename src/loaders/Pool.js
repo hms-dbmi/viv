@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import Worker from 'worker-loader!./viv.worker';
+import Worker from './viv.worker';
 
 const defaultPoolSize =
   typeof navigator !== 'undefined' ? navigator.hardwareConcurrency : null;
@@ -24,6 +24,7 @@ export default class Pool {
     this.waitQueue = [];
     this.decoder = null;
 
+    // eslint-disable-next-line no-plusplus
     for (let i = 0; i < size; ++i) {
       const w = new Worker();
       this.workers.push(w);
@@ -77,6 +78,7 @@ export default class Pool {
   }
 
   destroy() {
+    // eslint-disable-next-line no-plusplus
     for (let i = 0; i < this.workers.length; ++i) {
       this.workers[i].terminate();
     }
