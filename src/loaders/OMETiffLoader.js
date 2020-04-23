@@ -1,6 +1,7 @@
 import OMEXML from './omeXML';
 import { isInTileBounds } from './utils';
 import { DTYPE_VALUES } from '../constants';
+
 // Credit to https://github.com/zbjornson/node-bswap/blob/master/bswap.js for the implementation.
 // I could not get this to import, and it doesn't appear anyone else can judging by the "Used by" on github.
 // We need this for handling the endianness returned by geotiff since it only returns bytes.
@@ -95,7 +96,15 @@ export default class OMETiffLoader {
       this.omexml.getNumberOfImages() || (SubIFDs && SubIFDs.length);
     this.isBioFormats6Pyramid = SubIFDs;
     this.isPyramid = this.numLevels > 1;
-
+    // The omexml specification only allows for these - zarr is more flexible so this
+    // is for unifying the two loaders in upstream applications.
+    this.dimensions = [
+      { field: 'channel', type: 'nominal', values: this.channelNames },
+      { field: 'z', type: 'number', values: null },
+      { field: 'time', type: 'number', values: null },
+      { field: 'x', type: 'quantitative', values: null },
+      { field: 'y', type: 'quantitative', values: null }
+    ];
     const type = this.omexml.Type;
     // We use zarr's internal format.  It encodes endiannes, but we leave it little for now
     // since javascript is little endian.
