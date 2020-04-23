@@ -4,7 +4,7 @@
 
 ### Added
 
-- Remove threads.js and use WebWorkers.
+- Remove threads.js and use WebWorkers for tiff decompression.
 
 ### Changed
 
