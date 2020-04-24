@@ -15,30 +15,32 @@ const loader = await createZarrLoader({
   isPyramid: true
 });
 
-const sliders = [[0,2000], [0,2000]]
-const colors = [[255, 0, 0], [0, 255, 0]]
-const isOn = [true, false]
-const selections = [[1, 0, 0], [2, 0, 0]]
+const sliders = [[0,2000], [0,2000]];
+const colors = [[255, 0, 0], [0, 255, 0]];
+const isOn = [true, false];
+const selections = [{ channel: 0 }, { channel: 1 }];
 const initialViewState = {
   height: 1000,
   width: 500,
   zoom: -5,
   target: [10000, 10000, 0].
-}
-const colormap = ''
-const panLock = true
-const zoomLock = false
-const linkedDetailViewer = <SideBySideViewer
-  loader={loader}
-  sliderValues={sliders}
-  colorValues={colors}
-  channelIsOn={isOn}
-  loaderSelection={selections}
-  initialViewState={initialViewState}
-  colormap={colormap.length > 0 && colormap}
-  zoomLock={zoomLock}
-  panLock={panLock}
-/>
+};
+const colormap = '';
+const panLock = true;
+const zoomLock = false;
+const linkedDetailViewer = (
+  <SideBySideViewer
+    loader={loader}
+    sliderValues={sliders}
+    colorValues={colors}
+    channelIsOn={isOn}
+    loaderSelection={selections}
+    initialViewState={initialViewState}
+    colormap={colormap.length > 0 && colormap}
+    zoomLock={zoomLock}
+    panLock={panLock}
+  />
+);
 ```
 
 #### `PictureInPictureViewer`
@@ -68,30 +70,32 @@ const zarrInfo = {
   ...basePyramidInfo,
 };
 const loader = await createZarrLoader(zarrInfo);
-const sliders = [[0,2000], [0,2000]]
-const colors = [[255, 0, 0], [0, 255, 0]]
-const isOn = [true, false]
-const selections = [[1, 0, 0], [2, 0, 0]]
+const sliders = [[0,2000], [0,2000]];
+const colors = [[255, 0, 0], [0, 255, 0]];
+const isOn = [true, false];
+const selections = [{ channel: 1 }, { channel: 2 }];
 const initialViewState = {
   height: 1000,
   width: 500,
   zoom: -5,
   target: [10000, 10000, 0].
-}
-const colormap = ''
+};
+const colormap = '';
 const overview = {
   boundingBoxColor: [0, 0, 255]
-}
-const overviewOn = true
-const PictureInPictureViewer = <PictureInPictureViewer
-  loader={loader}
-  sliderValues={sliders}
-  colorValues={colors}
-  channelIsOn={isOn}
-  loaderSelection={selections}
-  initialViewState={initialViewState}
-  colormap={colormap.length > 0 && colormap}
-  overview={overview}
-  overviewOn={overviewOn}
-/>
+};
+const overviewOn = true;
+const PictureInPictureViewer = (
+  <PictureInPictureViewer
+    loader={loader}
+    sliderValues={sliders}
+    colorValues={colors}
+    channelIsOn={isOn}
+    loaderSelection={selections}
+    initialViewState={initialViewState}
+    colormap={colormap.length > 0 && colormap}
+    overview={overview}
+    overviewOn={overviewOn}
+  />
+);
 ```
