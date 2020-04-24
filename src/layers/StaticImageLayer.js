@@ -45,6 +45,7 @@ function scaleBounds({ width, height, translate, scale }) {
  * @param {Array} props.translate Translate transformation to be applied to the bounds after scaling.
  * @param {number} props.scale Scaling factor for this layer to be used against the dimensions of the loader's `getRaster`.
  * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
+ * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
  */
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {

@@ -22,6 +22,7 @@ const defaultProps = {
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {String} props.id Unique identifier for this layer.
  * @param {String} props.onTileError Custom override for handle tile fetching errors.
+ * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
  */
 
 export default class VivViewerLayer extends CompositeLayer {

@@ -14,6 +14,7 @@ import { DetailView, OverviewView } from '../views';
  * @param {Object} props.overview Allows you to pass settings into the OverviewView: { scale, margin, position, minimumWidth, maximumWidth,
  * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
+ * @param {Object} props.hoverHooks Object including the allowable hooks - right now only accepting a function with key handleValue like { handleValue: (valueArray) => {} }
  */
 
 const PictureInPictureViewer = props => {
