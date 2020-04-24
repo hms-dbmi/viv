@@ -2,7 +2,7 @@
 // A lot of this codes inherits paradigms form DeckGL that
 // we live in place for now, hence some of the not-destructuring
 import GL from '@luma.gl/constants';
-import { COORDINATE_SYSTEM, Layer, project32 } from '@deck.gl/core';
+import { COORDINATE_SYSTEM, Layer, project32, picking } from '@deck.gl/core';
 import { Model, Geometry, Texture2D } from '@luma.gl/core';
 import vs from './xr-layer-vertex.glsl';
 import fsColormap from './xr-layer-fragment-colormap.glsl';
@@ -10,7 +10,7 @@ import fs from './xr-layer-fragment.glsl';
 import { DTYPE_VALUES } from '../../constants';
 
 const defaultProps = {
-  pickable: false,
+  pickable: true,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'array', value: {}, async: true },
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
@@ -43,7 +43,7 @@ export default class XRLayer extends Layer {
     return super.getShaders({
       vs,
       fs: fragmentShaderDtype,
-      modules: [project32]
+      modules: [project32, picking]
     });
   }
 
@@ -65,8 +65,6 @@ export default class XRLayer extends Layer {
       numInstances: 1,
       positions: new Float64Array(12)
     });
-
-    attributeManager.remove('instancePickingColors');
   }
 
   /**

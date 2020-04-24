@@ -4,7 +4,7 @@ import XRLayer from './XRLayer';
 import { padColorsAndSliders } from './utils';
 
 const defaultProps = {
-  pickable: false,
+  pickable: true,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   sliderValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },

@@ -35,6 +35,7 @@ export default class VivViewer extends PureComponent {
     });
     this._onViewStateChange = this._onViewStateChange.bind(this);
     this.layerFilter = this.layerFilter.bind(this);
+    this.onHover = this.onHover.bind(this);
   }
 
   /**
@@ -107,14 +108,37 @@ export default class VivViewer extends PureComponent {
     return prevState;
   }
 
+  // eslint-disable-next-line consistent-return
+  onHover({ sourceLayer, coordinate, layer }) {
+    const { shouldGetHoveredValue, hoveredValueHook } = this.props;
+    if (shouldGetHoveredValue) {
+      const { channelData, bounds } = sourceLayer.props;
+      const { zoom } = layer.context.viewport;
+      const { data, width } = channelData;
+      if (!coordinate) {
+        return null;
+      }
+      const dataCoords = [
+        Math.floor((coordinate[0] - bounds[0]) / 2 ** -zoom),
+        Math.floor((coordinate[1] - bounds[3]) / 2 ** -zoom)
+      ];
+      const hoverData = data.map(d => d[dataCoords[1] * width + dataCoords[0]]);
+      hoveredValueHook(hoverData);
+    }
+  }
+
   /**
    * This renders the layers in the DeckGL context.
    */
   _renderLayers() {
+    const { onHover } = this;
     const { viewStates } = this.state;
-    const { views, layerProps } = this.props;
+    const { views, layerProps, shouldGetHoveredValue } = this.props;
     return views.map((view, i) =>
-      view.getLayers({ viewStates, props: layerProps[i] })
+      view.getLayers({
+        viewStates,
+        props: { ...layerProps[i], onHover, pickable: shouldGetHoveredValue }
+      })
     );
   }
 
