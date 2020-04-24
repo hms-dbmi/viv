@@ -44,7 +44,7 @@ function App() {
   const [panLock, togglePanLock] = useReducer(v => !v, true);
   const [isLoading, setIsLoading] = useState(true);
   const [hoverValue, setHoverValue] = useState(
-    new Array(channels.length).fill(0)
+    new Array(channels.length).fill('')
   );
 
   useEffect(() => {

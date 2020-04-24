@@ -37,8 +37,8 @@ function ChannelController({
   colormapOn,
   channelOptions,
   handleChange,
-  disableOptions = false,
-  value = 0
+  value,
+  disableOptions = false
 }) {
   const rgbColor = toRgb(colormapOn, colorValue);
   const classes = useStyles();
