@@ -1,6 +1,7 @@
 import OMEXML from './omeXML';
 import { isInTileBounds } from './utils';
 import { DTYPE_VALUES } from '../constants';
+import { range } from '../layers/utils';
 
 // Credit to https://github.com/zbjornson/node-bswap/blob/master/bswap.js for the implementation.
 // I could not get this to import, and it doesn't appear anyone else can judging by the "Used by" on github.
@@ -100,8 +101,8 @@ export default class OMETiffLoader {
     // is for unifying the two loaders in upstream applications.
     this.dimensions = [
       { field: 'channel', type: 'nominal', values: this.channelNames },
-      { field: 'z', type: 'number', values: null },
-      { field: 'time', type: 'number', values: null },
+      { field: 'z', type: 'ordinal', values: range(this.omexml.SizeZ) },
+      { field: 'time', type: 'ordinal', values: range(this.omexml.SizeT) },
       { field: 'x', type: 'quantitative', values: null },
       { field: 'y', type: 'quantitative', values: null }
     ];
