@@ -110,8 +110,9 @@ export default class VivViewer extends PureComponent {
 
   // eslint-disable-next-line consistent-return
   onHover({ sourceLayer, coordinate, layer }) {
-    const { shouldGetHoveredValue, hoveredValueHook } = this.props;
-    if (shouldGetHoveredValue) {
+    const { hoverHooks } = this.props;
+    const { handleValue } = hoverHooks;
+    if (handleValue) {
       const { channelData, bounds } = sourceLayer.props;
       const { zoom } = layer.context.viewport;
       const { data, width } = channelData;
@@ -119,11 +120,11 @@ export default class VivViewer extends PureComponent {
         return null;
       }
       const dataCoords = [
-        Math.floor((coordinate[0] - bounds[0]) / 2 ** -zoom),
-        Math.floor((coordinate[1] - bounds[3]) / 2 ** -zoom)
+        Math.floor((coordinate[0] - bounds[0]) / Math.max(1, 2 ** -zoom)),
+        Math.floor((coordinate[1] - bounds[3]) / Math.max(1, 2 ** -zoom))
       ];
       const hoverData = data.map(d => d[dataCoords[1] * width + dataCoords[0]]);
-      hoveredValueHook(hoverData);
+      handleValue(hoverData);
     }
   }
 
@@ -133,11 +134,14 @@ export default class VivViewer extends PureComponent {
   _renderLayers() {
     const { onHover } = this;
     const { viewStates } = this.state;
-    const { views, layerProps, shouldGetHoveredValue } = this.props;
+    const { views, layerProps } = this.props;
     return views.map((view, i) =>
       view.getLayers({
         viewStates,
-        props: { ...layerProps[i], onHover, pickable: shouldGetHoveredValue }
+        props: {
+          ...layerProps[i],
+          onHover
+        }
       })
     );
   }

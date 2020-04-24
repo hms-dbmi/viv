@@ -26,7 +26,8 @@ const PictureInPictureViewer = props => {
     colormap,
     overview,
     overviewOn,
-    loaderSelection
+    loaderSelection,
+    hoverHooks
   } = props;
   const detailViewState = { ...initialViewState, id: 'detail' };
   const detailView = new DetailView({ initialViewState: detailViewState });
@@ -52,7 +53,9 @@ const PictureInPictureViewer = props => {
     views.push(overviewView);
     layerProps.push(layerConfig);
   }
-  return loader ? <VivViewer layerProps={layerProps} views={views} /> : null;
+  return loader ? (
+    <VivViewer layerProps={layerProps} views={views} hoverHooks={hoverHooks} />
+  ) : null;
 };
 
 export default PictureInPictureViewer;

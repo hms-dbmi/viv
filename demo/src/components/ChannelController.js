@@ -4,6 +4,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import Select from '@material-ui/core/Select';
+import Typography from '@material-ui/core/Typography';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -36,7 +37,8 @@ function ChannelController({
   colormapOn,
   channelOptions,
   handleChange,
-  disableOptions = false
+  disableOptions = false,
+  value = 0
 }) {
   const rgbColor = toRgb(colormapOn, colorValue);
   const classes = useStyles();
@@ -66,7 +68,10 @@ function ChannelController({
           <ChannelOptions handleChange={handleChange} />
         </Grid>
       </Grid>
-      <Grid container direction="row" justify="flex-start">
+      <Grid container direction="row" justify="flex-start" alignItems="center">
+        <Grid item xs={2}>
+          <Typography>{isOn ? value : ''}</Typography>
+        </Grid>
         <Grid item xs={2}>
           <Checkbox
             onChange={() => handleChange('TOGGLE_ON')}
@@ -79,7 +84,7 @@ function ChannelController({
             }}
           />
         </Grid>
-        <Grid item xs={9}>
+        <Grid item xs={7}>
           <Slider
             value={sliderValue}
             onChange={(e, v) => handleChange('CHANGE_SLIDER', v)}

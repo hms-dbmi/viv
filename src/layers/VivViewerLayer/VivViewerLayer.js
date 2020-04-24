@@ -4,7 +4,7 @@ import StaticImageLayer from '../StaticImageLayer';
 import { padColorsAndSliders } from '../utils';
 
 const defaultProps = {
-  pickable: false,
+  pickable: true,
   onHover: { type: 'function', value: null, compare: false }
 };
 
@@ -49,7 +49,6 @@ export default class VivViewerLayer extends CompositeLayer {
       height,
       isBioFormats6Pyramid
     } = loader;
-    console.log(onHover, pickable);
     const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
       sliderValues,
       colorValues,

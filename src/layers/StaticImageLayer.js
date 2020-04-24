@@ -70,6 +70,15 @@ export default class StaticImageLayer extends CompositeLayer {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  getPickingInfo({ info, sourceLayer }) {
+    // eslint-disable-next-line no-param-reassign
+    info.sourceLayer = sourceLayer;
+    // eslint-disable-next-line no-param-reassign
+    info.tile = sourceLayer.props.tile;
+    return info;
+  }
+
   renderLayers() {
     const {
       loader,
@@ -83,6 +92,7 @@ export default class StaticImageLayer extends CompositeLayer {
       scale,
       domain,
       z,
+      pickable,
       id
     } = this.props;
     const { dtype } = loader;
@@ -103,11 +113,11 @@ export default class StaticImageLayer extends CompositeLayer {
     });
     return new XRLayer({
       channelData: Promise.resolve({ data, width, height }),
+      pickable,
       bounds,
       sliderValues: paddedSliderValues,
       colorValues: paddedColorValues,
       id: `XR-Static-Layer-${0}-${height}-${width}-${0}-${z}-${id}`,
-      pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       opacity,
       visible,
