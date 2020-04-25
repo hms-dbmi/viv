@@ -176,6 +176,9 @@ export default class VivViewer extends PureComponent {
         onViewStateChange={this._onViewStateChange}
         views={deckGLViews}
         viewState={viewStates}
+        getCursor={({ isDragging }) => {
+          return isDragging ? 'grabbing' : 'crosshair';
+        }}
       />
     ) : (
       <div className="viv-error">
