@@ -111,7 +111,7 @@ export function channelsReducer(state, { index, value, type }) {
     }
     case 'RESET_CHANNELS': {
       // Clears current channels and sets with new defaults
-      const { names, selections = [] } = value;
+      const { names, selections } = value;
       const n = names.length;
       return {
         names,

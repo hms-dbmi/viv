@@ -35,8 +35,8 @@ describe('Test multi-channel input', () => {
       omexmlString,
       offsets: [8, 2712, 4394]
     });
-    const selection = loader.serializeSelection([{ channel: 1 }]);
+    const selection = loader._getIFDIndex({ channel: 1 });
 
-    expect(selection).to.deep.equal([1]);
+    expect(selection).to.deep.equal(1);
   });
 });

@@ -8,6 +8,8 @@
 
 ### Changed
 
+- Removed `loader.serializeSelection` and standardized `loaderSelection` for `getTile` and `getRaster`
+
 ## 0.1.7
 
 ### Added

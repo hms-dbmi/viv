@@ -44,7 +44,11 @@ describe('Test zarr non-rgb image loader', () => {
     expect(res.data[0][10]).to.equal(42);
     expect(res.data[0].length).to.equal(tileSize * tileSize);
 
-    res = await loader.getTile({ x: 0, y: 0, loaderSelection: [[1, 0, 0]] });
+    res = await loader.getTile({
+      x: 0,
+      y: 0,
+      loaderSelection: [{ channel: 1 }]
+    });
     expect(res.data[0].subarray(0, 100)).to.deep.equal(
       NestedArray.arange(100).flatten()
     );
