@@ -119,9 +119,14 @@ export default class VivViewer extends PureComponent {
       if (!coordinate) {
         return null;
       }
+      // Using floor means that as we zoom out, we are scaling by the zoom just passed, not the one coming.
       const dataCoords = [
-        Math.floor((coordinate[0] - bounds[0]) / Math.max(1, 2 ** -zoom)),
-        Math.floor((coordinate[1] - bounds[3]) / Math.max(1, 2 ** -zoom))
+        Math.floor(
+          (coordinate[0] - bounds[0]) / Math.max(1, 2 ** Math.floor(-zoom))
+        ),
+        Math.floor(
+          (coordinate[1] - bounds[3]) / Math.max(1, 2 ** Math.floor(-zoom))
+        )
       ];
       const hoverData = data.map(d => d[dataCoords[1] * width + dataCoords[0]]);
       handleValue(hoverData);

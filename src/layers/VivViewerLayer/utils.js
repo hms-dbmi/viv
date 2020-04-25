@@ -42,6 +42,9 @@ export function renderSubLayers(props) {
     ],
     channelData: data,
     pickable,
+    // Uncomment to help debugging - shades the tile being hovered over.
+    // autoHighlight: true,
+    // highlightColor: [80, 80, 80, 50],
     data: null,
     sliderValues,
     colorValues,
