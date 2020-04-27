@@ -78,4 +78,6 @@ void main() {
   }
 
   color = vec4(rgbCombo, opacity);
+  geometry.uv = vTexCoord;
+  DECKGL_FILTER_COLOR(color, geometry);
 }

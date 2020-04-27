@@ -6,8 +6,11 @@
 
 - Remove threads.js and use WebWorkers for tiff decompression.
 - Add a dimension builder onto the tiff loader.
+- Add hover values for PictureInPictureViewer
 
 ### Changed
+
+- Removed `loader.serializeSelection` and standardized `loaderSelection` for `getTile` and `getRaster`
 
 ## 0.1.7
 

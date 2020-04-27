@@ -1,71 +1,14 @@
 import OMEXML from './omeXML';
-import { isInTileBounds } from './utils';
+import { isInTileBounds, flipEndianness } from './utils';
 import { DTYPE_VALUES } from '../constants';
 import { range } from '../layers/utils';
 
-// Credit to https://github.com/zbjornson/node-bswap/blob/master/bswap.js for the implementation.
-// I could not get this to import, and it doesn't appear anyone else can judging by the "Used by" on github.
-// We need this for handling the endianness returned by geotiff since it only returns bytes.
-function flip16(info) {
-  const flipper = new Uint8Array(info.buffer, info.byteOffset, info.length * 2);
-  const len = flipper.length;
-  for (let i = 0; i < len; i += 2) {
-    const t = flipper[i];
-    flipper[i] = flipper[i + 1];
-    flipper[i + 1] = t;
-  }
-}
-
-function flip32(info) {
-  const flipper = new Uint8Array(info.buffer, info.byteOffset, info.length * 4);
-  const len = flipper.length;
-  for (let i = 0; i < len; i += 4) {
-    let t = flipper[i];
-    flipper[i] = flipper[i + 3];
-    flipper[i + 3] = t;
-    t = flipper[i + 1];
-    flipper[i + 1] = flipper[i + 2];
-    flipper[i + 2] = t;
-  }
-}
-
-function flip64(info) {
-  const flipper = new Uint8Array(info.buffer, info.byteOffset, info.length * 8);
-  const len = flipper.length;
-  for (let i = 0; i < len; i += 8) {
-    let t = flipper[i];
-    flipper[i] = flipper[i + 7];
-    flipper[i + 7] = t;
-    t = flipper[i + 1];
-    flipper[i + 1] = flipper[i + 6];
-    flipper[i + 6] = t;
-    t = flipper[i + 2];
-    flipper[i + 2] = flipper[i + 5];
-    flipper[i + 5] = t;
-    t = flipper[i + 3];
-    flipper[i + 3] = flipper[i + 4];
-    flipper[i + 4] = t;
-  }
-}
-
-function flipEndianness(arr) {
-  switch (arr.BYTES_PER_ELEMENT) {
-    case 1:
-      // no op
-      return;
-    case 2:
-      flip16(arr);
-      break;
-    case 4:
-      flip32(arr);
-      break;
-    case 8:
-      flip64(arr);
-      break;
-    default:
-      throw new Error('Invalid input');
-  }
-}
+const DTYPE_LOOKUP = {
+  uint8: '<u1',
+  uint16: '<u2',
+  uint32: '<u4',
+  float32: '<f4'
+};
 
 /**
  * This class serves as a wrapper for fetching tiff data from a file server.
@@ -109,18 +52,7 @@ export default class OMETiffLoader {
     const type = this.omexml.Type;
     // We use zarr's internal format.  It encodes endiannes, but we leave it little for now
     // since javascript is little endian.
-    if (type === 'uint8') {
-      this.dtype = '<u1';
-    }
-    if (type === 'uint16') {
-      this.dtype = '<u2';
-    }
-    if (type === 'uint32') {
-      this.dtype = '<u4';
-    }
-    if (type === 'float32') {
-      this.dtype = '<f4';
-    }
+    this.dtype = DTYPE_LOOKUP[this.omexml.Type];
   }
 
   /**
@@ -192,7 +124,8 @@ export default class OMETiffLoader {
     const { SizeZ, SizeT, SizeC } = omexml;
     const pyramidOffset = z * SizeZ * SizeT * SizeC;
     let image;
-    const tileRequests = loaderSelection.map(async index => {
+    const tileRequests = loaderSelection.map(async sel => {
+      const index = this._getIFDIndex(sel);
       const pyramidIndex = pyramidOffset + index;
       // We need to put the request for parsing the file directory into this array.
       // This allows us to get tiff pages directly based on offset without parsing everything.
@@ -235,7 +168,8 @@ export default class OMETiffLoader {
     const { tiff, offsets, omexml, isBioFormats6Pyramid, pool } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const rasters = await Promise.all(
-      loaderSelection.map(async index => {
+      loaderSelection.map(async sel => {
+        const index = this._getIFDIndex(sel);
         const pyramidIndex = z * SizeZ * SizeT * SizeC + index;
         // We need to put the request for parsing the file directory into this array.
         // This allows us to get tiff pages directly based on offset without parsing everything.
@@ -261,7 +195,7 @@ export default class OMETiffLoader {
     );
     // Get first selectioz * SizeZ * SizeT * SizeC + loaderSelection[0]n size as proxy for image size.
     const image = await tiff.getImage(
-      z * SizeZ * SizeT * SizeC + loaderSelection[0]
+      z * SizeZ * SizeT * SizeC + this._getIFDIndex(loaderSelection[0])
     );
     const width = image.getWidth();
     const height = image.getHeight();
@@ -298,35 +232,6 @@ export default class OMETiffLoader {
       flipEndianness(data);
     }
     return data;
-  }
-
-  /**
-   * Converts Array of loader selection objects into an IFD index.
-   *
-   * Ex.
-   *  const loaderSelectionObj = [
-   *     { time: 1, channel: 'a', z: 0 },
-   *     { time: 1, channel: 'b', z: 0 }
-   *  ];
-   *  const serialized = loader.serializeSelection(loaderSelectionObj);
-   *  console.log(serialized);
-   *  // 4, 5
-   *
-   * @param {Array || Object} loaderSelectionObjs Human-interpretable array of desired selection objects
-   * @returns {Array} number[][], IFD indices for selecting an image of the tiff.
-   */
-  serializeSelection(loaderSelectionObjs) {
-    // Wrap selection in array if only one is provided
-    const selectionObjs = Array.isArray(loaderSelectionObjs)
-      ? loaderSelectionObjs
-      : [loaderSelectionObjs];
-    const serialized = selectionObjs.map(obj => this._serialize(obj));
-    return serialized;
-  }
-
-  _serialize(selectionObj) {
-    const serializedSelection = this._getIFDIndex(selectionObj);
-    return serializedSelection;
   }
 
   _tileInBounds({ x, y, z }) {

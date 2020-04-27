@@ -21,7 +21,9 @@ export function renderSubLayers(props) {
     height,
     tileSize,
     id,
-    isBioFormats6Pyramid
+    isBioFormats6Pyramid,
+    onHover,
+    pickable
   } = props;
   // Only render in positive coorinate system
   if ([left, top, right, bottom].some(v => v < 0)) {
@@ -39,12 +41,18 @@ export function renderSubLayers(props) {
       top
     ],
     channelData: data,
+    pickable,
+    // Uncomment to help debugging - shades the tile being hovered over.
+    // autoHighlight: true,
+    // highlightColor: [80, 80, 80, 50],
+    data: null,
     sliderValues,
     colorValues,
     opacity,
     visible,
     dtype,
-    colormap
+    colormap,
+    onHover
   });
   return xrl;
 }

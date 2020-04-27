@@ -4,6 +4,8 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import Select from '@material-ui/core/Select';
+import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -12,6 +14,7 @@ import ChannelOptions from './ChannelOptions';
 const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
+const FILL_PIXEL_VALUE = '----';
 
 const toRgb = (on, arr) => {
   const color = on ? COLORMAP_SLIDER_CHECKBOX_COLOR : arr;
@@ -28,6 +31,19 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+// If the channel is not on, display nothing.
+// If the channel has a not-undefined value, show it.
+// Otherwise, show a circular progress animation.
+const getPixelValueDisplay = (isOn, pixelValue, shouldShowPixelValue) => {
+  if (!isOn || !shouldShowPixelValue) {
+    return <Typography> {FILL_PIXEL_VALUE} </Typography>;
+  }
+  if (typeof pixelValue === 'number') {
+    return <Typography> {pixelValue} </Typography>;
+  }
+  return <CircularProgress size="50%" />;
+};
+
 function ChannelController({
   name,
   isOn,
@@ -36,6 +52,8 @@ function ChannelController({
   colormapOn,
   channelOptions,
   handleChange,
+  pixelValue,
+  shouldShowPixelValue,
   disableOptions = false
 }) {
   const rgbColor = toRgb(colormapOn, colorValue);
@@ -66,7 +84,10 @@ function ChannelController({
           <ChannelOptions handleChange={handleChange} />
         </Grid>
       </Grid>
-      <Grid container direction="row" justify="flex-start">
+      <Grid container direction="row" justify="flex-start" alignItems="center">
+        <Grid item xs={2}>
+          {getPixelValueDisplay(isOn, pixelValue, shouldShowPixelValue)}
+        </Grid>
         <Grid item xs={2}>
           <Checkbox
             onChange={() => handleChange('TOGGLE_ON')}
@@ -79,7 +100,7 @@ function ChannelController({
             }}
           />
         </Grid>
-        <Grid item xs={9}>
+        <Grid item xs={7}>
           <Slider
             value={sliderValue}
             onChange={(e, v) => handleChange('CHANGE_SLIDER', v)}

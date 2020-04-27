@@ -27,17 +27,12 @@ export default class ZarrLoader {
     this._defaultSelection = [Array(dimensions.legnth).fill(0)];
 
     this._data = data;
-    if (this.isRgb) {
-      this._xIndex = base.shape.length - 2;
-      this._yIndex = base.shape.length - 3;
-    } else {
-      this._xIndex = base.shape.length - 1;
-      this._yIndex = base.shape.length - 2;
-    }
+    this._dimIndices = new Map();
+    dimensions.forEach(({ field }, i) => this._dimIndices.set(field, i));
 
     const { dtype, chunks } = base;
     this.dtype = dtype;
-    this.tileSize = chunks[this._xIndex];
+    this.tileSize = chunks[this._dimIndices.get('x')];
   }
 
   get isPyramid() {
@@ -53,16 +48,16 @@ export default class ZarrLoader {
    * @param {number} x positive integer
    * @param {number} y positive integer
    * @param {number} z positive integer (0 === highest zoom level)
-   * @param {Array} loaderSelection, Array of number Arrays specifying channel selections
+   * @param {Array} loaderSelection, Array of valid dimension selections
    * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize)
    */
   async getTile({ x, y, z, loaderSelection }) {
     const source = this._getSource(z);
     const selections = loaderSelection || this._defaultSelection;
-    const dataRequests = selections.map(async key => {
-      const chunkKey = [...key];
-      chunkKey[this._yIndex] = y;
-      chunkKey[this._xIndex] = x;
+    const dataRequests = selections.map(async sel => {
+      const chunkKey = this._serializeSelection(sel);
+      chunkKey[this._dimIndices.get('y')] = y;
+      chunkKey[this._dimIndices.get('x')] = x;
       const { data } = await source.getRawChunk(chunkKey);
       return data;
     });
@@ -73,24 +68,25 @@ export default class ZarrLoader {
   /**
    * Returns full image panes (at level z if pyramid)
    * @param {number} z positive integer (0 === highest zoom level)
-   * @param {Array} loaderSelection, Array of number Arrays specifying channel selections
+   * @param {Array} loaderSelection, Array of valid dimension selections
    * @returns {Object} data: TypedArray[], width: number, height: number
    */
   async getRaster({ z, loaderSelection }) {
     const source = this._getSource(z);
+    const [xIndex, yIndex] = ['x', 'y'].map(k => this._dimIndices.get(k));
     const selections = loaderSelection || this._defaultSelection;
-    const dataRequests = selections.map(async key => {
-      const chunkKey = [...key];
-      chunkKey[this._yIndex] = null;
-      chunkKey[this._xIndex] = null;
+    const dataRequests = selections.map(async sel => {
+      const chunkKey = this._serializeSelection(sel);
+      chunkKey[yIndex] = null;
+      chunkKey[xIndex] = null;
       if (this.isRgb) chunkKey[chunkKey.length - 1] = null;
       const { data } = await source.getRaw(chunkKey);
       return data;
     });
     const data = await Promise.all(dataRequests);
     const { shape } = source;
-    const width = shape[this._xIndex];
-    const height = shape[this._yIndex];
+    const width = shape[xIndex];
+    const height = shape[yIndex];
     return { data, width, height };
   }
 
@@ -116,76 +112,64 @@ export default class ZarrLoader {
    */
   getRasterSize({ z }) {
     const source = this._getSource(z);
-    const height = source.shape[this._yIndex];
-    const width = source.shape[this._xIndex];
+    const [height, width] = ['y', 'x'].map(
+      k => source.shape[this._dimIndices.get(k)]
+    );
     return { height, width };
-  }
-
-  /**
-   * Converts Array of loader selection objects into zarr-specific selection
-   *
-   * Ex.
-   *  const loaderSelectionObj = [
-   *     { time: 1, channel: 'a' },
-   *     { time: 1, channel: 'b' }
-   *  ];
-   *  const serialized = loader.serializeSelection(loaderSelectionObj);
-   *  console.log(serialized);
-   *  // [[1, 0, 0, 0], [1, 1, 0, 0]]
-   *
-   * @param {Array || Object} loaderSelectionObjs Human-interpretable array of desired selection objects
-   * @returns {Array} number[][], zarr-specific selections to be passed to to viv as loaderSelections
-   */
-  serializeSelection(loaderSelectionObjs) {
-    // Wrap selection in array if only one is provided
-    const selectionObjs = Array.isArray(loaderSelectionObjs)
-      ? loaderSelectionObjs
-      : [loaderSelectionObjs];
-
-    const serialized = selectionObjs.map(obj => this._serialize(obj));
-    return serialized;
   }
 
   _getSource(z) {
     return typeof z === 'number' && this.isPyramid ? this._data[z] : this._data;
   }
 
-  _serialize(selectionObj) {
-    const serializedSelection = Array(this.dimensions.length).fill(0);
-    const dimFields = this.dimensions.map(d => d.field);
-    Object.entries(selectionObj).forEach(([key, val]) => {
-      // Get index of named dimension in zarr array
-      const dimIndex = dimFields.indexOf(key);
-      if (dimIndex === undefined) {
+  /**
+   * Returns valid zarr.js selection for ZarrArray.getRaw or ZarrArray.getRawChunk
+   * @param {Object} selection valid dimension selection
+   * @returns {Array} Array of indicies
+   *
+   * Valid dimension selections include:
+   *   - Direct zarr.js selection: [1, 0, 0, 0]
+   *   - Named selection object: { channel: 0, time: 2 } or { channel: "DAPI", time: 2 }
+   */
+  _serializeSelection(selection) {
+    // Just return copy if array-like zarr.js selection
+    if (Array.isArray(selection)) return [...selection];
+
+    const serialized = Array(this.dimensions.length).fill(0);
+    Object.entries(selection).forEach(([dimName, value]) => {
+      if (!this._dimIndices.has(dimName)) {
         throw Error(
-          `Dimension '${key}' does not exist on array with dimensions :
-          ${dimFields}`
+          `Dimension "${dimName}" does not exist on loader.
+           Must be one of "${this.dimensions.map(d => d.field)}."`
         );
       }
-      // Get position of index along dimension axis
-      let valueIndex;
-      const { field, type, values } = this.dimensions[dimIndex];
-      if (typeof val === 'number') {
-        // Assign index directly, regardless of dimension type
-        valueIndex = val;
-      } else if (type === 'ordinal' || type === 'nominal') {
-        // Lookup index if categorical dimension type.
-        // This is slower if dimension is large; setting directly is preferred.
-        valueIndex = values.indexOf(val);
-      } else {
-        // Cannot use string value for dimension that is 'quantitative' or 'temporal', must set directly.
-        throw Error(
-          `The value '${val}' is invalid for dimension of type ${type}`
-        );
+      const dimIndex = this._dimIndices.get(dimName);
+      switch (typeof value) {
+        case 'number': {
+          // ex. { channel: 0 }
+          serialized[dimIndex] = value;
+          break;
+        }
+        case 'string': {
+          const { values, type } = this.dimensions[dimIndex];
+          if (type === 'nominal' || type === 'ordinal') {
+            // ex. { channel: 'DAPI' }
+            serialized[dimIndex] = values.indexOf(value);
+            break;
+          } else {
+            // { z: 'DAPI' }
+            throw Error(
+              `Cannot use selection "${value}" for dimension "${dimName}" with type "${type}".`
+            );
+          }
+        }
+        default: {
+          throw Error(
+            `Named selection must be a string or number. Got ${value} for ${dimName}.`
+          );
+        }
       }
-
-      if (valueIndex < 0 || valueIndex > this.base.shape[dimIndex]) {
-        // Ensure desired index is within the bounds of the dimension
-        throw Error(`Dimension ${field} does not contain index ${valueIndex}.`);
-      }
-
-      serializedSelection[dimIndex] = valueIndex;
     });
-    return serializedSelection;
+    return serialized;
   }
 }

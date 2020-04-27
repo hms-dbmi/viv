@@ -3,7 +3,7 @@ import { PolygonLayer } from '@deck.gl/layers';
 import StaticImageLayer from './StaticImageLayer';
 
 const defaultProps = {
-  pickable: false,
+  pickable: true,
   loader: {
     type: 'object',
     value: {

@@ -4,7 +4,7 @@ import { renderSubLayers } from './utils';
 
 const defaultProps = {
   ...TileLayer.defaultProps,
-  pickable: false,
+  pickable: true,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   sliderValues: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
