@@ -136,6 +136,13 @@ export default class OMETiffLoader {
       image = await tiff.getImage(pyramidIndex);
       return this._getChannel({ image, x, y });
     });
+    if (!loaderSelection || loaderSelection.length === 0) {
+      return {
+        data: [],
+        width: tileSize,
+        height: tileSize
+      };
+    }
     const tiles = await Promise.all(tileRequests);
     const { ImageLength } = image.fileDirectory;
     return {
@@ -184,6 +191,9 @@ export default class OMETiffLoader {
       })
     );
     // Get first selectioz * SizeZ * SizeT * SizeC + loaderSelection[0]n size as proxy for image size.
+    if (!loaderSelection || loaderSelection.length === 0) {
+      return { data: [], ...this.getRasterSize({ z }) };
+    }
     const image = await tiff.getImage(
       z * SizeZ * SizeT * SizeC + this._getIFDIndex(loaderSelection[0])
     );

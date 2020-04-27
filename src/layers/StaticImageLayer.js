@@ -9,7 +9,7 @@ const defaultProps = {
   sliderValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
-  loaderSelection: { type: 'array', value: undefined, compare: true },
+  loaderSelection: { type: 'array', value: [], compare: true },
   colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
   translate: { type: 'array', value: [0, 0], compare: true },
@@ -55,11 +55,12 @@ export default class StaticImageLayer extends CompositeLayer {
     });
   }
 
-  updateState({ changeFlags }) {
+  updateState({ changeFlags, props, oldProps }) {
     const { propsChanged } = changeFlags;
     if (
       typeof propsChanged === 'string' &&
-      propsChanged.includes('props.loader')
+      (propsChanged.includes('props.loader') ||
+        props.loaderSelection !== oldProps.loaderSelection)
     ) {
       // Only fetch new data to render if loader has changed
       const { loader, z, loaderSelection } = this.props;
