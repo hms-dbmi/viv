@@ -11,6 +11,7 @@
 ### Changed
 
 - Removed `loader.serializeSelection` and standardized `loaderSelection` for `getTile` and `getRaster`
+- Fix loaderSelection fetching on `StaticImageLayer`
 
 ## 0.1.7
 

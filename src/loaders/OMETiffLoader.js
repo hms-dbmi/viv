@@ -43,9 +43,21 @@ export default class OMETiffLoader {
     // The omexml specification only allows for these - zarr is more flexible so this
     // is for unifying the two loaders in upstream applications.
     this.dimensions = [
-      { field: 'channel', type: 'nominal', values: this.channelNames },
-      { field: 'z', type: 'ordinal', values: range(this.omexml.SizeZ) },
-      { field: 'time', type: 'ordinal', values: range(this.omexml.SizeT) },
+      {
+        field: 'channel',
+        type: 'nominal',
+        values: this.channelNames
+      },
+      {
+        field: 'z',
+        type: 'ordinal',
+        values: range(this.omexml.SizeZ)
+      },
+      {
+        field: 'time',
+        type: 'ordinal',
+        values: range(this.omexml.SizeT)
+      },
       { field: 'x', type: 'quantitative', values: null },
       { field: 'y', type: 'quantitative', values: null }
     ];
@@ -113,7 +125,8 @@ export default class OMETiffLoader {
    * @param {number} y positive integer
    * @param {number} z positive integer (0 === highest zoom level)
    * @param {Array} loaderSelection, Array of number Arrays specifying channel selections
-   * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize)
+   * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize).
+   * Default is `{data: [], width: tileSize, height: tileSize}`.
    */
   async getTile({ x, y, z, loaderSelection }) {
     if (!this._tileInBounds({ x, y, z })) {
@@ -145,6 +158,13 @@ export default class OMETiffLoader {
       image = await tiff.getImage(pyramidIndex);
       return this._getChannel({ image, x, y });
     });
+    if (!loaderSelection || loaderSelection.length === 0) {
+      return {
+        data: [],
+        width: tileSize,
+        height: tileSize
+      };
+    }
     const tiles = await Promise.all(tileRequests);
     const { ImageLength } = image.fileDirectory;
     return {
@@ -162,6 +182,8 @@ export default class OMETiffLoader {
    * @param {number} z positive integer (0 === highest zoom level)
    * @param {Array} loaderSelection, Array of number Arrays specifying channel selections
    * @returns {Object} data: TypedArray[], width: number, height: number
+    * Default is `{data: [], width, height}`.
+
    */
   async getRaster({ z, loaderSelection }) {
     const { tiff, offsets, omexml, isBioFormats6Pyramid, pool } = this;
@@ -192,7 +214,10 @@ export default class OMETiffLoader {
         return raster[0];
       })
     );
-    // Get first selectioz * SizeZ * SizeT * SizeC + loaderSelection[0]n size as proxy for image size.
+    // Get first selection * SizeZ * SizeT * SizeC + loaderSelection[0] size as proxy for image size.
+    if (!loaderSelection || loaderSelection.length === 0) {
+      return { data: [], ...this.getRasterSize({ z }) };
+    }
     const image = await tiff.getImage(
       z * SizeZ * SizeT * SizeC + this._getIFDIndex(loaderSelection[0])
     );

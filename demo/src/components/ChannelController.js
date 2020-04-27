@@ -10,11 +10,11 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 
 import ChannelOptions from './ChannelOptions';
+import { FILL_PIXEL_VALUE } from '../constants';
 
 const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
-const FILL_PIXEL_VALUE = '----';
 
 const toRgb = (on, arr) => {
   const color = on ? COLORMAP_SLIDER_CHECKBOX_COLOR : arr;
@@ -38,7 +38,8 @@ const getPixelValueDisplay = (isOn, pixelValue, shouldShowPixelValue) => {
   if (!isOn || !shouldShowPixelValue) {
     return <Typography> {FILL_PIXEL_VALUE} </Typography>;
   }
-  if (typeof pixelValue === 'number') {
+  // Need to check if it's a number becaue 0 is falsy.
+  if (pixelValue || typeof pixelValue === 'number') {
     return <Typography> {pixelValue} </Typography>;
   }
   return <CircularProgress size="50%" />;

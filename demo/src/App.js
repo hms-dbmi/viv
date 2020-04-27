@@ -19,7 +19,8 @@ import SourceSelect from './components/SourceSelect';
 import {
   MAX_CHANNELS,
   DEFAULT_VIEW_STATE,
-  DEFAULT_OVERVIEW
+  DEFAULT_OVERVIEW,
+  FILL_PIXEL_VALUE
 } from './constants';
 
 const initialChannels = {
@@ -44,9 +45,8 @@ function App() {
   const [panLock, togglePanLock] = useReducer(v => !v, true);
   const [isLoading, setIsLoading] = useState(true);
   const [pixelValues, setPixelValues] = useState(
-    new Array(channels.length).fill(null)
+    new Array(sources[sourceName].selections.length).fill(FILL_PIXEL_VALUE)
   );
-
   useEffect(() => {
     async function changeLoader() {
       setIsLoading(true);
