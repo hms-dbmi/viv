@@ -57,11 +57,11 @@ export default class StaticImageLayer extends CompositeLayer {
 
   updateState({ changeFlags, props, oldProps }) {
     const { propsChanged } = changeFlags;
-    if (
-      typeof propsChanged === 'string' &&
-      (propsChanged.includes('props.loader') ||
-        props.loaderSelection !== oldProps.loaderSelection)
-    ) {
+    const loaderChanged =
+      typeof propsChanged === 'string' && propsChanged.includes('props.loader');
+    const loaderSelectionChanged =
+      props.loaderSelection !== oldProps.loaderSelection;
+    if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
       const { loader, z, loaderSelection } = this.props;
       loader

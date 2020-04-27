@@ -38,11 +38,9 @@ const getPixelValueDisplay = (isOn, pixelValue, shouldShowPixelValue) => {
   if (!isOn || !shouldShowPixelValue) {
     return <Typography> {FILL_PIXEL_VALUE} </Typography>;
   }
-  if (typeof pixelValue === 'number') {
+  // Need to check if it's a number becaue 0 is falsy.
+  if (pixelValue || typeof pixelValue === 'number') {
     return <Typography> {pixelValue} </Typography>;
-  }
-  if (pixelValue === FILL_PIXEL_VALUE) {
-    return <Typography> {FILL_PIXEL_VALUE} </Typography>;
   }
   return <CircularProgress size="50%" />;
 };
