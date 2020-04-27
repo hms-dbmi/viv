@@ -3,6 +3,11 @@ import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
 import { padColorsAndSliders } from '../utils';
 
+const defaultProps = {
+  pickable: true,
+  onHover: { type: 'function', value: null, compare: false }
+};
+
 /**
  * This layer generates a VivViewerLayer (tiled) and a StaticImageLayer (background for the tiled layer)
  * @param {Object} props
@@ -17,6 +22,7 @@ import { padColorsAndSliders } from '../utils';
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {String} props.id Unique identifier for this layer.
  * @param {String} props.onTileError Custom override for handle tile fetching errors.
+ * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
  */
 
 export default class VivViewerLayer extends CompositeLayer {
@@ -32,6 +38,8 @@ export default class VivViewerLayer extends CompositeLayer {
       colormap,
       viewportId,
       onTileError,
+      onHover,
+      pickable,
       id
     } = this.props;
     const {
@@ -87,6 +95,8 @@ export default class VivViewerLayer extends CompositeLayer {
       domain,
       colormap,
       viewportId,
+      onHover,
+      pickable,
       width,
       height,
       // Needed for misreported metadata.
@@ -106,7 +116,9 @@ export default class VivViewerLayer extends CompositeLayer {
           opacity === 1 ||
           (-numLevels > this.context.viewport.zoom &&
             (!viewportId || this.context.viewport.id === viewportId)),
-        z: numLevels - 1
+        z: numLevels - 1,
+        pickable: true,
+        onHover
       });
     const layers = [baseLayer, tiledLayer];
     return layers;
@@ -114,3 +126,4 @@ export default class VivViewerLayer extends CompositeLayer {
 }
 
 VivViewerLayer.layerName = 'VivViewerLayer';
+VivViewerLayer.defaultProps = defaultProps;

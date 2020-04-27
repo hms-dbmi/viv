@@ -14,6 +14,7 @@ import { DetailView, OverviewView } from '../views';
  * @param {Object} props.overview Allows you to pass settings into the OverviewView: { scale, margin, position, minimumWidth, maximumWidth,
  * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
+ * @param {Object} props.hoverHooks Object including the allowable hooks - right now only accepting a function with key handleValue like { handleValue: (valueArray) => {} }
  */
 
 const PictureInPictureViewer = props => {
@@ -26,7 +27,8 @@ const PictureInPictureViewer = props => {
     colormap,
     overview,
     overviewOn,
-    loaderSelection
+    loaderSelection,
+    hoverHooks
   } = props;
   const detailViewState = { ...initialViewState, id: 'detail' };
   const detailView = new DetailView({ initialViewState: detailViewState });
@@ -52,7 +54,10 @@ const PictureInPictureViewer = props => {
     views.push(overviewView);
     layerProps.push(layerConfig);
   }
-  return loader ? <VivViewer layerProps={layerProps} views={views} /> : null;
+  if (!loader) return null;
+  return (
+    <VivViewer layerProps={layerProps} views={views} hoverHooks={hoverHooks} />
+  );
 };
 
 export default PictureInPictureViewer;

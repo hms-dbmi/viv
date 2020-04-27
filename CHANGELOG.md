@@ -5,6 +5,7 @@
 ### Added
 
 - Remove threads.js and use WebWorkers for tiff decompression.
+- Add hover values for PictureInPictureViewer
 
 ### Changed
 

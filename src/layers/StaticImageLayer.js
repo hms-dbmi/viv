@@ -4,7 +4,7 @@ import XRLayer from './XRLayer';
 import { padColorsAndSliders } from './utils';
 
 const defaultProps = {
-  pickable: false,
+  pickable: true,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   sliderValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
@@ -45,6 +45,7 @@ function scaleBounds({ width, height, translate, scale }) {
  * @param {Array} props.translate Translate transformation to be applied to the bounds after scaling.
  * @param {number} props.scale Scaling factor for this layer to be used against the dimensions of the loader's `getRaster`.
  * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
+ * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
  */
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
@@ -70,6 +71,15 @@ export default class StaticImageLayer extends CompositeLayer {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  getPickingInfo({ info, sourceLayer }) {
+    // eslint-disable-next-line no-param-reassign
+    info.sourceLayer = sourceLayer;
+    // eslint-disable-next-line no-param-reassign
+    info.tile = sourceLayer.props.tile;
+    return info;
+  }
+
   renderLayers() {
     const {
       loader,
@@ -83,6 +93,7 @@ export default class StaticImageLayer extends CompositeLayer {
       scale,
       domain,
       z,
+      pickable,
       id
     } = this.props;
     const { dtype } = loader;
@@ -103,11 +114,11 @@ export default class StaticImageLayer extends CompositeLayer {
     });
     return new XRLayer({
       channelData: Promise.resolve({ data, width, height }),
+      pickable,
       bounds,
       sliderValues: paddedSliderValues,
       colorValues: paddedColorValues,
       id: `XR-Static-Layer-${0}-${height}-${width}-${0}-${z}-${id}`,
-      pickable: false,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       opacity,
       visible,
