@@ -43,8 +43,8 @@ function App() {
   const [zoomLock, toggleZoomLock] = useReducer(v => !v, true);
   const [panLock, togglePanLock] = useReducer(v => !v, true);
   const [isLoading, setIsLoading] = useState(true);
-  const [hoverValue, setHoverValue] = useState(
-    new Array(channels.length).fill('')
+  const [pixelValues, setPixelValues] = useState(
+    new Array(channels.length).fill(null)
   );
 
   useEffect(() => {
@@ -126,7 +126,8 @@ function App() {
           colorValue={colors[i]}
           handleChange={(type, value) => handleControllerChange(i, type, value)}
           colormapOn={colormap.length > 0}
-          value={hoverValue[i]}
+          pixelValue={pixelValues[i]}
+          shouldShowPixelValue={!useLinkedView}
         />
       </Grid>
     );
@@ -149,6 +150,7 @@ function App() {
             colormap={colormap.length > 0 && colormap}
             zoomLock={zoomLock}
             panLock={panLock}
+            hoverHooks={{ handleValue: setPixelValues }}
           />
         ) : (
           <PictureInPictureViewer
@@ -165,7 +167,7 @@ function App() {
             colormap={colormap.length > 0 && colormap}
             overview={DEFAULT_OVERVIEW}
             overviewOn={overviewOn && isPyramid}
-            hoverHooks={{ handleValue: setHoverValue }}
+            hoverHooks={{ handleValue: setPixelValues }}
           />
         ))}
       {controllerOn && (

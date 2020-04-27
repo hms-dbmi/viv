@@ -117,7 +117,8 @@ export default class VivViewerLayer extends CompositeLayer {
           (-numLevels > this.context.viewport.zoom &&
             (!viewportId || this.context.viewport.id === viewportId)),
         z: numLevels - 1,
-        pickable: false
+        pickable: true,
+        onHover
       });
     const layers = [baseLayer, tiledLayer];
     return layers;

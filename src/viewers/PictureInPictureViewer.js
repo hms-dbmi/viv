@@ -54,9 +54,10 @@ const PictureInPictureViewer = props => {
     views.push(overviewView);
     layerProps.push(layerConfig);
   }
-  return loader ? (
+  if (!loader) return null;
+  return (
     <VivViewer layerProps={layerProps} views={views} hoverHooks={hoverHooks} />
-  ) : null;
+  );
 };
 
 export default PictureInPictureViewer;
