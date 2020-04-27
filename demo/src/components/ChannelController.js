@@ -14,6 +14,7 @@ import ChannelOptions from './ChannelOptions';
 const MIN_SLIDER_VALUE = 0;
 const MAX_SLIDER_VALUE = 65535;
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
+const FILL_PIXEL_VALUE = '----';
 
 const toRgb = (on, arr) => {
   const color = on ? COLORMAP_SLIDER_CHECKBOX_COLOR : arr;
@@ -35,7 +36,7 @@ const useStyles = makeStyles(theme => ({
 // Otherwise, show a circular progress animation.
 const getPixelValueDisplay = (isOn, pixelValue, shouldShowPixelValue) => {
   if (!isOn || !shouldShowPixelValue) {
-    return <Typography> {'----'} </Typography>;
+    return <Typography> {FILL_PIXEL_VALUE} </Typography>;
   }
   if (typeof pixelValue === 'number') {
     return <Typography> {pixelValue} </Typography>;
