@@ -6,6 +6,12 @@
 
 ### Changed
 
+## 0.2.1
+
+### Added
+
+### Changed
+
 - Allow for offsets in OMETiffLoader for `bioformats6` pyramids.
 - Update geotiff off from Ilan's for to the official release.
 
