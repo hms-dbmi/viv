@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Allow for offsets in OMETiffLoader for `bioformats6` pyramids.
+
 ## 0.2.0
 
 ### Added
