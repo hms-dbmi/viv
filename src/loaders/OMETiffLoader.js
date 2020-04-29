@@ -142,7 +142,7 @@ export default class OMETiffLoader {
       // We need to put the request for parsing the file directory into this array.
       // This allows us to get tiff pages directly based on offset without parsing everything.
       if (!isBioFormats6Pyramid) {
-        if (offsets) {
+        if (offsets.length > 0) {
           tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
             offsets[pyramidIndex]
           );
@@ -150,7 +150,7 @@ export default class OMETiffLoader {
       } else {
         // Pyramids with large z-stacks + large numbers of channels could get slow
         // so we allow for offsets for the lowest-resolution images ("parentImage").
-        if (offsets) {
+        if (offsets.length > 0) {
           tiff.ifdRequests[index] = tiff.parseFileDirectoryAt(offsets[index]);
         }
         const parentImage = await tiff.getImage(index);
@@ -200,7 +200,7 @@ export default class OMETiffLoader {
         // We need to put the request for parsing the file directory into this array.
         // This allows us to get tiff pages directly based on offset without parsing everything.
         if (!isBioFormats6Pyramid) {
-          if (offsets) {
+          if (offsets.length > 0) {
             tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
               offsets[pyramidIndex]
             );
@@ -208,7 +208,7 @@ export default class OMETiffLoader {
         } else {
           // Pyramids with large z-stacks + large numbers of channels could get slow
           // so we allow for offsets for the initial images ("parentImage").
-          if (offsets) {
+          if (offsets.length > 0) {
             tiff.ifdRequests[index] = tiff.parseFileDirectoryAt(offsets[index]);
           }
           const parentImage = await tiff.getImage(index);
