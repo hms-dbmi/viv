@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Update geotiff off from Ilan's for to the official release.
+
 ## 0.2.0
 
 ### Added
