@@ -148,6 +148,11 @@ export default class OMETiffLoader {
           );
         }
       } else {
+        // Pyramids with large z-stacks + large numbers of channels could get slow
+        // so we allow for offsets for the lowest-resolution images ("parentImage").
+        if (offsets) {
+          tiff.ifdRequests[index] = tiff.parseFileDirectoryAt(offsets[index]);
+        }
         const parentImage = await tiff.getImage(index);
         if (z !== 0) {
           tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
@@ -201,6 +206,11 @@ export default class OMETiffLoader {
             );
           }
         } else {
+          // Pyramids with large z-stacks + large numbers of channels could get slow
+          // so we allow for offsets for the initial images ("parentImage").
+          if (offsets) {
+            tiff.ifdRequests[index] = tiff.parseFileDirectoryAt(offsets[index]);
+          }
           const parentImage = await tiff.getImage(index);
           if (z !== 0) {
             tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
