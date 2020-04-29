@@ -132,7 +132,7 @@ export default class OMETiffLoader {
     if (!this._tileInBounds({ x, y, z })) {
       return null;
     }
-    const { tiff, offsets, isBioFormats6Pyramid, omexml, tileSize } = this;
+    const { tiff, isBioFormats6Pyramid, omexml, tileSize } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const pyramidOffset = z * SizeZ * SizeT * SizeC;
     let image;
@@ -142,12 +142,11 @@ export default class OMETiffLoader {
       // We need to put the request for parsing the file directory into this array.
       // This allows us to get tiff pages directly based on offset without parsing everything.
       if (!isBioFormats6Pyramid) {
-        if (offsets) {
-          tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
-            offsets[pyramidIndex]
-          );
-        }
+        this._parseIFD(pyramidIndex);
       } else {
+        // Pyramids with large z-stacks + large numbers of channels could get slow
+        // so we allow for offsets for the lowest-resolution images ("parentImage").
+        this._parseIFD(index);
         const parentImage = await tiff.getImage(index);
         if (z !== 0) {
           tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
@@ -186,7 +185,7 @@ export default class OMETiffLoader {
 
    */
   async getRaster({ z, loaderSelection }) {
-    const { tiff, offsets, omexml, isBioFormats6Pyramid, pool } = this;
+    const { tiff, omexml, isBioFormats6Pyramid, pool } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const rasters = await Promise.all(
       loaderSelection.map(async sel => {
@@ -195,12 +194,11 @@ export default class OMETiffLoader {
         // We need to put the request for parsing the file directory into this array.
         // This allows us to get tiff pages directly based on offset without parsing everything.
         if (!isBioFormats6Pyramid) {
-          if (offsets) {
-            tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
-              offsets[pyramidIndex]
-            );
-          }
+          this._parseIFD(pyramidIndex);
         } else {
+          // Pyramids with large z-stacks + large numbers of channels could get slow
+          // so we allow for offsets for the initial images ("parentImage").
+          this._parseIFD(index);
           const parentImage = await tiff.getImage(index);
           if (z !== 0) {
             tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
@@ -269,5 +267,12 @@ export default class OMETiffLoader {
       tileSize,
       numLevels
     });
+  }
+
+  _parseIFD(index) {
+    const { tiff, offsets } = this;
+    if (offsets.length > 0) {
+      tiff.ifdRequests[index] = tiff.parseFileDirectoryAt(offsets[index]);
+    }
   }
 }
