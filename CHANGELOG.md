@@ -4,6 +4,8 @@
 
 ### Added
 
+- Allow for headers with OME-TIFF.
+
 ### Changed
 
 ## 0.2.1
