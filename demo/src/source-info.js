@@ -19,7 +19,7 @@ const basePyramidInfo = {
 };
 
 const tiffInfo = {
-  url: `https://vitessce-demo-data.storage.googleapis.com/test-data/deflate_no_legacy/spraggins.bioformats.raw2ometiff.ome.tif`,
+  url: `https://vitessce-demo-data.storage.googleapis.com/test-data/spraggins.bioformats.raw2ometiff.ome.tif`,
   ...basePyramidInfo,
   description: 'Kidney mxIF (OME-TIFF)'
 };
@@ -176,7 +176,7 @@ const remoteBFTiff = {
 };
 
 const remoteTiffUrl2 =
-  'https://vitessce-demo-data.storage.googleapis.com/test-data/VAN0003-LK-32-21-AF_preIMS_registered.pyramid.ome.tiff ';
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/test_VAN0003-LK-32-21-AF_preIMS_registered.ome.tif';
 
 const remoteTiff2 = {
   url: remoteTiffUrl2,
