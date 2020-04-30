@@ -7,7 +7,7 @@ import { createOMETiffLoader } from '@hubmap/vitessce-image-viewer';
 
 const url =
   'https://vitessce-demo-data.storage.googleapis.com/test-data/deflate_no_legacy/spraggins.bioformats.raw2ometiff.ome.tif';
-const loader = await createOMETiffLoader({ url, offsets: [] });
+const loader = await createOMETiffLoader({ url, offsets: [], headers: {} });
 ```
 
 A bit is going on under the hood here, though. Here are some of those things:
