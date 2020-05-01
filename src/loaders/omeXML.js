@@ -42,7 +42,7 @@ export default class OMEXML {
     const { Channel } = this._Pixels;
     return Array.isArray(Channel)
       ? Channel.map(channel => channel['@_Name'])
-      : Channel['@_Name'];
+      : [Channel['@_Name']];
   }
 
   getNumberOfImages() {
