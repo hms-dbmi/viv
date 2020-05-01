@@ -78,7 +78,7 @@ export default class OMETiffLoader {
    */
   _getIFDIndex({ z = 0, channel, time = 0 }) {
     let channelIndex;
-    if (this.channelNames.every(v => !v)) {
+    if (!this.channelNames || this.channelNames.every(v => !v)) {
       // Without names, enforce a numeric channel indexing scheme
       console.warn(
         'There are no channel names in the OMEXML.  Please use numeric indexing'
