@@ -5,7 +5,7 @@
 ### Added
 
 - Allow for headers with OME-TIFF.
-- Add COVID-19 Image
+- Add COVID-19 Image to public demo.
 
 ### Changed
 
