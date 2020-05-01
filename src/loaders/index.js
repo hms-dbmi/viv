@@ -33,8 +33,15 @@ export async function createZarrLoader({
   });
 }
 
-export async function createOMETiffLoader({ url, offsets }) {
-  const tiff = await fromUrl(url);
+/**
+ * This function wraps creating a ome-tiff loader.
+ * @param {Object} args
+ * @param {String} props.url URL from which to fetch the tiff.
+ * @param {Array} props.offsets List of IFD offsets.
+ * @param {Object} props.headers Object containing headers to be passed to all fetch requests.
+ */
+export async function createOMETiffLoader({ url, offsets = [], headers = {} }) {
+  const tiff = await fromUrl(url, headers);
   const firstImage = await tiff.getImage(0);
   const pool = new Pool();
   const omexmlString = firstImage.fileDirectory.ImageDescription;

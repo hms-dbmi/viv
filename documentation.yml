@@ -21,8 +21,9 @@ toc:
 - StaticImageLayer
 - ScaleBarLayer
 - name: Loaders
-- ZarrLoader
+- createOMETiffLoader
 - OMETiffLoader
+- ZarrLoader
 - name: Layers (Internal)
 - XRLayer
 - OverviewLayer

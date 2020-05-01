@@ -36,8 +36,11 @@ export default class OMETiffLoader {
     this.height = this.omexml.SizeY;
     this.tileSize = firstImage.getTileWidth();
     const { SubIFDs } = firstImage.fileDirectory;
+    // These subIFDs are going to take some tuning to get right.
+    // This works with the current bioformats6 pipeline.
+    // Related to: https://github.com/hubmapconsortium/vitessce-image-viewer/issues/144
     this.numLevels =
-      this.omexml.getNumberOfImages() || (SubIFDs && SubIFDs.length);
+      this.omexml.getNumberOfImages() || (SubIFDs && SubIFDs.length - 1);
     this.isBioFormats6Pyramid = SubIFDs;
     this.isPyramid = this.numLevels > 1;
     // The omexml specification only allows for these - zarr is more flexible so this
