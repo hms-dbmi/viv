@@ -234,7 +234,7 @@ const covidTiffInfo = {
   },
   url:
     'https://vitessce-demo-data.storage.googleapis.com/test-data/12448_G1HR_Mesh003.ome.tif'
-}
+};
 
 export default {
   zarr: zarrInfo,
