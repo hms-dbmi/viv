@@ -18,6 +18,7 @@ const basePyramidInfo = {
   selections: channelNames.map(name => ({ channel: name }))
 };
 
+// Generated using bioformats2raw and raw2ometiff.
 const tiffInfo = {
   url: `https://vitessce-demo-data.storage.googleapis.com/test-data/spraggins.bioformats.raw2ometiff.ome.tif`,
   ...basePyramidInfo,
@@ -145,6 +146,7 @@ const staticTiffInfo = {
   description: 'CODEX Tile'
 };
 
+// Old Faas(?) bioformats pyramid
 const remoteBFTiffUrl =
   'https://vitessce-demo-data.storage.googleapis.com/test-data/TONSIL-1_40X.ome.tif';
 
@@ -175,6 +177,7 @@ const remoteBFTiff = {
   description: 'Tonsil Legacy Bioformats Pyramid Tiff'
 };
 
+// Generated using bioformats2raw and raw2ometiff.
 const remoteTiffUrl2 =
   'https://vitessce-demo-data.storage.googleapis.com/test-data/test_VAN0003-LK-32-21-AF_preIMS_registered.ome.tif';
 
