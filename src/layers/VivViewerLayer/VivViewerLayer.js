@@ -42,14 +42,7 @@ export default class VivViewerLayer extends CompositeLayer {
       pickable,
       id
     } = this.props;
-    const {
-      tileSize,
-      numLevels,
-      dtype,
-      width,
-      height,
-      isBioFormats6Pyramid
-    } = loader;
+    const { tileSize, numLevels, dtype, width, height } = loader;
     const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
       sliderValues,
       colorValues,
@@ -99,8 +92,8 @@ export default class VivViewerLayer extends CompositeLayer {
       pickable,
       width,
       height,
-      // Needed for misreported metadata.
-      isBioFormats6Pyramid
+      // Needed for misreported metadata in bioformats.
+      loader
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity

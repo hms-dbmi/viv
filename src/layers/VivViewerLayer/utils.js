@@ -1,4 +1,5 @@
 import XRLayer from '../XRLayer';
+import { isBioformatsNoPadHeightVersion } from '../../loaders/utils';
 
 export function range(len) {
   return [...Array(len).keys()];
@@ -21,7 +22,7 @@ export function renderSubLayers(props) {
     height,
     tileSize,
     id,
-    isBioFormats6Pyramid,
+    loader,
     onHover,
     pickable
   } = props;
@@ -34,7 +35,7 @@ export function renderSubLayers(props) {
     bounds: [
       left,
       // This is a hack for now since bioformats mis-reports their data lower bound data.
-      isBioFormats6Pyramid
+      loader && isBioformatsNoPadHeightVersion(loader.software)
         ? Math.min(height, (y + 1) * tileSize * 2 ** (-1 * z))
         : bottom,
       right,

@@ -9,6 +9,8 @@
 
 ### Changed
 
+- Change bioformats padding check.
+
 ## 0.2.1
 
 ### Added
