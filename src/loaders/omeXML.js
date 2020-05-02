@@ -28,18 +28,21 @@ export default class OMEXML {
     this.PhysicalSizeYUnit =
       PhysicalSizeYUnit && PhysicalSizeYUnit.includes('µm')
         ? 'µm'
-        : this.PhysicalSizeXUnit;
+        : PhysicalSizeYUnit;
     const PhysicalSizeXUnit = Pixels['@_PhysicalSizeXUnit'];
     this.PhysicalSizeXUnit =
       PhysicalSizeXUnit && PhysicalSizeXUnit.includes('µm')
         ? 'µm'
-        : this.PhysicalSizeXUnit;
+        : PhysicalSizeXUnit;
     this.PhysicalSizeY = Pixels['@_PhysicalSizeY'];
     this.PhysicalSizeX = Pixels['@_PhysicalSizeX'];
   }
 
   getChannelNames() {
-    return this._Pixels.Channel.map(channel => channel['@_Name']);
+    const { Channel } = this._Pixels;
+    return Array.isArray(Channel)
+      ? Channel.map(channel => channel['@_Name'])
+      : [Channel['@_Name']];
   }
 
   getNumberOfImages() {

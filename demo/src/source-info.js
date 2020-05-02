@@ -214,11 +214,34 @@ const remoteTiff2 = {
   description: 'VAN0003-LK-32-21 Donor Image'
 };
 
+const covidTiffInfo = {
+  dimensions: [
+    {
+      field: 'channel',
+      type: 'nominal',
+      values: [0]
+    },
+    { field: 'y', type: 'quantitative', values: null },
+    { field: 'x', type: 'quantitative', values: null }
+  ],
+  selections: [{ channel: 0 }],
+  isPublic: true,
+  isPyramid: true,
+  description: 'Covid-19 Primary Gut Epithelial Stem Cells',
+  initialViewState: {
+    zoom: -7,
+    target: [50000, 50000]
+  },
+  url:
+    'https://vitessce-demo-data.storage.googleapis.com/test-data/12448_G1HR_Mesh003.ome.tif'
+};
+
 export default {
   zarr: zarrInfo,
   tiff: tiffInfo,
   static: staticInfo,
   'static tiff': staticTiffInfo,
   'bf tiff': remoteBFTiff,
-  'tiff 2': remoteTiff2
+  'tiff 2': remoteTiff2,
+  'covid tiff': covidTiffInfo
 };
