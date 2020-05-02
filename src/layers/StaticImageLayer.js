@@ -1,8 +1,6 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import XRLayer from './XRLayer';
 
-import { padColorsAndSliders } from './utils';
-
 const defaultProps = {
   pickable: true,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
@@ -92,19 +90,12 @@ export default class StaticImageLayer extends CompositeLayer {
       channelIsOn,
       translate,
       scale,
-      domain,
       z,
+      domain,
       pickable,
       id
     } = this.props;
     const { dtype } = loader;
-    const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
-      sliderValues,
-      colorValues,
-      channelIsOn,
-      domain,
-      dtype
-    });
     const { data, width, height } = this.state;
     if (!(width && height)) return null;
     const bounds = scaleBounds({
@@ -117,8 +108,10 @@ export default class StaticImageLayer extends CompositeLayer {
       channelData: Promise.resolve({ data, width, height }),
       pickable,
       bounds,
-      sliderValues: paddedSliderValues,
-      colorValues: paddedColorValues,
+      sliderValues,
+      colorValues,
+      channelIsOn,
+      domain,
       id: `XR-Static-Layer-${0}-${height}-${width}-${0}-${z}-${id}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       opacity,

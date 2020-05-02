@@ -8,6 +8,7 @@ import vs from './xr-layer-vertex.glsl';
 import fsColormap from './xr-layer-fragment-colormap.glsl';
 import fs from './xr-layer-fragment.glsl';
 import { DTYPE_VALUES } from '../../constants';
+import { padColorsAndSliders } from '../utils';
 
 const defaultProps = {
   pickable: true,
@@ -16,6 +17,7 @@ const defaultProps = {
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
+  channelIsOn: { type: 'array', value: [], compare: true },
   tileSize: { type: 'number', value: 0, compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: '<u2', compare: true },
@@ -169,12 +171,30 @@ export default class XRLayer extends Layer {
   draw({ uniforms }) {
     const { textures, model } = this.state;
     if (textures && model) {
-      const { sliderValues, colorValues, opacity } = this.props;
+      const {
+        sliderValues,
+        colorValues,
+        opacity,
+        domain,
+        dtype,
+        channelIsOn
+      } = this.props;
+      // Check number of textures not null.
+      const numTextures = Object.values(textures).filter(t => t).length;
+      // Slider values and color values can come in before textures since their data is async.
+      // Thus we pad based on the number of textures bound.
+      const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
+        sliderValues: sliderValues.slice(0, numTextures),
+        colorValues: colorValues.slice(0, numTextures),
+        channelIsOn: channelIsOn.slice(0, numTextures),
+        domain,
+        dtype
+      });
       model
         .setUniforms({
           ...uniforms,
-          colorValues,
-          sliderValues,
+          colorValues: paddedColorValues,
+          sliderValues: paddedSliderValues,
           opacity,
           ...textures
         })
