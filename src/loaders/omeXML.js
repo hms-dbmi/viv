@@ -28,12 +28,12 @@ export default class OMEXML {
     this.PhysicalSizeYUnit =
       PhysicalSizeYUnit && PhysicalSizeYUnit.includes('µm')
         ? 'µm'
-        : this.PhysicalSizeXUnit;
+        : PhysicalSizeYUnit;
     const PhysicalSizeXUnit = Pixels['@_PhysicalSizeXUnit'];
     this.PhysicalSizeXUnit =
       PhysicalSizeXUnit && PhysicalSizeXUnit.includes('µm')
         ? 'µm'
-        : this.PhysicalSizeXUnit;
+        : PhysicalSizeXUnit;
     this.PhysicalSizeY = Pixels['@_PhysicalSizeY'];
     this.PhysicalSizeX = Pixels['@_PhysicalSizeX'];
   }
