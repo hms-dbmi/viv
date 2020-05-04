@@ -1,4 +1,4 @@
-import { guessRgb } from './utils';
+import { guessRgb, isInTileBounds } from './utils';
 
 /**
  * This class serves as a wrapper for fetching zarr data from a file server.
@@ -52,6 +52,9 @@ export default class ZarrLoader {
    * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize)
    */
   async getTile({ x, y, z, loaderSelection }) {
+    if (!this._tileInBounds({ x, y, z })) {
+      return null;
+    }
     const source = this._getSource(z);
     const selections = loaderSelection || this._defaultSelection;
     const dataRequests = selections.map(async sel => {
@@ -171,5 +174,19 @@ export default class ZarrLoader {
       }
     });
     return serialized;
+  }
+
+  _tileInBounds({ x, y, z }) {
+    const { _data, tileSize, numLevels } = this;
+    const { shape }  = _data[0].meta
+    return isInTileBounds({
+      x,
+      y,
+      z,
+      width: shape[this._dimIndices.get('x')],
+      height: shape[this._dimIndices.get('y')],
+      tileSize,
+      numLevels
+    });
   }
 }
