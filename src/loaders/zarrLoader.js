@@ -178,15 +178,18 @@ export default class ZarrLoader {
 
   _tileInBounds({ x, y, z }) {
     const { _data, tileSize, numLevels } = this;
-    const { shape }  = _data[0].meta
-    return isInTileBounds({
-      x,
-      y,
-      z,
-      width: shape[this._dimIndices.get('x')],
-      height: shape[this._dimIndices.get('y')],
-      tileSize,
-      numLevels
-    });
+    if (_data[0]) {
+      const { shape } = _data[0].meta;
+      return isInTileBounds({
+        x,
+        y,
+        z,
+        width: shape[this._dimIndices.get('x')],
+        height: shape[this._dimIndices.get('y')],
+        tileSize,
+        numLevels
+      });
+    }
+    return true;
   }
 }

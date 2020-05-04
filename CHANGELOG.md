@@ -9,6 +9,8 @@
 
 ### Changed
 
+- Check bounds for tiles on zarr loader.
+
 ## 0.2.1
 
 ### Added
