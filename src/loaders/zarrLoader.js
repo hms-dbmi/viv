@@ -118,6 +118,16 @@ export default class ZarrLoader {
     return { height, width };
   }
 
+  /**
+   * Get the metadata associated with a Zarr image layer, in a human-readable format.
+   * @returns {Object} Metadata keys mapped to values.
+   */
+  getMetadata() {
+    return {
+
+    };
+  }
+
   _getSource(z) {
     return typeof z === 'number' && this.isPyramid ? this._data[z] : this._data;
   }
