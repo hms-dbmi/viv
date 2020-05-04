@@ -123,9 +123,7 @@ export default class ZarrLoader {
    * @returns {Object} Metadata keys mapped to values.
    */
   getMetadata() {
-    return {
-
-    };
+    return {};
   }
 
   _getSource(z) {

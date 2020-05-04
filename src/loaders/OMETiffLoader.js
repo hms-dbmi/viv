@@ -252,21 +252,50 @@ export default class OMETiffLoader {
    */
   getMetadata() {
     const { omexml } = this;
-    const { metadataOMEXML: { Image: { AcquisitionDate }, StructuredAnnotations: { MapAnnotation } }, SizeX, SizeY, SizeZ, SizeT, SizeC, Type, PhysicalSizeX, PhysicalSizeXUnit, PhysicalSizeY, PhysicalSizeYUnit, PhysicalSizeZ, PhysicalSizeZUnit } = omexml;
+    const {
+      metadataOMEXML: {
+        Image: { AcquisitionDate },
+        StructuredAnnotations: { MapAnnotation }
+      },
+      SizeX,
+      SizeY,
+      SizeZ,
+      SizeT,
+      SizeC,
+      Type,
+      PhysicalSizeX,
+      PhysicalSizeXUnit,
+      PhysicalSizeY,
+      PhysicalSizeYUnit,
+      PhysicalSizeZ,
+      PhysicalSizeZUnit
+    } = omexml;
 
-    const physicalSizeAndUnitX = (PhysicalSizeX && PhysicalSizeXUnit ? `${PhysicalSizeX} (${PhysicalSizeXUnit})` : '-');
-    const physicalSizeAndUnitY = (PhysicalSizeY && PhysicalSizeYUnit ? `${PhysicalSizeY} (${PhysicalSizeYUnit})` : '-');
-    const physicalSizeAndUnitZ = (PhysicalSizeZ && PhysicalSizeZUnit ? `${PhysicalSizeZ} (${PhysicalSizeZUnit})` : '-');
-    const roiCount = (MapAnnotation && MapAnnotation.Value ? Object.entries(MapAnnotation.Value).length : 0);
+    const physicalSizeAndUnitX =
+      PhysicalSizeX && PhysicalSizeXUnit
+        ? `${PhysicalSizeX} (${PhysicalSizeXUnit})`
+        : '-';
+    const physicalSizeAndUnitY =
+      PhysicalSizeY && PhysicalSizeYUnit
+        ? `${PhysicalSizeY} (${PhysicalSizeYUnit})`
+        : '-';
+    const physicalSizeAndUnitZ =
+      PhysicalSizeZ && PhysicalSizeZUnit
+        ? `${PhysicalSizeZ} (${PhysicalSizeZUnit})`
+        : '-';
+    const roiCount =
+      MapAnnotation && MapAnnotation.Value
+        ? Object.entries(MapAnnotation.Value).length
+        : 0;
 
     return {
-        "Acquisition Date": AcquisitionDate,
-        "Dimensions (XY)": `${SizeX} x ${SizeY}`,
-        "Pixels Type": Type,
-        "Pixels Size (XYZ)": `${physicalSizeAndUnitX} x ${physicalSizeAndUnitY} x ${physicalSizeAndUnitZ}`,
-        "Z-sections/Timepoints": `${SizeZ} x ${SizeT}`,
-        "Channels": SizeC,
-        "ROI Count": roiCount
+      'Acquisition Date': AcquisitionDate,
+      'Dimensions (XY)': `${SizeX} x ${SizeY}`,
+      'Pixels Type': Type,
+      'Pixels Size (XYZ)': `${physicalSizeAndUnitX} x ${physicalSizeAndUnitY} x ${physicalSizeAndUnitZ}`,
+      'Z-sections/Timepoints': `${SizeZ} x ${SizeT}`,
+      Channels: SizeC,
+      'ROI Count': roiCount
     };
   }
 
