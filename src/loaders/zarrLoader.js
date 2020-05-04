@@ -122,6 +122,7 @@ export default class ZarrLoader {
    * Get the metadata associated with a Zarr image layer, in a human-readable format.
    * @returns {Object} Metadata keys mapped to values.
    */
+  // eslint-disable-next-line class-methods-use-this
   getMetadata() {
     return {};
   }
