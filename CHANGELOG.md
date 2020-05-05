@@ -6,6 +6,7 @@
 
 - Allow for headers with OME-TIFF.
 - Add COVID-19 Image to public demo.
+- Added `getMetadata` function to `ZarrLoader` and `OMETiffLoader` classes to enable Vitessce to obtain human-readable image layer metadata.
 
 ### Changed
 
