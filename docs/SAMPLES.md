@@ -1,6 +1,6 @@
 Here are two snippets to help get you started with our higher-level components. For a more complete example of using these higher level components, look at the source code of the demo [here](https://github.com/hubmapconsortium/vitessce-image-viewer/blob/master/demo/src/App.js), or look at the source code of the library [here](https://github.com/hubmapconsortium/vitessce-image-viewer/tree/master/src) for building your own components with custom `VivViews` or custom `deck.gl` layers.
 
-This snippet is the most basic view: a simple view of the data.  With `overviewOn=false`, this will just be a single view of the data.  Turn `overviewOn=true` for a picture-in-picture.
+This snippet is the most basic view: a simple view of the data. With `overviewOn=false`, this will just be a single view of the data. Turn `overviewOn=true` for a picture-in-picture.
 
 #### `PictureInPictureViewer`
 
