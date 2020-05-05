@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Clean up the docs.
+
 ## 0.2.2
 
 ### Added

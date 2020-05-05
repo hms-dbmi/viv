@@ -26,7 +26,9 @@ const defaultProps = {
 
 /**
  * This layer serves as the workhorse of the project, handling all the rendering.  Much of it is
- * adapted from BitmapLayer in DeckGL.
+ * adapted from BitmapLayer in DeckGL.  
+ * XR = eXtended Range i.e more than the standard 8-bit RGBA data format 
+ * (16/32 bit floats/ints/uints with more than 3/4 channels).
  */
 export default class XRLayer extends Layer {
   /**
