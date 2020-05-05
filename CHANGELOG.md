@@ -10,6 +10,7 @@
 
 ### Changed
 
+- Change bioformats padding check.
 - Pad based on textures and not channel props.
 
 ## 0.2.1

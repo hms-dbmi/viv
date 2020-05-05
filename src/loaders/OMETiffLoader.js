@@ -1,5 +1,9 @@
 import OMEXML from './omeXML';
-import { isInTileBounds, flipEndianness } from './utils';
+import {
+  isInTileBounds,
+  flipEndianness,
+  isBioformatsNoPadHeightVersion
+} from './utils';
 import { DTYPE_VALUES } from '../constants';
 import { range } from '../layers/utils';
 
@@ -30,6 +34,7 @@ export default class OMETiffLoader {
         unit: this.omexml.PhysicalSizeYUnit
       }
     };
+    this.software = firstImage.fileDirectory.Software;
     this.offsets = offsets || [];
     this.channelNames = this.omexml.getChannelNames();
     this.width = this.omexml.SizeX;
@@ -135,7 +140,7 @@ export default class OMETiffLoader {
     if (!this._tileInBounds({ x, y, z })) {
       return null;
     }
-    const { tiff, isBioFormats6Pyramid, omexml, tileSize } = this;
+    const { tiff, isBioFormats6Pyramid, omexml, tileSize, software } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const pyramidOffset = z * SizeZ * SizeT * SizeC;
     let image;
@@ -172,10 +177,9 @@ export default class OMETiffLoader {
     return {
       data: tiles,
       width: tileSize,
-      height:
-        tiles[0].length === tileSize ** 2
-          ? tileSize
-          : Math.min(tileSize, ImageLength - y * tileSize)
+      height: isBioformatsNoPadHeightVersion(software)
+        ? Math.min(tileSize, ImageLength - y * tileSize)
+        : tileSize
     };
   }
 

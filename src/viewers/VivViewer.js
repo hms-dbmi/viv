@@ -122,7 +122,13 @@ export default class VivViewer extends PureComponent {
       return null;
     }
     const { channelData, bounds } = sourceLayer.props;
+    if (!channelData) {
+      return null;
+    }
     const { data, width } = channelData;
+    if (!data) {
+      return null;
+    }
     let dataCoords;
     // This is currently a work-around for: https://github.com/visgl/deck.gl/pull/4526.
     // Once this is fixed we can make something more robust.
