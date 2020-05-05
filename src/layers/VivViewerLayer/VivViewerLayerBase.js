@@ -8,6 +8,7 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   sliderValues: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
+  channelIsOn: { type: 'array', value: [], compare: true },
   tileSize: { type: 'number', value: 512, compare: true },
   minZoom: { type: 'number', value: 0, compare: true },
   maxZoom: { type: 'number', value: 0, compare: true },

@@ -1,7 +1,6 @@
 import { CompositeLayer } from '@deck.gl/core';
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
-import { padColorsAndSliders } from '../utils';
 
 const defaultProps = {
   pickable: true,
@@ -43,13 +42,6 @@ export default class VivViewerLayer extends CompositeLayer {
       id
     } = this.props;
     const { tileSize, numLevels, dtype, width, height } = loader;
-    const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
-      sliderValues,
-      colorValues,
-      channelIsOn,
-      domain,
-      dtype
-    });
     const getTileData = async ({ x, y, z }) => {
       const tile = await loader.getTile({
         x,
@@ -72,8 +64,10 @@ export default class VivViewerLayer extends CompositeLayer {
       getTileData,
       dtype,
       minZoom: -(numLevels - 1),
-      colorValues: paddedColorValues,
-      sliderValues: paddedSliderValues,
+      colorValues,
+      sliderValues,
+      channelIsOn,
+      domain,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
       // multiple rendered sublayers (some of which have been cached) from overlapping
       refinementStrategy: opacity === 1 ? 'best-available' : 'no-overlap',
@@ -85,7 +79,6 @@ export default class VivViewerLayer extends CompositeLayer {
       },
       onTileError: onTileError || loader.onTileError,
       opacity,
-      domain,
       colormap,
       viewportId,
       onHover,
