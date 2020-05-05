@@ -13,6 +13,7 @@ export function renderSubLayers(props) {
   const {
     colorValues,
     sliderValues,
+    channelIsOn,
     visible,
     opacity,
     data,
@@ -48,6 +49,7 @@ export function renderSubLayers(props) {
     data: null,
     sliderValues,
     colorValues,
+    channelIsOn,
     opacity,
     visible,
     dtype,
