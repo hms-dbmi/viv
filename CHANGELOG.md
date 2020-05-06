@@ -7,6 +7,7 @@
 ### Changed
 
 - Add OME-TIFF to Covid-19 data description.
+- Clean up the docs.
 
 ## 0.2.2
 
