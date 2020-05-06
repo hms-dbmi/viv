@@ -227,7 +227,7 @@ const covidTiffInfo = {
   selections: [{ channel: 0 }],
   isPublic: true,
   isPyramid: true,
-  description: 'Covid-19 Primary Gut Epithelial Stem Cells',
+  description: 'Covid-19 Primary Gut Epithelial Stem Cells (OME-TIFF)',
   initialViewState: {
     zoom: -7,
     target: [50000, 50000]
