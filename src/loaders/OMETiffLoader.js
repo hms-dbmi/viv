@@ -16,6 +16,12 @@ const DTYPE_LOOKUP = {
 
 /**
  * This class serves as a wrapper for fetching tiff data from a file server.
+ * @param {Object} args
+ * @param {Object} args.tiff geotiffjs tiff object.
+ * @param {Object} args.pool Pool that implements a `decode` function.
+ * @param {Object} args.firstImage First image (geotiff Image object) in the tiff (containing base-resolution data).
+ * @param {String} args.omexmlString Raw OMEXML as a string.
+ * @param {Array} args.offsets The offsets of each IFD in the tiff.
  * */
 export default class OMETiffLoader {
   constructor({ tiff, pool, firstImage, omexmlString, offsets }) {

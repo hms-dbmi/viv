@@ -10,7 +10,7 @@ We have thus established that standard image files are 8-bit (256 value-options)
 
 A challenge of working in a browser is that you don't have access to data unless it is fed over the internet to you. Thus if you have a very large image in `height` and `width`, storing the entire image in memory is tough. For this reason, people have developed various image **tiling**/**pyramimd** schemes. **Tiling** is the manner in which the underlying image is broken up into smaller images and the **pyramid** represents the image at increasingly downsampled resolutions. This allows you to efficiently view the image in different locations at different zoom levels, given the current viewport in your browser, the most famous example of this being [OpenSeaDragon](https://openseadragon.github.io/).
 
-![Deep Zoom](deepzoom_example.jpg)
+![Deep Zoom](https://github.com/hubmapconsortium/vitessce-image-viewer/raw/master/docs/deepzoom_example.jpg)
 
 For example, if you are very zoomed in on an image, say the top-left corner of `0:512` in both height and width on the original image, you only need that portion of the image served to your browser for you to view it. You don't need the rest of the image at this moment and should you pan to it, you can always fetch it from the server which contains the output of the **tiling**/**pyramid** generation.
 
@@ -36,13 +36,13 @@ Second, we believe that **_[HTTP/2](https://en.wikipedia.org/wiki/HTTP/2)_** can
 
 ###### s3
 
-<img src="s3FirstRequest.png" width="300" alt="first s3 request"/>
-<img src="s3FinalRequest.png" width="300" alt="last s3 request"/>
+<img src="https://github.com/hubmapconsortium/vitessce-image-viewer/raw/master/docs/s3FirstRequest.png" width="300" alt="first s3 request"/>
+<img src="https://github.com/hubmapconsortium/vitessce-image-viewer/raw/master/docs/s3FinalRequest.png" width="300" alt="last s3 request"/>
 
 ###### GCS
 
-<img src="GCSFirstRequest.png" width="300" alt="first GCS request"/>
-<img src="GCSFinalRequest.png" width="300" alt="last GCS request"/>
+<img src="https://github.com/hubmapconsortium/vitessce-image-viewer/raw/master/docs/GCSFirstRequest.png" width="300" alt="first GCS request"/>
+<img src="https://github.com/hubmapconsortium/vitessce-image-viewer/raw/master/docs/GCSFinalRequest.png" width="300" alt="last GCS request"/>
 
 #### Pitfalls of other routes
 
