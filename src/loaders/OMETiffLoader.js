@@ -89,13 +89,10 @@ export default class OMETiffLoader {
    */
   _getIFDIndex({ z = 0, channel, time = 0 }) {
     let channelIndex;
-    if (this.channelNames.every(v => !v)) {
-      // Without names, enforce a numeric channel indexing scheme
-      console.warn(
-        'There are no channel names in the OMEXML.  Please use numeric indexing'
-      );
+    // Without names, enforce a numeric channel indexing scheme
+    if (this.channelNames.every(v => !v) || typeof channel === 'number') {
       channelIndex = channel;
-    } else {
+    } else if (typeof channel === 'string') {
       channelIndex = this.channelNames.indexOf(channel);
     }
     const { SizeZ, SizeT, SizeC, DimensionOrder } = this.omexml;
