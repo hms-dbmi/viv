@@ -8,6 +8,7 @@
 
 - Add OME-TIFF to Covid-19 data description.
 - Clean up the docs.
+- Allow numeric indexing on OME-TIFF loader.
 
 ## 0.2.2
 
