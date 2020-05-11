@@ -6,6 +6,12 @@
 
 ### Changed
 
+## 0.2.4
+
+### Added
+
+### Changed
+
 - Clean up dependencies.
 
 ## 0.2.3
