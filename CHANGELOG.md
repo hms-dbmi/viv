@@ -6,6 +6,12 @@
 
 ### Changed
 
+## 0.2.5
+
+### Added
+
+### Changed
+
 - Address OMEXML discrepancy on StructuredAnnotations.
 
 ## 0.2.4
