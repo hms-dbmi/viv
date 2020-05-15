@@ -300,9 +300,10 @@ export default class OMETiffLoader {
     let roiCount;
     if (StructuredAnnotations) {
       const { MapAnnotation } = StructuredAnnotations;
-      roiCount = MapAnnotation && MapAnnotation.Value
-        ? Object.entries(MapAnnotation.Value).length
-        : 0;
+      roiCount =
+        MapAnnotation && MapAnnotation.Value
+          ? Object.entries(MapAnnotation.Value).length
+          : 0;
     }
     return {
       'Acquisition Date': AcquisitionDate,
