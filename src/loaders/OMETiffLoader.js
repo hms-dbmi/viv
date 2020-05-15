@@ -269,7 +269,7 @@ export default class OMETiffLoader {
     const {
       metadataOMEXML: {
         Image: { AcquisitionDate },
-        StructuredAnnotations: { MapAnnotation }
+        StructuredAnnotations
       },
       SizeX,
       SizeY,
@@ -297,11 +297,14 @@ export default class OMETiffLoader {
       PhysicalSizeZ && PhysicalSizeZUnit
         ? `${PhysicalSizeZ} (${PhysicalSizeZUnit})`
         : '-';
-    const roiCount =
-      MapAnnotation && MapAnnotation.Value
-        ? Object.entries(MapAnnotation.Value).length
-        : 0;
-
+    let roiCount;
+    if (StructuredAnnotations) {
+      const { MapAnnotation } = StructuredAnnotations;
+      roiCount =
+        MapAnnotation && MapAnnotation.Value
+          ? Object.entries(MapAnnotation.Value).length
+          : 0;
+    }
     return {
       'Acquisition Date': AcquisitionDate,
       'Dimensions (XY)': `${SizeX} x ${SizeY}`,
