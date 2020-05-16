@@ -8,7 +8,12 @@ import AddIcon from '@material-ui/icons/Add';
 
 import { SideBySideViewer, PictureInPictureViewer } from '../../src';
 import sources from './source-info';
-import { createLoader, channelsReducer, useWindowSize } from './utils';
+import {
+  createLoader,
+  channelsReducer,
+  useWindowSize,
+  buildWindow
+} from './utils';
 
 import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
@@ -29,7 +34,8 @@ const initialChannels = {
   selections: [],
   names: [],
   ids: [],
-  isOn: []
+  isOn: [],
+  sliderRanges: []
 };
 
 function App() {
@@ -53,8 +59,26 @@ function App() {
       const sourceInfo = sources[sourceName];
       const { selections, dimensions } = sourceInfo;
       const nextLoader = await createLoader(sourceName, sourceInfo);
+      const {
+        dataRanges,
+        means,
+        standardDeviations
+      } = await nextLoader.getChannelStats({
+        z: nextLoader.numLevels - 1,
+        loaderSelection: selections
+      });
       const names = selections.map(sel => sel[dimensions[0].field]);
-      dispatch({ type: 'RESET_CHANNELS', value: { names, selections } });
+      dispatch({
+        type: 'RESET_CHANNELS',
+        value: {
+          names,
+          selections,
+          dataRanges,
+          windows: means.map((mean, i) =>
+            buildWindow(mean, standardDeviations[i])
+          )
+        }
+      });
       setLoader(nextLoader);
       setIsLoading(false);
       // Bioformats pyramid has a broken getRaster call.
@@ -78,11 +102,23 @@ function App() {
       const { field, values } = channelDim;
       const dimIndex = values.indexOf(value);
       const selection = { [field]: value };
-      dispatch({
-        type,
-        index,
-        value: { name: values[dimIndex], selection }
-      });
+      loader
+        .getChannelStats({
+          z: loader.numLevels - 1,
+          loaderSelection: [selection]
+        })
+        .then(({ dataRanges, means, standardDeviations }) => {
+          dispatch({
+            type,
+            index,
+            value: {
+              name: values[dimIndex],
+              selection,
+              dataRange: dataRanges[0],
+              window: buildWindow(means[0], standardDeviations[0])
+            }
+          });
+        });
     } else {
       dispatch({ type, index, value });
     }
@@ -91,17 +127,37 @@ function App() {
   const handleChannelAdd = () => {
     const { dimensions, selections } = sources[sourceName];
     const [channelDim] = dimensions;
-    dispatch({
-      type: 'ADD_CHANNEL',
-      value: {
-        name: channelDim.values[0],
-        selection: selections[0]
-      }
-    });
+    loader
+      .getChannelStats({
+        z: loader.numLevels - 1,
+        loaderSelection: [selections[0]]
+      })
+      .then(({ dataRanges, means, standardDeviations }) => {
+        dispatch({
+          type: 'ADD_CHANNEL',
+          value: {
+            name: channelDim.values[0],
+            selection: selections[0],
+            dataRange: dataRanges[0],
+            window: [
+              Math.round(Math.max(0, means[0] - 2 * standardDeviations[0])),
+              Math.round(means[0] + 2 * standardDeviations[0])
+            ]
+          }
+        });
+      });
   };
 
   const { initialViewState, isPyramid, dimensions } = sources[sourceName];
-  const { names, colors, sliders, isOn, ids, selections } = channels;
+  const {
+    names,
+    colors,
+    sliders,
+    isOn,
+    ids,
+    selections,
+    sliderRanges
+  } = channels;
   const channelControllers = ids.map((id, i) => {
     return (
       <Grid
@@ -119,6 +175,7 @@ function App() {
           colormapOn={colormap.length > 0}
           pixelValue={pixelValues[i]}
           shouldShowPixelValue={!useLinkedView}
+          sliderRange={sliderRanges[i]}
         />
       </Grid>
     );

@@ -49,6 +49,7 @@ function ChannelController({
   name,
   isOn,
   sliderValue,
+  sliderRange,
   colorValue,
   colormapOn,
   channelOptions,
@@ -107,8 +108,8 @@ function ChannelController({
             onChange={(e, v) => handleChange('CHANGE_SLIDER', v)}
             valueLabelDisplay="auto"
             getAriaLabel={() => `${name}-${colorValue}-${sliderValue}`}
-            min={MIN_SLIDER_VALUE}
-            max={MAX_SLIDER_VALUE}
+            min={sliderRange[0]}
+            max={sliderRange[1]}
             orientation="horizontal"
             style={{
               color: rgbColor,

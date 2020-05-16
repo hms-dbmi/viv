@@ -1,4 +1,4 @@
-import { guessRgb } from './utils';
+import { guessRgb, getChannelStats } from './utils';
 
 /**
  * This class serves as a wrapper for fetching zarr data from a file server.
@@ -116,6 +116,18 @@ export default class ZarrLoader {
       k => source.shape[this._dimIndices.get(k)]
     );
     return { height, width };
+  }
+
+  /**
+   * Returns image stats (mean, standard deviation, max/min).
+   * @param {Array} loaderSelection, Array of valid dimension selections
+   * @returns {Object} { means, dataRanges, standardDeviations }, arrays with entries for each channel
+   */
+  async getChannelStats({ loaderSelection }) {
+    const z = this.isPyramid ? this.numLevels - 1 : 0;
+    const rasters = await this.getRaster({ z, loaderSelection });
+    const { data } = rasters;
+    return getChannelStats({ data });
   }
 
   /**

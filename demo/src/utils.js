@@ -1,7 +1,14 @@
 import { useState, useEffect } from 'react';
 import { createZarrLoader, createOMETiffLoader } from '../../src';
 
-import { COLOR_PALLETE, INITIAL_SLIDER_VALUE } from './constants';
+import { COLOR_PALLETE } from './constants';
+
+export function buildWindow(mean, standardDeviation) {
+  return [
+    Math.round(Math.max(0, mean - 0.25 * standardDeviation)),
+    Math.round(mean + 4 * standardDeviation)
+  ];
+}
 
 export async function createLoader(type, infoObj) {
   switch (type) {
@@ -64,12 +71,16 @@ export function channelsReducer(state, { index, value, type }) {
   switch (type) {
     case 'CHANGE_CHANNEL': {
       // Changes name and selection for channel by index
-      const { name, selection } = value;
+      const { name, selection, window, dataRange } = value;
       const names = [...state.names];
       const selections = [...state.selections];
+      const sliders = [...state.sliders];
+      const sliderRanges = [...state.sliderRanges];
+      sliderRanges[index] = dataRange;
+      sliders[index] = window;
       names[index] = name;
       selections[index] = selection;
-      return { ...state, names, selections };
+      return { ...state, names, selections, sliders, sliderRanges };
     }
     case 'CHANGE_COLOR': {
       // Changes color for individual channel by index
@@ -91,33 +102,36 @@ export function channelsReducer(state, { index, value, type }) {
     }
     case 'ADD_CHANNEL': {
       // Adds an additional channel
-      const { name, selection } = value;
+      const { name, selection, window, dataRange } = value;
       const names = [...state.names, name];
       const selections = [...state.selections, selection];
       const colors = [...state.colors, [255, 255, 255]];
       const isOn = [...state.isOn, true];
-      const sliders = [...state.sliders, INITIAL_SLIDER_VALUE];
+      const sliders = [...state.sliders, window];
+      const sliderRanges = [...state.sliderRanges, dataRange];
       const ids = [...state.ids, String(Math.random())];
-      return { names, selections, colors, isOn, sliders, ids };
+      return { names, selections, colors, isOn, sliders, ids, sliderRanges };
     }
     case 'REMOVE_CHANNEL': {
       // Remove a single channel by index
       const names = state.names.filter((_, i) => i !== index);
       const sliders = state.sliders.filter((_, i) => i !== index);
+      const sliderRanges = state.sliderRanges.filter((_, i) => i !== index);
       const colors = state.colors.filter((_, i) => i !== index);
       const isOn = state.isOn.filter((_, i) => i !== index);
       const ids = state.ids.filter((_, i) => i !== index);
       const selections = state.selections.filter((_, i) => i !== index);
-      return { names, sliders, colors, isOn, ids, selections };
+      return { names, sliders, colors, isOn, ids, selections, sliderRanges };
     }
     case 'RESET_CHANNELS': {
       // Clears current channels and sets with new defaults
-      const { names, selections } = value;
+      const { names, selections, dataRanges, windows } = value;
       const n = names.length;
       return {
         names,
         selections,
-        sliders: Array(n).fill(INITIAL_SLIDER_VALUE),
+        sliders: windows,
+        sliderRanges: dataRanges,
         colors: range(n).map(i => COLOR_PALLETE[i]),
         isOn: Array(n).fill(true),
         ids: range(n).map(() => String(Math.random()))

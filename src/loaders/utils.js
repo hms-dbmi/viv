@@ -1,3 +1,5 @@
+import * as tf from '@tensorflow/tfjs';
+
 export function isInTileBounds({
   x,
   y,
@@ -101,4 +103,65 @@ export function isBioformatsNoPadHeightVersion(software) {
     }
   }
   return false;
+}
+
+export async function getChannelStats({ data }) {
+  // Max/min range.
+  const dataRangesTf = tf.tidy(() => {
+    const dataRanges = data.map(channel => {
+      const dataTensor = tf.tensor1d(new Float32Array(channel));
+      const min = tf.min(dataTensor);
+      const max = tf.max(dataTensor);
+      return [min, max];
+    });
+    return dataRanges;
+  });
+  const dataRanges = await Promise.all(
+    dataRangesTf.map(async dataRange => {
+      const min = await dataRange[0].data();
+      const max = await dataRange[1].data();
+      return [min[0], max[0]];
+    })
+  );
+  // Mean.
+  const channelMeansTf = tf.tidy(() => {
+    const channelMeans = data.map(channel => {
+      const dataTensor = tf.tensor1d(new Float32Array(channel));
+      const mean = tf.mean(dataTensor);
+      return mean;
+    });
+    return channelMeans;
+  });
+  const means = await Promise.all(
+    channelMeansTf.map(async meanTf => {
+      const mean = await meanTf.data();
+      return mean[0];
+    })
+  );
+  // Standard deviation.
+  const channelStandardDeviationsTf = tf.tidy(() => {
+    const channelMeans = data.map(channel => {
+      // tfjs doesn't have this implemented?
+      const dataTensor = tf.tensor1d(new Float32Array(channel));
+      const mean = tf.mean(dataTensor);
+      const squaredDifferenceSum = tf.sum(
+        tf.squaredDifference(dataTensor, mean)
+      );
+      const standardDeviation = tf.sqrt(
+        tf.div(squaredDifferenceSum, dataTensor.shape)
+      );
+      return standardDeviation;
+    });
+    return channelMeans;
+  });
+  const standardDeviations = await Promise.all(
+    channelStandardDeviationsTf.map(async standardDeviationTf => {
+      const sd = await standardDeviationTf.data();
+      return sd[0];
+    })
+  );
+  tf.dispose(dataRanges);
+  tf.dispose(channelMeansTf);
+  tf.dispose(channelStandardDeviationsTf);
+  return { dataRanges, means, standardDeviations };
 }
