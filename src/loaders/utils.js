@@ -163,5 +163,5 @@ export async function getChannelStats({ data }) {
   tf.dispose(dataRanges);
   tf.dispose(channelMeansTf);
   tf.dispose(channelStandardDeviationsTf);
-  return { dataRanges, means, standardDeviations };
+  return { dataRanges, means, standardDeviations, data };
 }
