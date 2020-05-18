@@ -4,6 +4,8 @@
 
 ### Added
 
+- Min/max, mean, standard deviation calculations directly from loaders.
+
 ### Changed
 
 ## 0.2.5
