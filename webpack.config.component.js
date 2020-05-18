@@ -46,6 +46,9 @@ const esConfig = {
     path: path.join(__dirname, '/dist/'),
     filename: 'bundle.es.js',
     libraryTarget: 'commonjs2'
+  },
+  optimization: {
+    minimize: false
   }
 };
 
