@@ -59,24 +59,12 @@ function App() {
       const sourceInfo = sources[sourceName];
       const { selections, dimensions } = sourceInfo;
       const nextLoader = await createLoader(sourceName, sourceInfo);
-      const {
-        dataRanges,
-        means,
-        standardDeviations
-      } = await nextLoader.getChannelStats({
-        z: nextLoader.numLevels - 1,
-        loaderSelection: selections
-      });
       const names = selections.map(sel => sel[dimensions[0].field]);
       dispatch({
         type: 'RESET_CHANNELS',
         value: {
           names,
-          selections,
-          dataRanges,
-          windows: means.map((mean, i) =>
-            buildWindow(mean, standardDeviations[i])
-          )
+          selections
         }
       });
       setLoader(nextLoader);
@@ -102,23 +90,14 @@ function App() {
       const { field, values } = channelDim;
       const dimIndex = values.indexOf(value);
       const selection = { [field]: value };
-      loader
-        .getChannelStats({
-          z: loader.numLevels - 1,
-          loaderSelection: [selection]
-        })
-        .then(({ dataRanges, means, standardDeviations }) => {
-          dispatch({
-            type,
-            index,
-            value: {
-              name: values[dimIndex],
-              selection,
-              dataRange: dataRanges[0],
-              window: buildWindow(means[0], standardDeviations[0])
-            }
-          });
-        });
+      dispatch({
+        type,
+        index,
+        value: {
+          name: values[dimIndex],
+          selection
+        }
+      });
     } else {
       dispatch({ type, index, value });
     }
@@ -127,37 +106,17 @@ function App() {
   const handleChannelAdd = () => {
     const { dimensions, selections } = sources[sourceName];
     const [channelDim] = dimensions;
-    loader
-      .getChannelStats({
-        z: loader.numLevels - 1,
-        loaderSelection: [selections[0]]
-      })
-      .then(({ dataRanges, means, standardDeviations }) => {
-        dispatch({
-          type: 'ADD_CHANNEL',
-          value: {
-            name: channelDim.values[0],
-            selection: selections[0],
-            dataRange: dataRanges[0],
-            window: [
-              Math.round(Math.max(0, means[0] - 2 * standardDeviations[0])),
-              Math.round(means[0] + 2 * standardDeviations[0])
-            ]
-          }
-        });
-      });
+    dispatch({
+      type: 'ADD_CHANNEL',
+      value: {
+        name: channelDim.values[0],
+        selection: selections[0]
+      }
+    });
   };
 
   const { initialViewState, isPyramid, dimensions } = sources[sourceName];
-  const {
-    names,
-    colors,
-    sliders,
-    isOn,
-    ids,
-    selections,
-    sliderRanges
-  } = channels;
+  const { names, colors, sliders, isOn, ids, selections } = channels;
   const channelControllers = ids.map((id, i) => {
     return (
       <Grid
@@ -175,7 +134,6 @@ function App() {
           colormapOn={colormap.length > 0}
           pixelValue={pixelValues[i]}
           shouldShowPixelValue={!useLinkedView}
-          sliderRange={sliderRanges[i]}
         />
       </Grid>
     );
