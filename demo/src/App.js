@@ -8,12 +8,7 @@ import AddIcon from '@material-ui/icons/Add';
 
 import { SideBySideViewer, PictureInPictureViewer } from '../../src';
 import sources from './source-info';
-import {
-  createLoader,
-  channelsReducer,
-  useWindowSize,
-  buildWindow
-} from './utils';
+import { createLoader, channelsReducer, useWindowSize } from './utils';
 
 import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
@@ -34,8 +29,7 @@ const initialChannels = {
   selections: [],
   names: [],
   ids: [],
-  isOn: [],
-  sliderRanges: []
+  isOn: []
 };
 
 function App() {
@@ -60,13 +54,7 @@ function App() {
       const { selections, dimensions } = sourceInfo;
       const nextLoader = await createLoader(sourceName, sourceInfo);
       const names = selections.map(sel => sel[dimensions[0].field]);
-      dispatch({
-        type: 'RESET_CHANNELS',
-        value: {
-          names,
-          selections
-        }
-      });
+      dispatch({ type: 'RESET_CHANNELS', value: { names, selections } });
       setLoader(nextLoader);
       setIsLoading(false);
       // Bioformats pyramid has a broken getRaster call.
@@ -93,10 +81,7 @@ function App() {
       dispatch({
         type,
         index,
-        value: {
-          name: values[dimIndex],
-          selection
-        }
+        value: { name: values[dimIndex], selection }
       });
     } else {
       dispatch({ type, index, value });

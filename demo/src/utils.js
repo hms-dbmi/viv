@@ -3,13 +3,6 @@ import { createZarrLoader, createOMETiffLoader } from '../../src';
 
 import { COLOR_PALLETE, INITIAL_SLIDER_VALUE } from './constants';
 
-export function buildWindow(mean, standardDeviation) {
-  return [
-    Math.round(Math.max(0, mean - 0.25 * standardDeviation)),
-    Math.round(mean + 4 * standardDeviation)
-  ];
-}
-
 export async function createLoader(type, infoObj) {
   switch (type) {
     case 'zarr': {

@@ -121,7 +121,7 @@ export default class ZarrLoader {
   /**
    * Returns image stats (mean, standard deviation, max/min).
    * @param {Array} loaderSelection, Array of valid dimension selections
-   * @returns {Object} { means, dataRanges, standardDeviations }, arrays with entries for each channel
+   * @returns {Object} { means, dataRanges, standardDeviations, data }, arrays with entries for each channel
    */
   async getChannelStats({ loaderSelection }) {
     const z = this.isPyramid ? this.numLevels - 1 : 0;
