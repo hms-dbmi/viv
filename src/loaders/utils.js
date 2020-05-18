@@ -105,7 +105,27 @@ export function isBioformatsNoPadHeightVersion(software) {
   return false;
 }
 
-export async function getChannelStats({ data }) {
+async function getMeans({ data }) {
+  // Mean.
+  const channelMeansTf = tf.tidy(() => {
+    const channelMeans = data.map(channel => {
+      const dataTensor = tf.tensor1d(new Float32Array(channel));
+      const mean = tf.mean(dataTensor);
+      return mean;
+    });
+    return channelMeans;
+  });
+  const means = await Promise.all(
+    channelMeansTf.map(async meanTf => {
+      const mean = await meanTf.data();
+      return mean[0];
+    })
+  );
+  tf.dispose(channelMeansTf);
+  return means;
+}
+
+async function getDataRanges({ data }) {
   // Max/min range.
   const dataRangesTf = tf.tidy(() => {
     const dataRanges = data.map(channel => {
@@ -123,24 +143,14 @@ export async function getChannelStats({ data }) {
       return [min[0], max[0]];
     })
   );
-  // Mean.
-  const channelMeansTf = tf.tidy(() => {
-    const channelMeans = data.map(channel => {
-      const dataTensor = tf.tensor1d(new Float32Array(channel));
-      const mean = tf.mean(dataTensor);
-      return mean;
-    });
-    return channelMeans;
-  });
-  const means = await Promise.all(
-    channelMeansTf.map(async meanTf => {
-      const mean = await meanTf.data();
-      return mean[0];
-    })
-  );
+  tf.dispose(dataRanges);
+  return dataRanges;
+}
+
+async function getStandardDeviations({ data }) {
   // Standard deviation.
   const channelStandardDeviationsTf = tf.tidy(() => {
-    const channelMeans = data.map(channel => {
+    const channelStandardDeviations = data.map(channel => {
       // tfjs doesn't have this implemented?
       const dataTensor = tf.tensor1d(new Float32Array(channel));
       const mean = tf.mean(dataTensor);
@@ -152,7 +162,7 @@ export async function getChannelStats({ data }) {
       );
       return standardDeviation;
     });
-    return channelMeans;
+    return channelStandardDeviations;
   });
   const standardDeviations = await Promise.all(
     channelStandardDeviationsTf.map(async standardDeviationTf => {
@@ -160,8 +170,13 @@ export async function getChannelStats({ data }) {
       return sd[0];
     })
   );
-  tf.dispose(dataRanges);
-  tf.dispose(channelMeansTf);
   tf.dispose(channelStandardDeviationsTf);
+  return standardDeviations;
+}
+
+export async function getChannelStats({ data }) {
+  const dataRanges = await getDataRanges({ data });
+  const means = await getMeans({ data });
+  const standardDeviations = await getStandardDeviations({ data });
   return { dataRanges, means, standardDeviations, data };
 }
