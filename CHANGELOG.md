@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Don't minify es bundle.
+
 ## 0.2.5
 
 ### Added
