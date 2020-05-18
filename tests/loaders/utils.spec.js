@@ -3,7 +3,7 @@ import { expect } from 'chai';
 
 import { getChannelStats } from '../../src/loaders/utils';
 
-describe('Test getChannelStates', () => {
+describe('Test getChannelStats', () => {
   it('Stats test', async () => {
     const { dataRanges, means, standardDeviations } = await getChannelStats({
       data: [
