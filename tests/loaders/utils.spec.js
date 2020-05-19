@@ -5,7 +5,12 @@ import { getChannelStats } from '../../src/loaders/utils';
 
 describe('Test getChannelStats', () => {
   it('Stats test', async () => {
-    const { dataRanges, means, standardDeviations } = await getChannelStats({
+    const {
+      dataRanges,
+      means,
+      standardDeviations,
+      medians
+    } = await getChannelStats({
       data: [
         [0, 1, 2, 3],
         [0, 2, 0, 2],
@@ -18,8 +23,7 @@ describe('Test getChannelStats', () => {
       [0, 2],
       [0, 1]
     ]);
-    // Actual standard deviation for the first one is 1.11803398875
-    // but clearly we have a rounding issue since the others are right?
-    expect(standardDeviations).to.deep.equal([1.1180340051651, 1, 0.5]);
+    expect(standardDeviations).to.deep.equal([1.118033988749895, 1, 0.5]);
+    expect(medians).to.deep.equal([2, 2, 1]);
   });
 });

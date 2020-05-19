@@ -1,5 +1,3 @@
-import * as tf from '@tensorflow/tfjs';
-
 export function isInTileBounds({
   x,
   y,
@@ -105,57 +103,50 @@ export function isBioformatsNoPadHeightVersion(software) {
   return false;
 }
 
-async function asyncForEach(array, callback) {
-  // eslint-disable-next-line no-plusplus
-  for (let index = 0; index < array.length; index++) {
-    // eslint-disable-next-line no-await-in-loop
-    await callback(array[index], index, array);
-  }
-}
-
-export async function getChannelStats({ data }) {
-  // Run tfjs operations.
-  const channelStatsTf = tf.tidy(() => {
-    const channelStats = data.map(channel => {
-      // tfjs doesn't have sd implemented?
-      const dataTensor = tf.tensor1d(new Float32Array(channel));
-      // Mean.
-      const mean = tf.mean(dataTensor);
-      const squaredDifferenceSum = tf.sum(
-        tf.squaredDifference(dataTensor, mean)
-      );
-      const standardDeviation = tf.sqrt(
-        tf.div(squaredDifferenceSum, dataTensor.shape)
-      );
-      // Max/min range.
-      const min = tf.min(dataTensor);
-      const max = tf.max(dataTensor);
-      return {
-        standardDeviation,
-        dataRange: [min, max],
-        mean
-      };
-    });
-    return channelStats;
-  });
+export function getChannelStats({ data }) {
   const channelStats = {
     means: [],
-    standardDeviations: [],
+    medians: [],
     dataRanges: [],
+    standardDeviations: [],
     data
   };
-  // Download data from GPU.
-  await asyncForEach(channelStatsTf, async stats => {
-    const { standardDeviation, dataRange, mean } = stats;
-    const min = await dataRange[0].data();
-    const max = await dataRange[1].data();
-    const sd = await standardDeviation.data();
-    const meanVal = await mean.data();
-    channelStats.means.push(meanVal[0]);
-    channelStats.standardDeviations.push(sd[0]);
-    channelStats.dataRanges.push([min[0], max[0]]);
+  data.forEach(arr => {
+    let len = arr.length;
+    let min = Infinity;
+    let max = -Infinity;
+    let total = 0;
+    // Range (min/max).
+    // eslint-disable-next-line no-plusplus
+    while (len--) {
+      if (arr[len] < min) {
+        min = arr[len];
+      }
+      if (arr[len] > max) {
+        max = arr[len];
+      }
+      total += arr[len];
+    }
+    channelStats.dataRanges.push([min, max]);
+
+    // Mean.
+    const mean = total / arr.length;
+    channelStats.means.push(mean);
+
+    // Median.
+    // Odd number lengths should round down the index.
+    const median = arr.slice().sort()[Math.floor(arr.length / 2)];
+    channelStats.medians.push(median);
+
+    // Standard Deviation.
+    len = arr.length;
+    let sumSquared = 0;
+    // eslint-disable-next-line no-plusplus
+    while (len--) {
+      sumSquared += (arr[len] - mean) ** 2;
+    }
+    const standardDeviation = (sumSquared / arr.length) ** 0.5;
+    channelStats.standardDeviations.push(standardDeviation);
   });
-  // Clean GPU memory of the data.
-  Object.values(channelStatsTf).forEach(tensor => tf.dispose(tensor));
   return channelStats;
 }
