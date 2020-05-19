@@ -105,54 +105,21 @@ export function isBioformatsNoPadHeightVersion(software) {
   return false;
 }
 
-async function getMeans({ data }) {
-  // Mean.
-  const channelMeansTf = tf.tidy(() => {
-    const channelMeans = data.map(channel => {
-      const dataTensor = tf.tensor1d(new Float32Array(channel));
-      const mean = tf.mean(dataTensor);
-      return mean;
-    });
-    return channelMeans;
-  });
-  const means = await Promise.all(
-    channelMeansTf.map(async meanTf => {
-      const mean = await meanTf.data();
-      return mean[0];
-    })
-  );
-  tf.dispose(channelMeansTf);
-  return means;
+async function asyncForEach(array, callback) {
+  // eslint-disable-next-line no-plusplus
+  for (let index = 0; index < array.length; index++) {
+    // eslint-disable-next-line no-await-in-loop
+    await callback(array[index], index, array);
+  }
 }
 
-async function getDataRanges({ data }) {
-  // Max/min range.
-  const dataRangesTf = tf.tidy(() => {
-    const dataRanges = data.map(channel => {
+export async function getChannelStats({ data }) {
+  // Run tfjs operations.
+  const channelStatsTf = tf.tidy(() => {
+    const channelStats = data.map(channel => {
+      // tfjs doesn't have sd implemented?
       const dataTensor = tf.tensor1d(new Float32Array(channel));
-      const min = tf.min(dataTensor);
-      const max = tf.max(dataTensor);
-      return [min, max];
-    });
-    return dataRanges;
-  });
-  const dataRanges = await Promise.all(
-    dataRangesTf.map(async dataRange => {
-      const min = await dataRange[0].data();
-      const max = await dataRange[1].data();
-      return [min[0], max[0]];
-    })
-  );
-  tf.dispose(dataRanges);
-  return dataRanges;
-}
-
-async function getStandardDeviations({ data }) {
-  // Standard deviation.
-  const channelStandardDeviationsTf = tf.tidy(() => {
-    const channelStandardDeviations = data.map(channel => {
-      // tfjs doesn't have this implemented?
-      const dataTensor = tf.tensor1d(new Float32Array(channel));
+      // Mean.
       const mean = tf.mean(dataTensor);
       const squaredDifferenceSum = tf.sum(
         tf.squaredDifference(dataTensor, mean)
@@ -160,23 +127,35 @@ async function getStandardDeviations({ data }) {
       const standardDeviation = tf.sqrt(
         tf.div(squaredDifferenceSum, dataTensor.shape)
       );
-      return standardDeviation;
+      // Max/min range.
+      const min = tf.min(dataTensor);
+      const max = tf.max(dataTensor);
+      return {
+        standardDeviation,
+        dataRange: [min, max],
+        mean
+      };
     });
-    return channelStandardDeviations;
+    return channelStats;
   });
-  const standardDeviations = await Promise.all(
-    channelStandardDeviationsTf.map(async standardDeviationTf => {
-      const sd = await standardDeviationTf.data();
-      return sd[0];
-    })
-  );
-  tf.dispose(channelStandardDeviationsTf);
-  return standardDeviations;
-}
-
-export async function getChannelStats({ data }) {
-  const dataRanges = await getDataRanges({ data });
-  const means = await getMeans({ data });
-  const standardDeviations = await getStandardDeviations({ data });
-  return { dataRanges, means, standardDeviations, data };
+  const channelStats = {
+    means: [],
+    standardDeviations: [],
+    dataRanges: [],
+    data
+  };
+  // Download data from GPU.
+  await asyncForEach(channelStatsTf, async stats => {
+    const { standardDeviation, dataRange, mean } = stats;
+    const min = await dataRange[0].data();
+    const max = await dataRange[1].data();
+    const sd = await standardDeviation.data();
+    const meanVal = await mean.data();
+    channelStats.means.push(meanVal[0]);
+    channelStats.standardDeviations.push(sd[0]);
+    channelStats.dataRanges.push([min[0], max[0]]);
+  });
+  // Clean GPU memory of the data.
+  Object.values(channelStatsTf).forEach(tensor => tf.dispose(tensor));
+  return channelStats;
 }
