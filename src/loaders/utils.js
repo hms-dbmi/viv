@@ -103,7 +103,18 @@ export function isBioformatsNoPadHeightVersion(software) {
   return false;
 }
 
-export function getChannelStats({ data }) {
+/**
+ * Returns actual image stats for static imagery and an estimate via a downsampled version of image pyramids.
+ * This is helpful for generating histograms of your channel data, or scaling your sliders down to a reasonable range.
+ * @param {Object} args
+ * @param {Object} args.loader A valid loader object.
+ * @param {Array} args.loaderSelection Array of valid dimension selections
+ * @returns {Object} { means, dataRanges, standardDeviations, data }, each arrays with entries for each channel based on your selection.
+ */
+export async function getChannelStats({ loader, loaderSelection }) {
+  const z = loader.isPyramid ? loader.numLevels - 1 : 0;
+  const rasters = await loader.getRaster({ z, loaderSelection });
+  const { data } = rasters;
   const channelStats = {
     means: [],
     medians: [],

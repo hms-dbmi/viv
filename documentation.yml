@@ -16,6 +16,8 @@ toc:
 - SideBySideView
 - name: Utility Methods
 - makeBoundingBox
+- getChannelStats
+- Pool
 - name: Layers
 - VivViewerLayer
 - StaticImageLayer

@@ -5,18 +5,24 @@ import { getChannelStats } from '../../src/loaders/utils';
 
 describe('Test getChannelStats', () => {
   it('Stats test', async () => {
+    const loader = {
+      isPyramid: false,
+      getRaster: async () => {
+        return {
+          data: [
+            [0, 1, 2, 3],
+            [0, 2, 0, 2],
+            [0, 0, 1, 1]
+          ]
+        };
+      }
+    };
     const {
       dataRanges,
       means,
       standardDeviations,
       medians
-    } = await getChannelStats({
-      data: [
-        [0, 1, 2, 3],
-        [0, 2, 0, 2],
-        [0, 0, 1, 1]
-      ]
-    });
+    } = await getChannelStats({ loader });
     expect(means).to.deep.equal([1.5, 1, 0.5]);
     expect(dataRanges).to.deep.equal([
       [0, 3],

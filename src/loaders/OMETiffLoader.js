@@ -2,8 +2,7 @@ import OMEXML from './omeXML';
 import {
   isInTileBounds,
   flipEndianness,
-  isBioformatsNoPadHeightVersion,
-  getChannelStats
+  isBioformatsNoPadHeightVersion
 } from './utils';
 import { DTYPE_VALUES } from '../constants';
 import { range } from '../layers/utils';
@@ -240,18 +239,6 @@ export default class OMETiffLoader {
     const width = image.getWidth();
     const height = image.getHeight();
     return { data: rasters, width, height };
-  }
-
-  /**
-   * Returns image stats (mean, standard deviation, max/min).
-   * @param {Array} loaderSelection, Array of valid dimension selections
-   * @returns {Object} { means, dataRanges, standardDeviations, data }, arrays with entries for each channel
-   */
-  async getChannelStats({ loaderSelection }) {
-    const z = this.isPyramid ? this.numLevels - 1 : 0;
-    const rasters = await this.getRaster({ z, loaderSelection });
-    const { data } = rasters;
-    return getChannelStats({ data });
   }
 
   /**
