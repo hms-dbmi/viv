@@ -7,7 +7,7 @@
 ### Changed
 
 - Don't minify es bundle.
-- Remove bioformats hack.
+- Remove bioformats hack and update docs for container version.
 
 ## 0.2.5
 
