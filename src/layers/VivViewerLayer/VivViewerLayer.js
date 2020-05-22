@@ -41,7 +41,7 @@ export default class VivViewerLayer extends CompositeLayer {
       pickable,
       id
     } = this.props;
-    const { tileSize, numLevels, dtype, width, height } = loader;
+    const { tileSize, numLevels, dtype } = loader;
     const getTileData = async ({ x, y, z }) => {
       const tile = await loader.getTile({
         x,
@@ -62,6 +62,7 @@ export default class VivViewerLayer extends CompositeLayer {
       id: `Tiled-Image-${id}`,
       getTileData,
       dtype,
+      tileSize,
       minZoom: -(numLevels - 1),
       colorValues,
       sliderValues,
