@@ -255,9 +255,9 @@ export default class XRLayer extends Layer {
         [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
         [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
       },
-      format,
-      dataFormat,
-      type
+      format: GL.RGBA,
+      dataFormat: GL.RGBA,
+      type: GL.FLOAT
     });
     return texture;
   }

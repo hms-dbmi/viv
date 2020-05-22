@@ -102,3 +102,15 @@ export function isBioformatsNoPadHeightVersion(software) {
   }
   return false;
 }
+
+export function to32BitFloat({ data }) {
+  const data32bit = data.map(arr => {
+    const { length } = arr;
+    const arr32Bits = new Float32Array(length * 4).fill(0);
+    for (let i = 0; i < length; i++) {
+      arr32Bits[i * 4] = arr[i];
+    }
+    return arr32Bits;
+  });
+  return data32bit;
+}

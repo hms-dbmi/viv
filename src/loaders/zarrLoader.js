@@ -1,5 +1,5 @@
 import { guessRgb } from './utils';
-
+import { to32BitFloat } from './utils';
 /**
  * This class serves as a wrapper for fetching zarr data from a file server.
  * */
@@ -62,7 +62,12 @@ export default class ZarrLoader {
       return data;
     });
     const data = await Promise.all(dataRequests);
-    return { data, width: this.tileSize, height: this.tileSize };
+    console.log(data);
+    return {
+      data: to32BitFloat({ data }),
+      width: this.tileSize,
+      height: this.tileSize
+    };
   }
 
   /**
@@ -84,10 +89,11 @@ export default class ZarrLoader {
       return data;
     });
     const data = await Promise.all(dataRequests);
+    console.log(data);
     const { shape } = source;
     const width = shape[xIndex];
     const height = shape[yIndex];
-    return { data, width, height };
+    return { data: to32BitFloat({ data }), width, height };
   }
 
   /**

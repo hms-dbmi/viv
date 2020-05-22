@@ -193,7 +193,7 @@ export default class VivViewer extends PureComponent {
       deckGLViews[0] = deckGLViews[randomizedIndex];
       deckGLViews[randomizedIndex] = holdFirstElement;
     }
-    return !isSafari() ? (
+    return (
       <DeckGL
         glOptions={{ webgl2: true }}
         layerFilter={this.layerFilter}
@@ -205,14 +205,8 @@ export default class VivViewer extends PureComponent {
           return isDragging ? 'grabbing' : 'crosshair';
         }}
       />
-    ) : (
-      <div className="viv-error">
-        <p>
-          Safari does not support WebGL2, which Viv requires. Please use Chrome
-          or Firefox.
-        </p>
-      </div>
     );
+
     /* eslint-disable react/destructuring-assignment */
   }
 }
