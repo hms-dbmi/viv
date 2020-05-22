@@ -7,6 +7,7 @@
 ### Changed
 
 - Don't minify es bundle.
+- Remove bioformats hack.
 
 ## 0.2.5
 
