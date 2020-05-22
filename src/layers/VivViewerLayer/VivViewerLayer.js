@@ -60,7 +60,6 @@ export default class VivViewerLayer extends CompositeLayer {
     };
     const tiledLayer = new VivViewerLayerBase({
       id: `Tiled-Image-${id}`,
-      tileSize,
       getTileData,
       dtype,
       minZoom: -(numLevels - 1),
@@ -82,11 +81,7 @@ export default class VivViewerLayer extends CompositeLayer {
       colormap,
       viewportId,
       onHover,
-      pickable,
-      width,
-      height,
-      // Needed for misreported metadata in bioformats.
-      loader
+      pickable
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity
