@@ -81,3 +81,16 @@ export function flipEndianness(arr) {
       throw new Error('Invalid input');
   }
 }
+
+export function padTileWithZeros(tile, tileSize) {
+  const { data, width, height } = tile;
+  // Create new TypedArray with same constructor (filled with zeros)
+  const padded = new data.constructor(tileSize * tileSize);
+  // Take (row) strips from original tile data and fill padded tile using
+  // multiples of the tileSize as the offset.
+  for (let i = 0; i < height; i += 1) {
+    const subset = data.subarray(i * width, (i + 1) * width);
+    padded.set(subset, i * tileSize);
+  }
+  return padded;
+}

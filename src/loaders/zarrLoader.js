@@ -1,4 +1,5 @@
-import { guessRgb } from './utils';
+import { BoundsCheckError } from 'zarr';
+import { guessRgb, padTileWithZeros } from './utils';
 
 /**
  * This class serves as a wrapper for fetching zarr data from a file server.
@@ -31,7 +32,13 @@ export default class ZarrLoader {
     dimensions.forEach(({ field }, i) => this._dimIndices.set(field, i));
 
     const { dtype, chunks } = base;
-    this.dtype = dtype;
+    /* TODO: Use better dtype naming for DTYPE_LOOKUP.
+     *
+     * This should probably not include endianness, since tiles
+     * are row-major TypedArrays and the endianness of the underlying
+     * buffer are resolved prior to loading the texture.
+    */
+    this.dtype = dtype.includes('>') ? `<${dtype.slice(1)}` : dtype;
     this.tileSize = chunks[this._dimIndices.get('x')];
   }
 
@@ -58,9 +65,13 @@ export default class ZarrLoader {
       const chunkKey = this._serializeSelection(sel);
       chunkKey[this._dimIndices.get('y')] = y;
       chunkKey[this._dimIndices.get('x')] = x;
-      const { data } = await source.getRawChunk(chunkKey);
+      const { data, shape: [height, width] } = await source.getRawChunk(chunkKey);
+      if (height < this.tileSize || width < this.tileSize) {
+        return padTileWithZeros({ data, width, height }, this.tileSize);
+      }
       return data;
     });
+
     const data = await Promise.all(dataRequests);
     return { data, width: this.tileSize, height: this.tileSize };
   }
@@ -96,10 +107,7 @@ export default class ZarrLoader {
    */
   // eslint-disable-next-line class-methods-use-this
   onTileError(err) {
-    // Handle zarr-specific tile Errors
-    // Will check with `err instanceof BoundCheckError` when merged
-    // https://github.com/gzuidhof/zarr.js/issues/47
-    if (!err.message.includes('RangeError')) {
+    if (!(err instanceof BoundsCheckError)) {
       // Rethrow error if something other than tile being requested is out of bounds.
       throw err;
     }
