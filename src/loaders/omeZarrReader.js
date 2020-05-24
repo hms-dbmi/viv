@@ -1,7 +1,6 @@
 import { openArray } from 'zarr';
 import ZarrLoader from './zarrLoader';
 
-
 async function getJson(path, key) {
     const res = await fetch(`${path}${key}`);
     if (res.status === 404) {
@@ -35,7 +34,6 @@ class OMEZarrReader {
         if ('multiscales' in this.rootAttrs) {
             const { datasets } = this.rootAttrs.multiscales[0];
             resolutions = datasets.map(d => d.path);
-            resolutions = ['2', '3', '4', '5', '6', '7', '8', '9'];
         }
         const config = { store: this.zarrPath };
         const promises = resolutions.map(r => openArray({ ...config, path: r }));
