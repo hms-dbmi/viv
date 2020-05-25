@@ -31,11 +31,13 @@ export default class ZarrLoader {
     dimensions.forEach(({ field }, i) => this._dimIndices.set(field, i));
 
     const { dtype, chunks } = base;
-    /* TODO: Use better dtype naming for DTYPE_LOOKUP.
+    /* TODO: Use better dtype convention in DTYPE_LOOKUP.
      *
-     * This should probably not include endianness, since tiles
-     * are row-major TypedArrays and the endianness of the underlying
-     * buffer are resolved prior to loading the texture.
+     * This convension should probably _not_ describe endianness,
+     * since endianness is resolved when decoding the source arrayBuffers
+     * into TypedArrays. The dtype of the zarr array describes the dtype of the
+     * source but this is different from how the bytes end up being represented in
+     * memory client-side.
     */
     this.dtype = dtype.includes('>') ? `<${dtype.slice(1)}` : dtype;
     this.tileSize = chunks[this._dimIndices.get('x')];
