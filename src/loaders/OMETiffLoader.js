@@ -1,5 +1,5 @@
 import OMEXML from './omeXML';
-import { isInTileBounds, flipEndianness } from './utils';
+import { isInTileBounds, flipEndianness, padTileWithZeros } from './utils';
 import { DTYPE_VALUES } from '../constants';
 import { range } from '../layers/utils';
 
@@ -142,7 +142,7 @@ export default class OMETiffLoader {
    * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize).
    * Default is `{data: [], width: tileSize, height: tileSize}`.
    */
-  async getTile({ x, y, z, loaderSelection }) {
+  async getTile({ x, y, z, loaderSelection = [] }) {
     if (!this._tileInBounds({ x, y, z })) {
       return null;
     }
@@ -171,13 +171,7 @@ export default class OMETiffLoader {
       image = await tiff.getImage(pyramidIndex);
       return this._getChannel({ image, x, y });
     });
-    if (!loaderSelection || loaderSelection.length === 0) {
-      return {
-        data: [],
-        width: tileSize,
-        height: tileSize
-      };
-    }
+
     const tiles = await Promise.all(tileRequests);
     return {
       data: tiles,
@@ -313,12 +307,37 @@ export default class OMETiffLoader {
     const { dtype } = this;
     const { TypedArray } = DTYPE_VALUES[dtype];
     const tile = await image.getTileOrStrip(x, y, 0, this.pool);
-    const data = new TypedArray(tile.data);
-    // Javascript needs little endian byteorder, so we flip if the data is not.
-    // eslint-disable-next-line no-unused-expressions
-    if (!image.littleEndian) {
-      flipEndianness(data);
+    const reader = image.getReaderForSample(0);
+    const data = new TypedArray(tile.data.byteLength / TypedArray.BYTES_PER_ELEMENT);
+    const dataView = new DataView(tile.data);
+    for (let i = 0; i < data.length; i += 1) {
+      data[i] = reader.call(dataView, i, !image.littleEndian);
     }
+
+    // console.log(tile.data)
+
+    // /*
+    //  * The endianness of JavaScript TypedArrays are determined by the endianness
+    //  * of the end-users' hardware. Nearly all desktop computers are x86 (little endian),
+    //  * so if the image is big-endian we need to flip endian byteorder in-place.
+    //  *
+    //  * There is probably a better way to do this using the DataView API to ensure
+    //  * that all machines are supported (which is what geotiff does in getRaster), but we
+    //  * haven't run into issues so far.
+    //  *
+    //  * https://stackoverflow.com/questions/7869752/javascript-typed-arrays-and-endianness
+    //  */
+    // if (!image.littleEndian) {
+    //   flipEndianness(data);
+    // }
+
+    // If the tile data is not (tileSize x tileSize), pad the data with zeros
+    if (data.length < (this.tileSize * this.tileSize)) {
+      const width = Math.min(this.tileSize, image.getWidth() - x * this.tileSize);
+      const height = Math.min(this.tileSize, image.getHeight() - y * this.tileSize);
+      return padTileWithZeros({ data, width, height }, this.tileSize);
+    }
+
     return data;
   }
 
