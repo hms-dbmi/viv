@@ -35,10 +35,8 @@ class OMEZarrReader {
             const { datasets } = this.rootAttrs.multiscales[0];
             resolutions = datasets.map(d => d.path);
         }
-        const config = { store: this.zarrPath };
-        const promises = resolutions.map(r => openArray({ ...config, path: r }));
+        const promises = resolutions.map(r => openArray({ store: this.zarrPath, path: r }));
         const pyramid = await Promise.all(promises);
-
         const data = pyramid.length > 1 ? pyramid : pyramid[0];
         const dimensions = ['t', 'c', 'z', 'y', 'x'].map(field => ({ field }));
         return {

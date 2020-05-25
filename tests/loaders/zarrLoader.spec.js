@@ -40,7 +40,7 @@ describe('Test zarr non-rgb image loader', () => {
     ];
     const loader = new ZarrLoader({ data: z, dimensions });
     const { tileSize } = loader;
-    let res = await loader.getTile({ x: 0, y: 0 });
+    let res = await loader.getTile({ x: 0, y: 0, loaderSelection: [{ channel: 0 }] });
     expect(res.data[0][10]).to.equal(42);
     expect(res.data[0].length).to.equal(tileSize * tileSize);
 
@@ -81,15 +81,18 @@ describe('Test zarr pyramid', () => {
       { field: 'x', type: 'quantitative', values: null }
     ];
 
+    const config = { x: 0, y: 0, loaderSelection: [{ channel: 0 }] };
     const loader = new ZarrLoader({ data: [z0, z1, z2], dimensions });
-    const { data: baseTiles } = await loader.getTile({ x: 0, y: 0, z: 0 });
-    const { data: level1Tiles } = await loader.getTile({ x: 0, y: 0, z: 1 });
-    const { data: level2Tiles } = await loader.getTile({ x: 0, y: 0, z: 2 });
+    const { data: baseTiles } = await loader.getTile({ ...config, z: 0 });
+    const { data: level1Tiles } = await loader.getTile({ ...config, z: 1 });
+    const { data: level2Tiles } = await loader.getTile({ ...config, z: 2 });
+
     expect([
       baseTiles.length,
       level1Tiles.length,
       level2Tiles.length
     ]).to.deep.equal([1, 1, 1]);
+
     expect([
       baseTiles[0].length,
       level1Tiles[0].length,

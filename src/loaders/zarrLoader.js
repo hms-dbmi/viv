@@ -25,7 +25,6 @@ export default class ZarrLoader {
     this.translate = translate;
     this.isRgb = isRgb || guessRgb(base.shape);
     this.dimensions = dimensions;
-    this._defaultSelection = [Array(dimensions.legnth).fill(0)];
 
     this._data = data;
     this._dimIndices = new Map();
@@ -58,9 +57,9 @@ export default class ZarrLoader {
    * @param {Array} loaderSelection, Array of valid dimension selections
    * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize)
    */
-  async getTile({ x, y, z, loaderSelection }) {
+  async getTile({ x, y, z, loaderSelection = [] }) {
     const source = this._getSource(z);
-    const selections = loaderSelection || this._defaultSelection;
+    const selections = loaderSelection;
     const dataRequests = selections.map(async sel => {
       const chunkKey = this._serializeSelection(sel);
       chunkKey[this._dimIndices.get('y')] = y;
@@ -82,10 +81,10 @@ export default class ZarrLoader {
    * @param {Array} loaderSelection, Array of valid dimension selections
    * @returns {Object} data: TypedArray[], width: number, height: number
    */
-  async getRaster({ z, loaderSelection }) {
+  async getRaster({ z, loaderSelection = [] }) {
     const source = this._getSource(z);
     const [xIndex, yIndex] = ['x', 'y'].map(k => this._dimIndices.get(k));
-    const selections = loaderSelection || this._defaultSelection;
+    const selections = loaderSelection;
     const dataRequests = selections.map(async sel => {
       const chunkKey = this._serializeSelection(sel);
       chunkKey[yIndex] = null;
