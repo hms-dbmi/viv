@@ -20,7 +20,7 @@ const basePyramidInfo = {
 
 // Generated using bioformats2raw and raw2ometiff.
 const tiffInfo = {
-  url: `https://vitessce-demo-data.storage.googleapis.com/test-data/spraggins.bioformats.raw2ometiff.ome.tif`,
+  url: `https://vitessce-demo-data.storage.googleapis.com/test-data/hubmap/pyramid_0.0.2/spraggins.ome.tif`,
   ...basePyramidInfo,
   description: 'Kidney mxIF (OME-TIFF)'
 };
@@ -179,7 +179,7 @@ const remoteBFTiff = {
 
 // Generated using bioformats2raw and raw2ometiff.
 const remoteTiffUrl2 =
-  'https://vitessce-demo-data.storage.googleapis.com/test-data/test_VAN0003-LK-32-21-AF_preIMS_registered.ome.tif';
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/hubmap/pyramid_0.0.2/VAN0003-LK-32-21-AF_preIMS_registered.ome.tif';
 
 const remoteTiff2 = {
   url: remoteTiffUrl2,

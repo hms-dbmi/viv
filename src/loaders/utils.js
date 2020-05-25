@@ -82,27 +82,6 @@ export function flipEndianness(arr) {
   }
 }
 
-const NO_PAD_BIOFORMATS_VERSION = [6, 2, 1];
-
-export function isBioformatsNoPadHeightVersion(software) {
-  if (!software) {
-    return false;
-  }
-  const isBioFormats = software.includes('Bio-Formats');
-  const version = software.match(/[0-9]/g).map(e => Number(e));
-  // Guessing that bioformats 6.0.0 - 6.2.1 misreports bounds, we check the major version.
-  if (isBioFormats && version[0] === NO_PAD_BIOFORMATS_VERSION[0]) {
-    // The version is thus 6 (there is no 7).  Check if it's version 6.2 or lower.
-    if (version[1] <= NO_PAD_BIOFORMATS_VERSION[1]) {
-      // Version 6.2 or lower with y in 6.x.y less than or equal to 1.
-      if (version[2] <= NO_PAD_BIOFORMATS_VERSION[2]) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
 export function to32BitFloat({ data }) {
   const data32bit = data.map(arr => {
     const { length } = arr;

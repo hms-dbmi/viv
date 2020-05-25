@@ -18,7 +18,6 @@ const defaultProps = {
   colorValues: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
-  tileSize: { type: 'number', value: 0, compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: '<u2', compare: true },
   colormap: { type: 'string', value: '', compare: true }

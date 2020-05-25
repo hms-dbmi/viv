@@ -2,7 +2,6 @@ import OMEXML from './omeXML';
 import {
   isInTileBounds,
   flipEndianness,
-  isBioformatsNoPadHeightVersion,
   to32BitFloat
 } from './utils';
 import { DTYPE_VALUES } from '../constants';
@@ -151,7 +150,7 @@ export default class OMETiffLoader {
     if (!this._tileInBounds({ x, y, z })) {
       return null;
     }
-    const { tiff, isBioFormats6Pyramid, omexml, tileSize, software } = this;
+    const { tiff, isBioFormats6Pyramid, omexml, tileSize } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const pyramidOffset = z * SizeZ * SizeT * SizeC;
     let image;
@@ -184,14 +183,11 @@ export default class OMETiffLoader {
       };
     }
     const tiles = await Promise.all(tileRequests);
-    const { ImageLength } = image.fileDirectory;
     const tiles32BitFloat = to32BitFloat({ data: tiles });
     return {
       data: tiles32BitFloat,
       width: tileSize,
-      height: isBioformatsNoPadHeightVersion(software)
-        ? Math.min(tileSize, ImageLength - y * tileSize)
-        : tileSize
+      height: tileSize
     };
   }
 
@@ -204,7 +200,6 @@ export default class OMETiffLoader {
 
    */
   async getRaster({ z, loaderSelection }) {
-    console.log(z);
     const { tiff, omexml, isBioFormats6Pyramid, pool } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const rasters = await Promise.all(
@@ -227,10 +222,8 @@ export default class OMETiffLoader {
           }
         }
         const image = await tiff.getImage(pyramidIndex);
-        console.log(image);
         // Flips bits for us for endianness.
         const raster = await image.readRasters({ pool });
-        console.log(raster);
         return raster[0];
       })
     );
@@ -243,9 +236,7 @@ export default class OMETiffLoader {
     );
     const width = image.getWidth();
     const height = image.getHeight();
-    console.log(rasters);
     const raster32BitFloat = to32BitFloat({ data: rasters });
-    console.log(raster32BitFloat);
     return { data: raster32BitFloat, width, height };
   }
 
