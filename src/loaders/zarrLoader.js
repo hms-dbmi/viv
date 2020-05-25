@@ -61,11 +61,12 @@ export default class ZarrLoader {
    */
   async getTile({ x, y, z, loaderSelection = [] }) {
     const source = this._getSource(z);
-    const selections = loaderSelection;
-    const dataRequests = selections.map(async sel => {
+    const [xIndex, yIndex] = ['x', 'y'].map(k => this._dimIndices.get(k));
+
+    const dataRequests = loaderSelection.map(async sel => {
       const chunkKey = this._serializeSelection(sel);
-      chunkKey[this._dimIndices.get('y')] = y;
-      chunkKey[this._dimIndices.get('x')] = x;
+      chunkKey[yIndex] = y;
+      chunkKey[xIndex] = x;
       const { data, shape: [height, width] } = await source.getRawChunk(chunkKey);
       if (height < this.tileSize || width < this.tileSize) {
         return padTileWithZeros({ data, width, height }, this.tileSize);
@@ -86,20 +87,21 @@ export default class ZarrLoader {
   async getRaster({ z, loaderSelection = [] }) {
     const source = this._getSource(z);
     const [xIndex, yIndex] = ['x', 'y'].map(k => this._dimIndices.get(k));
-    const selections = loaderSelection;
-    const dataRequests = selections.map(async sel => {
+
+    const dataRequests = loaderSelection.map(async sel => {
       const chunkKey = this._serializeSelection(sel);
       chunkKey[yIndex] = null;
       chunkKey[xIndex] = null;
-      if (this.isRgb) chunkKey[chunkKey.length - 1] = null;
+      if (this.isRgb) {
+        chunkKey[chunkKey.length - 1] = null;
+      }
       const { data } = await source.getRaw(chunkKey);
       return data;
     });
+
     const data = await Promise.all(dataRequests);
     const { shape } = source;
-    const width = shape[xIndex];
-    const height = shape[yIndex];
-    return { data, width, height };
+    return { data, width: shape[xIndex], height: shape[yIndex] };
   }
 
   /**
@@ -120,10 +122,8 @@ export default class ZarrLoader {
    * @returns {Object} width: number, height: number
    */
   getRasterSize({ z }) {
-    const source = this._getSource(z);
-    const [height, width] = ['y', 'x'].map(
-      k => source.shape[this._dimIndices.get(k)]
-    );
+    const { shape } = this._getSource(z);
+    const [height, width] = ['y', 'x'].map(k => shape[this._dimIndices.get(k)]);
     return { height, width };
   }
 
