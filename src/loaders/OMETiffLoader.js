@@ -1,5 +1,5 @@
 import OMEXML from './omeXML';
-import { isInTileBounds, flipEndianness, padTileWithZeros } from './utils';
+import { isInTileBounds, padTileWithZeros } from './utils';
 import { DTYPE_VALUES } from '../constants';
 import { range } from '../layers/utils';
 
@@ -308,28 +308,24 @@ export default class OMETiffLoader {
     const { TypedArray } = DTYPE_VALUES[dtype];
     const tile = await image.getTileOrStrip(x, y, 0, this.pool);
     const reader = image.getReaderForSample(0);
-    const data = new TypedArray(tile.data.byteLength / TypedArray.BYTES_PER_ELEMENT);
-    const dataView = new DataView(tile.data);
+
+    const size = tile.data.byteLength / TypedArray.BYTES_PER_ELEMENT;
+    const data = new TypedArray(size);
+
+    /*
+     * The endianness of JavaScript TypedArrays are determined by the endianness
+     * of the end-users' hardware. Nearly all desktop computers are x86 (little endian),
+     * so we didn't run into issues with flipping bytes in place for big-endian buffers. However,
+     * geotiff uses the DataView API to ensure that buffers are read correctly on all machines
+     * (including big-endian machines) and we mimic ths below using the reader.
+     *
+     * https://github.com/geotiffjs/geotiff.js/blob/d3b095880c9b596df5c6319561f7c347e09c98e4/src/geotiffimage.js#L180
+    */
+    const dataView = new DataView(tile.data); // tile.data is an ArrayBuffer
     for (let i = 0; i < data.length; i += 1) {
-      data[i] = reader.call(dataView, i, !image.littleEndian);
+      const byteOffset = i * TypedArray.BYTES_PER_ELEMENT;
+      data[i] = reader.call(dataView, byteOffset, image.littleEndian);
     }
-
-    // console.log(tile.data)
-
-    // /*
-    //  * The endianness of JavaScript TypedArrays are determined by the endianness
-    //  * of the end-users' hardware. Nearly all desktop computers are x86 (little endian),
-    //  * so if the image is big-endian we need to flip endian byteorder in-place.
-    //  *
-    //  * There is probably a better way to do this using the DataView API to ensure
-    //  * that all machines are supported (which is what geotiff does in getRaster), but we
-    //  * haven't run into issues so far.
-    //  *
-    //  * https://stackoverflow.com/questions/7869752/javascript-typed-arrays-and-endianness
-    //  */
-    // if (!image.littleEndian) {
-    //   flipEndianness(data);
-    // }
 
     // If the tile data is not (tileSize x tileSize), pad the data with zeros
     if (data.length < (this.tileSize * this.tileSize)) {
