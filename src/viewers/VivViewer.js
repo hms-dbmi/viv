@@ -1,18 +1,7 @@
 import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { getVivId } from '../views/utils';
-
-// Taken from https://stackoverflow.com/a/31732310/8060591
-function isSafari() {
-  return (
-    navigator.vendor &&
-    navigator.vendor.indexOf('Apple') > -1 &&
-    navigator.userAgent &&
-    navigator.userAgent.indexOf('CriOS') === -1 &&
-    navigator.userAgent.indexOf('FxiOS') === -1
-  );
-}
-
+import { NO_WEBGL2 } from '../constants';
 /**
  * This component handles rendering the various views within the DeckGL contenxt.
  * @param {Object} props
@@ -149,7 +138,8 @@ export default class VivViewer extends PureComponent {
         Math.floor((coordinate[1] - bounds[3]) / layerZoomScale)
       ];
     }
-    const hoverData = data.map(d => d[dataCoords[1] * width + dataCoords[0]]);
+    const coords = dataCoords[1] * width + dataCoords[0];
+    const hoverData = data.map(d => d[NO_WEBGL2 ? coords * 4 : coords]);
     handleValue(hoverData);
   }
 

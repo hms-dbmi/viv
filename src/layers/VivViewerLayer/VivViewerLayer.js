@@ -1,6 +1,7 @@
 import { CompositeLayer } from '@deck.gl/core';
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
+import { NO_WEBGL2 } from '../../constants';
 
 const defaultProps = {
   pickable: true,
@@ -77,6 +78,8 @@ export default class VivViewerLayer extends CompositeLayer {
       updateTriggers: {
         getTileData: [loader, loaderSelection]
       },
+      // A single tileSize x tileSize tile for Safari or null otherwise (the default)
+      maxCacheByteSize: NO_WEBGL2 ? 4 * tileSize * tileSize : null,
       onTileError: onTileError || loader.onTileError,
       opacity,
       colormap,

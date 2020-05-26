@@ -1,5 +1,5 @@
-import { guessRgb } from './utils';
-import { to32BitFloat } from './utils';
+import { guessRgb, to32BitFloat } from './utils';
+import { NO_WEBGL2 } from '../constants';
 /**
  * This class serves as a wrapper for fetching zarr data from a file server.
  * */
@@ -62,11 +62,13 @@ export default class ZarrLoader {
       return data;
     });
     const data = await Promise.all(dataRequests);
-    console.log(data);
     return {
-      data: to32BitFloat({ data }),
+      data: NO_WEBGL2 ? to32BitFloat(data) : data,
       width: this.tileSize,
-      height: this.tileSize
+      height: this.tileSize,
+      byteLength: NO_WEBGL2
+        ? 4 * this.tileSize ** 2
+        : data[0].BYTES_PER_ELEMENT * this.tileSize ** 2
     };
   }
 
@@ -89,11 +91,10 @@ export default class ZarrLoader {
       return data;
     });
     const data = await Promise.all(dataRequests);
-    console.log(data);
     const { shape } = source;
     const width = shape[xIndex];
     const height = shape[yIndex];
-    return { data: to32BitFloat({ data }), width, height };
+    return { data: NO_WEBGL2 ? to32BitFloat(data) : data, width, height };
   }
 
   /**

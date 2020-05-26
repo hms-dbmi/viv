@@ -1,10 +1,6 @@
 import OMEXML from './omeXML';
-import {
-  isInTileBounds,
-  flipEndianness,
-  to32BitFloat
-} from './utils';
-import { DTYPE_VALUES } from '../constants';
+import { isInTileBounds, flipEndianness, to32BitFloat } from './utils';
+import { DTYPE_VALUES, NO_WEBGL2 } from '../constants';
 import { range } from '../layers/utils';
 
 const DTYPE_LOOKUP = {
@@ -183,11 +179,13 @@ export default class OMETiffLoader {
       };
     }
     const tiles = await Promise.all(tileRequests);
-    const tiles32BitFloat = to32BitFloat({ data: tiles });
     return {
-      data: tiles32BitFloat,
+      data: NO_WEBGL2 ? to32BitFloat(tiles) : tiles,
       width: tileSize,
-      height: tileSize
+      height: tileSize,
+      byteLength: NO_WEBGL2
+        ? 4 * tileSize ** 2
+        : tiles[0].BYTES_PER_ELEMENT * tileSize ** 2
     };
   }
 
@@ -236,8 +234,11 @@ export default class OMETiffLoader {
     );
     const width = image.getWidth();
     const height = image.getHeight();
-    const raster32BitFloat = to32BitFloat({ data: rasters });
-    return { data: raster32BitFloat, width, height };
+    return {
+      data: NO_WEBGL2 ? to32BitFloat(rasters) : rasters,
+      width,
+      height
+    };
   }
 
   /**

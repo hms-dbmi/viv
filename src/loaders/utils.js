@@ -82,10 +82,11 @@ export function flipEndianness(arr) {
   }
 }
 
-export function to32BitFloat({ data }) {
+export function to32BitFloat(data) {
   const data32bit = data.map(arr => {
     const { length } = arr;
     const arr32Bits = new Float32Array(length * 4).fill(0);
+    // eslint-disable-next-line no-plusplus
     for (let i = 0; i < length; i++) {
       arr32Bits[i * 4] = arr[i];
     }
