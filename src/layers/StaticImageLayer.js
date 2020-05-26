@@ -1,5 +1,6 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import XRLayer from './XRLayer';
+import { padTileWithZeros } from '../loaders/utils';
 
 const defaultProps = {
   pickable: true,
@@ -30,6 +31,18 @@ function scaleBounds({ width, height, translate, scale }) {
   return [left, bottom, right, top];
 }
 
+/*
+ * For some reason data of uneven length fails to be converted to a texture (Issue #144).
+ * Here we pad the width of tile by one if the data is uneven in length, which seemingly
+ * fixes the rendering. This is not ideal since padding the tile makes a copy of underlying
+ * buffer, but without digging deeper into the WebGL it is a reasonable fix.
+ */
+function padEven(data, width, height) {
+  const targetWidth = (width * height) % 2 === 0 ? width : width + 1;
+  const padded = data.map(d => padTileWithZeros({ data: d, width, height }, targetWidth, height));
+  return { data: padded, width: targetWidth, height }
+}
+
 /**
  * This layer wraps XRLayer and generates a static image
  * @param {Object} props
@@ -49,7 +62,7 @@ export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
     const { loader, z, loaderSelection } = this.props;
     loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) => {
-      this.setState({ data, width, height });
+      this.setState(padEven(data, width, height));
     });
   }
 
@@ -62,11 +75,9 @@ export default class StaticImageLayer extends CompositeLayer {
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
       const { loader, z, loaderSelection } = this.props;
-      loader
-        .getRaster({ z, loaderSelection })
-        .then(({ data, width, height }) => {
-          this.setState({ data, width, height });
-        });
+      loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) => {
+        this.setState(padEven(data, width, height));
+      });
     }
   }
 
