@@ -8,6 +8,9 @@
 
 - Don't minify es bundle.
 - Remove bioformats hack and update docs for container version.
+- Update zarr with new decoders.
+- Add tile-padding utility function for consistently sized tiles from `Loader.getTile`.
+- Fix #144 by padding uneven length tiles in `StaticImageLayer`.
 
 ## 0.2.5
 
