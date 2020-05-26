@@ -39,18 +39,16 @@ export default class XRLayer extends Layer {
    */
   getShaders() {
     const { colormap, dtype } = this.props;
-    const fragShader = NO_WEBGL2 ? fs1 : fs2;
+    const fragShaderNoColormap = NO_WEBGL2 ? fs1 : fs2;
     const fragShaderColoramp = NO_WEBGL2 ? fsColormap1 : fsColormap2;
-    const fragmentShaderColormap = colormap
+    const fragShader = colormap
       ? fragShaderColoramp.replace('colormapFunction', colormap)
-      : fragShader;
-    const fragmentShaderDtype =
-      dtype === '<f4'
-        ? fragmentShaderColormap.replace(/usampler/g, 'sampler')
-        : fragmentShaderColormap;
+      : fragShaderNoColormap;
+    const fragShaderDtype =
+      dtype === '<f4' ? fragShader.replace(/usampler/g, 'sampler') : fragShader;
     return super.getShaders({
       vs: NO_WEBGL2 ? vs1 : vs2,
-      fs: fragmentShaderDtype,
+      fs: fragShaderDtype,
       modules: [project32, picking]
     });
   }
