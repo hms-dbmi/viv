@@ -26,7 +26,6 @@ class OMEZarrReader {
     this.imageData = rootAttrs.omero;
   }
 
-
   /**
    * Returns OMEZarrReader instance.
    * @param {String} url root zarr store
