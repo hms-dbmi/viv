@@ -1,5 +1,5 @@
 import OMEXML from './omeXML';
-import { isInTileBounds, padTileWithZeros } from './utils';
+import { isInTileBounds, padTileWithZeros, byteSwapInplace } from './utils';
 import { DTYPE_VALUES } from '../constants';
 import { range } from '../layers/utils';
 
@@ -307,24 +307,15 @@ export default class OMETiffLoader {
     const { dtype } = this;
     const { TypedArray } = DTYPE_VALUES[dtype];
     const tile = await image.getTileOrStrip(x, y, 0, this.pool);
-    const reader = image.getReaderForSample(0);
-
-    const size = tile.data.byteLength / TypedArray.BYTES_PER_ELEMENT;
-    const data = new TypedArray(size);
-
+    const data = new TypedArray(tile.data);
     /*
      * The endianness of JavaScript TypedArrays are determined by the endianness
      * of the end-users' hardware. Nearly all desktop computers are x86 (little endian),
-     * so we didn't observe issues with flipping bytes in place for big-endian buffers before.
-     * However, geotiff uses the DataView API to ensure that buffers are read correctly on
-     * all machines (including big-endian machines) and we mimic ths below using the reader.
-     *
-     * https://github.com/geotiffjs/geotiff.js/blob/d3b095880c9b596df5c6319561f7c347e09c98e4/src/geotiffimage.js#L180
+     * so we flip bytes in place for big-endian buffers. This is substantially faster than using
+     * the DataView API.
      */
-    const dataView = new DataView(tile.data); // tile.data is an ArrayBuffer
-    for (let i = 0; i < data.length; i += 1) {
-      const byteOffset = i * TypedArray.BYTES_PER_ELEMENT;
-      data[i] = reader.call(dataView, byteOffset, image.littleEndian);
+    if (!image.littleEndian) {
+      byteSwapInplace(data);
     }
 
     // If the tile data is not (tileSize x tileSize), pad the data with zeros

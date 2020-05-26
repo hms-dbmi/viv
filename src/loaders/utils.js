@@ -39,3 +39,24 @@ export function padTileWithZeros(tile, targetWidth, targetHeight) {
   }
   return padded;
 }
+
+/**
+ * Flips the bytes of TypedArray in place. Used to flipendianess
+ * Adapted from https://github.com/zbjornson/node-bswap/blob/master/bswap.js
+ * @param {TypedArray} src
+ * @returns {void}
+ */
+export function byteSwapInplace(src) {
+  const b = src.BYTES_PER_ELEMENT;
+  const flipper = new Uint8Array(src.buffer, src.byteOffset, src.length * b);
+  const numFlips = b / 2;
+  const endByteIndex = b - 1;
+  let t = 0;
+  for (let i = 0; i < flipper.length; i += b) {
+    for (let j = 0; j < numFlips; j += 1) {
+      t = flipper[i + j];
+      flipper[i + j] = flipper[i + endByteIndex - j];
+      flipper[i + endByteIndex - j] = t;
+    }
+  }
+}
