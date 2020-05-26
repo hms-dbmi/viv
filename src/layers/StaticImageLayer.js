@@ -39,8 +39,10 @@ function scaleBounds({ width, height, translate, scale }) {
  */
 function padEven(data, width, height) {
   const targetWidth = (width * height) % 2 === 0 ? width : width + 1;
-  const padded = data.map(d => padTileWithZeros({ data: d, width, height }, targetWidth, height));
-  return { data: padded, width: targetWidth, height }
+  const padded = data.map(d =>
+    padTileWithZeros({ data: d, width, height }, targetWidth, height)
+  );
+  return { data: padded, width: targetWidth, height };
 }
 
 /**
@@ -75,9 +77,11 @@ export default class StaticImageLayer extends CompositeLayer {
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
       const { loader, z, loaderSelection } = this.props;
-      loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) => {
-        this.setState(padEven(data, width, height));
-      });
+      loader
+        .getRaster({ z, loaderSelection })
+        .then(({ data, width, height }) => {
+          this.setState(padEven(data, width, height));
+        });
     }
   }
 

@@ -320,7 +320,7 @@ export default class OMETiffLoader {
      * all machines (including big-endian machines) and we mimic ths below using the reader.
      *
      * https://github.com/geotiffjs/geotiff.js/blob/d3b095880c9b596df5c6319561f7c347e09c98e4/src/geotiffimage.js#L180
-    */
+     */
     const dataView = new DataView(tile.data); // tile.data is an ArrayBuffer
     for (let i = 0; i < data.length; i += 1) {
       const byteOffset = i * TypedArray.BYTES_PER_ELEMENT;
@@ -328,10 +328,17 @@ export default class OMETiffLoader {
     }
 
     // If the tile data is not (tileSize x tileSize), pad the data with zeros
-    if (data.length < (this.tileSize * this.tileSize)) {
-      const width = Math.min(this.tileSize, image.getWidth() - x * this.tileSize);
+    if (data.length < this.tileSize * this.tileSize) {
+      const width = Math.min(
+        this.tileSize,
+        image.getWidth() - x * this.tileSize
+      );
       const height = data.length / width;
-      return padTileWithZeros({ data, width, height }, this.tileSize, this.tileSize);
+      return padTileWithZeros(
+        { data, width, height },
+        this.tileSize,
+        this.tileSize
+      );
     }
 
     return data;

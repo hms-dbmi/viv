@@ -237,7 +237,8 @@ const covidTiffInfo = {
 };
 
 const omeZarr = {
-  url: 'https://vitessce-demo-data.storage.googleapis.com/test-data/9822151.zarr',
+  url:
+    'https://vitessce-demo-data.storage.googleapis.com/test-data/9822151.zarr',
   dimensions: [
     // TODO: Having the actual dimensions breaks the UI components currently
     // ome_zarr images are all (t, c, z, y, x)
@@ -251,8 +252,8 @@ const omeZarr = {
   initialViewState: {
     zoom: -5,
     target: [30000, 20000]
-  },
-}
+  }
+};
 
 export default {
   zarr: zarrInfo,
@@ -262,5 +263,5 @@ export default {
   'bf tiff': remoteBFTiff,
   'tiff 2': remoteTiff2,
   'covid tiff': covidTiffInfo,
-  'ome-zarr': omeZarr,
+  'ome-zarr': omeZarr
 };

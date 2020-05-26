@@ -38,7 +38,7 @@ export default class ZarrLoader {
      * into TypedArrays. The dtype of the zarr array describes the dtype of the
      * source but this is different from how the bytes end up being represented in
      * memory client-side.
-    */
+     */
     this.dtype = dtype.includes('>') ? `<${dtype.slice(1)}` : dtype;
     this.tileSize = chunks[this._dimIndices.get('x')];
   }
@@ -67,9 +67,16 @@ export default class ZarrLoader {
       const chunkKey = this._serializeSelection(sel);
       chunkKey[yIndex] = y;
       chunkKey[xIndex] = x;
-      const { data, shape: [height, width] } = await source.getRawChunk(chunkKey);
+      const {
+        data,
+        shape: [height, width]
+      } = await source.getRawChunk(chunkKey);
       if (height < this.tileSize || width < this.tileSize) {
-        return padTileWithZeros({ data, width, height }, this.tileSize, this.tileSize);
+        return padTileWithZeros(
+          { data, width, height },
+          this.tileSize,
+          this.tileSize
+        );
       }
       return data;
     });

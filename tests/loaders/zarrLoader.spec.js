@@ -40,7 +40,11 @@ describe('Test zarr non-rgb image loader', () => {
     ];
     const loader = new ZarrLoader({ data: z, dimensions });
     const { tileSize } = loader;
-    let res = await loader.getTile({ x: 0, y: 0, loaderSelection: [{ channel: 0 }] });
+    let res = await loader.getTile({
+      x: 0,
+      y: 0,
+      loaderSelection: [{ channel: 0 }]
+    });
     expect(res.data[0][10]).to.equal(42);
     expect(res.data[0].length).to.equal(tileSize * tileSize);
 

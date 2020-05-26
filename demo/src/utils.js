@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
-import { createZarrLoader, createOMETiffLoader, OMEZarrReader } from '../../src';
+import {
+  createZarrLoader,
+  createOMETiffLoader,
+  OMEZarrReader
+} from '../../src';
 
 import { COLOR_PALLETE, INITIAL_SLIDER_VALUE } from './constants';
 
