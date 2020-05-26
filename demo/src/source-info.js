@@ -215,6 +215,8 @@ const remoteTiff2 = {
 };
 
 const covidTiffInfo = {
+  url:
+    'https://vitessce-demo-data.storage.googleapis.com/test-data/12448_G1HR_Mesh003.ome.tif',
   dimensions: [
     {
       field: 'channel',
@@ -231,9 +233,7 @@ const covidTiffInfo = {
   initialViewState: {
     zoom: -7,
     target: [50000, 50000]
-  },
-  url:
-    'https://vitessce-demo-data.storage.googleapis.com/test-data/12448_G1HR_Mesh003.ome.tif'
+  }
 };
 
 const omeZarr = {
@@ -247,7 +247,8 @@ const omeZarr = {
     { field: 'x', type: 'quantitative', values: null }
   ],
   selections: [{ c: 0 }],
-  isPublic: false,
+  isPublic: true,
+  isPyramid: true,
   description: 'IDR 9822151.zarr - SARS-CoV-2 in human instestinal cells',
   initialViewState: {
     zoom: -5,

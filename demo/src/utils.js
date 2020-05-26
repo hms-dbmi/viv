@@ -126,7 +126,8 @@ export function channelsReducer(state, { index, value, type }) {
         names,
         selections,
         sliders: Array(n).fill(INITIAL_SLIDER_VALUE),
-        colors: range(n).map(i => COLOR_PALLETE[i]),
+        colors:
+          n === 1 ? [[255, 255, 255]] : range(n).map(i => COLOR_PALLETE[i]),
         isOn: Array(n).fill(true),
         ids: range(n).map(() => String(Math.random()))
       };
