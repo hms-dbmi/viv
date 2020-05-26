@@ -5,7 +5,8 @@ import {
   createZarrLoader,
   ZarrLoader,
   createOMETiffLoader,
-  OMETiffLoader
+  OMETiffLoader,
+  OMEZarrReader
 } from './loaders';
 
 export {
@@ -22,5 +23,6 @@ export {
   ZarrLoader,
   OMETiffLoader,
   createOMETiffLoader,
-  createZarrLoader
+  createZarrLoader,
+  OMEZarrReader
 };

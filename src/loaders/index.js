@@ -3,6 +3,7 @@ import { fromUrl } from 'geotiff';
 import Pool from './Pool';
 import ZarrLoader from './zarrLoader';
 import OMETiffLoader from './OMETiffLoader';
+import OMEZarrReader from './omeZarrReader';
 
 export async function createZarrLoader({
   url,
@@ -54,4 +55,4 @@ export async function createOMETiffLoader({ url, offsets = [], headers = {} }) {
   });
 }
 
-export { ZarrLoader, OMETiffLoader };
+export { ZarrLoader, OMETiffLoader, OMEZarrReader };

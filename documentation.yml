@@ -24,6 +24,7 @@ toc:
 - createOMETiffLoader
 - OMETiffLoader
 - ZarrLoader
+- OMEZarrReader
 - name: Layers (Internal)
 - XRLayer
 - OverviewLayer

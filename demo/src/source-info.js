@@ -215,6 +215,8 @@ const remoteTiff2 = {
 };
 
 const covidTiffInfo = {
+  url:
+    'https://vitessce-demo-data.storage.googleapis.com/test-data/12448_G1HR_Mesh003.ome.tif',
   dimensions: [
     {
       field: 'channel',
@@ -231,9 +233,28 @@ const covidTiffInfo = {
   initialViewState: {
     zoom: -7,
     target: [50000, 50000]
-  },
+  }
+};
+
+const omeZarr = {
   url:
-    'https://vitessce-demo-data.storage.googleapis.com/test-data/12448_G1HR_Mesh003.ome.tif'
+    'https://vitessce-demo-data.storage.googleapis.com/test-data/9822151.zarr',
+  dimensions: [
+    // TODO: Having the actual dimensions breaks the UI components currently
+    // ome_zarr images are all (t, c, z, y, x)
+    { field: 'c', type: 'nominal', values: [0] },
+    { field: 'y', type: 'quantitative', values: null },
+    { field: 'x', type: 'quantitative', values: null }
+  ],
+  selections: [{ c: 0 }],
+  isPublic: true,
+  isPyramid: true,
+  description:
+    'IDR 9822151.zarr - SARS-CoV-2 in human instestinal cells (OME-ZARR)',
+  initialViewState: {
+    zoom: -5,
+    target: [30000, 20000]
+  }
 };
 
 export default {
@@ -243,5 +264,6 @@ export default {
   'static tiff': staticTiffInfo,
   'bf tiff': remoteBFTiff,
   'tiff 2': remoteTiff2,
-  'covid tiff': covidTiffInfo
+  'covid tiff': covidTiffInfo,
+  'ome-zarr': omeZarr
 };
