@@ -6,6 +6,12 @@
 
 ### Changed
 
+## 0.2.6
+
+### Added
+
+### Changed
+
 - Don't minify es bundle.
 - Remove bioformats hack and update docs for container version.
 - Update zarr with new decoders.
