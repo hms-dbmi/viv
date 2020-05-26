@@ -69,7 +69,7 @@ export default class ZarrLoader {
       chunkKey[xIndex] = x;
       const { data, shape: [height, width] } = await source.getRawChunk(chunkKey);
       if (height < this.tileSize || width < this.tileSize) {
-        return padTileWithZeros({ data, width, height }, this.tileSize);
+        return padTileWithZeros({ data, width, height }, this.tileSize, this.tileSize);
       }
       return data;
     });

@@ -315,9 +315,9 @@ export default class OMETiffLoader {
     /*
      * The endianness of JavaScript TypedArrays are determined by the endianness
      * of the end-users' hardware. Nearly all desktop computers are x86 (little endian),
-     * so we didn't run into issues with flipping bytes in place for big-endian buffers. However,
-     * geotiff uses the DataView API to ensure that buffers are read correctly on all machines
-     * (including big-endian machines) and we mimic ths below using the reader.
+     * so we didn't observe issues with flipping bytes in place for big-endian buffers before.
+     * However, geotiff uses the DataView API to ensure that buffers are read correctly on
+     * all machines (including big-endian machines) and we mimic ths below using the reader.
      *
      * https://github.com/geotiffjs/geotiff.js/blob/d3b095880c9b596df5c6319561f7c347e09c98e4/src/geotiffimage.js#L180
     */
@@ -330,8 +330,8 @@ export default class OMETiffLoader {
     // If the tile data is not (tileSize x tileSize), pad the data with zeros
     if (data.length < (this.tileSize * this.tileSize)) {
       const width = Math.min(this.tileSize, image.getWidth() - x * this.tileSize);
-      const height = Math.min(this.tileSize, image.getHeight() - y * this.tileSize);
-      return padTileWithZeros({ data, width, height }, this.tileSize);
+      const height = data.length / width;
+      return padTileWithZeros({ data, width, height }, this.tileSize, this.tileSize);
     }
 
     return data;
