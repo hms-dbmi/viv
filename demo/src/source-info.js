@@ -249,7 +249,7 @@ const omeZarr = {
   selections: [{ c: 0 }],
   isPublic: true,
   isPyramid: true,
-  description: 'IDR 9822151.zarr - SARS-CoV-2 in human instestinal cells',
+  description: 'IDR 9822151.zarr - SARS-CoV-2 in human instestinal cells (OME-ZARR)',
   initialViewState: {
     zoom: -5,
     target: [30000, 20000]

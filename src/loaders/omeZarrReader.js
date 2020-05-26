@@ -10,9 +10,12 @@ async function getJson(path, key) {
   return json;
 }
 
-// Mostly a javascript implementation of ome-zarr-py
-// https://github.com/ome/ome-zarr-py/blob/master/ome_zarr.py
-
+/**
+ * This class attempts to be a javascript implementation of ome-zarr-py
+ * https://github.com/ome/ome-zarr-py/blob/master/ome_zarr.py
+ * @param {String} zarrPath url to root zarr store
+ * @param {Object} rootAttrs metadata for zarr array
+ * */
 class OMEZarrReader {
   constructor(zarrPath, rootAttrs) {
     this.zarrPath = zarrPath;
@@ -23,12 +26,22 @@ class OMEZarrReader {
     this.imageData = rootAttrs.omero;
   }
 
+
+  /**
+   * Returns OMEZarrReader instance.
+   * @param {String} url root zarr store
+   * @returns {OMEZarrReader} OME reader for zarr store
+   */
   static async fromUrl(url) {
     const zarrPath = url.endsWith('/') ? url : `${url}/`;
     const rootAttrs = await getJson(zarrPath, '.zattrs');
     return new OMEZarrReader(zarrPath, rootAttrs);
   }
 
+  /**
+   * Returns ZarrLoader as well as omero image metadata object.
+   * @returns {Object} { loader: ZarrLoader, metadata: Object }
+   */
   async loadOMEZarr() {
     let resolutions = ['0']; // TODO: could be first alphanumeric dataset on err
     if ('multiscales' in this.rootAttrs) {
