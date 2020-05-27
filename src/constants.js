@@ -37,9 +37,4 @@ export const DTYPE_VALUES = {
   }
 };
 
-// This is needed for testing without a DOM.  Should we mock a DOM instead?
-// eslint-disable-next-line no-use-before-define
-const document = typeof document === 'undefined' ? null : document;
-export const NO_WEBGL2 = document
-  ? !document.createElement('canvas').getContext('webgl2')
-  : false;
+export const NO_WEBGL2 = !document.createElement('canvas').getContext('webgl2');

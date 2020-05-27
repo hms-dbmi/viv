@@ -41,17 +41,17 @@ describe('Test zarr non-rgb image loader', () => {
     const loader = new ZarrLoader({ data: z, dimensions });
     const { tileSize } = loader;
     let res = await loader.getTile({ x: 0, y: 0 });
-    expect(res.data[0][10]).to.equal(42);
-    expect(res.data[0].length).to.equal(tileSize * tileSize);
+    expect(res.data[0][12]).to.equal(42);
+    expect(res.data[0].length).to.equal(tileSize * tileSize * 4);
 
     res = await loader.getTile({
       x: 0,
       y: 0,
       loaderSelection: [{ channel: 1 }]
     });
-    expect(res.data[0].subarray(0, 100)).to.deep.equal(
-      NestedArray.arange(100).flatten()
-    );
+    expect(
+      new Int32Array(res.data[0].subarray(0, 400).filter((_, i) => i % 4 === 0))
+    ).to.deep.equal(NestedArray.arange(100).flatten());
   });
 });
 
@@ -94,6 +94,6 @@ describe('Test zarr pyramid', () => {
       baseTiles[0].length,
       level1Tiles[0].length,
       level2Tiles[0].length
-    ]).to.deep.equal([100, 100, 100]);
+    ]).to.deep.equal([400, 400, 400]);
   });
 });
