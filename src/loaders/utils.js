@@ -1,3 +1,5 @@
+import quickselect from 'quickselect';
+
 export function isInTileBounds({
   x,
   y,
@@ -120,7 +122,9 @@ export async function getChannelStats({ loader, loaderSelection }) {
     medians: [],
     dataRanges: [],
     standardDeviations: [],
-    data
+    data,
+    firstQuartiles: [],
+    thirdQuartiles: []
   };
   data.forEach(arr => {
     let len = arr.length;
@@ -144,11 +148,6 @@ export async function getChannelStats({ loader, loaderSelection }) {
     const mean = total / arr.length;
     channelStats.means.push(mean);
 
-    // Median.
-    // Odd number lengths should round down the index.
-    const median = arr.slice().sort()[Math.floor(arr.length / 2)];
-    channelStats.medians.push(median);
-
     // Standard Deviation.
     len = arr.length;
     let sumSquared = 0;
@@ -158,6 +157,22 @@ export async function getChannelStats({ loader, loaderSelection }) {
     }
     const standardDeviation = (sumSquared / arr.length) ** 0.5;
     channelStats.standardDeviations.push(standardDeviation);
+
+    // Median, and quartiles via quickselect: https://en.wikipedia.org/wiki/Quickselect.
+    // Odd number lengths should round down the index.
+    const mid = Math.floor(arr.length / 2);
+    const firstQuartileLocation = Math.floor(arr.length / 4);
+    const thirdQuartileLocation = 3 * Math.floor(arr.length / 4);
+    quickselect(arr, mid);
+    const median = arr[mid];
+    quickselect(arr, firstQuartileLocation, 0, mid);
+    const firstQuartile = arr[firstQuartileLocation];
+    quickselect(arr, thirdQuartileLocation, mid, arr.length - 1);
+    const thirdQuartile = arr[thirdQuartileLocation];
+
+    channelStats.medians.push(median);
+    channelStats.firstQuartiles.push(firstQuartile);
+    channelStats.thirdQuartiles.push(thirdQuartile);
   });
   return channelStats;
 }
