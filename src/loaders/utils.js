@@ -174,5 +174,6 @@ export async function getChannelStats({ loader, loaderSelection }) {
     channelStats.firstQuartiles.push(firstQuartile);
     channelStats.thirdQuartiles.push(thirdQuartile);
   });
+
   return channelStats;
 }

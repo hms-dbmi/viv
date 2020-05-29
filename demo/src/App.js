@@ -54,13 +54,6 @@ function App() {
       const sourceInfo = sources[sourceName];
       const { selections, dimensions } = sourceInfo;
       const nextLoader = await createLoader(sourceName, sourceInfo);
-      // eslint-disable-next-line
-      console.log(
-        await getChannelStats({
-          loader: nextLoader,
-          loaderSelection: selections
-        })
-      );
       const names = selections.map(sel => sel[dimensions[0].field]);
       dispatch({ type: 'RESET_CHANNELS', value: { names, selections } });
       setLoader(nextLoader);
