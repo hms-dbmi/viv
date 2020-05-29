@@ -22,7 +22,6 @@ import {
   DEFAULT_OVERVIEW,
   FILL_PIXEL_VALUE
 } from './constants';
-import { getChannelStats } from '../../src/loaders/utils';
 
 const initialChannels = {
   sliders: [],
