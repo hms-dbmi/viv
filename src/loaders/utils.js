@@ -111,7 +111,7 @@ export function isBioformatsNoPadHeightVersion(software) {
  * @param {Object} args
  * @param {Object} args.loader A valid loader object.
  * @param {Array} args.loaderSelection Array of valid dimension selections
- * @returns {Object} { means, dataRanges, standardDeviations, data }, each arrays with entries for each channel based on your selection.
+ * @returns {Object} { means, dataRanges, standardDeviations, data, firstQuartiles, thirdQuartiles }, each arrays with entries for each channel based on your selection.
  */
 export async function getChannelStats({ loader, loaderSelection }) {
   const z = loader.isPyramid ? loader.numLevels - 1 : 0;
