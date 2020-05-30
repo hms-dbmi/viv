@@ -169,7 +169,6 @@ export async function getChannelStats({ loader, loaderSelection }) {
     const firstQuartile = arr[firstQuartileLocation];
     quickselect(arr, thirdQuartileLocation, mid, arr.length - 1);
     const thirdQuartile = arr[thirdQuartileLocation];
-
     channelStats.medians.push(median);
     channelStats.firstQuartiles.push(firstQuartile);
     channelStats.thirdQuartiles.push(thirdQuartile);

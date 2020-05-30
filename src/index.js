@@ -5,7 +5,8 @@ import {
   createZarrLoader,
   ZarrLoader,
   createOMETiffLoader,
-  OMETiffLoader
+  OMETiffLoader,
+  getChannelStats
 } from './loaders';
 
 export {
@@ -16,6 +17,7 @@ export {
   OverviewView,
   PictureInPictureViewer,
   SideBySideView,
+  getChannelStats,
   SideBySideViewer,
   DetailView,
   StaticImageLayer,
