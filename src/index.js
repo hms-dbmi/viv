@@ -6,6 +6,7 @@ import {
   ZarrLoader,
   createOMETiffLoader,
   OMETiffLoader,
+  getChannelStats,
   OMEZarrReader
 } from './loaders';
 
@@ -17,6 +18,7 @@ export {
   OverviewView,
   PictureInPictureViewer,
   SideBySideView,
+  getChannelStats,
   SideBySideViewer,
   DetailView,
   StaticImageLayer,
