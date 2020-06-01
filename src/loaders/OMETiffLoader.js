@@ -1,9 +1,5 @@
 import OMEXML from './omeXML';
-import {
-  isInTileBounds,
-  flipEndianness,
-  isBioformatsNoPadHeightVersion
-} from './utils';
+import { isInTileBounds, padTileWithZeros, byteSwapInplace } from './utils';
 import { DTYPE_VALUES } from '../constants';
 import { range } from '../layers/utils';
 
@@ -146,11 +142,11 @@ export default class OMETiffLoader {
    * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize).
    * Default is `{data: [], width: tileSize, height: tileSize}`.
    */
-  async getTile({ x, y, z, loaderSelection }) {
+  async getTile({ x, y, z, loaderSelection = [] }) {
     if (!this._tileInBounds({ x, y, z })) {
       return null;
     }
-    const { tiff, isBioFormats6Pyramid, omexml, tileSize, software } = this;
+    const { tiff, isBioFormats6Pyramid, omexml, tileSize } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const pyramidOffset = z * SizeZ * SizeT * SizeC;
     let image;
@@ -175,21 +171,12 @@ export default class OMETiffLoader {
       image = await tiff.getImage(pyramidIndex);
       return this._getChannel({ image, x, y });
     });
-    if (!loaderSelection || loaderSelection.length === 0) {
-      return {
-        data: [],
-        width: tileSize,
-        height: tileSize
-      };
-    }
+
     const tiles = await Promise.all(tileRequests);
-    const { ImageLength } = image.fileDirectory;
     return {
       data: tiles,
       width: tileSize,
-      height: isBioformatsNoPadHeightVersion(software)
-        ? Math.min(tileSize, ImageLength - y * tileSize)
-        : tileSize
+      height: tileSize
     };
   }
 
@@ -321,11 +308,30 @@ export default class OMETiffLoader {
     const { TypedArray } = DTYPE_VALUES[dtype];
     const tile = await image.getTileOrStrip(x, y, 0, this.pool);
     const data = new TypedArray(tile.data);
-    // Javascript needs little endian byteorder, so we flip if the data is not.
-    // eslint-disable-next-line no-unused-expressions
+    /*
+     * The endianness of JavaScript TypedArrays are determined by the endianness
+     * of the end-users' hardware. Nearly all desktop computers are x86 (little endian),
+     * so we flip bytes in place for big-endian buffers. This is substantially faster than using
+     * the DataView API.
+     */
     if (!image.littleEndian) {
-      flipEndianness(data);
+      byteSwapInplace(data);
     }
+
+    // If the tile data is not (tileSize x tileSize), pad the data with zeros
+    if (data.length < this.tileSize * this.tileSize) {
+      const width = Math.min(
+        this.tileSize,
+        image.getWidth() - x * this.tileSize
+      );
+      const height = data.length / width;
+      return padTileWithZeros(
+        { data, width, height },
+        this.tileSize,
+        this.tileSize
+      );
+    }
+
     return data;
   }
 

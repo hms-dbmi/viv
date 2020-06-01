@@ -26,8 +26,8 @@ A bit is going on under the hood here, though. Here are some of those things:
 
 ```shell
 # Pull docker images
-docker pull portal-contianer-ome-tiff-offsets:0.0.1
-docker pull portal-contianer-ome-tiff-tiler:0.0.1
+docker pull portal-contianer-ome-tiff-offsets:0.0.2
+docker pull portal-contianer-ome-tiff-tiler:0.0.2
 
 # Run docker images
 # For images that have large z/t/channel stack combinations.
@@ -35,13 +35,13 @@ docker run \
     --name offsets \
     --mount type=bind,source=/my/path/test-input/,target=/input \
     --mount type=bind,source=/my/path/test-output/,target=/output \
-    portal-contianer-ome-tiff-offsets:0.0.1
+    portal-contianer-ome-tiff-offsets:0.0.2
 # For large resolution images, to be downsampled and tiled.
 docker run \
     --name tiler \
     --mount type=bind,source=/my/path/test-input/,target=/input \
     --mount type=bind,source=/my/path/test-output/,target=/output \
-    portal-contianer-ome-tiff-tiler:0.0.1
+    portal-contianer-ome-tiff-tiler:0.0.2
 
 # Push output to the cloud
 gsutil -m cp -r /my/path/test-output/ gs://my/path/test-output/

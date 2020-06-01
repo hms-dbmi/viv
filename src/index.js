@@ -6,7 +6,8 @@ import {
   ZarrLoader,
   createOMETiffLoader,
   OMETiffLoader,
-  getChannelStats
+  getChannelStats,
+  OMEZarrReader
 } from './loaders';
 
 export {
@@ -24,5 +25,6 @@ export {
   ZarrLoader,
   OMETiffLoader,
   createOMETiffLoader,
-  createZarrLoader
+  createZarrLoader,
+  OMEZarrReader
 };
