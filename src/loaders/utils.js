@@ -69,22 +69,13 @@ export function byteSwapInplace(src) {
  * @param {Object} args
  * @param {Object} args.loader A valid loader object.
  * @param {Array} args.loaderSelection Array of valid dimension selections
- * @returns {Object} { means, dataRanges, standardDeviations, data, firstQuartiles, thirdQuartiles }, each arrays with entries for each channel based on your selection.
+ * @returns {Array} List of { mean, domain, sd, data, q1, q3 } objects.
  */
 export async function getChannelStats({ loader, loaderSelection }) {
   const z = loader.isPyramid ? loader.numLevels - 1 : 0;
   const rasters = await loader.getRaster({ z, loaderSelection });
   const { data } = rasters;
-  const channelStats = {
-    means: [],
-    medians: [],
-    dataRanges: [],
-    standardDeviations: [],
-    data,
-    firstQuartiles: [],
-    thirdQuartiles: []
-  };
-  data.forEach(arr => {
+  const channelStats = data.map(arr => {
     let len = arr.length;
     let min = Infinity;
     let max = -Infinity;
@@ -100,11 +91,9 @@ export async function getChannelStats({ loader, loaderSelection }) {
       }
       total += arr[len];
     }
-    channelStats.dataRanges.push([min, max]);
 
     // Mean.
     const mean = total / arr.length;
-    channelStats.means.push(mean);
 
     // Standard Deviation.
     len = arr.length;
@@ -113,8 +102,7 @@ export async function getChannelStats({ loader, loaderSelection }) {
     while (len--) {
       sumSquared += (arr[len] - mean) ** 2;
     }
-    const standardDeviation = (sumSquared / arr.length) ** 0.5;
-    channelStats.standardDeviations.push(standardDeviation);
+    const sd = (sumSquared / arr.length) ** 0.5;
 
     // Median, and quartiles via quickselect: https://en.wikipedia.org/wiki/Quickselect.
     // Odd number lengths should round down the index.
@@ -124,13 +112,10 @@ export async function getChannelStats({ loader, loaderSelection }) {
     quickselect(arr, mid);
     const median = arr[mid];
     quickselect(arr, firstQuartileLocation, 0, mid);
-    const firstQuartile = arr[firstQuartileLocation];
+    const q1 = arr[firstQuartileLocation];
     quickselect(arr, thirdQuartileLocation, mid, arr.length - 1);
-    const thirdQuartile = arr[thirdQuartileLocation];
-    channelStats.medians.push(median);
-    channelStats.firstQuartiles.push(firstQuartile);
-    channelStats.thirdQuartiles.push(thirdQuartile);
+    const q3 = arr[thirdQuartileLocation];
+    return { mean, sd, q1, q3, median, data: arr, domain: [min, max] };
   });
-
   return channelStats;
 }

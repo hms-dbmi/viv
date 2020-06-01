@@ -17,16 +17,15 @@ describe('Test getChannelStats Small Array', () => {
         };
       }
     };
-    const {
-      dataRanges,
-      means,
-      standardDeviations,
-      medians,
-      firstQuartiles,
-      thirdQuartiles
-    } = await getChannelStats({ loader });
+    const channelStats = await getChannelStats({ loader });
+    const means = channelStats.map(stat => stat.mean);
+    const domains = channelStats.map(stat => stat.domain);
+    const standardDeviations = channelStats.map(stat => stat.sd);
+    const thirdQuartiles = channelStats.map(stat => stat.q3);
+    const firstQuartiles = channelStats.map(stat => stat.q1);
+    const medians = channelStats.map(stat => stat.median);
     expect(means).to.deep.equal([1.5, 1, 0.5]);
-    expect(dataRanges).to.deep.equal([
+    expect(domains).to.deep.equal([
       [0, 3],
       [0, 2],
       [0, 1]
@@ -51,16 +50,15 @@ describe('Test getChannelStats Big Array', () => {
         };
       }
     };
-    const {
-      dataRanges,
-      means,
-      standardDeviations,
-      medians,
-      firstQuartiles,
-      thirdQuartiles
-    } = await getChannelStats({ loader });
+    const channelStats = await getChannelStats({ loader });
+    const means = channelStats.map(stat => stat.mean);
+    const domains = channelStats.map(stat => stat.domain);
+    const standardDeviations = channelStats.map(stat => stat.sd);
+    const thirdQuartiles = channelStats.map(stat => stat.q3);
+    const firstQuartiles = channelStats.map(stat => stat.q1);
+    const medians = channelStats.map(stat => stat.median);
     expect(means).to.deep.equal([5.5, 6]);
-    expect(dataRanges).to.deep.equal([
+    expect(domains).to.deep.equal([
       [0, 11],
       [0, 12]
     ]);
