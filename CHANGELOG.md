@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.2.7
+
+### Added
+
 - Min/max, mean, standard deviation, median, IQR calculations directly from loaders.
 
 ### Changed
