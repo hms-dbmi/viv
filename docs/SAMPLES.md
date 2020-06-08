@@ -2,6 +2,8 @@ Here are two snippets to help get you started with our higher-level components. 
 
 This snippet is the most basic view: a simple view of the data. With `overviewOn=false`, this will just be a single view of the data. Turn `overviewOn=true` for a picture-in-picture.
 
+We also export `DTYPE_VALUES` and `MAX_CHANNELS_AND_SLIDERS` so you can get some information (array type, max) for each `dtype` of a loader (such as `uint16/<u2`) and the number of channels the current release of Viv supports, respectively.
+
 #### `PictureInPictureViewer`
 
 ```javascript
