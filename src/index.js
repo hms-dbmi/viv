@@ -9,8 +9,11 @@ import {
   getChannelStats,
   OMEZarrReader
 } from './loaders';
+import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from './constants';
 
 export {
+  DTYPE_VALUES,
+  MAX_SLIDERS_AND_CHANNELS,
   ScaleBarLayer,
   VivViewerLayer,
   VivViewer,
