@@ -3,6 +3,12 @@
 ## In Progress
 
 ### Added
+
+### Changed
+
+## 0.2.8
+
+### Added
 -Export constants for loader type and max channels.
 
 ### Changed
