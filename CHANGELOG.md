@@ -4,12 +4,15 @@
 
 ### Added
 
+- Support Safari in 2D raster imagery.
+
 ### Changed
 
 ## 0.2.8
 
 ### Added
--Export constants for loader type and max channels.
+
+- Export constants for loader type and max channels.
 
 ### Changed
 

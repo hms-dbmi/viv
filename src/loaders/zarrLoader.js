@@ -1,7 +1,6 @@
 import { BoundsCheckError } from 'zarr';
 
-import { guessRgb, to32BitFloat, padTileWithZeros } from './utils';
-import { NO_WEBGL2 } from '../constants';
+import { guessRgb, padTileWithZeros } from './utils';
 /**
  * This class serves as a wrapper for fetching zarr data from a file server.
  * */
@@ -84,12 +83,9 @@ export default class ZarrLoader {
 
     const data = await Promise.all(dataRequests);
     return {
-      data: NO_WEBGL2 ? to32BitFloat(data) : data,
+      data,
       width: this.tileSize,
-      height: this.tileSize,
-      byteLength: NO_WEBGL2
-        ? 3 * this.tileSize ** 2
-        : data[0].BYTES_PER_ELEMENT * this.tileSize ** 2
+      height: this.tileSize
     };
   }
 
@@ -118,7 +114,7 @@ export default class ZarrLoader {
     const { shape } = source;
     const width = shape[xIndex];
     const height = shape[yIndex];
-    return { data: NO_WEBGL2 ? to32BitFloat(data) : data, width, height };
+    return { data, width, height };
   }
 
   /**

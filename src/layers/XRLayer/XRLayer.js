@@ -257,8 +257,8 @@ export default class XRLayer extends Layer {
         [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
         [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
       },
-      format: NO_WEBGL2 ? GL.RGB : format,
-      dataFormat: NO_WEBGL2 ? GL.RGB : dataFormat,
+      format: NO_WEBGL2 ? GL.LUMINANCE : format,
+      dataFormat: NO_WEBGL2 ? GL.LUMINANCE : dataFormat,
       type: NO_WEBGL2 ? GL.FLOAT : type
     });
     return texture;

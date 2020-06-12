@@ -46,16 +46,16 @@ describe('Test zarr non-rgb image loader', () => {
       loaderSelection: [{ channel: 0 }]
     });
     expect(res.data[0][12]).to.equal(42);
-    expect(res.data[0].length).to.equal(tileSize * tileSize * 4);
+    expect(res.data[0].length).to.equal(tileSize * tileSize);
 
     res = await loader.getTile({
       x: 0,
       y: 0,
       loaderSelection: [{ channel: 1 }]
     });
-    expect(
-      new Int32Array(res.data[0].subarray(0, 400).filter((_, i) => i % 4 === 0))
-    ).to.deep.equal(NestedArray.arange(100).flatten());
+    expect(new Int32Array(res.data[0].subarray(0, 100))).to.deep.equal(
+      NestedArray.arange(100).flatten()
+    );
   });
 });
 
@@ -101,6 +101,6 @@ describe('Test zarr pyramid', () => {
       baseTiles[0].length,
       level1Tiles[0].length,
       level2Tiles[0].length
-    ]).to.deep.equal([400, 400, 400]);
+    ]).to.deep.equal([100, 100, 100]);
   });
 });

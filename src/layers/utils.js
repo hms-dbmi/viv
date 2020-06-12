@@ -60,3 +60,10 @@ export function padColorsAndSliders({
 
   return paddedColorsAndSliders;
 }
+
+export function to32BitFloat(data) {
+  const data32bit = data.map(arr => {
+    return new Float32Array(arr);
+  });
+  return data32bit;
+}
