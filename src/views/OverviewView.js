@@ -15,6 +15,8 @@ import { makeBoundingBox, getVivId } from './utils';
  * @param {string} args.position Location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."  Default is 'bottom-right'.
  * @param {number} args.minimumWidth Absolute lower bound for how small the viewport should scale. Default is 150.
  * @param {number} args.maximumWidth Absolute upper bound for how large the viewport should scale. Default is 350.
+ * @param {number} args.minimumHeight Absolute lower bound for how small the viewport should scale. Default is 150.
+ * @param {number} args.maximumHeight Absolute upper bound for how large the viewport should scale. Default is 350.
  * */
 export default class OverviewView extends VivView {
   constructor({

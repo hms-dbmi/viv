@@ -43,9 +43,9 @@ const defaultProps = {
  * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
  * @param {Array} props.boundingBoxColor [r, g, b] color of the bounding box (default: [255, 0, 0]).
- * @param {number} props.boundingBoxOutlineWidth Width of the bounding box (default: 50).
+ * @param {number} props.boundingBoxOutlineWidth Width of the bounding box in px (default: 1).
  * @param {Array} props.viewportOutlineColor [r, g, b] color of the outline (default: [255, 190, 0]).
- * @param {number} props.viewportOutlineWidth Viewport outline width (default: 400).
+ * @param {number} props.viewportOutlineWidth Viewport outline width in px (default: 2).
  */
 export default class OverviewLayer extends CompositeLayer {
   renderLayers() {
