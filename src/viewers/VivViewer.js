@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { getVivId } from '../views/utils';
-import { NO_WEBGL2 } from '../constants';
+
 /**
  * This component handles rendering the various views within the DeckGL contenxt.
  * @param {Object} props
@@ -139,7 +139,7 @@ export default class VivViewer extends PureComponent {
       ];
     }
     const coords = dataCoords[1] * width + dataCoords[0];
-    const hoverData = data.map(d => d[NO_WEBGL2 ? coords * 4 : coords]);
+    const hoverData = data.map(d => d[coords]);
     handleValue(hoverData);
   }
 

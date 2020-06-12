@@ -82,7 +82,7 @@ export default class VivViewerLayer extends CompositeLayer {
         getTileData: [loader, loaderSelection]
       },
       // A single tileSize x tileSize tile for Safari or null otherwise (the default)
-      maxCacheByteSize: NO_WEBGL2 ? 4 * tileSize * tileSize : null,
+      maxCacheSize: NO_WEBGL2 ? 1 : null,
       onTileError: onTileError || loader.onTileError,
       opacity,
       colormap,
