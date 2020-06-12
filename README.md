@@ -2,7 +2,7 @@
 
 A viewer for high bit depth, high resolution, multi-channel images using DeckGL
 over the hood and WebGL under the hood. To learn more about the "theory" behind
-this, look at [this](image_rendering_docs/IMAGE_RENDERING.md). To really make this sing, you need to
+this, look at [this](https://github.com/hubmapconsortium/vitessce-image-viewer/blob/master/docs/IMAGE_RENDERING.md). To really make this sing, you need to
 use an http2 server in production (s3 is passable, though).
 
 ### Build
