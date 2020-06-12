@@ -1,6 +1,7 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import XRLayer from './XRLayer';
 import { padTileWithZeros } from '../loaders/utils';
+import { NO_WEBGL2 } from '../constants';
 
 const defaultProps = {
   pickable: true,
@@ -38,9 +39,14 @@ function scaleBounds({ width, height, translate, scale }) {
  * buffer, but without digging deeper into the WebGL it is a reasonable fix.
  */
 function padEven(data, width, height) {
+  const rgbMulitplier = NO_WEBGL2 ? 3 : 1;
   const targetWidth = (width * height) % 2 === 0 ? width : width + 1;
   const padded = data.map(d =>
-    padTileWithZeros({ data: d, width, height }, targetWidth, height)
+    padTileWithZeros(
+      { data: d, width: width * rgbMulitplier, height },
+      targetWidth * rgbMulitplier,
+      height
+    )
   );
   return { data: padded, width: targetWidth, height };
 }

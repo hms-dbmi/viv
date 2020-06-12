@@ -183,7 +183,7 @@ export default class OMETiffLoader {
       width: tileSize,
       height: tileSize,
       byteLength: NO_WEBGL2
-        ? 4 * tileSize ** 2
+        ? 3 * tileSize ** 2
         : tiles[0].BYTES_PER_ELEMENT * tileSize ** 2
     };
   }

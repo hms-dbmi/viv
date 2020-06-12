@@ -88,7 +88,7 @@ export default class ZarrLoader {
       width: this.tileSize,
       height: this.tileSize,
       byteLength: NO_WEBGL2
-        ? 4 * this.tileSize ** 2
+        ? 3 * this.tileSize ** 2
         : data[0].BYTES_PER_ELEMENT * this.tileSize ** 2
     };
   }
