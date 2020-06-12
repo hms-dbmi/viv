@@ -6,8 +6,32 @@
 
 ### Changed
 
+## 0.2.8
+
+### Added
+-Export constants for loader type and max channels.
+
+### Changed
+
+## 0.2.7
+
+### Added
+
+- Min/max, mean, standard deviation, median, IQR calculations directly from loaders.
+
+### Changed
+
+## 0.2.6
+
+### Added
+
+### Changed
+
 - Don't minify es bundle.
 - Remove bioformats hack and update docs for container version.
+- Update zarr with new decoders.
+- Add tile-padding utility function for consistently sized tiles from `Loader.getTile`.
+- Fix #144 by padding uneven length tiles in `StaticImageLayer`.
 
 ## 0.2.5
 

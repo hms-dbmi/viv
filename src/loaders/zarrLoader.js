@@ -1,4 +1,6 @@
-import { guessRgb, to32BitFloat } from './utils';
+import { BoundsCheckError } from 'zarr';
+
+import { guessRgb, to32BitFloat, padTileWithZeros } from './utils';
 import { NO_WEBGL2 } from '../constants';
 /**
  * This class serves as a wrapper for fetching zarr data from a file server.
@@ -24,14 +26,21 @@ export default class ZarrLoader {
     this.translate = translate;
     this.isRgb = isRgb || guessRgb(base.shape);
     this.dimensions = dimensions;
-    this._defaultSelection = [Array(dimensions.legnth).fill(0)];
 
     this._data = data;
     this._dimIndices = new Map();
     dimensions.forEach(({ field }, i) => this._dimIndices.set(field, i));
 
     const { dtype, chunks } = base;
-    this.dtype = dtype;
+    /* TODO: Use better dtype convention in DTYPE_LOOKUP.
+     *
+     * This convension should probably _not_ describe endianness,
+     * since endianness is resolved when decoding the source arrayBuffers
+     * into TypedArrays. The dtype of the zarr array describes the dtype of the
+     * source but this is different from how the bytes end up being represented in
+     * memory client-side.
+     */
+    this.dtype = dtype.includes('>') ? `<${dtype.slice(1)}` : dtype;
     this.tileSize = chunks[this._dimIndices.get('x')];
   }
 
@@ -51,16 +60,28 @@ export default class ZarrLoader {
    * @param {Array} loaderSelection, Array of valid dimension selections
    * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize)
    */
-  async getTile({ x, y, z, loaderSelection }) {
+  async getTile({ x, y, z, loaderSelection = [] }) {
     const source = this._getSource(z);
-    const selections = loaderSelection || this._defaultSelection;
-    const dataRequests = selections.map(async sel => {
+    const [xIndex, yIndex] = ['x', 'y'].map(k => this._dimIndices.get(k));
+
+    const dataRequests = loaderSelection.map(async sel => {
       const chunkKey = this._serializeSelection(sel);
-      chunkKey[this._dimIndices.get('y')] = y;
-      chunkKey[this._dimIndices.get('x')] = x;
-      const { data } = await source.getRawChunk(chunkKey);
+      chunkKey[yIndex] = y;
+      chunkKey[xIndex] = x;
+      const {
+        data,
+        shape: [height, width]
+      } = await source.getRawChunk(chunkKey);
+      if (height < this.tileSize || width < this.tileSize) {
+        return padTileWithZeros(
+          { data, width, height },
+          this.tileSize,
+          this.tileSize
+        );
+      }
       return data;
     });
+
     const data = await Promise.all(dataRequests);
     return {
       data: NO_WEBGL2 ? to32BitFloat(data) : data,
@@ -78,18 +99,21 @@ export default class ZarrLoader {
    * @param {Array} loaderSelection, Array of valid dimension selections
    * @returns {Object} data: TypedArray[], width: number, height: number
    */
-  async getRaster({ z, loaderSelection }) {
+  async getRaster({ z, loaderSelection = [] }) {
     const source = this._getSource(z);
     const [xIndex, yIndex] = ['x', 'y'].map(k => this._dimIndices.get(k));
-    const selections = loaderSelection || this._defaultSelection;
-    const dataRequests = selections.map(async sel => {
+
+    const dataRequests = loaderSelection.map(async sel => {
       const chunkKey = this._serializeSelection(sel);
       chunkKey[yIndex] = null;
       chunkKey[xIndex] = null;
-      if (this.isRgb) chunkKey[chunkKey.length - 1] = null;
+      if (this.isRgb) {
+        chunkKey[chunkKey.length - 1] = null;
+      }
       const { data } = await source.getRaw(chunkKey);
       return data;
     });
+
     const data = await Promise.all(dataRequests);
     const { shape } = source;
     const width = shape[xIndex];
@@ -103,10 +127,7 @@ export default class ZarrLoader {
    */
   // eslint-disable-next-line class-methods-use-this
   onTileError(err) {
-    // Handle zarr-specific tile Errors
-    // Will check with `err instanceof BoundCheckError` when merged
-    // https://github.com/gzuidhof/zarr.js/issues/47
-    if (!err.message.includes('RangeError')) {
+    if (!(err instanceof BoundsCheckError)) {
       // Rethrow error if something other than tile being requested is out of bounds.
       throw err;
     }
@@ -118,10 +139,8 @@ export default class ZarrLoader {
    * @returns {Object} width: number, height: number
    */
   getRasterSize({ z }) {
-    const source = this._getSource(z);
-    const [height, width] = ['y', 'x'].map(
-      k => source.shape[this._dimIndices.get(k)]
-    );
+    const { shape } = this._getSource(z);
+    const [height, width] = ['y', 'x'].map(k => shape[this._dimIndices.get(k)]);
     return { height, width };
   }
 

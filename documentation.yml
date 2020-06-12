@@ -16,6 +16,8 @@ toc:
 - SideBySideView
 - name: Utility Methods
 - makeBoundingBox
+- getChannelStats
+- Pool
 - name: Layers
 - VivViewerLayer
 - StaticImageLayer
@@ -24,6 +26,7 @@ toc:
 - createOMETiffLoader
 - OMETiffLoader
 - ZarrLoader
+- OMEZarrReader
 - name: Layers (Internal)
 - XRLayer
 - OverviewLayer

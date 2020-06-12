@@ -38,11 +38,13 @@ function App() {
   const [loader, setLoader] = useState(null);
   const [sourceName, setSourceName] = useState('tiff');
   const [colormap, setColormap] = useState('');
+
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
-  const [overviewOn, setOverviewOn] = useState(false);
+  const [overviewOn, setOverviewOn] = useReducer(v => !v, false);
   const [controllerOn, toggleController] = useReducer(v => !v, true);
   const [zoomLock, toggleZoomLock] = useReducer(v => !v, true);
   const [panLock, togglePanLock] = useReducer(v => !v, true);
+
   const [isLoading, setIsLoading] = useState(true);
   const [pixelValues, setPixelValues] = useState(
     new Array(sources[sourceName].selections.length).fill(FILL_PIXEL_VALUE)
@@ -57,10 +59,6 @@ function App() {
       dispatch({ type: 'RESET_CHANNELS', value: { names, selections } });
       setLoader(nextLoader);
       setIsLoading(false);
-      // Bioformats pyramid has a broken getRaster call.
-      if (sourceName === 'bf tiff') {
-        setOverviewOn(false);
-      }
     }
     changeLoader();
   }, [sourceName]);
@@ -198,14 +196,7 @@ function App() {
             Add Channel
           </Button>
           <Button
-            disabled={
-              !isPyramid ||
-              isLoading ||
-              useLinkedView ||
-              // Bioformats getRaster calls are a bit sketchy.
-              // see: https://github.com/hubmapconsortium/vitessce-image-viewer/issues/144
-              sourceName === 'bf tiff'
-            }
+            disabled={!isPyramid || isLoading || useLinkedView}
             onClick={() => setOverviewOn(prev => !prev)}
             variant="outlined"
             size="small"
