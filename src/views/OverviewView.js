@@ -26,7 +26,9 @@ export default class OverviewView extends VivView {
     margin = 25,
     position = 'bottom-right',
     minimumWidth = 150,
-    maximumWidth = 350
+    maximumWidth = 350,
+    minimumHeight = 150,
+    maximumHeight = 350
   }) {
     super({ initialViewState });
     this.margin = margin;
@@ -36,9 +38,12 @@ export default class OverviewView extends VivView {
     this.detailWidth = detailWidth;
     this._setHeightWidthScale({
       detailWidth,
+      detailHeight,
       scale,
       minimumWidth,
-      maximumWidth
+      maximumWidth,
+      minimumHeight,
+      maximumHeight
     });
     this._setXY();
   }
@@ -46,21 +51,41 @@ export default class OverviewView extends VivView {
   /**
    * Set the image-pixel scale and height and width based on detail view.
    */
-  _setHeightWidthScale({ detailWidth, scale, minimumWidth, maximumWidth }) {
+  _setHeightWidthScale({
+    detailWidth,
+    detailHeight,
+    scale,
+    minimumWidth,
+    maximumWidth,
+    minimumHeight,
+    maximumHeight
+  }) {
     const { loader } = this;
     const { numLevels } = loader;
     const { width: rasterWidth, height: rasterHeight } = loader.getRasterSize({
       z: 0
     });
-    const heightWidthRatio = rasterHeight / rasterWidth;
-    this.width = Math.min(
-      maximumWidth,
-      Math.max(detailWidth * scale, minimumWidth)
-    );
-    this.height = this.width * heightWidthRatio;
-    this.scale = (2 ** (numLevels - 1) / rasterWidth) * this.width;
-    this._imageWidth = rasterWidth;
-    this._imageHeight = rasterHeight;
+    if (rasterWidth > rasterHeight) {
+      const heightWidthRatio = rasterHeight / rasterWidth;
+      this.width = Math.min(
+        maximumWidth,
+        Math.max(detailWidth * scale, minimumWidth)
+      );
+      this.height = this.width * heightWidthRatio;
+      this.scale = (2 ** (numLevels - 1) / rasterWidth) * this.width;
+      this._imageWidth = rasterWidth;
+      this._imageHeight = rasterHeight;
+    } else {
+      const widthHeightRatio = rasterWidth / rasterHeight;
+      this.height = Math.min(
+        maximumHeight,
+        Math.max(detailHeight * scale, minimumHeight)
+      );
+      this.width = this.height * widthHeightRatio;
+      this.scale = (2 ** (numLevels - 1) / rasterHeight) * this.height;
+      this._imageWidth = rasterWidth;
+      this._imageHeight = rasterHeight;
+    }
   }
 
   /**
@@ -133,7 +158,7 @@ export default class OverviewView extends VivView {
   }
 
   getLayers({ viewStates, props }) {
-    const { detail } = viewStates;
+    const { detail, overview } = viewStates;
     if (!detail) {
       throw new Error('Overview requires a viewState with id detail');
     }
@@ -145,7 +170,8 @@ export default class OverviewView extends VivView {
     const overviewLayer = new OverviewLayer(props, {
       id: `${loader.type}${getVivId(id)}`,
       boundingBox,
-      overviewScale: scale
+      overviewScale: scale,
+      zoom: -overview.zoom
     });
     return [overviewLayer];
   }

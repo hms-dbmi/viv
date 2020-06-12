@@ -43,16 +43,49 @@ test(`OverviewView layer type check.`, t => {
   t.end();
 });
 
-test(`OverviewView respects minimumWidth and maximumWidth.`, t => {
+test(`OverviewView respects maximumHeight and minimumHeight when height > width.`, t => {
+  const minimumHeight = 350;
+  let view = new OverviewView({ ...overviewViewArguments, minimumHeight });
+  t.equal(
+    view.height,
+    350,
+    'OverviewView height should be minimumHeight when set and not calculated'
+  );
+  const maximumHeight = 5;
+  view = new OverviewView({ ...overviewViewArguments, maximumHeight });
+  t.equal(
+    view.height,
+    5,
+    'OverviewView height should be maximumHeight when set and not calculated'
+  );
+  t.end();
+});
+
+test(`OverviewView respects maximumWidth and minimumWidth when width > height.`, t => {
   const minimumWidth = 350;
-  let view = new OverviewView({ ...overviewViewArguments, minimumWidth });
+  const loaderWidth = {
+    type: 'loads',
+    numLevels: 7,
+    getRasterSize: () => {
+      return { height: 10000, width: 20000 };
+    }
+  };
+  let view = new OverviewView({
+    ...overviewViewArguments,
+    loader: loaderWidth,
+    minimumWidth
+  });
   t.equal(
     view.width,
     350,
     'OverviewView width should be minimumWidth when set and not calculated'
   );
   const maximumWidth = 5;
-  view = new OverviewView({ ...overviewViewArguments, maximumWidth });
+  view = new OverviewView({
+    ...overviewViewArguments,
+    loader: loaderWidth,
+    maximumWidth
+  });
   t.equal(
     view.width,
     5,

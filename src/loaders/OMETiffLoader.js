@@ -47,7 +47,7 @@ export default class OMETiffLoader {
     // This works with the current bioformats6 pipeline.
     // Related to: https://github.com/hubmapconsortium/vitessce-image-viewer/issues/144
     this.numLevels =
-      this.omexml.getNumberOfImages() || (SubIFDs && SubIFDs.length - 1);
+      this.omexml.getNumberOfImages() || (SubIFDs && SubIFDs.length);
     this.isBioFormats6Pyramid = SubIFDs;
     this.isPyramid = this.numLevels > 1;
     // The omexml specification only allows for these - zarr is more flexible so this
