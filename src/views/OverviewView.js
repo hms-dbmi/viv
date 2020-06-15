@@ -67,6 +67,8 @@ export default class OverviewView extends VivView {
     const { width: rasterWidth, height: rasterHeight } = loader.getRasterSize({
       z: 0
     });
+    this._imageWidth = rasterWidth;
+    this._imageHeight = rasterHeight;
     if (rasterWidth > rasterHeight) {
       const heightWidthRatio = rasterHeight / rasterWidth;
       this.width = Math.min(
@@ -75,8 +77,6 @@ export default class OverviewView extends VivView {
       );
       this.height = this.width * heightWidthRatio;
       this.scale = (2 ** (numLevels - 1) / rasterWidth) * this.width;
-      this._imageWidth = rasterWidth;
-      this._imageHeight = rasterHeight;
     } else {
       const widthHeightRatio = rasterWidth / rasterHeight;
       this.height = Math.min(
@@ -85,8 +85,6 @@ export default class OverviewView extends VivView {
       );
       this.width = this.height * widthHeightRatio;
       this.scale = (2 ** (numLevels - 1) / rasterHeight) * this.height;
-      this._imageWidth = rasterWidth;
-      this._imageHeight = rasterHeight;
     }
   }
 
