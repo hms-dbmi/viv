@@ -4,12 +4,17 @@
 
 ### Added
 
+- Support height as primary dimension for sizing OverviewView.
+
 ### Changed
+
+- Project overview boundary sizes instead of hardcoding.
 
 ## 0.2.8
 
 ### Added
--Export constants for loader type and max channels.
+
+- Export constants for loader type and max channels.
 
 ### Changed
 
