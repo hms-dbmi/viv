@@ -25,10 +25,11 @@ const defaultProps = {
     compare: true
   },
   boundingBoxColor: { type: 'array', value: [255, 0, 0], compare: true },
-  boundingBoxOutlineWidth: { type: 'number', value: 50, compare: true },
+  boundingBoxOutlineWidth: { type: 'number', value: 1, compare: true },
   viewportOutlineColor: { type: 'array', value: [255, 190, 0], compare: true },
-  viewportOutlineWidth: { type: 'number', value: 400, compare: true },
-  overviewScale: { type: 'number', value: 1, compare: true }
+  viewportOutlineWidth: { type: 'number', value: 2, compare: true },
+  overviewScale: { type: 'number', value: 1, compare: true },
+  zoom: { type: 'number', value: 1, compare: true }
 };
 
 /**
@@ -42,15 +43,16 @@ const defaultProps = {
  * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
  * @param {Array} props.boundingBoxColor [r, g, b] color of the bounding box (default: [255, 0, 0]).
- * @param {number} props.boundingBoxOutlineWidth Width of the bounding box (default: 50).
+ * @param {number} props.boundingBoxOutlineWidth Width of the bounding box in px (default: 1).
  * @param {Array} props.viewportOutlineColor [r, g, b] color of the outline (default: [255, 190, 0]).
- * @param {number} props.viewportOutlineWidth Viewport outline width (default: 400).
+ * @param {number} props.viewportOutlineWidth Viewport outline width in px (default: 2).
  */
 export default class OverviewLayer extends CompositeLayer {
   renderLayers() {
     const {
       loader,
       id,
+      zoom,
       boundingBox,
       boundingBoxColor,
       boundingBoxOutlineWidth,
@@ -75,7 +77,7 @@ export default class OverviewLayer extends CompositeLayer {
       filled: false,
       stroked: true,
       getLineColor: boundingBoxColor,
-      getLineWidth: boundingBoxOutlineWidth
+      getLineWidth: boundingBoxOutlineWidth * 2 ** zoom
     });
     const viewportOutline = new PolygonLayer({
       id: `viewport-outline-${id}`,
@@ -92,7 +94,7 @@ export default class OverviewLayer extends CompositeLayer {
       filled: false,
       stroked: true,
       getLineColor: viewportOutlineColor,
-      getLineWidth: viewportOutlineWidth
+      getLineWidth: viewportOutlineWidth * 2 ** zoom
     });
     const layers = [overview, boundingBoxOutline, viewportOutline];
     return layers;

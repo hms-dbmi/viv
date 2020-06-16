@@ -5,8 +5,11 @@
 ### Added
 
 - Support Safari in 2D raster imagery.
+- Support height as primary dimension for sizing OverviewView.
 
 ### Changed
+
+- Project overview boundary sizes instead of hardcoding.
 
 ## 0.2.8
 
