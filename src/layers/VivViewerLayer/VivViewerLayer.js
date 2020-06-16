@@ -1,7 +1,8 @@
 import { CompositeLayer } from '@deck.gl/core';
+import { isWebGL2 } from '@luma.gl/core';
+
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
-import { NO_WEBGL2 } from '../../constants';
 import { to32BitFloat } from '../utils';
 
 const defaultProps = {
@@ -44,6 +45,7 @@ export default class VivViewerLayer extends CompositeLayer {
       id
     } = this.props;
     const { tileSize, numLevels, dtype } = loader;
+    const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z }) => {
       const tile = await loader.getTile({
         x,
@@ -52,8 +54,7 @@ export default class VivViewerLayer extends CompositeLayer {
         loaderSelection
       });
       if (tile) {
-        tile.data = NO_WEBGL2 ? to32BitFloat(tile.data) : tile.data;
-        tile.byteLength = tile.data[0].BYTES_PER_ELEMENT * tileSize ** 2;
+        tile.data = noWebGl2 ? to32BitFloat(tile.data) : tile.data;
         if (tile.width !== tileSize || tile.height !== tileSize) {
           console.warn(
             `Tile data  { width: ${tile.width}, height: ${tile.height} } does not match tilesize: ${tileSize}`
@@ -81,8 +82,6 @@ export default class VivViewerLayer extends CompositeLayer {
       updateTriggers: {
         getTileData: [loader, loaderSelection]
       },
-      // A single tileSize x tileSize tile for Safari or null otherwise (the default)
-      maxCacheSize: NO_WEBGL2 ? 1 : null,
       onTileError: onTileError || loader.onTileError,
       opacity,
       colormap,
