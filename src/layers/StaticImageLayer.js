@@ -1,6 +1,9 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
+import { isWebGL2 } from '@luma.gl/core';
+
 import XRLayer from './XRLayer';
 import { padTileWithZeros } from '../loaders/utils';
+import { to32BitFloat } from './utils';
 
 const defaultProps = {
   pickable: true,
@@ -64,7 +67,13 @@ export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
     const { loader, z, loaderSelection } = this.props;
     loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) => {
-      this.setState(padEven(data, width, height));
+      this.setState(
+        padEven(
+          !isWebGL2(this.context.gl) ? to32BitFloat(data) : data,
+          width,
+          height
+        )
+      );
     });
   }
 
@@ -80,7 +89,13 @@ export default class StaticImageLayer extends CompositeLayer {
       loader
         .getRaster({ z, loaderSelection })
         .then(({ data, width, height }) => {
-          this.setState(padEven(data, width, height));
+          this.setState(
+            padEven(
+              !isWebGL2(this.context.gl) ? to32BitFloat(data) : data,
+              width,
+              height
+            )
+          );
         });
     }
   }

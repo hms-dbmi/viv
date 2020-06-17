@@ -1,6 +1,9 @@
 import { CompositeLayer } from '@deck.gl/core';
+import { isWebGL2 } from '@luma.gl/core';
+
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
+import { to32BitFloat } from '../utils';
 
 const defaultProps = {
   pickable: true,
@@ -42,6 +45,7 @@ export default class VivViewerLayer extends CompositeLayer {
       id
     } = this.props;
     const { tileSize, numLevels, dtype } = loader;
+    const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z }) => {
       const tile = await loader.getTile({
         x,
@@ -50,6 +54,7 @@ export default class VivViewerLayer extends CompositeLayer {
         loaderSelection
       });
       if (tile) {
+        tile.data = noWebGl2 ? to32BitFloat(tile.data) : tile.data;
         if (tile.width !== tileSize || tile.height !== tileSize) {
           console.warn(
             `Tile data  { width: ${tile.width}, height: ${tile.height} } does not match tilesize: ${tileSize}`

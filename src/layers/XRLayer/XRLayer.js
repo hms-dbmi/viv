@@ -4,10 +4,13 @@
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer, project32, picking } from '@deck.gl/core';
 import { Model, Geometry, Texture2D } from '@luma.gl/core';
-import vs from './xr-layer-vertex.glsl';
-import fsColormap from './xr-layer-fragment-colormap.glsl';
-import fs from './xr-layer-fragment.glsl';
-import { DTYPE_VALUES } from '../../constants';
+import fsColormap1 from './xr-layer-fragment-colormap.webgl1.glsl';
+import fsColormap2 from './xr-layer-fragment-colormap.webgl2.glsl';
+import fs1 from './xr-layer-fragment.webgl1.glsl';
+import fs2 from './xr-layer-fragment.webgl2.glsl';
+import vs1 from './xr-layer-vertex.webgl1.glsl';
+import vs2 from './xr-layer-vertex.webgl2.glsl';
+import { DTYPE_VALUES, NO_WEBGL2 } from '../../constants';
 import { padColorsAndSliders } from '../utils';
 
 const defaultProps = {
@@ -36,16 +39,16 @@ export default class XRLayer extends Layer {
    */
   getShaders() {
     const { colormap, dtype } = this.props;
-    const fragmentShaderColormap = colormap
-      ? fsColormap.replace('colormapFunction', colormap)
-      : fs;
-    const fragmentShaderDtype =
-      dtype === '<f4'
-        ? fragmentShaderColormap.replace(/usampler/g, 'sampler')
-        : fragmentShaderColormap;
+    const fragShaderNoColormap = NO_WEBGL2 ? fs1 : fs2;
+    const fragShaderColoramp = NO_WEBGL2 ? fsColormap1 : fsColormap2;
+    const fragShader = colormap
+      ? fragShaderColoramp.replace('colormapFunction', colormap)
+      : fragShaderNoColormap;
+    const fragShaderDtype =
+      dtype === '<f4' ? fragShader.replace(/usampler/g, 'sampler') : fragShader;
     return super.getShaders({
-      vs,
-      fs: fragmentShaderDtype,
+      vs: NO_WEBGL2 ? vs1 : vs2,
+      fs: fragShaderDtype,
       modules: [project32, picking]
     });
   }
@@ -254,9 +257,9 @@ export default class XRLayer extends Layer {
         [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
         [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
       },
-      format,
-      dataFormat,
-      type
+      format: NO_WEBGL2 ? GL.LUMINANCE : format,
+      dataFormat: NO_WEBGL2 ? GL.LUMINANCE : dataFormat,
+      type: NO_WEBGL2 ? GL.FLOAT : type
     });
     return texture;
   }

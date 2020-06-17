@@ -85,4 +85,6 @@ void main() {
     intensityCombo += max(0.0,intensityArray[i]);
   }
   color = vec4(colormapFunction(min(1.0,intensityCombo)).xyz, opacity);
+  geometry.uv = vTexCoord;
+  DECKGL_FILTER_COLOR(color, geometry);
 }

@@ -1,5 +1,5 @@
 import OMEXML from './omeXML';
-import { isInTileBounds, padTileWithZeros, byteSwapInplace } from './utils';
+import { isInTileBounds, byteSwapInplace, padTileWithZeros } from './utils';
 import { DTYPE_VALUES } from '../constants';
 import { range } from '../layers/utils';
 
@@ -224,7 +224,11 @@ export default class OMETiffLoader {
     );
     const width = image.getWidth();
     const height = image.getHeight();
-    return { data: rasters, width, height };
+    return {
+      data: rasters,
+      width,
+      height
+    };
   }
 
   /**

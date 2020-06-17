@@ -1,6 +1,6 @@
 import { BoundsCheckError } from 'zarr';
-import { guessRgb, padTileWithZeros } from './utils';
 
+import { guessRgb, padTileWithZeros } from './utils';
 /**
  * This class serves as a wrapper for fetching zarr data from a file server.
  * */
@@ -82,7 +82,11 @@ export default class ZarrLoader {
     });
 
     const data = await Promise.all(dataRequests);
-    return { data, width: this.tileSize, height: this.tileSize };
+    return {
+      data,
+      width: this.tileSize,
+      height: this.tileSize
+    };
   }
 
   /**
@@ -108,7 +112,9 @@ export default class ZarrLoader {
 
     const data = await Promise.all(dataRequests);
     const { shape } = source;
-    return { data, width: shape[xIndex], height: shape[yIndex] };
+    const width = shape[xIndex];
+    const height = shape[yIndex];
+    return { data, width, height };
   }
 
   /**

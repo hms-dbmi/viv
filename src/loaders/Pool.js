@@ -1,8 +1,12 @@
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import Worker from './viv.worker';
 
+// https://developer.mozilla.org/en-US/docs/Web/API/NavigatorConcurrentHardware/hardwareConcurrency
+// We need to give a different way of getting this for safari, so 4 is probably a safe bet
+// for parallel processing in the meantime.  More can't really hurt since they'll just block
+// each other and not the UI thread, which is the real benefit.
 const defaultPoolSize =
-  typeof navigator !== 'undefined' ? navigator.hardwareConcurrency : null;
+  typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 4 : null;
 
 /**
  * Pool for workers to decode chunks of the images.

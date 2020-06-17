@@ -1,29 +1,25 @@
-#version 300 es
 #define SHADER_NAME xr-layer-fragment-shader
 precision highp float;
-precision highp int;
-precision highp usampler2D;
 
 // our texture
-uniform usampler2D channel0;
-uniform usampler2D channel1;
-uniform usampler2D channel2;
-uniform usampler2D channel3;
-uniform usampler2D channel4;
-uniform usampler2D channel5;
+uniform sampler2D channel0;
+uniform sampler2D channel1;
+uniform sampler2D channel2;
+uniform sampler2D channel3;
+uniform sampler2D channel4;
+uniform sampler2D channel5;
 
 // range
 uniform vec2 sliderValues[6];
 
 // color
 uniform vec3 colorValues[6];
+uniform float intensityArray[6];
 
 // opacity
 uniform float opacity;
 
-in vec2 vTexCoord;
-
-out vec4 color;
+varying vec2 vTexCoord;
 
 
 vec3 hsv2rgb(vec3 c)
@@ -69,15 +65,32 @@ void main() {
 
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
-  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
 
-  for(int i = 0; i < 6; i++) {
-    hsvCombo = rgb2hsv(vec3(colorValues[i]));
-    hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityArray[i]));
-    rgbCombo += hsv2rgb(hsvCombo);
-  }
+  hsvCombo = rgb2hsv(vec3(colorValues[0]));
+  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue0));
+  rgbCombo += hsv2rgb(hsvCombo);
 
-  color = vec4(rgbCombo, opacity);
+  hsvCombo = rgb2hsv(vec3(colorValues[1]));
+  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue1));
+  rgbCombo += hsv2rgb(hsvCombo);
+
+  hsvCombo = rgb2hsv(vec3(colorValues[2]));
+  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue2));
+  rgbCombo += hsv2rgb(hsvCombo);
+
+  hsvCombo = rgb2hsv(vec3(colorValues[3]));
+  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue3));
+  rgbCombo += hsv2rgb(hsvCombo);
+
+  hsvCombo = rgb2hsv(vec3(colorValues[4]));
+  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue4));
+  rgbCombo += hsv2rgb(hsvCombo);
+
+  hsvCombo = rgb2hsv(vec3(colorValues[5]));
+  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue5));
+  rgbCombo += hsv2rgb(hsvCombo);
+
+  gl_FragColor = vec4(rgbCombo, opacity);
   geometry.uv = vTexCoord;
-  DECKGL_FILTER_COLOR(color, geometry);
+  DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }

@@ -2,17 +2,6 @@ import React, { PureComponent } from 'react';
 import DeckGL from '@deck.gl/react';
 import { getVivId } from '../views/utils';
 
-// Taken from https://stackoverflow.com/a/31732310/8060591
-function isSafari() {
-  return (
-    navigator.vendor &&
-    navigator.vendor.indexOf('Apple') > -1 &&
-    navigator.userAgent &&
-    navigator.userAgent.indexOf('CriOS') === -1 &&
-    navigator.userAgent.indexOf('FxiOS') === -1
-  );
-}
-
 /**
  * This component handles rendering the various views within the DeckGL contenxt.
  * @param {Object} props
@@ -149,7 +138,8 @@ export default class VivViewer extends PureComponent {
         Math.floor((coordinate[1] - bounds[3]) / layerZoomScale)
       ];
     }
-    const hoverData = data.map(d => d[dataCoords[1] * width + dataCoords[0]]);
+    const coords = dataCoords[1] * width + dataCoords[0];
+    const hoverData = data.map(d => d[coords]);
     handleValue(hoverData);
   }
 
@@ -193,7 +183,7 @@ export default class VivViewer extends PureComponent {
       deckGLViews[0] = deckGLViews[randomizedIndex];
       deckGLViews[randomizedIndex] = holdFirstElement;
     }
-    return !isSafari() ? (
+    return (
       <DeckGL
         glOptions={{ webgl2: true }}
         layerFilter={this.layerFilter}
@@ -205,14 +195,8 @@ export default class VivViewer extends PureComponent {
           return isDragging ? 'grabbing' : 'crosshair';
         }}
       />
-    ) : (
-      <div className="viv-error">
-        <p>
-          Safari does not support WebGL2, which Viv requires. Please use Chrome
-          or Firefox.
-        </p>
-      </div>
     );
+
     /* eslint-disable react/destructuring-assignment */
   }
 }
