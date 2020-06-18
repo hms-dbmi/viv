@@ -192,7 +192,7 @@ const remoteTiffRGB = {
     target: [30000, 30000]
   },
   dimensions: [
-    // This order does not matter since it is contained in the OME-XML.  
+    // This order does not matter since it is contained in the OME-XML.
     // It is just for the UI, and that should change since it can be inferred from the loader's OMEXML.
     {
       field: 'channel',
