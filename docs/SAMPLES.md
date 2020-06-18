@@ -4,33 +4,35 @@ This snippet is the most basic view: a simple view of the data. With `overviewOn
 
 We also export `DTYPE_VALUES` and `MAX_CHANNELS_AND_SLIDERS` so you can get some information (array type, max) for each `dtype` of a loader (such as `uint16/<u2`) and the number of channels the current release of Viv supports, respectively.
 
-#### `PictureInPictureViewer`
-
 ```javascript
-import { createZarrLoader, PictureInPictureViewer } from '@hubmap/vitessce-image-viewer';
+import { createZarrLoader, PictureInPictureViewer, createOMETiffLoader } from '@hubmap/vitessce-image-viewer';
 
-const channelNames = [
-  'DAPI - Hoechst (nuclei)',
-  'FITC - Laminin (basement membrane)',
-  'Cy3 - Synaptopodin (glomerular)',
-  'Cy5 - THP (thick limb)'
-];
-
-const basePyramidInfo = {
+/* Zarr Loader */
+const zarrInfo = {
+  url: `https://vitessce-data.storage.googleapis.com/0.0.25/master_release/spraggins/spraggins.mxif.zarr`,
   dimensions: [
-    { field: 'channel', type: 'nominal', values: channelNames },
+    { field: 'channel', type: 'nominal', values: [
+        'DAPI - Hoechst (nuclei)',
+        'FITC - Laminin (basement membrane)',
+        'Cy3 - Synaptopodin (glomerular)',
+        'Cy5 - THP (thick limb)'
+      ]
+    },
     { field: 'y', type: 'quantitative', values: null },
     { field: 'x', type: 'quantitative', values: null }
   ],
   isPublic: true,
   isPyramid: true,
-  selections: channelNames.map(name => ({ channel: name }))
-};
-const zarrInfo = {
-  url: `https://vitessce-data.storage.googleapis.com/0.0.25/master_release/spraggins/spraggins.mxif.zarr`,
-  ...basePyramidInfo,
 };
 const loader = await createZarrLoader(zarrInfo);
+/* Zarr loader */
+// OR
+/* Tiff Loader */
+const url =
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/deflate_no_legacy/spraggins.bioformats.raw2ometiff.ome.tif';
+const loader = await createOMETiffLoader({ url, offsets: [], headers: {} });
+/* Tiff Loader */
+
 const sliders = [[0,2000], [0,2000]];
 const colors = [[255, 0, 0], [0, 255, 0]];
 const isOn = [true, false];
@@ -61,47 +63,4 @@ const PictureInPictureViewer = (
 );
 ```
 
-This snippet produces a side-by-side viewer with optional linked zoom/pan.
-
-#### `SideBySideViewer`
-
-```javascript
-import { createZarrLoader, SideBySideViewer } from '@hubmap/vitessce-image-viewer';
-
-const loader = await createZarrLoader({
-  url: `https://vitessce-data.storage.googleapis.com/0.0.25/master_release/spraggins/spraggins.mxif.zarr`,
-  dimensions: [
-    { field: 'channel', type: 'nominal',  values: ['DAPI', 'FITC', 'Cy3', 'Cy5'] },
-    { field: 'y', type: 'quantitative', values: null },
-    { field: 'x', type: 'quantitative', values: null }
-  ],
-  isPyramid: true
-});
-
-const sliders = [[0,2000], [0,2000]];
-const colors = [[255, 0, 0], [0, 255, 0]];
-const isOn = [true, false];
-const selections = [{ channel: 0 }, { channel: 1 }];
-const initialViewState = {
-  height: 1000,
-  width: 500,
-  zoom: -5,
-  target: [10000, 10000, 0].
-};
-const colormap = '';
-const panLock = true;
-const zoomLock = false;
-const linkedDetailViewer = (
-  <SideBySideViewer
-    loader={loader}
-    sliderValues={sliders}
-    colorValues={colors}
-    channelIsOn={isOn}
-    loaderSelection={selections}
-    initialViewState={initialViewState}
-    colormap={colormap.length > 0 && colormap}
-    zoomLock={zoomLock}
-    panLock={panLock}
-  />
-);
-```
+If you wish to use the `SideBySideViewer`, simply replace `PictureInPictureViewer` with `SideBySideViewer` and add props for `zoomLock` and `panLock` while removing `overview` and `overviewOn`.
