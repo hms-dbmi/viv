@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.2.9
+
+### Added
+
 - Support Safari in 2D raster imagery.
 - Support height as primary dimension for sizing OverviewView.
 - Add preliminary RGB check.
