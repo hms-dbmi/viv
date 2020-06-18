@@ -48,3 +48,6 @@ gsutil -m cp -r /my/path/test-output/ gs://my/path/test-output/
 ```
 
 Note that if your tiff file is large in neither channel count nor resolution, you can simply load it in `viv` directly without passing in offsets or running this pipeline.
+
+Finally we are in the experimental stages of supporting RGB images. Right now we only support de-interleaved images.  
+One of the biggest issues we have is lack of (what we know to be) properly formatted sample OME-TIFF data. Please open an issue if this is important to your use-case.

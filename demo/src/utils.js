@@ -26,6 +26,7 @@ export async function createLoader(type, infoObj) {
     case 'bf tiff':
     case 'tiff 2':
     case 'covid tiff':
+    case 'rgb tiff':
     case 'tiff': {
       const { url } = infoObj;
       const res = await fetch(url.replace(/ome.tif(f?)/gi, 'offsets.json'));

@@ -105,6 +105,8 @@ const rootStaticTiffUrl =
 const staticTiffInfo = {
   url: rootStaticTiffUrl,
   dimensions: [
+    // This order does not matter since it is contained in the OME-XML.
+    // It is just for the UI, and that should change since it can be inferred from the loader's OMEXML.
     {
       field: 'channel',
       type: 'nominal',
@@ -157,6 +159,8 @@ const remoteBFTiff = {
     target: [5000, 5000]
   },
   dimensions: [
+    // This order does not matter since it is contained in the OME-XML.
+    // It is just for the UI, and that should change since it can be inferred from the loader's OMEXML.
     {
       field: 'channel',
       type: 'nominal',
@@ -178,6 +182,37 @@ const remoteBFTiff = {
 };
 
 // Generated using bioformats2raw and raw2ometiff.
+const remoteTiffRGBUrl =
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/hubmap/test/VAN0008-RK-403-100-PAS_registered.ome.tif';
+
+const remoteTiffRGB = {
+  url: remoteTiffRGBUrl,
+  initialViewState: {
+    zoom: -5,
+    target: [30000, 30000]
+  },
+  dimensions: [
+    // This order does not matter since it is contained in the OME-XML.
+    // It is just for the UI, and that should change since it can be inferred from the loader's OMEXML.
+    {
+      field: 'channel',
+      type: 'nominal',
+      values: ['red', 'green', 'blue']
+    },
+    { field: 'y', type: 'quantitative', values: null },
+    { field: 'x', type: 'quantitative', values: null },
+    { field: 'time', type: 'number', values: null },
+    { field: 'z', type: 'number', values: null }
+  ],
+  isPublic: false,
+  isPyramid: true,
+  selections: ['red', 'green', 'blue'].map(channel => {
+    return { channel, time: 0, z: 0 };
+  }),
+  description: 'VAN0008-RK-403-100-PAS_registered PAS Donor Image'
+};
+
+// Generated using bioformats2raw and raw2ometiff.
 const remoteTiffUrl2 =
   'https://vitessce-demo-data.storage.googleapis.com/test-data/hubmap/pyramid_0.0.2/VAN0003-LK-32-21-AF_preIMS_registered.ome.tif';
 
@@ -188,6 +223,8 @@ const remoteTiff2 = {
     target: [30000, 30000]
   },
   dimensions: [
+    // This order does not matter since it is contained in the OME-XML.
+    // It is just for the UI, and that should change since it can be inferred from the loader's OMEXML.
     {
       field: 'channel',
       type: 'nominal',
@@ -211,7 +248,7 @@ const remoteTiff2 = {
   ].map(channel => {
     return { channel, time: 0, z: 0 };
   }),
-  description: 'VAN0003-LK-32-21 Donor Image'
+  description: 'VAN0003-LK-32-21 AF Donor Image'
 };
 
 const covidTiffInfo = {
@@ -265,5 +302,6 @@ export default {
   'bf tiff': remoteBFTiff,
   'tiff 2': remoteTiff2,
   'covid tiff': covidTiffInfo,
-  'ome-zarr': omeZarr
+  'ome-zarr': omeZarr,
+  'rgb tiff': remoteTiffRGB
 };

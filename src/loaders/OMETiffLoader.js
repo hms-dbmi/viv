@@ -43,9 +43,6 @@ export default class OMETiffLoader {
     this.height = this.omexml.SizeY;
     this.tileSize = firstImage.getTileWidth();
     const { SubIFDs } = firstImage.fileDirectory;
-    // These subIFDs are going to take some tuning to get right.
-    // This works with the current bioformats6 pipeline.
-    // Related to: https://github.com/hubmapconsortium/vitessce-image-viewer/issues/144
     this.numLevels = this.omexml.getNumberOfImages() || SubIFDs?.length;
     this.isBioFormats6Pyramid = SubIFDs;
     this.isPyramid = this.numLevels > 1;
@@ -70,9 +67,15 @@ export default class OMETiffLoader {
       { field: 'x', type: 'quantitative', values: null },
       { field: 'y', type: 'quantitative', values: null }
     ];
-    // We use zarr's internal format.  It encodes endiannes, but we leave it little for now
+    // We use zarr's internal format.  It encodes endianness, but we leave it little for now
     // since javascript is little endian.
     this.dtype = DTYPE_LOOKUP[this.omexml.Type];
+    // This is experimental and will take some tuning to properly detect.  For now,
+    // if the SamplesPerPixel is 3 (i.e interleaved) or if there are three uint8 channels,
+    // we flag that as rgb.
+    this.isRgb =
+      this.omexml.SamplesPerPixel === 3 ||
+      (this.channelNames.length === 3 && this.dtype === '<u1');
   }
 
   /**

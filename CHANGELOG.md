@@ -6,6 +6,7 @@
 
 - Support Safari in 2D raster imagery.
 - Support height as primary dimension for sizing OverviewView.
+- Add preliminary RGB check.
 - Add doc giving an overview of our API structure.
 
 ### Changed
