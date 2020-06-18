@@ -178,6 +178,35 @@ const remoteBFTiff = {
 };
 
 // Generated using bioformats2raw and raw2ometiff.
+const remoteTiffRGBUrl =
+  'https://vitessce-demo-data.storage.googleapis.com/test-data/hubmap/test/VAN0008-RK-403-100-PAS_registered.ome.tif';
+
+const remoteTiffRGB = {
+  url: remoteTiffRGBUrl,
+  initialViewState: {
+    zoom: -5,
+    target: [30000, 30000]
+  },
+  dimensions: [
+    {
+      field: 'channel',
+      type: 'nominal',
+      values: ['red', 'green', 'blue']
+    },
+    { field: 'y', type: 'quantitative', values: null },
+    { field: 'x', type: 'quantitative', values: null },
+    { field: 'time', type: 'number', values: null },
+    { field: 'z', type: 'number', values: null }
+  ],
+  isPublic: false,
+  isPyramid: true,
+  selections: ['red', 'green', 'blue'].map(channel => {
+    return { channel, time: 0, z: 0 };
+  }),
+  description: 'VAN0003-LK-32-21 Donor Image'
+};
+
+// Generated using bioformats2raw and raw2ometiff.
 const remoteTiffUrl2 =
   'https://vitessce-demo-data.storage.googleapis.com/test-data/hubmap/pyramid_0.0.2/VAN0003-LK-32-21-AF_preIMS_registered.ome.tif';
 
@@ -265,5 +294,6 @@ export default {
   'bf tiff': remoteBFTiff,
   'tiff 2': remoteTiff2,
   'covid tiff': covidTiffInfo,
-  'ome-zarr': omeZarr
+  'ome-zarr': omeZarr,
+  'rgb tiff': remoteTiffRGB
 };
