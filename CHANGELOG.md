@@ -10,6 +10,7 @@
 ### Changed
 
 - Project overview boundary sizes instead of hardcoding.
+- Default demo color is now magenta and not red.
 
 ## 0.2.8
 

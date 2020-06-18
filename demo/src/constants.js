@@ -20,12 +20,12 @@ export const COLORMAP_OPTIONS = [
 export const COLOR_PALLETE = [
   [0, 0, 255],
   [0, 255, 0],
-  [255, 0, 0],
+  [255, 0, 255],
   [255, 255, 0],
   [255, 128, 0],
-  [255, 0, 255],
   [0, 255, 255],
-  [255, 255, 255]
+  [255, 255, 255],
+  [255, 0, 0]
 ];
 export const INITIAL_SLIDER_VALUE = [1500, 20000];
 export const FILL_PIXEL_VALUE = '----';
