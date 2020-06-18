@@ -2,8 +2,7 @@
 
 A viewer for high bit depth, high resolution, multi-channel images using DeckGL
 over the hood and WebGL under the hood. To learn more about the "theory" behind
-this, look at [this](https://github.com/hubmapconsortium/vitessce-image-viewer/blob/master/docs/IMAGE_RENDERING.md). To really make this sing, you need to
-use an http2 server in production (s3 is passable, though).
+this, look at [this](https://github.com/hubmapconsortium/vitessce-image-viewer/blob/master/docs/IMAGE_RENDERING.md).
 
 ### Build
 
@@ -24,25 +23,14 @@ for your preferred editor. (Badly formatted code will fail on Travis.)
 For the demo, run `npm start` and you will be able to update the component and use the
 `demo/src/App.js` to visually test.
 
-For development,
-HTTP is acceptable but potentially slower than HTTP2 for `TIFF`. However, for
-development with `zarr`, you should use an [HTTP2 server](https://github.com/GoogleChromeLabs/simplehttp2server)
-for best performance. Our demo
-uses Google Cloud Storage, which is HTTP2 by default.
+HTTP is acceptable but potentially slower than HTTP2. Our demo uses Google Cloud Storage, which is HTTP2 by default.
 
 Due to [difficulties](https://github.com/hubmapconsortium/vitessce-image-viewer/issues/103) around compiling shaders on Travis, unit tests and layer lifecycle
 tests are run locally as a pre-push hook. Travis runs a test build, linting, and prettier.
 
 ### Browser Support
 
-Currently Safari lacks full WebGL2 support. The `Viv` component will display an error. To override the styling, add something like
-
-```css
-.viv-error p {
-  color: red;
-  margin: 15px;
-}
-```
+We support both WebGL1 and WebGL2 contexts, which should give near universal coverage. Please file an issue if you find a browser in which we don't work.
 
 ### Documentation
 

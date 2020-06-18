@@ -6,11 +6,13 @@
 
 - Support Safari in 2D raster imagery.
 - Support height as primary dimension for sizing OverviewView.
+- Add doc giving an overview of our API structure.
 
 ### Changed
 
 - Project overview boundary sizes instead of hardcoding.
 - Default demo color is now magenta and not red.
+- Remove Safari browser warning in docs.
 
 ## 0.2.8
 
