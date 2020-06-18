@@ -11,6 +11,7 @@
 ### Changed
 
 - Project overview boundary sizes instead of hardcoding.
+- Default demo color is now magenta and not red.
 - Remove Safari browser warning in docs.
 
 ## 0.2.8
