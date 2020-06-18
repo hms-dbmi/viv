@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Change geotiff fork branch to work with downstream installations.
+
 ## 0.2.9
 
 ### Added
