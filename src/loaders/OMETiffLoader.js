@@ -70,7 +70,7 @@ export default class OMETiffLoader {
       { field: 'x', type: 'quantitative', values: null },
       { field: 'y', type: 'quantitative', values: null }
     ];
-    // We use zarr's internal format.  It encodes endiannes, but we leave it little for now
+    // We use zarr's internal format.  It encodes endianness, but we leave it little for now
     // since javascript is little endian.
     this.dtype = DTYPE_LOOKUP[this.omexml.Type];
     this.isRgb =
