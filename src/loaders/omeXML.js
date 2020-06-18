@@ -48,4 +48,11 @@ export default class OMEXML {
   getNumberOfImages() {
     return this.metadataOMEXML.Image.length || 0;
   }
+
+  get SamplesPerPixel() {
+    const { Channel } = this._Pixels;
+    return Array.isArray(Channel)
+      ? Channel.map(channel => channel['@_SamplesPerPixel'])[0]
+      : [Channel['@_SamplesPerPixel']];
+  }
 }

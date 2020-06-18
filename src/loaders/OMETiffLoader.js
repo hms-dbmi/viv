@@ -73,6 +73,9 @@ export default class OMETiffLoader {
     // We use zarr's internal format.  It encodes endiannes, but we leave it little for now
     // since javascript is little endian.
     this.dtype = DTYPE_LOOKUP[this.omexml.Type];
+    this.isRgb =
+      this.omexml.SamplesPerPixel === 3 ||
+      (this.channelNames.length === 3 && this.dtype === '<u1');
   }
 
   /**
