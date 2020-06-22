@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Fix shaders divisor for intensity.
+
 ## 0.2.9
 
 ### Added
