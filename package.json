@@ -107,7 +107,7 @@
     "@luma.gl/core": "^8.1.0",
     "@luma.gl/shadertools": "^8.1.0",
     "fast-xml-parser": "^3.16.0",
-    "geotiff": "github:ilan-gold/geotiff.js#ilan-gold/rangetop_bug",
+    "geotiff": "github:ilan-gold/geotiff.js#ilan-gold/viv_branch",
     "quickselect": "^2.0.0",
     "zarr": "^0.3.0"
   }
