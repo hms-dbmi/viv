@@ -7,6 +7,7 @@
 ### Changed
 
 - Change geotiff fork branch to work with downstream installations.
+- Fix shaders divisor for intensity.
 
 ## 0.2.9
 
