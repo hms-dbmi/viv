@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Move back on to geotiff full releases.
+
 ## 0.2.10
 
 ### Added
