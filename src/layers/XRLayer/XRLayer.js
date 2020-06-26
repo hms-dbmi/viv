@@ -3,14 +3,14 @@
 // we live in place for now, hence some of the not-destructuring
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer, project32, picking } from '@deck.gl/core';
-import { Model, Geometry, Texture2D } from '@luma.gl/core';
+import { Model, Geometry, Texture2D, isWebGL2 } from '@luma.gl/core';
 import fsColormap1 from './xr-layer-fragment-colormap.webgl1.glsl';
 import fsColormap2 from './xr-layer-fragment-colormap.webgl2.glsl';
 import fs1 from './xr-layer-fragment.webgl1.glsl';
 import fs2 from './xr-layer-fragment.webgl2.glsl';
 import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
-import { DTYPE_VALUES, NO_WEBGL2 } from '../../constants';
+import { DTYPE_VALUES } from '../../constants';
 import { padColorsAndSliders } from '../utils';
 
 const defaultProps = {
@@ -38,16 +38,18 @@ export default class XRLayer extends Layer {
    * replaces `usampler` with `sampler` if the data is not an unsigned integer
    */
   getShaders() {
+    const { gl } = this.context;
+    const noWebGL2 = !isWebGL2(gl);
     const { colormap, dtype } = this.props;
-    const fragShaderNoColormap = NO_WEBGL2 ? fs1 : fs2;
-    const fragShaderColoramp = NO_WEBGL2 ? fsColormap1 : fsColormap2;
+    const fragShaderNoColormap = noWebGL2 ? fs1 : fs2;
+    const fragShaderColoramp = noWebGL2 ? fsColormap1 : fsColormap2;
     const fragShader = colormap
       ? fragShaderColoramp.replace('colormapFunction', colormap)
       : fragShaderNoColormap;
     const fragShaderDtype =
       dtype === '<f4' ? fragShader.replace(/usampler/g, 'sampler') : fragShader;
     return super.getShaders({
-      vs: NO_WEBGL2 ? vs1 : vs2,
+      vs: noWebGL2 ? vs1 : vs2,
       fs: fragShaderDtype,
       modules: [project32, picking]
     });
@@ -241,6 +243,8 @@ export default class XRLayer extends Layer {
    * This function creates textures from the data
    */
   dataToTexture(data, width, height) {
+    const { gl } = this.context;
+    const noWebGL2 = !isWebGL2(gl);
     const { dtype } = this.props;
     const { format, dataFormat, type } = DTYPE_VALUES[dtype];
     const texture = new Texture2D(this.context.gl, {
@@ -257,9 +261,9 @@ export default class XRLayer extends Layer {
         [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
         [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
       },
-      format: NO_WEBGL2 ? GL.LUMINANCE : format,
-      dataFormat: NO_WEBGL2 ? GL.LUMINANCE : dataFormat,
-      type: NO_WEBGL2 ? GL.FLOAT : type
+      format: noWebGL2 ? GL.LUMINANCE : format,
+      dataFormat: noWebGL2 ? GL.LUMINANCE : dataFormat,
+      type: noWebGL2 ? GL.FLOAT : type
     });
     return texture;
   }

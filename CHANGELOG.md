@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Use WebGL context to detect what shaders and textures to use, not whether WebGL2 is available on environment `document`.
+
 ## 0.2.11
 
 ### Added
