@@ -36,5 +36,3 @@ export const DTYPE_VALUES = {
     TypedArray: Float32Array
   }
 };
-
-export const NO_WEBGL2 = !document.createElement('canvas').getContext('webgl2');
