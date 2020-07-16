@@ -8,6 +8,7 @@
 
 - Use WebGL context to detect what shaders and textures to use, not whether WebGL2 is available on environment `document`.
 - Fix link in `IMAGE_RENDERING.md` and remove `img2zarr` reference since it has been depricated.
+- Export `XRLayer`.
 
 ## 0.2.11
 
