@@ -1,4 +1,9 @@
-import { VivViewerLayer, StaticImageLayer, ScaleBarLayer } from './layers';
+import {
+  VivViewerLayer,
+  StaticImageLayer,
+  ScaleBarLayer,
+  XRLayer
+} from './layers';
 import { VivViewer, PictureInPictureViewer, SideBySideViewer } from './viewers';
 import { VivView, OverviewView, DetailView, SideBySideView } from './views';
 import {
@@ -16,6 +21,7 @@ export {
   MAX_SLIDERS_AND_CHANNELS,
   ScaleBarLayer,
   VivViewerLayer,
+  XRLayer,
   VivViewer,
   VivView,
   OverviewView,
