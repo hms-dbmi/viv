@@ -56,7 +56,7 @@ export default class VivViewerLayer extends CompositeLayer {
         // which felt odd to me to beign with.
         // The image-tile example works without, this but I have a feeling there is something
         // going on with our pyramids and/or rendering that is different.
-        z: -z + Math.log2(512 / tileSize),
+        z: Math.round(-z + Math.log2(512 / tileSize)),
         loaderSelection
       });
       if (tile) {
@@ -77,6 +77,7 @@ export default class VivViewerLayer extends CompositeLayer {
       tileSize,
       extent: [0, 0, width, height],
       minZoom: -(numLevels - 1),
+      maxZoom: Math.min(0, Math.round(Math.log2(512 / tileSize))),
       colorValues,
       sliderValues,
       channelIsOn,
