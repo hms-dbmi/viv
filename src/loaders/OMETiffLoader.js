@@ -229,7 +229,8 @@ export default class OMETiffLoader {
     const height = image.getHeight();
     return {
       // GeoTiff.js returns 32 bit uint when we the tiff has 32 significant bits.
-      data: this.dtype === '<f4' ? rasters.map(r => new Float32Array(r)): rasters,
+      data:
+        this.dtype === '<f4' ? rasters.map(r => new Float32Array(r)) : rasters,
       width,
       height
     };

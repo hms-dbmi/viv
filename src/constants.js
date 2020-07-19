@@ -34,7 +34,7 @@ export const DTYPE_VALUES = {
     type: GL.FLOAT,
     // Not sure what to do about this one - a good use case for channel stats, I suppose:
     // https://en.wikipedia.org/wiki/Single-precision_floating-point_format.
-    max: 3.4 * (10 ** 38),
+    max: 3.4 * 10 ** 38,
     TypedArray: Float32Array
   }
 };
