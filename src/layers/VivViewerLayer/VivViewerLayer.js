@@ -50,7 +50,13 @@ export default class VivViewerLayer extends CompositeLayer {
       const tile = await loader.getTile({
         x,
         y,
-        z: -z,
+        // I don't fully undertstand why this works, but I have a sense.
+        // It's basically to cancel out:
+        // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128,
+        // which felt odd to me to beign with.
+        // The image-tile example works without, this but I have a feeling there is something
+        // going on with our pyramids and/or rendering that is different.
+        z: Math.round(-z + Math.log2(512 / tileSize)),
         loaderSelection
       });
       if (tile) {
@@ -63,12 +69,15 @@ export default class VivViewerLayer extends CompositeLayer {
       }
       return tile;
     };
+    const { height, width } = loader.getRasterSize({ z: 0 });
     const tiledLayer = new VivViewerLayerBase({
       id: `Tiled-Image-${id}`,
       getTileData,
       dtype,
       tileSize,
+      extent: [0, 0, width, height],
       minZoom: -(numLevels - 1),
+      maxZoom: Math.min(0, Math.round(Math.log2(512 / tileSize))),
       colorValues,
       sliderValues,
       channelIsOn,
