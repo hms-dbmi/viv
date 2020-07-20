@@ -3,6 +3,12 @@
 ## In Progress
 
 ### Added
+
+### Changed
+
+## 0.3.0
+
+### Added
 - Thanks to deck.gl 8.2, we have a request scheduler which makes fetching tiles more efficient.
 
 ### Changed
