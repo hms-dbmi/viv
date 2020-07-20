@@ -11,6 +11,7 @@
 - Fix link in `IMAGE_RENDERING.md` and remove `img2zarr` reference since it has been depricated.
 - Upgrade deck.gl to 8.2.
 - Export `XRLayer`.
+- Fix OMEXML 32 bit float parse error.
 
 ## 0.2.11
 

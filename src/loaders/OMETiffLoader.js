@@ -7,7 +7,7 @@ const DTYPE_LOOKUP = {
   uint8: '<u1',
   uint16: '<u2',
   uint32: '<u4',
-  float32: '<f4'
+  float: '<f4'
 };
 
 /**
@@ -228,7 +228,11 @@ export default class OMETiffLoader {
     const width = image.getWidth();
     const height = image.getHeight();
     return {
-      data: rasters,
+      // GeoTiff.js returns 32 bit uint when the tiff has 32 significant bits.
+      data:
+        this.dtype === '<f4'
+          ? rasters.map(r => new Float32Array(r.buffer))
+          : rasters,
       width,
       height
     };
