@@ -16,7 +16,8 @@ const defaultProps = {
   colormap: { type: 'string', value: '', compare: true },
   dtype: { type: 'string', value: '<u2', compare: true },
   domain: { type: 'array', value: [], compare: true },
-  viewportId: { type: 'string', value: '', compare: true }
+  viewportId: { type: 'string', value: '', compare: true },
+  extent: { type: 'array', value: [], compare: true }
 };
 
 /**

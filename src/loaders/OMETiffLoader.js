@@ -171,7 +171,7 @@ export default class OMETiffLoader {
         }
       }
       image = await tiff.getImage(pyramidIndex);
-      return this._getChannel({ image, x, y });
+      return this._getChannel({ image, x, y, z });
     });
 
     const tiles = await Promise.all(tileRequests);
@@ -313,7 +313,7 @@ export default class OMETiffLoader {
     };
   }
 
-  async _getChannel({ image, x, y }) {
+  async _getChannel({ image, x, y, z }) {
     const { dtype } = this;
     const { TypedArray } = DTYPE_VALUES[dtype];
     const tile = await image.getTileOrStrip(x, y, 0, this.pool);
@@ -330,13 +330,19 @@ export default class OMETiffLoader {
 
     // If the tile data is not (tileSize x tileSize), pad the data with zeros
     if (data.length < this.tileSize * this.tileSize) {
-      const width = Math.min(
-        this.tileSize,
-        image.getWidth() - x * this.tileSize
-      );
-      const height = data.length / width;
+      const { height, width } = this.getRasterSize({ z });
+      let trueHeight = height;
+      let trueWidth = width;
+      // If height * tileSize is the size of the data, then the width is the tileSize.
+      if (data.length / height === 512) {
+        trueWidth = this.tileSize;
+      }
+      // If width * tileSize is the size of the data, then the height is the tileSize.
+      if (data.length / width === 512) {
+        trueHeight = this.tileSize;
+      }
       return padTileWithZeros(
-        { data, width, height },
+        { data, width: trueWidth, height: trueHeight },
         this.tileSize,
         this.tileSize
       );
