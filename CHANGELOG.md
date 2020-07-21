@@ -6,7 +6,7 @@
 
 ### Changed
 
-- Pad tiles using both height and width in the calculation.
+- Pad OME-TIFF tiles using both height and width in the calculation.
 
 ## 0.3.0
 
