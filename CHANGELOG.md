@@ -6,6 +6,12 @@
 
 ### Changed
 
+## 0.3.1
+
+### Added
+
+### Changed
+
 - Pad OME-TIFF tiles using both height and width in the calculation.
 
 ## 0.3.0
