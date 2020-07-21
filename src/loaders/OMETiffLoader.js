@@ -334,11 +334,11 @@ export default class OMETiffLoader {
       let trueHeight = height;
       let trueWidth = width;
       // If height * tileSize is the size of the data, then the width is the tileSize.
-      if (data.length / height === 512) {
+      if (data.length / height === this.tileSize) {
         trueWidth = this.tileSize;
       }
       // If width * tileSize is the size of the data, then the height is the tileSize.
-      if (data.length / width === 512) {
+      if (data.length / width === this.tileSize) {
         trueHeight = this.tileSize;
       }
       return padTileWithZeros(
