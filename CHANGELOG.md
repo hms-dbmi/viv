@@ -6,9 +6,12 @@
 
 ### Changed
 
+- Pad OME-TIFF tiles using both height and width in the calculation.
+
 ## 0.3.0
 
 ### Added
+
 - Thanks to deck.gl 8.2, we have a request scheduler which makes fetching tiles more efficient.
 
 ### Changed
