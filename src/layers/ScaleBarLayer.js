@@ -2,6 +2,7 @@ import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { LineLayer, TextLayer } from '@deck.gl/layers';
 import { range } from './utils';
 import { makeBoundingBox } from '../views/utils';
+import { DEFAULT_FONT_FAMILY } from '../constants';
 
 function getPosition(boundingBox, position, length) {
   const viewLength = boundingBox[2][0] - boundingBox[0][0];
@@ -126,7 +127,8 @@ export default class ScaleBarLayer extends CompositeLayer {
         }
       ],
       getColor: [220, 220, 220, 255],
-      getSize: 11,
+      getSize: 12,
+      fontFamily: DEFAULT_FONT_FAMILY,
       sizeUnits: 'meters',
       sizeScale: 2 ** -zoom,
       characterSet: [...unit.split(''), ...range(10).map(i => String(i)), '.']
