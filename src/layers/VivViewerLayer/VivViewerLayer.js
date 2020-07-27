@@ -110,7 +110,8 @@ export default class VivViewerLayer extends CompositeLayer {
         scale: 2 ** (numLevels - 1),
         visible:
           (-numLevels <= this.context.viewport.zoom && opacity === 1) ||
-          !viewportId || this.context.viewport.id === viewportId,
+          !viewportId ||
+          this.context.viewport.id === viewportId,
         z: numLevels - 1,
         pickable: true,
         onHover
