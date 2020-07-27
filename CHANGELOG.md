@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Do not show background image over tiled image after zoom out.
+
 ## 0.3.1
 
 ### Added
