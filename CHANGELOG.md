@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Updated the font family for the `ScaleBarLayer`'s internal `TextLayer`.
 
 ## 0.3.1
 
