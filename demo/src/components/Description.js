@@ -15,7 +15,7 @@ function Description() {
       <Grid item>
         <IconButton
           href="https://github.com/hms-dbmi/viv"
-          aria-label="Github repository"
+          aria-label="GitHub Repository"
           disableRipple
         >
           <GitHubIcon />
