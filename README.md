@@ -1,4 +1,4 @@
-### vitessce-image-viewer ("Viv") [![npm version](https://badge.fury.io/js/%40hubmap%2Fvitessce-image-viewer.svg)](https://badge.fury.io/js/%40hubmap%2Fvitessce-image-viewer)
+### Viv [![npm version](https://badge.fury.io/js/%40hms-dbmi%2Fviv.svg)](https://badge.fury.io/js/%40hms-dbmi%2Fviv)
 
 A viewer for high bit depth, high resolution, multi-channel images using DeckGL
 over the hood and WebGL under the hood. To learn more about the "theory" behind

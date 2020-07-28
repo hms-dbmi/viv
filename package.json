@@ -1,5 +1,5 @@
 {
-  "name": "@hubmap/vitessce-image-viewer",
+  "name": "@hms-dbmi/viv",
   "version": "0.3.1",
   "main": "dist/bundle.umd.js",
   "module": "dist/bundle.es.js",

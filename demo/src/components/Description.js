@@ -10,9 +10,9 @@ function Description() {
     <Grid container>
       <Grid item>
         <Typography variant="body1">
-          <strong>vitessce-image-viewer</strong> (&ldquo;Viv&rdquo;): A viewer
-          for high bit depth, high resolution, multi-channel images using DeckGL
-          over the hood and WebGL under the hood.
+          <strong>Viv</strong> (&ldquo;Viv&rdquo;): A viewer for high bit depth,
+          high resolution, multi-channel images using DeckGL over the hood and
+          WebGL under the hood.
         </Typography>
       </Grid>
       <Grid item>
@@ -26,7 +26,7 @@ function Description() {
             <GitHubIcon />
           </IconButton>
           <Link
-            href="https://www.npmjs.com/package/@hubmap/vitessce-image-viewer"
+            href="https://www.npmjs.com/package/@hms-dbmi/viv"
             color="inherit"
             aria-label="NPM package"
           >

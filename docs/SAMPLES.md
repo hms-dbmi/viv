@@ -5,7 +5,7 @@ This snippet is the most basic view: a simple view of the data. With `overviewOn
 We also export `DTYPE_VALUES` and `MAX_CHANNELS_AND_SLIDERS` so you can get some information (array type, max) for each `dtype` of a loader (such as `uint16/<u2`) and the number of channels the current release of Viv supports, respectively.
 
 ```javascript
-import { createZarrLoader, PictureInPictureViewer, createOMETiffLoader } from '@hubmap/vitessce-image-viewer';
+import { createZarrLoader, PictureInPictureViewer, createOMETiffLoader } from '@hms-dbmi/viv';
 
 /* Zarr Loader */
 const zarrInfo = {

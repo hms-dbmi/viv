@@ -3,7 +3,7 @@
 `Viv` has the ability to load OME-TIFF files directly through a simple API:
 
 ```javascript
-import { createOMETiffLoader } from '@hubmap/vitessce-image-viewer';
+import { createOMETiffLoader } from '@hms-dbmi/viv';
 
 const url =
   'https://vitessce-demo-data.storage.googleapis.com/test-data/deflate_no_legacy/spraggins.bioformats.raw2ometiff.ome.tif';
