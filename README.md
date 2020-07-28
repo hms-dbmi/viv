@@ -2,7 +2,7 @@
 
 A viewer for high bit depth, high resolution, multi-channel images using DeckGL
 over the hood and WebGL under the hood. To learn more about the "theory" behind
-this, look at [this](https://github.com/hubmapconsortium/vitessce-image-viewer/blob/master/docs/IMAGE_RENDERING.md).
+this, look at [this](https://github.com/hms-dbmi/viv/blob/master/docs/IMAGE_RENDERING.md).
 
 ### Build
 
@@ -25,7 +25,7 @@ For the demo, run `npm start` and you will be able to update the component and u
 
 HTTP is acceptable but potentially slower than HTTP2. Our demo uses Google Cloud Storage, which is HTTP2 by default.
 
-Due to [difficulties](https://github.com/hubmapconsortium/vitessce-image-viewer/issues/103) around compiling shaders on Travis, unit tests and layer lifecycle
+Due to [difficulties](https://github.com/hms-dbmi/viv/issues/103) around compiling shaders on Travis, unit tests and layer lifecycle
 tests are run locally as a pre-push hook. Travis runs a test build, linting, and prettier.
 
 ### Browser Support

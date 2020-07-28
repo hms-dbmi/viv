@@ -24,15 +24,15 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hubmapconsortium/vitessce-image-viewer.git"
+    "url": "git+https://github.com/hms-dbmi/viv.git"
   },
   "keywords": [],
   "author": "Ilan Gold",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hubmapconsortium/vitessce-image-viewer/issues"
+    "url": "https://github.com/hms-dbmi/viv/issues"
   },
-  "homepage": "https://github.com/hubmapconsortium/vitessce-image-viewer#readme",
+  "homepage": "https://github.com/hms-dbmi/viv#readme",
   "peerDependencies": {
     "react": "^16.12.0",
     "react-dom": "^16.12.0"

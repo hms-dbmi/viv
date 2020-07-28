@@ -19,7 +19,7 @@ function Description() {
         <Typography variant="body1">
           More information:
           <IconButton
-            href="https://github.com/hubmapconsortium/vitessce-image-viewer"
+            href="https://github.com/hms-dbmi/viv"
             aria-label="Github repository"
             disableRipple
           >
