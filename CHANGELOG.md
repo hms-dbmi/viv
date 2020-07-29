@@ -5,7 +5,9 @@
 ### Added
 
 ### Changed
+
 - Updated the font family for the `ScaleBarLayer`'s internal `TextLayer`.
+- Guarantee that `OverviewLayer` shows an image by forcing it to be a power of 2.
 
 ## 0.3.1
 
