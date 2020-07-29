@@ -103,6 +103,9 @@ export default class VivViewerLayer extends CompositeLayer {
     // paramteter set to anything but 1, but we always use it for situations where
     // we are zoomed out too far.
     const implementsGetRaster = typeof loader.getRaster === 'function';
+    const { width: lowResWidth, height: lowResHeight } = loader.getRasterSize({
+      z: numLevels - 1
+    });
     const baseLayer =
       implementsGetRaster &&
       new StaticImageLayer(this.props, {
@@ -114,7 +117,8 @@ export default class VivViewerLayer extends CompositeLayer {
             (!viewportId || this.context.viewport.id === viewportId)),
         z: numLevels - 1,
         pickable: true,
-        onHover
+        onHover,
+        boxSize: 2 ** Math.ceil(Math.log2(Math.max(lowResWidth, lowResHeight))),
       });
     const layers = [baseLayer, tiledLayer];
     return layers;
