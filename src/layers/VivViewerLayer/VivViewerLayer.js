@@ -3,7 +3,7 @@ import { isWebGL2 } from '@luma.gl/core';
 
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
-import { to32BitFloat } from '../utils';
+import { to32BitFloat, getNearestPowerOf2 } from '../utils';
 
 const defaultProps = {
   pickable: true,
@@ -118,7 +118,7 @@ export default class VivViewerLayer extends CompositeLayer {
         z: numLevels - 1,
         pickable: true,
         onHover,
-        boxSize: 2 ** Math.ceil(Math.log2(Math.max(lowResWidth, lowResHeight)))
+        boxSize: getNearestPowerOf2(lowResWidth, lowResHeight)
       });
     const layers = [baseLayer, tiledLayer];
     return layers;

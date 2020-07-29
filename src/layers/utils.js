@@ -67,3 +67,7 @@ export function to32BitFloat(data) {
   });
   return data32bit;
 }
+
+export function getNearestPowerOf2(width, height) {
+  return 2 ** Math.ceil(Math.log2(Math.max(width, height)));
+}

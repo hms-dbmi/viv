@@ -1,6 +1,7 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { PolygonLayer } from '@deck.gl/layers';
 import StaticImageLayer from './StaticImageLayer';
+import { getNearestPowerOf2 } from './utils';
 
 const defaultProps = {
   pickable: true,
@@ -71,7 +72,7 @@ export default class OverviewLayer extends CompositeLayer {
       id: `viewport-${id}`,
       scale: 2 ** (numLevels - 1) * overviewScale,
       z: numLevels - 1,
-      boxSize: 2 ** Math.ceil(Math.log2(Math.max(lowResWidth, lowResHeight)))
+      boxSize: getNearestPowerOf2(lowResWidth, lowResHeight)
     });
     const boundingBoxOutline = new PolygonLayer({
       id: `bounding-box-overview-${id}`,
