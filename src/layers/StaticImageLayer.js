@@ -16,6 +16,7 @@ const defaultProps = {
   domain: { type: 'array', value: [], compare: true },
   translate: { type: 'array', value: [0, 0], compare: true },
   scale: { type: 'number', value: 1, compare: true },
+  boxSize: { type: 'number', value: 0, compare: true },
   loader: {
     type: 'object',
     value: {
@@ -40,12 +41,13 @@ function scaleBounds({ width, height, translate, scale }) {
  * fixes the rendering. This is not ideal since padding the tile makes a copy of underlying
  * buffer, but without digging deeper into the WebGL it is a reasonable fix.
  */
-function padEven(data, width, height) {
-  const targetWidth = width % 2 === 0 ? width : width + 1;
+function padEven(data, width, height, boxSize) {
+  const targetWidth = boxSize ? boxSize : (width % 2 === 0 ? width : width + 1);
+  const targetHeight = boxSize ? boxSize : height;
   const padded = data.map(d =>
-    padTileWithZeros({ data: d, width, height }, targetWidth, height)
+    padTileWithZeros({ data: d, width, height }, targetWidth, targetHeight)
   );
-  return { data: padded, width: targetWidth, height };
+  return { data: padded, width: targetWidth, height: targetHeight };
 }
 
 /**
@@ -62,16 +64,18 @@ function padEven(data, width, height) {
  * @param {number} props.scale Scaling factor for this layer to be used against the dimensions of the loader's `getRaster`.
  * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
  * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
+ * @param {String} props.boxSize If you want to pad an incoming tile to be a certain squared pixel size, pass the number here (only used by OverviewLayer for now).
  */
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
-    const { loader, z, loaderSelection } = this.props;
+    const { loader, z, loaderSelection, boxSize } = this.props;
     loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) => {
       this.setState(
         padEven(
           !isWebGL2(this.context.gl) ? to32BitFloat(data) : data,
           width,
-          height
+          height,
+          boxSize
         )
       );
     });
@@ -85,7 +89,7 @@ export default class StaticImageLayer extends CompositeLayer {
       props.loaderSelection !== oldProps.loaderSelection;
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
-      const { loader, z, loaderSelection } = this.props;
+      const { loader, z, loaderSelection, boxSize } = this.props;
       loader
         .getRaster({ z, loaderSelection })
         .then(({ data, width, height }) => {
@@ -93,7 +97,8 @@ export default class StaticImageLayer extends CompositeLayer {
             padEven(
               !isWebGL2(this.context.gl) ? to32BitFloat(data) : data,
               width,
-              height
+              height,
+              boxSize
             )
           );
         });

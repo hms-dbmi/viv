@@ -64,10 +64,14 @@ export default class OverviewLayer extends CompositeLayer {
     const { width, height } = loader.getRasterSize({
       z: 0
     });
+    const { width: lowResWidth, height: lowResHeight } = loader.getRasterSize({
+      z: numLevels - 1
+    });
     const overview = new StaticImageLayer(this.props, {
       id: `viewport-${id}`,
       scale: 2 ** (numLevels - 1) * overviewScale,
-      z: numLevels - 1
+      z: numLevels - 1,
+      boxSize: 2 ** Math.ceil(Math.log2(Math.max(lowResWidth, lowResHeight))),
     });
     const boundingBoxOutline = new PolygonLayer({
       id: `bounding-box-overview-${id}`,
