@@ -71,7 +71,7 @@ export default class OverviewLayer extends CompositeLayer {
       id: `viewport-${id}`,
       scale: 2 ** (numLevels - 1) * overviewScale,
       z: numLevels - 1,
-      boxSize: 2 ** Math.ceil(Math.log2(Math.max(lowResWidth, lowResHeight))),
+      boxSize: 2 ** Math.ceil(Math.log2(Math.max(lowResWidth, lowResHeight)))
     });
     const boundingBoxOutline = new PolygonLayer({
       id: `bounding-box-overview-${id}`,

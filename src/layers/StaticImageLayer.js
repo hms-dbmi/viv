@@ -42,8 +42,8 @@ function scaleBounds({ width, height, translate, scale }) {
  * buffer, but without digging deeper into the WebGL it is a reasonable fix.
  */
 function padEven(data, width, height, boxSize) {
-  const targetWidth = boxSize ? boxSize : (width % 2 === 0 ? width : width + 1);
-  const targetHeight = boxSize ? boxSize : height;
+  const targetWidth = boxSize || (width % 2 === 0 ? width : width + 1);
+  const targetHeight = boxSize || height;
   const padded = data.map(d =>
     padTileWithZeros({ data: d, width, height }, targetWidth, targetHeight)
   );

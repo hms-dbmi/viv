@@ -118,7 +118,7 @@ export default class VivViewerLayer extends CompositeLayer {
         z: numLevels - 1,
         pickable: true,
         onHover,
-        boxSize: 2 ** Math.ceil(Math.log2(Math.max(lowResWidth, lowResHeight))),
+        boxSize: 2 ** Math.ceil(Math.log2(Math.max(lowResWidth, lowResHeight)))
       });
     const layers = [baseLayer, tiledLayer];
     return layers;
