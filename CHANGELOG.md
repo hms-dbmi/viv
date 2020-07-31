@@ -4,6 +4,8 @@
 
 ### Added
 
+- Lens view built into VivViewerLayer.
+
 ### Changed
 
 ## 0.3.2
