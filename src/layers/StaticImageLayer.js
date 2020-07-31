@@ -91,13 +91,17 @@ export default class StaticImageLayer extends CompositeLayer {
       );
     });
     const onPointer = () => {
+      // Duplicated from VivViewerLayer.
       const { mousePosition } = this.context;
+      const view = this.context.deck.viewManager.views.filter(
+        view => view.id === viewportId
+      )[0];
       const viewState = this.context.deck.viewManager.viewState[viewportId];
-      const viewport = new OrthographicView(viewState).makeViewport({
+      const viewport = view.makeViewport({
         ...viewState,
         viewState
       });
-      if (mousePosition) {
+      if (mousePosition && viewport.containsPixel(mousePosition)) {
         const offsetMousePosition = {
             x: mousePosition.x - viewport.x,
             y: mousePosition.y - viewport.y
@@ -106,7 +110,7 @@ export default class StaticImageLayer extends CompositeLayer {
             // left
             [offsetMousePosition.x - 100, offsetMousePosition.y],
             // bottom
-            [offsetMousePosition.x + 100, offsetMousePosition.y + 100],
+            [offsetMousePosition.x, offsetMousePosition.y + 100],
             // right
             [offsetMousePosition.x + 100, offsetMousePosition.y],
             // top
@@ -116,6 +120,8 @@ export default class StaticImageLayer extends CompositeLayer {
           (bounds, i) => viewport.unproject(bounds)[i % 2]
         );
         this.setState({ unprojectLensBounds });
+      } else {
+        this.setState({ unprojectLensBounds: [0, 0, 0, 0] });
       }
     };
     if (this.context.deck) {
