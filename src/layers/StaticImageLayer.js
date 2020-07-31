@@ -28,8 +28,7 @@ const defaultProps = {
   },
   z: { type: 'number', value: 0, compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
-  lensSelection: { type: 'number', value: 0, compare: true },
-  unprojectLensBounds: { type: 'array', value: [0, 0, 0, 0], compare: true }
+  lensSelection: { type: 'number', value: 0, compare: true }
 };
 
 function scaleBounds({ width, height, translate, scale }) {
@@ -69,6 +68,8 @@ function padEven(data, width, height, boxSize) {
  * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
  * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
  * @param {String} props.boxSize If you want to pad an incoming tile to be a certain squared pixel size, pass the number here (only used by OverviewLayer/VivViewerLayer for now).
+ * @param {boolean} props.isLensOn Whether or not to use the lens.
+ * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
  */
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {

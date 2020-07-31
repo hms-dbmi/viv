@@ -11,14 +11,10 @@ const defaultProps = {
   sliderValues: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
-  minZoom: { type: 'number', value: 0, compare: true },
-  maxZoom: { type: 'number', value: 0, compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   colormap: { type: 'string', value: '', compare: true },
-  dtype: { type: 'string', value: '<u2', compare: true },
   domain: { type: 'array', value: [], compare: true },
   viewportId: { type: 'string', value: '', compare: true },
-  unprojectMousePosition: { type: 'array', value: [0, 0, 0, 0], compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true }
 };
@@ -38,6 +34,8 @@ const defaultProps = {
  * @param {String} props.id Unique identifier for this layer.
  * @param {String} props.onTileError Custom override for handle tile fetching errors.
  * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
+ * @param {boolean} props.isLensOn Whether or not to use the lens.
+ * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
  */
 
 export default class VivViewerLayer extends CompositeLayer {

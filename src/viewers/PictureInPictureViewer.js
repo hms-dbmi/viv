@@ -15,6 +15,8 @@ import { DetailView, OverviewView } from '../views';
  * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
  * @param {Object} props.hoverHooks Object including the allowable hooks - right now only accepting a function with key handleValue like { handleValue: (valueArray) => {} }
+ * @param {boolean} props.isLensOn Whether or not to use the lens.
+ * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
  */
 
 const PictureInPictureViewer = props => {

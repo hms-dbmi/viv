@@ -13,6 +13,8 @@ import { SideBySideView } from '../views';
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {Boolean} props.zoomLock Whether or not lock the zooms of the two views.
  * @param {Boolean} props.panLock Whether or not lock the pans of the two views.
+ * @param {boolean} props.isLensOn Whether or not to use the lens.
+ * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
  */
 const SideBySideViewer = props => {
   const {
