@@ -19,9 +19,14 @@ uniform float intensityArray[6];
 // opacity
 uniform float opacity;
 
+// mouse bounds
+uniform vec4 mouseBounds;
+
 varying vec2 vTexCoord;
 
-
+bool tileInView() {
+  return (vTexCoord[0] < mouseBounds[2] && vTexCoord[0] > mouseBounds[0] && vTexCoord[1] < mouseBounds[1] && vTexCoord[1] > mouseBounds[3]);
+}
 vec3 hsv2rgb(vec3 c)
 {
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -62,7 +67,9 @@ void main() {
   float intensityValue3 = (float(texture(channel3, vTexCoord).r) - sliderValues[3][0]) / max(1.0, (sliderValues[3][1] - sliderValues[3][0]));
   float intensityValue4 = (float(texture(channel4, vTexCoord).r) - sliderValues[4][0]) / max(1.0, (sliderValues[4][1] - sliderValues[4][0]));
   float intensityValue5 = (float(texture(channel5, vTexCoord).r) - sliderValues[5][0]) / max(1.0, (sliderValues[5][1] - sliderValues[5][0]));
-
+  if(!tileInView()) {
+    discard;
+  }
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
 

@@ -42,12 +42,12 @@ export default class VivViewerLayer extends CompositeLayer {
           mousePositionBounds = [
             // left
             [offsetMousePosition.x - 100, offsetMousePosition.y],
-            // top
-            [offsetMousePosition.x, offsetMousePosition.y - 100],
+            // bottom
+            [offsetMousePosition.x, offsetMousePosition.y + 100],
             // right
             [offsetMousePosition.x + 100, offsetMousePosition.y],
-            // bottom
-            [offsetMousePosition.x + 100, offsetMousePosition.y + 100]
+            // top
+            [offsetMousePosition.x, offsetMousePosition.y - 100]
           ];
         const unprojectMouseBounds = mousePositionBounds.map(
           (bounds, i) => viewport.unproject(bounds)[i % 2]

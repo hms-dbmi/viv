@@ -68,6 +68,12 @@ function padEven(data, width, height, boxSize) {
  */
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
+    this.state = {
+      unprojectMouseBounds: [],
+      width: 0,
+      height: 0,
+      data: []
+    };
     const { loader, z, loaderSelection, boxSize } = this.props;
     loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) => {
       this.setState(
@@ -79,6 +85,35 @@ export default class StaticImageLayer extends CompositeLayer {
         )
       );
     });
+    const onPointer = () => {
+      const { mousePosition, viewport } = this.context;
+      if (mousePosition) {
+        const offsetMousePosition = {
+            x: mousePosition.x - viewport.x,
+            y: mousePosition.y - viewport.y
+          },
+          mousePositionBounds = [
+            // left
+            [offsetMousePosition.x - 100, offsetMousePosition.y],
+            // bottom
+            [offsetMousePosition.x + 100, offsetMousePosition.y + 100],
+            // right
+            [offsetMousePosition.x + 100, offsetMousePosition.y],
+            // top
+            [offsetMousePosition.x, offsetMousePosition.y - 100]
+          ];
+        const unprojectMouseBounds = mousePositionBounds.map(
+          (bounds, i) => viewport.unproject(bounds)[i % 2]
+        );
+        this.setState({ unprojectMouseBounds });
+      }
+    };
+    if (this.context.deck) {
+      this.context.deck.eventManager.on({
+        pointermove: () => onPointer(),
+        pointerleave: () => onPointer()
+      });
+    }
   }
 
   updateState({ changeFlags, props, oldProps }) {
@@ -131,7 +166,7 @@ export default class StaticImageLayer extends CompositeLayer {
       id
     } = this.props;
     const { dtype } = loader;
-    const { data, width, height } = this.state;
+    const { data, width, height, unprojectMouseBounds } = this.state;
     if (!(width && height)) return null;
     const bounds = scaleBounds({
       width,
@@ -152,7 +187,8 @@ export default class StaticImageLayer extends CompositeLayer {
       opacity,
       visible,
       dtype,
-      colormap
+      colormap,
+      unprojectMouseBounds
     });
   }
 }

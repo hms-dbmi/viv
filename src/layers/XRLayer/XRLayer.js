@@ -183,7 +183,9 @@ export default class XRLayer extends Layer {
         opacity,
         domain,
         dtype,
-        channelIsOn
+        channelIsOn,
+        unprojectMouseBounds,
+        bounds
       } = this.props;
       // Check number of textures not null.
       const numTextures = Object.values(textures).filter(t => t).length;
@@ -196,12 +198,31 @@ export default class XRLayer extends Layer {
         domain,
         dtype
       });
+      // create a 0-1 scaled intersection box for rendering lens
+
+      const [
+        leftMouseBound,
+        bottomMouseBound,
+        rightMouseBound,
+        topMouseBound
+      ] = unprojectMouseBounds;
+      const [left, bottom, right, top] = bounds;
+      const leftMouseBoundScaled = (leftMouseBound - left) / (right - left);
+      const bottomMouseBoundScaled = (bottomMouseBound - top) / (bottom - top);
+      const rightMouseBoundScaled = (rightMouseBound - left) / (right - left);
+      const topMouseBoundScaled = (topMouseBound - top) / (bottom - top);
       model
         .setUniforms({
           ...uniforms,
           colorValues: paddedColorValues,
           sliderValues: paddedSliderValues,
           opacity,
+          mouseBounds: [
+            leftMouseBoundScaled,
+            bottomMouseBoundScaled,
+            rightMouseBoundScaled,
+            topMouseBoundScaled
+          ],
           ...textures
         })
         .draw();
