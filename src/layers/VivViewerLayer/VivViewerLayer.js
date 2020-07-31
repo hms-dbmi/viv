@@ -1,13 +1,28 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
+import { OrthographicView } from '@deck.gl/core';
 
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
 import { to32BitFloat, getNearestPowerOf2 } from '../utils';
+import { COORDINATE_SYSTEM } from '@deck.gl/core';
 
 const defaultProps = {
   pickable: true,
-  onHover: { type: 'function', value: null, compare: false }
+  onHover: { type: 'function', value: null, compare: false },
+  sliderValues: { type: 'array', value: [], compare: true },
+  colorValues: { type: 'array', value: [], compare: true },
+  channelIsOn: { type: 'array', value: [], compare: true },
+  minZoom: { type: 'number', value: 0, compare: true },
+  maxZoom: { type: 'number', value: 0, compare: true },
+  opacity: { type: 'number', value: 1, compare: true },
+  colormap: { type: 'string', value: '', compare: true },
+  dtype: { type: 'string', value: '<u2', compare: true },
+  domain: { type: 'array', value: [], compare: true },
+  viewportId: { type: 'string', value: '', compare: true },
+  unprojectMousePosition: { type: 'array', value: [0, 0, 0, 0], compare: true },
+  isLensOn: { type: 'boolean', value: false, compare: true },
+  lensSelection: { type: 'number', value: 0, compare: true }
 };
 
 /**
@@ -30,11 +45,20 @@ const defaultProps = {
 export default class VivViewerLayer extends CompositeLayer {
   initializeState() {
     this.state = {
-      unprojectLensBounds: []
+      unprojectLensBounds: [0, 0, 0, 0]
     };
+    const { viewportId } = this.props;
     const onPointer = () => {
-      const { mousePosition, viewport } = this.context;
-      if (mousePosition) {
+      const { mousePosition } = this.context;
+      const view = this.context.deck.viewManager.views.filter(
+        view => view.id === viewportId
+      )[0];
+      const viewState = this.context.deck.viewManager.viewState[viewportId];
+      const viewport = view.makeViewport({
+        ...viewState,
+        viewState
+      });
+      if (mousePosition && viewport.containsPixel(mousePosition)) {
         const offsetMousePosition = {
             x: mousePosition.x - viewport.x,
             y: mousePosition.y - viewport.y
@@ -53,6 +77,8 @@ export default class VivViewerLayer extends CompositeLayer {
           (bounds, i) => viewport.unproject(bounds)[i % 2]
         );
         this.setState({ unprojectLensBounds });
+      } else {
+        this.setState({ unprojectLensBounds: [0, 0, 0, 0] });
       }
     };
     if (this.context.deck) {
@@ -158,6 +184,7 @@ export default class VivViewerLayer extends CompositeLayer {
         z: numLevels - 1,
         pickable: true,
         onHover,
+        viewportId,
         boxSize: getNearestPowerOf2(lowResWidth, lowResHeight)
       });
     const layers = [baseLayer, tiledLayer];

@@ -140,6 +140,8 @@ function App() {
               height: viewSize.height,
               width: viewSize.width * 0.5
             }}
+            lensSelection={lensSelection}
+            isLensOn={isLensOn}
             colormap={colormap.length > 0 && colormap}
             zoomLock={zoomLock}
             panLock={panLock}

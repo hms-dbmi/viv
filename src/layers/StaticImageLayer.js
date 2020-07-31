@@ -1,5 +1,6 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
+import { OrthographicView } from '@deck.gl/core';
 
 import XRLayer from './XRLayer';
 import { padTileWithZeros } from '../loaders/utils';
@@ -17,6 +18,7 @@ const defaultProps = {
   translate: { type: 'array', value: [0, 0], compare: true },
   scale: { type: 'number', value: 1, compare: true },
   boxSize: { type: 'number', value: 0, compare: true },
+  viewportId: { type: 'string', value: '', compare: true },
   loader: {
     type: 'object',
     value: {
@@ -25,7 +27,10 @@ const defaultProps = {
     },
     compare: true
   },
-  z: { type: 'number', value: 0, compare: true }
+  z: { type: 'number', value: 0, compare: true },
+  isLensOn: { type: 'boolean', value: false, compare: true },
+  lensSelection: { type: 'number', value: 0, compare: true },
+  unprojectLensBounds: { type: 'array', value: [0, 0, 0, 0], compare: true }
 };
 
 function scaleBounds({ width, height, translate, scale }) {
@@ -74,7 +79,7 @@ export default class StaticImageLayer extends CompositeLayer {
       height: 0,
       data: []
     };
-    const { loader, z, loaderSelection, boxSize } = this.props;
+    const { loader, z, loaderSelection, boxSize, viewportId } = this.props;
     loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) => {
       this.setState(
         padEven(
@@ -86,7 +91,12 @@ export default class StaticImageLayer extends CompositeLayer {
       );
     });
     const onPointer = () => {
-      const { mousePosition, viewport } = this.context;
+      const { mousePosition } = this.context;
+      const viewState = this.context.deck.viewManager.viewState[viewportId];
+      const viewport = new OrthographicView(viewState).makeViewport({
+        ...viewState,
+        viewState
+      });
       if (mousePosition) {
         const offsetMousePosition = {
             x: mousePosition.x - viewport.x,

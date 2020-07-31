@@ -24,7 +24,9 @@ const SideBySideViewer = props => {
     colormap,
     panLock,
     loaderSelection,
-    zoomLock
+    zoomLock,
+    isLensOn,
+    lensSelection
   } = props;
   const detailViewLeft = new SideBySideView({
     initialViewState: { ...initialViewState, id: 'left' },
@@ -45,7 +47,9 @@ const SideBySideViewer = props => {
     colorValues,
     channelIsOn,
     loaderSelection,
-    colormap
+    colormap,
+    isLensOn,
+    lensSelection
   };
   const views = [detailViewRight, detailViewLeft];
   const layerProps = [layerConfig, layerConfig];
