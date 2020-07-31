@@ -28,6 +28,40 @@ const defaultProps = {
  */
 
 export default class VivViewerLayer extends CompositeLayer {
+  initializeState() {
+    this.state = {
+      unprojectMouseBounds: []
+    };
+    const onPointer = () => {
+      const { mousePosition, viewport } = this.context;
+      if (mousePosition) {
+        const offsetMousePosition = {
+            x: mousePosition.x - viewport.x,
+            y: mousePosition.y - viewport.y
+          },
+          mousePositionBounds = [
+            // left
+            [offsetMousePosition.x - 100, offsetMousePosition.y],
+            // top
+            [offsetMousePosition.x, offsetMousePosition.y - 100],
+            // right
+            [offsetMousePosition.x + 100, offsetMousePosition.y],
+            // bottom
+            [offsetMousePosition.x + 100, offsetMousePosition.y + 100]
+          ];
+        const unprojectMouseBounds = mousePositionBounds.map(
+          (bounds, i) => viewport.unproject(bounds)[i % 2]
+        );
+        this.setState({ unprojectMouseBounds });
+      }
+    };
+    if (this.context.deck) {
+      this.context.deck.eventManager.on({
+        pointermove: () => onPointer(),
+        pointerleave: () => onPointer()
+      });
+    }
+  }
   renderLayers() {
     const {
       loader,
@@ -45,6 +79,7 @@ export default class VivViewerLayer extends CompositeLayer {
       id
     } = this.props;
     const { tileSize, numLevels, dtype } = loader;
+    const { unprojectMouseBounds } = this.state;
     const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z }) => {
       const tile = await loader.getTile({
@@ -96,7 +131,8 @@ export default class VivViewerLayer extends CompositeLayer {
       colormap,
       viewportId,
       onHover,
-      pickable
+      pickable,
+      unprojectMouseBounds
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity

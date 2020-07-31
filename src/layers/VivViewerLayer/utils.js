@@ -19,7 +19,8 @@ export function renderSubLayers(props) {
     dtype,
     id,
     onHover,
-    pickable
+    pickable,
+    unprojectMouseBounds
   } = props;
   // Only render in positive coorinate system
   if ([left, top, right, bottom].some(v => v < 0)) {
@@ -41,7 +42,8 @@ export function renderSubLayers(props) {
     visible,
     dtype,
     colormap,
-    onHover
+    onHover,
+    unprojectMouseBounds
   });
   return xrl;
 }
