@@ -189,7 +189,7 @@ function App() {
             handleToggle={setIsLensOn}
             handleSelection={setLensSelection}
             isOn={isLensOn}
-            channelOptions={dimensions[0].values}
+            channelOptions={names}
             lensSelection={lensSelection}
           />
           <Divider />

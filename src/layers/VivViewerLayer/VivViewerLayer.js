@@ -183,7 +183,6 @@ export default class VivViewerLayer extends CompositeLayer {
         z: numLevels - 1,
         pickable: true,
         onHover,
-        viewportId,
         boxSize: getNearestPowerOf2(lowResWidth, lowResHeight)
       });
     const layers = [baseLayer, tiledLayer];

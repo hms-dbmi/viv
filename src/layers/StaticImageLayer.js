@@ -178,6 +178,8 @@ export default class StaticImageLayer extends CompositeLayer {
       z,
       domain,
       pickable,
+      isLensOn,
+      lensSelection,
       id
     } = this.props;
     const { dtype } = loader;
@@ -203,7 +205,9 @@ export default class StaticImageLayer extends CompositeLayer {
       visible,
       dtype,
       colormap,
-      unprojectLensBounds
+      unprojectLensBounds,
+      isLensOn,
+      lensSelection
     });
   }
 }
