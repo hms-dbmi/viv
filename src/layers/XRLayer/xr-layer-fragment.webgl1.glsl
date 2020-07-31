@@ -19,13 +19,17 @@ uniform float intensityArray[6];
 // opacity
 uniform float opacity;
 
-// mouse bounds
-uniform vec4 mouseBounds;
+// lens bounds
+uniform vec4 lensBounds;
+
+// lens uniforms
+uniform bool isLensOn;
+uniform int lensSelection;
 
 varying vec2 vTexCoord;
 
-bool tileInView() {
-  return (vTexCoord[0] < mouseBounds[2] && vTexCoord[0] > mouseBounds[0] && vTexCoord[1] < mouseBounds[1] && vTexCoord[1] > mouseBounds[3]);
+bool fragInLensBounds() {
+  return (vTexCoord[0] < lensBounds[2] && vTexCoord[0] > lensBounds[0] && vTexCoord[1] < lensBounds[1] && vTexCoord[1] > lensBounds[3]);
 }
 vec3 hsv2rgb(vec3 c)
 {
@@ -67,33 +71,82 @@ void main() {
   float intensityValue3 = (float(texture(channel3, vTexCoord).r) - sliderValues[3][0]) / max(1.0, (sliderValues[3][1] - sliderValues[3][0]));
   float intensityValue4 = (float(texture(channel4, vTexCoord).r) - sliderValues[4][0]) / max(1.0, (sliderValues[4][1] - sliderValues[4][0]));
   float intensityValue5 = (float(texture(channel5, vTexCoord).r) - sliderValues[5][0]) / max(1.0, (sliderValues[5][1] - sliderValues[5][0]));
-  if(!tileInView()) {
-    discard;
-  }
+  
+  // Find out if the frag is in bounds of the lens.
+  bool isFragInLensBounds = fragInLensBounds();
+
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
 
-  hsvCombo = rgb2hsv(vec3(colorValues[0]));
+  if(isLensOn && isFragInLensBounds){
+    if(0 == lensSelection) {
+      hsvCombo = rgb2hsv(vec3(colorValues[0]));
+    } else {
+      hsvCombo = rgb2hsv(vec3(255, 255, 255));
+    }
+  } else {
+    hsvCombo = rgb2hsv(vec3(colorValues[0]));
+  }
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue0));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = rgb2hsv(vec3(colorValues[1]));
+  if(isLensOn && isFragInLensBounds){
+    if(1 == lensSelection) {
+      hsvCombo = rgb2hsv(vec3(colorValues[1]));
+    } else {
+      hsvCombo = rgb2hsv(vec3(255, 255, 255));
+    }
+  } else {
+    hsvCombo = rgb2hsv(vec3(colorValues[1]));
+  }
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue1));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = rgb2hsv(vec3(colorValues[2]));
+  if(isLensOn && isFragInLensBounds){
+    if(2 == lensSelection) {
+      hsvCombo = rgb2hsv(vec3(colorValues[2]));
+    } else {
+      hsvCombo = rgb2hsv(vec3(255, 255, 255));
+    }
+  } else {
+    hsvCombo = rgb2hsv(vec3(colorValues[2]));
+  }
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue2));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = rgb2hsv(vec3(colorValues[3]));
+  if(isLensOn && isFragInLensBounds){
+    if(3 == lensSelection) {
+      hsvCombo = rgb2hsv(vec3(colorValues[3]));
+    } else {
+      hsvCombo = rgb2hsv(vec3(255, 255, 255));
+    }
+  } else {
+    hsvCombo = rgb2hsv(vec3(colorValues[3]));
+  }
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue3));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = rgb2hsv(vec3(colorValues[4]));
+  if(isLensOn && isFragInLensBounds){
+    if(4 == lensSelection) {
+      hsvCombo = rgb2hsv(vec3(colorValues[4]));
+    } else {
+      hsvCombo = rgb2hsv(vec3(255, 255, 255));
+    }
+  } else {
+    hsvCombo = rgb2hsv(vec3(colorValues[4]));
+  }
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue4));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = rgb2hsv(vec3(colorValues[5]));
+  if(isLensOn && isFragInLensBounds){
+    if(5 == lensSelection) {
+      hsvCombo = rgb2hsv(vec3(colorValues[5]));
+    } else {
+      hsvCombo = rgb2hsv(vec3(255, 255, 255));
+    }
+  } else {
+    hsvCombo = rgb2hsv(vec3(colorValues[5]));
+  }
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue5));
   rgbCombo += hsv2rgb(hsvCombo);
 

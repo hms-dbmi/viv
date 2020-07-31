@@ -30,7 +30,7 @@ const defaultProps = {
 export default class VivViewerLayer extends CompositeLayer {
   initializeState() {
     this.state = {
-      unprojectMouseBounds: []
+      unprojectLensBounds: []
     };
     const onPointer = () => {
       const { mousePosition, viewport } = this.context;
@@ -49,10 +49,10 @@ export default class VivViewerLayer extends CompositeLayer {
             // top
             [offsetMousePosition.x, offsetMousePosition.y - 100]
           ];
-        const unprojectMouseBounds = mousePositionBounds.map(
+        const unprojectLensBounds = mousePositionBounds.map(
           (bounds, i) => viewport.unproject(bounds)[i % 2]
         );
-        this.setState({ unprojectMouseBounds });
+        this.setState({ unprojectLensBounds });
       }
     };
     if (this.context.deck) {
@@ -76,10 +76,12 @@ export default class VivViewerLayer extends CompositeLayer {
       onTileError,
       onHover,
       pickable,
-      id
+      id,
+      isLensOn,
+      lensSelection
     } = this.props;
     const { tileSize, numLevels, dtype } = loader;
-    const { unprojectMouseBounds } = this.state;
+    const { unprojectLensBounds } = this.state;
     const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z }) => {
       const tile = await loader.getTile({
@@ -132,7 +134,9 @@ export default class VivViewerLayer extends CompositeLayer {
       viewportId,
       onHover,
       pickable,
-      unprojectMouseBounds
+      unprojectLensBounds,
+      isLensOn,
+      lensSelection
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity

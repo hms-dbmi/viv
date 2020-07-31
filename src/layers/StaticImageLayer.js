@@ -69,7 +69,7 @@ function padEven(data, width, height, boxSize) {
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
     this.state = {
-      unprojectMouseBounds: [],
+      unprojectLensBounds: [],
       width: 0,
       height: 0,
       data: []
@@ -102,10 +102,10 @@ export default class StaticImageLayer extends CompositeLayer {
             // top
             [offsetMousePosition.x, offsetMousePosition.y - 100]
           ];
-        const unprojectMouseBounds = mousePositionBounds.map(
+        const unprojectLensBounds = mousePositionBounds.map(
           (bounds, i) => viewport.unproject(bounds)[i % 2]
         );
-        this.setState({ unprojectMouseBounds });
+        this.setState({ unprojectLensBounds });
       }
     };
     if (this.context.deck) {
@@ -166,7 +166,7 @@ export default class StaticImageLayer extends CompositeLayer {
       id
     } = this.props;
     const { dtype } = loader;
-    const { data, width, height, unprojectMouseBounds } = this.state;
+    const { data, width, height, unprojectLensBounds } = this.state;
     if (!(width && height)) return null;
     const bounds = scaleBounds({
       width,
@@ -188,7 +188,7 @@ export default class StaticImageLayer extends CompositeLayer {
       visible,
       dtype,
       colormap,
-      unprojectMouseBounds
+      unprojectLensBounds
     });
   }
 }

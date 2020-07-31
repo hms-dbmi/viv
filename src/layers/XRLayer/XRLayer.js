@@ -23,7 +23,10 @@ const defaultProps = {
   channelIsOn: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: '<u2', compare: true },
-  colormap: { type: 'string', value: '', compare: true }
+  colormap: { type: 'string', value: '', compare: true },
+  isLensOn: { type: 'boolean', value: false, compare: true },
+  lensSelection: { type: 'number', value: 0, compare: true },
+  unprojectLensBounds: { type: 'array', value: [0, 0, 0, 0], compare: true }
 };
 
 /**
@@ -184,8 +187,10 @@ export default class XRLayer extends Layer {
         domain,
         dtype,
         channelIsOn,
-        unprojectMouseBounds,
-        bounds
+        unprojectLensBounds,
+        bounds,
+        isLensOn,
+        lensSelection
       } = this.props;
       // Check number of textures not null.
       const numTextures = Object.values(textures).filter(t => t).length;
@@ -205,7 +210,7 @@ export default class XRLayer extends Layer {
         bottomMouseBound,
         rightMouseBound,
         topMouseBound
-      ] = unprojectMouseBounds;
+      ] = unprojectLensBounds;
       const [left, bottom, right, top] = bounds;
       const leftMouseBoundScaled = (leftMouseBound - left) / (right - left);
       const bottomMouseBoundScaled = (bottomMouseBound - top) / (bottom - top);
@@ -217,12 +222,14 @@ export default class XRLayer extends Layer {
           colorValues: paddedColorValues,
           sliderValues: paddedSliderValues,
           opacity,
-          mouseBounds: [
+          lensBounds: [
             leftMouseBoundScaled,
             bottomMouseBoundScaled,
             rightMouseBoundScaled,
             topMouseBoundScaled
           ],
+          isLensOn,
+          lensSelection,
           ...textures
         })
         .draw();

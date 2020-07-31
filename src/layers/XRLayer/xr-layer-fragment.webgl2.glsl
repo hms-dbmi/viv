@@ -21,15 +21,19 @@ uniform vec3 colorValues[6];
 // opacity
 uniform float opacity;
 
-// mouse bounds
-uniform vec4 mouseBounds;
+// lens bounds
+uniform vec4 lensBounds;
+
+// lens uniforms
+uniform bool isLensOn;
+uniform int lensSelection;
 
 in vec2 vTexCoord;
 
 out vec4 color;
 
-bool tileInView() {
-  return (vTexCoord[0] < mouseBounds[2] && vTexCoord[0] > mouseBounds[0] && vTexCoord[1] < mouseBounds[1] && vTexCoord[1] > mouseBounds[3]);
+bool fragInLensBounds() {
+  return (vTexCoord[0] < lensBounds[2] && vTexCoord[0] > lensBounds[0] && vTexCoord[1] < lensBounds[1] && vTexCoord[1] > lensBounds[3]);
 }
 
 vec3 hsv2rgb(vec3 c)
@@ -66,22 +70,35 @@ vec3 rgb2hsv(vec3 rgb) {
  }
 
 void main() {
+  // Scale intesities.
   float intensityValue0 = (float(texture(channel0, vTexCoord).r) - sliderValues[0][0]) / max(1.0, (sliderValues[0][1] - sliderValues[0][0]));
   float intensityValue1 = (float(texture(channel1, vTexCoord).r) - sliderValues[1][0]) / max(1.0, (sliderValues[1][1] - sliderValues[1][0]));
   float intensityValue2 = (float(texture(channel2, vTexCoord).r) - sliderValues[2][0]) / max(1.0, (sliderValues[2][1] - sliderValues[2][0]));
   float intensityValue3 = (float(texture(channel3, vTexCoord).r) - sliderValues[3][0]) / max(1.0, (sliderValues[3][1] - sliderValues[3][0]));
   float intensityValue4 = (float(texture(channel4, vTexCoord).r) - sliderValues[4][0]) / max(1.0, (sliderValues[4][1] - sliderValues[4][0]));
   float intensityValue5 = (float(texture(channel5, vTexCoord).r) - sliderValues[5][0]) / max(1.0, (sliderValues[5][1] - sliderValues[5][0]));
-  if(!tileInView()) {
-    discard;
-  }
 
+  // Find out if the frag is in bounds of the lens.
+  bool isFragInLensBounds = fragInLensBounds();
+
+  // Declare variables.
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
   float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
 
   for(int i = 0; i < 6; i++) {
-    hsvCombo = rgb2hsv(vec3(colorValues[i]));
+    // If we are using the lens and this frag is in bounds, focus on only the selection.
+    // Otherwise, use the props color value.
+    if(isLensOn && isFragInLensBounds){
+      if(i == lensSelection) {
+        hsvCombo = rgb2hsv(vec3(colorValues[i]));
+      } else {
+        hsvCombo = rgb2hsv(vec3(255, 255, 255));
+      }
+    } else {
+      hsvCombo = rgb2hsv(vec3(colorValues[i]));
+    }
+    // Sum up the intesitiies in additive blending.
     hsvCombo = vec3(hsvCombo.xy, max(0.0, intensityArray[i]));
     rgbCombo += hsv2rgb(hsvCombo);
   }

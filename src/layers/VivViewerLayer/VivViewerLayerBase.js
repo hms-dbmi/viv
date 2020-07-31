@@ -17,7 +17,9 @@ const defaultProps = {
   dtype: { type: 'string', value: '<u2', compare: true },
   domain: { type: 'array', value: [], compare: true },
   viewportId: { type: 'string', value: '', compare: true },
-  unprojectMousePosition: { type: 'array', value: [], compare: true }
+  unprojectMousePosition: { type: 'array', value: [0, 0, 0, 0], compare: true },
+  isLensOn: { type: 'boolean', value: false, compare: true },
+  lensSelection: { type: 'number', value: 0, compare: true }
 };
 
 /**

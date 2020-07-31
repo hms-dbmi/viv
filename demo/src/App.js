@@ -5,6 +5,7 @@ import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import AddIcon from '@material-ui/icons/Add';
+import Divider from '@material-ui/core/Divider';
 
 import { SideBySideViewer, PictureInPictureViewer } from '../../src';
 import sources from './source-info';
@@ -15,6 +16,7 @@ import Menu from './components/Menu';
 import MenuToggle from './components/MenuToggle';
 import ColormapSelect from './components/ColormapSelect';
 import SourceSelect from './components/SourceSelect';
+import LensSelect from './components/LensSelect';
 
 import {
   MAX_CHANNELS,
@@ -38,12 +40,14 @@ function App() {
   const [loader, setLoader] = useState(null);
   const [sourceName, setSourceName] = useState('tiff');
   const [colormap, setColormap] = useState('');
+  const [lensSelection, setLensSelection] = useState(0);
 
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
   const [overviewOn, setOverviewOn] = useReducer(v => !v, false);
   const [controllerOn, toggleController] = useReducer(v => !v, true);
   const [zoomLock, toggleZoomLock] = useReducer(v => !v, true);
   const [panLock, togglePanLock] = useReducer(v => !v, true);
+  const [isLensOn, setIsLensOn] = useReducer(v => !v, false);
 
   const [isLoading, setIsLoading] = useState(true);
   const [pixelValues, setPixelValues] = useState(
@@ -153,6 +157,8 @@ function App() {
               height: viewSize.height,
               width: viewSize.width
             }}
+            lensSelection={lensSelection}
+            isLensOn={isLensOn}
             colormap={colormap.length > 0 && colormap}
             overview={DEFAULT_OVERVIEW}
             overviewOn={overviewOn && isPyramid}
@@ -177,6 +183,14 @@ function App() {
               />
             </Grid>
           </Grid>
+          <LensSelect
+            handleToggle={setIsLensOn}
+            handleSelection={setLensSelection}
+            isOn={isLensOn}
+            channelOptions={dimensions[0].values}
+            lensSelection={lensSelection}
+          />
+          <Divider />
           {!isLoading ? (
             <Grid container>{channelControllers}</Grid>
           ) : (
