@@ -74,7 +74,7 @@ function padEven(data, width, height, boxSize) {
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {
     this.state = {
-      unprojectLensBounds: [],
+      unprojectLensBounds: [0, 0, 0, 0],
       width: 0,
       height: 0,
       data: []
