@@ -2,15 +2,7 @@ import React from 'react';
 
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
-import Slider from '@material-ui/core/Slider';
 import Select from '@material-ui/core/Select';
-import Typography from '@material-ui/core/Typography';
-import CircularProgress from '@material-ui/core/CircularProgress';
-
-import { makeStyles } from '@material-ui/core/styles';
-
-import ChannelOptions from './ChannelOptions';
-import { FILL_PIXEL_VALUE } from '../constants';
 
 function LensSelect({
   isOn,

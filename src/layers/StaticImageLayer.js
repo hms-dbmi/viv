@@ -1,6 +1,5 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
-import { OrthographicView } from '@deck.gl/core';
 
 import XRLayer from './XRLayer';
 import { padTileWithZeros } from '../loaders/utils';
@@ -93,29 +92,29 @@ export default class StaticImageLayer extends CompositeLayer {
     const onPointer = () => {
       // Duplicated from VivViewerLayer.
       const { mousePosition } = this.context;
-      const view = this.context.deck.viewManager.views.filter(
+      const layerView = this.context.deck.viewManager.views.filter(
         view => view.id === viewportId
       )[0];
       const viewState = this.context.deck.viewManager.viewState[viewportId];
-      const viewport = view.makeViewport({
+      const viewport = layerView.makeViewport({
         ...viewState,
         viewState
       });
       if (mousePosition && viewport.containsPixel(mousePosition)) {
         const offsetMousePosition = {
-            x: mousePosition.x - viewport.x,
-            y: mousePosition.y - viewport.y
-          },
-          mousePositionBounds = [
-            // left
-            [offsetMousePosition.x - 100, offsetMousePosition.y],
-            // bottom
-            [offsetMousePosition.x, offsetMousePosition.y + 100],
-            // right
-            [offsetMousePosition.x + 100, offsetMousePosition.y],
-            // top
-            [offsetMousePosition.x, offsetMousePosition.y - 100]
-          ];
+          x: mousePosition.x - viewport.x,
+          y: mousePosition.y - viewport.y
+        };
+        const mousePositionBounds = [
+          // left
+          [offsetMousePosition.x - 100, offsetMousePosition.y],
+          // bottom
+          [offsetMousePosition.x, offsetMousePosition.y + 100],
+          // right
+          [offsetMousePosition.x + 100, offsetMousePosition.y],
+          // top
+          [offsetMousePosition.x, offsetMousePosition.y - 100]
+        ];
         const unprojectLensBounds = mousePositionBounds.map(
           (bounds, i) => viewport.unproject(bounds)[i % 2]
         );
