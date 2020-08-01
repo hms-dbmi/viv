@@ -38,10 +38,10 @@ bool fragInLensBounds() {
   // to get a circle visually we have to treat the check as that of an ellipse to get the effect of a circle.
 
   // Width radius.
-  float majorAxis = abs(lensBounds[2] - lensBounds[0]);
+  float majorAxis = abs(lensBounds[2] - lensBounds[0]) / 2.0;
 
   // Height radius.
-  float minorAxis = abs(lensBounds[1] - lensBounds[3]);
+  float minorAxis = abs(lensBounds[1] - lensBounds[3]) / 2.0;
 
   // Ellipse center
   vec2 lensCenter = vec2(lensBounds[0] + ((lensBounds[2] - lensBounds[0]) / 2.0),lensBounds[1] + ((lensBounds[3] - lensBounds[1]) / 2.0));
