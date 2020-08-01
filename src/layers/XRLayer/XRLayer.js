@@ -203,7 +203,9 @@ export default class XRLayer extends Layer {
         domain,
         dtype
       });
-      // create a 0-1 scaled intersection box for rendering lens
+      // Creating a unit-square scaled intersection box for rendering the lens.
+      // It is ok if these coordinates are outside the unit square since
+      // we check membership in or out of the lens on the fragment shader.
       const [
         leftMouseBound,
         bottomMouseBound,

@@ -103,6 +103,8 @@ export default class StaticImageLayer extends CompositeLayer {
         ...viewState,
         viewState
       });
+      // If the mouse is in the viewport and the mousePosition exists, set
+      // the state with the bounding box of the circle that will render as a lens.
       if (mousePosition && viewport.containsPixel(mousePosition)) {
         const offsetMousePosition = {
           x: mousePosition.x - viewport.x,
@@ -118,6 +120,7 @@ export default class StaticImageLayer extends CompositeLayer {
           // top
           [offsetMousePosition.x, offsetMousePosition.y - 100]
         ];
+        // Unproject from screen to world coordinates.
         const unprojectLensBounds = mousePositionBounds.map(
           (bounds, i) => viewport.unproject(bounds)[i % 2]
         );
