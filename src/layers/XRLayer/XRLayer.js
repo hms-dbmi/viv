@@ -204,7 +204,6 @@ export default class XRLayer extends Layer {
         dtype
       });
       // create a 0-1 scaled intersection box for rendering lens
-
       const [
         leftMouseBound,
         bottomMouseBound,

@@ -28,7 +28,8 @@ const defaultProps = {
   },
   z: { type: 'number', value: 0, compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
-  lensSelection: { type: 'number', value: 0, compare: true }
+  lensSelection: { type: 'number', value: 0, compare: true },
+  lensRadius: { type: 'number', value: 100, compare: true }
 };
 
 function scaleBounds({ width, height, translate, scale }) {
@@ -70,6 +71,7 @@ function padEven(data, width, height, boxSize) {
  * @param {String} props.boxSize If you want to pad an incoming tile to be a certain squared pixel size, pass the number here (only used by OverviewLayer/VivViewerLayer for now).
  * @param {boolean} props.isLensOn Whether or not to use the lens.
  * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
+ * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
  */
 export default class StaticImageLayer extends CompositeLayer {
   initializeState() {

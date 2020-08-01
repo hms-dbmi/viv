@@ -33,7 +33,21 @@ in vec2 vTexCoord;
 out vec4 color;
 
 bool fragInLensBounds() {
-  return (vTexCoord[0] < lensBounds[2] && vTexCoord[0] > lensBounds[0] && vTexCoord[1] < lensBounds[1] && vTexCoord[1] > lensBounds[3]);
+  // Check membership in what is (not visually, but effectively) an ellipse.
+  // Since the fragment space is a unit square and the real coordinates could be longer than tall,
+  // to get a circle visually we have to treat the check as that of an ellipse to get the effect of a circle.
+
+  // Width radius.
+  float majorAxis = abs(lensBounds[2] - lensBounds[0]);
+
+  // Height radius.
+  float minorAxis = abs(lensBounds[1] - lensBounds[3]);
+
+  // Ellipse center
+  vec2 lensCenter = vec2(lensBounds[0] + ((lensBounds[2] - lensBounds[0]) / 2.0),lensBounds[1] + ((lensBounds[3] - lensBounds[1]) / 2.0));
+  
+  // Check membership in ellipse.
+  return pow((lensCenter.x - vTexCoord.x) / majorAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorAxis, 2.0) < 1.0;
 }
 
 vec3 hsv2rgb(vec3 c)

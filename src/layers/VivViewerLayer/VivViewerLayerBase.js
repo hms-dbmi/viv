@@ -19,7 +19,8 @@ const defaultProps = {
   viewportId: { type: 'string', value: '', compare: true },
   unprojectMousePosition: { type: 'array', value: [0, 0, 0, 0], compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
-  lensSelection: { type: 'number', value: 0, compare: true }
+  lensSelection: { type: 'number', value: 0, compare: true },
+  lensRadius: { type: 'number', value: 100, compare: true }
 };
 
 /**

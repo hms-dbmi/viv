@@ -17,6 +17,7 @@ import { DetailView, OverviewView } from '../views';
  * @param {Object} props.hoverHooks Object including the allowable hooks - right now only accepting a function with key handleValue like { handleValue: (valueArray) => {} }
  * @param {boolean} props.isLensOn Whether or not to use the lens.
  * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
+ * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
  */
 
 const PictureInPictureViewer = props => {
@@ -31,8 +32,9 @@ const PictureInPictureViewer = props => {
     overviewOn,
     loaderSelection,
     hoverHooks,
-    isLensOn,
-    lensSelection
+    isLensOn = false,
+    lensSelection,
+    lensRadius = 100
   } = props;
   const detailViewState = { ...initialViewState, id: 'detail' };
   const detailView = new DetailView({ initialViewState: detailViewState });
@@ -44,7 +46,8 @@ const PictureInPictureViewer = props => {
     loaderSelection,
     colormap,
     isLensOn,
-    lensSelection
+    lensSelection,
+    lensRadius
   };
   const views = [detailView];
   const layerProps = [layerConfig];

@@ -16,7 +16,8 @@ const defaultProps = {
   domain: { type: 'array', value: [], compare: true },
   viewportId: { type: 'string', value: '', compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
-  lensSelection: { type: 'number', value: 0, compare: true }
+  lensSelection: { type: 'number', value: 0, compare: true },
+  lensRadius: { type: 'number', value: 100, compare: true }
 };
 
 /**
@@ -36,6 +37,7 @@ const defaultProps = {
  * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
  * @param {boolean} props.isLensOn Whether or not to use the lens.
  * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
+ * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
  */
 
 export default class VivViewerLayer extends CompositeLayer {
@@ -43,7 +45,7 @@ export default class VivViewerLayer extends CompositeLayer {
     this.state = {
       unprojectLensBounds: [0, 0, 0, 0]
     };
-    const { viewportId } = this.props;
+    const { viewportId, lensRadius } = this.props;
     const onPointer = () => {
       const { mousePosition } = this.context;
       const layerView = this.context.deck.viewManager.views.filter(
@@ -61,13 +63,13 @@ export default class VivViewerLayer extends CompositeLayer {
         };
         const mousePositionBounds = [
           // left
-          [offsetMousePosition.x - 100, offsetMousePosition.y],
+          [offsetMousePosition.x - lensRadius, offsetMousePosition.y],
           // bottom
-          [offsetMousePosition.x, offsetMousePosition.y + 100],
+          [offsetMousePosition.x, offsetMousePosition.y + lensRadius],
           // right
-          [offsetMousePosition.x + 100, offsetMousePosition.y],
+          [offsetMousePosition.x + lensRadius, offsetMousePosition.y],
           // top
-          [offsetMousePosition.x, offsetMousePosition.y - 100]
+          [offsetMousePosition.x, offsetMousePosition.y - lensRadius]
         ];
         const unprojectLensBounds = mousePositionBounds.map(
           (bounds, i) => viewport.unproject(bounds)[i % 2]
