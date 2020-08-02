@@ -3,7 +3,7 @@ import { isWebGL2 } from '@luma.gl/core';
 
 import XRLayer from './XRLayer';
 import { padTileWithZeros } from '../loaders/utils';
-import { to32BitFloat } from './utils';
+import { to32BitFloat, onPointer } from './utils';
 
 const defaultProps = {
   pickable: true,
@@ -81,7 +81,7 @@ export default class StaticImageLayer extends CompositeLayer {
       height: 0,
       data: []
     };
-    const { loader, z, loaderSelection, boxSize, viewportId } = this.props;
+    const { loader, z, loaderSelection, boxSize } = this.props;
     loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) => {
       this.setState(
         padEven(
@@ -92,47 +92,10 @@ export default class StaticImageLayer extends CompositeLayer {
         )
       );
     });
-    const onPointer = () => {
-      // Duplicated from VivViewerLayer.
-      const { mousePosition } = this.context;
-      const layerView = this.context.deck.viewManager.views.filter(
-        view => view.id === viewportId
-      )[0];
-      const viewState = this.context.deck.viewManager.viewState[viewportId];
-      const viewport = layerView.makeViewport({
-        ...viewState,
-        viewState
-      });
-      // If the mouse is in the viewport and the mousePosition exists, set
-      // the state with the bounding box of the circle that will render as a lens.
-      if (mousePosition && viewport.containsPixel(mousePosition)) {
-        const offsetMousePosition = {
-          x: mousePosition.x - viewport.x,
-          y: mousePosition.y - viewport.y
-        };
-        const mousePositionBounds = [
-          // left
-          [offsetMousePosition.x - 100, offsetMousePosition.y],
-          // bottom
-          [offsetMousePosition.x, offsetMousePosition.y + 100],
-          // right
-          [offsetMousePosition.x + 100, offsetMousePosition.y],
-          // top
-          [offsetMousePosition.x, offsetMousePosition.y - 100]
-        ];
-        // Unproject from screen to world coordinates.
-        const unprojectLensBounds = mousePositionBounds.map(
-          (bounds, i) => viewport.unproject(bounds)[i % 2]
-        );
-        this.setState({ unprojectLensBounds });
-      } else {
-        this.setState({ unprojectLensBounds: [0, 0, 0, 0] });
-      }
-    };
     if (this.context.deck) {
       this.context.deck.eventManager.on({
-        pointermove: () => onPointer(),
-        pointerleave: () => onPointer()
+        pointermove: () => onPointer(this),
+        pointerleave: () => onPointer(this)
       });
     }
   }

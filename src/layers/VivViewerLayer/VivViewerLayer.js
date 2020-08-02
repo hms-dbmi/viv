@@ -3,7 +3,7 @@ import { isWebGL2 } from '@luma.gl/core';
 
 import VivViewerLayerBase from './VivViewerLayerBase';
 import StaticImageLayer from '../StaticImageLayer';
-import { to32BitFloat, getNearestPowerOf2 } from '../utils';
+import { to32BitFloat, getNearestPowerOf2, onPointer } from '../utils';
 
 const defaultProps = {
   pickable: true,
@@ -45,47 +45,10 @@ export default class VivViewerLayer extends CompositeLayer {
     this.state = {
       unprojectLensBounds: [0, 0, 0, 0]
     };
-    const { viewportId, lensRadius } = this.props;
-    const onPointer = () => {
-      const { mousePosition } = this.context;
-      const layerView = this.context.deck.viewManager.views.filter(
-        view => view.id === viewportId
-      )[0];
-      const viewState = this.context.deck.viewManager.viewState[viewportId];
-      const viewport = layerView.makeViewport({
-        ...viewState,
-        viewState
-      });
-      // If the mouse is in the viewport and the mousePosition exists, set
-      // the state with the bounding box of the circle that will render as a lens.
-      if (mousePosition && viewport.containsPixel(mousePosition)) {
-        const offsetMousePosition = {
-          x: mousePosition.x - viewport.x,
-          y: mousePosition.y - viewport.y
-        };
-        const mousePositionBounds = [
-          // left
-          [offsetMousePosition.x - lensRadius, offsetMousePosition.y],
-          // bottom
-          [offsetMousePosition.x, offsetMousePosition.y + lensRadius],
-          // right
-          [offsetMousePosition.x + lensRadius, offsetMousePosition.y],
-          // top
-          [offsetMousePosition.x, offsetMousePosition.y - lensRadius]
-        ];
-        // Unproject from screen to world coordinates.
-        const unprojectLensBounds = mousePositionBounds.map(
-          (bounds, i) => viewport.unproject(bounds)[i % 2]
-        );
-        this.setState({ unprojectLensBounds });
-      } else {
-        this.setState({ unprojectLensBounds: [0, 0, 0, 0] });
-      }
-    };
     if (this.context.deck) {
       this.context.deck.eventManager.on({
-        pointermove: () => onPointer(),
-        pointerleave: () => onPointer()
+        pointermove: () => onPointer(this),
+        pointerleave: () => onPointer(this)
       });
     }
   }
