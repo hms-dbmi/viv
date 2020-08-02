@@ -95,7 +95,8 @@ export default class StaticImageLayer extends CompositeLayer {
     if (this.context.deck) {
       this.context.deck.eventManager.on({
         pointermove: () => onPointer(this),
-        pointerleave: () => onPointer(this)
+        pointerleave: () => onPointer(this),
+        wheel: () => onPointer(this)
       });
     }
   }
