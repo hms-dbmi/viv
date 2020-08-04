@@ -6,6 +6,12 @@
 
 ### Changed
 
+## 0.3.3
+
+### Added
+
+### Changed
+
 - Upgrade geotiff.js to Ilan's branch for large string fix.
 
 ## 0.3.2

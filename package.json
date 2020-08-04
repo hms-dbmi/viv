@@ -1,6 +1,6 @@
 {
   "name": "@hubmap/vitessce-image-viewer",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "main": "dist/bundle.umd.js",
   "module": "dist/bundle.es.js",
   "files": [
