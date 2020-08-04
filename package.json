@@ -1,6 +1,6 @@
 {
   "name": "@hubmap/vitessce-image-viewer",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "main": "dist/bundle.umd.js",
   "module": "dist/bundle.es.js",
   "files": [
@@ -107,7 +107,7 @@
     "@luma.gl/core": "^8.2.0",
     "@luma.gl/shadertools": "^8.2.0",
     "fast-xml-parser": "^3.16.0",
-    "geotiff": "^1.0.0-beta.12",
+    "geotiff": "ilan-gold/geotiff.js#ilan-gold/string_fix",
     "quickselect": "^2.0.0",
     "zarr": "^0.3.0"
   }
