@@ -5,7 +5,11 @@ import {
   OMEZarrReader
 } from '../../src';
 
-import { COLOR_PALLETE, INITIAL_SLIDER_VALUE } from './constants';
+import {
+  COLOR_PALLETE,
+  INITIAL_SLIDER_VALUE,
+  GLOBAL_SLIDER_DIMENSION_FIELDS
+} from './constants';
 
 export async function createLoader(type, infoObj) {
   switch (type) {
@@ -38,6 +42,40 @@ export async function createLoader(type, infoObj) {
     default:
       throw Error(`Pyramid type (${type}) is not supported`);
   }
+}
+
+// Return the midpoint of the global dimensions.
+function getDefaultGlobalSelection(imageDims) {
+  const globalIndices = imageDims.filter(dim =>
+    GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dim.field)
+  );
+  const selection = {};
+  globalIndices.forEach(dim => {
+    selection[dim.field] = Math.floor((dim.values.length || 0) / 2);
+  });
+  return selection;
+}
+
+// Create a default selection using the midpoint of the available global dimensions,
+// and then the first four available selections from the first selectable channel.
+export function buildDefaultSelection(imageDims) {
+  const selection = [];
+  const globalSelection = getDefaultGlobalSelection(imageDims);
+  // First non-global dimension with some sort of selectable values
+  const firstNonGlobalDimension = imageDims.filter(
+    dim => !GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dim.field) && dim.values
+  )[0];
+  for (
+    let i = 0;
+    i < Math.min(4, firstNonGlobalDimension.values.length);
+    i += 1
+  ) {
+    selection.push({
+      [firstNonGlobalDimension.field]: i,
+      ...globalSelection
+    });
+  }
+  return selection;
 }
 
 export function hexToRgb(hex) {
@@ -74,12 +112,10 @@ export function channelsReducer(state, { index, value, type }) {
   switch (type) {
     case 'CHANGE_CHANNEL': {
       // Changes name and selection for channel by index
-      const { name, selection } = value;
-      const names = [...state.names];
+      const { selection } = value;
       const selections = [...state.selections];
-      names[index] = name;
       selections[index] = selection;
-      return { ...state, names, selections };
+      return { ...state, selections };
     }
     case 'CHANGE_COLOR': {
       // Changes color for individual channel by index
@@ -101,31 +137,28 @@ export function channelsReducer(state, { index, value, type }) {
     }
     case 'ADD_CHANNEL': {
       // Adds an additional channel
-      const { name, selection } = value;
-      const names = [...state.names, name];
+      const { selection } = value;
       const selections = [...state.selections, selection];
       const colors = [...state.colors, [255, 255, 255]];
       const isOn = [...state.isOn, true];
       const sliders = [...state.sliders, INITIAL_SLIDER_VALUE];
       const ids = [...state.ids, String(Math.random())];
-      return { names, selections, colors, isOn, sliders, ids };
+      return { selections, colors, isOn, sliders, ids };
     }
     case 'REMOVE_CHANNEL': {
       // Remove a single channel by index
-      const names = state.names.filter((_, i) => i !== index);
       const sliders = state.sliders.filter((_, i) => i !== index);
       const colors = state.colors.filter((_, i) => i !== index);
       const isOn = state.isOn.filter((_, i) => i !== index);
       const ids = state.ids.filter((_, i) => i !== index);
       const selections = state.selections.filter((_, i) => i !== index);
-      return { names, sliders, colors, isOn, ids, selections };
+      return { sliders, colors, isOn, ids, selections };
     }
     case 'RESET_CHANNELS': {
       // Clears current channels and sets with new defaults
-      const { names, selections } = value;
-      const n = names.length;
+      const { selections } = value;
+      const n = selections.length;
       return {
-        names,
         selections,
         sliders: Array(n).fill(INITIAL_SLIDER_VALUE),
         colors:

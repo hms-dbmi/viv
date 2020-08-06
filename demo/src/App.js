@@ -8,7 +8,12 @@ import AddIcon from '@material-ui/icons/Add';
 
 import { SideBySideViewer, PictureInPictureViewer } from '../../src';
 import sources from './source-info';
-import { createLoader, channelsReducer, useWindowSize } from './utils';
+import {
+  createLoader,
+  channelsReducer,
+  useWindowSize,
+  buildDefaultSelection
+} from './utils';
 
 import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
@@ -27,7 +32,6 @@ const initialChannels = {
   sliders: [],
   colors: [],
   selections: [],
-  names: [],
   ids: [],
   isOn: []
 };
@@ -35,9 +39,10 @@ const initialChannels = {
 function App() {
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
   const viewSize = useWindowSize();
-  const [loader, setLoader] = useState(null);
+  const [loader, setLoader] = useState({});
   const [sourceName, setSourceName] = useState('tiff');
   const [colormap, setColormap] = useState('');
+  const [dimensions, setDimensions] = useState({});
 
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
   const [overviewOn, setOverviewOn] = useReducer(v => !v, false);
@@ -46,19 +51,19 @@ function App() {
   const [panLock, togglePanLock] = useReducer(v => !v, true);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [pixelValues, setPixelValues] = useState(
-    new Array(sources[sourceName].selections.length).fill(FILL_PIXEL_VALUE)
-  );
+  const [pixelValues, setPixelValues] = useState([]);
   useEffect(() => {
     async function changeLoader() {
       setIsLoading(true);
       const sourceInfo = sources[sourceName];
-      const { selections, dimensions } = sourceInfo;
       const nextLoader = await createLoader(sourceName, sourceInfo);
-      const names = selections.map(sel => sel[dimensions[0].field]);
-      dispatch({ type: 'RESET_CHANNELS', value: { names, selections } });
+      const { dimensions: newDimensions } = nextLoader;
+      const selections = buildDefaultSelection(newDimensions);
+      setDimensions(newDimensions);
+      dispatch({ type: 'RESET_CHANNELS', value: { selections } });
       setLoader(nextLoader);
       setIsLoading(false);
+      setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
     }
     changeLoader();
   }, [sourceName]);
@@ -72,14 +77,14 @@ function App() {
    */
   const handleControllerChange = (index, type, value) => {
     if (type === 'CHANGE_CHANNEL') {
-      const [channelDim] = sources[sourceName].dimensions;
+      const [channelDim] = dimensions;
       const { field, values } = channelDim;
       const dimIndex = values.indexOf(value);
       const selection = { [field]: value };
       dispatch({
         type,
         index,
-        value: { name: values[dimIndex], selection }
+        value: { selection }
       });
     } else {
       dispatch({ type, index, value });
@@ -87,28 +92,42 @@ function App() {
   };
 
   const handleChannelAdd = () => {
-    const { dimensions, selections } = sources[sourceName];
-    const [channelDim] = dimensions;
+    const selection = {};
+
+    dimensions.forEach(dimension => {
+      // Set new image to default selection for non-global selections (0)
+      // and use current global selection otherwise.
+      selection[dimension.field] = GLOBAL_SLIDER_DIMENSION_FIELDS.includes(
+        dimension.field
+      )
+        ? Object.values(channels)[0].selection[dimension.field]
+        : 0;
+    });
     dispatch({
       type: 'ADD_CHANNEL',
       value: {
-        name: channelDim.values[0],
-        selection: selections[0]
+        selection
       }
     });
   };
-
-  const { initialViewState, isPyramid, dimensions } = sources[sourceName];
-  const { names, colors, sliders, isOn, ids, selections } = channels;
+  const { isPyramid, numLevels } = loader;
+  const initialViewState = {
+    target: [loader.height / 2, loader.width / 2, 0],
+    zoom: numLevels > 0 ? -(numLevels - 2) : -2
+  };
+  const { colors, sliders, isOn, ids, selections } = channels;
   const channelControllers = ids.map((id, i) => {
+    const name = dimensions.filter(i => i.field === 'channel')[0].values[
+      selections[i].channel
+    ];
     return (
       <Grid
-        key={`channel-controller-${names[i]}-${id}`}
+        key={`channel-controller-${name}-${id}`}
         style={{ width: '100%' }}
         item
       >
         <ChannelController
-          name={names[i]}
+          name={name}
           channelOptions={dimensions[0].values}
           isOn={isOn[i]}
           sliderValue={sliders[i]}
