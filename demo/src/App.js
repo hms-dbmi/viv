@@ -60,7 +60,7 @@ function App() {
     async function changeLoader() {
       setIsLoading(true);
       const sourceInfo = sources[sourceName];
-      const nextLoader = await createLoader(sourceName, sourceInfo);
+      const nextLoader = await createLoader(sourceInfo.url);
       const { dimensions: newDimensions } = nextLoader;
       const selections = buildDefaultSelection(newDimensions);
       const stats = await getChannelStats({

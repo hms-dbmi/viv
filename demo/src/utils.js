@@ -11,36 +11,12 @@ import {
   GLOBAL_SLIDER_DIMENSION_FIELDS
 } from './constants';
 
-export async function createLoader(type, infoObj) {
-  switch (type) {
-    case 'zarr': {
-      const loader = await createZarrLoader(infoObj);
-      return loader;
-    }
-    case 'static': {
-      const loader = await createZarrLoader(infoObj);
-      return loader;
-    }
-    case 'ome-zarr': {
-      const reader = await OMEZarrReader.fromUrl(infoObj.url);
-      const { loader } = await reader.loadOMEZarr();
-      return loader;
-    }
-    case 'static tiff': // These all resolve to the 'tiff' case.
-    case 'bf tiff':
-    case 'tiff 2':
-    case 'covid tiff':
-    case 'rgb tiff':
-    case 'rgb tiff 2':
-    case 'tiff': {
-      const { url } = infoObj;
-      const res = await fetch(url.replace(/ome.tif(f?)/gi, 'offsets.json'));
-      const offsets = res.status !== 404 ? await res.json() : [];
-      const loader = await createOMETiffLoader({ url, offsets });
-      return loader;
-    }
-    default:
-      throw Error(`Pyramid type (${type}) is not supported`);
+export async function createLoader(url) {
+  if (url.endsWith('ome.tif') || url.endsWith('ome.tiff')) {
+    const res = await fetch(url.replace(/ome.tif(f?)/gi, 'offsets.json'));
+    const offsets = res.status !== 404 ? await res.json() : [];
+    const loader = await createOMETiffLoader({ url, offsets });
+    return loader;
   }
 }
 
