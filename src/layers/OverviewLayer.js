@@ -1,6 +1,6 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { PolygonLayer } from '@deck.gl/layers';
-import StaticImageLayer from './StaticImageLayer';
+import ImageLayer from './ImageLayer';
 
 const defaultProps = {
   pickable: true,
@@ -33,7 +33,7 @@ const defaultProps = {
 };
 
 /**
- * This layer wraps a StaticImageLayer as an overview, as well as a bounding box of the detail view and a polygon boundary for the view
+ * This layer wraps a ImageLayer as an overview, as well as a bounding box of the detail view and a polygon boundary for the view
  * @param {Object} props
  * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
  * @param {Array} props.colorValues List of [r, g, b] values for each channel.
@@ -64,7 +64,7 @@ export default class OverviewLayer extends CompositeLayer {
     const { width, height } = loader.getRasterSize({
       z: 0
     });
-    const overview = new StaticImageLayer(this.props, {
+    const overview = new ImageLayer(this.props, {
       id: `viewport-${id}`,
       scale: 2 ** (numLevels - 1) * overviewScale,
       z: numLevels - 1

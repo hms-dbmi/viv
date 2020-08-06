@@ -1,11 +1,11 @@
 import { PolygonLayer } from '@deck.gl/layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 
-import { VivViewerLayer, StaticImageLayer, ScaleBarLayer } from '../layers';
+import { MultiscaleImageLayer, ImageLayer, ScaleBarLayer } from '../layers';
 import VivView from './VivView';
 import { getVivId, makeBoundingBox } from './utils';
 /**
- * This class generates a VivViewerLayer and a view for use in the SideBySideViewer.
+ * This class generates a MultiscaleImageLayer and a view for use in the SideBySideViewer.
  * It is linked with its other views as controlled by `linkedIds`, `zoomLock`, and `panLock` parameters.
  * @param {Object} args
  * @param {Object} args.viewState ViewState object
@@ -102,11 +102,11 @@ export default class SideBySideView extends VivView {
     const layers = [];
 
     const detailLayer = loader.isPyramid
-      ? new VivViewerLayer(props, {
+      ? new MultiscaleImageLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
           viewportId: id
         })
-      : new StaticImageLayer(props, {
+      : new ImageLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
           viewportId: id
         });

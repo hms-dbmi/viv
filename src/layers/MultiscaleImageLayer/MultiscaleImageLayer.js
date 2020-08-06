@@ -1,8 +1,8 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
 
-import VivViewerLayerBase from './VivViewerLayerBase';
-import StaticImageLayer from '../StaticImageLayer';
+import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
+import ImageLayer from '../ImageLayer';
 import { to32BitFloat } from '../utils';
 
 const defaultProps = {
@@ -11,7 +11,7 @@ const defaultProps = {
 };
 
 /**
- * This layer generates a VivViewerLayer (tiled) and a StaticImageLayer (background for the tiled layer)
+ * This layer generates a MultiscaleImageLayer (tiled) and a ImageLayer (background for the tiled layer)
  * @param {Object} props
  * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
  * @param {Array} props.colorValues List of [r, g, b] values for each channel.
@@ -27,7 +27,7 @@ const defaultProps = {
  * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
  */
 
-export default class VivViewerLayer extends CompositeLayer {
+export default class MultiscaleImageLayer extends CompositeLayer {
   renderLayers() {
     const {
       loader,
@@ -70,7 +70,7 @@ export default class VivViewerLayer extends CompositeLayer {
       return tile;
     };
     const { height, width } = loader.getRasterSize({ z: 0 });
-    const tiledLayer = new VivViewerLayerBase({
+    const tiledLayer = new MultiscaleImageLayerBase({
       id: `Tiled-Image-${id}`,
       getTileData,
       dtype,
@@ -105,7 +105,7 @@ export default class VivViewerLayer extends CompositeLayer {
     const implementsGetRaster = typeof loader.getRaster === 'function';
     const baseLayer =
       implementsGetRaster &&
-      new StaticImageLayer(this.props, {
+      new ImageLayer(this.props, {
         id: `Background-Image-${id}`,
         scale: 2 ** (numLevels - 1),
         visible:
@@ -121,5 +121,5 @@ export default class VivViewerLayer extends CompositeLayer {
   }
 }
 
-VivViewerLayer.layerName = 'VivViewerLayer';
-VivViewerLayer.defaultProps = defaultProps;
+MultiscaleImageLayer.layerName = 'MultiscaleImageLayer';
+MultiscaleImageLayer.defaultProps = defaultProps;

@@ -22,7 +22,7 @@ const defaultProps = {
 /**
  * This layer serves as a proxy of sorts to the rendering done in renderSubLayers, reacting to viewport changes in a custom manner.
  */
-export default class VivViewerLayerBase extends TileLayer {
+export default class MultiscaleImageLayerBase extends TileLayer {
   /**
    * This function allows us to controls which viewport gets to update the Tileset2D.
    * This is a uniquely TileLayer issue since it updates based on viewport updates thanks
@@ -45,5 +45,5 @@ export default class VivViewerLayerBase extends TileLayer {
   }
 }
 
-VivViewerLayerBase.layerName = 'VivViewerLayerBase';
-VivViewerLayerBase.defaultProps = defaultProps;
+MultiscaleImageLayerBase.layerName = 'MultiscaleImageLayerBase';
+MultiscaleImageLayerBase.defaultProps = defaultProps;

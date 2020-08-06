@@ -2,9 +2,9 @@
 import test from 'tape-catch';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
-import StaticImageLayer from '../../../src/layers/StaticImageLayer';
+import ImageLayer from '../../../src/layers/ImageLayer';
 
-test('StaticImageLayer', t => {
+test('ImageLayer', t => {
   const view = new OrthographicView({
     id: 'ortho',
     controller: true,
@@ -14,7 +14,7 @@ test('StaticImageLayer', t => {
     zoom: 0
   });
   const testCases = generateLayerTests({
-    Layer: StaticImageLayer,
+    Layer: ImageLayer,
     assert: t.ok,
     sampleProps: {
       sliderValues: [
@@ -39,7 +39,7 @@ test('StaticImageLayer', t => {
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
   });
   testLayer({
-    Layer: StaticImageLayer,
+    Layer: ImageLayer,
     testCases,
     onError: t.notOkimport,
     viewport: view.makeViewport({
@@ -51,7 +51,7 @@ test('StaticImageLayer', t => {
   t.end();
 });
 
-test('StaticImageLayer', t => {
+test('ImageLayer', t => {
   const view = new OrthographicView({
     id: 'ortho',
     controller: true,
@@ -101,7 +101,7 @@ test('StaticImageLayer', t => {
     }
   ];
   testLayer({
-    Layer: StaticImageLayer,
+    Layer: ImageLayer,
     testCases,
     onError: t.notOkimport,
     viewport: view.makeViewport({

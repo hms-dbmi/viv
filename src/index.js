@@ -1,6 +1,6 @@
 import {
-  VivViewerLayer,
-  StaticImageLayer,
+  MultiscaleImageLayer,
+  ImageLayer,
   ScaleBarLayer,
   XRLayer
 } from './layers';
@@ -20,7 +20,7 @@ export {
   DTYPE_VALUES,
   MAX_SLIDERS_AND_CHANNELS,
   ScaleBarLayer,
-  VivViewerLayer,
+  MultiscaleImageLayer,
   XRLayer,
   VivViewer,
   VivView,
@@ -30,7 +30,7 @@ export {
   getChannelStats,
   SideBySideViewer,
   DetailView,
-  StaticImageLayer,
+  ImageLayer,
   ZarrLoader,
   OMETiffLoader,
   createOMETiffLoader,

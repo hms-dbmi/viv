@@ -63,7 +63,7 @@ function padEven(data, width, height) {
  * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
  * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
  */
-export default class StaticImageLayer extends CompositeLayer {
+export default class ImageLayer extends CompositeLayer {
   initializeState() {
     const { loader, z, loaderSelection } = this.props;
     loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) => {
@@ -152,5 +152,5 @@ export default class StaticImageLayer extends CompositeLayer {
   }
 }
 
-StaticImageLayer.layerName = 'StaticImageLayer';
-StaticImageLayer.defaultProps = defaultProps;
+ImageLayer.layerName = 'ImageLayer';
+ImageLayer.defaultProps = defaultProps;

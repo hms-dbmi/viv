@@ -2,7 +2,7 @@
 import test from 'tape-catch';
 import { DetailView } from '../../../src/views';
 import { generateViewTests, defaultArguments } from './VivView.spec';
-import { VivViewerLayer, ScaleBarLayer } from '../../../src/layers';
+import { MultiscaleImageLayer, ScaleBarLayer } from '../../../src/layers';
 
 const id = 'detail';
 const detailViewArguments = { ...defaultArguments };
@@ -26,12 +26,12 @@ test(`DetailView layer type and props check`, t => {
     }
   });
   t.ok(
-    layers[0] instanceof VivViewerLayer,
-    'DetailView layer should be VivViewerLayer.'
+    layers[0] instanceof MultiscaleImageLayer,
+    'DetailView layer should be MultiscaleImageLayer.'
   );
   t.ok(
     layers[1] instanceof ScaleBarLayer,
-    'DetailView layer should be VivViewerLayer.'
+    'DetailView layer should be MultiscaleImageLayer.'
   );
   t.equal(
     layers[0].props.viewportId,

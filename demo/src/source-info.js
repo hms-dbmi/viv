@@ -1,4 +1,4 @@
-import { range } from '../../src/layers/VivViewerLayer/utils';
+import { range } from '../../src/layers/MultiscaleImageLayer/utils';
 
 const channelNames = [
   'DAPI - Hoechst (nuclei)',

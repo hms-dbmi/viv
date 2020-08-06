@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
-import { range } from '../../../src/layers/VivViewerLayer/utils';
+import { range } from '../../../src/layers/MultiscaleImageLayer/utils';
 import { padWithDefault, padColorsAndSliders } from '../../../src/layers/utils';
 import { isInTileBounds } from '../../../src/loaders/utils';
 
