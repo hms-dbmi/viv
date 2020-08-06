@@ -12,8 +12,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import ChannelOptions from './ChannelOptions';
 import { FILL_PIXEL_VALUE } from '../constants';
 
-const MIN_SLIDER_VALUE = 0;
-const MAX_SLIDER_VALUE = 65535;
 const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
 
 const toRgb = (on, arr) => {
@@ -55,7 +53,8 @@ function ChannelController({
   handleChange,
   pixelValue,
   shouldShowPixelValue,
-  disableOptions = false
+  disableOptions = false,
+  domain
 }) {
   const rgbColor = toRgb(colormapOn, colorValue);
   const classes = useStyles();
@@ -107,8 +106,8 @@ function ChannelController({
             onChange={(e, v) => handleChange('CHANGE_SLIDER', v)}
             valueLabelDisplay="auto"
             getAriaLabel={() => `${name}-${colorValue}-${sliderValue}`}
-            min={MIN_SLIDER_VALUE}
-            max={MAX_SLIDER_VALUE}
+            min={domain[0]}
+            max={domain[1]}
             orientation="horizontal"
             style={{
               color: rgbColor,

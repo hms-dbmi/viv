@@ -6,7 +6,11 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import AddIcon from '@material-ui/icons/Add';
 
-import { SideBySideViewer, PictureInPictureViewer } from '../../src';
+import {
+  SideBySideViewer,
+  PictureInPictureViewer,
+  getChannelStats
+} from '../../src';
 import sources from './source-info';
 import {
   createLoader,
@@ -59,8 +63,17 @@ function App() {
       const nextLoader = await createLoader(sourceName, sourceInfo);
       const { dimensions: newDimensions } = nextLoader;
       const selections = buildDefaultSelection(newDimensions);
+      const stats = await getChannelStats({
+        loader: nextLoader,
+        loaderSelection: selections
+      });
+      const domains = stats.map(stat => stat.domain);
+      const sliders = stats.map(stat => stat.autoSliders);
       setDimensions(newDimensions);
-      dispatch({ type: 'RESET_CHANNELS', value: { selections } });
+      dispatch({
+        type: 'RESET_CHANNELS',
+        value: { selections, domains, sliders }
+      });
       setLoader(nextLoader);
       setIsLoading(false);
       setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
@@ -115,7 +128,7 @@ function App() {
     target: [loader.height / 2, loader.width / 2, 0],
     zoom: numLevels > 0 ? -(numLevels - 2) : -2
   };
-  const { colors, sliders, isOn, ids, selections } = channels;
+  const { colors, sliders, isOn, ids, selections, domains } = channels;
   const channelControllers = ids.map((id, i) => {
     const name = dimensions.filter(i => i.field === 'channel')[0].values[
       selections[i].channel
@@ -132,6 +145,7 @@ function App() {
           isOn={isOn[i]}
           sliderValue={sliders[i]}
           colorValue={colors[i]}
+          domain={domains[i]}
           handleChange={(type, value) => handleControllerChange(i, type, value)}
           colormapOn={colormap.length > 0}
           pixelValue={pixelValues[i]}

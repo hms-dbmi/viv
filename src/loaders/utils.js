@@ -66,10 +66,11 @@ export function byteSwapInplace(src) {
 /**
  * Returns actual image stats for static imagery and an estimate via a downsampled version of image pyramids.
  * This is helpful for generating histograms of your channel data, or scaling your sliders down to a reasonable range.
+ * Also provided are "autoSliders" which are slider bounds that should give a good initial image.
  * @param {Object} args
  * @param {Object} args.loader A valid loader object.
  * @param {Array} args.loaderSelection Array of valid dimension selections
- * @returns {Array} List of { mean, domain, sd, data, q1, q3 } objects.
+ * @returns {Array} List of { mean, domain, sd, data, q1, q3, autoSliders } objects.
  */
 export async function getChannelStats({ loader, loaderSelection }) {
   const z = loader.isPyramid ? loader.numLevels - 1 : 0;
@@ -109,13 +110,41 @@ export async function getChannelStats({ loader, loaderSelection }) {
     const mid = Math.floor(arr.length / 2);
     const firstQuartileLocation = Math.floor(arr.length / 4);
     const thirdQuartileLocation = 3 * Math.floor(arr.length / 4);
+
     quickselect(arr, mid);
     const median = arr[mid];
     quickselect(arr, firstQuartileLocation, 0, mid);
     const q1 = arr[firstQuartileLocation];
     quickselect(arr, thirdQuartileLocation, mid, arr.length - 1);
     const q3 = arr[thirdQuartileLocation];
-    return { mean, sd, q1, q3, median, data: arr, domain: [min, max] };
+
+    // Used for "auto" settings.  This is the best parameter I've found experimentally.
+    // I don't think there is a right answer and this feature is common in Fiji.
+    // Also it's best to use a non-zero array for this.
+    const cutoffArr = arr.filter(i => i >= 1);
+    const cutoffPercentile = 0.001;
+    const topCutoffLocation = Math.floor(
+      cutoffArr.length * (1 - cutoffPercentile)
+    );
+    const bottomCutoffLocation = Math.floor(
+      cutoffArr.length * cutoffPercentile
+    );
+    quickselect(cutoffArr, topCutoffLocation);
+    quickselect(cutoffArr, bottomCutoffLocation, 0, topCutoffLocation);
+    const autoSliders = [
+      cutoffArr[bottomCutoffLocation],
+      cutoffArr[topCutoffLocation]
+    ];
+    return {
+      mean,
+      sd,
+      q1,
+      q3,
+      median,
+      data: arr,
+      domain: [min, max],
+      autoSliders
+    };
   });
   return channelStats;
 }
