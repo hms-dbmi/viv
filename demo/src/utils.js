@@ -132,14 +132,13 @@ export function channelsReducer(state, { index, value, type }) {
     }
     case 'RESET_CHANNELS': {
       // Clears current channels and sets with new defaults
-      const { selections, sliders, domains } = value;
+      const { selections, sliders, domains, colors } = value;
       const n = selections.length;
       return {
         selections,
         sliders,
         domains,
-        colors:
-          n === 1 ? [[255, 255, 255]] : range(n).map(i => COLOR_PALLETE[i]),
+        colors,
         isOn: Array(n).fill(true),
         ids: range(n).map(() => String(Math.random()))
       };

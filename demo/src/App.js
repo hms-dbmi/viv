@@ -29,7 +29,8 @@ import {
   MAX_CHANNELS,
   DEFAULT_VIEW_STATE,
   DEFAULT_OVERVIEW,
-  FILL_PIXEL_VALUE
+  FILL_PIXEL_VALUE,
+  COLOR_PALLETE
 } from './constants';
 
 const initialChannels = {
@@ -61,18 +62,36 @@ function App() {
       setIsLoading(true);
       const sourceInfo = sources[sourceName];
       const nextLoader = await createLoader(sourceInfo.url);
-      const { dimensions: newDimensions } = nextLoader;
+      const { dimensions: newDimensions, isRgb } = nextLoader;
       const selections = buildDefaultSelection(newDimensions);
-      const stats = await getChannelStats({
-        loader: nextLoader,
-        loaderSelection: selections
-      });
-      const domains = stats.map(stat => stat.domain);
-      const sliders = stats.map(stat => stat.autoSliders);
+      let sliders = [
+        [0, 255],
+        [0, 255],
+        [0, 255]
+      ];
+      let domains = [
+        [0, 255],
+        [0, 255],
+        [0, 255]
+      ];
+      let colors = [
+        [255, 0, 0],
+        [0, 255, 0],
+        [0, 0, 255]
+      ];
+      if (!isRgb) {
+        const stats = await getChannelStats({
+          loader: nextLoader,
+          loaderSelection: selections
+        });
+        domains = stats.map(stat => stat.domain);
+        sliders = stats.map(stat => stat.autoSliders);
+        colors = stats.map((_, i) => COLOR_PALLETE[i]);
+      }
       setDimensions(newDimensions);
       dispatch({
         type: 'RESET_CHANNELS',
-        value: { selections, domains, sliders }
+        value: { selections, domains, sliders, colors }
       });
       setLoader(nextLoader);
       setIsLoading(false);
@@ -123,7 +142,7 @@ function App() {
       }
     });
   };
-  const { isPyramid, numLevels } = loader;
+  const { isPyramid, numLevels, isRgb } = loader;
   const initialViewState = {
     target: [loader.height / 2, loader.width / 2, 0],
     zoom: numLevels > 0 ? -(numLevels - 2) : -2
@@ -210,24 +229,26 @@ function App() {
               />
             </Grid>
           </Grid>
-          {!isLoading ? (
+          {!isLoading && !isRgb ? (
             <Grid container>{channelControllers}</Grid>
           ) : (
             <Grid container justify="center">
-              <CircularProgress />
+              {!isRgb && <CircularProgress />}
             </Grid>
           )}
-          <Button
-            disabled={ids.length === MAX_CHANNELS || isLoading}
-            onClick={handleChannelAdd}
-            fullWidth
-            variant="outlined"
-            style={{ borderStyle: 'dashed' }}
-            startIcon={<AddIcon />}
-            size="small"
-          >
-            Add Channel
-          </Button>
+          {!isRgb && (
+            <Button
+              disabled={ids.length === MAX_CHANNELS || isLoading}
+              onClick={handleChannelAdd}
+              fullWidth
+              variant="outlined"
+              style={{ borderStyle: 'dashed' }}
+              startIcon={<AddIcon />}
+              size="small"
+            >
+              Add Channel
+            </Button>
+          )}
           <Button
             disabled={!isPyramid || isLoading || useLinkedView}
             onClick={() => setOverviewOn(prev => !prev)}
