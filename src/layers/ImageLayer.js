@@ -140,7 +140,7 @@ export default class ImageLayer extends CompositeLayer {
       scale
     });
     return new XRLayer({
-      channelData: Promise.resolve({ data, width, height }),
+      channelData: { data, width, height },
       pickable,
       bounds,
       sliderValues,
