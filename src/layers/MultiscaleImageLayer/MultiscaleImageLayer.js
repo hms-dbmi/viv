@@ -3,7 +3,7 @@ import { isWebGL2 } from '@luma.gl/core';
 
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
-import { to32BitFloat } from '../utils';
+import { to32BitFloat, getNearestPowerOf2 } from '../utils';
 
 const defaultProps = {
   pickable: true,
@@ -103,6 +103,9 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     // paramteter set to anything but 1, but we always use it for situations where
     // we are zoomed out too far.
     const implementsGetRaster = typeof loader.getRaster === 'function';
+    const { width: lowResWidth, height: lowResHeight } = loader.getRasterSize({
+      z: numLevels - 1
+    });
     const baseLayer =
       implementsGetRaster &&
       new ImageLayer(this.props, {
@@ -114,7 +117,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
             (!viewportId || this.context.viewport.id === viewportId)),
         z: numLevels - 1,
         pickable: true,
-        onHover
+        onHover,
+        boxSize: getNearestPowerOf2(lowResWidth, lowResHeight)
       });
     const layers = [baseLayer, tiledLayer];
     return layers;
