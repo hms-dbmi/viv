@@ -15,10 +15,12 @@ import {
   OMEZarrReader
 } from './loaders';
 import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from './constants';
+import { Avivator } from './avivator';
 
 export {
   DTYPE_VALUES,
   MAX_SLIDERS_AND_CHANNELS,
+  Avivator,
   ScaleBarLayer,
   MultiscaleImageLayer,
   XRLayer,

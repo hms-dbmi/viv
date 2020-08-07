@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useReducer } from 'react';
-
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -7,12 +6,8 @@ import Grid from '@material-ui/core/Grid';
 
 import AddIcon from '@material-ui/icons/Add';
 
-import {
-  SideBySideViewer,
-  PictureInPictureViewer,
-  getChannelStats
-} from '../../src';
-import sources from './source-info';
+import { SideBySideViewer, PictureInPictureViewer } from '../viewers';
+import { getChannelStats } from '../loaders';
 import {
   createLoader,
   channelsReducer,
@@ -34,6 +29,7 @@ import {
   GLOBAL_SLIDER_DIMENSION_FIELDS,
   COLOR_PALLETE
 } from './constants';
+import './index.css';
 
 const initialChannels = {
   sliders: [],
@@ -43,11 +39,11 @@ const initialChannels = {
   isOn: []
 };
 
-function App() {
+export default function Avivator({ sources }) {
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
   const viewSize = useWindowSize();
   const [loader, setLoader] = useState({});
-  const [source, setSource] = useState(sources.tiff);
+  const [source, setSource] = useState(sources[0]);
   const [colormap, setColormap] = useState('');
   const [dimensions, setDimensions] = useState([]);
   const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
@@ -286,7 +282,8 @@ function App() {
             <Grid item xs={6}>
               <SourceSelect
                 value={source.name}
-                handleChange={name => setSource(sources[name])}
+                sources={sources}
+                handleChange={i => setSource(sources[i])}
                 disabled={isLoading}
               />
             </Grid>
@@ -367,4 +364,3 @@ function App() {
     </>
   );
 }
-export default App;

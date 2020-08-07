@@ -51,11 +51,11 @@ const covidTiffInfo = {
   description: 'Covid-19 Primary Gut Epithelial Stem Cells (OME-TIFF)'
 };
 
-export default {
-  tiff: tiffInfo,
-  'static tiff': staticTiffInfo,
-  'bf tiff': remoteBFTiff,
-  'tiff 2': remoteTiff2,
-  'covid tiff': covidTiffInfo,
-  'rgb tiff': remoteTiffRGB
-};
+export default [
+  tiffInfo,
+  staticTiffInfo,
+  remoteBFTiff,
+  remoteTiff2,
+  covidTiffInfo,
+  remoteTiffRGB
+];
