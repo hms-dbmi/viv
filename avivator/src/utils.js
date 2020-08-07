@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { createOMETiffLoader, createBioformatsZarrLoader } from '../loaders';
+import { createOMETiffLoader, createBioformatsZarrLoader } from '../../src';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
 

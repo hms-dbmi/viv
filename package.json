@@ -17,7 +17,7 @@
     "test": "npm run-script test:loaders && npm run-script test:layers_views",
     "version": "./version.sh",
     "postversion": "git push && git push --tags",
-    "docs": "mkdir -p dist/docs || rm -r dist/docs && mkdir -p dist/docs && documentation build src/** -f html --config documentation.yml --shallow -o dist/docs"
+    "docs": "mkdir -p dist_docs || rm -r dist_docs && mkdir -p dist_docs && documentation build src/** -f html --config documentation.yml --shallow -o dist_docs"
   },
   "pre-push": [
     "test"

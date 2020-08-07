@@ -6,8 +6,11 @@ import Grid from '@material-ui/core/Grid';
 
 import AddIcon from '@material-ui/icons/Add';
 
-import { SideBySideViewer, PictureInPictureViewer } from '../viewers';
-import { getChannelStats } from '../loaders';
+import {
+  SideBySideViewer,
+  PictureInPictureViewer,
+  getChannelStats
+} from '../../src';
 import {
   createLoader,
   channelsReducer,
@@ -19,7 +22,6 @@ import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
 import MenuToggle from './components/MenuToggle';
 import ColormapSelect from './components/ColormapSelect';
-import SourceSelect from './components/SourceSelect';
 import GlobalSelectionSlider from './components/GlobalSelectionSlider';
 import {
   MAX_CHANNELS,
@@ -52,8 +54,7 @@ export default function Avivator(props) {
   const viewSize = useWindowSize();
   const [loader, setLoader] = useState({});
   /* eslint-disable react/destructuring-assignment */
-  const [sources, setSources] = useState(props.sources);
-  const [source, setSource] = useState(props.sources[0]);
+  const [source, setSource] = useState(props.source);
   /* eslint-disable react/destructuring-assignment */
   const [colormap, setColormap] = useState('');
   const [dimensions, setDimensions] = useState([]);
@@ -127,7 +128,6 @@ export default function Avivator(props) {
         .slice(-1)[0]
     };
     setSource(newSource);
-    setSources(prevSources => [...prevSources, newSource]);
   };
 
   const handleGlobalChannelsSelectionChange = async ({ selection, event }) => {
@@ -167,7 +167,7 @@ export default function Avivator(props) {
    */
   const handleControllerChange = (index, type, value) => {
     if (type === 'CHANGE_CHANNEL') {
-      const [channelDim] = dimensions;
+      const [channelDim] = dimensions.filter(d => d.field === 'channel');
       const { field, values } = channelDim;
       const dimIndex = values.indexOf(value);
       const selection = { [field]: dimIndex };
@@ -219,9 +219,8 @@ export default function Avivator(props) {
     GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dimension.field)
   );
   const channelControllers = ids.map((id, i) => {
-    const name = dimensions.filter(j => j.field === 'channel')[0].values[
-      selections[i].channel
-    ];
+    const channelOptions = dimensions.filter(j => j.field === 'channel')[0].values;
+    const name = channelOptions[selections[i].channel];
     return (
       <Grid
         key={`channel-controller-${name}-${id}`}
@@ -230,7 +229,7 @@ export default function Avivator(props) {
       >
         <ChannelController
           name={name}
-          channelOptions={dimensions[0].values}
+          channelOptions={channelOptions}
           isOn={isOn[i]}
           sliderValue={sliders[i]}
           colorValue={colors[i]}
@@ -297,24 +296,15 @@ export default function Avivator(props) {
         <Menu
           maxHeight={viewSize.height}
           handleSubmitNewUrl={handleSubmitNewUrl}
+          url={source.url}
         >
-          <Grid container justify="space-between">
-            <Grid item xs={6}>
-              <SourceSelect
-                value={sources.indexOf(source)}
-                sources={sources}
-                handleChange={i => setSource(sources[i])}
-                disabled={isLoading}
-              />
-            </Grid>
-            <Grid item xs={5}>
-              <ColormapSelect
-                value={colormap}
-                handleChange={setColormap}
-                disabled={isLoading}
-              />
-            </Grid>
-          </Grid>
+          {!isRgb && (
+            <ColormapSelect
+              value={colormap}
+              handleChange={setColormap}
+              disabled={isLoading}
+            />
+          )}
           {globalControllers}
           {!isLoading && !isRgb ? (
             <Grid container>{channelControllers}</Grid>

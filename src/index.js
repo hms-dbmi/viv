@@ -8,18 +8,17 @@ import { VivViewer, PictureInPictureViewer, SideBySideViewer } from './viewers';
 import { VivView, OverviewView, DetailView, SideBySideView } from './views';
 import {
   createZarrLoader,
+  createBioformatsZarrLoader,
   ZarrLoader,
   createOMETiffLoader,
   OMETiffLoader,
   getChannelStats,
 } from './loaders';
 import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from './constants';
-import { Avivator } from './avivator';
 
 export {
   DTYPE_VALUES,
   MAX_SLIDERS_AND_CHANNELS,
-  Avivator,
   ScaleBarLayer,
   MultiscaleImageLayer,
   XRLayer,
@@ -36,4 +35,5 @@ export {
   OMETiffLoader,
   createOMETiffLoader,
   createZarrLoader,
+  createBioformatsZarrLoader,
 };
