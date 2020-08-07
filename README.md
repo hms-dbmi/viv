@@ -21,7 +21,7 @@ Please install the [Prettier plug-in](https://prettier.io/docs/en/editors.html)
 for your preferred editor. (Badly formatted code will fail on Travis.)
 
 For the demo, run `npm start` and you will be able to update the component and use the
-`demo/src/App.js` to visually test.
+`demo/src/index.js` to visually test.
 
 HTTP is acceptable but potentially slower than HTTP2. Our demo uses Google Cloud Storage, which is HTTP2 by default.
 

@@ -1,4 +1,21 @@
-Here are two snippets to help get you started with our higher-level components. For a more complete example of using these higher level components, look at the source code of the demo [here](https://github.com/hms-dbmi/viv/blob/master/demo/src/App.js), or look at the source code of the library [here](https://github.com/hms-dbmi/viv/tree/master/src) for building your own components with custom `VivViews` or custom `deck.gl` layers.
+The simplest way to use `viv` is to use `Avivator`, a batteries-included component that has sliders, color selectors, and more. It features an option to input a url to an OME compliant image (TIFF or zarr):
+
+```javascript
+import { Avivator } from '@hms-dbmi/viv';
+const sources = [
+  {
+    url: 'https://vitessce-demo-data.storage.googleapis.com/test-data/hubmap/pyramid_0.0.2/spraggins.ome.tif',
+    description: 'Kidney mxIF (OME-TIFF)'
+  },
+  {
+    url: 'https://vitessce-demo-data.storage.googleapis.com/test-data/hubmap/test/VAN0008-RK-403-100-PAS_registered.ome.tif',
+    description: 'VAN0008-RK-403-100-PAS_registered PAS Donor Image'
+  },
+]
+const Viewer = <Avivator sources={sources}>
+```
+
+If you want to have more control over the UI (your sliders, selectors etc.), here are two snippets to help get you started with our higher-level viewer components. For a more complete example of using these higher level components, look at the source code of the demo [here](https://github.com/hms-dbmi/viv/blob/master/demo/src/App.js), or look at the source code of the library [here](https://github.com/hms-dbmi/viv/tree/master/src) for building your own components with custom `VivViews` or custom `deck.gl` layers.
 
 This snippet is the most basic view: a simple view of the data. With `overviewOn=false`, this will just be a single view of the data. Turn `overviewOn=true` for a picture-in-picture.
 
