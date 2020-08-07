@@ -48,7 +48,7 @@ function App() {
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
   const viewSize = useWindowSize();
   const [loader, setLoader] = useState({});
-  const [sourceName, setSourceName] = useState('tiff');
+  const [source, setSource] = useState(sources['tiff']);
   const [colormap, setColormap] = useState('');
   const [dimensions, setDimensions] = useState([]);
   const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
@@ -64,7 +64,7 @@ function App() {
   useEffect(() => {
     async function changeLoader() {
       setIsLoading(true);
-      const sourceInfo = sources[sourceName];
+      const sourceInfo = source;
       const nextLoader = await createLoader(sourceInfo.url);
       const { dimensions: newDimensions, isRgb } = nextLoader;
       const selections = buildDefaultSelection(newDimensions);
@@ -108,7 +108,12 @@ function App() {
       setGlobalSelections(selections[0]);
     }
     changeLoader();
-  }, [sourceName]);
+  }, [source]);
+
+  const handleSubmitNewUrl = (event, value) => {
+    event.preventDefault();
+    setSource({ url: value, name: 'User Tiff' });
+  };
 
   const handleGlobalChannelsSelectionChange = async ({ selection, event }) => {
     const { selections } = channels;
@@ -301,12 +306,15 @@ function App() {
           />
         ))}
       {controllerOn && (
-        <Menu maxHeight={viewSize.height}>
+        <Menu
+          maxHeight={viewSize.height}
+          handleSubmitNewUrl={handleSubmitNewUrl}
+        >
           <Grid container justify="space-between">
             <Grid item xs={6}>
               <SourceSelect
-                value={sourceName}
-                handleChange={setSourceName}
+                value={source.name}
+                handleChange={name => setSource(sources[name])}
                 disabled={isLoading}
               />
             </Grid>

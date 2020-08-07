@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
+import TextField from '@material-ui/core/TextField';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Description from './Description';
@@ -22,18 +23,33 @@ const useStyles = makeStyles(theme => ({
     width: '100%'
   },
   divider: {
-    paddingBottom: theme.spacing(1)
+    paddingBottom: theme.spacing(1),
+    paddingTop: theme.spacing(2)
   }
 }));
 
 function Menu({ children, ...props }) {
   const classes = useStyles(props);
+  const { handleSubmitNewUrl } = props;
+  const [text, onTextChange] = useState('');
   return (
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
       <Paper className={classes.paper}>
-        <Grid container>
-          <Grid item xs={11}>
+        <Grid container direction="column">
+          <Grid item xs={12}>
             <Description />
+          </Grid>
+          <Grid item xs={12}>
+            <form onSubmit={event => handleSubmitNewUrl(event, text)}>
+              <TextField
+                id="standard-basic"
+                label="OME-TIFF/OME-Zarr URL"
+                variant="filled"
+                size="small"
+                fullWidth
+                onChange={e => onTextChange(e.target.value)}
+              />
+            </form>
           </Grid>
           <Grid item xs={12} className={classes.divider}>
             <Divider />
