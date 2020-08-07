@@ -34,15 +34,6 @@ const remoteTiffRGB = {
   description: 'VAN0008-RK-403-100-PAS_registered PAS Donor Image'
 };
 
-const remoteTiffRGBUrl2 =
-  'https://vitessce-demo-data.storage.googleapis.com/test-data/hubmap/pyramid_0.0.2/VAN0011-RK-3-10-PAS_registered.ome.tif ';
-
-const remoteTiffRGB2 = {
-  url: remoteTiffRGBUrl2,
-  isPublic: false,
-  description: 'VAN0011-RK-3-10-PAS_registered PAS Donor Image'
-};
-
 // Generated using bioformats2raw and raw2ometiff.
 const remoteTiffUrl2 =
   'https://vitessce-demo-data.storage.googleapis.com/test-data/hubmap/pyramid_0.0.2/VAN0003-LK-32-21-AF_preIMS_registered.ome.tif';
@@ -66,6 +57,5 @@ export default {
   'bf tiff': remoteBFTiff,
   'tiff 2': remoteTiff2,
   'covid tiff': covidTiffInfo,
-  'rgb tiff': remoteTiffRGB,
-  'rgb tiff 2': remoteTiffRGB2
+  'rgb tiff': remoteTiffRGB
 };

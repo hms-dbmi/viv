@@ -122,7 +122,7 @@ export async function getChannelStats({ loader, loaderSelection }) {
     // I don't think there is a right answer and this feature is common in Fiji.
     // Also it's best to use a non-zero array for this.
     const cutoffArr = arr.filter(i => i >= 1);
-    const cutoffPercentile = 0.001;
+    const cutoffPercentile = 0.0005;
     const topCutoffLocation = Math.floor(
       cutoffArr.length * (1 - cutoffPercentile)
     );

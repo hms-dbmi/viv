@@ -90,7 +90,11 @@ function App() {
         });
         domains = stats.map(stat => stat.domain);
         sliders = stats.map(stat => stat.autoSliders);
-        colors = stats.map((_, i) => COLOR_PALLETE[i]);
+        // If there is only one channel, use white.
+        colors =
+          stats.length === 1
+            ? [[255, 255, 255]]
+            : stats.map((_, i) => COLOR_PALLETE[i]);
       }
       setDimensions(newDimensions);
       dispatch({
