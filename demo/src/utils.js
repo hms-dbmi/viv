@@ -1,15 +1,7 @@
 import { useState, useEffect } from 'react';
-import {
-  createZarrLoader,
-  createOMETiffLoader,
-  OMEZarrReader
-} from '../../src';
+import { createOMETiffLoader } from '../../src';
 
-import {
-  COLOR_PALLETE,
-  INITIAL_SLIDER_VALUE,
-  GLOBAL_SLIDER_DIMENSION_FIELDS
-} from './constants';
+import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
 
 export async function createLoader(url) {
   if (url.includes('ome.tif')) {
@@ -18,6 +10,7 @@ export async function createLoader(url) {
     const loader = await createOMETiffLoader({ url, offsets });
     return loader;
   }
+  return null;
 }
 
 // Return the midpoint of the global dimensions.

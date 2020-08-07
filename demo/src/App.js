@@ -48,7 +48,7 @@ function App() {
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
   const viewSize = useWindowSize();
   const [loader, setLoader] = useState({});
-  const [source, setSource] = useState(sources['tiff']);
+  const [source, setSource] = useState(sources.tiff);
   const [colormap, setColormap] = useState('');
   const [dimensions, setDimensions] = useState([]);
   const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
@@ -129,6 +129,10 @@ function App() {
       const stats = await getChannelStats({ loader, loaderSelection });
       const domains = stats.map(stat => stat.domain);
       const sliders = stats.map(stat => stat.autoSliders);
+      const colors =
+        stats.length === 1
+          ? [[255, 255, 255]]
+          : stats.map((_, i) => COLOR_PALLETE[i]);
       dispatch({
         type: 'RESET_CHANNELS',
         value: { selections: loaderSelection, domains, sliders, colors }
@@ -200,7 +204,7 @@ function App() {
     GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dimension.field)
   );
   const channelControllers = ids.map((id, i) => {
-    const name = dimensions.filter(i => i.field === 'channel')[0].values[
+    const name = dimensions.filter(j => j.field === 'channel')[0].values[
       selections[i].channel
     ];
     return (
