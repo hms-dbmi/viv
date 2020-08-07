@@ -128,7 +128,6 @@ export default function Avivator(props) {
         .slice(-1)[0]
     };
     setSource(newSource);
-    setSources(prevSources => [...prevSources, newSource]);
   };
 
   const handleGlobalChannelsSelectionChange = async ({ selection, event }) => {
