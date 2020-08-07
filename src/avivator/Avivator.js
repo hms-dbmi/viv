@@ -40,7 +40,8 @@ const initialChannels = {
 };
 
 /**
- * This component serves as visualization for OME-compliant tiff or zarr images.
+ * This component serves as batteries-included visualization for OME-compliant tiff or zarr images.
+ * This includes color sliders, selectors, and more.
  * @param {Object} props
  * @param {Object} props.history A React router history object to create new urls (optional).
  * @param {Object} args.sources A list of sources for a dropdown menu, like [{ url, description }]
