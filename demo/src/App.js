@@ -26,7 +26,7 @@ import Menu from './components/Menu';
 import MenuToggle from './components/MenuToggle';
 import ColormapSelect from './components/ColormapSelect';
 import SourceSelect from './components/SourceSelect';
-
+import GlobalSelectionSlider from './components/GlobalSelectionSlider';
 import {
   MAX_CHANNELS,
   DEFAULT_VIEW_STATE,
@@ -228,47 +228,16 @@ function App() {
       </Grid>
     );
   });
-  const globalControllers = globalControlDimensions.map(dimension => {
-    const { field, values } = dimension;
-    return values.length > 1 ? (
-      <Grid
-        container
-        key={field}
-        direction="row"
-        justify="space-between"
-        alignItems="center"
-      >
-        <Grid item xs={1}>
-          {field}:
-        </Grid>
-        <Grid item xs={11}>
-          <Slider
-            value={globalSelections[field]}
-            // See https://github.com/hubmapconsortium/vitessce-image-viewer/issues/176 for why
-            // we have the two handlers.
-            onChange={(event, newValue) =>
-              handleGlobalChannelsSelectionChange({
-                selection: { [field]: newValue },
-                event
-              })
-            }
-            onChangeCommitted={(event, newValue) =>
-              handleGlobalChannelsSelectionChange({
-                selection: { [field]: newValue },
-                event
-              })
-            }
-            valueLabelDisplay="auto"
-            getAriaLabel={() => `${field} slider`}
-            marks={values.map(val => ({ value: val }))}
-            min={Number(values[0])}
-            max={Number(values.slice(-1))}
-            orientation="horizontal"
-            style={{ marginTop: '7px' }}
-            step={null}
-          />
-        </Grid>
-      </Grid>
+  const globalControllers = globalControlDimensions.map(dimensions => {
+    return dimensions.values.length > 1 ? (
+      <GlobalSelectionSlider
+        key={dimensions.field}
+        dimensions={dimensions}
+        globalSelections={globalSelections}
+        handleGlobalChannelsSelectionChange={
+          handleGlobalChannelsSelectionChange
+        }
+      />
     ) : null;
   });
   return (

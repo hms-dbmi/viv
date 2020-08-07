@@ -27,34 +27,41 @@ const useStyles = makeStyles(theme => ({
     paddingTop: theme.spacing(2)
   }
 }));
+function Header(props) {
+  const { handleSubmitNewUrl } = props;
+  const [text, onTextChange] = useState('');
+  const classes = useStyles(props);
+
+  return (
+    <Grid container direction="column">
+      <Grid item xs={12}>
+        <Description />
+      </Grid>
+      <Grid item xs={12}>
+        <form onSubmit={event => handleSubmitNewUrl(event, text)}>
+          <TextField
+            id="standard-basic"
+            label="OME-TIFF/OME-Zarr URL"
+            variant="filled"
+            size="small"
+            fullWidth
+            onChange={e => onTextChange(e.target.value)}
+          />
+        </form>
+      </Grid>
+      <Grid item xs={12} className={classes.divider}>
+        <Divider />
+      </Grid>
+    </Grid>
+  );
+}
 
 function Menu({ children, ...props }) {
   const classes = useStyles(props);
-  const { handleSubmitNewUrl } = props;
-  const [text, onTextChange] = useState('');
   return (
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
       <Paper className={classes.paper}>
-        <Grid container direction="column">
-          <Grid item xs={12}>
-            <Description />
-          </Grid>
-          <Grid item xs={12}>
-            <form onSubmit={event => handleSubmitNewUrl(event, text)}>
-              <TextField
-                id="standard-basic"
-                label="OME-TIFF/OME-Zarr URL"
-                variant="filled"
-                size="small"
-                fullWidth
-                onChange={e => onTextChange(e.target.value)}
-              />
-            </form>
-          </Grid>
-          <Grid item xs={12} className={classes.divider}>
-            <Divider />
-          </Grid>
-        </Grid>
+        <Header {...props} />
         <Grid
           container
           direction="column"
