@@ -15,7 +15,7 @@ const sources = [
 const Viewer = <Avivator sources={sources}>
 ```
 
-If you want to have more control over the UI (your sliders, selectors etc.), here are two snippets to help get you started with our higher-level viewer components. For a more complete example of using these higher level components, look at the source code of the demo [here](https://github.com/hms-dbmi/viv/blob/master/demo/src/App.js), or look at the source code of the library [here](https://github.com/hms-dbmi/viv/tree/master/src) for building your own components with custom `VivViews` or custom `deck.gl` layers.
+If you want to have more control over the UI (your sliders, selectors etc.), here are two snippets to help get you started with our higher-level viewer components. For a more complete example of using these higher level components, look at the source code `Avivator` [here](https://github.com/hms-dbmi/viv/blob/master/src/avivator/Avivator.js), or look at the source code of the library [here](https://github.com/hms-dbmi/viv/tree/master/src) for building your own components with custom `VivViews` or custom `deck.gl` layers.
 
 This snippet is the most basic view: a simple view of the data. With `overviewOn=false`, this will just be a single view of the data. Turn `overviewOn=true` for a picture-in-picture.
 
