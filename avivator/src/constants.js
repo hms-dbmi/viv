@@ -1,5 +1,4 @@
 export const MAX_CHANNELS = 6;
-export const DEFAULT_VIEW_STATE = { zoom: -6, target: [25000, 10000, 0] };
 export const DEFAULT_OVERVIEW = {
   margin: 25,
   scale: 0.15,

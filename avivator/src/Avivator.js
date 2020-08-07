@@ -25,7 +25,6 @@ import ColormapSelect from './components/ColormapSelect';
 import GlobalSelectionSlider from './components/GlobalSelectionSlider';
 import {
   MAX_CHANNELS,
-  DEFAULT_VIEW_STATE,
   DEFAULT_OVERVIEW,
   FILL_PIXEL_VALUE,
   GLOBAL_SLIDER_DIMENSION_FIELDS,
