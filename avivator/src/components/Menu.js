@@ -65,7 +65,11 @@ function Header(props) {
                 <Typography className={classes.typography}>
                   Provide a URL to an OME-TIFF file or a Bio-Formats Zarr store
                   to view the image. View the
-                  <a target="_blank" href="http://viv.gehlenborglab.org">
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="http://viv.gehlenborglab.org"
+                  >
                     docs
                   </a>
                   to learn more about the supported file formats.
