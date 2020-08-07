@@ -1,13 +1,17 @@
 import OMEXML from './omeXML';
-import { isInTileBounds, byteSwapInplace, padTileWithZeros } from './utils';
+import {
+  isInTileBounds,
+  byteSwapInplace,
+  padTileWithZeros,
+  dimensionsFromOMEXML,
+} from './utils';
 import { DTYPE_VALUES } from '../constants';
-import { range } from '../layers/utils';
 
 const DTYPE_LOOKUP = {
   uint8: '<u1',
   uint16: '<u2',
   uint32: '<u4',
-  float: '<f4'
+  float: '<f4',
 };
 
 /**
@@ -29,12 +33,12 @@ export default class OMETiffLoader {
     this.physicalSizes = {
       x: {
         value: this.omexml.PhysicalSizeX,
-        unit: this.omexml.PhysicalSizeXUnit
+        unit: this.omexml.PhysicalSizeXUnit,
       },
       y: {
         value: this.omexml.PhysicalSizeY,
-        unit: this.omexml.PhysicalSizeYUnit
-      }
+        unit: this.omexml.PhysicalSizeYUnit,
+      },
     };
     this.software = firstImage.fileDirectory.Software;
     this.offsets = offsets || [];
@@ -46,27 +50,7 @@ export default class OMETiffLoader {
     this.numLevels = this.omexml.getNumberOfImages() || SubIFDs?.length;
     this.isBioFormats6Pyramid = SubIFDs;
     this.isPyramid = this.numLevels > 1;
-    // The omexml specification only allows for these - zarr is more flexible so this
-    // is for unifying the two loaders in upstream applications.
-    this.dimensions = [
-      {
-        field: 'channel',
-        type: 'nominal',
-        values: this.channelNames
-      },
-      {
-        field: 'z',
-        type: 'ordinal',
-        values: range(this.omexml.SizeZ)
-      },
-      {
-        field: 'time',
-        type: 'ordinal',
-        values: range(this.omexml.SizeT)
-      },
-      { field: 'x', type: 'quantitative', values: null },
-      { field: 'y', type: 'quantitative', values: null }
-    ];
+    this.dimensions = dimensionsFromOMEXML(this.omexml);
     // We use zarr's internal format.  It encodes endianness, but we leave it little for now
     // since javascript is little endian.
     this.dtype = DTYPE_LOOKUP[this.omexml.Type];
@@ -88,7 +72,7 @@ export default class OMETiffLoader {
   _getIFDIndex({ z = 0, channel, time = 0 }) {
     let channelIndex;
     // Without names, enforce a numeric channel indexing scheme
-    if (this.channelNames.every(v => !v)) {
+    if (this.channelNames.every((v) => !v)) {
       console.warn(
         'No channel names found in OMEXML.  Please be sure to use numeric indexing.'
       );
@@ -152,7 +136,7 @@ export default class OMETiffLoader {
     const { SizeZ, SizeT, SizeC } = omexml;
     const pyramidOffset = z * SizeZ * SizeT * SizeC;
     let image;
-    const tileRequests = loaderSelection.map(async sel => {
+    const tileRequests = loaderSelection.map(async (sel) => {
       const index = this._getIFDIndex(sel);
       const pyramidIndex = pyramidOffset + index;
       // We need to put the request for parsing the file directory into this array.
@@ -178,7 +162,7 @@ export default class OMETiffLoader {
     return {
       data: tiles,
       width: tileSize,
-      height: tileSize
+      height: tileSize,
     };
   }
 
@@ -194,7 +178,7 @@ export default class OMETiffLoader {
     const { tiff, omexml, isBioFormats6Pyramid, pool } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const rasters = await Promise.all(
-      loaderSelection.map(async sel => {
+      loaderSelection.map(async (sel) => {
         const index = this._getIFDIndex(sel);
         const pyramidIndex = z * SizeZ * SizeT * SizeC + index;
         // We need to put the request for parsing the file directory into this array.
@@ -231,10 +215,10 @@ export default class OMETiffLoader {
       // GeoTiff.js returns 32 bit uint when the tiff has 32 significant bits.
       data:
         this.dtype === '<f4'
-          ? rasters.map(r => new Float32Array(r.buffer))
+          ? rasters.map((r) => new Float32Array(r.buffer))
           : rasters,
       width,
-      height
+      height,
     };
   }
 
@@ -252,7 +236,7 @@ export default class OMETiffLoader {
     /* eslint-disable no-bitwise */
     return {
       height: height >> z,
-      width: width >> z
+      width: width >> z,
     };
     /* eslint-disable no-bitwise */
   }
@@ -266,7 +250,7 @@ export default class OMETiffLoader {
     const {
       metadataOMEXML: {
         Image: { AcquisitionDate },
-        StructuredAnnotations
+        StructuredAnnotations,
       },
       SizeX,
       SizeY,
@@ -279,7 +263,7 @@ export default class OMETiffLoader {
       PhysicalSizeY,
       PhysicalSizeYUnit,
       PhysicalSizeZ,
-      PhysicalSizeZUnit
+      PhysicalSizeZUnit,
     } = omexml;
 
     const physicalSizeAndUnitX =
@@ -309,7 +293,7 @@ export default class OMETiffLoader {
       'Pixels Size (XYZ)': `${physicalSizeAndUnitX} x ${physicalSizeAndUnitY} x ${physicalSizeAndUnitZ}`,
       'Z-sections/Timepoints': `${SizeZ} x ${SizeT}`,
       Channels: SizeC,
-      'ROI Count': roiCount
+      'ROI Count': roiCount,
     };
   }
 
@@ -360,7 +344,7 @@ export default class OMETiffLoader {
       width,
       height,
       tileSize,
-      numLevels
+      numLevels,
     });
   }
 

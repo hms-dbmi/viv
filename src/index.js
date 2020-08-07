@@ -12,7 +12,6 @@ import {
   createOMETiffLoader,
   OMETiffLoader,
   getChannelStats,
-  OMEZarrReader
 } from './loaders';
 import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from './constants';
 import { Avivator } from './avivator';
@@ -37,5 +36,4 @@ export {
   OMETiffLoader,
   createOMETiffLoader,
   createZarrLoader,
-  OMEZarrReader
 };

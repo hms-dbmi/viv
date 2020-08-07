@@ -1,5 +1,7 @@
 import quickselect from 'quickselect';
 
+import { range } from '../layers/utils';
+
 export function isInTileBounds({
   x,
   y,
@@ -7,7 +9,7 @@ export function isInTileBounds({
   width,
   height,
   tileSize,
-  numLevels
+  numLevels,
 }) {
   const xInBounds = x < Math.ceil(width / (tileSize * 2 ** z)) && x >= 0;
   const yInBounds = y < Math.ceil(height / (tileSize * 2 ** z)) && y >= 0;
@@ -76,7 +78,7 @@ export async function getChannelStats({ loader, loaderSelection }) {
   const z = loader.isPyramid ? loader.numLevels - 1 : 0;
   const rasters = await loader.getRaster({ z, loaderSelection });
   const { data } = rasters;
-  const channelStats = data.map(arr => {
+  const channelStats = data.map((arr) => {
     let len = arr.length;
     let min = Infinity;
     let max = -Infinity;
@@ -121,7 +123,7 @@ export async function getChannelStats({ loader, loaderSelection }) {
     // Used for "auto" settings.  This is the best parameter I've found experimentally.
     // I don't think there is a right answer and this feature is common in Fiji.
     // Also it's best to use a non-zero array for this.
-    const cutoffArr = arr.filter(i => i >= 1);
+    const cutoffArr = arr.filter((i) => i >= 1);
     const cutoffPercentile = 0.0005;
     const topCutoffLocation = Math.floor(
       cutoffArr.length * (1 - cutoffPercentile)
@@ -133,7 +135,7 @@ export async function getChannelStats({ loader, loaderSelection }) {
     quickselect(cutoffArr, bottomCutoffLocation, 0, topCutoffLocation);
     const autoSliders = [
       cutoffArr[bottomCutoffLocation],
-      cutoffArr[topCutoffLocation]
+      cutoffArr[topCutoffLocation],
     ];
     return {
       mean,
@@ -143,8 +145,40 @@ export async function getChannelStats({ loader, loaderSelection }) {
       median,
       data: arr,
       domain: [min, max],
-      autoSliders
+      autoSliders,
     };
   });
   return channelStats;
+}
+
+/**
+ * Retrieves blob from zarr store and parses as JSON.
+ * @param {Object} store Valid zarr.Store
+ * @param {String} key String path to to decode from store.
+ * @returns {Object}
+ */
+export async function getJson(store, key) {
+  const bytes = new Uint8Array(await store.getItem(key));
+  const decoder = new TextDecoder('utf-8');
+  const json = JSON.parse(decoder.decode(bytes));
+  return json;
+}
+
+/**
+ * Builds a dimensions object from OMEXML
+ * @param {Object} omexml OMEXML class
+ * @returns {Array} Array of dimensions objects
+ */
+export function dimensionsFromOMEXML(omexml) {
+  const { SizeZ, SizeT } = omexml;
+  // Dimension order for OME-Zarr precurer Bioformats-produced zarr
+  // from: bioformats2raw <file> --file_type=zarr --dimension_order=XYZCT
+  const dimensions = [
+    { field: 'time', type: 'ordinal', values: range(SizeT) },
+    { field: 'channel', type: 'nominal', values: omexml.getChannelNames() },
+    { field: 'z', type: 'ordinal', values: range(SizeZ) },
+    { field: 'y', type: 'quantitative', values: null },
+    { field: 'x', type: 'quantitative', values: null },
+  ];
+  return dimensions;
 }

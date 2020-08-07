@@ -45,11 +45,17 @@ const covidTiffInfo = {
   description: 'Covid-19 Primary Gut Epithelial Stem Cells (OME-TIFF)'
 };
 
+const LucaZarr = {
+  url: 'https://storage.googleapis.com/vitessce-demo-data/test-data/Luca-7Color',
+  description: 'QPTIFF image format'
+}
+
 export default [
   tiffInfo,
   staticTiffInfo,
   remoteBFTiff,
   remoteTiff2,
   covidTiffInfo,
-  remoteTiffRGB
+  remoteTiffRGB,
+  LucaZarr
 ];

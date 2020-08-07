@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { createOMETiffLoader } from '../loaders';
+import { createOMETiffLoader, createBioformatsZarrLoader } from '../loaders';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
 
@@ -10,7 +10,8 @@ export async function createLoader(url) {
     const loader = await createOMETiffLoader({ url, offsets });
     return loader;
   }
-  return null;
+  const loader = await createBioformatsZarrLoader({ url });
+  return loader;
 }
 
 // Return the midpoint of the global dimensions.
