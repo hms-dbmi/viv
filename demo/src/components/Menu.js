@@ -67,6 +67,7 @@ function Menu({ children, ...props }) {
   return (
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
       <Paper className={classes.paper}>
+        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <Header {...props} />
         <Grid
           container

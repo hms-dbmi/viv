@@ -4,7 +4,6 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
-import Slider from '@material-ui/core/Slider';
 
 import AddIcon from '@material-ui/icons/Add';
 
@@ -228,11 +227,11 @@ function App() {
       </Grid>
     );
   });
-  const globalControllers = globalControlDimensions.map(dimensions => {
-    return dimensions.values.length > 1 ? (
+  const globalControllers = globalControlDimensions.map(dimension => {
+    return dimension.values.length > 1 ? (
       <GlobalSelectionSlider
-        key={dimensions.field}
-        dimensions={dimensions}
+        key={dimension.field}
+        dimension={dimension}
         globalSelections={globalSelections}
         handleGlobalChannelsSelectionChange={
           handleGlobalChannelsSelectionChange

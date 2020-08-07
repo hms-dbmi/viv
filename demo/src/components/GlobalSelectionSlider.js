@@ -4,7 +4,7 @@ import Slider from '@material-ui/core/Slider';
 
 export default function GlobalSelectionSlider(props) {
   const {
-    dimensions: { field, values },
+    dimension: { field, values },
     globalSelections,
     handleGlobalChannelsSelectionChange
   } = props;
@@ -18,18 +18,18 @@ export default function GlobalSelectionSlider(props) {
           value={globalSelections[field]}
           // See https://github.com/hubmapconsortium/vitessce-image-viewer/issues/176 for why
           // we have the two handlers.
-          onChange={(event, newValue) =>
+          onChange={(event, newValue) => {
             handleGlobalChannelsSelectionChange({
               selection: { [field]: newValue },
               event
-            })
-          }
-          onChangeCommitted={(event, newValue) =>
+            });
+          }}
+          onChangeCommitted={(event, newValue) => {
             handleGlobalChannelsSelectionChange({
               selection: { [field]: newValue },
               event
-            })
-          }
+            });
+          }}
           valueLabelDisplay="auto"
           getAriaLabel={() => `${field} slider`}
           marks={values.map(val => ({ value: val }))}
