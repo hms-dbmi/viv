@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useReducer, useRef } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
 import InfoIcon from '@material-ui/icons/Info';
-import Tooltip from '@material-ui/core/Tooltip';
-
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Typography from '@material-ui/core/Typography';
+import Popper from '@material-ui/core/Popper';
 import { makeStyles } from '@material-ui/core/styles';
 import Description from './Description';
 
@@ -15,6 +16,9 @@ const useStyles = makeStyles(theme => ({
     maxHeight: props => `${props.maxHeight - theme.spacing(4)}px`,
     width: '350px',
     overflowY: 'auto'
+  },
+  typography: {
+    fontSize: '.8rem'
   },
   paper: {
     padding: theme.spacing(2),
@@ -30,12 +34,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const INFOTEXT =
-  'To learn more about the supported Bioformats/OME file formats, please visit the docs by clicking on the GitHub icon.  Generally speaking, the zarr output of bioformats2raw and the tiff output of raw2ometiff can be visualized easily by uplaoding them to your favorite cloud storage provider, and passing in the url in the text field above.';
-
 function Header(props) {
   const { handleSubmitNewUrl, url } = props;
   const [text, setText] = useState(url);
+  const [open, toggle] = useReducer(v => !v, false);
+  const anchorRef = useRef(null);
   const classes = useStyles(props);
 
   return (
@@ -50,9 +53,26 @@ function Header(props) {
         alignItems="center"
       >
         <Grid item xs={1}>
-          <Tooltip title={INFOTEXT}>
-            <InfoIcon />
-          </Tooltip>
+          <InfoIcon onClick={toggle} ref={anchorRef} />
+          <Popper
+            open={open}
+            anchorEl={anchorRef.current}
+            placement="bottom-start"
+            style={{ width: '25%' }}
+          >
+            <Paper style={{ padding: 8 }}>
+              <ClickAwayListener onClickAway={toggle}>
+                <Typography className={classes.typography}>
+                  Provide a URL to an OME-TIFF file or a Bio-Formats Zarr store
+                  to view the image. View the
+                  <a target="_blank" href="http://viv.gehlenborglab.org">
+                    docs
+                  </a>
+                  to learn more about the supported file formats.
+                </Typography>
+              </ClickAwayListener>
+            </Paper>
+          </Popper>
         </Grid>
         <Grid item xs={11}>
           <form
