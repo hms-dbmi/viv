@@ -33,7 +33,10 @@ function useQuery() {
 function RoutedAvivator(props) {
   const query = useQuery();
   const url = query.get('image_url');
-  if (url && sources.filter(source => source.url == url).length === 0) {
+  const {
+    routeProps: { history }
+  } = props;
+  if (url && sources.filter(source => source.url === url).length === 0) {
     const sourcesWithUrl = [
       {
         url,
@@ -43,16 +46,15 @@ function RoutedAvivator(props) {
           .slice(-1)[0]
       }
     ].concat(sources);
-    console.log(props.routeProps.history);
     return (
       <ThemeProvider theme={darkTheme}>
-        <Avivator sources={sourcesWithUrl} history={props.routeProps.history} />
+        <Avivator sources={sourcesWithUrl} history={history} />
       </ThemeProvider>
     );
   }
   return (
     <ThemeProvider theme={darkTheme}>
-      <Avivator sources={sources} history={props.routeProps.history} />
+      <Avivator sources={sources} history={history} />
     </ThemeProvider>
   );
 }

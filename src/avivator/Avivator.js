@@ -46,11 +46,14 @@ const initialChannels = {
  * @param {Object} args.sources A list of sources for a dropdown menu, like [{ url, description }]
  * */
 export default function Avivator(props) {
+  const { history } = props;
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
   const viewSize = useWindowSize();
   const [loader, setLoader] = useState({});
+  /* eslint-disable react/destructuring-assignment */
   const [sources, setSources] = useState(props.sources);
   const [source, setSource] = useState(props.sources[0]);
+  /* eslint-disable react/destructuring-assignment */
   const [colormap, setColormap] = useState('');
   const [dimensions, setDimensions] = useState([]);
   const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
@@ -66,8 +69,7 @@ export default function Avivator(props) {
   useEffect(() => {
     async function changeLoader() {
       setIsLoading(true);
-      const sourceInfo = source;
-      const nextLoader = await createLoader(sourceInfo.url);
+      const nextLoader = await createLoader(source.url);
       const { dimensions: newDimensions, isRgb } = nextLoader;
       const selections = buildDefaultSelection(newDimensions);
       let sliders = [
@@ -108,22 +110,23 @@ export default function Avivator(props) {
       setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
       // Set the global selections (needed for the UI).
       setGlobalSelections(selections[0]);
-      props.history?.push(`?image_url=${source.url}`);
+      // eslint-disable-next-line no-unused-expressions
+      history?.push(`?image_url=${source.url}`);
     }
     changeLoader();
-  }, [source]);
+  }, [source, history]);
 
   const handleSubmitNewUrl = (event, url) => {
     event.preventDefault();
-    const source = {
+    const newSource = {
       url,
       description: url
         .split('?')[0]
         .split('/')
         .slice(-1)[0]
     };
-    setSource(source);
-    setSources(prevSources => [...prevSources, source]);
+    setSource(newSource);
+    setSources(prevSources => [...prevSources, newSource]);
   };
 
   const handleGlobalChannelsSelectionChange = async ({ selection, event }) => {
