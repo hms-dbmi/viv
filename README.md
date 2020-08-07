@@ -1,8 +1,12 @@
 ### Viv [![npm version](https://badge.fury.io/js/%40hms-dbmi%2Fviv.svg)](https://badge.fury.io/js/%40hms-dbmi%2Fviv)
 
-A viewer for high bit depth, high resolution, multi-channel images using DeckGL
-over the hood and WebGL under the hood. To learn more about the "theory" behind
+A library for high bit depth, high resolution, multi-channel images using deck.gl
+with WebGL. To learn more about the "theory" behind
 this, look at [this](https://github.com/hms-dbmi/viv/blob/master/docs/IMAGE_RENDERING.md).
+
+### About
+
+Viv is a library with deck.gl layers, viewers, and utility functions/classes for viewering for multi-scale and non-multi-scale image data. The layers of our API make it easy to create UI elements with the desired level customization. Also included in this repository is `Avivator`, a lightweight "batteries-included" web-based tool for viewing remote microscopy data. To learn more about creating data more suitable for remote viewing, look at our section on [OME-TIFF files](http://viv.vitessce.io/docs/#ome-tiff-loading). In general, we can view almost any OME-TIFF file (or image pyramid, if necessary), perhaps with some small, non-destructive optimizations for remote viewing.
 
 ### Build
 

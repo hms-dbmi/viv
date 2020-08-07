@@ -1,6 +1,5 @@
 /* eslint-disable global-require, no-dupe-keys */
 const path = require('path');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const nodeExternals = require('webpack-node-externals');
 
 const baseConifg = {
@@ -31,31 +30,6 @@ const baseConifg = {
         use: {
           loader: 'babel-loader'
         }
-      },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader
-          },
-
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: true,
-              modules: {
-                localIdentName: '[local]'
-              }
-            }
-          },
-
-          {
-            loader: 'postcss-loader',
-            options: {
-              plugins: () => [require('autoprefixer')]
-            }
-          }
-        ]
       }
     ]
   },
@@ -63,8 +37,7 @@ const baseConifg = {
     fs: 'empty',
     buffer: 'empty',
     http: 'empty'
-  },
-  plugins: [new MiniCssExtractPlugin({ filename: 'css/style.css' })]
+  }
 };
 
 const esConfig = {

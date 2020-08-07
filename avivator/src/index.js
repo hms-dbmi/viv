@@ -10,7 +10,7 @@ import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { grey } from '@material-ui/core/colors';
 
 import sources from './source-info';
-import { Avivator } from '../../src';
+import Avivator from './Avivator';
 
 const darkTheme = createMuiTheme({
   palette: {
@@ -36,25 +36,24 @@ function RoutedAvivator(props) {
   const {
     routeProps: { history }
   } = props;
-  if (url && sources.filter(source => source.url === url).length === 0) {
-    const sourcesWithUrl = [
-      {
-        url,
-        description: url
-          .split('?')[0]
-          .split('/')
-          .slice(-1)[0]
-      }
-    ].concat(sources);
+  if (url) {
+    const urlSrouce = {
+      url,
+      description: url
+        .split('?')[0]
+        .split('/')
+        .slice(-1)[0]
+    };
     return (
       <ThemeProvider theme={darkTheme}>
-        <Avivator sources={sourcesWithUrl} history={history} />
+        <Avivator source={urlSrouce} history={history} />
       </ThemeProvider>
     );
   }
+  const source = sources[Math.floor(Math.random() * sources.length)];
   return (
     <ThemeProvider theme={darkTheme}>
-      <Avivator sources={sources} history={history} />
+      <Avivator source={source} history={history} />
     </ThemeProvider>
   );
 }
