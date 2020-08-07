@@ -1,7 +1,6 @@
 // Generated using bioformats2raw and raw2ometiff.
 const tiffInfo = {
   url: `https://vitessce-demo-data.storage.googleapis.com/test-data/hubmap/pyramid_0.0.2/spraggins.ome.tif`,
-  isPublic: true,
   description: 'Kidney mxIF (OME-TIFF)'
 };
 
@@ -10,7 +9,6 @@ const rootStaticTiffUrl =
 
 const staticTiffInfo = {
   url: rootStaticTiffUrl,
-  isPublic: false,
   description: 'CODEX Tile'
 };
 
@@ -20,7 +18,6 @@ const remoteBFTiffUrl =
 
 const remoteBFTiff = {
   url: remoteBFTiffUrl,
-  isPublic: false,
   description: 'Tonsil Legacy Bioformats Pyramid Tiff'
 };
 
@@ -30,7 +27,6 @@ const remoteTiffRGBUrl =
 
 const remoteTiffRGB = {
   url: remoteTiffRGBUrl,
-  isPublic: false,
   description: 'VAN0008-RK-403-100-PAS_registered PAS Donor Image'
 };
 
@@ -40,14 +36,12 @@ const remoteTiffUrl2 =
 
 const remoteTiff2 = {
   url: remoteTiffUrl2,
-  isPublic: false,
   description: 'VAN0003-LK-32-21 AF Donor Image'
 };
 
 const covidTiffInfo = {
   url:
     'https://vitessce-demo-data.storage.googleapis.com/test-data/12448_G1HR_Mesh003.ome.tif',
-  isPublic: true,
   description: 'Covid-19 Primary Gut Epithelial Stem Cells (OME-TIFF)'
 };
 

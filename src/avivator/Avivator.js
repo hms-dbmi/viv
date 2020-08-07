@@ -39,6 +39,12 @@ const initialChannels = {
   isOn: []
 };
 
+/**
+ * This component serves as visualization for OME-compliant tiff or zarr images.
+ * @param {Object} props
+ * @param {Object} props.history A React router history object to create new urls (optional).
+ * @param {Object} args.sources A list of sources for a dropdown menu, like [{ url, description }]
+ * */
 export default function Avivator(props) {
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
   const viewSize = useWindowSize();
@@ -102,6 +108,7 @@ export default function Avivator(props) {
       setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
       // Set the global selections (needed for the UI).
       setGlobalSelections(selections[0]);
+      props.history?.push(`?image_url=${source.url}`);
     }
     changeLoader();
   }, [source]);

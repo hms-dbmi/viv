@@ -30,10 +30,10 @@ function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
-function RoutedAvivator() {
+function RoutedAvivator(props) {
   const query = useQuery();
   const url = query.get('image_url');
-  if (url) {
+  if (url && sources.filter(source => source.url == url).length === 0) {
     const sourcesWithUrl = [
       {
         url,
@@ -43,24 +43,26 @@ function RoutedAvivator() {
           .slice(-1)[0]
       }
     ].concat(sources);
+    console.log(props.routeProps.history);
     return (
       <ThemeProvider theme={darkTheme}>
-        <Avivator sources={sourcesWithUrl} />
+        <Avivator sources={sourcesWithUrl} history={props.routeProps.history} />
       </ThemeProvider>
     );
   }
   return (
     <ThemeProvider theme={darkTheme}>
-      <Avivator sources={sources} />
+      <Avivator sources={sources} history={props.routeProps.history} />
     </ThemeProvider>
   );
 }
 ReactDOM.render(
   <Router>
     <Switch>
-      <Route path="/">
-        <RoutedAvivator />
-      </Route>
+      <Route
+        path="/"
+        render={routeProps => <RoutedAvivator routeProps={routeProps} />}
+      />
     </Switch>
   </Router>,
   document.getElementById('root')
