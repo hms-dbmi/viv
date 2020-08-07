@@ -33,18 +33,25 @@ function useQuery() {
 function RoutedAvivator() {
   const query = useQuery();
   const url = query.get('image_url');
-  const sourcesWithUrl = [
-    {
-      url,
-      description: url
-        .split('?')[0]
-        .split('/')
-        .slice(-1)[0]
-    }
-  ].concat(sources);
+  if (url) {
+    const sourcesWithUrl = [
+      {
+        url,
+        description: url
+          .split('?')[0]
+          .split('/')
+          .slice(-1)[0]
+      }
+    ].concat(sources);
+    return (
+      <ThemeProvider theme={darkTheme}>
+        <Avivator sources={sourcesWithUrl} />
+      </ThemeProvider>
+    );
+  }
   return (
     <ThemeProvider theme={darkTheme}>
-      <Avivator sources={sourcesWithUrl} />
+      <Avivator sources={sources} />
     </ThemeProvider>
   );
 }

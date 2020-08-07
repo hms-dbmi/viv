@@ -39,11 +39,12 @@ const initialChannels = {
   isOn: []
 };
 
-export default function Avivator({ sources }) {
+export default function Avivator(props) {
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
   const viewSize = useWindowSize();
   const [loader, setLoader] = useState({});
-  const [source, setSource] = useState(sources[0]);
+  const [sources, setSources] = useState(props.sources);
+  const [source, setSource] = useState(props.sources[0]);
   const [colormap, setColormap] = useState('');
   const [dimensions, setDimensions] = useState([]);
   const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
@@ -105,9 +106,17 @@ export default function Avivator({ sources }) {
     changeLoader();
   }, [source]);
 
-  const handleSubmitNewUrl = (event, value) => {
+  const handleSubmitNewUrl = (event, url) => {
     event.preventDefault();
-    setSource({ url: value, name: 'User Tiff' });
+    const source = {
+      url,
+      description: url
+        .split('?')[0]
+        .split('/')
+        .slice(-1)[0]
+    };
+    setSource(source);
+    setSources(prevSources => [...prevSources, source]);
   };
 
   const handleGlobalChannelsSelectionChange = async ({ selection, event }) => {
@@ -281,7 +290,7 @@ export default function Avivator({ sources }) {
           <Grid container justify="space-between">
             <Grid item xs={6}>
               <SourceSelect
-                value={source.name}
+                value={sources.indexOf(source)}
                 sources={sources}
                 handleChange={i => setSource(sources[i])}
                 disabled={isLoading}
