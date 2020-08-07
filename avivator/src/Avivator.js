@@ -59,7 +59,7 @@ export default function Avivator(props) {
   const [colormap, setColormap] = useState('');
   const [dimensions, setDimensions] = useState([]);
   const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
-
+  const [initialViewState, setInitialViewState] = useState({});
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
   const [overviewOn, setOverviewOn] = useReducer(v => !v, false);
   const [controllerOn, toggleController] = useReducer(v => !v, true);
@@ -102,6 +102,12 @@ export default function Avivator(props) {
             ? [[255, 255, 255]]
             : stats.map((_, i) => COLOR_PALLETE[i]);
       }
+      const { height, width } = nextLoader.getRasterSize({ z: 0 });
+      const { numLevels } = nextLoader;
+      const loaderInitialViewState = {
+        target: [height / 2, width / 2, 0],
+        zoom: numLevels > 0 ? -(numLevels - 2) : -2
+      };
       setDimensions(newDimensions);
       dispatch({
         type: 'RESET_CHANNELS',
@@ -110,6 +116,7 @@ export default function Avivator(props) {
       setLoader(nextLoader);
       setIsLoading(false);
       setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
+      setInitialViewState(loaderInitialViewState);
       // Set the global selections (needed for the UI).
       setGlobalSelections(selections[0]);
       // eslint-disable-next-line no-unused-expressions
@@ -209,19 +216,15 @@ export default function Avivator(props) {
       }
     });
   };
-  const { isPyramid, numLevels, isRgb } = loader;
-  const initialViewState = {
-    target: [loader.height / 2, loader.width / 2, 0],
-    zoom: numLevels > 0 ? -(numLevels - 2) : -2
-  };
+  const { isPyramid, isRgb } = loader;
   const { colors, sliders, isOn, ids, selections, domains } = channels;
   const globalControlDimensions = dimensions?.filter(dimension =>
     GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dimension.field)
   );
   const channelControllers = ids.map((id, i) => {
-    const name = dimensions.filter(j => j.field === 'channel')[0].values[
-      selections[i].channel
-    ];
+    const channelOptions = dimensions.filter(j => j.field === 'channel')[0]
+      .values;
+    const name = channelOptions[selections[i].channel];
     return (
       <Grid
         key={`channel-controller-${name}-${id}`}
@@ -258,6 +261,7 @@ export default function Avivator(props) {
   return (
     <>
       {!isLoading &&
+        initialViewState.target &&
         (useLinkedView && isPyramid ? (
           <SideBySideViewer
             loader={loader}
@@ -266,7 +270,7 @@ export default function Avivator(props) {
             channelIsOn={isOn}
             loaderSelection={selections}
             initialViewState={{
-              ...(initialViewState || DEFAULT_VIEW_STATE),
+              ...initialViewState,
               height: viewSize.height,
               width: viewSize.width * 0.5
             }}
@@ -283,7 +287,7 @@ export default function Avivator(props) {
             channelIsOn={isOn}
             loaderSelection={selections}
             initialViewState={{
-              ...(initialViewState || DEFAULT_VIEW_STATE),
+              ...initialViewState,
               height: viewSize.height,
               width: viewSize.width
             }}
