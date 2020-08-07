@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
 }));
 function Header(props) {
   const { handleSubmitNewUrl } = props;
-  const [text, onTextChange] = useState('');
+  const [text, setText] = useState('');
   const classes = useStyles(props);
 
   return (
@@ -38,14 +38,20 @@ function Header(props) {
         <Description />
       </Grid>
       <Grid item xs={12}>
-        <form onSubmit={event => handleSubmitNewUrl(event, text)}>
+        <form
+          onSubmit={event => {
+            handleSubmitNewUrl(event, text);
+            setText('');
+          }}
+        >
           <TextField
             id="standard-basic"
             label="OME-TIFF/OME-Zarr URL"
             variant="filled"
             size="small"
             fullWidth
-            onChange={e => onTextChange(e.target.value)}
+            value={text}
+            onChange={e => setText(e.target.value)}
           />
         </form>
       </Grid>

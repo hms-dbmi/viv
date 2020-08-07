@@ -362,7 +362,7 @@ function App() {
           )}
         </Menu>
       )}
-      <Box position="absolute" right={0} top={0} m={2}>
+      <Box position="absolute" right={-8} top={-8} m={2}>
         <MenuToggle on={controllerOn} toggle={toggleController} />
       </Box>
     </>
