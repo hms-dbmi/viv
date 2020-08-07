@@ -4,6 +4,8 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
+import Slider from '@material-ui/core/Slider';
+
 import AddIcon from '@material-ui/icons/Add';
 
 import {
@@ -30,6 +32,7 @@ import {
   DEFAULT_VIEW_STATE,
   DEFAULT_OVERVIEW,
   FILL_PIXEL_VALUE,
+  GLOBAL_SLIDER_DIMENSION_FIELDS,
   COLOR_PALLETE
 } from './constants';
 
@@ -47,7 +50,8 @@ function App() {
   const [loader, setLoader] = useState({});
   const [sourceName, setSourceName] = useState('tiff');
   const [colormap, setColormap] = useState('');
-  const [dimensions, setDimensions] = useState({});
+  const [dimensions, setDimensions] = useState([]);
+  const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
 
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
   const [overviewOn, setOverviewOn] = useReducer(v => !v, false);
@@ -96,9 +100,35 @@ function App() {
       setLoader(nextLoader);
       setIsLoading(false);
       setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
+      // Set the global selections (needed for the UI).
+      setGlobalSelections(selections[0]);
     }
     changeLoader();
   }, [sourceName]);
+
+  const handleGlobalChannelsSelectionChange = async ({ selection, event }) => {
+    const { selections } = channels;
+    const loaderSelection = selections.map(pastSelection => ({
+      ...pastSelection,
+      ...selection
+    }));
+    // See https://github.com/hubmapconsortium/vitessce-image-viewer/issues/176 for why
+    // we have to check mouseup.
+    const mouseUp = event.type === 'mouseup';
+    // Only update domains on a mouseup event for the same reason as above.
+    if (mouseUp) {
+      const stats = await getChannelStats({ loader, loaderSelection });
+      const domains = stats.map(stat => stat.domain);
+      const sliders = stats.map(stat => stat.autoSliders);
+      dispatch({
+        type: 'RESET_CHANNELS',
+        value: { selections: loaderSelection, domains, sliders, colors }
+      });
+      setGlobalSelections(prev => ({ ...prev, ...selection }));
+    } else {
+      setGlobalSelections(prev => ({ ...prev, ...selection }));
+    }
+  };
 
   /*
    * Handles updating state for each channel controller.
@@ -112,7 +142,7 @@ function App() {
       const [channelDim] = dimensions;
       const { field, values } = channelDim;
       const dimIndex = values.indexOf(value);
-      const selection = { [field]: value };
+      const selection = { [field]: dimIndex };
       dispatch({
         type,
         index,
@@ -123,8 +153,9 @@ function App() {
     }
   };
 
-  const handleChannelAdd = () => {
+  const handleChannelAdd = async () => {
     const selection = {};
+    const { selections } = channels;
 
     dimensions.forEach(dimension => {
       // Set new image to default selection for non-global selections (0)
@@ -132,13 +163,21 @@ function App() {
       selection[dimension.field] = GLOBAL_SLIDER_DIMENSION_FIELDS.includes(
         dimension.field
       )
-        ? Object.values(channels)[0].selection[dimension.field]
+        ? selections[0][dimension.field]
         : 0;
     });
+    const stats = await getChannelStats({
+      loader,
+      loaderSelection: [selection]
+    });
+    const [domain] = stats.map(stat => stat.domain);
+    const [slider] = stats.map(stat => stat.autoSliders);
     dispatch({
       type: 'ADD_CHANNEL',
       value: {
-        selection
+        selection,
+        domain,
+        slider
       }
     });
   };
@@ -148,6 +187,9 @@ function App() {
     zoom: numLevels > 0 ? -(numLevels - 2) : -2
   };
   const { colors, sliders, isOn, ids, selections, domains } = channels;
+  const globalControlDimensions = dimensions?.filter(dimension =>
+    GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dimension.field)
+  );
   const channelControllers = ids.map((id, i) => {
     const name = dimensions.filter(i => i.field === 'channel')[0].values[
       selections[i].channel
@@ -172,6 +214,49 @@ function App() {
         />
       </Grid>
     );
+  });
+  const globalControllers = globalControlDimensions.map(dimension => {
+    const { field, values } = dimension;
+    return values.length > 1 ? (
+      <Grid
+        container
+        key={field}
+        direction="row"
+        justify="space-between"
+        alignItems="center"
+      >
+        <Grid item xs={1}>
+          {field}:
+        </Grid>
+        <Grid item xs={11}>
+          <Slider
+            value={globalSelections[field]}
+            // See https://github.com/hubmapconsortium/vitessce-image-viewer/issues/176 for why
+            // we have the two handlers.
+            onChange={(event, newValue) =>
+              handleGlobalChannelsSelectionChange({
+                selection: { [field]: newValue },
+                event
+              })
+            }
+            onChangeCommitted={(event, newValue) =>
+              handleGlobalChannelsSelectionChange({
+                selection: { [field]: newValue },
+                event
+              })
+            }
+            valueLabelDisplay="auto"
+            getAriaLabel={() => `${field} slider`}
+            marks={values.map(val => ({ value: val }))}
+            min={Number(values[0])}
+            max={Number(values.slice(-1))}
+            orientation="horizontal"
+            style={{ marginTop: '7px' }}
+            step={null}
+          />
+        </Grid>
+      </Grid>
+    ) : null;
   });
   return (
     <>
@@ -229,6 +314,7 @@ function App() {
               />
             </Grid>
           </Grid>
+          {globalControllers}
           {!isLoading && !isRgb ? (
             <Grid container>{channelControllers}</Grid>
           ) : (

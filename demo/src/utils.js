@@ -113,13 +113,14 @@ export function channelsReducer(state, { index, value, type }) {
     }
     case 'ADD_CHANNEL': {
       // Adds an additional channel
-      const { selection } = value;
+      const { selection, domain, slider } = value;
       const selections = [...state.selections, selection];
       const colors = [...state.colors, [255, 255, 255]];
       const isOn = [...state.isOn, true];
-      const sliders = [...state.sliders, INITIAL_SLIDER_VALUE];
+      const sliders = [...state.sliders, slider];
       const ids = [...state.ids, String(Math.random())];
-      return { selections, colors, isOn, sliders, ids };
+      const domains = [...state.domains, domain];
+      return { selections, domains, colors, isOn, sliders, ids };
     }
     case 'REMOVE_CHANNEL': {
       // Remove a single channel by index
