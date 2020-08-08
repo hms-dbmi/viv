@@ -124,11 +124,11 @@ export default class VivViewer extends PureComponent {
       const {
         loader: { tileSize }
       } = layer.props;
+      const { z } = sourceLayer.props;
       // The zoomed out layer needs to use the fixed zoom at which it is rendered (i.e numLevels - 1).
       const layerZoomScale = Math.max(
         1,
-        2 **
-          Math.round(-layer.context.viewport.zoom + Math.log2(512 / tileSize))
+        2 ** Math.round(-z + Math.log2(512 / tileSize))
       );
       dataCoords = [
         Math.floor((coordinate[0] - bounds[0]) / layerZoomScale),
