@@ -19,9 +19,9 @@ const useStyles = makeStyles(theme => ({
     overflowY: 'scroll',
     '&::-webkit-scrollbar': {
       display: 'none',
-      background: 'transparent',
+      background: 'transparent'
     },
-    scrollbarWidth: 'none',
+    scrollbarWidth: 'none'
   },
   typography: {
     fontSize: '.8rem'
