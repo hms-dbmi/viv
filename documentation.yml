@@ -8,7 +8,6 @@ toc:
 - name: OME-TIFF Loading
   file: docs/OMETIFF_LOADING.md
 - name: Viewers (React Components)
-- Avivator
 - PictureInPictureViewer
 - SideBySideViewer
 - VivViewer
@@ -29,7 +28,6 @@ toc:
 - createOMETiffLoader
 - OMETiffLoader
 - ZarrLoader
-- OMEZarrReader
 - name: Layers (Internal)
 - XRLayer
 - OverviewLayer
