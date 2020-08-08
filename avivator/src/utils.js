@@ -123,7 +123,8 @@ export function channelsReducer(state, { index, value, type }) {
       const isOn = state.isOn.filter((_, i) => i !== index);
       const ids = state.ids.filter((_, i) => i !== index);
       const selections = state.selections.filter((_, i) => i !== index);
-      return { sliders, colors, isOn, ids, selections };
+      const domains = state.domains.filter((_, i) => i !== index);
+      return { sliders, colors, isOn, ids, domains, selections };
     }
     case 'RESET_CHANNELS': {
       // Clears current channels and sets with new defaults
