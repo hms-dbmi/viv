@@ -35,6 +35,9 @@ const sources = [
     path: 'Luca-7Color/',
     description: 'Perkin Elmer Luca-7Color_Scan1.qgtiff'
   }
-]
+];
 
-export default sources.map(s => ({ url: `${baseUrl}/${s.path}`, description: s.description }));
+export default sources.map(s => ({
+  url: `${baseUrl}/${s.path}`,
+  description: s.description
+}));

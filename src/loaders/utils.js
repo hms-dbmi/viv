@@ -9,7 +9,7 @@ export function isInTileBounds({
   width,
   height,
   tileSize,
-  numLevels,
+  numLevels
 }) {
   const xInBounds = x < Math.ceil(width / (tileSize * 2 ** z)) && x >= 0;
   const yInBounds = y < Math.ceil(height / (tileSize * 2 ** z)) && y >= 0;
@@ -78,7 +78,7 @@ export async function getChannelStats({ loader, loaderSelection }) {
   const z = loader.isPyramid ? loader.numLevels - 1 : 0;
   const rasters = await loader.getRaster({ z, loaderSelection });
   const { data } = rasters;
-  const channelStats = data.map((arr) => {
+  const channelStats = data.map(arr => {
     let len = arr.length;
     let min = Infinity;
     let max = -Infinity;
@@ -123,7 +123,7 @@ export async function getChannelStats({ loader, loaderSelection }) {
     // Used for "auto" settings.  This is the best parameter I've found experimentally.
     // I don't think there is a right answer and this feature is common in Fiji.
     // Also it's best to use a non-zero array for this.
-    const cutoffArr = arr.filter((i) => i >= 1);
+    const cutoffArr = arr.filter(i => i >= 1);
     const cutoffPercentile = 0.0005;
     const topCutoffLocation = Math.floor(
       cutoffArr.length * (1 - cutoffPercentile)
@@ -135,7 +135,7 @@ export async function getChannelStats({ loader, loaderSelection }) {
     quickselect(cutoffArr, bottomCutoffLocation, 0, topCutoffLocation);
     const autoSliders = [
       cutoffArr[bottomCutoffLocation],
-      cutoffArr[topCutoffLocation],
+      cutoffArr[topCutoffLocation]
     ];
     return {
       mean,
@@ -145,7 +145,7 @@ export async function getChannelStats({ loader, loaderSelection }) {
       median,
       data: arr,
       domain: [min, max],
-      autoSliders,
+      autoSliders
     };
   });
   return channelStats;
@@ -171,13 +171,20 @@ export async function getJson(store, key) {
  */
 export function dimensionsFromOMEXML(omexml) {
   const { SizeZ, SizeT, DimensionOrder } = omexml;
-  const dims = DimensionOrder.toLowerCase().split('').slice().reverse();
+  const dims = DimensionOrder.toLowerCase()
+    .split('')
+    .slice()
+    .reverse();
   const dimensions = dims.map(field => {
     if (field === 'x' || field === 'y') {
       return { field, type: 'quantitative', values: null };
     }
     if (field === 'c') {
-      return { field: 'channel', type: 'nominal', values: omexml.getChannelNames() };
+      return {
+        field: 'channel',
+        type: 'nominal',
+        values: omexml.getChannelNames()
+      };
     }
     const type = 'ordinal';
     if (field === 't') {

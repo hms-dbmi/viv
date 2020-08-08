@@ -12,7 +12,7 @@ import {
   ZarrLoader,
   createOMETiffLoader,
   OMETiffLoader,
-  getChannelStats,
+  getChannelStats
 } from './loaders';
 import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from './constants';
 
@@ -35,5 +35,5 @@ export {
   OMETiffLoader,
   createOMETiffLoader,
   createZarrLoader,
-  createBioformatsZarrLoader,
+  createBioformatsZarrLoader
 };

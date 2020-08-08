@@ -12,7 +12,7 @@ export async function createZarrLoader({
   isPyramid,
   isRgb,
   scale,
-  translate,
+  translate
 }) {
   // TODO: This is a legacy initialization function. There is an official
   // specification now for multiscale datasets (see below), that doesn't
@@ -23,9 +23,9 @@ export async function createZarrLoader({
     const response = await fetch(metadataUrl);
     const { metadata } = await response.json();
     const paths = Object.keys(metadata)
-      .filter((metaKey) => metaKey.includes('.zarray'))
-      .map((arrMetaKeys) => arrMetaKeys.slice(0, -7));
-    data = Promise.all(paths.map((path) => openArray({ store: url, path })));
+      .filter(metaKey => metaKey.includes('.zarray'))
+      .map(arrMetaKeys => arrMetaKeys.slice(0, -7));
+    data = Promise.all(paths.map(path => openArray({ store: url, path })));
   } else {
     data = openArray({ store: url });
   }
@@ -34,7 +34,7 @@ export async function createZarrLoader({
     dimensions,
     scale,
     translate,
-    isRgb,
+    isRgb
   });
 }
 
@@ -48,42 +48,44 @@ export async function createBioformatsZarrLoader({ url }) {
   if ('multiscales' in rootAttrs) {
     // Get path to subresolutions if they exist
     const { datasets } = rootAttrs.multiscales[0];
-    resolutions = datasets.map((d) => d.path);
+    resolutions = datasets.map(d => d.path);
   }
 
-  const promises = resolutions.map((path) => openArray({ store, path }));
+  const promises = resolutions.map(path => openArray({ store, path }));
   const pyramid = await Promise.all(promises);
 
-  /* 
-  * TODO: There should be a much better way to do this.
-  * If base image is small, we don't need to fetch data for the
-  * top levels of the pyramid. For large images, the tile sizes (chunks)
-  * will be the same size for x/y. We check the chunksize here for this edge case.
-  */
+  /*
+   * TODO: There should be a much better way to do this.
+   * If base image is small, we don't need to fetch data for the
+   * top levels of the pyramid. For large images, the tile sizes (chunks)
+   * will be the same size for x/y. We check the chunksize here for this edge case.
+   */
   const { chunks, shape } = pyramid[0];
   const shouldUseBase = chunks[-1] !== chunks[-2];
   const data = pyramid.length > 1 || shouldUseBase ? pyramid : pyramid[0];
 
   // Get OMEXML string
-  const buffer = await fetch(metaUrl).then((res) => res.arrayBuffer());
+  const buffer = await fetch(metaUrl).then(res => res.arrayBuffer());
   const omexmlString = new TextDecoder().decode(new Uint8Array(buffer));
   const omexml = new OMEXML(omexmlString);
   const dimensions = dimensionsFromOMEXML(omexml);
 
-  /* 
-  * Specifying different dimension orders form the METADATA.ome.xml is 
-  * possible and necessary for creating an OME-Zarr precursor. 
-  * 
-  * e.g. `bioformats2raw --file_type=zarr --dimension-order='XYZCY'`
-  * 
-  * Here we check the shape of base of the pyrmaid and compare the shape
-  * to the shape of the dimensions. If they are different, we reorder the 
-  * dimensions to create the zarr loader. This is fragile code, and will only 
-  * be executed if someone tries to specify different dimension orders.
-  */
+  /*
+   * Specifying different dimension orders form the METADATA.ome.xml is
+   * possible and necessary for creating an OME-Zarr precursor.
+   *
+   * e.g. `bioformats2raw --file_type=zarr --dimension-order='XYZCY'`
+   *
+   * Here we check the shape of base of the pyrmaid and compare the shape
+   * to the shape of the dimensions. If they are different, we reorder the
+   * dimensions to create the zarr loader. This is fragile code, and will only
+   * be executed if someone tries to specify different dimension orders.
+   */
   const nonXYShape = shape.slice(0, -2); // XY always last dims and don't need to be compared
   const nonXYDims = dimensions.filter(d => d.values); // XY are null
-  const allSameSize = nonXYShape.every((s, i) => s === nonXYDims[i].values.length);
+  const allSameSize = nonXYShape.every(
+    (s, i) => s === nonXYDims[i].values.length
+  );
   if (!allSameSize) {
     const sortedDims = [];
     // Greedily match first matching dimension
@@ -115,7 +117,7 @@ export async function createOMETiffLoader({ url, offsets = [], headers = {} }) {
     pool,
     firstImage,
     omexmlString,
-    offsets,
+    offsets
   });
 }
 

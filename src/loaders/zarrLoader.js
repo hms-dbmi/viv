@@ -10,7 +10,7 @@ export default class ZarrLoader {
     dimensions,
     isRgb,
     scale = 1,
-    translate = { x: 0, y: 0 },
+    translate = { x: 0, y: 0 }
   }) {
     let base;
     if (Array.isArray(data)) {
@@ -62,15 +62,15 @@ export default class ZarrLoader {
    */
   async getTile({ x, y, z, loaderSelection = [] }) {
     const source = this._getSource(z);
-    const [xIndex, yIndex] = ['x', 'y'].map((k) => this._dimIndices.get(k));
+    const [xIndex, yIndex] = ['x', 'y'].map(k => this._dimIndices.get(k));
 
-    const dataRequests = loaderSelection.map(async (sel) => {
+    const dataRequests = loaderSelection.map(async sel => {
       const chunkKey = this._serializeSelection(sel);
       chunkKey[yIndex] = y;
       chunkKey[xIndex] = x;
       const {
         data,
-        shape: [height, width],
+        shape: [height, width]
       } = await source.getRawChunk(chunkKey);
       if (height < this.tileSize || width < this.tileSize) {
         return padTileWithZeros(
@@ -86,7 +86,7 @@ export default class ZarrLoader {
     return {
       data,
       width: this.tileSize,
-      height: this.tileSize,
+      height: this.tileSize
     };
   }
 
@@ -98,9 +98,9 @@ export default class ZarrLoader {
    */
   async getRaster({ z, loaderSelection = [] }) {
     const source = this._getSource(z);
-    const [xIndex, yIndex] = ['x', 'y'].map((k) => this._dimIndices.get(k));
+    const [xIndex, yIndex] = ['x', 'y'].map(k => this._dimIndices.get(k));
 
-    const dataRequests = loaderSelection.map(async (sel) => {
+    const dataRequests = loaderSelection.map(async sel => {
       const chunkKey = this._serializeSelection(sel);
       chunkKey[yIndex] = null;
       chunkKey[xIndex] = null;
@@ -137,9 +137,7 @@ export default class ZarrLoader {
    */
   getRasterSize({ z }) {
     const { shape } = this._getSource(z);
-    const [height, width] = ['y', 'x'].map(
-      (k) => shape[this._dimIndices.get(k)]
-    );
+    const [height, width] = ['y', 'x'].map(k => shape[this._dimIndices.get(k)]);
     return { height, width };
   }
 
@@ -174,7 +172,7 @@ export default class ZarrLoader {
       if (!this._dimIndices.has(dimName)) {
         throw Error(
           `Dimension "${dimName}" does not exist on loader.
-           Must be one of "${this.dimensions.map((d) => d.field)}."`
+           Must be one of "${this.dimensions.map(d => d.field)}."`
         );
       }
       const dimIndex = this._dimIndices.get(dimName);
