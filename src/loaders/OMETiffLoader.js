@@ -11,7 +11,11 @@ const DTYPE_LOOKUP = {
   uint8: '<u1',
   uint16: '<u2',
   uint32: '<u4',
-  float: '<f4'
+  float: '<f4',
+  // TODO: we currently need to cast these dtypes to their uint counterparts.
+  int8: '<u1',
+  int16: '<u2',
+  int32: '<u4'
 };
 
 /**
@@ -211,12 +215,22 @@ export default class OMETiffLoader {
     );
     const width = image.getWidth();
     const height = image.getHeight();
-    return {
+
+    let data;
+    if (this.dtype === '<f4') {
       // GeoTiff.js returns 32 bit uint when the tiff has 32 significant bits.
-      data:
-        this.dtype === '<f4'
-          ? rasters.map(r => new Float32Array(r.buffer))
-          : rasters,
+      data = rasters.map(r => new Float32Array(r.buffer));
+    } else if (this.omexml.Type.startsWith('int')) {
+      // geotiff.js returns the correct typedarray but need to cast to Uint for viv.
+      const b = rasters[0].BYTES_PER_ELEMENT;
+      // eslint-disable-next-line no-nested-ternary
+      const T = b === 1 ? Uint8Array : b === 2 ? Uint16Array : Uint32Array;
+      data = rasters.map(r => new T(r));
+    } else {
+      data = rasters;
+    }
+    return {
+      data,
       width,
       height
     };
@@ -330,6 +344,18 @@ export default class OMETiffLoader {
         this.tileSize,
         this.tileSize
       );
+    }
+
+    if (this.omexml.Type.startsWith('int')) {
+      // Uint view isn't correct for underling buffer, need to take an
+      // IntXArray view and cast to UintXArray.
+      if (data.BYTES_PER_ELEMENT === 1) {
+        return new Uint8Array(new Int8Array(data.buffer));
+      }
+      if (data.BYTES_PER_ELEMENT === 2) {
+        return new Uint16Array(new Int16Array(data.buffer));
+      }
+      return new Uint32Array(new Int32Array(data.buffer));
     }
 
     return data;
