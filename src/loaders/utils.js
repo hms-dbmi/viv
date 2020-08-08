@@ -1,5 +1,7 @@
 import quickselect from 'quickselect';
 
+import { range } from '../layers/utils';
+
 export function isInTileBounds({
   x,
   y,
@@ -147,4 +149,48 @@ export async function getChannelStats({ loader, loaderSelection }) {
     };
   });
   return channelStats;
+}
+
+/**
+ * Retrieves blob from zarr store and parses as JSON.
+ * @param {Object} store Valid zarr.Store
+ * @param {String} key String path to to decode from store.
+ * @returns {Object}
+ */
+export async function getJson(store, key) {
+  const bytes = new Uint8Array(await store.getItem(key));
+  const decoder = new TextDecoder('utf-8');
+  const json = JSON.parse(decoder.decode(bytes));
+  return json;
+}
+
+/**
+ * Builds a dimensions object from OMEXML
+ * @param {Object} omexml OMEXML class
+ * @returns {Array} Array of dimensions objects
+ */
+export function dimensionsFromOMEXML(omexml) {
+  const { SizeZ, SizeT, DimensionOrder } = omexml;
+  const dims = DimensionOrder.toLowerCase()
+    .split('')
+    .slice()
+    .reverse();
+  const dimensions = dims.map(field => {
+    if (field === 'x' || field === 'y') {
+      return { field, type: 'quantitative', values: null };
+    }
+    if (field === 'c') {
+      return {
+        field: 'channel',
+        type: 'nominal',
+        values: omexml.getChannelNames()
+      };
+    }
+    const type = 'ordinal';
+    if (field === 't') {
+      return { field: 'time', type, values: range(SizeT) };
+    }
+    return { field, type, values: range(SizeZ) };
+  });
+  return dimensions;
 }

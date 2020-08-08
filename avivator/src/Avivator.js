@@ -173,7 +173,7 @@ export default function Avivator(props) {
    */
   const handleControllerChange = (index, type, value) => {
     if (type === 'CHANGE_CHANNEL') {
-      const [channelDim] = dimensions;
+      const [channelDim] = dimensions.filter(d => d.field === 'channel');
       const { field, values } = channelDim;
       const dimIndex = values.indexOf(value);
       const selection = { [field]: dimIndex };
@@ -232,7 +232,7 @@ export default function Avivator(props) {
       >
         <ChannelController
           name={name}
-          channelOptions={dimensions[0].values}
+          channelOptions={channelOptions}
           isOn={isOn[i]}
           sliderValue={sliders[i]}
           colorValue={colors[i]}

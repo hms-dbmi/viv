@@ -8,11 +8,11 @@ import { VivViewer, PictureInPictureViewer, SideBySideViewer } from './viewers';
 import { VivView, OverviewView, DetailView, SideBySideView } from './views';
 import {
   createZarrLoader,
+  createBioformatsZarrLoader,
   ZarrLoader,
   createOMETiffLoader,
   OMETiffLoader,
-  getChannelStats,
-  OMEZarrReader
+  getChannelStats
 } from './loaders';
 import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from './constants';
 
@@ -35,5 +35,5 @@ export {
   OMETiffLoader,
   createOMETiffLoader,
   createZarrLoader,
-  OMEZarrReader
+  createBioformatsZarrLoader
 };

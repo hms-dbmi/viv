@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
-import { createOMETiffLoader } from '../../src';
+import { createOMETiffLoader, createBioformatsZarrLoader } from '../../src';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
 
 export async function createLoader(url) {
-  if (url.includes('ome.tif')) {
+  if (url.includes('ome.tif') || url.includes('ome.tiff')) {
     const res = await fetch(url.replace(/ome.tif(f?)/gi, 'offsets.json'));
     const offsets = res.status !== 404 ? await res.json() : [];
     const loader = await createOMETiffLoader({ url, offsets });
     return loader;
   }
-  return null;
+  const loader = await createBioformatsZarrLoader({ url });
+  return loader;
 }
 
 // Return the midpoint of the global dimensions.
@@ -122,7 +123,8 @@ export function channelsReducer(state, { index, value, type }) {
       const isOn = state.isOn.filter((_, i) => i !== index);
       const ids = state.ids.filter((_, i) => i !== index);
       const selections = state.selections.filter((_, i) => i !== index);
-      return { sliders, colors, isOn, ids, selections };
+      const domains = state.domains.filter((_, i) => i !== index);
+      return { sliders, colors, isOn, ids, domains, selections };
     }
     case 'RESET_CHANNELS': {
       // Clears current channels and sets with new defaults
