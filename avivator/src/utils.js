@@ -5,7 +5,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
 
 export async function createLoader(url) {
   if (url.includes('ome.tif') || url.includes('ome.tiff')) {
-    const res = await fetch(url.replace(/ome.tif(f?)/gi, 'offsets.json'));
+    const res = await fetch(url.replace(/ome\.tif(f?)/gi, 'offsets.json'));
     const offsets = res.status !== 404 ? await res.json() : [];
     const loader = await createOMETiffLoader({ url, offsets });
     return loader;

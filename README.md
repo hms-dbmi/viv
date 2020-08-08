@@ -13,7 +13,7 @@ The layers of our API make it easy to create UI elements with the desired level 
 
 Also included in this repository is `Avivator`, a lightweight "batteries-included" web-based tool for viewing remote microscopy data.
 To learn more about creating data more suitable for remote viewing, look at our section on [OME-TIFF files](http://viv.gehlenborglab.org/#ome-tiff-loading).
-In general, we can view almost any OME-TIFF file (or image pyramid, if necessary), perhaps with some small, non-destructive optimizations for remote viewing - specifically, an extra file can be placed next to the image on your cloud storage provider or on the file server with the same name but ending in `offsets.json`. Avivator will use this to traverse the IFD structure of your OMETTIFF more quickly. This is very helpful for OMETTIFFs with a lot of channels (roughly >30); For example, you may have `mycloudprovider.com/tet-bucket/myfile.ome.tif` and `Avivator` will try to find `mycloudprovider.com/tet-bucket/myfile.offsets.json` to make loading faster.
+In general, we can view almost any OME-TIFF file (or image pyramid, if necessary), perhaps with some small, non-destructive optimizations for remote viewing - specifically, an extra file can be placed next to the image on your cloud storage provider or on the file server with the same name but ending in `offsets.json`. Avivator will use this to traverse the IFD structure of your OMETTIFF more quickly. This is very helpful for OMETIFFs with a lot of channels (roughly >30); For example, you may have `mycloudprovider.com/test-bucket/myfile.ome.tif` and `Avivator` will try to find `mycloudprovider.com/test-bucket/myfile.offsets.json` to make loading faster.
 
 ### Build
 
