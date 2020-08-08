@@ -170,15 +170,20 @@ export async function getJson(store, key) {
  * @returns {Array} Array of dimensions objects
  */
 export function dimensionsFromOMEXML(omexml) {
-  const { SizeZ, SizeT } = omexml;
-  // Dimension order for OME-Zarr precurer Bioformats-produced zarr
-  // from: bioformats2raw <file> --file_type=zarr --dimension_order=XYZCT
-  const dimensions = [
-    { field: 'time', type: 'ordinal', values: range(SizeT) },
-    { field: 'channel', type: 'nominal', values: omexml.getChannelNames() },
-    { field: 'z', type: 'ordinal', values: range(SizeZ) },
-    { field: 'y', type: 'quantitative', values: null },
-    { field: 'x', type: 'quantitative', values: null },
-  ];
+  const { SizeZ, SizeT, DimensionOrder } = omexml;
+  const dims = DimensionOrder.toLowerCase().split('').slice().reverse();
+  const dimensions = dims.map(field => {
+    if (field === 'x' || field === 'y') {
+      return { field, type: 'quantitative', values: null };
+    }
+    if (field === 'c') {
+      return { field: 'channel', type: 'nominal', values: omexml.getChannelNames() };
+    }
+    const type = 'ordinal';
+    if (field === 't') {
+      return { field: 'time', type, values: range(SizeT) };
+    }
+    return { field, type, values: range(SizeZ) };
+  });
   return dimensions;
 }

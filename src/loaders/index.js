@@ -54,11 +54,13 @@ export async function createBioformatsZarrLoader({ url }) {
   const promises = resolutions.map((path) => openArray({ store, path }));
   const pyramid = await Promise.all(promises);
 
-  // TODO: There should be a much better way to do this.
-  // If base image is small, we don't need to fetch data for the
-  // top levels of the pyramid. For large images, the tile sizes (chunks)
-  // will be the same size for x/y. We check the chunksize here for this edge case.
-  const { chunks } = pyramid[0];
+  /* 
+  * TODO: There should be a much better way to do this.
+  * If base image is small, we don't need to fetch data for the
+  * top levels of the pyramid. For large images, the tile sizes (chunks)
+  * will be the same size for x/y. We check the chunksize here for this edge case.
+  */
+  const { chunks, shape } = pyramid[0];
   const shouldUseBase = chunks[-1] !== chunks[-2];
   const data = pyramid.length > 1 || shouldUseBase ? pyramid : pyramid[0];
 
@@ -68,11 +70,32 @@ export async function createBioformatsZarrLoader({ url }) {
   const omexml = new OMEXML(omexmlString);
   const dimensions = dimensionsFromOMEXML(omexml);
 
-  const loader = new ZarrLoader({ data, dimensions });
-  // Need to prefix all dtypes with < bc of current DTYPE
-  // https://github.com/hubmapconsortium/vitessce-image-viewer/issues/203
-  loader.dtype = `<${loader.dtype.slice(1)}`;
-  return loader;
+  /* 
+  * Specifying different dimension orders form the METADATA.ome.xml is 
+  * possible and necessary for creating an OME-Zarr precursor. 
+  * 
+  * e.g. `bioformats2raw --file_type=zarr --dimension-order='XYZCY'`
+  * 
+  * Here we check the shape of base of the pyrmaid and compare the shape
+  * to the shape of the dimensions. If they are different, we reorder the 
+  * dimensions to create the zarr loader. This is fragile code, and will only 
+  * be executed if someone tries to specify different dimension orders.
+  */
+  const nonXYShape = shape.slice(0, -2); // XY always last dims and don't need to be compared
+  const nonXYDims = dimensions.filter(d => d.values); // XY are null
+  const allSameSize = nonXYShape.every((s, i) => s === nonXYDims[i].values.length);
+  if (!allSameSize) {
+    const sortedDims = [];
+    // Greedily match first matching dimension
+    nonXYShape.forEach(len => {
+      const firstMatchedDim = nonXYDims.filter(d => d.values.length === len)[0];
+      sortedDims.push(firstMatchedDim);
+    });
+    const newDimensions = [...sortedDims, ...dimensions.slice(-2)]; // append YX dims
+    return new ZarrLoader({ data, dimensions: newDimensions });
+  }
+
+  return new ZarrLoader({ data, dimensions });
 }
 
 /**
