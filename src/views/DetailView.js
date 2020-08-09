@@ -1,9 +1,9 @@
-import { VivViewerLayer, StaticImageLayer, ScaleBarLayer } from '../layers';
+import { MultiscaleImageLayer, ImageLayer, ScaleBarLayer } from '../layers';
 import VivView from './VivView';
 import { getVivId } from './utils';
 
 /**
- * This class generates a VivViewerLayer and a view for use in the VivViewer as a detailed view.
+ * This class generates a MultiscaleImageLayer and a view for use in the VivViewer as a detailed view.
  * */
 export default class DetailView extends VivView {
   getLayers({ props, viewStates }) {
@@ -13,11 +13,11 @@ export default class DetailView extends VivView {
     const layers = [];
 
     const detailLayer = loader.isPyramid
-      ? new VivViewerLayer(props, {
+      ? new MultiscaleImageLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
           viewportId: id
         })
-      : new StaticImageLayer(props, {
+      : new ImageLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
           viewportId: id
         });

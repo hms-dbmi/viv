@@ -1,7 +1,11 @@
 import OMEXML from './omeXML';
-import { isInTileBounds, byteSwapInplace, padTileWithZeros } from './utils';
+import {
+  isInTileBounds,
+  byteSwapInplace,
+  padTileWithZeros,
+  dimensionsFromOMEXML
+} from './utils';
 import { DTYPE_VALUES } from '../constants';
-import { range } from '../layers/utils';
 
 const DTYPE_LOOKUP = {
   uint8: '<u1',
@@ -46,27 +50,7 @@ export default class OMETiffLoader {
     this.numLevels = this.omexml.getNumberOfImages() || SubIFDs?.length;
     this.isBioFormats6Pyramid = SubIFDs;
     this.isPyramid = this.numLevels > 1;
-    // The omexml specification only allows for these - zarr is more flexible so this
-    // is for unifying the two loaders in upstream applications.
-    this.dimensions = [
-      {
-        field: 'channel',
-        type: 'nominal',
-        values: this.channelNames
-      },
-      {
-        field: 'z',
-        type: 'ordinal',
-        values: range(this.omexml.SizeZ)
-      },
-      {
-        field: 'time',
-        type: 'ordinal',
-        values: range(this.omexml.SizeT)
-      },
-      { field: 'x', type: 'quantitative', values: null },
-      { field: 'y', type: 'quantitative', values: null }
-    ];
+    this.dimensions = dimensionsFromOMEXML(this.omexml);
     // We use zarr's internal format.  It encodes endianness, but we leave it little for now
     // since javascript is little endian.
     this.dtype = DTYPE_LOOKUP[this.omexml.Type];

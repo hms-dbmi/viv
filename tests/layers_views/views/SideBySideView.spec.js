@@ -4,7 +4,7 @@ import { PolygonLayer } from '@deck.gl/layers';
 
 import { SideBySideView } from '../../../src/views';
 import { generateViewTests, defaultArguments } from './VivView.spec';
-import { VivViewerLayer, ScaleBarLayer } from '../../../src/layers';
+import { MultiscaleImageLayer, ScaleBarLayer } from '../../../src/layers';
 
 generateViewTests(SideBySideView, defaultArguments);
 
@@ -23,16 +23,16 @@ test(`SideBySideView layer type and props check`, t => {
     }
   });
   t.ok(
-    layers[0] instanceof VivViewerLayer,
-    'SideBySideView layer should be VivViewerLayer.'
+    layers[0] instanceof MultiscaleImageLayer,
+    'SideBySideView layer should be MultiscaleImageLayer.'
   );
   t.ok(
     layers[1] instanceof PolygonLayer,
-    'SideBySideView layer should be VivViewerLayer.'
+    'SideBySideView layer should be MultiscaleImageLayer.'
   );
   t.ok(
     layers[2] instanceof ScaleBarLayer,
-    'DetailView layer should be VivViewerLayer.'
+    'DetailView layer should be MultiscaleImageLayer.'
   );
   t.equal(
     layers[0].props.viewportId,

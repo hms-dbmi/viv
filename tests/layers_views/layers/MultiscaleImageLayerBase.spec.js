@@ -2,9 +2,9 @@
 import test from 'tape-catch';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
-import VivViewerLayerBase from '../../../src/layers/VivViewerLayer/VivViewerLayerBase';
+import MultiscaleImageLayerBase from '../../../src/layers/MultiscaleImageLayer/MultiscaleImageLayerBase';
 
-test('VivViewerLayerBase', t => {
+test('MultiscaleImageLayerBase', t => {
   const view = new OrthographicView({
     id: 'ortho',
     controller: true,
@@ -14,7 +14,7 @@ test('VivViewerLayerBase', t => {
     zoom: 0
   });
   const testCases = generateLayerTests({
-    Layer: VivViewerLayerBase,
+    Layer: MultiscaleImageLayerBase,
     assert: t.ok,
     sampleProps: {
       sliderValues: [[0, 10]],
@@ -31,7 +31,7 @@ test('VivViewerLayerBase', t => {
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
   });
   testLayer({
-    Layer: VivViewerLayerBase,
+    Layer: MultiscaleImageLayerBase,
     testCases,
     onError: t.notOkimport,
     viewport: view.makeViewport({

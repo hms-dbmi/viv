@@ -1,5 +1,5 @@
-require('./StaticImageLayer.spec');
+require('./ImageLayer.spec');
 require('./XRLayer.spec');
-require('./VivViewerLayerBase.spec');
+require('./MultiscaleImageLayerBase.spec');
 require('./ScaleBarLayer.spec');
 require('./utils.spec');

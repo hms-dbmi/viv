@@ -1,8 +1,8 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
 
-import VivViewerLayerBase from './VivViewerLayerBase';
-import StaticImageLayer from '../StaticImageLayer';
+import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
+import ImageLayer from '../ImageLayer';
 import { to32BitFloat, getNearestPowerOf2, onPointer } from '../utils';
 
 const defaultProps = {
@@ -21,7 +21,7 @@ const defaultProps = {
 };
 
 /**
- * This layer generates a VivViewerLayer (tiled) and a StaticImageLayer (background for the tiled layer)
+ * This layer generates a MultiscaleImageLayer (tiled) and a ImageLayer (background for the tiled layer)
  * @param {Object} props
  * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
  * @param {Array} props.colorValues List of [r, g, b] values for each channel.
@@ -40,7 +40,7 @@ const defaultProps = {
  * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
  */
 
-export default class VivViewerLayer extends CompositeLayer {
+export default class MultiscaleImageLayer extends CompositeLayer {
   initializeState() {
     this.state = {
       unprojectLensBounds: [0, 0, 0, 0]
@@ -99,7 +99,7 @@ export default class VivViewerLayer extends CompositeLayer {
       return tile;
     };
     const { height, width } = loader.getRasterSize({ z: 0 });
-    const tiledLayer = new VivViewerLayerBase({
+    const tiledLayer = new MultiscaleImageLayerBase({
       id: `Tiled-Image-${id}`,
       getTileData,
       dtype,
@@ -140,7 +140,7 @@ export default class VivViewerLayer extends CompositeLayer {
     });
     const baseLayer =
       implementsGetRaster &&
-      new StaticImageLayer(this.props, {
+      new ImageLayer(this.props, {
         id: `Background-Image-${id}`,
         scale: 2 ** (numLevels - 1),
         visible:
@@ -148,7 +148,7 @@ export default class VivViewerLayer extends CompositeLayer {
           (-numLevels > this.context.viewport.zoom &&
             (!viewportId || this.context.viewport.id === viewportId)),
         z: numLevels - 1,
-        pickable: true,
+        pickable: false,
         onHover,
         boxSize: getNearestPowerOf2(lowResWidth, lowResHeight)
       });
@@ -157,5 +157,5 @@ export default class VivViewerLayer extends CompositeLayer {
   }
 }
 
-VivViewerLayer.layerName = 'VivViewerLayer';
-VivViewerLayer.defaultProps = defaultProps;
+MultiscaleImageLayer.layerName = 'MultiscaleImageLayer';
+MultiscaleImageLayer.defaultProps = defaultProps;

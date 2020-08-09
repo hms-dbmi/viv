@@ -6,7 +6,10 @@ export function range(len) {
 
 export function renderSubLayers(props) {
   const {
-    bbox: { left, top, right, bottom }
+    bbox: { left, top, right, bottom },
+    x,
+    y,
+    z
   } = props.tile;
   const {
     colorValues,
@@ -47,7 +50,10 @@ export function renderSubLayers(props) {
     onHover,
     unprojectLensBounds,
     isLensOn,
-    lensSelection
+    lensSelection,
+    x,
+    y,
+    z
   });
   return xrl;
 }

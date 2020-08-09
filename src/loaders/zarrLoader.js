@@ -32,6 +32,7 @@ export default class ZarrLoader {
 
     const { dtype, chunks } = base;
     /* TODO: Use better dtype convention in DTYPE_LOOKUP.
+     * https://github.com/hubmapconsortium/vitessce-image-viewer/issues/203
      *
      * This convension should probably _not_ describe endianness,
      * since endianness is resolved when decoding the source arrayBuffers
@@ -39,7 +40,7 @@ export default class ZarrLoader {
      * source but this is different from how the bytes end up being represented in
      * memory client-side.
      */
-    this.dtype = dtype.includes('>') ? `<${dtype.slice(1)}` : dtype;
+    this.dtype = `<${dtype.slice(1)}`;
     this.tileSize = chunks[this._dimIndices.get('x')];
   }
 

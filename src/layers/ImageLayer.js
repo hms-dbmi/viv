@@ -73,7 +73,7 @@ function padEven(data, width, height, boxSize) {
  * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
  * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
  */
-export default class StaticImageLayer extends CompositeLayer {
+export default class ImageLayer extends CompositeLayer {
   initializeState() {
     this.state = {
       unprojectLensBounds: [0, 0, 0, 0],
@@ -162,7 +162,7 @@ export default class StaticImageLayer extends CompositeLayer {
       scale
     });
     return new XRLayer({
-      channelData: Promise.resolve({ data, width, height }),
+      channelData: { data, width, height },
       pickable,
       bounds,
       sliderValues,
@@ -182,5 +182,5 @@ export default class StaticImageLayer extends CompositeLayer {
   }
 }
 
-StaticImageLayer.layerName = 'StaticImageLayer';
-StaticImageLayer.defaultProps = defaultProps;
+ImageLayer.layerName = 'ImageLayer';
+ImageLayer.defaultProps = defaultProps;

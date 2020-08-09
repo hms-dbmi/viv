@@ -1,5 +1,4 @@
 export const MAX_CHANNELS = 6;
-export const DEFAULT_VIEW_STATE = { zoom: -6, target: [25000, 10000, 0] };
 export const DEFAULT_OVERVIEW = {
   margin: 25,
   scale: 0.15,
@@ -27,5 +26,6 @@ export const COLOR_PALLETE = [
   [255, 255, 255],
   [255, 0, 0]
 ];
+export const GLOBAL_SLIDER_DIMENSION_FIELDS = ['z', 'time'];
 export const INITIAL_SLIDER_VALUE = [1500, 20000];
 export const FILL_PIXEL_VALUE = '----';

@@ -16,7 +16,7 @@ import { padColorsAndSliders } from '../utils';
 const defaultProps = {
   pickable: true,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-  channelData: { type: 'array', value: {}, async: true },
+  channelData: { type: 'array', value: {}, compare: true },
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
