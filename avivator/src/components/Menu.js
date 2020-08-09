@@ -14,8 +14,14 @@ import Description from './Description';
 const useStyles = makeStyles(theme => ({
   root: {
     maxHeight: props => `${props.maxHeight - theme.spacing(4)}px`,
-    width: '350px',
-    overflowY: 'auto'
+    width: '365px',
+    overflowX: 'hidden',
+    overflowY: 'scroll',
+    '&::-webkit-scrollbar': {
+      display: 'none',
+      background: 'transparent'
+    },
+    scrollbarWidth: 'none'
   },
   typography: {
     fontSize: '.8rem'
