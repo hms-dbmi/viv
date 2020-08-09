@@ -63,7 +63,7 @@ export default class OMETiffLoader {
     // we flag that as rgb.
     this.isRgb =
       this.omexml.SamplesPerPixel === 3 ||
-      (this.channelNames.length === 3 && this.dtype === '<u1');
+      (this.channelNames.length === 3 && this.omexml.Type === 'uint8');
   }
 
   /**
