@@ -82,10 +82,14 @@ export function channelsReducer(state, { index, value, type }) {
   switch (type) {
     case 'CHANGE_CHANNEL': {
       // Changes name and selection for channel by index
-      const { selection } = value;
+      const { selection, domain, slider } = value;
       const selections = [...state.selections];
       selections[index] = selection;
-      return { ...state, selections };
+      const domains = [...state.domains];
+      domains[index] = domain;
+      const sliders = [...state.sliders];
+      sliders[index] = slider;
+      return { ...state, selections, domains, sliders };
     }
     case 'CHANGE_COLOR': {
       // Changes color for individual channel by index

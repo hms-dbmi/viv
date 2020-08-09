@@ -171,16 +171,22 @@ export default function Avivator(props) {
    * in separate arrays. We use the ordering of the channels in the menu to make
    * update state very responsive (but dispatching the index of the channel)
    */
-  const handleControllerChange = (index, type, value) => {
+  const handleControllerChange = async (index, type, value) => {
     if (type === 'CHANGE_CHANNEL') {
       const [channelDim] = dimensions.filter(d => d.field === 'channel');
       const { field, values } = channelDim;
       const dimIndex = values.indexOf(value);
-      const selection = { [field]: dimIndex };
+      const selection = { ...globalSelections, [field]: dimIndex };
+      const stats = await getChannelStats({
+        loader,
+        loaderSelection: [selection]
+      });
+      const [domain] = stats.map(stat => stat.domain);
+      const [slider] = stats.map(stat => stat.autoSliders);
       dispatch({
         type,
         index,
-        value: { selection }
+        value: { selection, domain, slider }
       });
     } else {
       dispatch({ type, index, value });
