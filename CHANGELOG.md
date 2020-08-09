@@ -4,7 +4,7 @@
 
 ### Added
 
-- Lens view built into VivViewerLayer.
+- Lens view built into layers.
 
 ### Changed
 
