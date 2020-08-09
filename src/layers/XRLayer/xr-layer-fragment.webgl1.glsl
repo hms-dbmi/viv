@@ -25,6 +25,8 @@ uniform vec4 lensBounds;
 // lens uniforms
 uniform bool isLensOn;
 uniform int lensSelection;
+uniform vec3 lensBorderColor;
+uniform float lensBorderRadius;
 
 varying vec2 vTexCoord;
 
@@ -43,7 +45,24 @@ bool fragInLensBounds() {
   vec2 lensCenter = vec2(lensBounds[0] + ((lensBounds[2] - lensBounds[0]) / 2.0),lensBounds[1] + ((lensBounds[3] - lensBounds[1]) / 2.0));
   
   // Check membership in ellipse.
-  return pow((lensCenter.x - vTexCoord.x) / majorAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorAxis, 2.0) < 1.0;
+  return pow((lensCenter.x - vTexCoord.x) / majorAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorAxis, 2.0) < (1.0 - lensBorderRadius);
+}
+
+bool fragOnLensBounds() {
+  // Same as the above, except this checks the boundary.
+
+  // Width radius.
+  float majorAxis = abs(lensBounds[2] - lensBounds[0]) / 2.0;
+
+  // Height radius.
+  float minorAxis = abs(lensBounds[1] - lensBounds[3]) / 2.0;
+
+  // Ellipse center and distance
+  vec2 lensCenter = vec2(lensBounds[0] + ((lensBounds[2] - lensBounds[0]) / 2.0),lensBounds[1] + ((lensBounds[3] - lensBounds[1]) / 2.0));
+  float ellipseDistance = pow((lensCenter.x - vTexCoord.x) / majorAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorAxis, 2.0);
+  
+  // Check membership on "bourndary" of ellipse.
+  return ellipseDistance <= 1.0 && ellipseDistance >= (1.0 - lensBorderRadius);
 }
 
 vec3 hsv2rgb(vec3 c)
@@ -89,9 +108,18 @@ void main() {
   
   // Find out if the frag is in bounds of the lens.
   bool isFragInLensBounds = fragInLensBounds();
+  bool isFragOnLensBounds = fragOnLensBounds();
 
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
+
+  if(isLensOn && isFragOnLensBounds){
+    rgbCombo = lensBorderColor;
+    gl_FragColor = vec4(rgbCombo, opacity);
+    geometry.uv = vTexCoord;
+    DECKGL_FILTER_COLOR(gl_FragColor, geometry);
+    return;
+  }
 
   if(isLensOn && isFragInLensBounds){
     if(0 == lensSelection) {

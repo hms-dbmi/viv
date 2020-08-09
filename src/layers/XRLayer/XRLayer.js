@@ -26,6 +26,8 @@ const defaultProps = {
   colormap: { type: 'string', value: '', compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true },
+  lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
+  lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   unprojectLensBounds: { type: 'array', value: [0, 0, 0, 0], compare: true }
 };
 
@@ -190,7 +192,9 @@ export default class XRLayer extends Layer {
         unprojectLensBounds,
         bounds,
         isLensOn,
-        lensSelection
+        lensSelection,
+        lensBorderColor,
+        lensBorderRadius
       } = this.props;
       // Check number of textures not null.
       const numTextures = Object.values(textures).filter(t => t).length;
@@ -231,6 +235,8 @@ export default class XRLayer extends Layer {
           ],
           isLensOn,
           lensSelection,
+          lensBorderColor,
+          lensBorderRadius,
           ...textures
         })
         .draw();

@@ -324,7 +324,7 @@ export default function Avivator(props) {
               disabled={isLoading}
             />
           )}
-          {
+          {!isRgb && (
             <LensSelect
               handleToggle={setIsLensOn}
               handleSelection={setLensSelection}
@@ -334,7 +334,7 @@ export default function Avivator(props) {
               )}
               lensSelection={lensSelection}
             />
-          }
+          )}
           {globalControllers}
           {!isLoading && !isRgb ? (
             <Grid container>{channelControllers}</Grid>

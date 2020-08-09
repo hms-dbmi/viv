@@ -17,7 +17,9 @@ const defaultProps = {
   viewportId: { type: 'string', value: '', compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true },
-  lensRadius: { type: 'number', value: 100, compare: true }
+  lensRadius: { type: 'number', value: 100, compare: true },
+  lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
+  lensBorderRadius: { type: 'number', value: 0.02, compare: true }
 };
 
 /**
@@ -38,6 +40,8 @@ const defaultProps = {
  * @param {boolean} props.isLensOn Whether or not to use the lens.
  * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
  * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
+ * @param {number} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
+ * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  */
 
 export default class MultiscaleImageLayer extends CompositeLayer {
@@ -70,7 +74,9 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       pickable,
       id,
       isLensOn,
-      lensSelection
+      lensSelection,
+      lensBorderColor,
+      lensBorderRadius
     } = this.props;
     const { tileSize, numLevels, dtype } = loader;
     const { unprojectLensBounds } = this.state;
@@ -128,7 +134,9 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       pickable,
       unprojectLensBounds,
       isLensOn,
-      lensSelection
+      lensSelection,
+      lensBorderColor,
+      lensBorderRadius
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity
