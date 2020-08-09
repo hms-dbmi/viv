@@ -46,7 +46,7 @@ create the OME-XML metadata along with a pyramidal Zarr for high-resolution imag
 $ bioformats2raw LuCa-7color_Scan1.qptiff LuCa-7color_Scan1/ --file_type=zarr
 ```
 
-`bioformats2raw` created the file directory `LuCa-7color_Scan1/` which contains the "raw" bioformats output. The root directory 
+`bioformats2raw` creates the file directory `LuCa-7color_Scan1/` which contains the "raw" bioformats output. The root directory 
 contains a `METADATA.ome.xml` file along with a `data.zarr/` directory containing the zarr
 output. This output can be viewed directly with [Avivator] by serving the top-level directory (`LuCa-7color_Scan1/`) 
 over HTTP ([see below](#viewing-in-avivator)).
@@ -81,7 +81,7 @@ $ brew install http-server
 ```
 
 
-#### Starting a server
+#### Starting a Server
 
 From within this directory, start a local server and open [Avivator] in your browser. 
 
@@ -90,14 +90,14 @@ $ http-server --cors='*' --port 8000 .
 ```
 
 This command starts a web-server and makes the content in the current directory readable over HTTP. Once the server is running,
-open [Avivator] and paste `http://localhost:8000/LuCa-7color_Scan1/` (zarr) or `http://localhost:8000/LuCa7_color1.ome.tif` (OME-TIFF) 
-to view the repective pyramids generated above.
+open [Avivator] and paste `http://localhost:8000/LuCa-7color_Scan1/` (zarr) or `http://localhost:8000/LuCa-7color_Scan1.ome.tif` (OME-TIFF) 
+to view the respective pyramids generated above.
 
 > Troubleshooting: Viv relies on cross-origin requests to retrieve data from servers. The `--cors='*'` flag is important to ensure
 > that the appropriate `Access-Control-Allow-Origin` response is sent from your local server.
 
 
-### Final note on file formats and OME-Zarr
+### Final Note on File Formats and OME-Zarr
 
 The Glencoe software and OME teams hava been clear that the "raw" n5/zarr formats produced by `bioformats2raw` should be considered 
 experimental for the time being as intermediates for generating valid OME-TIFFs. Therefore `Option 1` is not as stable as `Option 2` 
@@ -111,7 +111,7 @@ which is compatible with OME-Zarr, but is missing some metadata within the zarr 
 Aviviator can view the "raw" output as described above, and the *same* multiscale pyramid can also be viewed 
 in desktop analysis tools like [`napari`](https://github.com/napari/napari). 
 
-### Other examples:
+### Other Examples
 Other sample OME-TIFF data can be downloaded from [OME-TIFF sample data](https://docs.openmicroscopy.org/ome-model/5.6.3/ome-tiff/data.html) provided by OME and viewed with Viv locally (without needing to run Bio-Formats).
 
 - [MitoCheck](https://docs.openmicroscopy.org/ome-model/5.6.3/ome-tiff/data.html#mitocheck) 
