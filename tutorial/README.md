@@ -1,8 +1,8 @@
-# Data preparatation
+# Data Preparation
 
 Viv supports a subset of the files generated from the `bioformats2raw` + `raw2ometiff` pipeline, described 
 [here](https://www.glencoesoftware.com/blog/2019/12/09/converting-whole-slide-images-to-OME-TIFF.html). 
-This guide will demonstrate how to generate a pyramidal Zarr or OME-TIFF with Bio-Formats that can be viewed with 
+This guide demonstrates how to generate a pyramidal Zarr or OME-TIFF with Bio-Formats that can be viewed with 
 [Avivator](http://avivator.gehlenborglab.org) via HTTP.
 
 
@@ -10,7 +10,7 @@ This guide will demonstrate how to generate a pyramidal Zarr or OME-TIFF with Bi
 
 This tutorial requires Bio-Formats [`bioformats2raw`](https://github.com/glencoesoftware/bioformats2raw) and 
 [`raw2ometiff`](https://github.com/glencoesoftware/raw2ometiff) command-line tools. It's easiest to install 
-these tools using `conda`, but binaries also are available for download on the corresponding github repositories.
+these tools using [`conda`](https://docs.conda.io/projects/conda/en/latest/user-guide/install/), but binaries also are available for download on the corresponding github repositories.
 
 ```bash
 $ conda create --name bioformats python=3.8
@@ -24,14 +24,14 @@ $ conda install -c ome bioformats2raw raw2ometiff
 Bio-Formats is an incredibly valuable toolkit and supports reading over 
 [150 file formats](https://docs.openmicroscopy.org/bio-formats/6.5.1/supported-formats.html). You can choose 
 one of your own images, but for the purposes of this tutorial, we will use a multiplexed, high-resolution 
-[Perkin Elmer](https://downloads.openmicroscopy.org/images/Vectra-QPTIFF/perkinelmer/) image made available 
+[Perkin Elmer](https://downloads.openmicroscopy.org/images/Vectra-QPTIFF/perkinelmer/) (1.95 GB) image made available 
 under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) on OME.
 
 ```bash
 $ wget https://downloads.openmicroscopy.org/images/Vectra-QPTIFF/perkinelmer/PKI_scans/LuCa-7color_Scan1.qptiff 
 ```
 
-After the image has finished downloading, there are two options for creating a Avivator/Viv-compliant image. 
+After the image has finished downloading, there are two options for creating an Avivator/Viv-compliant image. 
 
 
 ### Pyramid Generation
@@ -90,7 +90,7 @@ $ http-server --cors='*' --port 8000 .
 ```
 
 This command starts a web-server and makes the content in the current directory readable over HTTP. Once the server is running,
-open [Avivator] and paste `http://localhost:8000/LuCa7_color1/` (zarr) or `http://localhost:8000/LuCa7_color1.ome.tif` (OME-TIFF) 
+open [Avivator] and paste `http://localhost:8000/LuCa-7color_Scan1/` (zarr) or `http://localhost:8000/LuCa7_color1.ome.tif` (OME-TIFF) 
 to view the repective pyramids generated above.
 
 > Troubleshooting: Viv relies on cross-origin requests to retrieve data from servers. The `--cors='*'` flag is important to ensure
