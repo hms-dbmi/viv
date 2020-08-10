@@ -33,7 +33,7 @@ const sources = [
   {
     // Generated with `bioformats2raw --file_type=zarr --dimension_order='XYZCT'`
     path: 'LuCa-7color_Scan1/',
-    description: 'Perkin Elmer Luca-7Color_Scan1.qgtiff'
+    description: 'Perkin Elmer LuCa-7color_Scan1.qptiff'
   }
 ];
 
