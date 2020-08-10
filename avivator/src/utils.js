@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
 import { createOMETiffLoader, createBioformatsZarrLoader } from '../../src';
 
-import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
+import {
+  GLOBAL_SLIDER_DIMENSION_FIELDS,
+  COLORMAP_SLIDER_CHECKBOX_COLOR
+} from './constants';
+
+export const toRgb = (on, arr) => {
+  const color = on ? COLORMAP_SLIDER_CHECKBOX_COLOR : arr;
+  return `rgb(${color})`;
+};
 
 export async function createLoader(url) {
   if (url.includes('ome.tif') || url.includes('ome.tiff')) {

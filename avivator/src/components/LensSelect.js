@@ -4,6 +4,8 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
 
+import { toRgb } from '../utils';
+
 function LensSelect({
   isOn,
   handleToggle,
@@ -11,6 +13,7 @@ function LensSelect({
   channelOptions,
   lensSelection
 }) {
+  const checkboxColor = toRgb([255, 255, 255]);
   return (
     <Grid container direction="row" justify="flex-start" alignItems="center">
       <Grid item xs={2}>
@@ -21,9 +24,9 @@ function LensSelect({
           onChange={() => handleToggle()}
           checked={isOn}
           style={{
-            color: [255, 255, 255],
+            color: checkboxColor,
             '&$checked': {
-              color: [255, 255, 255]
+              color: checkboxColor
             }
           }}
         />

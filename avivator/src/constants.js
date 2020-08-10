@@ -29,3 +29,4 @@ export const COLOR_PALLETE = [
 export const GLOBAL_SLIDER_DIMENSION_FIELDS = ['z', 'time'];
 export const INITIAL_SLIDER_VALUE = [1500, 20000];
 export const FILL_PIXEL_VALUE = '----';
+export const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
