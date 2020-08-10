@@ -9,8 +9,10 @@ import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Typography from '@material-ui/core/Typography';
 import Popper from '@material-ui/core/Popper';
 import Link from '@material-ui/core/Link';
+import Button from '@material-ui/core/Button';
+import SettingsIcon from '@material-ui/icons/Settings';
 import { makeStyles } from '@material-ui/core/styles';
-import Description from './Description';
+import MenuTitle from './MenuTitle';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -28,7 +30,9 @@ const useStyles = makeStyles(theme => ({
     fontSize: '.8rem'
   },
   paper: {
-    padding: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
+    paddingRight: theme.spacing(2),
+    paddingLeft: theme.spacing(2),
     backgroundColor: 'rgba(0, 0, 0, 0.75)',
     borderRadius: 2
   },
@@ -42,7 +46,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Header(props) {
-  const { handleSubmitNewUrl, url } = props;
+  const { handleSubmitNewUrl, url, toggle: menuToggle } = props;
   const [text, setText] = useState(url);
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
@@ -51,7 +55,7 @@ function Header(props) {
   return (
     <Grid container direction="column">
       <Grid item xs={12}>
-        <Description />
+        <MenuTitle menuToggle={menuToggle} />
       </Grid>
       <Grid
         container
@@ -113,7 +117,8 @@ function Header(props) {
 
 function Menu({ children, ...props }) {
   const classes = useStyles(props);
-  return (
+  const { on, toggle } = props;
+  return on ? (
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
       <Paper className={classes.paper}>
         {/* eslint-disable-next-line react/jsx-props-no-spreading */}
@@ -135,6 +140,19 @@ function Menu({ children, ...props }) {
           })}
         </Grid>
       </Paper>
+    </Box>
+  ) : (
+    <Box position="absolute" right={-8} top={-8} m={2}>
+      <Button
+        variant="outlined"
+        color="default"
+        size="small"
+        endIcon={<SettingsIcon />}
+        onClick={toggle}
+        aria-label="show-menu"
+      >
+        AVIVATOR
+      </Button>
     </Box>
   );
 }

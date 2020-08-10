@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
@@ -20,7 +19,6 @@ import {
 
 import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
-import MenuToggle from './components/MenuToggle';
 import ColormapSelect from './components/ColormapSelect';
 import GlobalSelectionSlider from './components/GlobalSelectionSlider';
 import {
@@ -319,11 +317,13 @@ export default function Avivator(props) {
             hoverHooks={{ handleValue: setPixelValues }}
           />
         ))}
-      {controllerOn && (
+      {
         <Menu
           maxHeight={viewSize.height}
           handleSubmitNewUrl={handleSubmitNewUrl}
           url={source.url}
+          on={controllerOn}
+          toggle={toggleController}
         >
           {!isRgb && (
             <ColormapSelect
@@ -394,10 +394,7 @@ export default function Avivator(props) {
             </>
           )}
         </Menu>
-      )}
-      <Box position="absolute" right={-8} top={-8} m={2}>
-        <MenuToggle on={controllerOn} toggle={toggleController} />
-      </Box>
+      }
     </>
   );
 }
