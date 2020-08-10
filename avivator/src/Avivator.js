@@ -101,16 +101,19 @@ export default function Avivator(props) {
             ? [[255, 255, 255]]
             : stats.map((_, i) => COLOR_PALLETE[i]);
       }
-      const { height, width } = nextLoader.getRasterSize({ z: 0 });
+      const { height, width } = nextLoader.getRasterSize({
+        z: 0
+      });
       // Get a reasonable initial zoom level for pyramids based on screen.
       const { numLevels } = nextLoader;
       let zoom = 0;
       let size = Infinity;
+      // viewSize is not in the dependencies array becuase we only want to use it when the source changes.
       while (size >= Math.max(...Object.values(viewSize)) || numLevels === 0) {
-        const { height: heightZ, width: widthZ } = nextLoader.getRasterSize({
+        const rasterSize = nextLoader.getRasterSize({
           z: zoom
         });
-        size = Math.max(heightZ, widthZ);
+        size = Math.max(...Object.values(rasterSize));
         zoom += 1;
       }
       const loaderInitialViewState = {
@@ -137,7 +140,7 @@ export default function Avivator(props) {
       history?.push(`?image_url=${source.url}`);
     }
     changeLoader();
-  }, [source, history]);
+  }, [source, history]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmitNewUrl = (event, url) => {
     event.preventDefault();

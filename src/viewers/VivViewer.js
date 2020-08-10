@@ -97,7 +97,8 @@ export default class VivViewer extends PureComponent {
         });
       });
       return { viewStates };
-    } else if (
+    }
+    if (
       views.some(
         view =>
           view.initialViewState.target !==
