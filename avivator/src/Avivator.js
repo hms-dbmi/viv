@@ -102,15 +102,30 @@ export default function Avivator(props) {
             : stats.map((_, i) => COLOR_PALLETE[i]);
       }
       const { height, width } = nextLoader.getRasterSize({ z: 0 });
+      // Get a reasonable initial zoom level for pyramids based on screen.
       const { numLevels } = nextLoader;
+      let zoom = 0;
+      let size = Infinity;
+      while (size >= Math.max(...Object.values(viewSize)) || numLevels === 0) {
+        const { height: heightZ, width: widthZ } = nextLoader.getRasterSize({
+          z: zoom
+        });
+        size = Math.max(heightZ, widthZ);
+        zoom += 1;
+      }
       const loaderInitialViewState = {
         target: [height / 2, width / 2, 0],
-        zoom: numLevels > 0 ? -(numLevels - 2) : -2
+        zoom: numLevels > 0 ? -zoom : -1.5
       };
       setDimensions(newDimensions);
       dispatch({
         type: 'RESET_CHANNELS',
-        value: { selections, domains, sliders, colors }
+        value: {
+          selections,
+          domains,
+          sliders,
+          colors
+        }
       });
       setLoader(nextLoader);
       setIsLoading(false);
