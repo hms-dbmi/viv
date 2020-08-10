@@ -16,7 +16,9 @@ export async function createLoader(
       const loader = await createOMETiffLoader({ url, offsets });
       const totalChannelCount =
         loader.omexml.SizeZ * loader.omexml.SizeT * loader.omexml.SizeC;
-      isOffsets404 && totalChannelCount > 40 && handleOffsetsNotFound(true);
+      if (isOffsets404 && totalChannelCount > 40) {
+        handleOffsetsNotFound(true);
+      }
       return loader;
     }
     const loader = await createBioformatsZarrLoader({ url });
