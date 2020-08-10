@@ -52,6 +52,9 @@ contains a `METADATA.ome.xml` file along with a `data.zarr/` directory containin
 output. This output can be viewed directly with [Avivator] by serving the top-level directory (`LuCa-7color_Scan1/`) 
 over HTTP ([see below](#viewing-in-avivator)).
 
+> NOTE: Alternate tile dimensions can be specified with the `--tile_width` and `--tile_height` options. 
+> For more about performance see the [docs](https://github.com/glencoesoftware/bioformats2raw#performance).
+
 
 #### Option 2: Create an OME-TIFF
 
