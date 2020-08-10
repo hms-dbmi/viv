@@ -77,6 +77,8 @@ export default function Avivator(props) {
       setIsLoading(true);
       const nextLoader = await createLoader(source.url);
       const { dimensions: newDimensions, isRgb } = nextLoader;
+      const channelOptions = newDimensions.filter(j => j.field === 'channel')[0]
+        ?.values;
       const selections = buildDefaultSelection(newDimensions);
       let sliders = [
         [0, 255],
@@ -105,7 +107,7 @@ export default function Avivator(props) {
           stats.length === 1
             ? [[255, 255, 255]]
             : stats.map((_, i) => COLOR_PALLETE[i]);
-      } else {
+      } else if (isRgb || channelOptions.length === 1) {
         // RGB should not use a lens.
         isLensOn && setIsLensOn();
       }
@@ -344,7 +346,7 @@ export default function Avivator(props) {
               disabled={isLoading}
             />
           )}
-          {!isRgb && (
+          {!isRgb && channelOptions?.length > 1 && (
             <LensSelect
               handleToggle={setIsLensOn}
               handleSelection={setLensSelection}
