@@ -1,8 +1,7 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
-import AddIcon from '@material-ui/icons/Add';
-import RemoveIcon from '@material-ui/icons/Remove';
+import SettingsIcon from '@material-ui/icons/Settings';
 
 const hideButtonStyle = {
   marginRight: '4.5px',
@@ -18,7 +17,7 @@ function MenuToggle({ on, toggle }) {
       aria-label="hide-menu"
       style={hideButtonStyle}
     >
-      <RemoveIcon fontSize="small" />
+      <SettingsIcon fontSize="small" />
     </IconButton>
   );
 
@@ -27,11 +26,11 @@ function MenuToggle({ on, toggle }) {
       variant="outlined"
       color="default"
       size="small"
-      endIcon={<AddIcon />}
+      endIcon={<SettingsIcon />}
       onClick={toggle}
       aria-label="show-menu"
     >
-      Show Menu
+      AVIVATOR
     </Button>
   );
   return on ? HideButton : ShowButton;
