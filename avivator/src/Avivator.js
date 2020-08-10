@@ -113,16 +113,18 @@ export default function Avivator(props) {
         z: 0
       });
       // Get a reasonable initial zoom level for pyramids based on screen.
-      const { numLevels } = nextLoader;
+      const { isPyramid, numLevels } = nextLoader;
       let zoom = 0;
       let size = Infinity;
       // viewSize is not in the dependencies array becuase we only want to use it when the source changes.
-      while (size >= Math.max(...Object.values(viewSize)) || numLevels === 0) {
-        const rasterSize = nextLoader.getRasterSize({
-          z: zoom
-        });
-        size = Math.max(...Object.values(rasterSize));
-        zoom += 1;
+      if (isPyramid) {
+        while (size >= Math.max(...Object.values(viewSize))) {
+          const rasterSize = nextLoader.getRasterSize({
+            z: zoom
+          });
+          size = Math.max(...Object.values(rasterSize));
+          zoom += 1;
+        }
       }
       const loaderInitialViewState = {
         target: [height / 2, width / 2, 0],
