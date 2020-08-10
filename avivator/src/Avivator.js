@@ -107,7 +107,7 @@ export default function Avivator(props) {
             : stats.map((_, i) => COLOR_PALLETE[i]);
       } else {
         // RGB should not use a lens.
-        setIsLensOn(false);
+        isLensOn && setIsLensOn();
       }
       const { height, width } = nextLoader.getRasterSize({
         z: 0
