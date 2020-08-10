@@ -165,10 +165,7 @@ export default function Avivator(props) {
       const stats = await getChannelStats({ loader, loaderSelection });
       const domains = stats.map(stat => stat.domain);
       const sliders = stats.map(stat => stat.autoSliders);
-      const colors =
-        stats.length === 1
-          ? [[255, 255, 255]]
-          : stats.map((_, i) => COLOR_PALLETE[i]);
+      const { colors } = channels;
       dispatch({
         type: 'RESET_CHANNELS',
         value: { selections: loaderSelection, domains, sliders, colors }
