@@ -53,7 +53,7 @@ output. This output can be viewed directly with [Avivator] by serving the top-le
 over HTTP ([see below](#viewing-in-avivator)).
 
 > NOTE: Alternate tile dimensions can be specified with the `--tile_width` and `--tile_height` options. 
-> In our experience, tile sizes of 512 and 1024 (default) have worked well in Viv. For more information 
+> In our experience, tile sizes of 512x512 and 1024x1024 (default) work well. Viv can only handle square tiles. For more information 
 > see the [docs](https://github.com/glencoesoftware/bioformats2raw#performance).
 
 
