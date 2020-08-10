@@ -179,10 +179,10 @@ export default function Avivator(props) {
       const stats = await getChannelStats({ loader, loaderSelection });
       const domains = stats.map(stat => stat.domain);
       const sliders = stats.map(stat => stat.autoSliders);
-      const { colors } = channels;
+      const { colors, isOn } = channels;
       dispatch({
         type: 'RESET_CHANNELS',
-        value: { selections: loaderSelection, domains, sliders, colors }
+        value: { selections: loaderSelection, domains, sliders, colors, isOn }
       });
       setGlobalSelections(prev => ({ ...prev, ...selection }));
     } else {

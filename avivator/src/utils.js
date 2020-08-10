@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createOMETiffLoader, createBioformatsZarrLoader } from '../../src';
 
-import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
+import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
 
 export async function createLoader(
   url,
@@ -147,14 +147,14 @@ export function channelsReducer(state, { index, value, type }) {
     }
     case 'RESET_CHANNELS': {
       // Clears current channels and sets with new defaults
-      const { selections, sliders, domains, colors } = value;
+      const { selections, sliders, domains, colors, isOn } = value;
       const n = selections.length;
       return {
         selections,
         sliders,
         domains,
-        colors,
-        isOn: Array(n).fill(true),
+        colors: colors || selections.map((sel, i) => COLOR_PALLETE[i]),
+        isOn: isOn || Array(n).fill(true),
         ids: range(n).map(() => String(Math.random()))
       };
     }
