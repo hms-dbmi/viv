@@ -2,6 +2,8 @@ import React, { useState, useEffect, useReducer } from 'react';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
 
 import AddIcon from '@material-ui/icons/Add';
 
@@ -21,6 +23,7 @@ import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
 import ColormapSelect from './components/ColormapSelect';
 import GlobalSelectionSlider from './components/GlobalSelectionSlider';
+import { LoaderError, OffsetsWarning } from './components/Snackbars';
 import {
   MAX_CHANNELS,
   DEFAULT_OVERVIEW,
@@ -62,82 +65,90 @@ export default function Avivator(props) {
   const [controllerOn, toggleController] = useReducer(v => !v, true);
   const [zoomLock, toggleZoomLock] = useReducer(v => !v, true);
   const [panLock, togglePanLock] = useReducer(v => !v, true);
+  const [offsetsSnackbarOn, toggleOffsetsSnackbar] = useState(false);
+  const [loaderErrorSnackbarOn, toggleLoaderErrorSnackbar] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
   const [pixelValues, setPixelValues] = useState([]);
   useEffect(() => {
     async function changeLoader() {
       setIsLoading(true);
-      const nextLoader = await createLoader(source.url);
-      const { dimensions: newDimensions, isRgb } = nextLoader;
-      const selections = buildDefaultSelection(newDimensions);
-      let sliders = [
-        [0, 255],
-        [0, 255],
-        [0, 255]
-      ];
-      let domains = [
-        [0, 255],
-        [0, 255],
-        [0, 255]
-      ];
-      let colors = [
-        [255, 0, 0],
-        [0, 255, 0],
-        [0, 0, 255]
-      ];
-      if (!isRgb) {
-        const stats = await getChannelStats({
-          loader: nextLoader,
-          loaderSelection: selections
-        });
-        domains = stats.map(stat => stat.domain);
-        sliders = stats.map(stat => stat.autoSliders);
-        // If there is only one channel, use white.
-        colors =
-          stats.length === 1
-            ? [[255, 255, 255]]
-            : stats.map((_, i) => COLOR_PALLETE[i]);
-      }
-      const { height, width } = nextLoader.getRasterSize({
-        z: 0
-      });
-      // Get a reasonable initial zoom level for pyramids based on screen.
-      const { isPyramid, numLevels } = nextLoader;
-      let zoom = 0;
-      let size = Infinity;
-      // viewSize is not in the dependencies array becuase we only want to use it when the source changes.
-      if (isPyramid) {
-        while (size >= Math.max(...Object.values(viewSize))) {
-          const rasterSize = nextLoader.getRasterSize({
-            z: zoom
+      const nextLoader = await createLoader(
+        source.url,
+        toggleOffsetsSnackbar,
+        toggleLoaderErrorSnackbar
+      );
+      if (nextLoader) {
+        const { dimensions: newDimensions, isRgb } = nextLoader;
+        const selections = buildDefaultSelection(newDimensions);
+        let sliders = [
+          [0, 255],
+          [0, 255],
+          [0, 255]
+        ];
+        let domains = [
+          [0, 255],
+          [0, 255],
+          [0, 255]
+        ];
+        let colors = [
+          [255, 0, 0],
+          [0, 255, 0],
+          [0, 0, 255]
+        ];
+        if (!isRgb) {
+          const stats = await getChannelStats({
+            loader: nextLoader,
+            loaderSelection: selections
           });
-          size = Math.max(...Object.values(rasterSize));
-          zoom += 1;
+          domains = stats.map(stat => stat.domain);
+          sliders = stats.map(stat => stat.autoSliders);
+          // If there is only one channel, use white.
+          colors =
+            stats.length === 1
+              ? [[255, 255, 255]]
+              : stats.map((_, i) => COLOR_PALLETE[i]);
         }
+        const { height, width } = nextLoader.getRasterSize({
+          z: 0
+        });
+        // Get a reasonable initial zoom level for pyramids based on screen.
+        const { isPyramid, numLevels } = nextLoader;
+        let zoom = 0;
+        let size = Infinity;
+        // viewSize is not in the dependencies array becuase we only want to use it when the source changes.
+        if (isPyramid) {
+          while (size >= Math.max(...Object.values(viewSize))) {
+            const rasterSize = nextLoader.getRasterSize({
+              z: zoom
+            });
+            size = Math.max(...Object.values(rasterSize));
+            zoom += 1;
+          }
+        }
+        const loaderInitialViewState = {
+          target: [height / 2, width / 2, 0],
+          zoom: numLevels > 0 ? -zoom : -1.5
+        };
+        setDimensions(newDimensions);
+        dispatch({
+          type: 'RESET_CHANNELS',
+          value: {
+            selections,
+            domains,
+            sliders,
+            colors
+          }
+        });
+        setLoader(nextLoader);
+        setIsLoading(false);
+        setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
+        setInitialViewState(loaderInitialViewState);
+        // Set the global selections (needed for the UI).
+        setGlobalSelections(selections[0]);
+        // eslint-disable-next-line no-unused-expressions
+        history?.push(`?image_url=${source.url}`);
       }
-      const loaderInitialViewState = {
-        target: [height / 2, width / 2, 0],
-        zoom: numLevels > 0 ? -zoom : -1.5
-      };
-      setDimensions(newDimensions);
-      dispatch({
-        type: 'RESET_CHANNELS',
-        value: {
-          selections,
-          domains,
-          sliders,
-          colors
-        }
-      });
-      setLoader(nextLoader);
-      setIsLoading(false);
-      setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
-      setInitialViewState(loaderInitialViewState);
-      // Set the global selections (needed for the UI).
-      setGlobalSelections(selections[0]);
-      // eslint-disable-next-line no-unused-expressions
-      history?.push(`?image_url=${source.url}`);
     }
     changeLoader();
   }, [source, history]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -395,6 +406,29 @@ export default function Avivator(props) {
           )}
         </Menu>
       }
+      <Snackbar
+        open={offsetsSnackbarOn || loaderErrorSnackbarOn}
+        autoHideDuration={8000}
+        onClose={() => {
+          toggleOffsetsSnackbar(false);
+          toggleLoaderErrorSnackbar(false);
+        }}
+        elevation={6}
+        variant="filled"
+      >
+        {offsetsSnackbarOn || loaderErrorSnackbarOn ? (
+          <Alert
+            onClose={() => {
+              toggleOffsetsSnackbar(false);
+              toggleLoaderErrorSnackbar(false);
+            }}
+            severity={offsetsSnackbarOn ? 'warning' : 'error'}
+          >
+            {offsetsSnackbarOn && <OffsetsWarning />}
+            {loaderErrorSnackbarOn && <LoaderError />}
+          </Alert>
+        ) : null}
+      </Snackbar>
     </>
   );
 }

@@ -3,15 +3,28 @@ import { createOMETiffLoader, createBioformatsZarrLoader } from '../../src';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
 
-export async function createLoader(url) {
-  if (url.includes('ome.tif') || url.includes('ome.tiff')) {
-    const res = await fetch(url.replace(/ome\.tif(f?)/gi, 'offsets.json'));
-    const offsets = res.status !== 404 ? await res.json() : [];
-    const loader = await createOMETiffLoader({ url, offsets });
+export async function createLoader(
+  url,
+  handleOffsetsNotFound,
+  handleLoaderError
+) {
+  try {
+    if (url.includes('ome.tif') || url.includes('ome.tiff')) {
+      const res = await fetch(url.replace(/ome\.tif(f?)/gi, 'offsets.json'));
+      const isOffsets404 = res.status === 404;
+      const offsets = !isOffsets404 ? await res.json() : [];
+      const loader = await createOMETiffLoader({ url, offsets });
+      const totalChannelCount =
+        loader.omexml.SizeZ * loader.omexml.SizeT * loader.omexml.SizeC;
+      isOffsets404 && totalChannelCount > 40 && handleOffsetsNotFound(true);
+      return loader;
+    }
+    const loader = await createBioformatsZarrLoader({ url });
     return loader;
+  } catch {
+    handleLoaderError(true);
+    return null;
   }
-  const loader = await createBioformatsZarrLoader({ url });
-  return loader;
 }
 
 // Return the midpoint of the global dimensions.

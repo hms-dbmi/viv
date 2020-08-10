@@ -93,7 +93,6 @@ function Header(props) {
           <form
             onSubmit={event => {
               handleSubmitNewUrl(event, text);
-              setText('');
             }}
           >
             <TextField
