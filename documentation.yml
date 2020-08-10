@@ -8,6 +8,8 @@ toc:
 - name: OME-TIFF Loading
   file: docs/OMETIFF_LOADING.md
 - name: Viewers (React Components)
+- name: Data preparation
+  file: tutorial/README.md
 - PictureInPictureViewer
 - SideBySideViewer
 - VivViewer
