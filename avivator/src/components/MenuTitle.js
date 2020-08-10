@@ -3,7 +3,7 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import Grid from '@material-ui/core/Grid';
-import SettingsIcon from '@material-ui/icons/Settings';
+import CloseIcon from '@material-ui/icons/Close';
 
 const hideButtonStyle = {
   marginRight: '4.5px',
@@ -34,7 +34,7 @@ function MenuTitle({ menuToggle }) {
           aria-label="hide-menu"
           style={hideButtonStyle}
         >
-          <SettingsIcon fontSize="small" />
+          <CloseIcon fontSize="small" />
         </IconButton>
       </Grid>
     </Grid>
