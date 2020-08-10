@@ -9,7 +9,7 @@ function Description() {
     <Grid container direction="row" justify="space-between" alignItems="center">
       <Grid item>
         <Typography variant="body1">
-          <strong>Avivator</strong>
+          <strong>AVIVATOR</strong>
         </Typography>
       </Grid>
       <Grid item>

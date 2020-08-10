@@ -4,7 +4,6 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import Select from '@material-ui/core/Select';
-import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -29,16 +28,24 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+function truncateNumber(value, maxLength) {
+  if (!value && value !== 0) return '';
+  const stringValue = value.toString();
+  return stringValue.length > maxLength
+    ? stringValue.substring(0, maxLength).replace(/\.$/, '')
+    : stringValue;
+}
+
 // If the channel is not on, display nothing.
 // If the channel has a not-undefined value, show it.
 // Otherwise, show a circular progress animation.
 const getPixelValueDisplay = (isOn, pixelValue, shouldShowPixelValue) => {
   if (!isOn || !shouldShowPixelValue) {
-    return <Typography> {FILL_PIXEL_VALUE} </Typography>;
+    return FILL_PIXEL_VALUE;
   }
   // Need to check if it's a number becaue 0 is falsy.
   if (pixelValue || typeof pixelValue === 'number') {
-    return <Typography> {pixelValue} </Typography>;
+    return truncateNumber(pixelValue, 7);
   }
   return <CircularProgress size="50%" />;
 };
@@ -106,6 +113,7 @@ function ChannelController({
             onChange={(e, v) => handleChange('CHANGE_SLIDER', v)}
             valueLabelDisplay="auto"
             getAriaLabel={() => `${name}-${colorValue}-${sliderValue}`}
+            valueLabelFormat={v => truncateNumber(v, 5)}
             min={domain[0]}
             max={domain[1]}
             orientation="horizontal"

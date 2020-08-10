@@ -109,16 +109,34 @@ export default function Avivator(props) {
         // RGB should not use a lens.
         setIsLensOn(false);
       }
-      const { height, width } = nextLoader.getRasterSize({ z: 0 });
+      const { height, width } = nextLoader.getRasterSize({
+        z: 0
+      });
+      // Get a reasonable initial zoom level for pyramids based on screen.
       const { numLevels } = nextLoader;
+      let zoom = 0;
+      let size = Infinity;
+      // viewSize is not in the dependencies array becuase we only want to use it when the source changes.
+      while (size >= Math.max(...Object.values(viewSize)) || numLevels === 0) {
+        const rasterSize = nextLoader.getRasterSize({
+          z: zoom
+        });
+        size = Math.max(...Object.values(rasterSize));
+        zoom += 1;
+      }
       const loaderInitialViewState = {
         target: [height / 2, width / 2, 0],
-        zoom: numLevels > 0 ? -(numLevels - 2) : -2
+        zoom: numLevels > 0 ? -zoom : -1.5
       };
       setDimensions(newDimensions);
       dispatch({
         type: 'RESET_CHANNELS',
-        value: { selections, domains, sliders, colors }
+        value: {
+          selections,
+          domains,
+          sliders,
+          colors
+        }
       });
       setLoader(nextLoader);
       setIsLoading(false);
@@ -130,7 +148,7 @@ export default function Avivator(props) {
       history?.push(`?image_url=${source.url}`);
     }
     changeLoader();
-  }, [source, history]);
+  }, [source, history]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmitNewUrl = (event, url) => {
     event.preventDefault();
@@ -158,10 +176,7 @@ export default function Avivator(props) {
       const stats = await getChannelStats({ loader, loaderSelection });
       const domains = stats.map(stat => stat.domain);
       const sliders = stats.map(stat => stat.autoSliders);
-      const colors =
-        stats.length === 1
-          ? [[255, 255, 255]]
-          : stats.map((_, i) => COLOR_PALLETE[i]);
+      const { colors } = channels;
       dispatch({
         type: 'RESET_CHANNELS',
         value: { selections: loaderSelection, domains, sliders, colors }

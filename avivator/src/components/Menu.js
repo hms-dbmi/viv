@@ -8,14 +8,21 @@ import InfoIcon from '@material-ui/icons/Info';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Typography from '@material-ui/core/Typography';
 import Popper from '@material-ui/core/Popper';
+import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
 import Description from './Description';
 
 const useStyles = makeStyles(theme => ({
   root: {
     maxHeight: props => `${props.maxHeight - theme.spacing(4)}px`,
-    width: '350px',
-    overflowY: 'auto'
+    width: '365px',
+    overflowX: 'hidden',
+    overflowY: 'scroll',
+    '&::-webkit-scrollbar': {
+      display: 'none',
+      background: 'transparent'
+    },
+    scrollbarWidth: 'none'
   },
   typography: {
     fontSize: '.8rem'
@@ -64,14 +71,14 @@ function Header(props) {
               <ClickAwayListener onClickAway={toggle}>
                 <Typography className={classes.typography}>
                   Provide a URL to an OME-TIFF file or a Bio-Formats Zarr store
-                  to view the image. View the
-                  <a
+                  to view the image. View the{' '}
+                  <Link
                     target="_blank"
                     rel="noopener noreferrer"
                     href="http://viv.gehlenborglab.org"
                   >
                     docs
-                  </a>
+                  </Link>{' '}
                   to learn more about the supported file formats.
                 </Typography>
               </ClickAwayListener>
