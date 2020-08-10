@@ -51,7 +51,7 @@ export default class OMETiffLoader {
     this.height = this.omexml.SizeY;
     this.tileSize = firstImage.getTileWidth();
     const { SubIFDs } = firstImage.fileDirectory;
-    this.numLevels = this.omexml.getNumberOfImages() || SubIFDs?.length;
+    this.numLevels = SubIFDs?.length || this.omexml.getNumberOfImages();
     this.isBioFormats6Pyramid = SubIFDs;
     this.isPyramid = this.numLevels > 1;
     this.dimensions = dimensionsFromOMEXML(this.omexml);
