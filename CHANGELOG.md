@@ -6,6 +6,8 @@
 
 ### Changed
 
+-  Fix lens and PIP.
+
 ## 0.4.0
 
 ### Added

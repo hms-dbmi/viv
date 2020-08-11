@@ -74,6 +74,11 @@ export function getNearestPowerOf2(width, height) {
 
 export function onPointer(layer) {
   const { viewportId, lensRadius } = layer.props;
+  // If there is no viewportId, don't try to do anything.
+  if (!viewportId) {
+    layer.setState({ unprojectLensBounds: [0, 0, 0, 0] });
+    return;
+  } 
   const { mousePosition } = layer.context;
   const layerView = layer.context.deck.viewManager.views.filter(
     view => view.id === viewportId
