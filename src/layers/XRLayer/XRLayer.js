@@ -16,14 +16,19 @@ import { padColorsAndSliders } from '../utils';
 const defaultProps = {
   pickable: true,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-  channelData: { type: 'array', value: {}, async: true },
+  channelData: { type: 'array', value: {}, compare: true },
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: '<u2', compare: true },
-  colormap: { type: 'string', value: '', compare: true }
+  colormap: { type: 'string', value: '', compare: true },
+  isLensOn: { type: 'boolean', value: false, compare: true },
+  lensSelection: { type: 'number', value: 0, compare: true },
+  lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
+  lensBorderRadius: { type: 'number', value: 0.02, compare: true },
+  unprojectLensBounds: { type: 'array', value: [0, 0, 0, 0], compare: true }
 };
 
 /**
@@ -183,7 +188,13 @@ export default class XRLayer extends Layer {
         opacity,
         domain,
         dtype,
-        channelIsOn
+        channelIsOn,
+        unprojectLensBounds,
+        bounds,
+        isLensOn,
+        lensSelection,
+        lensBorderColor,
+        lensBorderRadius
       } = this.props;
       // Check number of textures not null.
       const numTextures = Object.values(textures).filter(t => t).length;
@@ -196,12 +207,36 @@ export default class XRLayer extends Layer {
         domain,
         dtype
       });
+      // Creating a unit-square scaled intersection box for rendering the lens.
+      // It is ok if these coordinates are outside the unit square since
+      // we check membership in or out of the lens on the fragment shader.
+      const [
+        leftMouseBound,
+        bottomMouseBound,
+        rightMouseBound,
+        topMouseBound
+      ] = unprojectLensBounds;
+      const [left, bottom, right, top] = bounds;
+      const leftMouseBoundScaled = (leftMouseBound - left) / (right - left);
+      const bottomMouseBoundScaled = (bottomMouseBound - top) / (bottom - top);
+      const rightMouseBoundScaled = (rightMouseBound - left) / (right - left);
+      const topMouseBoundScaled = (topMouseBound - top) / (bottom - top);
       model
         .setUniforms({
           ...uniforms,
           colorValues: paddedColorValues,
           sliderValues: paddedSliderValues,
           opacity,
+          majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
+          minorLensAxis: (bottomMouseBoundScaled - topMouseBoundScaled) / 2,
+          lensCenter: [
+            (rightMouseBoundScaled + leftMouseBoundScaled) / 2,
+            (bottomMouseBoundScaled + topMouseBoundScaled) / 2
+          ],
+          isLensOn,
+          lensSelection,
+          lensBorderColor,
+          lensBorderRadius,
           ...textures
         })
         .draw();

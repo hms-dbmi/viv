@@ -8,6 +8,8 @@ toc:
 - name: OME-TIFF Loading
   file: docs/OMETIFF_LOADING.md
 - name: Viewers (React Components)
+- name: Data preparation
+  file: tutorial/README.md
 - PictureInPictureViewer
 - SideBySideViewer
 - VivViewer
@@ -21,17 +23,16 @@ toc:
 - getChannelStats
 - Pool
 - name: Layers
-- VivViewerLayer
-- StaticImageLayer
+- MultiscaleImageLayer
+- ImageLayer
 - ScaleBarLayer
 - name: Loaders
 - createOMETiffLoader
 - OMETiffLoader
 - ZarrLoader
-- OMEZarrReader
 - name: Layers (Internal)
 - XRLayer
 - OverviewLayer
-- VivViewerLayerBase
+- MultiscaleImageLayerBase
 - name: Overview Of Viv Image Rendering
   file: docs/IMAGE_RENDERING.md

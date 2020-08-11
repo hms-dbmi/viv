@@ -4,6 +4,8 @@
 
 ### Added
 
+- Lens view built into layers.
+
 ### Changed
 
 ## 0.3.3

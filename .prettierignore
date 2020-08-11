@@ -1,3 +1,5 @@
 dist/
 **/*.yml
 test_dist/
+dist_docs/
+node_modules/
