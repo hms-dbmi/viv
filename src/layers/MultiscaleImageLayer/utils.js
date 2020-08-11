@@ -22,14 +22,17 @@ export function renderSubLayers(props) {
     dtype,
     id,
     onHover,
-    pickable
+    pickable,
+    unprojectLensBounds,
+    isLensOn,
+    lensSelection
   } = props;
   // Only render in positive coorinate system
-  if ([left, top, right, bottom].some(v => v < 0)) {
+  if ([left, bottom, right, top].some(v => v < 0)) {
     return null;
   }
   const xrl = new XRLayer({
-    id: `XRLayer-${left}-${top}-${right}-${bottom}-${id}`,
+    id: `XRLayer-${left}-${bottom}-${right}-${top}-${id}`,
     bounds: [left, bottom, right, top],
     channelData: data,
     pickable,
@@ -45,6 +48,9 @@ export function renderSubLayers(props) {
     dtype,
     colormap,
     onHover,
+    unprojectLensBounds,
+    isLensOn,
+    lensSelection,
     tileId: { x, y, z }
   });
   return xrl;

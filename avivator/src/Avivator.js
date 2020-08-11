@@ -25,7 +25,9 @@ import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
 import ColormapSelect from './components/ColormapSelect';
 import GlobalSelectionSlider from './components/GlobalSelectionSlider';
+import LensSelect from './components/LensSelect';
 import { LoaderError, OffsetsWarning } from './components/Snackbars';
+
 import {
   MAX_CHANNELS,
   DEFAULT_OVERVIEW,
@@ -56,6 +58,7 @@ export default function Avivator(props) {
   const viewSize = useWindowSize();
 
   const [loader, setLoader] = useState({});
+  const [lensSelection, setLensSelection] = useState(0);
   const [source, setSource] = useState(initSource);
   const [colormap, setColormap] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -71,6 +74,7 @@ export default function Avivator(props) {
   const [controllerOn, toggleController] = useReducer(v => !v, true);
   const [zoomLock, toggleZoomLock] = useReducer(v => !v, true);
   const [panLock, togglePanLock] = useReducer(v => !v, true);
+  const [isLensOn, toggleIsLensOn] = useReducer(v => !v, false);
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
 
   useEffect(() => {
@@ -84,6 +88,9 @@ export default function Avivator(props) {
       if (nextLoader) {
         const { dimensions: newDimensions, isRgb } = nextLoader;
         const selections = buildDefaultSelection(newDimensions);
+        const channelOptions = newDimensions.filter(
+          j => j.field === 'channel'
+        )[0]?.values;
         // Default RGB.
         let sliders = [
           [0, 255],
@@ -112,6 +119,9 @@ export default function Avivator(props) {
             stats.length === 1
               ? [[255, 255, 255]]
               : stats.map((_, i) => COLOR_PALLETE[i]);
+        } else if (isRgb || channelOptions.length === 1) {
+          // RGB should not use a lens.
+          isLensOn && toggleIsLensOn(); // eslint-disable-line no-unused-expressions
         }
         const { height, width } = nextLoader.getRasterSize({
           z: 0
@@ -248,9 +258,9 @@ export default function Avivator(props) {
   const globalControlDimensions = dimensions?.filter(dimension =>
     GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dimension.field)
   );
+  const channelOptions = dimensions.filter(j => j.field === 'channel')[0]
+    ?.values;
   const channelControllers = ids.map((id, i) => {
-    const channelOptions = dimensions.filter(j => j.field === 'channel')[0]
-      .values;
     const name = channelOptions[selections[i].channel];
     return (
       <Grid
@@ -306,6 +316,8 @@ export default function Avivator(props) {
             zoomLock={zoomLock}
             panLock={panLock}
             hoverHooks={{ handleValue: setPixelValues }}
+            lensSelection={lensSelection}
+            isLensOn={isLensOn}
           />
         ) : (
           <PictureInPictureViewer
@@ -323,6 +335,8 @@ export default function Avivator(props) {
             overview={DEFAULT_OVERVIEW}
             overviewOn={overviewOn && isPyramid}
             hoverHooks={{ handleValue: setPixelValues }}
+            lensSelection={lensSelection}
+            isLensOn={isLensOn}
           />
         ))}
       {
@@ -338,6 +352,17 @@ export default function Avivator(props) {
               value={colormap}
               handleChange={setColormap}
               disabled={isLoading}
+            />
+          )}
+          {!isRgb && channelOptions?.length > 1 && !colormap && (
+            <LensSelect
+              handleToggle={toggleIsLensOn}
+              handleSelection={setLensSelection}
+              isOn={isLensOn}
+              channelOptions={selections.map(
+                sel => channelOptions[sel.channel]
+              )}
+              lensSelection={lensSelection}
             />
           )}
           {globalControllers}

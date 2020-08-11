@@ -19,8 +19,36 @@ uniform float intensityArray[6];
 // opacity
 uniform float opacity;
 
+// lens bounds
+uniform float majorLensAxis;
+uniform float minorLensAxis;
+uniform vec2 lensCenter;
+
+// lens uniforms
+uniform bool isLensOn;
+uniform int lensSelection;
+uniform vec3 lensBorderColor;
+uniform float lensBorderRadius;
+
 varying vec2 vTexCoord;
 
+bool fragInLensBounds() {
+  // Check membership in what is (not visually, but effectively) an ellipse.
+  // Since the fragment space is a unit square and the real coordinates could be longer than tall,
+  // to get a circle visually we have to treat the check as that of an ellipse to get the effect of a circle.
+  
+  // Check membership in ellipse.
+  return pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.0) < (1.0 - lensBorderRadius);
+}
+
+bool fragOnLensBounds() {
+  // Same as the above, except this checks the boundary.
+
+  float ellipseDistance = pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.0);
+  
+  // Check membership on "bourndary" of ellipse.
+  return ellipseDistance <= 1.0 && ellipseDistance >= (1.0 - lensBorderRadius);
+}
 
 vec3 hsv2rgb(vec3 c)
 {
@@ -62,33 +90,54 @@ void main() {
   float intensityValue3 = (float(texture(channel3, vTexCoord).r) - sliderValues[3][0]) / max(1.0, (sliderValues[3][1] - sliderValues[3][0]));
   float intensityValue4 = (float(texture(channel4, vTexCoord).r) - sliderValues[4][0]) / max(1.0, (sliderValues[4][1] - sliderValues[4][0]));
   float intensityValue5 = (float(texture(channel5, vTexCoord).r) - sliderValues[5][0]) / max(1.0, (sliderValues[5][1] - sliderValues[5][0]));
+  
+  // Find out if the frag is in bounds of the lens.
+  bool isFragInLensBounds = fragInLensBounds();
+  bool isFragOnLensBounds = fragOnLensBounds();
 
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
 
-  hsvCombo = rgb2hsv(vec3(colorValues[0]));
+  bool inLensAndUseLens = isLensOn && isFragInLensBounds;
+
+  float useColorValue = float(int((inLensAndUseLens && 0 == lensSelection) || (!inLensAndUseLens)));
+  // Max is faster than ternaries/if-else for turning on/off channels.
+  hsvCombo = rgb2hsv(max(vec3(colorValues[0]), (1.0 - useColorValue) * vec3(255, 255, 255)));
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue0));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = rgb2hsv(vec3(colorValues[1]));
-  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue1));
+
+  useColorValue = float(int((inLensAndUseLens && 1 == lensSelection) || (!inLensAndUseLens)));
+  // Max is faster than ternaries/if-else for turning on/off channels.
+  hsvCombo = rgb2hsv(max(vec3(colorValues[1]), (1.0 - useColorValue) * vec3(255, 255, 255)));  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue1));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = rgb2hsv(vec3(colorValues[2]));
-  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue2));
+
+  useColorValue = float(int((inLensAndUseLens && 2 == lensSelection) || (!inLensAndUseLens)));
+  // Max is faster than ternaries/if-else for turning on/off channels.
+  hsvCombo = rgb2hsv(max(vec3(colorValues[2]), (1.0 - useColorValue) * vec3(255, 255, 255)));  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue2));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = rgb2hsv(vec3(colorValues[3]));
-  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue3));
+
+  useColorValue = float(int((inLensAndUseLens && 3 == lensSelection) || (!inLensAndUseLens)));
+  // Max is faster than ternaries/if-else for turning on/off channels.
+  hsvCombo = rgb2hsv(max(vec3(colorValues[3]), (1.0 - useColorValue) * vec3(255, 255, 255)));  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue3));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = rgb2hsv(vec3(colorValues[4]));
-  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue4));
+
+  useColorValue = float(int((inLensAndUseLens && 4 == lensSelection) || (!inLensAndUseLens)));
+  // Max is faster than ternaries/if-else for turning on/off channels.
+  hsvCombo = rgb2hsv(max(vec3(colorValues[4]), (1.0 - useColorValue) * vec3(255, 255, 255)));  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue4));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = rgb2hsv(vec3(colorValues[5]));
-  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue5));
+
+  useColorValue = float(int((inLensAndUseLens && 5 == lensSelection) || (!inLensAndUseLens)));
+  // Max is faster than ternaries/if-else for turning on/off channels.
+  hsvCombo = rgb2hsv(max(vec3(colorValues[5]), (1.0 - useColorValue) * vec3(255, 255, 255)));  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue5));
   rgbCombo += hsv2rgb(hsvCombo);
+
+  // Ternaries are faster than checking this first and then returning/breaking out of shader.
+  rgbCombo = (isLensOn && isFragOnLensBounds) ? lensBorderColor : rgbCombo;
 
   gl_FragColor = vec4(rgbCombo, opacity);
   geometry.uv = vTexCoord;

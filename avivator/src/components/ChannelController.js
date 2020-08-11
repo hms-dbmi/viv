@@ -11,7 +11,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import ChannelOptions from './ChannelOptions';
 import { FILL_PIXEL_VALUE } from '../constants';
 
-const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
+export const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
 
 const toRgb = (on, arr) => {
   const color = on ? COLORMAP_SLIDER_CHECKBOX_COLOR : arr;
