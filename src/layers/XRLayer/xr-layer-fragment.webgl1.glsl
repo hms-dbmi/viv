@@ -100,29 +100,40 @@ void main() {
 
   bool inLensAndUseLens = isLensOn && isFragInLensBounds;
 
-  // Ternaries are much faster than if-then statements.
-  hsvCombo = (inLensAndUseLens && 0 == lensSelection) || (!inLensAndUseLens) ? rgb2hsv(vec3(colorValues[0])) : rgb2hsv(vec3(255, 255, 255));
+  float useColorValue = float(int((inLensAndUseLens && 0 == lensSelection) || (!inLensAndUseLens)));
+  // Max is faster than ternaries/if-else for turning on/off channels.
+  hsvCombo = rgb2hsv(max(vec3(colorValues[0]), (1.0 - useColorValue) * vec3(255, 255, 255)));
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue0));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = (inLensAndUseLens && 1 == lensSelection) || (!inLensAndUseLens) ? rgb2hsv(vec3(colorValues[1])) : rgb2hsv(vec3(255, 255, 255));
-  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue1));
+
+  useColorValue = float(int((inLensAndUseLens && 1 == lensSelection) || (!inLensAndUseLens)));
+  // Max is faster than ternaries/if-else for turning on/off channels.
+  hsvCombo = rgb2hsv(max(vec3(colorValues[1]), (1.0 - useColorValue) * vec3(255, 255, 255)));  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue1));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = (inLensAndUseLens && 2 == lensSelection) || (!inLensAndUseLens) ? rgb2hsv(vec3(colorValues[2])) : rgb2hsv(vec3(255, 255, 255));
-  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue2));
+
+  useColorValue = float(int((inLensAndUseLens && 2 == lensSelection) || (!inLensAndUseLens)));
+  // Max is faster than ternaries/if-else for turning on/off channels.
+  hsvCombo = rgb2hsv(max(vec3(colorValues[2]), (1.0 - useColorValue) * vec3(255, 255, 255)));  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue2));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = (inLensAndUseLens && 3 == lensSelection) || (!inLensAndUseLens) ? rgb2hsv(vec3(colorValues[3])) : rgb2hsv(vec3(255, 255, 255));
-  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue3));
+
+  useColorValue = float(int((inLensAndUseLens && 3 == lensSelection) || (!inLensAndUseLens)));
+  // Max is faster than ternaries/if-else for turning on/off channels.
+  hsvCombo = rgb2hsv(max(vec3(colorValues[3]), (1.0 - useColorValue) * vec3(255, 255, 255)));  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue3));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = (inLensAndUseLens && 4 == lensSelection) || (!inLensAndUseLens) ? rgb2hsv(vec3(colorValues[4])) : rgb2hsv(vec3(255, 255, 255));
-  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue4));
+
+  useColorValue = float(int((inLensAndUseLens && 4 == lensSelection) || (!inLensAndUseLens)));
+  // Max is faster than ternaries/if-else for turning on/off channels.
+  hsvCombo = rgb2hsv(max(vec3(colorValues[4]), (1.0 - useColorValue) * vec3(255, 255, 255)));  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue4));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  hsvCombo = (inLensAndUseLens && 5 == lensSelection) || (!inLensAndUseLens) ? rgb2hsv(vec3(colorValues[5])) : rgb2hsv(vec3(255, 255, 255));
-  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue5));
+
+  useColorValue = float(int((inLensAndUseLens && 5 == lensSelection) || (!inLensAndUseLens)));
+  // Max is faster than ternaries/if-else for turning on/off channels.
+  hsvCombo = rgb2hsv(max(vec3(colorValues[5]), (1.0 - useColorValue) * vec3(255, 255, 255)));  hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue5));
   rgbCombo += hsv2rgb(hsvCombo);
 
   // Ternaries are faster than checking this first and then returning/breaking out of shader.

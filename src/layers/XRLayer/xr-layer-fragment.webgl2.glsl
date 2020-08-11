@@ -110,9 +110,9 @@ void main() {
     // If we are using the lens and this frag is in bounds, focus on only the selection.
     // Otherwise, use the props color value.
     bool inLensAndUseLens = isLensOn && isFragInLensBounds;
-    bool useColorValue = (inLensAndUseLens && i == lensSelection) || (!inLensAndUseLens);
+    float useColorValue = float(int((inLensAndUseLens && i == lensSelection) || (!inLensAndUseLens)));
     // Ternaries are much faster than if-then statements.
-    hsvCombo = useColorValue ? rgb2hsv(vec3(colorValues[i])) : rgb2hsv(vec3(255, 255, 255));
+    hsvCombo = rgb2hsv(max(vec3(colorValues[i]), (1.0 - useColorValue) * vec3(255, 255, 255)));
     // Sum up the intesitiies in additive blending.
     hsvCombo = vec3(hsvCombo.xy, max(0.0, intensityArray[i]));
     rgbCombo += hsv2rgb(hsvCombo);
