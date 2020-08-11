@@ -12,11 +12,6 @@ const sources = [
     description: 'CODEX Tile'
   },
   {
-    // Old Faas(?) bioformats pyramid
-    path: 'TONSIL-1_40X.ome.tif',
-    description: 'Legacy Bioformats OME-TIFF pyramid (Fass)'
-  },
-  {
     path: '12448_G1HR_Mesh003.ome.tif',
     description: 'OME-TIFF Covid-19 Primary Gut Epithelial Stem Cells'
   },
