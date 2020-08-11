@@ -16,7 +16,8 @@ import {
   createLoader,
   channelsReducer,
   useWindowSize,
-  buildDefaultSelection
+  buildDefaultSelection,
+  getNameFromUrl
 } from './utils';
 
 import ChannelController from './components/ChannelController';
@@ -49,27 +50,28 @@ const initialChannels = {
  * @param {Object} args.sources A list of sources for a dropdown menu, like [{ url, description }]
  * */
 export default function Avivator(props) {
-  const { history } = props;
-  const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
+  const { history, source: initSource } = props;
+
   const viewSize = useWindowSize();
+
   const [loader, setLoader] = useState({});
-  /* eslint-disable react/destructuring-assignment */
-  const [source, setSource] = useState(props.source);
-  /* eslint-disable react/destructuring-assignment */
+  const [source, setSource] = useState(initSource);
   const [colormap, setColormap] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [pixelValues, setPixelValues] = useState([]);
   const [dimensions, setDimensions] = useState([]);
   const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
   const [initialViewState, setInitialViewState] = useState({});
+  const [offsetsSnackbarOn, toggleOffsetsSnackbar] = useState(false);
+  const [loaderErrorSnackbarOn, toggleLoaderErrorSnackbar] = useState(false);
+
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
   const [overviewOn, setOverviewOn] = useReducer(v => !v, false);
   const [controllerOn, toggleController] = useReducer(v => !v, true);
   const [zoomLock, toggleZoomLock] = useReducer(v => !v, true);
   const [panLock, togglePanLock] = useReducer(v => !v, true);
-  const [offsetsSnackbarOn, toggleOffsetsSnackbar] = useState(false);
-  const [loaderErrorSnackbarOn, toggleLoaderErrorSnackbar] = useState(false);
+  const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [pixelValues, setPixelValues] = useState([]);
   useEffect(() => {
     async function changeLoader() {
       setIsLoading(true);
@@ -81,6 +83,7 @@ export default function Avivator(props) {
       if (nextLoader) {
         const { dimensions: newDimensions, isRgb } = nextLoader;
         const selections = buildDefaultSelection(newDimensions);
+        // Default RGB.
         let sliders = [
           [0, 255],
           [0, 255],
@@ -112,7 +115,7 @@ export default function Avivator(props) {
         const { height, width } = nextLoader.getRasterSize({
           z: 0
         });
-        // Get a reasonable initial zoom level for pyramids based on screen.
+        // Get a reasonable initial zoom level for pyramids based on screen size.
         const { isPyramid, numLevels } = nextLoader;
         let zoom = 0;
         let size = Infinity;
@@ -144,7 +147,7 @@ export default function Avivator(props) {
         setIsLoading(false);
         setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
         setInitialViewState(loaderInitialViewState);
-        // Set the global selections (needed for the UI).
+        // Set the global selections (needed for the UI). All selections have the same global selection.
         setGlobalSelections(selections[0]);
         // eslint-disable-next-line no-unused-expressions
         history?.push(`?image_url=${source.url}`);
@@ -157,10 +160,8 @@ export default function Avivator(props) {
     event.preventDefault();
     const newSource = {
       url,
-      description: url
-        .split('?')[0]
-        .split('/')
-        .slice(-1)[0]
+      // Use the trailing part of the URL (file name, presumably) as the description.
+      description: getNameFromUrl(url)
     };
     setSource(newSource);
   };
@@ -174,7 +175,7 @@ export default function Avivator(props) {
     // See https://github.com/hubmapconsortium/vitessce-image-viewer/issues/176 for why
     // we have to check mouseup.
     const mouseUp = event.type === 'mouseup';
-    // Only update domains on a mouseup event for the same reason as above.
+    // Only update image on screen on a mouseup event for the same reason as above.
     if (mouseUp) {
       const stats = await getChannelStats({ loader, loaderSelection });
       const domains = stats.map(stat => stat.domain);
@@ -278,6 +279,7 @@ export default function Avivator(props) {
     );
   });
   const globalControllers = globalControlDimensions.map(dimension => {
+    // Only return a slider if there is a "stack."
     return dimension.values.length > 1 ? (
       <GlobalSelectionSlider
         key={dimension.field}

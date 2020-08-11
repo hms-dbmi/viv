@@ -11,6 +11,7 @@ import { grey } from '@material-ui/core/colors';
 
 import sources from './source-info';
 import Avivator from './Avivator';
+import { getNameFromUrl } from './utils';
 
 const darkTheme = createMuiTheme({
   palette: {
@@ -39,10 +40,7 @@ function RoutedAvivator(props) {
   if (url) {
     const urlSrouce = {
       url,
-      description: url
-        .split('?')[0]
-        .split('/')
-        .slice(-1)[0]
+      description: getNameFromUrl(url)
     };
     return (
       <ThemeProvider theme={darkTheme}>

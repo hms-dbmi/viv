@@ -149,8 +149,11 @@ export default class VivViewer extends PureComponent {
       const {
         loader: { tileSize }
       } = layer.props;
-      const { z } = sourceLayer.props;
-      // The zoomed out layer needs to use the fixed zoom at which it is rendered (i.e numLevels - 1).
+      const {
+        tileId: { z }
+      } = sourceLayer.props;
+      // The zoomed out layer needs to use the fixed zoom at which it is rendered.
+      // See: https://github.com/visgl/deck.gl/blob/2b15bc459c6534ea38ce1153f254ce0901f51d6f/modules/geo-layers/src/tile-layer/utils.js#L130.
       const layerZoomScale = Math.max(
         1,
         2 ** Math.round(-z + Math.log2(512 / tileSize))

@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function truncateNumber(value, maxLength) {
+function truncateDecimalNumber(value, maxLength) {
   if (!value && value !== 0) return '';
   const stringValue = value.toString();
   return stringValue.length > maxLength
@@ -45,7 +45,7 @@ const getPixelValueDisplay = (isOn, pixelValue, shouldShowPixelValue) => {
   }
   // Need to check if it's a number becaue 0 is falsy.
   if (pixelValue || typeof pixelValue === 'number') {
-    return truncateNumber(pixelValue, 7);
+    return truncateDecimalNumber(pixelValue, 7);
   }
   return <CircularProgress size="50%" />;
 };
@@ -113,7 +113,7 @@ function ChannelController({
             onChange={(e, v) => handleChange('CHANGE_SLIDER', v)}
             valueLabelDisplay="auto"
             getAriaLabel={() => `${name}-${colorValue}-${sliderValue}`}
-            valueLabelFormat={v => truncateNumber(v, 5)}
+            valueLabelFormat={v => truncateDecimalNumber(v, 5)}
             min={domain[0]}
             max={domain[1]}
             orientation="horizontal"
