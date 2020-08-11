@@ -7,6 +7,8 @@ toc:
   file: docs/API_STRUCTURE.md
 - name: OME-TIFF Loading
   file: docs/OMETIFF_LOADING.md
+- name: Data preparation
+  file: tutorial/README.md
 - name: Viewers (React Components)
 - PictureInPictureViewer
 - SideBySideViewer
@@ -17,21 +19,19 @@ toc:
 - DetailView
 - SideBySideView
 - name: Utility Methods
-- makeBoundingBox
 - getChannelStats
-- Pool
 - name: Layers
-- VivViewerLayer
-- StaticImageLayer
+- MultiscaleImageLayer
+- ImageLayer
 - ScaleBarLayer
 - name: Loaders
 - createOMETiffLoader
 - OMETiffLoader
 - ZarrLoader
-- OMEZarrReader
-- name: Layers (Internal)
+- name: Internal
 - XRLayer
 - OverviewLayer
-- VivViewerLayerBase
-- name: Overview Of Viv Image Rendering
-  file: docs/IMAGE_RENDERING.md
+- MultiscaleImageLayerBase
+- makeBoundingBox
+- Pool
+

@@ -15,6 +15,11 @@ import { DetailView, OverviewView } from '../views';
  * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
  * @param {Object} props.hoverHooks Object including the allowable hooks - right now only accepting a function with key handleValue like { handleValue: (valueArray) => {} }
+ * @param {boolean} props.isLensOn Whether or not to use the lens.
+ * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
+ * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
+ * @param {number} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
+ * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  */
 
 const PictureInPictureViewer = props => {
@@ -28,7 +33,12 @@ const PictureInPictureViewer = props => {
     overview,
     overviewOn,
     loaderSelection,
-    hoverHooks
+    hoverHooks,
+    isLensOn = false,
+    lensSelection,
+    lensRadius = 100,
+    lensBorderColor = [255, 255, 255],
+    lensBorderRadius = 0.02
   } = props;
   const detailViewState = { ...initialViewState, id: 'detail' };
   const detailView = new DetailView({ initialViewState: detailViewState });
@@ -38,7 +48,12 @@ const PictureInPictureViewer = props => {
     colorValues,
     channelIsOn,
     loaderSelection,
-    colormap
+    colormap,
+    isLensOn,
+    lensSelection,
+    lensRadius,
+    lensBorderColor,
+    lensBorderRadius
   };
   const views = [detailView];
   const layerProps = [layerConfig];

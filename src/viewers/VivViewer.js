@@ -13,12 +13,16 @@ export default class VivViewer extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      viewStates: {}
+      viewStates: {},
+      initialViewStates: {}
     };
-    const { viewStates } = this.state;
+    const { viewStates, initialViewStates } = this.state;
     const { views } = this.props;
     views.forEach(view => {
       viewStates[view.id] = view.filterViewState({
+        viewState: view.initialViewState
+      });
+      initialViewStates[view.id] = view.filterViewState({
         viewState: view.initialViewState
       });
     });
@@ -94,6 +98,27 @@ export default class VivViewer extends PureComponent {
       });
       return { viewStates };
     }
+    if (
+      views.some(
+        view =>
+          view.initialViewState.target !==
+            prevState.initialViewStates[view.id].target ||
+          view.initialViewState.zoom !==
+            prevState.initialViewStates[view.id].zoom
+      )
+    ) {
+      const initialViewStates = {};
+      const viewStates = {};
+      views.forEach(view => {
+        viewStates[view.id] = view.filterViewState({
+          viewState: view.initialViewState
+        });
+        initialViewStates[view.id] = view.filterViewState({
+          viewState: view.initialViewState
+        });
+      });
+      return { initialViewStates, viewStates };
+    }
     return prevState;
   }
 
@@ -119,12 +144,20 @@ export default class VivViewer extends PureComponent {
       return null;
     }
     let dataCoords;
-    // This is currently a work-around for: https://github.com/visgl/deck.gl/pull/4526.
-    // Once this is fixed we can make something more robust.
-    if (sourceLayer.id.includes('Background')) {
-      const { numLevels } = layer.props.loader;
-      // The zoomed out layer needs to use the fixed zoom at which it is rendered (i.e numLevels - 1).
-      const layerZoomScale = Math.max(1, 2 ** Math.floor(numLevels - 1));
+    // Tiled layer needs a custom layerZoomScale.
+    if (sourceLayer.id.includes('Tiled')) {
+      const {
+        loader: { tileSize }
+      } = layer.props;
+      const {
+        tileId: { z }
+      } = sourceLayer.props;
+      // The zoomed out layer needs to use the fixed zoom at which it is rendered.
+      // See: https://github.com/visgl/deck.gl/blob/2b15bc459c6534ea38ce1153f254ce0901f51d6f/modules/geo-layers/src/tile-layer/utils.js#L130.
+      const layerZoomScale = Math.max(
+        1,
+        2 ** Math.round(-z + Math.log2(512 / tileSize))
+      );
       dataCoords = [
         Math.floor((coordinate[0] - bounds[0]) / layerZoomScale),
         Math.floor((coordinate[1] - bounds[3]) / layerZoomScale)

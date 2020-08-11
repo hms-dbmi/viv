@@ -16,13 +16,19 @@ const defaultProps = {
   colormap: { type: 'string', value: '', compare: true },
   dtype: { type: 'string', value: '<u2', compare: true },
   domain: { type: 'array', value: [], compare: true },
-  viewportId: { type: 'string', value: '', compare: true }
+  viewportId: { type: 'string', value: '', compare: true },
+  unprojectLensBounds: { type: 'array', value: [0, 0, 0, 0], compare: true },
+  isLensOn: { type: 'boolean', value: false, compare: true },
+  lensSelection: { type: 'number', value: 0, compare: true },
+  lensRadius: { type: 'number', value: 100, compare: true },
+  lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
+  lensBorderRadius: { type: 'number', value: 0.02, compare: true }
 };
 
 /**
  * This layer serves as a proxy of sorts to the rendering done in renderSubLayers, reacting to viewport changes in a custom manner.
  */
-export default class VivViewerLayerBase extends TileLayer {
+export default class MultiscaleImageLayerBase extends TileLayer {
   /**
    * This function allows us to controls which viewport gets to update the Tileset2D.
    * This is a uniquely TileLayer issue since it updates based on viewport updates thanks
@@ -45,5 +51,5 @@ export default class VivViewerLayerBase extends TileLayer {
   }
 }
 
-VivViewerLayerBase.layerName = 'VivViewerLayerBase';
-VivViewerLayerBase.defaultProps = defaultProps;
+MultiscaleImageLayerBase.layerName = 'MultiscaleImageLayerBase';
+MultiscaleImageLayerBase.defaultProps = defaultProps;

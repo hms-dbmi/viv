@@ -13,6 +13,10 @@ import { SideBySideView } from '../views';
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {Boolean} props.zoomLock Whether or not lock the zooms of the two views.
  * @param {Boolean} props.panLock Whether or not lock the pans of the two views.
+ * @param {boolean} props.isLensOn Whether or not to use the lens.
+ * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
+ * @param {number} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
+ * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  */
 const SideBySideViewer = props => {
   const {
@@ -24,7 +28,12 @@ const SideBySideViewer = props => {
     colormap,
     panLock,
     loaderSelection,
-    zoomLock
+    zoomLock,
+    isLensOn = false,
+    lensSelection,
+    lensRadius = 100,
+    lensBorderColor = [255, 255, 255],
+    lensBorderRadius = 0.02
   } = props;
   const detailViewLeft = new SideBySideView({
     initialViewState: { ...initialViewState, id: 'left' },
@@ -45,7 +54,12 @@ const SideBySideViewer = props => {
     colorValues,
     channelIsOn,
     loaderSelection,
-    colormap
+    colormap,
+    isLensOn,
+    lensSelection,
+    lensRadius,
+    lensBorderColor,
+    lensBorderRadius
   };
   const views = [detailViewRight, detailViewLeft];
   const layerProps = [layerConfig, layerConfig];

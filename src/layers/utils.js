@@ -71,3 +71,41 @@ export function to32BitFloat(data) {
 export function getNearestPowerOf2(width, height) {
   return 2 ** Math.ceil(Math.log2(Math.max(width, height)));
 }
+
+export function onPointer(layer) {
+  const { viewportId, lensRadius } = layer.props;
+  const { mousePosition } = layer.context;
+  const layerView = layer.context.deck.viewManager.views.filter(
+    view => view.id === viewportId
+  )[0];
+  const viewState = layer.context.deck.viewManager.viewState[viewportId];
+  const viewport = layerView.makeViewport({
+    ...viewState,
+    viewState
+  });
+  // If the mouse is in the viewport and the mousePosition exists, set
+  // the state with the bounding box of the circle that will render as a lens.
+  if (mousePosition && viewport.containsPixel(mousePosition)) {
+    const offsetMousePosition = {
+      x: mousePosition.x - viewport.x,
+      y: mousePosition.y - viewport.y
+    };
+    const mousePositionBounds = [
+      // left
+      [offsetMousePosition.x - lensRadius, offsetMousePosition.y],
+      // bottom
+      [offsetMousePosition.x, offsetMousePosition.y + lensRadius],
+      // right
+      [offsetMousePosition.x + lensRadius, offsetMousePosition.y],
+      // top
+      [offsetMousePosition.x, offsetMousePosition.y - lensRadius]
+    ];
+    // Unproject from screen to world coordinates.
+    const unprojectLensBounds = mousePositionBounds.map(
+      (bounds, i) => viewport.unproject(bounds)[i % 2]
+    );
+    layer.setState({ unprojectLensBounds });
+  } else {
+    layer.setState({ unprojectLensBounds: [0, 0, 0, 0] });
+  }
+}

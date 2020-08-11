@@ -7,7 +7,7 @@ die() { set +v; echo "$*" 1>&2 ; sleep 1; exit 1; }
 
 start changelog
 if [ "$TRAVIS_BRANCH" != 'master' ]; then
-  diff CHANGELOG.md <(curl "https://raw.githubusercontent.com/hubmapconsortium/vitessce-image-viewer/master/CHANGELOG.md") \
+  diff CHANGELOG.md <(curl "https://raw.githubusercontent.com/hms-dbmi/viv/master/CHANGELOG.md") \
     && die 'Update CHANGELOG.md'
 fi
 end changelog

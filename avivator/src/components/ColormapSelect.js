@@ -9,7 +9,7 @@ function ColormapSelect({ value, handleChange, disabled }) {
   return (
     <FormControl fullWidth>
       <InputLabel htmlFor="colormap-select">
-        {value === '' ? 'Use' : null} Colormap
+        Additive {value === '' ? ' Blending' : 'Color Mapping'}
       </InputLabel>
       <Select
         native

@@ -5,7 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   devtool: 'source-map',
-  entry: './demo/src/index.js',
+  entry: './avivator/src/index.js',
   output: {
     path: path.join(__dirname, '/dist'),
     filename: 'index_bundle.js'
@@ -81,7 +81,7 @@ module.exports = {
     new HtmlWebPackPlugin({
       hash: true,
       filename: 'index.html', // target html
-      template: './demo/public/index.html' // source html
+      template: './avivator/public/index.html' // source html
     }),
     new MiniCssExtractPlugin({ filename: 'css/style.css' })
   ]
