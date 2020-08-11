@@ -73,7 +73,7 @@ export default function Avivator(props) {
   const [controllerOn, toggleController] = useReducer(v => !v, true);
   const [zoomLock, toggleZoomLock] = useReducer(v => !v, true);
   const [panLock, togglePanLock] = useReducer(v => !v, true);
-  const [isLensOn, setIsLensOn] = useReducer(v => !v, false);
+  const [isLensOn, toggleIsLensOn] = useReducer(v => !v, false);
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
 
   useEffect(() => {
@@ -120,7 +120,7 @@ export default function Avivator(props) {
               : stats.map((_, i) => COLOR_PALLETE[i]);
         } else if (isRgb || channelOptions.length === 1) {
           // RGB should not use a lens.
-          isLensOn && setIsLensOn(); // eslint-disable-line no-unused-expressions
+          isLensOn && toggleIsLensOn(); // eslint-disable-line no-unused-expressions
         }
         const { height, width } = nextLoader.getRasterSize({
           z: 0
@@ -359,9 +359,9 @@ export default function Avivator(props) {
               disabled={isLoading}
             />
           )}
-          {!isRgb && channelOptions?.length > 1 && (
+          {!isRgb && channelOptions?.length > 1 && !colormap && (
             <LensSelect
-              handleToggle={setIsLensOn}
+              handleToggle={toggleIsLensOn}
               handleSelection={setLensSelection}
               isOn={isLensOn}
               channelOptions={selections.map(

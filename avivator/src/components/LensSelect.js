@@ -19,7 +19,7 @@ function LensSelect({
       </Grid>
       <Grid item xs={2}>
         <Checkbox
-          onChange={() => handleToggle()}
+          onChange={handleToggle}
           checked={isOn}
           style={{
             color: checkboxColor,
