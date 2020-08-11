@@ -51,9 +51,7 @@ export function renderSubLayers(props) {
     unprojectLensBounds,
     isLensOn,
     lensSelection,
-    x,
-    y,
-    z
+    tileId: { x, y, z }
   });
   return xrl;
 }

@@ -122,7 +122,10 @@ export default class ScaleBarLayer extends CompositeLayer {
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         {
-          text: String(numUnits).slice(0, 5) + unit,
+          text:
+            String(numUnits)
+              .slice(0, 5)
+              .replace(/\.$/, '') + unit,
           position: [xLeftCoord + barLength * 0.5, yCoord + barHeight * 4]
         }
       ],

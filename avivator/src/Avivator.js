@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
 
 import AddIcon from '@material-ui/icons/Add';
 
@@ -15,15 +16,16 @@ import {
   createLoader,
   channelsReducer,
   useWindowSize,
-  buildDefaultSelection
+  buildDefaultSelection,
+  getNameFromUrl
 } from './utils';
 
 import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
-import MenuToggle from './components/MenuToggle';
 import ColormapSelect from './components/ColormapSelect';
 import GlobalSelectionSlider from './components/GlobalSelectionSlider';
 import LensSelect from './components/LensSelect';
+import { LoaderError, OffsetsWarning } from './components/Snackbars';
 
 import {
   MAX_CHANNELS,
@@ -50,106 +52,116 @@ const initialChannels = {
  * @param {Object} args.sources A list of sources for a dropdown menu, like [{ url, description }]
  * */
 export default function Avivator(props) {
-  const { history } = props;
-  const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
+  const { history, source: initSource } = props;
+
   const viewSize = useWindowSize();
+
   const [loader, setLoader] = useState({});
   const [lensSelection, setLensSelection] = useState(0);
-
-  /* eslint-disable react/destructuring-assignment */
-  const [source, setSource] = useState(props.source);
-  /* eslint-disable react/destructuring-assignment */
+  const [source, setSource] = useState(initSource);
   const [colormap, setColormap] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [pixelValues, setPixelValues] = useState([]);
   const [dimensions, setDimensions] = useState([]);
   const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
   const [initialViewState, setInitialViewState] = useState({});
+  const [offsetsSnackbarOn, toggleOffsetsSnackbar] = useState(false);
+  const [loaderErrorSnackbarOn, toggleLoaderErrorSnackbar] = useState(false);
+
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
   const [overviewOn, setOverviewOn] = useReducer(v => !v, false);
   const [controllerOn, toggleController] = useReducer(v => !v, true);
   const [zoomLock, toggleZoomLock] = useReducer(v => !v, true);
   const [panLock, togglePanLock] = useReducer(v => !v, true);
   const [isLensOn, setIsLensOn] = useReducer(v => !v, false);
+  const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [pixelValues, setPixelValues] = useState([]);
   useEffect(() => {
     async function changeLoader() {
       setIsLoading(true);
-      const nextLoader = await createLoader(source.url);
-      const { dimensions: newDimensions, isRgb } = nextLoader;
-      const channelOptions = newDimensions.filter(j => j.field === 'channel')[0]
-        ?.values;
-      const selections = buildDefaultSelection(newDimensions);
-      let sliders = [
-        [0, 255],
-        [0, 255],
-        [0, 255]
-      ];
-      let domains = [
-        [0, 255],
-        [0, 255],
-        [0, 255]
-      ];
-      let colors = [
-        [255, 0, 0],
-        [0, 255, 0],
-        [0, 0, 255]
-      ];
-      if (!isRgb) {
-        const stats = await getChannelStats({
-          loader: nextLoader,
-          loaderSelection: selections
-        });
-        domains = stats.map(stat => stat.domain);
-        sliders = stats.map(stat => stat.autoSliders);
-        // If there is only one channel, use white.
-        colors =
-          stats.length === 1
-            ? [[255, 255, 255]]
-            : stats.map((_, i) => COLOR_PALLETE[i]);
-      } else if (isRgb || channelOptions.length === 1) {
-        // RGB should not use a lens.
-        isLensOn && setIsLensOn();
-      }
-      const { height, width } = nextLoader.getRasterSize({
-        z: 0
-      });
-      // Get a reasonable initial zoom level for pyramids based on screen.
-      const { isPyramid, numLevels } = nextLoader;
-      let zoom = 0;
-      let size = Infinity;
-      // viewSize is not in the dependencies array becuase we only want to use it when the source changes.
-      if (isPyramid) {
-        while (size >= Math.max(...Object.values(viewSize))) {
-          const rasterSize = nextLoader.getRasterSize({
-            z: zoom
+      const nextLoader = await createLoader(
+        source.url,
+        toggleOffsetsSnackbar,
+        toggleLoaderErrorSnackbar
+      );
+      if (nextLoader) {
+        const { dimensions: newDimensions, isRgb } = nextLoader;
+        const selections = buildDefaultSelection(newDimensions);
+        const channelOptions = newDimensions.filter(
+          j => j.field === 'channel'
+        )[0]?.values;
+        // Default RGB.
+        let sliders = [
+          [0, 255],
+          [0, 255],
+          [0, 255]
+        ];
+        let domains = [
+          [0, 255],
+          [0, 255],
+          [0, 255]
+        ];
+        let colors = [
+          [255, 0, 0],
+          [0, 255, 0],
+          [0, 0, 255]
+        ];
+        if (!isRgb) {
+          const stats = await getChannelStats({
+            loader: nextLoader,
+            loaderSelection: selections
           });
-          size = Math.max(...Object.values(rasterSize));
-          zoom += 1;
+          domains = stats.map(stat => stat.domain);
+          sliders = stats.map(stat => stat.autoSliders);
+          // If there is only one channel, use white.
+          colors =
+            stats.length === 1
+              ? [[255, 255, 255]]
+              : stats.map((_, i) => COLOR_PALLETE[i]);
+        } else if (isRgb || channelOptions.length === 1) {
+          // RGB should not use a lens.
+          isLensOn && setIsLensOn(); // eslint-disable-line no-unused-expressions
         }
+        const { height, width } = nextLoader.getRasterSize({
+          z: 0
+        });
+        // Get a reasonable initial zoom level for pyramids based on screen size.
+        const { isPyramid, numLevels } = nextLoader;
+        let zoom = 0;
+        let size = Infinity;
+        // viewSize is not in the dependencies array becuase we only want to use it when the source changes.
+        if (isPyramid) {
+          while (size >= Math.max(...Object.values(viewSize))) {
+            const rasterSize = nextLoader.getRasterSize({
+              z: zoom
+            });
+            size = Math.max(...Object.values(rasterSize));
+            zoom += 1;
+          }
+        }
+        const loaderInitialViewState = {
+          target: [height / 2, width / 2, 0],
+          zoom: numLevels > 0 ? -zoom : -1.5
+        };
+        setDimensions(newDimensions);
+        dispatch({
+          type: 'RESET_CHANNELS',
+          value: {
+            selections,
+            domains,
+            sliders,
+            colors
+          }
+        });
+        setLoader(nextLoader);
+        setIsLoading(false);
+        setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
+        setInitialViewState(loaderInitialViewState);
+        // Set the global selections (needed for the UI). All selections have the same global selection.
+        setGlobalSelections(selections[0]);
+        // eslint-disable-next-line no-unused-expressions
+        history?.push(`?image_url=${source.url}`);
       }
-      const loaderInitialViewState = {
-        target: [height / 2, width / 2, 0],
-        zoom: numLevels > 0 ? -zoom : -1.5
-      };
-      setDimensions(newDimensions);
-      dispatch({
-        type: 'RESET_CHANNELS',
-        value: {
-          selections,
-          domains,
-          sliders,
-          colors
-        }
-      });
-      setLoader(nextLoader);
-      setIsLoading(false);
-      setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
-      setInitialViewState(loaderInitialViewState);
-      // Set the global selections (needed for the UI).
-      setGlobalSelections(selections[0]);
-      // eslint-disable-next-line no-unused-expressions
-      history?.push(`?image_url=${source.url}`);
     }
     changeLoader();
   }, [source, history]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -158,10 +170,8 @@ export default function Avivator(props) {
     event.preventDefault();
     const newSource = {
       url,
-      description: url
-        .split('?')[0]
-        .split('/')
-        .slice(-1)[0]
+      // Use the trailing part of the URL (file name, presumably) as the description.
+      description: getNameFromUrl(url)
     };
     setSource(newSource);
   };
@@ -175,15 +185,15 @@ export default function Avivator(props) {
     // See https://github.com/hubmapconsortium/vitessce-image-viewer/issues/176 for why
     // we have to check mouseup.
     const mouseUp = event.type === 'mouseup';
-    // Only update domains on a mouseup event for the same reason as above.
+    // Only update image on screen on a mouseup event for the same reason as above.
     if (mouseUp) {
       const stats = await getChannelStats({ loader, loaderSelection });
       const domains = stats.map(stat => stat.domain);
       const sliders = stats.map(stat => stat.autoSliders);
-      const { colors } = channels;
+      const { colors, isOn } = channels;
       dispatch({
         type: 'RESET_CHANNELS',
-        value: { selections: loaderSelection, domains, sliders, colors }
+        value: { selections: loaderSelection, domains, sliders, colors, isOn }
       });
       setGlobalSelections(prev => ({ ...prev, ...selection }));
     } else {
@@ -279,6 +289,7 @@ export default function Avivator(props) {
     );
   });
   const globalControllers = globalControlDimensions.map(dimension => {
+    // Only return a slider if there is a "stack."
     return dimension.values.length > 1 ? (
       <GlobalSelectionSlider
         key={dimension.field}
@@ -333,11 +344,13 @@ export default function Avivator(props) {
             isLensOn={isLensOn}
           />
         ))}
-      {controllerOn && (
+      {
         <Menu
           maxHeight={viewSize.height}
           handleSubmitNewUrl={handleSubmitNewUrl}
           url={source.url}
+          on={controllerOn}
+          toggle={toggleController}
         >
           {!isRgb && (
             <ColormapSelect
@@ -419,10 +432,30 @@ export default function Avivator(props) {
             </>
           )}
         </Menu>
-      )}
-      <Box position="absolute" right={-8} top={-8} m={2}>
-        <MenuToggle on={controllerOn} toggle={toggleController} />
-      </Box>
+      }
+      <Snackbar
+        open={offsetsSnackbarOn || loaderErrorSnackbarOn}
+        autoHideDuration={8000}
+        onClose={() => {
+          toggleOffsetsSnackbar(false);
+          toggleLoaderErrorSnackbar(false);
+        }}
+        elevation={6}
+        variant="filled"
+      >
+        {offsetsSnackbarOn || loaderErrorSnackbarOn ? (
+          <Alert
+            onClose={() => {
+              toggleOffsetsSnackbar(false);
+              toggleLoaderErrorSnackbar(false);
+            }}
+            severity={offsetsSnackbarOn ? 'warning' : 'error'}
+          >
+            {offsetsSnackbarOn && <OffsetsWarning />}
+            {loaderErrorSnackbarOn && <LoaderError />}
+          </Alert>
+        ) : null}
+      </Snackbar>
     </>
   );
 }
