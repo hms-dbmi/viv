@@ -1,5 +1,3 @@
-# Data Preparation
-
 Viv supports a subset of the files generated from the `bioformats2raw` + `raw2ometiff` pipeline, described 
 [here](https://www.glencoesoftware.com/blog/2019/12/09/converting-whole-slide-images-to-OME-TIFF.html). 
 This guide demonstrates how to generate a pyramidal Zarr or OME-TIFF with Bio-Formats that can be viewed with 

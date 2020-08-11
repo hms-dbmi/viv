@@ -1,5 +1,3 @@
-### OME-TIFF Loading
-
 `Viv` has the ability to load OME-TIFF files directly through a simple API:
 
 ```javascript
@@ -26,8 +24,8 @@ A bit is going on under the hood here, though. Here are some of those things:
 
 ```shell
 # Pull docker images
-docker pull portal-contianer-ome-tiff-offsets:0.0.3
-docker pull portal-contianer-ome-tiff-tiler:0.0.3
+docker pull hubmap/portal-container-ome-tiff-offsets:0.0.3
+docker pull hubmap/portal-container-ome-tiff-tiler:0.0.3
 
 # Run docker images
 # For images that have large z/t/channel stack combinations.
@@ -35,13 +33,13 @@ docker run \
     --name offsets \
     --mount type=bind,source=/my/path/test-input/,target=/input \
     --mount type=bind,source=/my/path/test-output/,target=/output \
-    portal-contianer-ome-tiff-offsets:0.0.3
+    hubmap/portal-container-ome-tiff-offsets:0.0.3
 # For large resolution images, to be downsampled and tiled.
 docker run \
     --name tiler \
     --mount type=bind,source=/my/path/test-input/,target=/input \
     --mount type=bind,source=/my/path/test-output/,target=/output \
-    portal-contianer-ome-tiff-tiler:0.0.3
+    hubmap/portal-container-ome-tiff-tiler:0.0.3
 
 # Push output to the cloud
 gsutil -m cp -r /my/path/test-output/ gs://my/path/test-output/
