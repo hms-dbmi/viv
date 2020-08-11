@@ -17,7 +17,8 @@ import {
   channelsReducer,
   useWindowSize,
   buildDefaultSelection,
-  getNameFromUrl
+  getNameFromUrl,
+  getSingleSelectionStats
 } from './utils';
 
 import ChannelController from './components/ChannelController';
@@ -116,7 +117,7 @@ export default function Avivator(props) {
           z: 0
         });
         // Get a reasonable initial zoom level for pyramids based on screen size.
-        const { isPyramid, numLevels } = nextLoader;
+        const { isPyramid } = nextLoader;
         let zoom = 0;
         let size = Infinity;
         // viewSize is not in the dependencies array becuase we only want to use it when the source changes.
@@ -131,7 +132,7 @@ export default function Avivator(props) {
         }
         const loaderInitialViewState = {
           target: [height / 2, width / 2, 0],
-          zoom: numLevels > 0 ? -zoom : -1.5
+          zoom: isPyramid ? -zoom : -1.5
         };
         setDimensions(newDimensions);
         dispatch({
@@ -204,12 +205,10 @@ export default function Avivator(props) {
       const { field, values } = channelDim;
       const dimIndex = values.indexOf(value);
       const selection = { ...globalSelections, [field]: dimIndex };
-      const stats = await getChannelStats({
+      const { domain, slider } = await getSingleSelectionStats({
         loader,
-        loaderSelection: [selection]
+        selection
       });
-      const [domain] = stats.map(stat => stat.domain);
-      const [slider] = stats.map(stat => stat.autoSliders);
       dispatch({
         type,
         index,
@@ -224,21 +223,17 @@ export default function Avivator(props) {
     const selection = {};
     const { selections } = channels;
 
-    dimensions.forEach(dimension => {
+    dimensions.forEach(({ field }) => {
       // Set new image to default selection for non-global selections (0)
       // and use current global selection otherwise.
-      selection[dimension.field] = GLOBAL_SLIDER_DIMENSION_FIELDS.includes(
-        dimension.field
-      )
-        ? selections[0][dimension.field]
+      selection[field] = GLOBAL_SLIDER_DIMENSION_FIELDS.includes(field)
+        ? selections[0][field]
         : 0;
     });
-    const stats = await getChannelStats({
+    const { domain, slider } = await getSingleSelectionStats({
       loader,
-      loaderSelection: [selection]
+      selection
     });
-    const [domain] = stats.map(stat => stat.domain);
-    const [slider] = stats.map(stat => stat.autoSliders);
     dispatch({
       type: 'ADD_CHANNEL',
       value: {

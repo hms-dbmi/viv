@@ -26,6 +26,10 @@ const darkTheme = createMuiTheme({
   }
 });
 
+function getRandomSource() {
+  return sources[Math.floor(Math.random() * sources.length)];
+}
+
 // https://reactrouter.com/web/example/query-parameters
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -48,7 +52,7 @@ function RoutedAvivator(props) {
       </ThemeProvider>
     );
   }
-  const source = sources[Math.floor(Math.random() * sources.length)];
+  const source = getRandomSource();
   return (
     <ThemeProvider theme={darkTheme}>
       <Avivator source={source} history={history} />

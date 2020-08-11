@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
-import { createOMETiffLoader, createBioformatsZarrLoader } from '../../src';
+import {
+  createOMETiffLoader,
+  createBioformatsZarrLoader,
+  getChannelStats
+} from '../../src';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
 
@@ -181,4 +185,13 @@ export function channelsReducer(state, { index, value, type }) {
     default:
       throw new Error();
   }
+}
+
+export async function getSingleSelectionStats({ loader, selection }) {
+  const [selectionStats] = await getChannelStats({
+    loader,
+    loaderSelection: [selection]
+  });
+  const { domain, autoSliders: slider } = selectionStats;
+  return { domain, slider };
 }
