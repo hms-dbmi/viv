@@ -65,7 +65,7 @@ function padEven(data, width, height, boxSize) {
  * @param {number} props.opacity Opacity of the layer.
  * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
- * @param {string} props.viewportId Id for the current view.
+ * @param {string} props.viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
  * @param {Array} props.translate Translate transformation to be applied to the bounds after scaling.
  * @param {number} props.scale Scaling factor for this layer to be used against the dimensions of the loader's `getRaster`.
  * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
