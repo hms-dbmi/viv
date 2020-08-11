@@ -78,7 +78,7 @@ export function onPointer(layer) {
   if (!viewportId) {
     layer.setState({ unprojectLensBounds: [0, 0, 0, 0] });
     return;
-  } 
+  }
   const { mousePosition } = layer.context;
   const layerView = layer.context.deck.viewManager.views.filter(
     view => view.id === viewportId
