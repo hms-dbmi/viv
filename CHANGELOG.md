@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.4.0
+
+### Added
+
 - Lens view built into layers.
 - Add avivator.
 
