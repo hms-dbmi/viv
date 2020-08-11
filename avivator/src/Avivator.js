@@ -172,7 +172,7 @@ export default function Avivator(props) {
       ...pastSelection,
       ...selection
     }));
-    // See https://github.com/hubmapconsortium/vitessce-image-viewer/issues/176 for why
+    // See https://github.com/hms-dbmi/viv/issues/176 for why
     // we have to check mouseup.
     const mouseUp = event.type === 'mouseup';
     // Only update image on screen on a mouseup event for the same reason as above.

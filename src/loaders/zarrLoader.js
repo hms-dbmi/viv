@@ -32,7 +32,7 @@ export default class ZarrLoader {
 
     const { dtype, chunks } = base;
     /* TODO: Use better dtype convention in DTYPE_LOOKUP.
-     * https://github.com/hubmapconsortium/vitessce-image-viewer/issues/203
+     * https://github.com/hms-dbmi/viv/issues/203
      *
      * This convension should probably _not_ describe endianness,
      * since endianness is resolved when decoding the source arrayBuffers

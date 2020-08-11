@@ -5,13 +5,12 @@ with WebGL.
 
 ### About
 
-Viv is a library with deck.gl layers, viewers, and utility functions/classes for viewering for multi-scale and non-multi-scale image data.
-The layers of our API make it easy to create UI elements with the desired level customization.
+Viv is a JavaScript library providing utilities for rendering primary imaging data. Viv supports WebGL-based multi-channel rendering of both pyramidal and non-pyramidal images. The rendering components of Viv are provided as Deck.gl layers, making it easy to compose images with existing layers and efficiently update rendering properties within a reactive paradigm. 
 
 ### Avivator
 
 Also included in this repository is [`Avivator`](http://avivator.gehlenborglab.org), a lightweight "batteries-included" 
-web-based tool for viewing remote microscopy data. Avivator is a purely client-side program that requires access to
+WebGL viewer for remote microscopy data. Avivator is a purely client-side program that requires access to
 Bio-Formats "raw" Zarr or OME-TIFF data over HTTP. To use Avivator with your own data, please see the data preparation 
 [tutorial](tutorial/README.md). Initial load time for OME-TIFFs can be optimized by generating a special `offsets.json`
 file containing byte offsets for the associated binary data. For more information, see the 
@@ -34,7 +33,7 @@ Please install the [Prettier plug-in](https://prettier.io/docs/en/editors.html)
 for your preferred editor. (Badly formatted code will fail on Travis.)
 
 For the demo, run `npm start` and you will be able to update the component and use the
-`demo/src/index.js` to visually test.
+`avivator/src/index.js` to visually test.
 
 HTTP is acceptable but potentially slower than HTTP2. Our demo uses Google Cloud Storage, which is HTTP2 by default.
 

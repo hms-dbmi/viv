@@ -16,7 +16,7 @@ export default function GlobalSelectionSlider(props) {
       <Grid item xs={11}>
         <Slider
           value={globalSelections[field]}
-          // See https://github.com/hubmapconsortium/vitessce-image-viewer/issues/176 for why
+          // See https://github.com/hms-dbmi/viv/issues/176 for why
           // we have the two handlers.
           onChange={(event, newValue) => {
             handleGlobalChannelsSelectionChange({

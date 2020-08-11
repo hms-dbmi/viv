@@ -1,4 +1,4 @@
-Here are two snippets to help get you started with our higher-level viewer components. For a more complete example of using these higher level components, look at the source code for `Avivator` [here](https://github.com/hms-dbmi/viv/blob/master/avivator/src/Avivator.js), or look at the source code of the library [here](https://github.com/hms-dbmi/viv/tree/master/src) for building your own components with custom `VivViews` or custom `deck.gl` layers.
+Here are two snippets to help get you started with our higher-level viewer components. More comprehensive usage of the higher-level components can be found in the `Avivator` [source](https://github.com/hms-dbmi/viv/blob/master/avivator/src/Avivator.js). Otherwise please look at Viv's [source](https://github.com/hms-dbmi/viv/tree/master/src) for building your own components with custom `VivViews` or custom `Deck.gl` layers.
 
 This snippet is the most basic view: a simple view of the data. With `overviewOn=false`, this will just be a single view of the data. Turn `overviewOn=true` for a picture-in-picture.
 
