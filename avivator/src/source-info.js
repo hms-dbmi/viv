@@ -7,11 +7,6 @@ const sources = [
     description: 'OME-TIFF Kidney mxIF'
   },
   {
-    // Non-pyramidal OME-TIFF
-    path: 'antigen_exprs.ome.tiff',
-    description: 'CODEX Tile'
-  },
-  {
     path: '12448_G1HR_Mesh003.ome.tif',
     description: 'OME-TIFF Covid-19 Primary Gut Epithelial Stem Cells'
   },
