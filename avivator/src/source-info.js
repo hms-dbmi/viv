@@ -17,16 +17,6 @@ const sources = [
     description: 'Legacy Bioformats OME-TIFF pyramid (Fass)'
   },
   {
-    // Generated using bioformats2raw and raw2ometiff.
-    path: 'VAN0008-RK-403-100-PAS_registered.ome.tif',
-    description: 'OME-TIFF PAS Donor Image'
-  },
-  {
-    // Generated using bioformats2raw and raw2ometiff
-    path: 'VAN0003-LK-32-21-AF_preIMS_registered.ome.tif',
-    description: 'OME-TIFF AF Donor Image'
-  },
-  {
     path: '12448_G1HR_Mesh003.ome.tif',
     description: 'OME-TIFF Covid-19 Primary Gut Epithelial Stem Cells'
   },
