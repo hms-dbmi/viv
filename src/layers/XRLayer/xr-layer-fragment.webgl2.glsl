@@ -21,8 +21,10 @@ uniform vec3 colorValues[6];
 // opacity
 uniform float opacity;
 
-// lens bounds
-uniform vec4 lensBounds;
+// lens bounds for ellipse
+uniform float majorLensAxis;
+uniform float minorLensAxis;
+uniform vec2 lensCenter;
 
 // lens uniforms
 uniform bool isLensOn;
@@ -39,32 +41,15 @@ bool fragInLensBounds() {
   // Check membership in what is (not visually, but effectively) an ellipse.
   // Since the fragment space is a unit square and the real coordinates could be longer than tall,
   // to get a circle visually we have to treat the check as that of an ellipse to get the effect of a circle.
-
-  // Width radius.
-  float majorAxis = abs(lensBounds[2] - lensBounds[0]) / 2.0;
-
-  // Height radius.
-  float minorAxis = abs(lensBounds[1] - lensBounds[3]) / 2.0;
-
-  // Ellipse center
-  vec2 lensCenter = vec2(lensBounds[0] + ((lensBounds[2] - lensBounds[0]) / 2.0),lensBounds[1] + ((lensBounds[3] - lensBounds[1]) / 2.0));
   
   // Check membership in ellipse.
-  return pow((lensCenter.x - vTexCoord.x) / majorAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorAxis, 2.0) < (1.0 - lensBorderRadius);
+  return pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.0) < (1.0 - lensBorderRadius);
 }
 
 bool fragOnLensBounds() {
   // Same as the above, except this checks the boundary.
 
-  // Width radius.
-  float majorAxis = abs(lensBounds[2] - lensBounds[0]) / 2.0;
-
-  // Height radius.
-  float minorAxis = abs(lensBounds[1] - lensBounds[3]) / 2.0;
-
-  // Ellipse center and distance
-  vec2 lensCenter = vec2(lensBounds[0] + ((lensBounds[2] - lensBounds[0]) / 2.0),lensBounds[1] + ((lensBounds[3] - lensBounds[1]) / 2.0));
-  float ellipseDistance = pow((lensCenter.x - vTexCoord.x) / majorAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorAxis, 2.0);
+  float ellipseDistance = pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.0);
   
   // Check membership on "bourndary" of ellipse.
   return ellipseDistance <= 1.0 && ellipseDistance >= (1.0 - lensBorderRadius);
@@ -124,22 +109,17 @@ void main() {
   for(int i = 0; i < 6; i++) {
     // If we are using the lens and this frag is in bounds, focus on only the selection.
     // Otherwise, use the props color value.
-    if(isLensOn && isFragInLensBounds){
-      if(i == lensSelection) {
-        hsvCombo = rgb2hsv(vec3(colorValues[i]));
-      } else {
-        hsvCombo = rgb2hsv(vec3(255, 255, 255));
-      }
-    } else if(isLensOn && isFragOnLensBounds){
-      rgbCombo = lensBorderColor;
-      break;
-    } else {
-      hsvCombo = rgb2hsv(vec3(colorValues[i]));
-    }
+    bool inLensAndUseLens = isLensOn && isFragInLensBounds;
+    bool useColorValue = (inLensAndUseLens && i == lensSelection) || (!inLensAndUseLens);
+    // Ternaries are much faster than if-then statements.
+    hsvCombo = useColorValue ? rgb2hsv(vec3(colorValues[i])) : rgb2hsv(vec3(255, 255, 255));
     // Sum up the intesitiies in additive blending.
     hsvCombo = vec3(hsvCombo.xy, max(0.0, intensityArray[i]));
     rgbCombo += hsv2rgb(hsvCombo);
   }
+
+  // Ternaries are faster than checking this first and then returning/breaking out of shader.
+  rgbCombo = (isLensOn && isFragOnLensBounds) ? lensBorderColor : rgbCombo;
 
   color = vec4(rgbCombo, opacity);
   geometry.uv = vTexCoord;

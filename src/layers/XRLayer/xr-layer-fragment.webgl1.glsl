@@ -20,7 +20,9 @@ uniform float intensityArray[6];
 uniform float opacity;
 
 // lens bounds
-uniform vec4 lensBounds;
+uniform float majorLensAxis;
+uniform float minorLensAxis;
+uniform vec2 lensCenter;
 
 // lens uniforms
 uniform bool isLensOn;
@@ -34,32 +36,15 @@ bool fragInLensBounds() {
   // Check membership in what is (not visually, but effectively) an ellipse.
   // Since the fragment space is a unit square and the real coordinates could be longer than tall,
   // to get a circle visually we have to treat the check as that of an ellipse to get the effect of a circle.
-
-  // Width radius.
-  float majorAxis = abs(lensBounds[2] - lensBounds[0]) / 2.0;
-
-  // Height radius.
-  float minorAxis = abs(lensBounds[1] - lensBounds[3]) / 2.0;
-
-  // Ellipse center
-  vec2 lensCenter = vec2(lensBounds[0] + ((lensBounds[2] - lensBounds[0]) / 2.0),lensBounds[1] + ((lensBounds[3] - lensBounds[1]) / 2.0));
   
   // Check membership in ellipse.
-  return pow((lensCenter.x - vTexCoord.x) / majorAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorAxis, 2.0) < (1.0 - lensBorderRadius);
+  return pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.0) < (1.0 - lensBorderRadius);
 }
 
 bool fragOnLensBounds() {
   // Same as the above, except this checks the boundary.
 
-  // Width radius.
-  float majorAxis = abs(lensBounds[2] - lensBounds[0]) / 2.0;
-
-  // Height radius.
-  float minorAxis = abs(lensBounds[1] - lensBounds[3]) / 2.0;
-
-  // Ellipse center and distance
-  vec2 lensCenter = vec2(lensBounds[0] + ((lensBounds[2] - lensBounds[0]) / 2.0),lensBounds[1] + ((lensBounds[3] - lensBounds[1]) / 2.0));
-  float ellipseDistance = pow((lensCenter.x - vTexCoord.x) / majorAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorAxis, 2.0);
+  float ellipseDistance = pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.0);
   
   // Check membership on "bourndary" of ellipse.
   return ellipseDistance <= 1.0 && ellipseDistance >= (1.0 - lensBorderRadius);
@@ -113,85 +98,35 @@ void main() {
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
 
-  if(isLensOn && isFragOnLensBounds){
-    rgbCombo = lensBorderColor;
-    gl_FragColor = vec4(rgbCombo, opacity);
-    geometry.uv = vTexCoord;
-    DECKGL_FILTER_COLOR(gl_FragColor, geometry);
-    return;
-  }
+  bool inLensAndUseLens = isLensOn && isFragInLensBounds;
 
-  if(isLensOn && isFragInLensBounds){
-    if(0 == lensSelection) {
-      hsvCombo = rgb2hsv(vec3(colorValues[0]));
-    } else {
-      hsvCombo = rgb2hsv(vec3(255, 255, 255));
-    }
-  } else {
-    hsvCombo = rgb2hsv(vec3(colorValues[0]));
-  }
+  // Ternaries are much faster than if-then statements.
+  hsvCombo = (inLensAndUseLens && 0 == lensSelection) || (!inLensAndUseLens) ? rgb2hsv(vec3(colorValues[0])) : rgb2hsv(vec3(255, 255, 255));
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue0));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  if(isLensOn && isFragInLensBounds){
-    if(1 == lensSelection) {
-      hsvCombo = rgb2hsv(vec3(colorValues[1]));
-    } else {
-      hsvCombo = rgb2hsv(vec3(255, 255, 255));
-    }
-  } else {
-    hsvCombo = rgb2hsv(vec3(colorValues[1]));
-  }
+  hsvCombo = (inLensAndUseLens && 1 == lensSelection) || (!inLensAndUseLens) ? rgb2hsv(vec3(colorValues[1])) : rgb2hsv(vec3(255, 255, 255));
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue1));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  if(isLensOn && isFragInLensBounds){
-    if(2 == lensSelection) {
-      hsvCombo = rgb2hsv(vec3(colorValues[2]));
-    } else {
-      hsvCombo = rgb2hsv(vec3(255, 255, 255));
-    }
-  } else {
-    hsvCombo = rgb2hsv(vec3(colorValues[2]));
-  }
+  hsvCombo = (inLensAndUseLens && 2 == lensSelection) || (!inLensAndUseLens) ? rgb2hsv(vec3(colorValues[2])) : rgb2hsv(vec3(255, 255, 255));
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue2));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  if(isLensOn && isFragInLensBounds){
-    if(3 == lensSelection) {
-      hsvCombo = rgb2hsv(vec3(colorValues[3]));
-    } else {
-      hsvCombo = rgb2hsv(vec3(255, 255, 255));
-    }
-  } else {
-    hsvCombo = rgb2hsv(vec3(colorValues[3]));
-  }
+  hsvCombo = (inLensAndUseLens && 3 == lensSelection) || (!inLensAndUseLens) ? rgb2hsv(vec3(colorValues[3])) : rgb2hsv(vec3(255, 255, 255));
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue3));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  if(isLensOn && isFragInLensBounds){
-    if(4 == lensSelection) {
-      hsvCombo = rgb2hsv(vec3(colorValues[4]));
-    } else {
-      hsvCombo = rgb2hsv(vec3(255, 255, 255));
-    }
-  } else {
-    hsvCombo = rgb2hsv(vec3(colorValues[4]));
-  }
+  hsvCombo = (inLensAndUseLens && 4 == lensSelection) || (!inLensAndUseLens) ? rgb2hsv(vec3(colorValues[4])) : rgb2hsv(vec3(255, 255, 255));
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue4));
   rgbCombo += hsv2rgb(hsvCombo);
 
-  if(isLensOn && isFragInLensBounds){
-    if(5 == lensSelection) {
-      hsvCombo = rgb2hsv(vec3(colorValues[5]));
-    } else {
-      hsvCombo = rgb2hsv(vec3(255, 255, 255));
-    }
-  } else {
-    hsvCombo = rgb2hsv(vec3(colorValues[5]));
-  }
+  hsvCombo = (inLensAndUseLens && 5 == lensSelection) || (!inLensAndUseLens) ? rgb2hsv(vec3(colorValues[5])) : rgb2hsv(vec3(255, 255, 255));
   hsvCombo = vec3(hsvCombo.xy, max(0.0,intensityValue5));
   rgbCombo += hsv2rgb(hsvCombo);
+
+  // Ternaries are faster than checking this first and then returning/breaking out of shader.
+  rgbCombo = (isLensOn && isFragOnLensBounds) ? lensBorderColor : rgbCombo;
 
   gl_FragColor = vec4(rgbCombo, opacity);
   geometry.uv = vTexCoord;

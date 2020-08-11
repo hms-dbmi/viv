@@ -227,11 +227,11 @@ export default class XRLayer extends Layer {
           colorValues: paddedColorValues,
           sliderValues: paddedSliderValues,
           opacity,
-          lensBounds: [
-            leftMouseBoundScaled,
-            bottomMouseBoundScaled,
-            rightMouseBoundScaled,
-            topMouseBoundScaled
+          majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
+          minorLensAxis: (bottomMouseBoundScaled - topMouseBoundScaled) / 2,
+          lensCenter: [
+            (rightMouseBoundScaled + leftMouseBoundScaled) / 2,
+            (bottomMouseBoundScaled + topMouseBoundScaled) / 2
           ],
           isLensOn,
           lensSelection,
