@@ -46,7 +46,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Header(props) {
-  const { handleSubmitNewUrl, url, toggle: menuToggle } = props;
+  const { handleSubmitNewUrl, url, menuToggle } = props;
   const [text, setText] = useState(url);
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
@@ -96,7 +96,7 @@ function Header(props) {
             }}
           >
             <TextField
-              id="standard-basic"
+              id="ome-input"
               label="OME-TIFF/Bioformats-Zarr URL"
               variant="filled"
               size="small"
@@ -116,12 +116,15 @@ function Header(props) {
 
 function Menu({ children, ...props }) {
   const classes = useStyles(props);
-  const { on, toggle } = props;
+  const { on, toggle, handleSubmitNewUrl, url } = props;
   return on ? (
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
       <Paper className={classes.paper}>
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-        <Header {...props} />
+        <Header
+          handleSubmitNewUrl={handleSubmitNewUrl}
+          url={url}
+          menuToggle={toggle}
+        />
         <Grid
           container
           direction="column"

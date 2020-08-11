@@ -45,9 +45,7 @@ export function renderSubLayers(props) {
     dtype,
     colormap,
     onHover,
-    x,
-    y,
-    z
+    tileId: { x, y, z }
   });
   return xrl;
 }

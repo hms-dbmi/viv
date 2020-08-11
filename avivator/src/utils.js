@@ -3,20 +3,31 @@ import { createOMETiffLoader, createBioformatsZarrLoader } from '../../src';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
 
+const MAX_CHANNELS_FOR_SNACKBAR_WARNING = 40;
+
 export async function createLoader(
   url,
   handleOffsetsNotFound,
   handleLoaderError
 ) {
+  // If the loader fails to load, handle the error (show an error snackbar).
+  // Otherwise load.
   try {
     if (url.includes('ome.tif') || url.includes('ome.tiff')) {
       const res = await fetch(url.replace(/ome\.tif(f?)/gi, 'offsets.json'));
       const isOffsets404 = res.status === 404;
       const offsets = !isOffsets404 ? await res.json() : [];
       const loader = await createOMETiffLoader({ url, offsets });
-      const totalChannelCount =
-        loader.omexml.SizeZ * loader.omexml.SizeT * loader.omexml.SizeC;
-      if (isOffsets404 && totalChannelCount > 40) {
+      // Show a warning if the total number of channels/images exceeds a fixed amount.
+      // Non-Bioformats6 pyramids use Image tags for pyramid levels and do not have offsets
+      // built in to the format for them, hence the ternary.
+      const {
+        omexml: { SizeZ, SizeT, SizeC },
+        isBioFormats6Pyramid
+      } = loader;
+      const totalImageCount =
+        SizeZ * SizeT * SizeC * (isBioFormats6Pyramid ? 1 : loader.numLevels);
+      if (isOffsets404 && totalImageCount > MAX_CHANNELS_FOR_SNACKBAR_WARNING) {
         handleOffsetsNotFound(true);
       }
       return loader;
@@ -29,7 +40,16 @@ export async function createLoader(
   }
 }
 
-// Return the midpoint of the global dimensions.
+// Get the last part of a url (minus query parameters) to be used
+// as a display name for avivator.
+export function getNameFromUrl(url) {
+  return url
+    .split('?')[0]
+    .split('/')
+    .slice(-1)[0];
+}
+
+// Return the midpoint of the global dimensions as a default selection.
 function getDefaultGlobalSelection(imageDims) {
   const globalIndices = imageDims.filter(dim =>
     GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dim.field)
@@ -46,7 +66,7 @@ function getDefaultGlobalSelection(imageDims) {
 export function buildDefaultSelection(imageDims) {
   const selection = [];
   const globalSelection = getDefaultGlobalSelection(imageDims);
-  // First non-global dimension with some sort of selectable values
+  // First non-global dimension with some sort of selectable values.
   const firstNonGlobalDimension = imageDims.filter(
     dim => !GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dim.field) && dim.values
   )[0];
