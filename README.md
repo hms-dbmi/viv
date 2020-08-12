@@ -6,6 +6,10 @@ A library for multiscale visualization of high-resolution multiplexed tissue dat
 
 Viv is a JavaScript library providing utilities for rendering primary imaging data. Viv supports WebGL-based multi-channel rendering of both pyramidal and non-pyramidal images. The rendering components of Viv are provided as Deck.gl layers, making it easy to compose images with existing layers and efficiently update rendering properties within a reactive paradigm. 
 
+More details can be found in our preprint describing the Viv library and related work. Please cite this preprint in your research:
+
+> Trevor Manz, Ilan Gold, Nathan Heath Patterson, Chuck McCallum, Mark S Keller, Bruce W Herr II, Katy Börner, Jeffrey M Spraggins, Nils Gehlenborg, "Viv: Multiscale Visualization of High-resolution Multiplexed Tissue Data on the Web." **OSF Preprints** (2020), [doi:10.31219/osf.io/wd2gu](https://doi.org/10.31219/osf.io/wd2gu)
+
 ## Avivator
 
 Also included in this repository is [`Avivator`](http://avivator.gehlenborglab.org), a lightweight "batteries-included" 
