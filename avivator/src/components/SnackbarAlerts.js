@@ -40,8 +40,8 @@ export function NoImageUrlInfo() {
   return (
     <>
       You are seeing a random demo image because no image URL was provided. To
-      view your own images, enter a URL into the "OME-TIFF/Bioformats-Zarr URL"
-      field. See the{' '}
+      view your own images, enter a URL into the &quot;OME-TIFF/Bioformats-Zarr
+      URL&quot; field. See the{' '}
       <Link
         target="_blank"
         rel="noopener noreferrer"
