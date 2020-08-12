@@ -443,9 +443,7 @@ export default function Avivator(props) {
         variant="filled"
       >
         <Alert
-          onClose={() => {
-            toggleOffsetsSnackbar(false);
-          }}
+          onClose={() => toggleOffsetsSnackbar(false)}
           severity={'warning'}
         >
           <OffsetsWarning />
@@ -458,9 +456,7 @@ export default function Avivator(props) {
         variant="filled"
       >
         <Alert
-          onClose={() => {
-            toggleLoaderErrorSnackbar(false);
-          }}
+          onClose={() => toggleLoaderErrorSnackbar(false)}
           severity={'error'}
         >
           <LoaderError />
@@ -474,9 +470,7 @@ export default function Avivator(props) {
         variant="filled"
       >
         <Alert
-          onClose={() => {
-            toggleNoImageUrlSnackbar(false);
-          }}
+          onClose={() => toggleNoImageUrlSnackbar(false)}
           severity={'info'}
         >
           <NoImageUrlInfo />
