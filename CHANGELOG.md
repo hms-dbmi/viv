@@ -4,7 +4,7 @@
 
 ### Added
 
-- Add snackbar for included images.
+- Add snackbar for included images when no url provided.
 
 ### Changed
 
