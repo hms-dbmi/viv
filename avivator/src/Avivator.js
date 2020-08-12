@@ -442,10 +442,7 @@ export default function Avivator(props) {
         elevation={6}
         variant="filled"
       >
-        <Alert
-          onClose={() => toggleOffsetsSnackbar(false)}
-          severity={'warning'}
-        >
+        <Alert onClose={() => toggleOffsetsSnackbar(false)} severity="warning">
           <OffsetsWarning />
         </Alert>
       </Snackbar>
@@ -457,7 +454,7 @@ export default function Avivator(props) {
       >
         <Alert
           onClose={() => toggleLoaderErrorSnackbar(false)}
-          severity={'error'}
+          severity="error"
         >
           <LoaderError />
         </Alert>
@@ -469,10 +466,7 @@ export default function Avivator(props) {
         elevation={6}
         variant="filled"
       >
-        <Alert
-          onClose={() => toggleNoImageUrlSnackbar(false)}
-          severity={'info'}
-        >
+        <Alert onClose={() => toggleNoImageUrlSnackbar(false)} severity="info">
           <NoImageUrlInfo />
         </Alert>
       </Snackbar>
