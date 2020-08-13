@@ -84,12 +84,12 @@ vec3 rgb2hsv(vec3 rgb) {
  }
 
 void main() {
-  float intensityValue0 = (float(texture(channel0, vTexCoord).r) - sliderValues[0][0]) / max(1.0, (sliderValues[0][1] - sliderValues[0][0]));
-  float intensityValue1 = (float(texture(channel1, vTexCoord).r) - sliderValues[1][0]) / max(1.0, (sliderValues[1][1] - sliderValues[1][0]));
-  float intensityValue2 = (float(texture(channel2, vTexCoord).r) - sliderValues[2][0]) / max(1.0, (sliderValues[2][1] - sliderValues[2][0]));
-  float intensityValue3 = (float(texture(channel3, vTexCoord).r) - sliderValues[3][0]) / max(1.0, (sliderValues[3][1] - sliderValues[3][0]));
-  float intensityValue4 = (float(texture(channel4, vTexCoord).r) - sliderValues[4][0]) / max(1.0, (sliderValues[4][1] - sliderValues[4][0]));
-  float intensityValue5 = (float(texture(channel5, vTexCoord).r) - sliderValues[5][0]) / max(1.0, (sliderValues[5][1] - sliderValues[5][0]));
+  float intensityValue0 = (float(texture(channel0, vTexCoord).r) - sliderValues[0][0]) / max(0.0005, (sliderValues[0][1] - sliderValues[0][0]));
+  float intensityValue1 = (float(texture(channel1, vTexCoord).r) - sliderValues[1][0]) / max(0.0005, (sliderValues[1][1] - sliderValues[1][0]));
+  float intensityValue2 = (float(texture(channel2, vTexCoord).r) - sliderValues[2][0]) / max(0.0005, (sliderValues[2][1] - sliderValues[2][0]));
+  float intensityValue3 = (float(texture(channel3, vTexCoord).r) - sliderValues[3][0]) / max(0.0005, (sliderValues[3][1] - sliderValues[3][0]));
+  float intensityValue4 = (float(texture(channel4, vTexCoord).r) - sliderValues[4][0]) / max(0.0005, (sliderValues[4][1] - sliderValues[4][0]));
+  float intensityValue5 = (float(texture(channel5, vTexCoord).r) - sliderValues[5][0]) / max(0.0005, (sliderValues[5][1] - sliderValues[5][0]));
   
   // Find out if the frag is in bounds of the lens.
   bool isFragInLensBounds = fragInLensBounds();

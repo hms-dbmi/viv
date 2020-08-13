@@ -9,6 +9,7 @@
 ### Changed
 
 - Fix snackbar placement.
+- Fix small dif between sliders in shaders.
 
 ## 0.4.1
 
