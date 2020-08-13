@@ -26,7 +26,11 @@ import Menu from './components/Menu';
 import ColormapSelect from './components/ColormapSelect';
 import GlobalSelectionSlider from './components/GlobalSelectionSlider';
 import LensSelect from './components/LensSelect';
-import { LoaderError, OffsetsWarning } from './components/Snackbars';
+import {
+  LoaderError,
+  OffsetsWarning,
+  NoImageUrlInfo
+} from './components/SnackbarAlerts';
 
 import {
   MAX_CHANNELS,
@@ -35,6 +39,7 @@ import {
   GLOBAL_SLIDER_DIMENSION_FIELDS,
   COLOR_PALLETE
 } from './constants';
+import sources from './source-info';
 import './index.css';
 
 const initialChannels = {
@@ -68,6 +73,9 @@ export default function Avivator(props) {
   const [initialViewState, setInitialViewState] = useState({});
   const [offsetsSnackbarOn, toggleOffsetsSnackbar] = useState(false);
   const [loaderErrorSnackbarOn, toggleLoaderErrorSnackbar] = useState(false);
+  const [noImageUrlSnackbarIsOn, toggleNoImageUrlSnackbar] = useState(
+    sources.map(s => s.url).indexOf(initSource.url) >= 0
+  );
 
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
   const [overviewOn, setOverviewOn] = useReducer(v => !v, false);
@@ -429,27 +437,38 @@ export default function Avivator(props) {
         </Menu>
       }
       <Snackbar
-        open={offsetsSnackbarOn || loaderErrorSnackbarOn}
-        autoHideDuration={8000}
-        onClose={() => {
-          toggleOffsetsSnackbar(false);
-          toggleLoaderErrorSnackbar(false);
-        }}
+        open={offsetsSnackbarOn}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         elevation={6}
         variant="filled"
       >
-        {offsetsSnackbarOn || loaderErrorSnackbarOn ? (
-          <Alert
-            onClose={() => {
-              toggleOffsetsSnackbar(false);
-              toggleLoaderErrorSnackbar(false);
-            }}
-            severity={offsetsSnackbarOn ? 'warning' : 'error'}
-          >
-            {offsetsSnackbarOn && <OffsetsWarning />}
-            {loaderErrorSnackbarOn && <LoaderError />}
-          </Alert>
-        ) : null}
+        <Alert onClose={() => toggleOffsetsSnackbar(false)} severity="warning">
+          <OffsetsWarning />
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={loaderErrorSnackbarOn}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        elevation={6}
+        variant="filled"
+      >
+        <Alert
+          onClose={() => toggleLoaderErrorSnackbar(false)}
+          severity="error"
+        >
+          <LoaderError />
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={noImageUrlSnackbarIsOn}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        elevation={6}
+        variant="filled"
+      >
+        <Alert onClose={() => toggleNoImageUrlSnackbar(false)} severity="info">
+          <NoImageUrlInfo />
+        </Alert>
       </Snackbar>
     </>
   );

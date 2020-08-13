@@ -4,7 +4,11 @@
 
 ### Added
 
+- Add snackbar for included images when no url provided.
+
 ### Changed
+
+- Fix snackbar placement.
 
 ## 0.4.1
 
@@ -12,7 +16,7 @@
 
 ### Changed
 
--  Fix lens and PIP.
+- Fix lens and PIP.
 
 ## 0.4.0
 

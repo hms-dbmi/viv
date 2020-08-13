@@ -35,3 +35,21 @@ export function LoaderError() {
     </>
   );
 }
+
+export function NoImageUrlInfo() {
+  return (
+    <>
+      You are seeing a random demo image because no image URL was provided. To
+      view your own images, enter a URL into the &quot;OME-TIFF/Bioformats-Zarr
+      URL&quot; field. See the{' '}
+      <Link
+        target="_blank"
+        rel="noopener noreferrer"
+        href="http://viv.gehlenborglab.org"
+      >
+        docs
+      </Link>{' '}
+      for details on how to prepare your images for viewing with Avivator.
+    </>
+  );
+}
