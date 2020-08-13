@@ -9,6 +9,7 @@
 ### Changed
 
 - Fix snackbar placement.
+- Fix small range, float sliders.
 
 ## 0.4.1
 
