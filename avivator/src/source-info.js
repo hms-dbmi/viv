@@ -14,6 +14,16 @@ const sources = [
     // Generated with `bioformats2raw --file_type=zarr --dimension_order='XYZCT'`
     path: 'LuCa-7color_Scan1/',
     description: 'Perkin Elmer LuCa-7color_Scan1.qptiff'
+  },
+  {
+    // Generated using bioformats2raw and raw2ometiff.
+    path: 'LuCa-7color_3x3component_data.ome.tif',
+    description: 'Perkin Elmer LuCa-7color_3x3component_data.qptiff'
+  },
+  {
+    // Generated using bioformats2raw and raw2ometiff.
+    path: 'HandEuncompressed_Scan1.ome.tif',
+    description: 'Perkin Elmer H&E Stain HandEuncompressed_Scan1.qptiff'
   }
 ];
 

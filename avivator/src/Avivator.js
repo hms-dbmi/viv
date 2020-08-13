@@ -261,7 +261,7 @@ export default function Avivator(props) {
       }
     });
   };
-  const { isPyramid, isRgb } = loader;
+  const { isPyramid, isRgb, dtype } = loader;
   const { colors, sliders, isOn, ids, selections, domains } = channels;
   const globalControlDimensions = dimensions?.filter(dimension =>
     GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dimension.field)
@@ -280,6 +280,7 @@ export default function Avivator(props) {
           name={name}
           channelOptions={channelOptions}
           isOn={isOn[i]}
+          dtype={dtype}
           sliderValue={sliders[i]}
           colorValue={colors[i]}
           domain={domains[i]}

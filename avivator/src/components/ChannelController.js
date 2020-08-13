@@ -53,6 +53,7 @@ const getPixelValueDisplay = (isOn, pixelValue, shouldShowPixelValue) => {
 function ChannelController({
   name,
   isOn,
+  dtype,
   sliderValue,
   colorValue,
   colormapOn,
@@ -65,6 +66,9 @@ function ChannelController({
 }) {
   const rgbColor = toRgb(colormapOn, colorValue);
   const classes = useStyles();
+  const [min, max] = domain;
+  // If the min/max range is and the dtype is float, make the step size smaller so sliders are smoother.
+  const step = max - min < 500 && dtype === '<f4' ? (max - min) / 500 : 1;
   return (
     <Grid
       container
@@ -114,8 +118,9 @@ function ChannelController({
             valueLabelDisplay="auto"
             getAriaLabel={() => `${name}-${colorValue}-${sliderValue}`}
             valueLabelFormat={v => truncateDecimalNumber(v, 5)}
-            min={domain[0]}
-            max={domain[1]}
+            min={min}
+            max={max}
+            step={step}
             orientation="horizontal"
             style={{
               color: rgbColor,
