@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.4.2
+
+### Added
+
 - Add snackbar for included images when no url provided.
 
 ### Changed
