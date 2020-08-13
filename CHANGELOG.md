@@ -9,6 +9,7 @@
 ### Changed
 
 - Fix snackbar placement.
+- Clean up dependencies from migration.
 
 ## 0.4.1
 
