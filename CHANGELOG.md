@@ -10,6 +10,8 @@
 
 - Fix snackbar placement.
 - Fix small range, float sliders.
+- Clean up dependencies from migration.
+- Fix small dif between sliders in shaders.
 
 ## 0.4.1
 
