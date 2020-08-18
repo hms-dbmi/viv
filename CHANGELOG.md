@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Stronger checking in Avivator for global selections.
+
 ## 0.4.2
 
 ### Added

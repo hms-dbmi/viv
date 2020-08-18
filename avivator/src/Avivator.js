@@ -37,7 +37,8 @@ import {
   DEFAULT_OVERVIEW,
   FILL_PIXEL_VALUE,
   GLOBAL_SLIDER_DIMENSION_FIELDS,
-  COLOR_PALLETE
+  COLOR_PALLETE,
+  DEFAULT_GLOBAL_SELECTION
 } from './constants';
 import sources from './source-info';
 import './index.css';
@@ -69,7 +70,9 @@ export default function Avivator(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [pixelValues, setPixelValues] = useState([]);
   const [dimensions, setDimensions] = useState([]);
-  const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
+  const [globalSelections, setGlobalSelections] = useState(
+    DEFAULT_GLOBAL_SELECTION
+  );
   const [initialViewState, setInitialViewState] = useState({});
   const [offsetsSnackbarOn, toggleOffsetsSnackbar] = useState(false);
   const [loaderErrorSnackbarOn, toggleLoaderErrorSnackbar] = useState(false);
@@ -167,7 +170,7 @@ export default function Avivator(props) {
         setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
         setInitialViewState(loaderInitialViewState);
         // Set the global selections (needed for the UI). All selections have the same global selection.
-        setGlobalSelections(selections[0]);
+        setGlobalSelections({ ...DEFAULT_GLOBAL_SELECTION, ...selections[0] });
         // eslint-disable-next-line no-unused-expressions
         history?.push(`?image_url=${source.url}`);
       }
