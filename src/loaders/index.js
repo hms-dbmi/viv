@@ -74,12 +74,10 @@ export async function createBioformatsZarrLoader({ url }) {
    * Specifying different dimension orders form the METADATA.ome.xml is
    * possible and necessary for creating an OME-Zarr precursor.
    *
-   * e.g. `bioformats2raw --file_type=zarr --dimension-order='XYZCY'`
+   * e.g. `bioformats2raw --file_type=zarr --dimension-order='XYZCT'`
    *
-   * Here we check the shape of base of the pyrmaid and compare the shape
-   * to the shape of the dimensions. If they are different, we reorder the
-   * dimensions to create the zarr loader. This is fragile code, and will only
-   * be executed if someone tries to specify different dimension orders.
+   * This is fragile code, and will only be executed if someone
+   * tries to specify different dimension orders.
    */
   const nonXYShape = shape.slice(0, -2); // XY always last dims and don't need to be compared
   const nonXYDims = dimensions.filter(d => d.values); // XY are null
@@ -87,13 +85,21 @@ export async function createBioformatsZarrLoader({ url }) {
     (s, i) => s === nonXYDims[i].values.length
   );
   if (!allSameSize) {
-    const sortedDims = [];
-    // Greedily match first matching dimension
-    nonXYShape.forEach(len => {
-      const firstMatchedDim = nonXYDims.filter(d => d.values.length === len)[0];
-      sortedDims.push(firstMatchedDim);
-    });
-    const newDimensions = [...sortedDims, ...dimensions.slice(-2)]; // append YX dims
+    // Assume OME-Zarr, dims === XYZCT
+    const omeZarrDims = [
+      nonXYDims.filter(d => d.field === 'time')[0],
+      nonXYDims.filter(d => d.field === 'channel')[0],
+      nonXYDims.filter(d => d.field === 'z')[0]
+    ];
+    // compare sizes of sorted dims
+    if (
+      !omeZarrDims.every(({ values }, i) => values.length === nonXYShape[i])
+    ) {
+      throw Error(
+        `Dimension order is different from METADATA.ome.xml and isn't OME-Zarr.`
+      );
+    }
+    const newDimensions = [...omeZarrDims, ...dimensions.slice(-2)]; // append YX dims
     return new ZarrLoader({ data, dimensions: newDimensions });
   }
 
