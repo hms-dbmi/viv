@@ -243,7 +243,7 @@ export default function Avivator(props) {
     const newSource = {
       urlOrFile: files[0],
       // Use the trailing part of the URL (file name, presumably) as the description.
-      description: 'File'
+      description: files[0].name
     };
     setSource(newSource);
   };
