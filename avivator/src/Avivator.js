@@ -88,8 +88,9 @@ export default function Avivator(props) {
   useEffect(() => {
     async function changeLoader() {
       setIsLoading(true);
+      const { urlOrFile } = source;
       const nextLoader = await createLoader(
-        source.url,
+        urlOrFile,
         toggleOffsetsSnackbar,
         toggleLoaderErrorSnackbar
       );
@@ -169,7 +170,9 @@ export default function Avivator(props) {
         // Set the global selections (needed for the UI). All selections have the same global selection.
         setGlobalSelections(selections[0]);
         // eslint-disable-next-line no-unused-expressions
-        history?.push(`?image_url=${source.url}`);
+        history?.push(
+          urlOrFile instanceof File ? '' : `?image_url=${urlOrFile}`
+        );
       }
     }
     changeLoader();
@@ -178,7 +181,7 @@ export default function Avivator(props) {
   const handleSubmitNewUrl = (event, url) => {
     event.preventDefault();
     const newSource = {
-      url,
+      urlOrFile: url,
       // Use the trailing part of the URL (file name, presumably) as the description.
       description: getNameFromUrl(url)
     };
@@ -235,6 +238,14 @@ export default function Avivator(props) {
     } else {
       dispatch({ type, index, value });
     }
+  };
+  const handleSubmitFile = files => {
+    const newSource = {
+      urlOrFile: files[0],
+      // Use the trailing part of the URL (file name, presumably) as the description.
+      description: 'File'
+    };
+    setSource(newSource);
   };
 
   const handleChannelAdd = async () => {
@@ -352,9 +363,10 @@ export default function Avivator(props) {
         <Menu
           maxHeight={viewSize.height}
           handleSubmitNewUrl={handleSubmitNewUrl}
-          url={source.url}
+          urlOrFile={source.urlOrFile}
           on={controllerOn}
           toggle={toggleController}
+          handleSubmitFile={handleSubmitFile}
         >
           {!isRgb && (
             <ColormapSelect

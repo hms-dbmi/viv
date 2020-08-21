@@ -1,5 +1,5 @@
 import { openArray, HTTPStore } from 'zarr';
-import { fromUrl } from 'geotiff';
+import { fromBlob, fromUrl } from 'geotiff';
 import Pool from './Pool';
 import ZarrLoader from './zarrLoader';
 import OMETiffLoader from './OMETiffLoader';
@@ -104,11 +104,22 @@ export async function createBioformatsZarrLoader({ url }) {
  * This function wraps creating a ome-tiff loader.
  * @param {Object} args
  * @param {String} args.url URL from which to fetch the tiff.
+ * @param {String} args.file File Object from which to fetch the tiff.
  * @param {Array} args.offsets List of IFD offsets.
  * @param {Object} args.headers Object containing headers to be passed to all fetch requests.
  */
-export async function createOMETiffLoader({ url, offsets = [], headers = {} }) {
-  const tiff = await fromUrl(url, headers);
+export async function createOMETiffLoader({
+  url,
+  file,
+  offsets = [],
+  headers = {}
+}) {
+  let tiff;
+  if (file) {
+    tiff = await fromBlob(file);
+  } else {
+    tiff = await fromUrl(url, headers);
+  }
   const firstImage = await tiff.getImage(0);
   const pool = new Pool();
   const omexmlString = firstImage.fileDirectory.ImageDescription;

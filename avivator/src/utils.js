@@ -10,13 +10,19 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
 const MAX_CHANNELS_FOR_SNACKBAR_WARNING = 40;
 
 export async function createLoader(
-  url,
+  urlOrFile,
   handleOffsetsNotFound,
   handleLoaderError
 ) {
   // If the loader fails to load, handle the error (show an error snackbar).
   // Otherwise load.
   try {
+    if (urlOrFile instanceof File) {
+      const file = urlOrFile;
+      const loader = await createOMETiffLoader({ file });
+      return loader;
+    }
+    const url = urlOrFile;
     if (url.includes('ome.tif') || url.includes('ome.tiff')) {
       const res = await fetch(url.replace(/ome\.tif(f?)/gi, 'offsets.json'));
       const isOffsets404 = res.status === 404;

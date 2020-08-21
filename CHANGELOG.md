@@ -4,6 +4,8 @@
 
 ### Added
 
+- Support local tiff files.
+
 ### Changed
 
 ## 0.4.2

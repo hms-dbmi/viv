@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useRef } from 'react';
+import React, { useState, useReducer, useRef, useEffect } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
@@ -12,6 +12,8 @@ import Link from '@material-ui/core/Link';
 import Button from '@material-ui/core/Button';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { makeStyles } from '@material-ui/core/styles';
+import { useDropzone } from 'react-dropzone';
+
 import MenuTitle from './MenuTitle';
 
 const useStyles = makeStyles(theme => ({
@@ -45,12 +47,35 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+function Dropzone({ handleSubmitFile }) {
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop: handleSubmitFile
+  });
+
+  return (
+    <Button
+      fullWidth
+      variant="outlined"
+      style={{ borderStyle: 'dashed', backgroundColor: 'transparent' }}
+      size="small"
+      /* eslint-disable-next-line react/jsx-props-no-spreading */
+      {...getRootProps()}
+    >
+      {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+      <input {...getInputProps()} />
+      <p>Upload Local OME-TIFF</p>
+    </Button>
+  );
+}
+
 function Header(props) {
-  const { handleSubmitNewUrl, url, menuToggle } = props;
+  const { handleSubmitNewUrl, url, menuToggle, handleSubmitFile } = props;
   const [text, setText] = useState(url);
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
   const classes = useStyles(props);
+
+  useEffect(() => setText(url), [url]);
 
   return (
     <Grid container direction="column">
@@ -107,6 +132,9 @@ function Header(props) {
           </form>
         </Grid>
       </Grid>
+      <Grid item xs={12} style={{ paddingTop: 16 }}>
+        <Dropzone handleSubmitFile={handleSubmitFile} />
+      </Grid>
       <Grid item xs={12} className={classes.divider}>
         <Divider />
       </Grid>
@@ -116,14 +144,15 @@ function Header(props) {
 
 function Menu({ children, ...props }) {
   const classes = useStyles(props);
-  const { on, toggle, handleSubmitNewUrl, url } = props;
+  const { on, toggle, handleSubmitNewUrl, urlOrFile, handleSubmitFile } = props;
   return on ? (
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
       <Paper className={classes.paper}>
         <Header
           handleSubmitNewUrl={handleSubmitNewUrl}
-          url={url}
+          url={urlOrFile instanceof File ? '' : urlOrFile}
           menuToggle={toggle}
+          handleSubmitFile={handleSubmitFile}
         />
         <Grid
           container
