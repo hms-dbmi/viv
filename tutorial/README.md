@@ -68,11 +68,10 @@ $ raw2ometiff n5_tile_directory/ LuCa-7color_Scan1.ome.tif --compression=zlib
 
 There are a few different ways to view your data in Avivator.
 
-If you have a locally stored OME-TIFF image, you may simply drag and drop the file over the canvas or use the "Open Local OME-TIFF" button to view your data.
-Note that this does **NOT** necessarily open the entire OME-TIFF file - Viv still works as normal, lazily loading only the portions in the viewport for an image pyramid and/or only your chosen channel/z/time selection.
+If you have an OME-TIFF saved locally, you may simply drag and drop the file over the canvas or use the "Open Local OME-TIFF" button to view your data. 
+Note that this action does **NOT** necessarily load the entire OME-TIFF file into memory. Viv still works as normal and will retrieve data tiles based on the viewport for an image pyramid and/or a specific channel/z/time selection.
 
-If you have a local Zarr store, or you wish to view remote data, you must serve your data over HTTP.
-Thus, viewing a Zarr dataset locally (or OME-TIFF, if you choose to not use local file upload)
+Otherwise Avivator relies on access to OME-TIFF and Bio-Formats Zarr data over HTTP and you can serve data locally using a simple web-server.
 requires a simple web-server. The easist option is to use [`http-server`](https://github.com/http-party/http-server#readme),
 which can be installed via `npm` or `Homebrew` if using a Mac:
 
