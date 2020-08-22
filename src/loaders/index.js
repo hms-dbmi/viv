@@ -103,22 +103,20 @@ export async function createBioformatsZarrLoader({ url }) {
 /**
  * This function wraps creating a ome-tiff loader.
  * @param {Object} args
- * @param {String} args.url URL from which to fetch the tiff.
- * @param {String} args.file File Object from which to fetch the tiff.
+ * @param {String} args.urlOrFile URL or File Object from which to fetch the tiff.
  * @param {Array} args.offsets List of IFD offsets.
  * @param {Object} args.headers Object containing headers to be passed to all fetch requests.
  */
 export async function createOMETiffLoader({
-  url,
-  file,
+  urlOrFile,
   offsets = [],
   headers = {}
 }) {
   let tiff;
-  if (file) {
-    tiff = await fromBlob(file);
+  if (urlOrFile instanceof File) {
+    tiff = await fromBlob(urlOrFile);
   } else {
-    tiff = await fromUrl(url, headers);
+    tiff = await fromUrl(urlOrFile, headers);
   }
   const firstImage = await tiff.getImage(0);
   const pool = new Pool();

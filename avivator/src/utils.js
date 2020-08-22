@@ -18,8 +18,7 @@ export async function createLoader(
   // Otherwise load.
   try {
     if (urlOrFile instanceof File) {
-      const file = urlOrFile;
-      const loader = await createOMETiffLoader({ file });
+      const loader = await createOMETiffLoader({ urlOrFile });
       return loader;
     }
     const url = urlOrFile;
@@ -27,7 +26,7 @@ export async function createLoader(
       const res = await fetch(url.replace(/ome\.tif(f?)/gi, 'offsets.json'));
       const isOffsets404 = res.status === 404;
       const offsets = !isOffsets404 ? await res.json() : [];
-      const loader = await createOMETiffLoader({ url, offsets });
+      const loader = await createOMETiffLoader({ urlOrFile, offsets });
       // Show a warning if the total number of channels/images exceeds a fixed amount.
       // Non-Bioformats6 pyramids use Image tags for pyramid levels and do not have offsets
       // built in to the format for them, hence the ternary.
