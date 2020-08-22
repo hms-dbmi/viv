@@ -9,6 +9,19 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
 
 const MAX_CHANNELS_FOR_SNACKBAR_WARNING = 40;
 
+function isOMETIFF(urlOrFile) {
+  if (Array.isArray(urlOrFile)) return false; // local Zarr is array of File Objects
+  const name = typeof urlOrFile === 'string' ? urlOrFile : urlOrFile.name;
+  return name.includes('ome.tiff') || name.includes('ome.tif');
+}
+
+class UnsupportedBrowserError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'UnsupportedBrowserError';
+  }
+}
+
 export async function createLoader(
   urlOrFile,
   handleOffsetsNotFound,
@@ -17,12 +30,13 @@ export async function createLoader(
   // If the loader fails to load, handle the error (show an error snackbar).
   // Otherwise load.
   try {
-    if (urlOrFile instanceof File) {
-      const loader = await createOMETiffLoader({ urlOrFile });
-      return loader;
-    }
-    const url = urlOrFile;
-    if (url.includes('ome.tif') || url.includes('ome.tiff')) {
+    // OME-TIFF
+    if (isOMETIFF(urlOrFile)) {
+      if (urlOrFile instanceof File) {
+        const loader = await createOMETiffLoader({ urlOrFile });
+        return loader;
+      }
+      const url = urlOrFile;
       const res = await fetch(url.replace(/ome\.tif(f?)/gi, 'offsets.json'));
       const isOffsets404 = res.status === 404;
       const offsets = !isOffsets404 ? await res.json() : [];
@@ -45,10 +59,23 @@ export async function createLoader(
       }
       return loader;
     }
+    // Bio-Formats Zarr
+    if (
+      Array.isArray(urlOrFile) &&
+      typeof urlOrFile[0].arrayBuffer !== 'function'
+    ) {
+      throw new UnsupportedBrowserError(
+        'Cannot upload a local Zarr with this browser. Try using Chrome, Firefox, or Microsoft Edge.'
+      );
+    }
     const loader = await createBioformatsZarrLoader({ source: urlOrFile });
     return loader;
-  } catch {
-    handleLoaderError(true);
+  } catch (e) {
+    if (e instanceof UnsupportedBrowserError) {
+      handleLoaderError(e.message);
+    } else {
+      handleLoaderError(true);
+    }
     return null;
   }
 }
