@@ -172,7 +172,7 @@ export default function Avivator(props) {
         setGlobalSelections(selections[0]);
         // eslint-disable-next-line no-unused-expressions
         history?.push(
-          urlOrFile instanceof File ? '' : `?image_url=${urlOrFile}`
+          typeof urlOrFile === 'string' ? `?image_url=${urlOrFile}` : ''
         );
       }
     }
@@ -241,11 +241,19 @@ export default function Avivator(props) {
     }
   };
   const handleSubmitFile = files => {
-    const newSource = {
-      urlOrFile: files[0],
-      // Use the trailing part of the URL (file name, presumably) as the description.
-      description: files[0].name
-    };
+    let newSource;
+    if (files.length === 1) {
+      newSource = {
+        urlOrFile: files[0],
+        // Use the trailing part of the URL (file name, presumably) as the description.
+        description: files[0].name
+      };
+    } else {
+      newSource = {
+        urlOrFile: files,
+        description: 'data.zarr'
+      };
+    }
     setSource(newSource);
   };
 

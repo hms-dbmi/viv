@@ -5,6 +5,7 @@
 ### Added
 
 - Support local tiff files.
+- Support local zarr directories.
 
 ### Changed
 

@@ -45,7 +45,7 @@ export async function createLoader(
       }
       return loader;
     }
-    const loader = await createBioformatsZarrLoader({ url });
+    const loader = await createBioformatsZarrLoader({ source: urlOrFile });
     return loader;
   } catch {
     handleLoaderError(true);
