@@ -12,7 +12,7 @@ export default class FileStore {
   async getItem(key) {
     const file = this._store.get(key);
     if (!file) {
-      throw new KeyError(item);
+      throw new KeyError(key);
     }
     const buffer = await file.arrayBuffer();
     return buffer;
