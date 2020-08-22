@@ -12,9 +12,9 @@ import Link from '@material-ui/core/Link';
 import Button from '@material-ui/core/Button';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { makeStyles } from '@material-ui/core/styles';
-import { useDropzone } from 'react-dropzone';
 
 import MenuTitle from './MenuTitle';
+import { DropzoneButton } from './Dropzone';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -46,27 +46,6 @@ const useStyles = makeStyles(theme => ({
     paddingTop: theme.spacing(2)
   }
 }));
-
-function Dropzone({ handleSubmitFile }) {
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop: handleSubmitFile
-  });
-
-  return (
-    <Button
-      fullWidth
-      variant="outlined"
-      style={{ borderStyle: 'dashed', backgroundColor: 'transparent' }}
-      size="small"
-      /* eslint-disable-next-line react/jsx-props-no-spreading */
-      {...getRootProps()}
-    >
-      {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-      <input {...getInputProps()} />
-      <p>Upload Local OME-TIFF</p>
-    </Button>
-  );
-}
 
 function Header(props) {
   const { handleSubmitNewUrl, url, menuToggle, handleSubmitFile } = props;
@@ -133,7 +112,7 @@ function Header(props) {
         </Grid>
       </Grid>
       <Grid item xs={12} style={{ paddingTop: 16 }}>
-        <Dropzone handleSubmitFile={handleSubmitFile} />
+        <DropzoneButton handleSubmitFile={handleSubmitFile} />
       </Grid>
       <Grid item xs={12} className={classes.divider}>
         <Divider />

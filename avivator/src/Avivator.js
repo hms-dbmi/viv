@@ -31,6 +31,7 @@ import {
   OffsetsWarning,
   NoImageUrlInfo
 } from './components/SnackbarAlerts';
+import { DropzoneWrapper } from './components/Dropzone';
 
 import {
   MAX_CHANNELS,
@@ -318,47 +319,51 @@ export default function Avivator(props) {
   });
   return (
     <>
-      {!isLoading &&
-        initialViewState.target &&
-        (useLinkedView && isPyramid ? (
-          <SideBySideViewer
-            loader={loader}
-            sliderValues={sliders}
-            colorValues={colors}
-            channelIsOn={isOn}
-            loaderSelection={selections}
-            initialViewState={{
-              ...initialViewState,
-              height: viewSize.height,
-              width: viewSize.width * 0.5
-            }}
-            colormap={colormap.length > 0 && colormap}
-            zoomLock={zoomLock}
-            panLock={panLock}
-            hoverHooks={{ handleValue: setPixelValues }}
-            lensSelection={lensSelection}
-            isLensOn={isLensOn}
-          />
-        ) : (
-          <PictureInPictureViewer
-            loader={loader}
-            sliderValues={sliders}
-            colorValues={colors}
-            channelIsOn={isOn}
-            loaderSelection={selections}
-            initialViewState={{
-              ...initialViewState,
-              height: viewSize.height,
-              width: viewSize.width
-            }}
-            colormap={colormap.length > 0 && colormap}
-            overview={DEFAULT_OVERVIEW}
-            overviewOn={overviewOn && isPyramid}
-            hoverHooks={{ handleValue: setPixelValues }}
-            lensSelection={lensSelection}
-            isLensOn={isLensOn}
-          />
-        ))}
+      {
+        <DropzoneWrapper handleSubmitFile={handleSubmitFile}>
+          {!isLoading &&
+            initialViewState.target &&
+            (useLinkedView && isPyramid ? (
+              <SideBySideViewer
+                loader={loader}
+                sliderValues={sliders}
+                colorValues={colors}
+                channelIsOn={isOn}
+                loaderSelection={selections}
+                initialViewState={{
+                  ...initialViewState,
+                  height: viewSize.height,
+                  width: viewSize.width * 0.5
+                }}
+                colormap={colormap.length > 0 && colormap}
+                zoomLock={zoomLock}
+                panLock={panLock}
+                hoverHooks={{ handleValue: setPixelValues }}
+                lensSelection={lensSelection}
+                isLensOn={isLensOn}
+              />
+            ) : (
+              <PictureInPictureViewer
+                loader={loader}
+                sliderValues={sliders}
+                colorValues={colors}
+                channelIsOn={isOn}
+                loaderSelection={selections}
+                initialViewState={{
+                  ...initialViewState,
+                  height: viewSize.height,
+                  width: viewSize.width
+                }}
+                colormap={colormap.length > 0 && colormap}
+                overview={DEFAULT_OVERVIEW}
+                overviewOn={overviewOn && isPyramid}
+                hoverHooks={{ handleValue: setPixelValues }}
+                lensSelection={lensSelection}
+                isLensOn={isLensOn}
+              />
+            ))}
+        </DropzoneWrapper>
+      }
       {
         <Menu
           maxHeight={viewSize.height}
