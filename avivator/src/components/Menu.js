@@ -15,6 +15,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import MenuTitle from './MenuTitle';
 import { DropzoneButton } from './Dropzone';
+import { isMobileOrTablet } from '../utils';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -111,9 +112,11 @@ function Header(props) {
           </form>
         </Grid>
       </Grid>
-      <Grid item xs={12} style={{ paddingTop: 16 }}>
-        <DropzoneButton handleSubmitFile={handleSubmitFile} />
-      </Grid>
+      {!isMobileOrTablet() && (
+        <Grid item xs={12} style={{ paddingTop: 16 }}>
+          <DropzoneButton handleSubmitFile={handleSubmitFile} />
+        </Grid>
+      )}
       <Grid item xs={12} className={classes.divider}>
         <Divider />
       </Grid>

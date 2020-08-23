@@ -21,8 +21,8 @@ export function DropzoneButton({ handleSubmitFile }) {
       {...getRootProps()}
     >
       {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-      <input {...getInputProps()} />
-      <p>Open Local OME-TIFF</p>
+      <input {...getInputProps({ accept: '.tif, .tiff' })} />
+      Choose a file
     </Button>
   );
 }
