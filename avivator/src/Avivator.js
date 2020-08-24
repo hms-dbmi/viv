@@ -73,7 +73,10 @@ export default function Avivator(props) {
   const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
   const [initialViewState, setInitialViewState] = useState({});
   const [offsetsSnackbarOn, toggleOffsetsSnackbar] = useState(false);
-  const [loaderErrorSnackbarOn, toggleLoaderErrorSnackbar] = useState(false);
+  const [loaderErrorSnackbar, setLoaderErrorSnackbar] = useState({
+    on: false,
+    message: null
+  });
   const [noImageUrlSnackbarIsOn, toggleNoImageUrlSnackbar] = useState(
     sources.map(s => s.url).indexOf(initSource.url) >= 0
   );
@@ -93,7 +96,7 @@ export default function Avivator(props) {
       const nextLoader = await createLoader(
         urlOrFile,
         toggleOffsetsSnackbar,
-        toggleLoaderErrorSnackbar
+        message => setLoaderErrorSnackbar({ on: true, message })
       );
       if (nextLoader) {
         const { dimensions: newDimensions, isRgb } = nextLoader;
@@ -172,7 +175,7 @@ export default function Avivator(props) {
         setGlobalSelections(selections[0]);
         // eslint-disable-next-line no-unused-expressions
         history?.push(
-          urlOrFile instanceof File ? '' : `?image_url=${urlOrFile}`
+          typeof urlOrFile === 'string' ? `?image_url=${urlOrFile}` : ''
         );
       }
     }
@@ -241,11 +244,19 @@ export default function Avivator(props) {
     }
   };
   const handleSubmitFile = files => {
-    const newSource = {
-      urlOrFile: files[0],
-      // Use the trailing part of the URL (file name, presumably) as the description.
-      description: files[0].name
-    };
+    let newSource;
+    if (files.length === 1) {
+      newSource = {
+        urlOrFile: files[0],
+        // Use the trailing part of the URL (file name, presumably) as the description.
+        description: files[0].name
+      };
+    } else {
+      newSource = {
+        urlOrFile: files,
+        description: 'data.zarr'
+      };
+    }
     setSource(newSource);
   };
 
@@ -465,16 +476,16 @@ export default function Avivator(props) {
         </Alert>
       </Snackbar>
       <Snackbar
-        open={loaderErrorSnackbarOn}
+        open={loaderErrorSnackbar.on}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         elevation={6}
         variant="filled"
       >
         <Alert
-          onClose={() => toggleLoaderErrorSnackbar(false)}
+          onClose={() => setLoaderErrorSnackbar({ on: false, message: null })}
           severity="error"
         >
-          <LoaderError />
+          <LoaderError message={loaderErrorSnackbar.message} />
         </Alert>
       </Snackbar>
 

@@ -68,12 +68,19 @@ $ raw2ometiff n5_tile_directory/ LuCa-7color_Scan1.ome.tif --compression=zlib
 
 There are a few different ways to view your data in Avivator.
 
-If you have an OME-TIFF saved locally, you may simply drag and drop the file over the canvas or use the "Open Local OME-TIFF" button to view your data. 
-Note that this action does **NOT** necessarily load the entire OME-TIFF file into memory. Viv still works as normal and will retrieve data tiles based on the viewport for an image pyramid and/or a specific channel/z/time selection.
+If you have an OME-TIFF or Bio-Formats "raw" Zarr output saved locally, you may simply drag and drop 
+the file (or directory) over the canvas or use the "Choose file" button to view your data.
+Note that this action does **NOT** necessarily load the entire dataset into memory. Viv still works as normal and will retrieve data tiles based on the viewport for an image pyramid and/or a specific channel/z/time selection. 
 
-Otherwise Avivator relies on access to OME-TIFF and Bio-Formats Zarr data over HTTP and you can serve data locally using a simple web-server.
-requires a simple web-server. The easist option is to use [`http-server`](https://github.com/http-party/http-server#readme),
-which can be installed via `npm` or `Homebrew` if using a Mac:
+If you followed **Option 1** above, you may drag and drop the `LuCa-7color_Scan1/` directory created via `bioformats2raw`
+into Avivator. If you followed **Option 2**, simply select the `LuCa-7color_Scan1.ome.tif` to view in Avivator.
+
+> NOTE: Large Zarr-based image pyramids may take a bit longer to load initially using this method. We recommend using a simple web 
+> server (see below) if you experience issues with Zarr loading times. Additionally, support for drag-and-drop for Zarr-based 
+> images is only currently supported in Chrome, Firefox, and Microsoft Edge. If using Safari, please use a web-server.
+
+Otherwise Avivator relies on access to data over HTTP, and you can serve data locally using a simple web-server. 
+It's easiest to use [`http-server`](https://github.com/http-party/http-server#readme) to start a web-server locally, which can be installed via `npm` or `Homebrew` if using a Mac:
 
 #### Install `http-server`
 

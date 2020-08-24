@@ -132,7 +132,7 @@ function Menu({ children, ...props }) {
       <Paper className={classes.paper}>
         <Header
           handleSubmitNewUrl={handleSubmitNewUrl}
-          url={urlOrFile instanceof File ? '' : urlOrFile}
+          url={typeof urlOrFile === 'string' ? urlOrFile : ''}
           menuToggle={toggle}
           handleSubmitFile={handleSubmitFile}
         />
