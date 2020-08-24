@@ -22,7 +22,7 @@ export function DropzoneButton({ handleSubmitFile }) {
     >
       {/* eslint-disable-next-line react/jsx-props-no-spreading */}
       <input {...getInputProps({ accept: '.tif, .tiff' })} />
-      <p>Choose a file</p>
+      Choose a file
     </Button>
   );
 }
