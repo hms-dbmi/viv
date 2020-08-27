@@ -9,6 +9,7 @@ function LensSelect({
   handleToggle,
   handleSelection,
   channelOptions,
+  ids,
   lensSelection
 }) {
   const checkboxColor = `rgb(${[255, 255, 255]})`;
@@ -36,7 +37,7 @@ function LensSelect({
           onChange={e => handleSelection(e.target.value)}
         >
           {channelOptions.map((opt, i) => (
-            <option key={opt} value={i}>
+            <option key={`${opt}-${ids[i]}`} value={i}>
               {opt}
             </option>
           ))}

@@ -371,6 +371,7 @@ export default function Avivator(props) {
               channelOptions={selections.map(
                 sel => channelOptions[sel.channel]
               )}
+              ids={ids}
               lensSelection={lensSelection}
             />
           )}

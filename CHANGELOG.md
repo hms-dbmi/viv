@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Fix keys issue in lens.
+
 ## 0.4.2
 
 ### Added
