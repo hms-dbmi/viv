@@ -28,6 +28,6 @@ const sources = [
 ];
 
 export default sources.map(s => ({
-  url: `${baseUrl}/${s.path}`,
+  urlOrFile: `${baseUrl}/${s.path}`,
   description: s.description
 }));

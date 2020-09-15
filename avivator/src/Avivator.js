@@ -31,6 +31,7 @@ import {
   OffsetsWarning,
   NoImageUrlInfo
 } from './components/SnackbarAlerts';
+import { DropzoneWrapper } from './components/Dropzone';
 
 import {
   MAX_CHANNELS,
@@ -72,7 +73,10 @@ export default function Avivator(props) {
   const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
   const [initialViewState, setInitialViewState] = useState({});
   const [offsetsSnackbarOn, toggleOffsetsSnackbar] = useState(false);
-  const [loaderErrorSnackbarOn, toggleLoaderErrorSnackbar] = useState(false);
+  const [loaderErrorSnackbar, setLoaderErrorSnackbar] = useState({
+    on: false,
+    message: null
+  });
   const [noImageUrlSnackbarIsOn, toggleNoImageUrlSnackbar] = useState(
     sources.map(s => s.url).indexOf(initSource.url) >= 0
   );
@@ -88,10 +92,11 @@ export default function Avivator(props) {
   useEffect(() => {
     async function changeLoader() {
       setIsLoading(true);
+      const { urlOrFile } = source;
       const nextLoader = await createLoader(
-        source.url,
+        urlOrFile,
         toggleOffsetsSnackbar,
-        toggleLoaderErrorSnackbar
+        message => setLoaderErrorSnackbar({ on: true, message })
       );
       if (nextLoader) {
         const { dimensions: newDimensions, isRgb } = nextLoader;
@@ -169,7 +174,9 @@ export default function Avivator(props) {
         // Set the global selections (needed for the UI). All selections have the same global selection.
         setGlobalSelections(selections[0]);
         // eslint-disable-next-line no-unused-expressions
-        history?.push(`?image_url=${source.url}`);
+        history?.push(
+          typeof urlOrFile === 'string' ? `?image_url=${urlOrFile}` : ''
+        );
       }
     }
     changeLoader();
@@ -178,7 +185,7 @@ export default function Avivator(props) {
   const handleSubmitNewUrl = (event, url) => {
     event.preventDefault();
     const newSource = {
-      url,
+      urlOrFile: url,
       // Use the trailing part of the URL (file name, presumably) as the description.
       description: getNameFromUrl(url)
     };
@@ -235,6 +242,22 @@ export default function Avivator(props) {
     } else {
       dispatch({ type, index, value });
     }
+  };
+  const handleSubmitFile = files => {
+    let newSource;
+    if (files.length === 1) {
+      newSource = {
+        urlOrFile: files[0],
+        // Use the trailing part of the URL (file name, presumably) as the description.
+        description: files[0].name
+      };
+    } else {
+      newSource = {
+        urlOrFile: files,
+        description: 'data.zarr'
+      };
+    }
+    setSource(newSource);
   };
 
   const handleChannelAdd = async () => {
@@ -307,54 +330,59 @@ export default function Avivator(props) {
   });
   return (
     <>
-      {!isLoading &&
-        initialViewState.target &&
-        (useLinkedView && isPyramid ? (
-          <SideBySideViewer
-            loader={loader}
-            sliderValues={sliders}
-            colorValues={colors}
-            channelIsOn={isOn}
-            loaderSelection={selections}
-            initialViewState={{
-              ...initialViewState,
-              height: viewSize.height,
-              width: viewSize.width * 0.5
-            }}
-            colormap={colormap.length > 0 && colormap}
-            zoomLock={zoomLock}
-            panLock={panLock}
-            hoverHooks={{ handleValue: setPixelValues }}
-            lensSelection={lensSelection}
-            isLensOn={isLensOn}
-          />
-        ) : (
-          <PictureInPictureViewer
-            loader={loader}
-            sliderValues={sliders}
-            colorValues={colors}
-            channelIsOn={isOn}
-            loaderSelection={selections}
-            initialViewState={{
-              ...initialViewState,
-              height: viewSize.height,
-              width: viewSize.width
-            }}
-            colormap={colormap.length > 0 && colormap}
-            overview={DEFAULT_OVERVIEW}
-            overviewOn={overviewOn && isPyramid}
-            hoverHooks={{ handleValue: setPixelValues }}
-            lensSelection={lensSelection}
-            isLensOn={isLensOn}
-          />
-        ))}
+      {
+        <DropzoneWrapper handleSubmitFile={handleSubmitFile}>
+          {!isLoading &&
+            initialViewState.target &&
+            (useLinkedView && isPyramid ? (
+              <SideBySideViewer
+                loader={loader}
+                sliderValues={sliders}
+                colorValues={colors}
+                channelIsOn={isOn}
+                loaderSelection={selections}
+                initialViewState={{
+                  ...initialViewState,
+                  height: viewSize.height,
+                  width: viewSize.width * 0.5
+                }}
+                colormap={colormap.length > 0 && colormap}
+                zoomLock={zoomLock}
+                panLock={panLock}
+                hoverHooks={{ handleValue: setPixelValues }}
+                lensSelection={lensSelection}
+                isLensOn={isLensOn}
+              />
+            ) : (
+              <PictureInPictureViewer
+                loader={loader}
+                sliderValues={sliders}
+                colorValues={colors}
+                channelIsOn={isOn}
+                loaderSelection={selections}
+                initialViewState={{
+                  ...initialViewState,
+                  height: viewSize.height,
+                  width: viewSize.width
+                }}
+                colormap={colormap.length > 0 && colormap}
+                overview={DEFAULT_OVERVIEW}
+                overviewOn={overviewOn && isPyramid}
+                hoverHooks={{ handleValue: setPixelValues }}
+                lensSelection={lensSelection}
+                isLensOn={isLensOn}
+              />
+            ))}
+        </DropzoneWrapper>
+      }
       {
         <Menu
           maxHeight={viewSize.height}
           handleSubmitNewUrl={handleSubmitNewUrl}
-          url={source.url}
+          urlOrFile={source.urlOrFile}
           on={controllerOn}
           toggle={toggleController}
+          handleSubmitFile={handleSubmitFile}
         >
           {!isRgb && (
             <ColormapSelect
@@ -448,16 +476,16 @@ export default function Avivator(props) {
         </Alert>
       </Snackbar>
       <Snackbar
-        open={loaderErrorSnackbarOn}
+        open={loaderErrorSnackbar.on}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         elevation={6}
         variant="filled"
       >
         <Alert
-          onClose={() => toggleLoaderErrorSnackbar(false)}
+          onClose={() => setLoaderErrorSnackbar({ on: false, message: null })}
           severity="error"
         >
-          <LoaderError />
+          <LoaderError message={loaderErrorSnackbar.message} />
         </Alert>
       </Snackbar>
 
