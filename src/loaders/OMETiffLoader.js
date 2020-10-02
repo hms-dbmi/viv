@@ -132,7 +132,7 @@ export default class OMETiffLoader {
    * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize).
    * Default is `{data: [], width: tileSize, height: tileSize}`.
    */
-  async getTile({ x, y, z, loaderSelection = [] }) {
+  async getTile({ x, y, z, loaderSelection = [], signal }) {
     if (!this._tileInBounds({ x, y, z })) {
       return null;
     }
@@ -159,7 +159,7 @@ export default class OMETiffLoader {
         }
       }
       image = await tiff.getImage(pyramidIndex);
-      return this._getChannel({ image, x, y, z });
+      return this._getChannel({ image, x, y, z, signal });
     });
 
     const tiles = await Promise.all(tileRequests);
@@ -311,10 +311,10 @@ export default class OMETiffLoader {
     };
   }
 
-  async _getChannel({ image, x, y, z }) {
+  async _getChannel({ image, x, y, z, signal }) {
     const { dtype } = this;
     const { TypedArray } = DTYPE_VALUES[dtype];
-    const tile = await image.getTileOrStrip(x, y, 0, this.pool);
+    const tile = await image.getTileOrStrip(x, y, 0, this.pool, signal);
     const data = new TypedArray(tile.data);
     /*
      * The endianness of JavaScript TypedArrays are determined by the endianness

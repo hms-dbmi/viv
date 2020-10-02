@@ -81,7 +81,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     const { tileSize, numLevels, dtype } = loader;
     const { unprojectLensBounds } = this.state;
     const noWebGl2 = !isWebGL2(this.context.gl);
-    const getTileData = async ({ x, y, z }) => {
+    const getTileData = async ({ x, y, z, signal }) => {
       const tile = await loader.getTile({
         x,
         y,
@@ -92,7 +92,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         // The image-tile example works without, this but I have a feeling there is something
         // going on with our pyramids and/or rendering that is different.
         z: Math.round(-z + Math.log2(512 / tileSize)),
-        loaderSelection
+        loaderSelection,
+        signal
       });
       if (tile) {
         tile.data = noWebGl2 ? to32BitFloat(tile.data) : tile.data;
