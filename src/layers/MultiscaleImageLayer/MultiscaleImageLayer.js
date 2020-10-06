@@ -96,6 +96,9 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         signal
       });
       if (tile) {
+        if (tile.data.some(i => i.length === 0)) {
+          return null
+        }
         tile.data = noWebGl2 ? to32BitFloat(tile.data) : tile.data;
         if (tile.width !== tileSize || tile.height !== tileSize) {
           console.warn(
@@ -117,6 +120,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       colorValues,
       sliderValues,
       channelIsOn,
+      maxRequests: 10,
       domain,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
       // multiple rendered sublayers (some of which have been cached) from overlapping

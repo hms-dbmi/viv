@@ -316,6 +316,9 @@ export default class OMETiffLoader {
     const { TypedArray } = DTYPE_VALUES[dtype];
     const tile = await image.getTileOrStrip(x, y, 0, this.pool, signal);
     const data = new TypedArray(tile.data);
+    if (data.length === 0) {
+      return []
+    }
     /*
      * The endianness of JavaScript TypedArrays are determined by the endianness
      * of the end-users' hardware. Nearly all desktop computers are x86 (little endian),
