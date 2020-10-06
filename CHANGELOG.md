@@ -10,6 +10,7 @@
 ### Changed
 
 - Removed greedy matching of dimension order in Bio-Formats Zarr output. Just check if OME-Zarr.
+- Upgrade to deck.gl 8.3.0
 
 ## 0.4.2
 
