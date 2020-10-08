@@ -6,13 +6,16 @@ import { KeyError, HTTPError } from 'zarr';
  * @param args parts of a path or URL to join.
  */
 export function joinUrlParts(...args) {
-  return args.map((part, i) => {
-    if (i === 0) {
-      return part.trim().replace(/[\/]*$/g, '');
-    } else {
-      return part.trim().replace(/(^[\/]*|[\/]*$)/g, '');
-    }
-  }).filter(x=>x.length).join('/');
+  return args
+    .map((part, i) => {
+      if (i === 0) {
+        return part.trim().replace(/[\/]*$/g, '');
+      } else {
+        return part.trim().replace(/(^[\/]*|[\/]*$)/g, '');
+      }
+    })
+    .filter(x => x.length)
+    .join('/');
 }
 
 export default class HTTPStore {
@@ -38,4 +41,3 @@ export default class HTTPStore {
     return value.status === 200;
   }
 }
-

@@ -67,7 +67,7 @@ export default class ZarrLoader {
     const { TypedArray } = DTYPE_VALUES[this.dtype];
     const source = this._getSource(z);
     const [xIndex, yIndex] = ['x', 'y'].map(k => this._dimIndices.get(k));
-    
+
     const dataRequests = loaderSelection.map(async sel => {
       const chunkKey = this._serializeSelection(sel);
       chunkKey[yIndex] = y;

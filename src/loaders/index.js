@@ -46,7 +46,10 @@ export async function createZarrLoader({
  * @param {(string | File[])} args.source either a string URL or array of File Objects.
  * @param {Object} args.fetchOptions options to forward to fetch requests for url if provided.
  */
-export async function createBioformatsZarrLoader({ source, fetchOptions = {} }) {
+export async function createBioformatsZarrLoader({
+  source,
+  fetchOptions = {}
+}) {
   const METADATA = 'METADATA.ome.xml';
   const ZARR_DIR = 'data.zarr/';
 

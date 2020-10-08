@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
-import 'abortcontroller-polyfill/dist/polyfill-patch-fetch'
+import 'abortcontroller-polyfill/dist/polyfill-patch-fetch';
 import { implementation } from 'promise.prototype.finally';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';

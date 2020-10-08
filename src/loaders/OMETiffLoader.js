@@ -317,7 +317,7 @@ export default class OMETiffLoader {
     const tile = await image.getTileOrStrip(x, y, 0, this.pool, signal);
     const data = new TypedArray(tile.data);
     if (data.length === 0) {
-      return []
+      return [];
     }
     /*
      * The endianness of JavaScript TypedArrays are determined by the endianness
