@@ -1,6 +1,9 @@
 import { BoundsCheckError } from 'zarr';
 
 import { guessRgb, padTileWithZeros } from './utils';
+import HTTPStore from './httpStore';
+import { DTYPE_VALUES } from '../constants';
+
 /**
  * This class serves as a wrapper for fetching zarr data from a file server.
  * */
@@ -60,18 +63,25 @@ export default class ZarrLoader {
    * @param {Array} loaderSelection, Array of valid dimension selections
    * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize)
    */
-  async getTile({ x, y, z, loaderSelection = [] }) {
+  async getTile({ x, y, z, loaderSelection = [], signal }) {
+    const { TypedArray } = DTYPE_VALUES[this.dtype];
     const source = this._getSource(z);
     const [xIndex, yIndex] = ['x', 'y'].map(k => this._dimIndices.get(k));
-
+    
     const dataRequests = loaderSelection.map(async sel => {
       const chunkKey = this._serializeSelection(sel);
       chunkKey[yIndex] = y;
       chunkKey[xIndex] = x;
-      const {
-        data,
-        shape: [height, width]
-      } = await source.getRawChunk(chunkKey);
+
+      const key = source.keyPrefix + chunkKey.join('.');
+      const buffer = await source.store.getItem(key, { signal });
+      let bytes = new Uint8Array(buffer);
+      if (source.compressor) {
+        bytes = await source.compressor.decode(bytes);
+      }
+      const data = new TypedArray(bytes.buffer);
+      const width = source.chunks[xIndex];
+      const height = source.chunks[yIndex];
       if (height < this.tileSize || width < this.tileSize) {
         return padTileWithZeros(
           { data, width, height },

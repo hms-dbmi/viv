@@ -1,4 +1,4 @@
-import { openArray, HTTPStore } from 'zarr';
+import { openArray } from 'zarr';
 import { fromBlob, fromUrl } from 'geotiff';
 import Pool from './Pool';
 import ZarrLoader from './zarrLoader';
@@ -6,6 +6,7 @@ import OMETiffLoader from './OMETiffLoader';
 import { getChannelStats, getJson, dimensionsFromOMEXML } from './utils';
 import OMEXML from './omeXML';
 import FileStore from './fileStore';
+import HTTPStore from './httpStore';
 
 export async function createZarrLoader({
   url,
@@ -41,9 +42,11 @@ export async function createZarrLoader({
 
 /**
  * This function wraps parsing OME-XML metadata and creating a zarr loader.
- * @param {(string | File[])}, either a string URL or array of File Objects.
+ * @param {Object} args
+ * @param {(string | File[])} args.source either a string URL or array of File Objects.
+ * @param {Object} args.fetchOptions options to forward to fetch requests for url if provided.
  */
-export async function createBioformatsZarrLoader({ source }) {
+export async function createBioformatsZarrLoader({ source, fetchOptions = {} }) {
   const METADATA = 'METADATA.ome.xml';
   const ZARR_DIR = 'data.zarr/';
 
@@ -53,7 +56,7 @@ export async function createBioformatsZarrLoader({ source }) {
     // Remote Zarr
     const baseUrl = source.endsWith('/') ? source : `${source}/`;
     const metaUrl = `${baseUrl}${METADATA}`;
-    store = new HTTPStore(`${baseUrl}${ZARR_DIR}`); // first image
+    store = new HTTPStore(`${baseUrl}${ZARR_DIR}`, fetchOptions); // first image
     omexmlBuffer = await fetch(metaUrl).then(res => res.arrayBuffer());
   } else {
     // Local Zarr
