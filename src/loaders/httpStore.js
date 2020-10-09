@@ -1,22 +1,6 @@
 import { KeyError, HTTPError } from 'zarr';
 
-/**
- * Preserves (double) slashes earlier in the path, so this works better
- * for URLs. From https://stackoverflow.com/a/46427607/4178400
- * @param args parts of a path or URL to join.
- */
-export function joinUrlParts(...args) {
-  return args
-    .map((part, i) => {
-      if (i === 0) {
-        return part.trim().replace(/[\/]*$/g, '');
-      } else {
-        return part.trim().replace(/(^[\/]*|[\/]*$)/g, '');
-      }
-    })
-    .filter(x => x.length)
-    .join('/');
-}
+import { joinUrlParts } from './utils';
 
 export default class HTTPStore {
   constructor(url, options = {}) {
