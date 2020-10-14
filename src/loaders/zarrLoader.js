@@ -1,6 +1,6 @@
 import { BoundsCheckError } from 'zarr';
 
-import { guessRgb, padTileWithZeros } from './utils';
+import { guessRgb, padTileWithZeros, byteSwapInplace } from './utils';
 import { DTYPE_VALUES } from '../constants';
 import HTTPStore from './httpStore';
 
@@ -81,6 +81,10 @@ export default class ZarrLoader {
         bytes = await source.compressor.decode(bytes);
       }
       const data = new TypedArray(bytes.buffer);
+      if (source.dtype[0] === '>') {
+        // big endian
+        byteSwapInplace(data);
+      }
       const width = source.chunks[xIndex];
       const height = source.chunks[yIndex];
       if (height < this.tileSize || width < this.tileSize) {
