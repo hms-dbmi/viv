@@ -2,6 +2,7 @@ import { BoundsCheckError } from 'zarr';
 
 import { guessRgb, padTileWithZeros } from './utils';
 import { DTYPE_VALUES } from '../constants';
+import HTTPStore from './httpStore';
 
 /**
  * This class serves as a wrapper for fetching zarr data from a file server.
@@ -74,6 +75,7 @@ export default class ZarrLoader {
 
       const key = source.keyPrefix + chunkKey.join('.');
       const buffer = await source.store.getItem(key, { signal });
+      if (source.store instanceof HTTPStore && signal.aborted) return null;
       let bytes = new Uint8Array(buffer);
       if (source.compressor) {
         bytes = await source.compressor.decode(bytes);

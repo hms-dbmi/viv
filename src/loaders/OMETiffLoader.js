@@ -161,8 +161,8 @@ export default class OMETiffLoader {
       image = await tiff.getImage(pyramidIndex);
       return this._getChannel({ image, x, y, z, signal });
     });
-
     const tiles = await Promise.all(tileRequests);
+    if (signal.aborted) return null;
     return {
       data: tiles,
       width: tileSize,
