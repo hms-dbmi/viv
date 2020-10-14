@@ -1,7 +1,6 @@
 import { BoundsCheckError } from 'zarr';
 
 import { guessRgb, padTileWithZeros } from './utils';
-import HTTPStore from './httpStore';
 import { DTYPE_VALUES } from '../constants';
 
 /**
