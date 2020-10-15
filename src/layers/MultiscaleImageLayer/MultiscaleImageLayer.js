@@ -19,7 +19,8 @@ const defaultProps = {
   lensSelection: { type: 'number', value: 0, compare: true },
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
-  lensBorderRadius: { type: 'number', value: 0.02, compare: true }
+  lensBorderRadius: { type: 'number', value: 0.02, compare: true },
+  maxRequests: { type: 'number', value: 10, compare: true }
 };
 
 /**
@@ -42,6 +43,7 @@ const defaultProps = {
  * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
  * @param {number} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * @param {number} props.maxRequests Maximum parallel ongoing requests allowed before aborting.
  */
 
 export default class MultiscaleImageLayer extends CompositeLayer {
@@ -76,7 +78,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       isLensOn,
       lensSelection,
       lensBorderColor,
-      lensBorderRadius
+      lensBorderRadius,
+      maxRequests
     } = this.props;
     const { tileSize, numLevels, dtype } = loader;
     const { unprojectLensBounds } = this.state;
@@ -117,7 +120,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       colorValues,
       sliderValues,
       channelIsOn,
-      maxRequests: 10,
+      maxRequests,
       domain,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
       // multiple rendered sublayers (some of which have been cached) from overlapping
