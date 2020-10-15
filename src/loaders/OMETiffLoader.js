@@ -162,7 +162,7 @@ export default class OMETiffLoader {
       return this._getChannel({ image, x, y, z, signal });
     });
     const tiles = await Promise.all(tileRequests);
-    if (signal.aborted) return null;
+    if (signal?.aborted) return null;
     return {
       data: tiles,
       width: tileSize,
@@ -316,7 +316,7 @@ export default class OMETiffLoader {
     const { TypedArray } = DTYPE_VALUES[dtype];
     const tile = await image.getTileOrStrip(x, y, 0, this.pool, signal);
     const data = new TypedArray(tile.data);
-    if (signal.aborted) return null;
+    if (signal?.aborted) return null;
     /*
      * The endianness of JavaScript TypedArrays are determined by the endianness
      * of the end-users' hardware. Nearly all desktop computers are x86 (little endian),
