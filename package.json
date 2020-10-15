@@ -109,7 +109,7 @@
     "@luma.gl/core": "^8.2.0",
     "@luma.gl/shadertools": "^8.2.0",
     "fast-xml-parser": "^3.16.0",
-    "geotiff": "manzt/geotiff.js#lzw",
+    "geotiff": "ilan-gold/geotiff.js#ilan-gold/signal_abort_controller",
     "quickselect": "^2.0.0",
     "zarr": "^0.3.0"
   }
