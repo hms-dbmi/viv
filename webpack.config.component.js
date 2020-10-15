@@ -57,7 +57,7 @@ const umdConfig = {
   externals: {
     // Only because this is the library target.
     react: 'react',
-    'react-dom': 'react-dom',
+    'react-dom': 'react-dom'
   },
   output: {
     path: path.join(__dirname, '/dist/'),
