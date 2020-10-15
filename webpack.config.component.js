@@ -5,8 +5,6 @@ const nodeExternals = require('webpack-node-externals');
 const baseConifg = {
   devtool: 'source-map',
   entry: './src/index.js',
-  // Bundle geotiff so we can use workers with its code.
-  externals: [nodeExternals({ whitelist: 'geotiff' })],
   module: {
     rules: [
       {
@@ -42,6 +40,8 @@ const baseConifg = {
 
 const esConfig = {
   ...baseConifg,
+  // Bundle geotiff so we can use workers with its code.
+  externals: [nodeExternals({ whitelist: 'geotiff' })],
   output: {
     path: path.join(__dirname, '/dist/'),
     filename: 'bundle.es.js',
@@ -54,6 +54,11 @@ const esConfig = {
 
 const umdConfig = {
   ...baseConifg,
+  externals: {
+    // Only because this is the library target.
+    react: 'react',
+    'react-dom': 'react-dom'
+  },
   output: {
     path: path.join(__dirname, '/dist/'),
     filename: 'bundle.umd.js',

@@ -11,7 +11,7 @@ const loader = await createOMETiffLoader({ url, offsets: [], headers: {} });
 A bit is going on under the hood here, though. Here are some of those things:
 
 1. First and foremost, if the `tiff` has many channels, then you will need to provide the offsets to each IFD.  
-   The `createOMETiffLoader` takes in a list of offsets via `offsets` so that they can be stored anyhere i.e `https://vitessce-demo-data.storage.googleapis.com/test-data/deflate_no_legacy/spraggins.bioformats.raw2ometiff.offsets.json`. To get this information, you may use [this docker container](https://hub.docker.com/r/hubmap/portal-container-ome-tiff-offsets) and push the output to the url.
+   The `createOMETiffLoader` takes in a list of offsets via `offsets` so that they can be stored anyhere i.e `https://vitessce-demo-data.storage.googleapis.com/test-data/deflate_no_legacy/spraggins.bioformats.raw2ometiff.offsets.json`. To get this information, you may use [this docker container](https://hub.docker.com/r/hubmap/portal-container-ome-tiff-offsets) and push the output to the url. This is only necessary for remote tiff viewing. If you are using a tiff file locally via local file upload, an `offsets.json` is not necessary.
 
 2. Related to the above, if your `tiff` is a pyramid from `bioformats`, then there are two potential routes:
 
@@ -46,6 +46,7 @@ gsutil -m cp -r /my/path/test-output/ gs://my/path/test-output/
 ```
 
 Note that if your tiff file is large in neither channel count nor resolution, you can simply load it in `viv` directly without passing in offsets or running this pipeline.
+And, if you have a local tiff, the main restriction is your computer's RAM/graphics card - we have not done extensive testing on large WSI local tiffs (i.e non-pyramidal) but image pyramids and large channel counts seem to perform under local usage without `offsets.json`.
 
 Finally we are in the experimental stages of supporting RGB images. Right now we only support de-interleaved images.  
 One of the biggest issues we have is lack of (what we know to be) properly formatted sample OME-TIFF data. Please open an issue if this is important to your use-case.

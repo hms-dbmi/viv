@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useRef } from 'react';
+import React, { useState, useReducer, useRef, useEffect } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
@@ -12,7 +12,10 @@ import Link from '@material-ui/core/Link';
 import Button from '@material-ui/core/Button';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { makeStyles } from '@material-ui/core/styles';
+
 import MenuTitle from './MenuTitle';
+import { DropzoneButton } from './Dropzone';
+import { isMobileOrTablet } from '../utils';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -46,11 +49,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Header(props) {
-  const { handleSubmitNewUrl, url, menuToggle } = props;
+  const { handleSubmitNewUrl, url, menuToggle, handleSubmitFile } = props;
   const [text, setText] = useState(url);
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
   const classes = useStyles(props);
+
+  useEffect(() => setText(url), [url]);
 
   return (
     <Grid container direction="column">
@@ -107,6 +112,11 @@ function Header(props) {
           </form>
         </Grid>
       </Grid>
+      {!isMobileOrTablet() && (
+        <Grid item xs={12} style={{ paddingTop: 16 }}>
+          <DropzoneButton handleSubmitFile={handleSubmitFile} />
+        </Grid>
+      )}
       <Grid item xs={12} className={classes.divider}>
         <Divider />
       </Grid>
@@ -116,14 +126,15 @@ function Header(props) {
 
 function Menu({ children, ...props }) {
   const classes = useStyles(props);
-  const { on, toggle, handleSubmitNewUrl, url } = props;
+  const { on, toggle, handleSubmitNewUrl, urlOrFile, handleSubmitFile } = props;
   return on ? (
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
       <Paper className={classes.paper}>
         <Header
           handleSubmitNewUrl={handleSubmitNewUrl}
-          url={url}
+          url={typeof urlOrFile === 'string' ? urlOrFile : ''}
           menuToggle={toggle}
+          handleSubmitFile={handleSubmitFile}
         />
         <Grid
           container

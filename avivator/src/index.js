@@ -43,7 +43,7 @@ function RoutedAvivator(props) {
   } = props;
   if (url) {
     const urlSrouce = {
-      url,
+      urlOrFile: url,
       description: getNameFromUrl(url)
     };
     return (

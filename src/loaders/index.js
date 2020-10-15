@@ -1,10 +1,11 @@
 import { openArray, HTTPStore } from 'zarr';
-import { fromUrl } from 'geotiff';
+import { fromBlob, fromUrl } from 'geotiff';
 import Pool from './Pool';
 import ZarrLoader from './zarrLoader';
 import OMETiffLoader from './OMETiffLoader';
 import { getChannelStats, getJson, dimensionsFromOMEXML } from './utils';
 import OMEXML from './omeXML';
+import FileStore from './fileStore';
 
 export async function createZarrLoader({
   url,
@@ -38,17 +39,55 @@ export async function createZarrLoader({
   });
 }
 
-export async function createBioformatsZarrLoader({ url }) {
-  const baseUrl = url.endsWith('/') ? url : `${url}/`;
-  const metaUrl = `${baseUrl}METADATA.ome.xml`;
-  const store = new HTTPStore(`${baseUrl}data.zarr/0`); // first image
-  const rootAttrs = await getJson(store, '.zattrs');
+/**
+ * This function wraps parsing OME-XML metadata and creating a zarr loader.
+ * @param {(string | File[])}, either a string URL or array of File Objects.
+ */
+export async function createBioformatsZarrLoader({ source }) {
+  const METADATA = 'METADATA.ome.xml';
+  const ZARR_DIR = 'data.zarr/';
 
+  let store;
+  let omexmlBuffer;
+  if (typeof source === 'string') {
+    // Remote Zarr
+    const baseUrl = source.endsWith('/') ? source : `${source}/`;
+    const metaUrl = `${baseUrl}${METADATA}`;
+    store = new HTTPStore(`${baseUrl}${ZARR_DIR}`); // first image
+    omexmlBuffer = await fetch(metaUrl).then(res => res.arrayBuffer());
+  } else {
+    // Local Zarr
+    /*
+     * You can't randomly access files from a directory by path name
+     * without the Native File System API, so we need to get objects for _all_
+     * the files right away for Zarr. This is unfortunate because we need to iterate
+     * over all File objects and create an in-memory index.
+     */
+    const fMap = new Map();
+    let keyPrefixLength;
+    for (let i = 0; i < source.length; i += 1) {
+      const file = source[i];
+      if (file.name === METADATA) {
+        // Find the metadata file.
+        // eslint-disable-next-line no-await-in-loop
+        omexmlBuffer = await file.arrayBuffer();
+      } else {
+        if (!keyPrefixLength) {
+          keyPrefixLength = file.path.indexOf(ZARR_DIR) + ZARR_DIR.length;
+        }
+        const path = file.path.slice(keyPrefixLength);
+        fMap.set(path, file);
+      }
+    }
+    store = new FileStore(fMap);
+  }
+
+  const rootAttrs = await getJson(store, '0/.zattrs');
   let resolutions = ['0'];
   if ('multiscales' in rootAttrs) {
     // Get path to subresolutions if they exist
     const { datasets } = rootAttrs.multiscales[0];
-    resolutions = datasets.map(d => d.path);
+    resolutions = datasets.map(d => `0/${d.path}`);
   }
 
   const promises = resolutions.map(path => openArray({ store, path }));
@@ -65,8 +104,7 @@ export async function createBioformatsZarrLoader({ url }) {
   const data = pyramid.length > 1 || shouldUseBase ? pyramid : pyramid[0];
 
   // Get OMEXML string
-  const buffer = await fetch(metaUrl).then(res => res.arrayBuffer());
-  const omexmlString = new TextDecoder().decode(new Uint8Array(buffer));
+  const omexmlString = new TextDecoder().decode(new Uint8Array(omexmlBuffer));
   const omexml = new OMEXML(omexmlString);
   const dimensions = dimensionsFromOMEXML(omexml);
 
@@ -109,12 +147,21 @@ export async function createBioformatsZarrLoader({ url }) {
 /**
  * This function wraps creating a ome-tiff loader.
  * @param {Object} args
- * @param {String} args.url URL from which to fetch the tiff.
+ * @param {String} args.urlOrFile URL or File Object from which to fetch the tiff.
  * @param {Array} args.offsets List of IFD offsets.
  * @param {Object} args.headers Object containing headers to be passed to all fetch requests.
  */
-export async function createOMETiffLoader({ url, offsets = [], headers = {} }) {
-  const tiff = await fromUrl(url, headers);
+export async function createOMETiffLoader({
+  urlOrFile,
+  offsets = [],
+  headers = {}
+}) {
+  let tiff;
+  if (urlOrFile instanceof File) {
+    tiff = await fromBlob(urlOrFile);
+  } else {
+    tiff = await fromUrl(urlOrFile, headers);
+  }
   const firstImage = await tiff.getImage(0);
   const pool = new Pool();
   const omexmlString = firstImage.fileDirectory.ImageDescription;

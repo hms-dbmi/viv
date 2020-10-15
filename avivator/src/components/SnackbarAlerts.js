@@ -5,9 +5,9 @@ import Link from '@material-ui/core/Link';
 export function OffsetsWarning() {
   return (
     <>
-      A lot of channels but have been detected in the requested OME-TIFF. To
-      learn how to speed up load times by providing byte offsets, refer to the
-      first point{' '}
+      A lot of channels have been detected in the requested OME-TIFF. To learn
+      how to speed up load times by providing byte offsets, refer to the first
+      point{' '}
       <Link
         target="_blank"
         rel="noopener noreferrer"
@@ -20,8 +20,8 @@ export function OffsetsWarning() {
   );
 }
 
-export function LoaderError() {
-  return (
+export function LoaderError({ message }) {
+  const defaultErrorMessage = (
     <>
       Something has gone wrong loading your image. Please refer to the{' '}
       <Link
@@ -34,6 +34,7 @@ export function LoaderError() {
       for information about supported file formats.
     </>
   );
+  return message ? <>{message}</> : defaultErrorMessage;
 }
 
 export function NoImageUrlInfo() {
