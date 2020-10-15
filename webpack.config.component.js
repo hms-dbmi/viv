@@ -56,18 +56,8 @@ const umdConfig = {
   ...baseConifg,
   externals: {
     // Only because this is the library target.
-    react: {
-      commonjs: 'react',
-      commonjs2: 'react',
-      amd: 'react',
-      root: 'React'
-    },
-    'react-dom': {
-      commonjs: 'react-dom',
-      commonjs2: 'react-dom',
-      amd: 'react-dom',
-      root: 'ReactDOM'
-    }
+    react: 'react',
+    'react-dom': 'react-dom',
   },
   output: {
     path: path.join(__dirname, '/dist/'),
