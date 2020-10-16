@@ -11,6 +11,7 @@
 
 - Removed greedy matching of dimension order in Bio-Formats Zarr output. Just check if OME-Zarr.
 - Upgrade to deck.gl 8.3.0
+- Use WASM LZW decoder from `manzt/geotiff.js`
 - Bundle UMD build with deps.
 
 ## 0.4.2
