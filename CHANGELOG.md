@@ -10,6 +10,7 @@
 ### Changed
 
 - Removed greedy matching of dimension order in Bio-Formats Zarr output. Just check if OME-Zarr.
+- Use WASM LZW decoder from `manzt/geotiff.js`
 - Bundle UMD build with deps.
 
 ## 0.4.2

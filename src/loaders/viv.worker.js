@@ -2,9 +2,9 @@
 
 import { getTiffDecoder } from './decoder';
 
-function decode(self, fileDirectory, buffer) {
+async function decode(self, fileDirectory, buffer) {
   const decoder = getTiffDecoder(fileDirectory);
-  const result = decoder.decode(fileDirectory, buffer);
+  const result = await decoder.decode(fileDirectory, buffer);
   self.postMessage([result], [result]);
 }
 
