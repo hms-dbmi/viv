@@ -61,8 +61,9 @@ $ raw2ometiff n5_tile_directory/ LuCa-7color_Scan1.ome.tif --compression=zlib
 ```
 
 > NOTE: Viv currently uses [`geotiff.js`](https://geotiffjs.github.io/) for accessing data from remote TIFFs
-> over HTTP. There is limited compression support in this library, so the `--compression` flag must be specified with
-> either `zlib` or `Uncompressed` for viewing in the browser.
+> over HTTP and support the three lossless compression options supported
+> by `raw2ometiff` - `LZW`, `zlib`, and `Uncompressed`. `LZW` is the default if you
+> do not specify a `--compression` option.
 
 ### Viewing in Avivator
 
@@ -107,7 +108,8 @@ link by appending an `image_url` query parameter:
 - http://avivator.gehlenborglab.org/?image_url=http://localhost:8000/LuCa-7color_Scan1.ome.tif (OME-TIFF)
 
 > Troubleshooting: Viv relies on cross-origin requests to retrieve data from servers. The `--cors='*'` flag is important to ensure
-> that the appropriate `Access-Control-Allow-Origin` response is sent from your local server.
+> that the appropriate `Access-Control-Allow-Origin` response is sent from your local server.  In addition, you need to allow
+> `Range` requests on your production web servers, even though you do not need to specify for `http-server`.
 
 ### Final Note on File Formats and OME-Zarr
 
