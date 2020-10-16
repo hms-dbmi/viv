@@ -109,7 +109,7 @@ link by appending an `image_url` query parameter:
 
 > Troubleshooting: Viv relies on cross-origin requests to retrieve data from servers. The `--cors='*'` flag is important to ensure
 > that the appropriate `Access-Control-Allow-Origin` response is sent from your local server.  In addition, you need to allow
-> `Range` requests on your production web servers, even though you do not need to specify for `http-server`.
+> `Range` requests on your production web servers in order to serve `OME-TIFF`s, even though you do not need to specify for `http-server`.
 
 ### Final Note on File Formats and OME-Zarr
 
