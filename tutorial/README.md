@@ -57,12 +57,13 @@ The second option is to run the complete Bio-Formats pipeline to generate a vali
 
 ```bash
 $ bioformats2raw LuCa-7color_Scan1.qptiff n5_tile_directory/
-$ raw2ometiff n5_tile_directory/ LuCa-7color_Scan1.ome.tif --compression=zlib
+$ raw2ometiff n5_tile_directory/ LuCa-7color_Scan1.ome.tif
 ```
 
 > NOTE: Viv currently uses [`geotiff.js`](https://geotiffjs.github.io/) for accessing data from remote TIFFs
-> over HTTP. There is limited compression support in this library, so the `--compression` flag must be specified with
-> either `zlib` or `Uncompressed` for viewing in the browser.
+> over HTTP and support the three lossless compression options supported
+> by `raw2ometiff` - `LZW`, `zlib`, and `Uncompressed`. `LZW` is the default if you
+> do not specify a `--compression` option (the syntax requires an "=" sign, like `--compression=zlib`).
 
 ### Viewing in Avivator
 
@@ -107,7 +108,9 @@ link by appending an `image_url` query parameter:
 - http://avivator.gehlenborglab.org/?image_url=http://localhost:8000/LuCa-7color_Scan1.ome.tif (OME-TIFF)
 
 > Troubleshooting: Viv relies on cross-origin requests to retrieve data from servers. The `--cors='*'` flag is important to ensure
-> that the appropriate `Access-Control-Allow-Origin` response is sent from your local server.
+> that the appropriate `Access-Control-Allow-Origin` response is sent from your local server.  In addition, web servers must allow
+> [HTTP range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests) to support viewing OME-TIFF images.
+> Range requests are allowed by default by `http-server` but may need to be enabled explicitly for your production web server.
 
 ### Final Note on File Formats and OME-Zarr
 
