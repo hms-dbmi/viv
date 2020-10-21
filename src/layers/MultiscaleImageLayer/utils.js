@@ -25,7 +25,8 @@ export function renderSubLayers(props) {
     pickable,
     unprojectLensBounds,
     isLensOn,
-    lensSelection
+    lensSelection,
+    onClick
   } = props;
   // Only render in positive coorinate system
   if ([left, bottom, right, top].some(v => v < 0)) {
@@ -51,7 +52,8 @@ export function renderSubLayers(props) {
     unprojectLensBounds,
     isLensOn,
     lensSelection,
-    tileId: { x, y, z }
+    tileId: { x, y, z },
+    onClick
   });
   return xrl;
 }

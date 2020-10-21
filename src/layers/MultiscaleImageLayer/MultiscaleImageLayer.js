@@ -19,7 +19,8 @@ const defaultProps = {
   lensSelection: { type: 'number', value: 0, compare: true },
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
-  lensBorderRadius: { type: 'number', value: 0.02, compare: true }
+  lensBorderRadius: { type: 'number', value: 0.02, compare: true },
+  onClick: { type: 'function', value: null, compare: true }
 };
 
 /**
@@ -42,6 +43,7 @@ const defaultProps = {
  * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
  * @param {number} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * @param {number} props.onClick Hook function from deck.gl to handle clicked-on objects.
  */
 
 export default class MultiscaleImageLayer extends CompositeLayer {
@@ -76,7 +78,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       isLensOn,
       lensSelection,
       lensBorderColor,
-      lensBorderRadius
+      lensBorderRadius,
+      onClick
     } = this.props;
     const { tileSize, numLevels, dtype } = loader;
     const { unprojectLensBounds } = this.state;
@@ -110,6 +113,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       getTileData,
       dtype,
       tileSize,
+      onClick,
       extent: [0, 0, width, height],
       minZoom: -(numLevels - 1),
       maxZoom: Math.min(0, Math.round(Math.log2(512 / tileSize))),
@@ -158,6 +162,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         z: numLevels - 1,
         pickable: true,
         onHover,
+        onClick,
         boxSize: getNearestPowerOf2(lowResWidth, lowResHeight)
       });
     const layers = [baseLayer, tiledLayer];
