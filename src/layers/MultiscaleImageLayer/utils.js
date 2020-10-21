@@ -32,7 +32,7 @@ export function renderSubLayers(props) {
   if ([left, bottom, right, top].some(v => v < 0)) {
     return null;
   }
-  const xrl = new XRLayer({
+  const xrl = new XRLayer(props, {
     id: `XRLayer-${left}-${bottom}-${right}-${top}-${id}`,
     bounds: [left, bottom, right, top],
     channelData: data,

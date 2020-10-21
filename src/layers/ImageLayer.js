@@ -171,7 +171,7 @@ export default class ImageLayer extends CompositeLayer {
       translate,
       scale
     });
-    return new XRLayer({
+    return new XRLayer(this.props, {
       channelData: { data, width, height },
       pickable,
       bounds,
