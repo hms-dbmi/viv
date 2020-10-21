@@ -31,7 +31,8 @@ const defaultProps = {
   lensSelection: { type: 'number', value: 0, compare: true },
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
-  lensBorderRadius: { type: 'number', value: 0.02, compare: true }
+  lensBorderRadius: { type: 'number', value: 0.02, compare: true },
+  onClick: { type: 'function', value: null, compare: true }
 };
 
 function scaleBounds({ width, height, translate, scale }) {
@@ -76,6 +77,7 @@ function padEven(data, width, height, boxSize) {
  * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
  * @param {number} props.lensBorderColor RGB color of the border of the lens.
  * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * @param {number} props.onClick Hook function from deck.gl to handle clicked-on objects.
  */
 export default class ImageLayer extends CompositeLayer {
   initializeState() {
@@ -156,7 +158,9 @@ export default class ImageLayer extends CompositeLayer {
       lensSelection,
       lensBorderColor,
       lensRadius,
-      id
+      id,
+      onClick,
+      onHover
     } = this.props;
     const { dtype } = loader;
     const { data, width, height, unprojectLensBounds } = this.state;
@@ -167,7 +171,7 @@ export default class ImageLayer extends CompositeLayer {
       translate,
       scale
     });
-    return new XRLayer({
+    return new XRLayer(this.props, {
       channelData: { data, width, height },
       pickable,
       bounds,
@@ -185,7 +189,9 @@ export default class ImageLayer extends CompositeLayer {
       isLensOn,
       lensSelection,
       lensBorderColor,
-      lensRadius
+      lensRadius,
+      onClick,
+      onHover
     });
   }
 }

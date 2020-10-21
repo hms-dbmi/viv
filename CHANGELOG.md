@@ -6,6 +6,7 @@
 
 - Support local tiff files.
 - Support local zarr directories.
+- onClick callbacks for layers.
 
 ### Changed
 
