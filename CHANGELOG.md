@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.5.0
+
+### Added
+
 - Support local tiff files.
 - Support local zarr directories.
 - onClick callbacks for layers.
