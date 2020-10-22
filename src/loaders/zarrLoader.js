@@ -74,8 +74,15 @@ export default class ZarrLoader {
       chunkKey[xIndex] = x;
 
       const key = source.keyPrefix + chunkKey.join('.');
-      const buffer = await source.store.getItem(key, { signal });
-      if (source.store instanceof HTTPStore && signal?.aborted) return null;
+      let buffer;
+      try {
+        buffer = await source.store.getItem(key, { signal });
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          throw err;
+        }
+        return null;
+      }
       let bytes = new Uint8Array(buffer);
       if (source.compressor) {
         bytes = await source.compressor.decode(bytes);
@@ -96,8 +103,8 @@ export default class ZarrLoader {
       }
       return data;
     });
-
     const data = await Promise.all(dataRequests);
+    if (source.store instanceof HTTPStore && signal?.aborted) return null;
     return {
       data,
       width: this.tileSize,
