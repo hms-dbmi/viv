@@ -194,3 +194,18 @@ export function dimensionsFromOMEXML(omexml) {
   });
   return dimensions;
 }
+
+/**
+ * Preserves (double) slashes earlier in the path, so this works better
+ * for URLs. From https://stackoverflow.com/a/46427607/4178400
+ * @param args parts of a path or URL to join.
+ */
+export function joinUrlParts(...args) {
+  return args
+    .map((part, i) => {
+      if (i === 0) return part.trim().replace(/[/]*$/g, '');
+      return part.trim().replace(/(^[/]*|[/]*$)/g, '');
+    })
+    .filter(x => x.length)
+    .join('/');
+}

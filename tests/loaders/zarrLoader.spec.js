@@ -8,7 +8,7 @@ describe('Test zarr non-rgb image loader', () => {
   it('Properties test', async () => {
     const z = await zeros([2, 500, 250], {
       chunks: [1, 100, 100],
-      dtype: '<i4'
+      dtype: '<f4'
     });
     await z.set([0, null, null], 42);
     await z.set([1, 0, null], NestedArray.arange(250));
@@ -20,7 +20,7 @@ describe('Test zarr non-rgb image loader', () => {
     ];
     const loader = new ZarrLoader({ data: z, dimensions });
     const { dtype, numLevels, tileSize } = loader;
-    expect(dtype).to.equal('<i4');
+    expect(dtype).to.equal('<f4');
     expect(numLevels).to.equal(1);
     expect(tileSize).to.equal(100);
   });
@@ -28,7 +28,7 @@ describe('Test zarr non-rgb image loader', () => {
   it('getTile tests', async () => {
     const z = await zeros([2, 500, 250], {
       chunks: [1, 100, 100],
-      dtype: '<i4'
+      dtype: '<f4'
     });
     await z.set([0, null, null], 42);
     await z.set([1, 0, null], NestedArray.arange(250));
@@ -54,7 +54,7 @@ describe('Test zarr non-rgb image loader', () => {
       loaderSelection: [{ channel: 1 }]
     });
     expect(res.data[0].subarray(0, 100)).to.deep.equal(
-      NestedArray.arange(100).flatten()
+      NestedArray.arange(100, '<f4').flatten()
     );
   });
 });
@@ -63,19 +63,19 @@ describe('Test zarr pyramid', () => {
   it('Pyramid tiles have correct dimensions', async () => {
     const z0 = await zeros([4, 100, 150], {
       chunks: [1, 10, 10],
-      dtype: '<i4'
+      dtype: '<f4'
     });
     await z0.set(null, 0);
 
     const z1 = await zeros([4, 50, 75], {
       chunks: [1, 10, 10],
-      dtype: '<i4'
+      dtype: '<f4'
     });
     await z1.set(null, 1);
 
     const z2 = await zeros([4, 25, 38], {
       chunks: [1, 10, 10],
-      dtype: '<i4'
+      dtype: '<f4'
     });
     await z2.set(null, 2);
 

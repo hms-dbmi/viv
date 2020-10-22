@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import { expect } from 'chai';
 
-import { getChannelStats } from '../../src/loaders/utils';
+import { getChannelStats, joinUrlParts } from '../../src/loaders/utils';
 
 describe('Test getChannelStats Small Array', () => {
   it('Stats Test Small', async () => {
@@ -69,5 +69,22 @@ describe('Test getChannelStats Big Array', () => {
     expect(firstQuartiles).to.deep.equal([3, 3]);
     expect(thirdQuartiles).to.deep.equal([9, 9]);
     expect(medians).to.deep.equal([6, 6]);
+  });
+});
+
+describe('URL joining works', () => {
+  it('join various suffixes', () => {
+    expect(joinUrlParts('https://example.com', 'bla')).equal(
+      'https://example.com/bla'
+    );
+    expect(joinUrlParts('https://example.com/my-store', 'arr.zarr')).equal(
+      'https://example.com/my-store/arr.zarr'
+    );
+    expect(joinUrlParts('https://example.com/', 'arr.zarr')).equal(
+      'https://example.com/arr.zarr'
+    );
+    expect(joinUrlParts('https://example.com/', '', 'arr.zarr')).equal(
+      'https://example.com/arr.zarr'
+    );
   });
 });
