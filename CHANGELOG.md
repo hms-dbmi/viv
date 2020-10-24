@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Fix snackbars for errors and initial image.
 
 ## 0.5.0
 
