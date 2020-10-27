@@ -20,7 +20,12 @@ A bit is going on under the hood here, though. Here are some of those things:
 
 3. We are not experts on the OMEXML format, but we make a reasonable attempt to parse the OMEXML metadata for channel names, z stack size, time stack size etc. Please open a PR against the [`OMEXML`](https://github.com/hms-dbmi/viv/tree/master/src/loaders/omeXML.js) class if it fails for your use case.
 
-4. If you are interested in generating your own image pyramids, we use the new `bioformats` image pyramid from [here](https://github.com/glencoesoftware/bioformats2raw) and [here](https://github.com/glencoesoftware/raw2ometiff) - we have [this docker container](https://hub.docker.com/r/hubmap/portal-container-ome-tiff-tiler) for that purpose. Both `viv` and this new `bioformats` software are under development, so there will likely be tweaks and changes as time goes on, but the current implementation-pairing should be stable (it currently backs the public OME-TIFF demo as well as one of the not-public ones). Additionally, the intermediary `n5` format can be quickly ported to `zarr` for analysis locally.  If you wish to do these two steps without docker, [here](http://viv.gehlenborglab.org/#data-preparation) is a tutorial on installing and using the bioformats pyramid pipeline via `conda` and [here](https://github.com/hubmapconsortium/portal-containers/blob/ad0cd2def3887cab10b9aa717aae0435197c0a1f/containers/ome-tiff-offsets/context/main.py) is the source code for generating `offsets.json`.
+4. Viv's data loaders are compatible with modern BioFormats image pyramids produced via the two-step [`bioformats2raw`](https://github.com/glencoesoftware/bioformats2raw) + [`raw2ometiff`](https://github.com/glencoesoftware/raw2ometiff) conversion.
+We have [dockerized a workflow](https://hub.docker.com/r/hubmap/portal-container-ome-tiff-tiler) to convert images for HuBMAP Data Portal, but we recommend following [our tutorial](http://viv.gehlenborglab.org/#data-preparation) to get started with your own images.
+The tutorial requires `conda` to use the BioFormats software. 
+Generating tile offsets for pyramidal OME-TIFF images, `offsets.json`, can be done via [a docker container](https://hub.docker.com/r/hubmap/portal-container-ome-tiff-offsets) or by using the python source code [here](https://github.com/hubmapconsortium/portal-containers/blob/ad0cd2def3887cab10b9aa717aae0435197c0a1f/containers/ome-tiff-offsets/context/main.py).
+
+For example, a dockerized workflow might look like:
 
 ```shell
 # Pull docker images
