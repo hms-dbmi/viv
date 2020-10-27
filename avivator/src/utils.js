@@ -94,7 +94,7 @@ export async function createLoader(
     if (e instanceof UnsupportedBrowserError) {
       handleLoaderError(e.message);
     } else {
-      handleLoaderError(true);
+      handleLoaderError(null);
     }
     return null;
   }

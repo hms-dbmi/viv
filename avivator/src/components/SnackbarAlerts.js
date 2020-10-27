@@ -21,9 +21,12 @@ export function OffsetsWarning() {
 }
 
 export function LoaderError({ message }) {
-  const defaultErrorMessage = (
+  return (
     <>
-      Something has gone wrong loading your image. Please refer to the{' '}
+      {message
+        ? `The following error was thrown: "${message}". `
+        : 'Something has gone wrong loading your image. '}
+      Please refer to the{' '}
       <Link
         target="_blank"
         rel="noopener noreferrer"
@@ -34,7 +37,6 @@ export function LoaderError({ message }) {
       for information about supported file formats.
     </>
   );
-  return message ? <>{message}</> : defaultErrorMessage;
 }
 
 export function NoImageUrlInfo() {
