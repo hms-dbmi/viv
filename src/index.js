@@ -14,6 +14,7 @@ import {
   OMETiffLoader,
   getChannelStats
 } from './loaders';
+import HTTPStore from './loaders/httpStore';
 import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from './constants';
 
 export {
@@ -35,5 +36,6 @@ export {
   OMETiffLoader,
   createOMETiffLoader,
   createZarrLoader,
-  createBioformatsZarrLoader
+  createBioformatsZarrLoader,
+  HTTPStore,
 };
