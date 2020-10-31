@@ -10,8 +10,14 @@ import fs1 from './xr-layer-fragment.webgl1.glsl';
 import fs2 from './xr-layer-fragment.webgl2.glsl';
 import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
+import multiChannelLinearColormapFs from './multi-channel-linear-colormap-fs';
 import { DTYPE_VALUES } from '../../constants';
 import { padColorsAndSliders } from '../utils';
+
+function getSamplerType(props) {
+  const { dtype } = props;
+  return dtype === '<f4' ? 'sampler2D' : 'usampler2D'
+}
 
 const defaultProps = {
   pickable: true,
@@ -53,10 +59,14 @@ export default class XRLayer extends Layer {
       : fragShaderNoColormap;
     const fragShaderDtype =
       dtype === '<f4' ? fragShader.replace(/usampler/g, 'sampler') : fragShader;
+    multiChannelLinearColormapFs.defines.SAMPLER_TYPE = getSamplerType(this.props)
     return super.getShaders({
       vs: noWebGL2 ? vs1 : vs2,
       fs: fragShaderDtype,
-      modules: [project32, picking]
+      defines: {
+        SAMPLER_TYPE: getSamplerType(this.props)
+      },
+      modules: [project32, picking, multiChannelLinearColormapFs]
     });
   }
 
