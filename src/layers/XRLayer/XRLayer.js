@@ -14,9 +14,9 @@ import multiChannelLinearColormapFs from './multi-channel-linear-colormap-fs';
 import { DTYPE_VALUES } from '../../constants';
 import { padColorsAndSliders } from '../utils';
 
-function getSamplerType(props) {
+function getSamplerType(props, noWebGL2) {
   const { dtype } = props;
-  return dtype === '<f4' ? 'sampler2D' : 'usampler2D'
+  return dtype === '<f4' || noWebGL2 ? 'sampler2D' : 'usampler2D';
 }
 
 const defaultProps = {
@@ -59,12 +59,12 @@ export default class XRLayer extends Layer {
       : fragShaderNoColormap;
     const fragShaderDtype =
       dtype === '<f4' ? fragShader.replace(/usampler/g, 'sampler') : fragShader;
-    multiChannelLinearColormapFs.defines.SAMPLER_TYPE = getSamplerType(this.props)
+    multiChannelLinearColormapFs.defines.SAMPLER_TYPE = getSamplerType(this.props, noWebGL2)
     return super.getShaders({
       vs: noWebGL2 ? vs1 : vs2,
       fs: fragShaderDtype,
       defines: {
-        SAMPLER_TYPE: getSamplerType(this.props)
+        SAMPLER_TYPE: getSamplerType(this.props, noWebGL2)
       },
       modules: [project32, picking, multiChannelLinearColormapFs]
     });

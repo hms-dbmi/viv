@@ -37,11 +37,11 @@ export default {
     return hsv;
   }
 
-  vec3 process_channel(SAMPLER_TYPE channel, vec2 vTexCoord, vec3 colorValues[6], vec2 sliderValues[6], int channelIndex, bool inLensAndUseLens, int lensSelection) {
-    float intensity = (float(texture(channel, vTexCoord).r) - sliderValues[channelIndex][0]) / max(0.0005, (sliderValues[channelIndex][1] - sliderValues[channelIndex][0]));
+  vec3 process_channel(SAMPLER_TYPE channel, vec2 vTexCoord, vec3 colorValues, vec2 sliderValues, int channelIndex, bool inLensAndUseLens, int lensSelection) {
+    float intensity = (float(texture(channel, vTexCoord).r) - sliderValues[0]) / max(0.0005, (sliderValues[1] - sliderValues[0]));
     float useColorValue = float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));
     // Use arithmetic instead of if-then for useColorValue.
-    vec3 hsvCombo = rgb2hsv(max(vec3(colorValues[channelIndex]), (1.0 - useColorValue) * vec3(255, 255, 255)));
+    vec3 hsvCombo = rgb2hsv(max(vec3(colorValues), (1.0 - useColorValue) * vec3(255, 255, 255)));
     // Sum up the intesitiies in additive blending.
     hsvCombo = vec3(hsvCombo.xy, max(0.0, intensity));
     return hsv2rgb(hsvCombo);
