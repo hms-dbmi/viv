@@ -2,7 +2,7 @@
 #define SHADER_NAME xr-layer-fragment-shader
 precision highp float;
 precision highp int;
-precision highp usampler2D;
+precision highp SAMPLER_TYPE;
 
 #pragma glslify: jet = require("glsl-colormap/jet")
 #pragma glslify: hsv = require("glsl-colormap/hsv")
@@ -51,12 +51,12 @@ precision highp usampler2D;
 
 
 // our texture
-uniform usampler2D channel0;
-uniform usampler2D channel1;
-uniform usampler2D channel2;
-uniform usampler2D channel3;
-uniform usampler2D channel4;
-uniform usampler2D channel5;
+uniform SAMPLER_TYPE channel0;
+uniform SAMPLER_TYPE channel1;
+uniform SAMPLER_TYPE channel2;
+uniform SAMPLER_TYPE channel3;
+uniform SAMPLER_TYPE channel4;
+uniform SAMPLER_TYPE channel5;
 
 // range
 uniform vec2 sliderValues[6];
