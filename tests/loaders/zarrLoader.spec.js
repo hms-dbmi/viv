@@ -59,7 +59,10 @@ test('ZarrLoader getTile tests', async t => {
       y: 0,
       loaderSelection: [{ channel: 1 }]
     });
-    t.deepEqual(res.data[0].subarray(0, 100), NestedArray.arange(100, '<f4').flatten());
+    t.deepEqual(
+      res.data[0].subarray(0, 100),
+      NestedArray.arange(100, '<f4').flatten()
+    );
     t.end();
   } catch (e) {
     t.fail(e);
@@ -99,17 +102,15 @@ test('Pyramid tiles have correct dimensions', async t => {
     const { data: level1Tiles } = await loader.getTile({ ...config, z: 1 });
     const { data: level2Tiles } = await loader.getTile({ ...config, z: 2 });
 
-    t.deepEqual([
-      baseTiles.length,
-      level1Tiles.length,
-      level2Tiles.length
-    ],[1, 1, 1]);
+    t.deepEqual(
+      [baseTiles.length, level1Tiles.length, level2Tiles.length],
+      [1, 1, 1]
+    );
 
-    t.deepEqual([
-      baseTiles[0].length,
-      level1Tiles[0].length,
-      level2Tiles[0].length
-    ], [100, 100, 100]);
+    t.deepEqual(
+      [baseTiles[0].length, level1Tiles[0].length, level2Tiles[0].length],
+      [100, 100, 100]
+    );
 
     t.end();
   } catch (e) {

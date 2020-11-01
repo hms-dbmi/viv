@@ -4,7 +4,7 @@ import { fromFile } from 'geotiff';
 import OMETiffLoader from '../../src/loaders/OMETiffLoader';
 
 test('OME-TIFF Properties', async t => {
-  t.plan(4)
+  t.plan(4);
   try {
     const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
     const firstImage = await tiff.getImage();
