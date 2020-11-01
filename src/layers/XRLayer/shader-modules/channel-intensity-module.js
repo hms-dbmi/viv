@@ -1,5 +1,5 @@
 export default {
-  name: 'mutli-channel-shader-module',
+  name: 'channel-intensity-module',
   defines: {
     SAMPLER_TYPE: 'usampler2D'
   },

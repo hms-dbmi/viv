@@ -37,24 +37,6 @@ in vec2 vTexCoord;
 
 out vec4 color;
 
-bool fragInLensBounds() {
-  // Check membership in what is (not visually, but effectively) an ellipse.
-  // Since the fragment space is a unit square and the real coordinates could be longer than tall,
-  // to get a circle visually we have to treat the check as that of an ellipse to get the effect of a circle.
-  
-  // Check membership in ellipse.
-  return pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.0) < (1.0 - lensBorderRadius);
-}
-
-bool fragOnLensBounds() {
-  // Same as the above, except this checks the boundary.
-
-  float ellipseDistance = pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.0);
-  
-  // Check membership on "bourndary" of ellipse.
-  return ellipseDistance <= 1.0 && ellipseDistance >= (1.0 - lensBorderRadius);
-}
-
 void main() {
 
   float intensityValue0 = sample_and_apply_sliders(channel0, vTexCoord, sliderValues[0]);
@@ -67,8 +49,8 @@ void main() {
   float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
 
   // Find out if the frag is in bounds of the lens.
-  bool isFragInLensBounds = fragInLensBounds();
-  bool isFragOnLensBounds = fragOnLensBounds();
+  bool isFragInLensBounds = fragInLensBounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);
+  bool isFragOnLensBounds = fragOnLensBounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);
 
   // Declare variables.
   bool inLensAndUseLens = isLensOn && isFragInLensBounds;

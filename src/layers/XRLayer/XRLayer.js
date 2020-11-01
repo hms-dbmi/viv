@@ -10,7 +10,7 @@ import fs1 from './xr-layer-fragment.webgl1.glsl';
 import fs2 from './xr-layer-fragment.webgl2.glsl';
 import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
-import multiChannelLinearColormapFs from './multi-channel-linear-colormap-fs';
+import modules from './shader-modules';
 import { DTYPE_VALUES } from '../../constants';
 import { padColorsAndSliders } from '../utils';
 
@@ -57,9 +57,11 @@ export default class XRLayer extends Layer {
     const fragShader = colormap
       ? fragShaderColoramp.replace('colormapFunction', colormap)
       : fragShaderNoColormap;
-    multiChannelLinearColormapFs.defines.SAMPLER_TYPE = getSamplerType(
-      this.props,
-      noWebGL2
+    modules.forEach(
+      // eslint-disable-next-line no-return-assign
+      module =>
+        // eslint-disable-next-line no-param-reassign
+        (module.defines.SAMPLER_TYPE = getSamplerType(this.props, noWebGL2))
     );
     return super.getShaders({
       vs: noWebGL2 ? vs1 : vs2,
@@ -67,7 +69,7 @@ export default class XRLayer extends Layer {
       defines: {
         SAMPLER_TYPE: getSamplerType(this.props, noWebGL2)
       },
-      modules: [project32, picking, multiChannelLinearColormapFs]
+      modules: [project32, picking, ...modules]
     });
   }
 
