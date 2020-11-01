@@ -12,46 +12,34 @@ const external = [
   ...Object.keys(pkg.devDependencies),
 ];
 
-const configs = {
-  build: {
-    input: 'src/index.js',
-    file: 'dist/index.js',
-    format: 'esm',
-  },
-  testLayers: {
-    input: 'tests/layers_views/index.spec.js',
-    format: 'cjs'
-  },
-  testLoaders: {
-    input: 'tests/loaders/index.spec.js',
-    format: 'cjs'
+const config = (test) => {
+  if (!test) {
+    return {
+      input: 'src/index.js',
+      output: { file: 'dist/index.js', format: 'esm' }
+    }
   }
-};
-
-const key = process.env.TEST_LAYERS ? 
-  'testLayers' : process.env.TEST_LOADERS ? 
-  'testLoaders' : 'build';
-const config = configs[key];
+  return {
+    input: `tests/${test}/index.spec.js`,
+    output: { format: 'cjs' }
+  }
+}
 
 export default {
-    input: config.input,
-    output: {
-      file: config.file,
-      format: config.format,
-    },
-    external,
-    plugins: [
-      resolve(),
-      glslify(),
-      workerLoader({
-        targetPlatform: 'browser', 
-        inline: true,
-      }),
-      sucrase({
-        exclude: "node_modules/*", 
-        transforms: ['jsx'],
-        production: true,
-      }),
-      commonjs(),
-    ]
+  ...config(process.env.TEST),
+  external,
+  plugins: [
+    resolve(),
+    glslify(),
+    workerLoader({
+      targetPlatform: 'browser',
+      inline: true,
+    }),
+    sucrase({
+      exclude: "node_modules/*",
+      transforms: ['jsx'],
+      production: true,
+    }),
+    commonjs(),
+  ]
 }

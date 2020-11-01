@@ -12,8 +12,8 @@
     "build": "rollup -c",
     "build:w": "rollup -c --watch",
     "test": "npm run test:layers && npm run test:loaders",
-    "test:layers": "TEST_LAYERS=true rollup -c | browserify - | tape-run | tap-spec",
-    "test:loaders": "TEST_LOADERS=true rollup -c | node - | tap-spec",
+    "test:layers": "rollup -c --environment TEST:layers_views | browserify - | tape-run | tap-spec",
+    "test:loaders": "rollup -c --environment TEST:loaders | node - | tap-spec",
     "version": "./version.sh",
     "postversion": "git push && git push --tags",
     "docs": "mkdir -p dist_docs || rm -r dist_docs && mkdir -p dist_docs && documentation build src/** -f html --config documentation.yml --shallow -o dist_docs"
