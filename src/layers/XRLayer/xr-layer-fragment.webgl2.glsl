@@ -49,8 +49,8 @@ void main() {
   float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
 
   // Find out if the frag is in bounds of the lens.
-  bool isFragInLensBounds = fragInLensBounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);
-  bool isFragOnLensBounds = fragOnLensBounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);
+  bool isFragInLensBounds = frag_in_lens_bounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);
+  bool isFragOnLensBounds = frag_on_lens_bounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);
 
   // Declare variables.
   bool inLensAndUseLens = isLensOn && isFragInLensBounds;

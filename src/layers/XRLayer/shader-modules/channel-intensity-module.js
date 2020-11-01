@@ -5,13 +5,13 @@ export default {
   },
   fs: `\
 
-  vec3 hsv2rgb(vec3 c) {
+  vec3 hsv_to_rgb(vec3 c) {
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
   }
 
-  vec3 rgb2hsv(vec3 rgb) {
+  vec3 rgb_to_hsv(vec3 rgb) {
     float Cmax = max(rgb.r, max(rgb.g, rgb.b));
     float Cmin = min(rgb.r, min(rgb.g, rgb.b));
     float delta = Cmax - Cmin;
@@ -44,10 +44,10 @@ export default {
   vec3 process_channel_intensity(float intensity, vec3 colorValues, int channelIndex, bool inLensAndUseLens, int lensSelection) {
     float useColorValue = float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));
     // Use arithmetic instead of if-then for useColorValue.
-    vec3 hsvCombo = rgb2hsv(max(vec3(colorValues), (1.0 - useColorValue) * vec3(255, 255, 255)));
+    vec3 hsvCombo = rgb_to_hsv(max(vec3(colorValues), (1.0 - useColorValue) * vec3(255, 255, 255)));
     // Sum up the intesitiies in additive blending.
     hsvCombo = vec3(hsvCombo.xy, max(0.0, intensity));
-    return hsv2rgb(hsvCombo);
+    return hsv_to_rgb(hsvCombo);
   }
 `
 };
