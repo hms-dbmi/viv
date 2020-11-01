@@ -3,7 +3,7 @@ import {
   createOMETiffLoader,
   createBioformatsZarrLoader,
   getChannelStats
-} from '../../src';
+} from '../../dist';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
 
