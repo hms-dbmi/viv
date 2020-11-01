@@ -37,8 +37,12 @@ export default {
     return hsv;
   }
 
+  float sample_and_apply_sliders(SAMPLER_TYPE channel, vec2 vTexCoord, vec2 sliderValues) {
+    return (float(texture(channel, vTexCoord).r) - sliderValues[0]) / max(0.0005, (sliderValues[1] - sliderValues[0]));
+  }
+
   vec3 process_channel(SAMPLER_TYPE channel, vec2 vTexCoord, vec3 colorValues, vec2 sliderValues, int channelIndex, bool inLensAndUseLens, int lensSelection) {
-    float intensity = (float(texture(channel, vTexCoord).r) - sliderValues[0]) / max(0.0005, (sliderValues[1] - sliderValues[0]));
+    float intensity = sample_and_apply_sliders(channel, vTexCoord, sliderValues);
     float useColorValue = float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));
     // Use arithmetic instead of if-then for useColorValue.
     vec3 hsvCombo = rgb2hsv(max(vec3(colorValues), (1.0 - useColorValue) * vec3(255, 255, 255)));

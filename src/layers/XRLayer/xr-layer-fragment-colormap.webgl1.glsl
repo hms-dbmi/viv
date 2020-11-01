@@ -66,12 +66,12 @@ varying vec2 vTexCoord;
 
 
 void main() {
-  float intensityValue0 = (float(texture(channel0, vTexCoord).r) - sliderValues[0][0]) / max(0.0005, (sliderValues[0][1] - sliderValues[0][0]));
-  float intensityValue1 = (float(texture(channel1, vTexCoord).r) - sliderValues[1][0]) / max(0.0005, (sliderValues[1][1] - sliderValues[1][0]));
-  float intensityValue2 = (float(texture(channel2, vTexCoord).r) - sliderValues[2][0]) / max(0.0005, (sliderValues[2][1] - sliderValues[2][0]));
-  float intensityValue3 = (float(texture(channel3, vTexCoord).r) - sliderValues[3][0]) / max(0.0005, (sliderValues[3][1] - sliderValues[3][0]));
-  float intensityValue4 = (float(texture(channel4, vTexCoord).r) - sliderValues[4][0]) / max(0.0005, (sliderValues[4][1] - sliderValues[4][0]));
-  float intensityValue5 = (float(texture(channel5, vTexCoord).r) - sliderValues[5][0]) / max(0.0005, (sliderValues[5][1] - sliderValues[5][0]));
+  float intensityValue0 = sample_and_apply_sliders(channel0, vTexCoord, sliderValues[0]);
+  float intensityValue1 = sample_and_apply_sliders(channel1, vTexCoord, sliderValues[1]);
+  float intensityValue2 = sample_and_apply_sliders(channel2, vTexCoord, sliderValues[2]);
+  float intensityValue3 = sample_and_apply_sliders(channel3, vTexCoord, sliderValues[3]);
+  float intensityValue4 = sample_and_apply_sliders(channel4, vTexCoord, sliderValues[4]);
+  float intensityValue5 = sample_and_apply_sliders(channel5, vTexCoord, sliderValues[5]);
 
   float intensityCombo = 0.0;
   
