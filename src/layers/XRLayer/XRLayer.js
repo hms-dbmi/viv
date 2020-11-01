@@ -57,7 +57,10 @@ export default class XRLayer extends Layer {
     const fragShader = colormap
       ? fragShaderColoramp.replace('colormapFunction', colormap)
       : fragShaderNoColormap;
-    multiChannelLinearColormapFs.defines.SAMPLER_TYPE = getSamplerType(this.props, noWebGL2)
+    multiChannelLinearColormapFs.defines.SAMPLER_TYPE = getSamplerType(
+      this.props,
+      noWebGL2
+    );
     return super.getShaders({
       vs: noWebGL2 ? vs1 : vs2,
       fs: fragShader,
