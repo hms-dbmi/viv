@@ -22,11 +22,7 @@ end eslint
 
 # Shader compilation does not work on travis.
 start test
-if [[ "$CI" != 'true' ]]
-then 
-  npm run test:layers_views
-fi
-npm run test:loaders
+npm run test
 end test
 
 start build
