@@ -5,14 +5,10 @@
 **/dist/*
 /.pnp
 .pnp.js
-/test_dist
 /dist_docs
 
 # testing
 /coverage
-
-# production
-/build
 
 # misc
 .DS_Store
