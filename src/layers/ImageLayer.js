@@ -121,12 +121,6 @@ export default class ImageLayer extends CompositeLayer {
           );
         });
     }
-    if (props.colormap && props.colormap !== oldProps.colormap) {
-      const url = `${baseColormapUrl + props.colormap}.png`;
-      this.setState({ colormap: loadImage(url) });
-    } else if (!props.colormap) {
-      this.setState({ colormap: null });
-    }
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -157,10 +151,11 @@ export default class ImageLayer extends CompositeLayer {
       lensRadius,
       id,
       onClick,
-      onHover
+      onHover,
+      colormap
     } = this.props;
     const { dtype } = loader;
-    const { data, width, height, unprojectLensBounds, colormap } = this.state;
+    const { data, width, height, unprojectLensBounds } = this.state;
     if (!(width && height)) return null;
     const bounds = scaleBounds({
       width,

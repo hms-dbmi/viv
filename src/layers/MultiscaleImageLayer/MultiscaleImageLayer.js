@@ -64,15 +64,6 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     }
   }
 
-  updateState({ props, oldProps }) {
-    if (props.colormap && props.colormap !== oldProps.colormap) {
-      const url = `${baseColormapUrl + props.colormap}.png`;
-      this.setState({ colormap: loadImage(url) });
-    } else if (!props.colormap) {
-      this.setState({ colormap: null });
-    }
-  }
-
   renderLayers() {
     const {
       loader,
@@ -91,11 +82,12 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       lensSelection,
       lensBorderColor,
       lensBorderRadius,
+      colormap,
       maxRequests,
       onClick
     } = this.props;
     const { tileSize, numLevels, dtype } = loader;
-    const { unprojectLensBounds, colormap } = this.state;
+    const { unprojectLensBounds } = this.state;
     const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z, signal }) => {
       const tile = await loader.getTile({

@@ -29,7 +29,7 @@ const defaultProps = {
   channelIsOn: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: '<u2', compare: true },
-  colormap: { type: 'object', value: new Promise(() => {}), compare: true },
+  colormap: { type: 'object', value: null, compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
@@ -132,10 +132,16 @@ export default class XRLayer extends Layer {
       if (props.colormap) {
         // Colormap is a promise - I couldn't get it working by resolving the promise before hitting
         // the XRLayer (i.e resolving in MultiscaleImageLayer etc.).
-        props.colormap.then(data => {
-          this.setState({
-            colormap: new Texture2D(gl, { data })
-          });
+        this.setState({
+          colormap: new Texture2D(gl, {
+            data: props.colormap,
+            parameters: {
+              [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
+              [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
+              [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
+              [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
+            }
+          })
         });
       } else {
         this.setState({ colormap: null });
@@ -212,19 +218,11 @@ export default class XRLayer extends Layer {
    * This function runs the shaders and draws to the canvas
    */
   draw({ uniforms }) {
-    const { gl } = this.context;
     const { textures, model, colormap } = this.state;
     // Without checking the colormaps are in both state/props,
     // Safari/WebGL1 has flickering due to the brief mismatch during a draw() call
     // while WebGL2 simply does not render if we check this condition.
-    if (
-      textures &&
-      model &&
-      (isWebGL2(gl) ||
-        (!isWebGL2(gl) &&
-          ((this.props.colormap && colormap) ||
-            (!this.props.colormap && !colormap))))
-    ) {
+    if (textures && model) {
       const {
         sliderValues,
         colorValues,

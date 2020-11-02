@@ -10,7 +10,8 @@ import AddIcon from '@material-ui/icons/Add';
 import {
   SideBySideViewer,
   PictureInPictureViewer,
-  getChannelStats
+  getChannelStats,
+  getColormap
 } from '../../src';
 import {
   createLoader,
@@ -66,7 +67,7 @@ export default function Avivator(props) {
   const [loader, setLoader] = useState({});
   const [lensSelection, setLensSelection] = useState(0);
   const [source, setSource] = useState(initSource);
-  const [colormap, setColormap] = useState('');
+  const [colormap, setColormap] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [pixelValues, setPixelValues] = useState([]);
   const [dimensions, setDimensions] = useState([]);
@@ -346,7 +347,7 @@ export default function Avivator(props) {
                   height: viewSize.height,
                   width: viewSize.width * 0.5
                 }}
-                colormap={colormap.length > 0 && colormap}
+                colormap={colormap.texture}
                 zoomLock={zoomLock}
                 panLock={panLock}
                 hoverHooks={{ handleValue: setPixelValues }}
@@ -365,7 +366,7 @@ export default function Avivator(props) {
                   height: viewSize.height,
                   width: viewSize.width
                 }}
-                colormap={colormap.length > 0 && colormap}
+                colormap={colormap.texture}
                 overview={DEFAULT_OVERVIEW}
                 overviewOn={overviewOn && isPyramid}
                 hoverHooks={{ handleValue: setPixelValues }}
@@ -386,8 +387,15 @@ export default function Avivator(props) {
         >
           {!isRgb && (
             <ColormapSelect
-              value={colormap}
-              handleChange={setColormap}
+              value={colormap.name}
+              handleChange={async name => {
+                setColormap(
+                  name && {
+                    name,
+                    texture: await getColormap({ name })
+                  }
+                );
+              }}
               disabled={isLoading}
             />
           )}
