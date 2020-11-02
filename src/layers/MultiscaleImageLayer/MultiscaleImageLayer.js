@@ -68,6 +68,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     if (props.colormap && props.colormap !== oldProps.colormap) {
       const url = `${baseColormapUrl + props.colormap}.png`;
       this.setState({ colormap: loadImage(url) });
+    } else if (!props.colormap) {
+      this.setState({ colormap: null });
     }
   }
 

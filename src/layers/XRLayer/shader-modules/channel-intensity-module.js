@@ -54,7 +54,8 @@ export default {
 
   vec3 sample_colormap_texture(float intensity, sampler2D colormap) {
     vec2 loc = vec2(min(max(intensity, 1.0 / 255.0), 1.0 - (1.0 / 255.0)), 0.5);
-    return texture(colormap, loc).rgb;
+    vec3 sampled = texture(colormap, loc).rgb;
+    return sampled;
   }
 `
 };

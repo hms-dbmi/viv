@@ -41,6 +41,6 @@ void main() {
   intensityCombo += max(0.0,intensityValue5);
 
   gl_FragColor = vec4(sample_colormap_texture(intensityCombo, colormap), opacity);
-
+  geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }

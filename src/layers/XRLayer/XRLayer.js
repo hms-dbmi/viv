@@ -128,14 +128,18 @@ export default class XRLayer extends Layer {
     ) {
       this.loadChannelTexture(props.channelData);
     }
-    if (props.colormap && props.colormap !== oldProps.colormap) {
-      // Colormap is a promise - I couldn't get it working by resolving the promise before hitting
-      // the XRLayer (i.e resolving in MultiscaleImageLayer etc.).
-      props.colormap.then(data => {
-        this.setState({
-          colormap: new Texture2D(gl, { data })
+    if (props.colormap !== oldProps.colormap) {
+      if (props.colormap) {
+        // Colormap is a promise - I couldn't get it working by resolving the promise before hitting
+        // the XRLayer (i.e resolving in MultiscaleImageLayer etc.).
+        props.colormap.then(data => {
+          this.setState({
+            colormap: new Texture2D(gl, { data })
+          });
         });
-      });
+      } else {
+        this.setState({ colormap: null });
+      }
     }
     const attributeManager = this.getAttributeManager();
     if (props.bounds !== oldProps.bounds) {
@@ -209,7 +213,13 @@ export default class XRLayer extends Layer {
    */
   draw({ uniforms }) {
     const { textures, model, colormap } = this.state;
-    if (textures && model) {
+    // Without checking the colormaps are in both state/props,
+    // Safari has flickering due to the brief mismatch during a draw() call.
+    if (
+      textures &&
+      model &&
+      ((this.props.colormap && colormap) || (!this.props.colormap && !colormap))
+    ) {
       const {
         sliderValues,
         colorValues,
