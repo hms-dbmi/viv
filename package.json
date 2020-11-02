@@ -55,7 +55,6 @@
     "@rollup/plugin-sucrase": "^3.1.0",
     "abortcontroller-polyfill": "^1.5.0",
     "browserify": "^17.0.0",
-    "bufferutil": "^4.0.2",
     "concurrently": "^5.3.0",
     "documentation": "^13.1.0",
     "eslint": "^7.12.1",
@@ -72,12 +71,10 @@
     "rollup": "^2.32.1",
     "rollup-plugin-glslify": "^1.2.0",
     "rollup-plugin-web-worker-loader": "^1.4.0",
-    "supports-color": "^7.2.0",
     "tap-spec": "^5.0.0",
     "tape": "^5.0.1",
     "tape-catch": "^1.0.6",
-    "tape-run": "^8.0.0",
-    "utf-8-validate": "^5.0.3"
+    "tape-run": "^8.0.0"
   },
   "dependencies": {
     "@deck.gl/core": "^8.3.2",
@@ -92,5 +89,8 @@
     "geotiff": "ilan-gold/geotiff.js#ilan-gold/viv_050_release",
     "quickselect": "^2.0.0",
     "zarr": "^0.3.0"
+  },
+  "prettier": {
+    "singleQuote": true
   }
 }
