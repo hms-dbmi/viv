@@ -25,9 +25,6 @@
     "postversion": "git push && git push --tags",
     "docs": "mkdir -p dist_docs || rm -r dist_docs && mkdir -p dist_docs && documentation build src/** -f html --config documentation.yml --shallow -o dist_docs"
   },
-  "pre-push": [
-    "test"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hms-dbmi/viv.git"
@@ -65,7 +62,6 @@
     "eslint-plugin-react-app": "^6.2.2",
     "gl": "^4.4.1",
     "glsl-colormap": "^1.0.1",
-    "pre-push": "^0.1.1",
     "prettier": "^1.19.1",
     "promise.prototype.finally": "^3.1.2",
     "rollup": "^2.32.1",
