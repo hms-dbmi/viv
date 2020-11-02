@@ -38,7 +38,9 @@ export default {
   }
 
   float sample_and_apply_sliders(SAMPLER_TYPE channel, vec2 vTexCoord, vec2 sliderValues) {
-    return (float(texture(channel, vTexCoord).r) - sliderValues[0]) / max(0.0005, (sliderValues[1] - sliderValues[0]));
+    float fragIntensity = float(texture(channel, vTexCoord).r);
+    float slidersAppliedToIntensity = (fragIntensity - sliderValues[0]) / max(0.0005, (sliderValues[1] - sliderValues[0]));
+    return max(0.0, slidersAppliedToIntensity);
   }
 
   vec3 process_channel_intensity(float intensity, vec3 colorValues, int channelIndex, bool inLensAndUseLens, int lensSelection) {
@@ -48,6 +50,11 @@ export default {
     // Sum up the intesitiies in additive blending.
     hsvCombo = vec3(hsvCombo.xy, max(0.0, intensity));
     return hsv_to_rgb(hsvCombo);
+  }
+
+  vec3 sample_colormap_texture(float intensity, sampler2D colormap) {
+    vec2 loc = vec2(min(max(intensity, 1.0 / 255.0), 1.0 - (1.0 / 255.0)), 0.5);
+    return texture(colormap, loc).rgb;
   }
 `
 };

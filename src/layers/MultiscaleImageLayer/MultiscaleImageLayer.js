@@ -1,9 +1,11 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
+import { loadImage } from '@loaders.gl/images';
 
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
 import { to32BitFloat, getNearestPowerOf2, onPointer } from '../utils';
+import { baseColormapUrl } from '../../constants';
 
 const defaultProps = {
   pickable: true,
@@ -62,6 +64,13 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     }
   }
 
+  updateState({ props, oldProps }) {
+    if (props.colormap && props.colormap !== oldProps.colormap) {
+      const url = `${baseColormapUrl + props.colormap}.png`;
+      this.setState({ colormap: loadImage(url) });
+    }
+  }
+
   renderLayers() {
     const {
       loader,
@@ -71,7 +80,6 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       loaderSelection,
       domain,
       opacity,
-      colormap,
       viewportId,
       onTileError,
       onHover,
@@ -85,7 +93,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       onClick
     } = this.props;
     const { tileSize, numLevels, dtype } = loader;
-    const { unprojectLensBounds } = this.state;
+    const { unprojectLensBounds, colormap } = this.state;
     const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z, signal }) => {
       const tile = await loader.getTile({

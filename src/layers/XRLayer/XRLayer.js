@@ -22,14 +22,14 @@ function getSamplerType(props, noWebGL2) {
 const defaultProps = {
   pickable: true,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-  channelData: { type: 'array', value: {}, compare: true },
+  channelData: { type: 'object', value: {}, compare: true },
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: '<u2', compare: true },
-  colormap: { type: 'string', value: '', compare: true },
+  colormap: { type: 'object', value: new Promise(() => {}), compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
@@ -54,9 +54,7 @@ export default class XRLayer extends Layer {
     const { colormap } = this.props;
     const fragShaderNoColormap = noWebGL2 ? fs1 : fs2;
     const fragShaderColoramp = noWebGL2 ? fsColormap1 : fsColormap2;
-    const fragShader = colormap
-      ? fragShaderColoramp.replace('colormapFunction', colormap)
-      : fragShaderNoColormap;
+    const fragShader = colormap ? fragShaderColoramp : fragShaderNoColormap;
     modules.forEach(
       // eslint-disable-next-line no-return-assign
       module =>
@@ -110,8 +108,13 @@ export default class XRLayer extends Layer {
    */
   updateState({ props, oldProps, changeFlags }) {
     // setup model first
-    if (changeFlags.extensionsChanged || props.colormap !== oldProps.colormap) {
-      const { gl } = this.context;
+    const { gl } = this.context;
+    // We only want to get new shaders if the colormap turns on and off.
+    if (
+      changeFlags.extensionsChanged ||
+      (props.colormap !== oldProps.colormap &&
+        (!props.colormap || !oldProps.colormap))
+    ) {
       if (this.state.model) {
         this.state.model.delete();
       }
@@ -119,8 +122,20 @@ export default class XRLayer extends Layer {
 
       this.getAttributeManager().invalidateAll();
     }
-    if (props.channelData !== oldProps.channelData) {
-      this.loadTexture(props.channelData);
+    if (
+      props.channelData !== oldProps.channelData &&
+      props.channelData?.data !== oldProps.channelData?.data
+    ) {
+      this.loadChannelTexture(props.channelData);
+    }
+    if (props.colormap && props.colormap !== oldProps.colormap) {
+      // Colormap is a promise - I couldn't get it working by resolving the promise before hitting
+      // the XRLayer (i.e resolving in MultiscaleImageLayer etc.).
+      props.colormap.then(data => {
+        this.setState({
+          colormap: new Texture2D(gl, { data })
+        });
+      });
     }
     const attributeManager = this.getAttributeManager();
     if (props.bounds !== oldProps.bounds) {
@@ -193,7 +208,7 @@ export default class XRLayer extends Layer {
    * This function runs the shaders and draws to the canvas
    */
   draw({ uniforms }) {
-    const { textures, model } = this.state;
+    const { textures, model, colormap } = this.state;
     if (textures && model) {
       const {
         sliderValues,
@@ -250,6 +265,7 @@ export default class XRLayer extends Layer {
           lensSelection,
           lensBorderColor,
           lensBorderRadius,
+          colormap,
           ...textures
         })
         .draw();
@@ -257,9 +273,9 @@ export default class XRLayer extends Layer {
   }
 
   /**
-   * This function loads all textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
+   * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
-  loadTexture(channelData) {
+  loadChannelTexture(channelData) {
     const textures = {
       channel0: null,
       channel1: null,

@@ -108,6 +108,7 @@
     "@deck.gl/geo-layers": "^8.3.2",
     "@deck.gl/layers": "^8.3.2",
     "@deck.gl/react": "^8.3.2",
+    "@loaders.gl/images": "^2.3.1",
     "@luma.gl/constants": "^8.3.1",
     "@luma.gl/core": "^8.3.1",
     "@luma.gl/shadertools": "^8.3.1",

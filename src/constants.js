@@ -41,3 +41,6 @@ export const DTYPE_VALUES = {
     TypedArray: Float32Array
   }
 };
+
+export const baseColormapUrl =
+  'https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/';

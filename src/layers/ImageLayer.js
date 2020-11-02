@@ -1,9 +1,11 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
+import { loadImage } from '@loaders.gl/images';
 
 import XRLayer from './XRLayer';
 import { padTileWithZeros } from '../loaders/utils';
 import { to32BitFloat, onPointer } from './utils';
+import { baseColormapUrl } from '../constants';
 
 const defaultProps = {
   pickable: true,
@@ -85,19 +87,9 @@ export default class ImageLayer extends CompositeLayer {
       unprojectLensBounds: [0, 0, 0, 0],
       width: 0,
       height: 0,
-      data: []
+      data: [],
+      colormap: null
     };
-    const { loader, z, loaderSelection, boxSize } = this.props;
-    loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) => {
-      this.setState(
-        padEven(
-          !isWebGL2(this.context.gl) ? to32BitFloat(data) : data,
-          width,
-          height,
-          boxSize
-        )
-      );
-    });
     if (this.context.deck) {
       this.context.deck.eventManager.on({
         pointermove: () => onPointer(this),
@@ -129,6 +121,10 @@ export default class ImageLayer extends CompositeLayer {
           );
         });
     }
+    if (props.colormap && props.colormap !== oldProps.colormap) {
+      const url = `${baseColormapUrl + props.colormap}.png`;
+      this.setState({ colormap: loadImage(url) });
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -145,7 +141,6 @@ export default class ImageLayer extends CompositeLayer {
       loader,
       visible,
       opacity,
-      colormap,
       sliderValues,
       colorValues,
       channelIsOn,
@@ -163,7 +158,7 @@ export default class ImageLayer extends CompositeLayer {
       onHover
     } = this.props;
     const { dtype } = loader;
-    const { data, width, height, unprojectLensBounds } = this.state;
+    const { data, width, height, unprojectLensBounds, colormap } = this.state;
     if (!(width && height)) return null;
     const bounds = scaleBounds({
       width,
