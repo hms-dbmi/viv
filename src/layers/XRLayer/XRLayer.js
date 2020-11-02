@@ -212,13 +212,18 @@ export default class XRLayer extends Layer {
    * This function runs the shaders and draws to the canvas
    */
   draw({ uniforms }) {
+    const { gl } = this.context;
     const { textures, model, colormap } = this.state;
     // Without checking the colormaps are in both state/props,
-    // Safari has flickering due to the brief mismatch during a draw() call.
+    // Safari/WebGL1 has flickering due to the brief mismatch during a draw() call
+    // while WebGL2 simply does not render if we check this condition.
     if (
       textures &&
       model &&
-      ((this.props.colormap && colormap) || (!this.props.colormap && !colormap))
+      (isWebGL2(gl) ||
+        (!isWebGL2(gl) &&
+          ((this.props.colormap && colormap) ||
+            (!this.props.colormap && !colormap))))
     ) {
       const {
         sliderValues,
