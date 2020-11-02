@@ -13,7 +13,7 @@
     "build:w": "rollup -c --watch",
     "start": "concurrently \"npm run build:w\" \"cd avivator && npm start\"",
     "install:avivator": "cd avivator && npm install",
-    "build:avivator": "npm run build && cd avivator && npm run build",
+    "build:avivator": "cd avivator && npm run build",
     "test": "npm run test:layers_views && npm run test:loaders",
     "test:layers_views": "rollup -c --environment TEST:layers_views | browserify - | tape-run | tap-spec",
     "test:loaders": "rollup -c --environment TEST:loaders | node - | tap-spec",
