@@ -13,32 +13,21 @@ fi
 end changelog
 
 start prettier
-PRETTIER=node_modules/prettier/bin-prettier.js
-PRETTIER_GLOB='**/*.js'
-$PRETTIER --check "$PRETTIER_GLOB" --loglevel debug \
-  || die "Prettier failed. Run:
-     $PRETTIER --check '$PRETTIER_GLOB' --write"
-# The '**' is quoted so the glob is expanded by prettier, not bash.
-# (Mac default bash silently ignores **!)
-# Use 'debug' so we get a list of files scanned.
+npm run format
 end prettier
 
 start eslint
-node_modules/eslint/bin/eslint.js .
+npm run lint
 end eslint
 
 # Shader compilation does not work on travis.
 start test
-if [[ "$CI" != 'true' ]]
-then 
-  npm run-script test:layers_views
-fi
-npm run-script test:loaders
+npm run test
 end test
 
 start build
-npm run-script build-component
-npm run-script build-site
+npm run build
+npm run build:avivator
 end build
 
 echo 'ALL TESTS PASSED'

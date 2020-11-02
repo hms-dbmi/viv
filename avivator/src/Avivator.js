@@ -11,7 +11,7 @@ import {
   SideBySideViewer,
   PictureInPictureViewer,
   getChannelStats
-} from '../../src';
+} from '../../dist';
 import {
   createLoader,
   channelsReducer,

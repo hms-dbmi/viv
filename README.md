@@ -1,6 +1,13 @@
 # Viv [![npm version](https://badge.fury.io/js/%40hms-dbmi%2Fviv.svg)](https://badge.fury.io/js/%40hms-dbmi%2Fviv)
 
-A library for multiscale visualization of high-resolution multiplexed tissue data on the web. Directly renders Bio-Formats-compatible Zarr and OME-TIFF. Written in JavaScript and built on Deck.gl with modern web technologies.
+A library for multiscale visualization of high-resolution multiplexed tissue data on the web. Directly renders Bio-Formats-compatible Zarr and OME-TIFF.
+Written in JavaScript and built on Deck.gl with modern web technologies.
+
+## Installation
+
+```bash
+$ npm install @hms-dbmi/viv
+```
 
 ## About
 
@@ -19,29 +26,35 @@ Bio-Formats "raw" Zarr or OME-TIFF data over HTTP. To use Avivator with your own
 file containing byte offsets for the associated binary data. For more information, see the 
 [documentation](http://viv.gehlenborglab.org/#ome-tiff-loading).
 
+
+
+## Development
+
+```bash
+$ git clone https://github.com/hms-dbmi/viv.git
+$ cd viv && npm install # install deps for viv library
+$ npm run install:avivator # install deps for avivator app
+$ npm start # Starts rollup build (for Viv) & dev server for Avivator
+```
+
+Please install the [Prettier plug-in](https://prettier.io/docs/en/editors.html) for your preferred editor. 
+(Badly formatted code will fail on Travis.)
+
+Due to [difficulties](https://github.com/hms-dbmi/viv/issues/103) around compiling shaders on Travis, unit tests and layer lifecycle
+tests are run locally as a pre-push hook. Travis runs a test build, linting, and prettier.
+
+To run unit and integration tests locally, use `npm test`. For full prodcution test (including linting and formatting checks), 
+use `npm run test:prod`.
+
 ## Build
 
-To build the component alone via `webpack` use `npm run-script build-component`.
-To build the demo used for visual testing (seen on `npm start`), run
-`npm run-script build-site`.
+- `@hms-dbmi/viv` library: `npm run build`
+- `Avivator` viewer: `npm run build:avivator`
 
 ## Publish
 
 To bump the version number, clean up/update the CHANGELOG.md, and push the tag to Github,
 please run `npm version [major | minor | patch]` depending on which you want. Then run `./publish.sh` to publish the package/demo.
-
-## Development
-
-Please install the [Prettier plug-in](https://prettier.io/docs/en/editors.html)
-for your preferred editor. (Badly formatted code will fail on Travis.)
-
-For the demo, run `npm start` and you will be able to update the component and use the
-`avivator/src/index.js` to visually test.
-
-HTTP is acceptable but potentially slower than HTTP2. Our demo uses Google Cloud Storage, which is HTTP2 by default.
-
-Due to [difficulties](https://github.com/hms-dbmi/viv/issues/103) around compiling shaders on Travis, unit tests and layer lifecycle
-tests are run locally as a pre-push hook. Travis runs a test build, linting, and prettier.
 
 ## Browser Support
 

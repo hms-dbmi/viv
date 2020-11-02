@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent } from 'react'; // eslint-disable-line import/no-unresolved
 import DeckGL from '@deck.gl/react';
 import { getVivId } from '../views/utils';
 
