@@ -1,11 +1,9 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
-import { loadImage } from '@loaders.gl/images';
 
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
 import { to32BitFloat, getNearestPowerOf2, onPointer } from '../utils';
-import { baseColormapUrl } from '../../constants';
 
 const defaultProps = {
   pickable: true,

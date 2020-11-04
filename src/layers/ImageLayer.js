@@ -1,11 +1,9 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
-import { loadImage } from '@loaders.gl/images';
 
 import XRLayer from './XRLayer';
 import { padTileWithZeros } from '../loaders/utils';
 import { to32BitFloat, onPointer } from './utils';
-import { baseColormapUrl } from '../constants';
 
 const defaultProps = {
   pickable: true,
