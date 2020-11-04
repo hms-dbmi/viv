@@ -130,8 +130,6 @@ export default class XRLayer extends Layer {
     }
     if (props.colormap !== oldProps.colormap) {
       if (props.colormap) {
-        // Colormap is a promise - I couldn't get it working by resolving the promise before hitting
-        // the XRLayer (i.e resolving in MultiscaleImageLayer etc.).
         this.setState({
           colormap: new Texture2D(gl, {
             data: props.colormap,
@@ -219,9 +217,6 @@ export default class XRLayer extends Layer {
    */
   draw({ uniforms }) {
     const { textures, model, colormap } = this.state;
-    // Without checking the colormaps are in both state/props,
-    // Safari/WebGL1 has flickering due to the brief mismatch during a draw() call
-    // while WebGL2 simply does not render if we check this condition.
     if (textures && model) {
       const {
         sliderValues,
