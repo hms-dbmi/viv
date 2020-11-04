@@ -126,7 +126,7 @@ export default class XRLayer extends Layer {
       props.channelData !== oldProps.channelData &&
       props.channelData?.data !== oldProps.channelData?.data
     ) {
-      this.loadChannelTexture(props.channelData);
+      this.loadChannelTextures(props.channelData);
     }
     if (props.colormap !== oldProps.colormap) {
       if (props.colormap) {
@@ -288,7 +288,7 @@ export default class XRLayer extends Layer {
   /**
    * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
-  loadChannelTexture(channelData) {
+  loadChannelTextures(channelData) {
     const textures = {
       channel0: null,
       channel1: null,
