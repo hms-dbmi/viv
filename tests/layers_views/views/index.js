@@ -1,4 +1,4 @@
-require('./VivView.spec');
-require('./DetailView.spec');
-require('./OverviewView.spec');
-require('./SideBySideView.spec');
+import './VivView.spec';
+import './DetailView.spec';
+import './OverviewView.spec';
+import './SideBySideView.spec';

@@ -18,6 +18,6 @@ rules:
   react/jsx-one-expression-per-line: [0] # Makes punctuation after tab awkward.
   react/prop-types: [0] # Re-enable: https://github.com/hubmapconsortium/vitessce/issues/144
   import/prefer-default-export: [0] # Hit eslint error: SyntaxError: Unexpected token, expected {
-  import/no-extraneous-dependencies: [2, { "devDependencies": ["demo/**/*.js", "webpack.*.js"]}]
+  import/no-extraneous-dependencies: [2, { "devDependencies": ["tests/**/*.js"]}]
   # For some locations, just having a dev dependency is sufficient.
   no-underscore-dangle: [0]

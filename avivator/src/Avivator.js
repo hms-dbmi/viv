@@ -12,7 +12,7 @@ import {
   PictureInPictureViewer,
   getChannelStats,
   getColormap
-} from '../../src';
+} from '../../dist';
 import {
   createLoader,
   channelsReducer,

@@ -10,6 +10,7 @@
 - Export custom zarr `HTTPStore` with abort controller signal support.
 - Modularize shaders using deck.gl shader modules.
 - Make colormaps remote images instead of glsl functions.
+- Provide pure ESM export of Viv and use separate build for Avivator
 
 ## 0.5.0
 

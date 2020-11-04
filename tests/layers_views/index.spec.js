@@ -1,2 +1,2 @@
-require('./layers');
-require('./views');
+import './layers';
+import './views';
