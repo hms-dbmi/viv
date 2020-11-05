@@ -10,7 +10,7 @@ import fs1 from './xr-layer-fragment.webgl1.glsl';
 import fs2 from './xr-layer-fragment.webgl2.glsl';
 import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
-import modules from './shader-modules';
+import { lens, channels } from './shader-modules';
 import { DTYPE_VALUES } from '../../constants';
 import { padColorsAndSliders } from '../utils';
 
@@ -29,7 +29,7 @@ const defaultProps = {
   channelIsOn: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: '<u2', compare: true },
-  colormap: { type: 'object', value: null, compare: true },
+  colormap: { type: 'string', value: 'viridis', compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
@@ -55,19 +55,14 @@ export default class XRLayer extends Layer {
     const fragShaderNoColormap = noWebGL2 ? fs1 : fs2;
     const fragShaderColoramp = noWebGL2 ? fsColormap1 : fsColormap2;
     const fragShader = colormap ? fragShaderColoramp : fragShaderNoColormap;
-    modules.forEach(
-      // eslint-disable-next-line no-return-assign
-      module =>
-        // eslint-disable-next-line no-param-reassign
-        (module.defines.SAMPLER_TYPE = getSamplerType(this.props, noWebGL2))
-    );
     return super.getShaders({
       vs: noWebGL2 ? vs1 : vs2,
       fs: fragShader,
       defines: {
-        SAMPLER_TYPE: getSamplerType(this.props, noWebGL2)
+        SAMPLER_TYPE: getSamplerType(this.props, noWebGL2),
+        COLORMAP_FUNCTION: colormap || 'viridis'
       },
-      modules: [project32, picking, ...modules]
+      modules: [project32, picking, channels, lens]
     });
   }
 
@@ -110,11 +105,7 @@ export default class XRLayer extends Layer {
     // setup model first
     const { gl } = this.context;
     // We only want to get new shaders if the colormap turns on and off.
-    if (
-      changeFlags.extensionsChanged ||
-      (props.colormap !== oldProps.colormap &&
-        (!props.colormap || !oldProps.colormap))
-    ) {
+    if (changeFlags.extensionsChanged || props.colormap !== oldProps.colormap) {
       if (this.state.model) {
         this.state.model.delete();
       }
@@ -127,23 +118,6 @@ export default class XRLayer extends Layer {
       props.channelData?.data !== oldProps.channelData?.data
     ) {
       this.loadChannelTextures(props.channelData);
-    }
-    if (props.colormap !== oldProps.colormap) {
-      if (props.colormap) {
-        this.setState({
-          colormap: new Texture2D(gl, {
-            data: props.colormap,
-            parameters: {
-              [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
-              [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
-              [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-              [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
-            }
-          })
-        });
-      } else {
-        this.setState({ colormap: null });
-      }
     }
     const attributeManager = this.getAttributeManager();
     if (props.bounds !== oldProps.bounds) {

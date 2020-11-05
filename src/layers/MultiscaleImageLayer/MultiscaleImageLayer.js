@@ -12,7 +12,7 @@ const defaultProps = {
   colorValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
-  colormap: { type: 'string', value: '', compare: true },
+  colormap: { type: 'string', value: undefined, compare: true },
   domain: { type: 'array', value: [], compare: true },
   viewportId: { type: 'string', value: '', compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },

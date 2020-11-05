@@ -16,12 +16,10 @@ import {
 } from './loaders';
 import HTTPStore from './loaders/httpStore';
 import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from './constants';
-import { getColormap } from './utils';
 
 export {
   DTYPE_VALUES,
   MAX_SLIDERS_AND_CHANNELS,
-  getColormap,
   ScaleBarLayer,
   MultiscaleImageLayer,
   XRLayer,
@@ -39,5 +37,5 @@ export {
   createOMETiffLoader,
   createZarrLoader,
   createBioformatsZarrLoader,
-  HTTPStore,
+  HTTPStore
 };

@@ -12,7 +12,7 @@ const defaultProps = {
   channelIsOn: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   loaderSelection: { type: 'array', value: [], compare: true },
-  colormap: { type: 'string', value: '', compare: true },
+  colormap: { type: 'string', value: undefined, compare: true },
   domain: { type: 'array', value: [], compare: true },
   translate: { type: 'array', value: [0, 0], compare: true },
   scale: { type: 'number', value: 1, compare: true },

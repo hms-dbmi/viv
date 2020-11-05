@@ -12,9 +12,6 @@ uniform SAMPLER_TYPE channel3;
 uniform SAMPLER_TYPE channel4;
 uniform SAMPLER_TYPE channel5;
 
-// colormap
-uniform sampler2D colormap;
-
 // range
 uniform vec2 sliderValues[6];
 
@@ -40,7 +37,7 @@ void main() {
   for(int i = 0; i < 6; i++) {
     intensityCombo += max(0.0,intensityArray[i]);
   }
-  color = vec4(sample_colormap_texture(intensityCombo, colormap), opacity);
+  color = colormap(intensityCombo, opacity);
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(color, geometry);
 }

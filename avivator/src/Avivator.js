@@ -10,8 +10,7 @@ import AddIcon from '@material-ui/icons/Add';
 import {
   SideBySideViewer,
   PictureInPictureViewer,
-  getChannelStats,
-  getColormap
+  getChannelStats
 } from '../../dist';
 import {
   createLoader,
@@ -67,7 +66,7 @@ export default function Avivator(props) {
   const [loader, setLoader] = useState({});
   const [lensSelection, setLensSelection] = useState(0);
   const [source, setSource] = useState(initSource);
-  const [colormap, setColormap] = useState({});
+  const [colormap, setColormap] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [pixelValues, setPixelValues] = useState([]);
   const [dimensions, setDimensions] = useState([]);
@@ -309,7 +308,7 @@ export default function Avivator(props) {
           colorValue={colors[i]}
           domain={domains[i]}
           handleChange={(type, value) => handleControllerChange(i, type, value)}
-          colormapOn={colormap.length > 0}
+          colormapOn={colormap && colormap.length > 0}
           pixelValue={pixelValues[i]}
           shouldShowPixelValue={!useLinkedView}
         />
@@ -347,7 +346,7 @@ export default function Avivator(props) {
                   height: viewSize.height,
                   width: viewSize.width * 0.5
                 }}
-                colormap={colormap.texture}
+                colormap={colormap}
                 zoomLock={zoomLock}
                 panLock={panLock}
                 hoverHooks={{ handleValue: setPixelValues }}
@@ -366,7 +365,7 @@ export default function Avivator(props) {
                   height: viewSize.height,
                   width: viewSize.width
                 }}
-                colormap={colormap.texture}
+                colormap={colormap}
                 overview={DEFAULT_OVERVIEW}
                 overviewOn={overviewOn && isPyramid}
                 hoverHooks={{ handleValue: setPixelValues }}
@@ -387,15 +386,8 @@ export default function Avivator(props) {
         >
           {!isRgb && (
             <ColormapSelect
-              value={colormap.name}
-              handleChange={async name => {
-                setColormap(
-                  name && {
-                    name,
-                    texture: await getColormap({ name })
-                  }
-                );
-              }}
+              value={colormap}
+              handleChange={setColormap}
               disabled={isLoading}
             />
           )}

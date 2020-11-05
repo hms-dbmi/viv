@@ -10,9 +10,6 @@ uniform sampler2D channel3;
 uniform sampler2D channel4;
 uniform sampler2D channel5;
 
-// colormap
-uniform sampler2D colormap;
-
 // range
 uniform vec2 sliderValues[6];
 
@@ -40,7 +37,7 @@ void main() {
   intensityCombo += max(0.0,intensityValue4);
   intensityCombo += max(0.0,intensityValue5);
 
-  gl_FragColor = vec4(sample_colormap_texture(intensityCombo, colormap), opacity);
+  gl_FragColor = colormap(intensityCombo, opacity);
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }
