@@ -12,7 +12,7 @@ const defaultProps = {
   channelIsOn: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   loaderSelection: { type: 'array', value: [], compare: true },
-  colormap: { type: 'string', value: undefined, compare: true },
+  colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
   translate: { type: 'array', value: [0, 0], compare: true },
   scale: { type: 'number', value: 1, compare: true },
@@ -85,8 +85,7 @@ export default class ImageLayer extends CompositeLayer {
       unprojectLensBounds: [0, 0, 0, 0],
       width: 0,
       height: 0,
-      data: [],
-      colormap: null
+      data: []
     };
     if (this.context.deck) {
       this.context.deck.eventManager.on({
@@ -135,6 +134,7 @@ export default class ImageLayer extends CompositeLayer {
       loader,
       visible,
       opacity,
+      colormap,
       sliderValues,
       colorValues,
       channelIsOn,
@@ -149,8 +149,7 @@ export default class ImageLayer extends CompositeLayer {
       lensRadius,
       id,
       onClick,
-      onHover,
-      colormap
+      onHover
     } = this.props;
     const { dtype } = loader;
     const { data, width, height, unprojectLensBounds } = this.state;

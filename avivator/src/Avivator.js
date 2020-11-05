@@ -66,7 +66,7 @@ export default function Avivator(props) {
   const [loader, setLoader] = useState({});
   const [lensSelection, setLensSelection] = useState(0);
   const [source, setSource] = useState(initSource);
-  const [colormap, setColormap] = useState(undefined);
+  const [colormap, setColormap] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [pixelValues, setPixelValues] = useState([]);
   const [dimensions, setDimensions] = useState([]);
@@ -308,7 +308,7 @@ export default function Avivator(props) {
           colorValue={colors[i]}
           domain={domains[i]}
           handleChange={(type, value) => handleControllerChange(i, type, value)}
-          colormapOn={colormap && colormap.length > 0}
+          colormapOn={colormap.length > 0}
           pixelValue={pixelValues[i]}
           shouldShowPixelValue={!useLinkedView}
         />
@@ -346,7 +346,7 @@ export default function Avivator(props) {
                   height: viewSize.height,
                   width: viewSize.width * 0.5
                 }}
-                colormap={colormap}
+                colormap={colormap.length > 0 && colormap}
                 zoomLock={zoomLock}
                 panLock={panLock}
                 hoverHooks={{ handleValue: setPixelValues }}
@@ -365,7 +365,7 @@ export default function Avivator(props) {
                   height: viewSize.height,
                   width: viewSize.width
                 }}
-                colormap={colormap}
+                colormap={colormap.length > 0 && colormap}
                 overview={DEFAULT_OVERVIEW}
                 overviewOn={overviewOn && isPyramid}
                 hoverHooks={{ handleValue: setPixelValues }}

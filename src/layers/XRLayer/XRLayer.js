@@ -29,7 +29,7 @@ const defaultProps = {
   channelIsOn: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: '<u2', compare: true },
-  colormap: { type: 'string', value: 'viridis', compare: true },
+  colormap: { type: 'string', value: '', compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
@@ -103,9 +103,8 @@ export default class XRLayer extends Layer {
    */
   updateState({ props, oldProps, changeFlags }) {
     // setup model first
-    const { gl } = this.context;
-    // We only want to get new shaders if the colormap turns on and off.
     if (changeFlags.extensionsChanged || props.colormap !== oldProps.colormap) {
+      const { gl } = this.context;
       if (this.state.model) {
         this.state.model.delete();
       }
@@ -190,7 +189,7 @@ export default class XRLayer extends Layer {
    * This function runs the shaders and draws to the canvas
    */
   draw({ uniforms }) {
-    const { textures, model, colormap } = this.state;
+    const { textures, model } = this.state;
     if (textures && model) {
       const {
         sliderValues,
@@ -247,7 +246,6 @@ export default class XRLayer extends Layer {
           lensSelection,
           lensBorderColor,
           lensBorderRadius,
-          colormap,
           ...textures
         })
         .draw();

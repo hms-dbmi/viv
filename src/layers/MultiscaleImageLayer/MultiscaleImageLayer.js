@@ -12,7 +12,7 @@ const defaultProps = {
   colorValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
-  colormap: { type: 'string', value: undefined, compare: true },
+  colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
   viewportId: { type: 'string', value: '', compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
@@ -71,6 +71,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       loaderSelection,
       domain,
       opacity,
+      colormap,
       viewportId,
       onTileError,
       onHover,
@@ -80,7 +81,6 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       lensSelection,
       lensBorderColor,
       lensBorderRadius,
-      colormap,
       maxRequests,
       onClick
     } = this.props;
