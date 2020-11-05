@@ -49,9 +49,7 @@ function ChannelOptions({ handleChange }) {
       <IconButton
         aria-label="Remove channel"
         size="small"
-        onClick={() => {
-          toggle();
-        }}
+        onClick={toggle}
         ref={anchorRef}
       >
         <MoreVertIcon fontSize="small" />
