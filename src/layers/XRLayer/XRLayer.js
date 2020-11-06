@@ -10,13 +10,33 @@ import fs1 from './xr-layer-fragment.webgl1.glsl';
 import fs2 from './xr-layer-fragment.webgl2.glsl';
 import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
+import { lens, channels } from './shader-modules';
 import { DTYPE_VALUES } from '../../constants';
 import { padColorsAndSliders } from '../utils';
+
+const SHADER_MODULES = [
+  { fs: fs1, fscmap: fsColormap1, vs: vs1 },
+  { fs: fs2, fscmap: fsColormap2, vs: vs2 }
+];
+
+function getShaderProps({ colormap, dtype }, gl) {
+  const isWebGL1 = !isWebGL2(gl);
+  const mod = isWebGL1 ? SHADER_MODULES[0] : SHADER_MODULES[1];
+  return {
+    fs: colormap ? mod.fscmap : mod.fs,
+    vs: mod.vs,
+    defines: {
+      SAMPLER_TYPE: dtype === '<f4' || isWebGL1 ? 'sampler2D' : 'usampler2D',
+      COLORMAP_FUNCTION: colormap || 'viridis'
+    },
+    modules: [project32, picking, channels, lens]
+  };
+}
 
 const defaultProps = {
   pickable: true,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-  channelData: { type: 'array', value: {}, compare: true },
+  channelData: { type: 'object', value: {}, compare: true },
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
@@ -43,21 +63,8 @@ export default class XRLayer extends Layer {
    * replaces `usampler` with `sampler` if the data is not an unsigned integer
    */
   getShaders() {
-    const { gl } = this.context;
-    const noWebGL2 = !isWebGL2(gl);
-    const { colormap, dtype } = this.props;
-    const fragShaderNoColormap = noWebGL2 ? fs1 : fs2;
-    const fragShaderColoramp = noWebGL2 ? fsColormap1 : fsColormap2;
-    const fragShader = colormap
-      ? fragShaderColoramp.replace('colormapFunction', colormap)
-      : fragShaderNoColormap;
-    const fragShaderDtype =
-      dtype === '<f4' ? fragShader.replace(/usampler/g, 'sampler') : fragShader;
-    return super.getShaders({
-      vs: noWebGL2 ? vs1 : vs2,
-      fs: fragShaderDtype,
-      modules: [project32, picking]
-    });
+    const shaderProps = getShaderProps(this.props, this.context.gl);
+    return super.getShaders(shaderProps);
   }
 
   /**
@@ -106,8 +113,11 @@ export default class XRLayer extends Layer {
 
       this.getAttributeManager().invalidateAll();
     }
-    if (props.channelData !== oldProps.channelData) {
-      this.loadTexture(props.channelData);
+    if (
+      props.channelData !== oldProps.channelData &&
+      props.channelData?.data !== oldProps.channelData?.data
+    ) {
+      this.loadChannelTextures(props.channelData);
     }
     const attributeManager = this.getAttributeManager();
     if (props.bounds !== oldProps.bounds) {
@@ -244,9 +254,9 @@ export default class XRLayer extends Layer {
   }
 
   /**
-   * This function loads all textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
+   * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
-  loadTexture(channelData) {
+  loadChannelTextures(channelData) {
     const textures = {
       channel0: null,
       channel1: null,

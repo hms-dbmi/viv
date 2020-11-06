@@ -2,15 +2,15 @@
 #define SHADER_NAME xr-layer-fragment-shader
 precision highp float;
 precision highp int;
-precision highp usampler2D;
+precision highp SAMPLER_TYPE;
 
 // our texture
-uniform usampler2D channel0;
-uniform usampler2D channel1;
-uniform usampler2D channel2;
-uniform usampler2D channel3;
-uniform usampler2D channel4;
-uniform usampler2D channel5;
+uniform SAMPLER_TYPE channel0;
+uniform SAMPLER_TYPE channel1;
+uniform SAMPLER_TYPE channel2;
+uniform SAMPLER_TYPE channel3;
+uniform SAMPLER_TYPE channel4;
+uniform SAMPLER_TYPE channel5;
 
 // range
 uniform vec2 sliderValues[6];
@@ -37,86 +37,29 @@ in vec2 vTexCoord;
 
 out vec4 color;
 
-bool fragInLensBounds() {
-  // Check membership in what is (not visually, but effectively) an ellipse.
-  // Since the fragment space is a unit square and the real coordinates could be longer than tall,
-  // to get a circle visually we have to treat the check as that of an ellipse to get the effect of a circle.
-  
-  // Check membership in ellipse.
-  return pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.0) < (1.0 - lensBorderRadius);
-}
-
-bool fragOnLensBounds() {
-  // Same as the above, except this checks the boundary.
-
-  float ellipseDistance = pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.0) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.0);
-  
-  // Check membership on "bourndary" of ellipse.
-  return ellipseDistance <= 1.0 && ellipseDistance >= (1.0 - lensBorderRadius);
-}
-
-vec3 hsv2rgb(vec3 c)
-{
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}
-
-vec3 rgb2hsv(vec3 rgb) {
- 	float Cmax = max(rgb.r, max(rgb.g, rgb.b));
- 	float Cmin = min(rgb.r, min(rgb.g, rgb.b));
- 	float delta = Cmax - Cmin;
-
- 	vec3 hsv = vec3(0., 0., Cmax);
-
- 	if (Cmax > Cmin) {
- 		hsv.y = delta / Cmax;
-
- 		if (rgb.r == Cmax) {
-      hsv.x = (rgb.g - rgb.b) / delta;
-    }
- 		else {
- 			if (rgb.g == Cmax){
-        hsv.x = 2. + (rgb.b - rgb.r) / delta;
-      }
- 			else {
-        hsv.x = 4. + (rgb.r - rgb.g) / delta;
-      }
- 		}
- 		hsv.x = fract(hsv.x / 6.);
- 	}
- 	return hsv;
- }
-
 void main() {
-  // Scale intesities.
-  float intensityValue0 = (float(texture(channel0, vTexCoord).r) - sliderValues[0][0]) / max(0.0005, (sliderValues[0][1] - sliderValues[0][0]));
-  float intensityValue1 = (float(texture(channel1, vTexCoord).r) - sliderValues[1][0]) / max(0.0005, (sliderValues[1][1] - sliderValues[1][0]));
-  float intensityValue2 = (float(texture(channel2, vTexCoord).r) - sliderValues[2][0]) / max(0.0005, (sliderValues[2][1] - sliderValues[2][0]));
-  float intensityValue3 = (float(texture(channel3, vTexCoord).r) - sliderValues[3][0]) / max(0.0005, (sliderValues[3][1] - sliderValues[3][0]));
-  float intensityValue4 = (float(texture(channel4, vTexCoord).r) - sliderValues[4][0]) / max(0.0005, (sliderValues[4][1] - sliderValues[4][0]));
-  float intensityValue5 = (float(texture(channel5, vTexCoord).r) - sliderValues[5][0]) / max(0.0005, (sliderValues[5][1] - sliderValues[5][0]));
 
-  // Find out if the frag is in bounds of the lens.
-  bool isFragInLensBounds = fragInLensBounds();
-  bool isFragOnLensBounds = fragOnLensBounds();
+  float intensityValue0 = sample_and_apply_sliders(channel0, vTexCoord, sliderValues[0]);
+  float intensityValue1 = sample_and_apply_sliders(channel1, vTexCoord, sliderValues[1]);
+  float intensityValue2 = sample_and_apply_sliders(channel2, vTexCoord, sliderValues[2]);
+  float intensityValue3 = sample_and_apply_sliders(channel3, vTexCoord, sliderValues[3]);
+  float intensityValue4 = sample_and_apply_sliders(channel4, vTexCoord, sliderValues[4]);
+  float intensityValue5 = sample_and_apply_sliders(channel5, vTexCoord, sliderValues[5]);
 
-  // Declare variables.
-  vec3 rgbCombo = vec3(0.0);
-  vec3 hsvCombo = vec3(0.0);
   float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
 
+  // Find out if the frag is in bounds of the lens.
+  bool isFragInLensBounds = frag_in_lens_bounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);
+  bool isFragOnLensBounds = frag_on_lens_bounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);
+
+  // Declare variables.
+  bool inLensAndUseLens = isLensOn && isFragInLensBounds;
+  vec3 rgbCombo = vec3(0.0);
+
   for(int i = 0; i < 6; i++) {
-    // If we are using the lens and this frag is in bounds, focus on only the selection.
-    // Otherwise, use the props color value.
-    bool inLensAndUseLens = isLensOn && isFragInLensBounds;
-    float useColorValue = float(int((inLensAndUseLens && i == lensSelection) || (!inLensAndUseLens)));
-    // Ternaries are much faster than if-then statements.
-    hsvCombo = rgb2hsv(max(vec3(colorValues[i]), (1.0 - useColorValue) * vec3(255, 255, 255)));
-    // Sum up the intesitiies in additive blending.
-    hsvCombo = vec3(hsvCombo.xy, max(0.0, intensityArray[i]));
-    rgbCombo += hsv2rgb(hsvCombo);
+    rgbCombo += process_channel_intensity(intensityArray[i], colorValues[i], i, inLensAndUseLens, lensSelection);
   }
+
 
   // Ternaries are faster than checking this first and then returning/breaking out of shader.
   rgbCombo = (isLensOn && isFragOnLensBounds) ? lensBorderColor : rgbCombo;
