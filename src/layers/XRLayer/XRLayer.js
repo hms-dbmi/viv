@@ -14,9 +14,23 @@ import { lens, channels } from './shader-modules';
 import { DTYPE_VALUES } from '../../constants';
 import { padColorsAndSliders } from '../utils';
 
-function getSamplerType(props, noWebGL2) {
-  const { dtype } = props;
-  return dtype === '<f4' || noWebGL2 ? 'sampler2D' : 'usampler2D';
+const SHADER_MODULES = [
+  { fs: fs1, fscmap: fsColormap1, vs: vs1 },
+  { fs: fs2, fscmap: fsColormap2, vs: vs2 }
+];
+
+function getShaderProps({ colormap, dtype }, gl) {
+  const isWebGL1 = !isWebGL2(gl);
+  const mod = isWebGL1 ? SHADER_MODULES[0] : SHADER_MODULES[1];
+  return {
+    fs: colormap ? mod.fscmap : mod.fs,
+    vs: mod.vs,
+    defines: {
+      SAMPLER_TYPE: dtype === '<f4' || isWebGL1 ? 'sampler2D' : 'usampler2D',
+      COLORMAP_FUNCTION: colormap || 'viridis'
+    },
+    modules: [project32, picking, channels, lens]
+  };
 }
 
 const defaultProps = {
@@ -49,21 +63,8 @@ export default class XRLayer extends Layer {
    * replaces `usampler` with `sampler` if the data is not an unsigned integer
    */
   getShaders() {
-    const { gl } = this.context;
-    const noWebGL2 = !isWebGL2(gl);
-    const { colormap } = this.props;
-    const fragShaderNoColormap = noWebGL2 ? fs1 : fs2;
-    const fragShaderColoramp = noWebGL2 ? fsColormap1 : fsColormap2;
-    const fragShader = colormap ? fragShaderColoramp : fragShaderNoColormap;
-    return super.getShaders({
-      vs: noWebGL2 ? vs1 : vs2,
-      fs: fragShader,
-      defines: {
-        SAMPLER_TYPE: getSamplerType(this.props, noWebGL2),
-        COLORMAP_FUNCTION: colormap || 'viridis'
-      },
-      modules: [project32, picking, channels, lens]
-    });
+    const shaderProps = getShaderProps(this.props, this.context.gl);
+    return super.getShaders(shaderProps);
   }
 
   /**
