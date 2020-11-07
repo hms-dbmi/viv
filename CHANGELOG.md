@@ -6,6 +6,12 @@
 
 ### Changed
 
+## 0.6.0
+
+### Added
+
+### Changed
+
 - Fix snackbars for errors and initial image.
 - Export custom zarr `HTTPStore` with abort controller signal support.
 - Modularize shaders using deck.gl shader modules.
