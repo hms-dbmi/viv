@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Clean up docs for OME-TIFF creation.
+
 ## 0.6.0
 
 ### Added

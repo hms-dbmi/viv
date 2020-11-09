@@ -20,7 +20,12 @@ A bit is going on under the hood here, though. Here are some of those things:
 
 3. We are not experts on the OMEXML format, but we make a reasonable attempt to parse the OMEXML metadata for channel names, z stack size, time stack size etc. Please open a PR against the [`OMEXML`](https://github.com/hms-dbmi/viv/tree/master/src/loaders/omeXML.js) class if it fails for your use case.
 
-4. If you are interested in generating your own image pyramids, we use the new `bioformats` image pyramid from [here](https://github.com/glencoesoftware/bioformats2raw) and [here](https://github.com/glencoesoftware/raw2ometiff) - we have [this docker container](https://hub.docker.com/r/hubmap/portal-container-ome-tiff-tiler) for that purpose. Both `viv` and this new `bioformats` software are under development, so there will likely be tweaks and changes as time goes on, but the current implementation-pairing should be stable (it currently backs the public OME-TIFF demo as well as one of the not-public ones). Additionally, the intermediary `n5` format can be quickly ported to `zarr` for analysis locally. Please use `zlib` as `LZW` is not great on the browser, it seems. If you need `LZW` please open an issue. Here is a snippet to help get you started if you have a folder `/my/path/test-input/` containing OME-TIFF files:
+4. Viv's data loaders are compatible with modern BioFormats image pyramids produced via the two-step [`bioformats2raw`](https://github.com/glencoesoftware/bioformats2raw) + [`raw2ometiff`](https://github.com/glencoesoftware/raw2ometiff) conversion.
+We have [dockerized a workflow](https://hub.docker.com/r/hubmap/portal-container-ome-tiff-tiler) to convert images for HuBMAP Data Portal, but we recommend following [our tutorial](http://viv.gehlenborglab.org/#data-preparation) to get started with your own images.
+The tutorial requires `conda` to use the BioFormats software. 
+Generating tile offsets for pyramidal OME-TIFF images, `offsets.json`, can be done via [a docker container](https://hub.docker.com/r/hubmap/portal-container-ome-tiff-offsets) or by using the python package [here](https://pypi.org/project/generate-tiff-offsets/).
+
+For example, a dockerized workflow might look like:
 
 ```shell
 # Pull docker images
@@ -43,6 +48,19 @@ docker run \
 
 # Push output to the cloud
 gsutil -m cp -r /my/path/test-output/ gs://my/path/test-output/
+```
+
+while a python-based cli workflow might look like:
+
+```shell
+conda create --name bioformats python=3.8
+conda activate bioformats
+conda install -c ome bioformats2raw raw2ometiff
+pip install generate-tiff-offsets
+
+bioformats2raw my_tiff_file.tiff n5_tile_directory/
+raw2ometiff n5_tile_directory/ my_tiff_file.ome.tiff
+generate_tiff_offsets --input_file my_tiff_file.ome.tiff
 ```
 
 Note that if your tiff file is large in neither channel count nor resolution, you can simply load it in `viv` directly without passing in offsets or running this pipeline.
