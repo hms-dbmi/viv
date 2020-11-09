@@ -23,7 +23,7 @@ A bit is going on under the hood here, though. Here are some of those things:
 4. Viv's data loaders are compatible with modern BioFormats image pyramids produced via the two-step [`bioformats2raw`](https://github.com/glencoesoftware/bioformats2raw) + [`raw2ometiff`](https://github.com/glencoesoftware/raw2ometiff) conversion.
 We have [dockerized a workflow](https://hub.docker.com/r/hubmap/portal-container-ome-tiff-tiler) to convert images for HuBMAP Data Portal, but we recommend following [our tutorial](http://viv.gehlenborglab.org/#data-preparation) to get started with your own images.
 The tutorial requires `conda` to use the BioFormats software. 
-Generating tile offsets for pyramidal OME-TIFF images, `offsets.json`, can be done via [a docker container](https://hub.docker.com/r/hubmap/portal-container-ome-tiff-offsets) or by using the python source code [here](https://github.com/hubmapconsortium/portal-containers/blob/ad0cd2def3887cab10b9aa717aae0435197c0a1f/containers/ome-tiff-offsets/context/main.py).
+Generating tile offsets for pyramidal OME-TIFF images, `offsets.json`, can be done via [a docker container](https://hub.docker.com/r/hubmap/portal-container-ome-tiff-offsets) or by using the python package [here](https://pypi.org/project/generate-tiff-offsets/).
 
 For example, a dockerized workflow might look like:
 
@@ -48,6 +48,19 @@ docker run \
 
 # Push output to the cloud
 gsutil -m cp -r /my/path/test-output/ gs://my/path/test-output/
+```
+
+while a python-based cli workflow might look like:
+
+```shell
+conda create --name bioformats python=3.8
+conda activate bioformats
+conda install -c ome bioformats2raw raw2ometiff
+pip install generate-tiff-offsets
+
+bioformats2raw my_tiff_file.tiff n5_tile_directory/
+raw2ometiff n5_tile_directory/ my_tiff_file.ome.tiff
+generate_tiff_offsets my_tiff_file.ome.tiff
 ```
 
 Note that if your tiff file is large in neither channel count nor resolution, you can simply load it in `viv` directly without passing in offsets or running this pipeline.
