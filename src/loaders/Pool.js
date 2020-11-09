@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import Worker from './viv.worker';
+import Worker from 'web-worker:./viv.worker'; // eslint-disable-line import/no-unresolved
 
 // https://developer.mozilla.org/en-US/docs/Web/API/NavigatorConcurrentHardware/hardwareConcurrency
 // We need to give a different way of getting this for safari, so 4 is probably a safe bet

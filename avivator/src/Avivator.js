@@ -11,7 +11,7 @@ import {
   SideBySideViewer,
   PictureInPictureViewer,
   getChannelStats
-} from '../../src';
+} from '../../dist';
 import {
   createLoader,
   channelsReducer,
@@ -78,7 +78,7 @@ export default function Avivator(props) {
     message: null
   });
   const [noImageUrlSnackbarIsOn, toggleNoImageUrlSnackbar] = useState(
-    sources.map(s => s.url).indexOf(initSource.url) >= 0
+    sources.map(s => s.urlOrFile).indexOf(initSource.urlOrFile) >= 0
   );
 
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);

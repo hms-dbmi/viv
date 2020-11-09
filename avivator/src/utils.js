@@ -3,7 +3,7 @@ import {
   createOMETiffLoader,
   createBioformatsZarrLoader,
   getChannelStats
-} from '../../src';
+} from '../../dist';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
 
@@ -94,7 +94,7 @@ export async function createLoader(
     if (e instanceof UnsupportedBrowserError) {
       handleLoaderError(e.message);
     } else {
-      handleLoaderError(true);
+      handleLoaderError(null);
     }
     return null;
   }

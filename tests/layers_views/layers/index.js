@@ -1,5 +1,5 @@
-require('./ImageLayer.spec');
-require('./XRLayer.spec');
-require('./MultiscaleImageLayerBase.spec');
-require('./ScaleBarLayer.spec');
-require('./utils.spec');
+import './ImageLayer.spec';
+import './XRLayer.spec';
+import './MultiscaleImageLayerBase.spec';
+import './ScaleBarLayer.spec';
+import './utils.spec';

@@ -87,17 +87,6 @@ export default class ImageLayer extends CompositeLayer {
       height: 0,
       data: []
     };
-    const { loader, z, loaderSelection, boxSize } = this.props;
-    loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) => {
-      this.setState(
-        padEven(
-          !isWebGL2(this.context.gl) ? to32BitFloat(data) : data,
-          width,
-          height,
-          boxSize
-        )
-      );
-    });
     if (this.context.deck) {
       this.context.deck.eventManager.on({
         pointermove: () => onPointer(this),
