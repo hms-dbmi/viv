@@ -60,7 +60,7 @@ pip install generate-tiff-offsets
 
 bioformats2raw my_tiff_file.tiff n5_tile_directory/
 raw2ometiff n5_tile_directory/ my_tiff_file.ome.tiff
-generate_tiff_offsets my_tiff_file.ome.tiff
+generate_tiff_offsets --input_file my_tiff_file.ome.tiff
 ```
 
 Note that if your tiff file is large in neither channel count nor resolution, you can simply load it in `viv` directly without passing in offsets or running this pipeline.
