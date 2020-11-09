@@ -6,7 +6,19 @@
 
 ### Changed
 
-- Clean up docs on OME-TIFF creation.
+- Clean up docs for OME-TIFF creation.
+
+## 0.6.0
+
+### Added
+
+### Changed
+
+- Fix snackbars for errors and initial image.
+- Export custom zarr `HTTPStore` with abort controller signal support.
+- Modularize shaders using deck.gl shader modules.
+- Provide pure ESM export of Viv and use separate build for Avivator
+- Downgrade react back to 16.8
 
 ## 0.5.0
 
