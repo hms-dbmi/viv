@@ -40,9 +40,6 @@ $ npm start # Starts rollup build (for Viv) & dev server for Avivator
 Please install the [Prettier plug-in](https://prettier.io/docs/en/editors.html) for your preferred editor. 
 (Badly formatted code will fail on Travis.)
 
-Due to [difficulties](https://github.com/hms-dbmi/viv/issues/103) around compiling shaders on Travis, unit tests and layer lifecycle
-tests are run locally as a pre-push hook. Travis runs a test build, linting, and prettier.
-
 To run unit and integration tests locally, use `npm test`. For full prodcution test (including linting and formatting checks), 
 use `npm run test:prod`.
 

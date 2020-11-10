@@ -60,6 +60,13 @@ $ bioformats2raw LuCa-7color_Scan1.qptiff n5_tile_directory/
 $ raw2ometiff n5_tile_directory/ LuCa-7color_Scan1.ome.tif
 ```
 
+> If your OME-TIFF image has many [TIFF IFDs](https://en.wikipedia.org/wiki/TIFF#Multiple_subfiles), which correspond to indvidual time-z-channel sub-images, please generate an `offsets.json` file as well.
+> This file contains the byte offsets to each IFD and allows fast interaction with remote data:
+> ```bash
+> $ pip install generate-tiff-offsets
+> $ generate_tiff_offsets --input_file my_tiff_file.ome.tiff
+> ```
+
 > NOTE: Viv currently uses [`geotiff.js`](https://geotiffjs.github.io/) for accessing data from remote TIFFs
 > over HTTP and support the three lossless compression options supported
 > by `raw2ometiff` - `LZW`, `zlib`, and `Uncompressed`. `LZW` is the default if you
