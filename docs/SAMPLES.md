@@ -29,7 +29,7 @@ const loader = await createZarrLoader(zarrInfo);
 // OR
 /* Tiff Loader */
 const urlOrFile =
-  'https://vitessce-demo-data.storage.googleapis.com/test-data/deflate_no_legacy/spraggins.bioformats.raw2ometiff.ome.tif';
+  'https://viv-demo.storage.googleapis.com/Vanderbilt-Spraggins-Kidney-MxIF.ome.tif';
 const res = await fetch(urlOrFile.replace(/ome\.tif(f?)/gi, 'offsets.json'));
 const isOffsets404 = res.status === 404;
 const offsets = !isOffsets404 ? await res.json() : [];
