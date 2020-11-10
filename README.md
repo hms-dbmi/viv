@@ -24,7 +24,7 @@ WebGL viewer for remote imaging data. Avivator is a purely client-side program t
 Bio-Formats "raw" Zarr or OME-TIFF data over HTTP. To use Avivator with your own data, please see the data preparation 
 [tutorial](tutorial/README.md). Initial load time for OME-TIFFs can be optimized by generating a special `offsets.json`
 file containing byte offsets for the associated binary data. For more information, see the 
-[documentation](http://viv.gehlenborglab.org/#ome-tiff-loading).
+[documentation](http://viv.gehlenborglab.org/#data-preparation).
 
 
 
