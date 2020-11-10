@@ -30,6 +30,7 @@ const loader = await createZarrLoader(zarrInfo);
 /* Tiff Loader */
 const urlOrFile =
   'https://viv-demo.storage.googleapis.com/Vanderbilt-Spraggins-Kidney-MxIF.ome.tif';
+// See here for information about offsets: http://viv.gehlenborglab.org/#data-preparation
 const res = await fetch(urlOrFile.replace(/ome\.tif(f?)/gi, 'offsets.json'));
 const isOffsets404 = res.status === 404;
 const offsets = !isOffsets404 ? await res.json() : [];
