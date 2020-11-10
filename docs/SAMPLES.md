@@ -28,9 +28,12 @@ const loader = await createZarrLoader(zarrInfo);
 /* Zarr loader */
 // OR
 /* Tiff Loader */
-const url =
+const urlOrFile =
   'https://vitessce-demo-data.storage.googleapis.com/test-data/deflate_no_legacy/spraggins.bioformats.raw2ometiff.ome.tif';
-const loader = await createOMETiffLoader({ url, offsets: [], headers: {} });
+const res = await fetch(urlOrFile.replace(/ome\.tif(f?)/gi, 'offsets.json'));
+const isOffsets404 = res.status === 404;
+const offsets = !isOffsets404 ? await res.json() : [];
+const loader = await createOMETiffLoader({ urlOrFile, offsets, headers: {} });
 /* Tiff Loader */
 
 const sliders = [[0,2000], [0,2000]];
