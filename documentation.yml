@@ -5,8 +5,6 @@ toc:
   file: docs/SAMPLES.md
 - name: More in Depth
   file: docs/API_STRUCTURE.md
-- name: OME-TIFF Loading
-  file: docs/OMETIFF_LOADING.md
 - name: Data preparation
   file: tutorial/README.md
 - name: Viewers (React Components)
