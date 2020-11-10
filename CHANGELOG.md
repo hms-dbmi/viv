@@ -7,6 +7,7 @@
 ### Changed
 
 - Clean up docs for OME-TIFF creation.
+- Remove OMETIFF_LOADING.md docs.
 
 ## 0.6.0
 

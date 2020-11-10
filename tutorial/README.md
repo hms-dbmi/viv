@@ -81,7 +81,17 @@ into Avivator. If you followed **Option 2**, simply select the `LuCa-7color_Scan
 > images is only currently supported in Chrome, Firefox, and Microsoft Edge. If using Safari, please use a web-server.
 
 Otherwise Avivator relies on access to data over HTTP, and you can serve data locally using a simple web-server. 
-It's easiest to use [`http-server`](https://github.com/http-party/http-server#readme) to start a web-server locally, which can be installed via `npm` or `Homebrew` if using a Mac:
+It's easiest to use [`http-server`](https://github.com/http-party/http-server#readme) to start a web-server locally, which can be installed via `npm` or `Homebrew` if using a Mac.
+
+> NOTE: If your OME-TIFF image has many [TIFF IFDs](https://en.wikipedia.org/wiki/TIFF#Multiple_subfiles), which correspond to indvidual time-z-channel sub-images, please generate an `offsets.json` file as well for remote HTTP viewing.
+> This file contains the byte offsets to each IFD and allows fast interaction with remote data:
+> ```bash
+> $ pip install generate-tiff-offsets
+> $ generate_tiff_offsets --input_file my_tiff_file.ome.tiff
+> ```
+> For viewing in Avivator, this file should live adjacent to the OME-TIFF file in its folder and will be automatically recognized and used.
+> For use with Viv's loaders/layers, you need to fetch the `offsets.json` and pass it in as an argument to the [loader](http://viv.gehlenborglab.org/#createometiffloader).
+> Please see [this sample](http://viv.gehlenborglab.org/#getting-started) for help getting started.
 
 #### Install `http-server`
 
