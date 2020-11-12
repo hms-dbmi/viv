@@ -69,6 +69,7 @@ function padEven(data, width, height, boxSize) {
  * @param {number} props.lensBorderColor RGB color of the border of the lens.
  * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  * @param {number} props.onClick Hook function from deck.gl to handle clicked-on objects.
+ * @param {number} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
  */
 export default class ImageLayer extends CompositeLayer {
   initializeState() {
@@ -138,7 +139,8 @@ export default class ImageLayer extends CompositeLayer {
       lensRadius,
       id,
       onClick,
-      onHover
+      onHover,
+      modelMatrix
     } = this.props;
     const { dtype } = loader;
     const { data, width, height, unprojectLensBounds } = this.state;
@@ -163,7 +165,8 @@ export default class ImageLayer extends CompositeLayer {
       lensBorderColor,
       lensRadius,
       onClick,
-      onHover
+      onHover,
+      modelMatrix
     });
   }
 }
