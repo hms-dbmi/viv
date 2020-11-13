@@ -14,8 +14,6 @@ const defaultProps = {
   loaderSelection: { type: 'array', value: [], compare: true },
   colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
-  translate: { type: 'array', value: [0, 0], compare: true },
-  scale: { type: 'number', value: 1, compare: true },
   boxSize: { type: 'number', value: 0, compare: true },
   viewportId: { type: 'string', value: '', compare: true },
   loader: {

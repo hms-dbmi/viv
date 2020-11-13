@@ -1,5 +1,6 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
+import { Matrix4 } from 'math.gl';
 
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
@@ -162,7 +163,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       implementsGetRaster &&
       new ImageLayer(this.props, {
         id: `Background-Image-${id}`,
-        scale: 2 ** (numLevels - 1),
+        modelMatrix: new Matrix4().scale(2 ** (numLevels - 1)),
         visible:
           opacity === 1 ||
           (-numLevels > this.context.viewport.zoom &&
