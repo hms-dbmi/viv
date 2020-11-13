@@ -163,7 +163,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       implementsGetRaster &&
       new ImageLayer(this.props, {
         id: `Background-Image-${id}`,
-        modelMatrix: new Matrix4().scale(2 ** (numLevels - 1)),
+        modelMatrix: ((modelMatrix && modelMatrix.clone()) || new Matrix4()).scale(2 ** (numLevels - 1)),
         visible:
           opacity === 1 ||
           (-numLevels > this.context.viewport.zoom &&
