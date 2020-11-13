@@ -1,5 +1,7 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { PolygonLayer } from '@deck.gl/layers';
+import { Matrix4 } from 'math.gl';
+
 import ImageLayer from './ImageLayer';
 import { getNearestPowerOf2 } from './utils';
 
@@ -70,7 +72,7 @@ export default class OverviewLayer extends CompositeLayer {
     });
     const overview = new ImageLayer(this.props, {
       id: `viewport-${id}`,
-      scale: 2 ** (numLevels - 1) * overviewScale,
+      modelMatrix: new Matrix4().scale(2 ** (numLevels - 1) * overviewScale),
       z: numLevels - 1,
       boxSize: getNearestPowerOf2(lowResWidth, lowResHeight)
     });

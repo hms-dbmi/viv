@@ -83,6 +83,7 @@
     "@luma.gl/shadertools": "^8.3.1",
     "fast-xml-parser": "^3.16.0",
     "geotiff": "ilan-gold/geotiff.js#ilan-gold/viv_050_release",
+    "math.gl": "^3.3.0",
     "quickselect": "^2.0.0",
     "zarr": "^0.3.0"
   },
