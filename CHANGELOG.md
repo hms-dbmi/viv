@@ -4,10 +4,14 @@
 
 ### Added
 
+- Support arbitrary affine transformations of `MultiscaleImageLayer`.
+
 ### Changed
 
 - Clean up docs for OME-TIFF creation.
 - Remove OMETIFF_LOADING.md docs.
+- Upgrade deck.gl to 8.4.0-alpha.2.
+- Remove `scale` and `translate` from `ImageLayer` in favor of `modelMatrix`.
 
 ## 0.6.0
 
