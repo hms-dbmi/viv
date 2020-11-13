@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.7.0
+
+### Added
+
 - Support arbitrary affine transformations of `MultiscaleImageLayer`.
 
 ### Changed
