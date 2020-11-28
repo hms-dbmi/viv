@@ -4,7 +4,7 @@ import { Matrix4 } from 'math.gl';
 
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
-import { to32BitFloat, getNearestPowerOf2, onPointer } from '../utils';
+import { to32BitFloat, onPointer } from '../utils';
 
 const defaultProps = {
   pickable: true,
