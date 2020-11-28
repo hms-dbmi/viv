@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Fix leaky views API.
+
 ## 0.7.0
 
 ### Added

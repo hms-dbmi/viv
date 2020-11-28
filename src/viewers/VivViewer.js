@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'; // eslint-disable-line import/no-unresolved
 import DeckGL from '@deck.gl/react';
-import { isEqual } from 'lodash';
 import { getVivId } from '../views/utils';
 
 /**
