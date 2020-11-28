@@ -13,6 +13,9 @@ import { SideBySideView, getDefaultInitialViewState } from '../views';
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {Boolean} props.zoomLock Whether or not lock the zooms of the two views.
  * @param {Boolean} props.panLock Whether or not lock the pans of the two views.
+ * @param {number} props.initialViewState Object like { target: [x, y, 0], zoom: -zoom } for initializing where the viewer looks (optional - this can be inferred from height/width/loader).
+ * @param {number} props.height Current height of the component.
+ * @param {number} props.width Current width of the component.
  * @param {boolean} props.isLensOn Whether or not to use the lens deafult (false).
  * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens (default 0).
  * @param {number} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
