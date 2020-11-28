@@ -24,6 +24,12 @@ export function makeBoundingBox(viewState) {
   ];
 }
 
+/**
+ * Create an initial view state that centers the image in the view at the right zoom level.
+ * @param {loader} Object The loader of the image for which the view state is desired.
+ * @param {viewSize} Object { height, width } object for deducing the right zoom level to center the image.
+ * @returns {ViewState} A default initial view state that centers the image within the view: { target: [x, y, 0], zoom: -zoom }.
+ */
 export function getDefaultInitialViewState(loader, viewSize) {
   const { height, width } = loader.getRasterSize({
     z: 0

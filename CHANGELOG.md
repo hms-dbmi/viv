@@ -4,9 +4,11 @@
 
 ### Added
 
+- Export a `getDefaultInitialViewState` function for getting a deafult inital view state given a loader and desired size of view.
+
 ### Changed
 
-- Fix leaky views API.
+- Fix default component args API.
 
 ## 0.7.0
 
