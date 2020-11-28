@@ -96,9 +96,15 @@ export default class SideBySideView extends VivView {
 
   getLayers({ props, viewStates }) {
     const { loader } = props;
-    const { id, viewportOutlineColor, viewportOutlineWidth } = this;
+    const {
+      id,
+      viewportOutlineColor,
+      viewportOutlineWidth,
+      height,
+      width
+    } = this;
     const layerViewState = viewStates[id];
-    const boundingBox = makeBoundingBox(layerViewState);
+    const boundingBox = makeBoundingBox({ ...layerViewState, height, width });
     const layers = [];
 
     const detailLayer = loader.isPyramid

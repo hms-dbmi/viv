@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'; // eslint-disable-line import/no-unresolved
 import DeckGL from '@deck.gl/react';
+import { isEqual } from 'lodash';
 import { getVivId } from '../views/utils';
 
 /**
@@ -78,14 +79,13 @@ export default class VivViewer extends PureComponent {
       views.some(
         view =>
           !prevState.viewStates[view.id] ||
-          view.initialViewState.height !==
-            prevState.viewStates[view.id].height ||
-          view.initialViewState.width !== prevState.viewStates[view.id].width
+          view.height !== prevState.viewStates[view.id].height ||
+          view.width !== prevState.viewStates[view.id].width
       )
     ) {
       const viewStates = {};
       views.forEach(view => {
-        const { height, width } = view.initialViewState;
+        const { height, width } = view;
         const currentViewState = prevState.viewStates[view.id];
         viewStates[view.id] = view.filterViewState({
           viewState: {
@@ -101,8 +101,10 @@ export default class VivViewer extends PureComponent {
     if (
       views.some(
         view =>
-          view.initialViewState.target !==
-            prevState.initialViewStates[view.id].target ||
+          !isEqual(
+            view.initialViewState.target,
+            prevState.initialViewStates[view.id].target
+          ) ||
           view.initialViewState.zoom !==
             prevState.initialViewStates[view.id].zoom
       )
@@ -110,11 +112,12 @@ export default class VivViewer extends PureComponent {
       const initialViewStates = {};
       const viewStates = {};
       views.forEach(view => {
+        const { height, width } = view;
         viewStates[view.id] = view.filterViewState({
-          viewState: view.initialViewState
+          viewState: { ...view.initialViewState, height, width }
         });
         initialViewStates[view.id] = view.filterViewState({
-          viewState: view.initialViewState
+          viewState: { ...view.initialViewState, height, width }
         });
       });
       return { initialViewStates, viewStates };

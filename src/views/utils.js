@@ -23,3 +23,28 @@ export function makeBoundingBox(viewState) {
     viewport.unproject([0, viewport.height])
   ];
 }
+
+export function getDefaultInitialViewState(loader, viewSize) {
+  const { height, width } = loader.getRasterSize({
+    z: 0
+  });
+  // Get a reasonable initial zoom level for pyramids based on screen size.
+  const { isPyramid } = loader;
+  let zoom = 0;
+  let size = Infinity;
+  // viewSize is not in the dependencies array becuase we only want to use it when the source changes.
+  if (isPyramid) {
+    while (size >= Math.max(...Object.values(viewSize))) {
+      const rasterSize = loader.getRasterSize({
+        z: zoom
+      });
+      size = Math.max(...Object.values(rasterSize));
+      zoom += 1;
+    }
+  }
+  const loaderInitialViewState = {
+    target: [height / 2, width / 2, 0],
+    zoom: isPyramid ? -zoom : -1.5
+  };
+  return loaderInitialViewState;
+}

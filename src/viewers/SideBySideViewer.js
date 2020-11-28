@@ -1,6 +1,6 @@
 import React from 'react'; // eslint-disable-line import/no-unresolved
 import VivViewer from './VivViewer';
-import { SideBySideView } from '../views';
+import { SideBySideView, getDefaultInitialViewState } from '../views';
 
 /**
  * This component provides a side-by-side VivViewer with linked zoom/pan.
@@ -29,24 +29,34 @@ const SideBySideViewer = props => {
     panLock,
     loaderSelection,
     zoomLock,
+    height,
+    width,
     isLensOn = false,
     lensSelection = 0,
     lensRadius = 100,
     lensBorderColor = [255, 255, 255],
     lensBorderRadius = 0.02
   } = props;
+  let viewState = initialViewState;
+  if (height && width && !initialViewState) {
+    viewState = getDefaultInitialViewState(loader, { height, width });
+  }
   const detailViewLeft = new SideBySideView({
-    initialViewState: { ...initialViewState, id: 'left' },
+    initialViewState: { ...viewState, id: 'left' },
     linkedIds: ['right'],
     panLock,
-    zoomLock
+    zoomLock,
+    height,
+    width: width / 2
   });
   const detailViewRight = new SideBySideView({
-    initialViewState: { ...initialViewState, id: 'right' },
+    initialViewState: { ...viewState, id: 'right' },
     x: initialViewState.width,
     linkedIds: ['left'],
     panLock,
-    zoomLock
+    zoomLock,
+    height,
+    width: width / 2
   });
   const layerConfig = {
     loader,

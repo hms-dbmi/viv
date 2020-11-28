@@ -1,6 +1,6 @@
 import React from 'react'; // eslint-disable-line import/no-unresolved
 import VivViewer from './VivViewer';
-import { DetailView, OverviewView } from '../views';
+import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -35,14 +35,24 @@ const PictureInPictureViewer = props => {
     overviewOn,
     loaderSelection,
     hoverHooks,
+    height,
+    width,
     isLensOn = false,
     lensSelection = 0,
     lensRadius = 100,
     lensBorderColor = [255, 255, 255],
     lensBorderRadius = 0.02
   } = props;
-  const detailViewState = { ...initialViewState, id: 'detail' };
-  const detailView = new DetailView({ initialViewState: detailViewState });
+  let viewState = initialViewState;
+  if (height && width && !initialViewState) {
+    viewState = getDefaultInitialViewState(loader, { height, width });
+  }
+  const detailViewState = { ...viewState, id: 'detail' };
+  const detailView = new DetailView({
+    initialViewState: detailViewState,
+    height,
+    width
+  });
   const layerConfig = {
     loader,
     sliderValues,
@@ -59,12 +69,12 @@ const PictureInPictureViewer = props => {
   const views = [detailView];
   const layerProps = [layerConfig];
   if (overviewOn && loader) {
-    const overviewViewState = { ...initialViewState, id: 'overview' };
+    const overviewViewState = { ...viewState, id: 'overview' };
     const overviewView = new OverviewView({
       initialViewState: overviewViewState,
       loader,
-      detailHeight: initialViewState.height,
-      detailWidth: initialViewState.width,
+      detailHeight: height,
+      detailWidth: width,
       ...overview
     });
     views.push(overviewView);
