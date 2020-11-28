@@ -45,10 +45,8 @@ const PictureInPictureViewer = props => {
     lensBorderColor = [255, 255, 255],
     lensBorderRadius = 0.02
   } = props;
-  let viewState = initialViewState;
-  if (height && width && !initialViewState) {
-    viewState = getDefaultInitialViewState(loader, { height, width });
-  }
+  const viewState =
+    initialViewState || getDefaultInitialViewState(loader, { height, width });
   const detailViewState = { ...viewState, id: 'detail' };
   const detailView = new DetailView({
     initialViewState: detailViewState,
