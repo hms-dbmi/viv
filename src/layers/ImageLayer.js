@@ -2,7 +2,6 @@ import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
 
 import XRLayer from './XRLayer';
-import { padTileWithZeros } from '../loaders/utils';
 import { to32BitFloat, onPointer } from './utils';
 
 const defaultProps = {
@@ -32,21 +31,6 @@ const defaultProps = {
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   onClick: { type: 'function', value: null, compare: true }
 };
-
-/*
- * For some reason data of uneven length fails to be converted to a texture (Issue #144).
- * Here we pad the width of tile by one if the data is uneven in length, which seemingly
- * fixes the rendering. This is not ideal since padding the tile makes a copy of underlying
- * buffer, but without digging deeper into the WebGL it is a reasonable fix.
- */
-function padEven(data, width, height, boxSize) {
-  const targetWidth = boxSize || (width % 2 === 0 ? width : width + 1);
-  const targetHeight = boxSize || height;
-  const padded = data.map(d =>
-    padTileWithZeros({ data: d, width, height }, targetWidth, targetHeight)
-  );
-  return { data: padded, width: targetWidth, height: targetHeight };
-}
 
 /**
  * This layer wraps XRLayer and generates a static image
@@ -94,19 +78,14 @@ export default class ImageLayer extends CompositeLayer {
       props.loaderSelection !== oldProps.loaderSelection;
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
-      const { loader, z, loaderSelection, boxSize } = this.props;
-      loader
-        .getRaster({ z, loaderSelection })
-        .then(({ data, width, height }) => {
-          this.setState(
-            padEven(
-              !isWebGL2(this.context.gl) ? to32BitFloat(data) : data,
-              width,
-              height,
-              boxSize
-            )
-          );
-        });
+      const { loader, z, loaderSelection } = this.props;
+      loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) =>
+        this.setState({
+          data: !isWebGL2(this.context.gl) ? to32BitFloat(data) : data,
+          height,
+          width
+        })
+      );
     }
   }
 

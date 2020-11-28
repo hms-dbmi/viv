@@ -9,6 +9,7 @@
 ### Changed
 
 - Fix default component args API.
+- Fix tile padding issue.
 
 ## 0.7.0
 
