@@ -1,6 +1,6 @@
 import React from 'react'; // eslint-disable-line import/no-unresolved
 import VivViewer from './VivViewer';
-import { DetailView, OverviewView } from '../views';
+import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -15,8 +15,11 @@ import { DetailView, OverviewView } from '../views';
  * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
  * @param {Object} props.hoverHooks Object including the allowable hooks - right now only accepting a function with key handleValue like { handleValue: (valueArray) => {} }
- * @param {boolean} props.isLensOn Whether or not to use the lens.
- * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
+ * @param {number} props.initialViewState Object like { target: [x, y, 0], zoom: -zoom } for initializing where the viewer looks (optional - this can be inferred from height/width/loader).
+ * @param {number} props.height Current height of the component.
+ * @param {number} props.width Current width of the component.
+ * @param {boolean} props.isLensOn Whether or not to use the lens (deafult false).
+ * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens (default 0).
  * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
  * @param {number} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
@@ -34,14 +37,22 @@ const PictureInPictureViewer = props => {
     overviewOn,
     loaderSelection,
     hoverHooks,
+    height,
+    width,
     isLensOn = false,
-    lensSelection,
+    lensSelection = 0,
     lensRadius = 100,
     lensBorderColor = [255, 255, 255],
     lensBorderRadius = 0.02
   } = props;
-  const detailViewState = { ...initialViewState, id: 'detail' };
-  const detailView = new DetailView({ initialViewState: detailViewState });
+  const viewState =
+    initialViewState || getDefaultInitialViewState(loader, { height, width });
+  const detailViewState = { ...viewState, id: 'detail' };
+  const detailView = new DetailView({
+    initialViewState: detailViewState,
+    height,
+    width
+  });
   const layerConfig = {
     loader,
     sliderValues,
@@ -58,12 +69,12 @@ const PictureInPictureViewer = props => {
   const views = [detailView];
   const layerProps = [layerConfig];
   if (overviewOn && loader) {
-    const overviewViewState = { ...initialViewState, id: 'overview' };
+    const overviewViewState = { ...viewState, id: 'overview' };
     const overviewView = new OverviewView({
       initialViewState: overviewViewState,
       loader,
-      detailHeight: initialViewState.height,
-      detailWidth: initialViewState.width,
+      detailHeight: height,
+      detailWidth: width,
       ...overview
     });
     views.push(overviewView);

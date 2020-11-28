@@ -71,7 +71,6 @@ export default function Avivator(props) {
   const [pixelValues, setPixelValues] = useState([]);
   const [dimensions, setDimensions] = useState([]);
   const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
-  const [initialViewState, setInitialViewState] = useState({});
   const [offsetsSnackbarOn, toggleOffsetsSnackbar] = useState(false);
   const [loaderErrorSnackbar, setLoaderErrorSnackbar] = useState({
     on: false,
@@ -136,27 +135,6 @@ export default function Avivator(props) {
           // RGB should not use a lens.
           isLensOn && toggleIsLensOn(); // eslint-disable-line no-unused-expressions
         }
-        const { height, width } = nextLoader.getRasterSize({
-          z: 0
-        });
-        // Get a reasonable initial zoom level for pyramids based on screen size.
-        const { isPyramid } = nextLoader;
-        let zoom = 0;
-        let size = Infinity;
-        // viewSize is not in the dependencies array becuase we only want to use it when the source changes.
-        if (isPyramid) {
-          while (size >= Math.max(...Object.values(viewSize))) {
-            const rasterSize = nextLoader.getRasterSize({
-              z: zoom
-            });
-            size = Math.max(...Object.values(rasterSize));
-            zoom += 1;
-          }
-        }
-        const loaderInitialViewState = {
-          target: [height / 2, width / 2, 0],
-          zoom: isPyramid ? -zoom : -1.5
-        };
         setDimensions(newDimensions);
         dispatch({
           type: 'RESET_CHANNELS',
@@ -170,7 +148,6 @@ export default function Avivator(props) {
         setLoader(nextLoader);
         setIsLoading(false);
         setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
-        setInitialViewState(loaderInitialViewState);
         // Set the global selections (needed for the UI). All selections have the same global selection.
         setGlobalSelections(selections[0]);
         // eslint-disable-next-line no-unused-expressions
@@ -333,7 +310,6 @@ export default function Avivator(props) {
       {
         <DropzoneWrapper handleSubmitFile={handleSubmitFile}>
           {!isLoading &&
-            initialViewState.target &&
             (useLinkedView && isPyramid ? (
               <SideBySideViewer
                 loader={loader}
@@ -341,11 +317,8 @@ export default function Avivator(props) {
                 colorValues={colors}
                 channelIsOn={isOn}
                 loaderSelection={selections}
-                initialViewState={{
-                  ...initialViewState,
-                  height: viewSize.height,
-                  width: viewSize.width * 0.5
-                }}
+                height={viewSize.height}
+                width={viewSize.width}
                 colormap={colormap.length > 0 && colormap}
                 zoomLock={zoomLock}
                 panLock={panLock}
@@ -360,11 +333,8 @@ export default function Avivator(props) {
                 colorValues={colors}
                 channelIsOn={isOn}
                 loaderSelection={selections}
-                initialViewState={{
-                  ...initialViewState,
-                  height: viewSize.height,
-                  width: viewSize.width
-                }}
+                height={viewSize.height}
+                width={viewSize.width}
                 colormap={colormap.length > 0 && colormap}
                 overview={DEFAULT_OVERVIEW}
                 overviewOn={overviewOn && isPyramid}

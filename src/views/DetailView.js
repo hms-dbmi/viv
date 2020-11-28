@@ -8,7 +8,7 @@ import { getVivId } from './utils';
 export default class DetailView extends VivView {
   getLayers({ props, viewStates }) {
     const { loader } = props;
-    const { id } = this;
+    const { id, height, width } = this;
     const layerViewState = viewStates[id];
     const layers = [];
 
@@ -34,7 +34,7 @@ export default class DetailView extends VivView {
             loader,
             unit,
             size: value,
-            viewState: layerViewState
+            viewState: { ...layerViewState, height, width }
           })
         );
       }

@@ -4,8 +4,11 @@
 
 ### Added
 
+- Export a `getDefaultInitialViewState` function for getting a deafult inital view state given a loader and desired size of view.
+
 ### Changed
 
+- Fix default component args API.
 - Fix tile padding issue.
 
 ## 0.7.0

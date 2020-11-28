@@ -13,16 +13,12 @@ export default class VivViewer extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      viewStates: {},
-      initialViewStates: {}
+      viewStates: {}
     };
-    const { viewStates, initialViewStates } = this.state;
+    const { viewStates } = this.state;
     const { views } = this.props;
     views.forEach(view => {
       viewStates[view.id] = view.filterViewState({
-        viewState: view.initialViewState
-      });
-      initialViewStates[view.id] = view.filterViewState({
         viewState: view.initialViewState
       });
     });
@@ -78,14 +74,13 @@ export default class VivViewer extends PureComponent {
       views.some(
         view =>
           !prevState.viewStates[view.id] ||
-          view.initialViewState.height !==
-            prevState.viewStates[view.id].height ||
-          view.initialViewState.width !== prevState.viewStates[view.id].width
+          view.height !== prevState.viewStates[view.id].height ||
+          view.width !== prevState.viewStates[view.id].width
       )
     ) {
       const viewStates = {};
       views.forEach(view => {
-        const { height, width } = view.initialViewState;
+        const { height, width } = view;
         const currentViewState = prevState.viewStates[view.id];
         viewStates[view.id] = view.filterViewState({
           viewState: {
@@ -97,27 +92,6 @@ export default class VivViewer extends PureComponent {
         });
       });
       return { viewStates };
-    }
-    if (
-      views.some(
-        view =>
-          view.initialViewState.target !==
-            prevState.initialViewStates[view.id].target ||
-          view.initialViewState.zoom !==
-            prevState.initialViewStates[view.id].zoom
-      )
-    ) {
-      const initialViewStates = {};
-      const viewStates = {};
-      views.forEach(view => {
-        viewStates[view.id] = view.filterViewState({
-          viewState: view.initialViewState
-        });
-        initialViewStates[view.id] = view.filterViewState({
-          viewState: view.initialViewState
-        });
-      });
-      return { initialViewStates, viewStates };
     }
     return prevState;
   }

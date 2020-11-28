@@ -23,13 +23,15 @@ export default class SideBySideView extends VivView {
     initialViewState,
     x,
     y,
+    height,
+    width,
     linkedIds = [],
     panLock = true,
     zoomLock = true,
     viewportOutlineColor = [255, 255, 255],
     viewportOutlineWidth = 10
   }) {
-    super({ initialViewState, x, y });
+    super({ initialViewState, x, y, height, width });
     this.linkedIds = linkedIds;
     this.panLock = panLock;
     this.zoomLock = zoomLock;
@@ -96,9 +98,15 @@ export default class SideBySideView extends VivView {
 
   getLayers({ props, viewStates }) {
     const { loader } = props;
-    const { id, viewportOutlineColor, viewportOutlineWidth } = this;
+    const {
+      id,
+      viewportOutlineColor,
+      viewportOutlineWidth,
+      height,
+      width
+    } = this;
     const layerViewState = viewStates[id];
-    const boundingBox = makeBoundingBox(layerViewState);
+    const boundingBox = makeBoundingBox({ ...layerViewState, height, width });
     const layers = [];
 
     const detailLayer = loader.isPyramid
@@ -135,7 +143,7 @@ export default class SideBySideView extends VivView {
             loader,
             unit,
             size: value,
-            viewState: layerViewState
+            viewState: { ...layerViewState, height, width }
           })
         );
       }

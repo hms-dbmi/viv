@@ -5,7 +5,7 @@ import {
   XRLayer
 } from './layers';
 import { VivViewer, PictureInPictureViewer, SideBySideViewer } from './viewers';
-import { VivView, OverviewView, DetailView, SideBySideView } from './views';
+import { VivView, OverviewView, DetailView, SideBySideView, getDefaultInitialViewState } from './views';
 import {
   createZarrLoader,
   createBioformatsZarrLoader,
@@ -27,6 +27,7 @@ export {
   VivView,
   OverviewView,
   PictureInPictureViewer,
+  getDefaultInitialViewState,
   SideBySideView,
   getChannelStats,
   SideBySideViewer,
