@@ -156,9 +156,6 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     // paramteter set to anything but 1, but we always use it for situations where
     // we are zoomed out too far.
     const implementsGetRaster = typeof loader.getRaster === 'function';
-    const { width: lowResWidth, height: lowResHeight } = loader.getRasterSize({
-      z: numLevels - 1
-    });
     const layerModelMatrix = modelMatrix ? modelMatrix.clone() : new Matrix4();
     const baseLayer =
       implementsGetRaster &&
@@ -172,8 +169,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         z: numLevels - 1,
         pickable: true,
         onHover,
-        onClick,
-        boxSize: getNearestPowerOf2(lowResWidth, lowResHeight)
+        onClick
       });
     const layers = [baseLayer, tiledLayer];
     return layers;

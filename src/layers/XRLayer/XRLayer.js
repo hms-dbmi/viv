@@ -71,6 +71,10 @@ export default class XRLayer extends Layer {
    * This function initializes the internal state.
    */
   initializeState() {
+    const { gl } = this.context;
+    // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
+    gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
+    gl.pixelStorei(GL.PACK_ALIGNMENT, 1);
     const attributeManager = this.getAttributeManager();
     attributeManager.add({
       positions: {

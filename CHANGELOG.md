@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Fix tile padding issue.
+
 ## 0.7.0
 
 ### Added
