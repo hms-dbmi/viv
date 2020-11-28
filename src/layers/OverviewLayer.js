@@ -3,7 +3,6 @@ import { PolygonLayer } from '@deck.gl/layers';
 import { Matrix4 } from 'math.gl';
 
 import ImageLayer from './ImageLayer';
-import { getNearestPowerOf2 } from './utils';
 
 const defaultProps = {
   pickable: true,
@@ -67,14 +66,10 @@ export default class OverviewLayer extends CompositeLayer {
     const { width, height } = loader.getRasterSize({
       z: 0
     });
-    const { width: lowResWidth, height: lowResHeight } = loader.getRasterSize({
-      z: numLevels - 1
-    });
     const overview = new ImageLayer(this.props, {
       id: `viewport-${id}`,
       modelMatrix: new Matrix4().scale(2 ** (numLevels - 1) * overviewScale),
-      z: numLevels - 1,
-      boxSize: getNearestPowerOf2(lowResWidth, lowResHeight)
+      z: numLevels - 1
     });
     const boundingBoxOutline = new PolygonLayer({
       id: `bounding-box-overview-${id}`,
