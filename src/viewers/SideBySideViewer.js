@@ -51,7 +51,7 @@ const SideBySideViewer = props => {
   });
   const detailViewRight = new SideBySideView({
     initialViewState: { ...viewState, id: 'right' },
-    x: initialViewState.width,
+    x: width / 2,
     linkedIds: ['left'],
     panLock,
     zoomLock,

@@ -14,16 +14,12 @@ export default class VivViewer extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      viewStates: {},
-      initialViewStates: {}
+      viewStates: {}
     };
-    const { viewStates, initialViewStates } = this.state;
+    const { viewStates } = this.state;
     const { views } = this.props;
     views.forEach(view => {
       viewStates[view.id] = view.filterViewState({
-        viewState: view.initialViewState
-      });
-      initialViewStates[view.id] = view.filterViewState({
         viewState: view.initialViewState
       });
     });
@@ -97,30 +93,6 @@ export default class VivViewer extends PureComponent {
         });
       });
       return { viewStates };
-    }
-    if (
-      views.some(
-        view =>
-          !isEqual(
-            view.initialViewState.target,
-            prevState.initialViewStates[view.id].target
-          ) ||
-          view.initialViewState.zoom !==
-            prevState.initialViewStates[view.id].zoom
-      )
-    ) {
-      const initialViewStates = {};
-      const viewStates = {};
-      views.forEach(view => {
-        const { height, width } = view;
-        viewStates[view.id] = view.filterViewState({
-          viewState: { ...view.initialViewState, height, width }
-        });
-        initialViewStates[view.id] = view.filterViewState({
-          viewState: { ...view.initialViewState, height, width }
-        });
-      });
-      return { initialViewStates, viewStates };
     }
     return prevState;
   }

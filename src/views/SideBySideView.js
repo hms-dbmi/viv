@@ -23,13 +23,15 @@ export default class SideBySideView extends VivView {
     initialViewState,
     x,
     y,
+    height,
+    width,
     linkedIds = [],
     panLock = true,
     zoomLock = true,
     viewportOutlineColor = [255, 255, 255],
     viewportOutlineWidth = 10
   }) {
-    super({ initialViewState, x, y });
+    super({ initialViewState, x, y, height, width });
     this.linkedIds = linkedIds;
     this.panLock = panLock;
     this.zoomLock = zoomLock;
@@ -141,7 +143,7 @@ export default class SideBySideView extends VivView {
             loader,
             unit,
             size: value,
-            viewState: layerViewState
+            viewState: { ...layerViewState, height, width }
           })
         );
       }
