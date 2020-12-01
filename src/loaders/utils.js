@@ -44,6 +44,35 @@ export function padTileWithZeros(tile, targetWidth, targetHeight) {
   return padded;
 }
 
+export function fillWithZeros(loader, data, tile) {
+  const { x, y, z } = tile;
+  const { tileSize } = loader;
+  const { height, width } = loader.getRasterSize({ z });
+  const numTilesX = Math.ceil(width / tileSize);
+  const numTilesY = Math.ceil(height / tileSize);
+  if (x === numTilesX - 1) {
+    const paddedWidth = numTilesX * tileSize;
+    const boundaryLength = tileSize - (paddedWidth - width);
+    for (let i = 0; i < height; i += 1) {
+      for (let j = boundaryLength; j < tileSize; j += 1) {
+        // eslint-disable-next-line no-param-reassign
+        data[i * tileSize + j] = 0;
+      }
+    }
+  }
+  if (y === numTilesY - 1) {
+    const paddedHeight = numTilesY * tileSize;
+    const boundaryLength = tileSize - (paddedHeight - height);
+    for (let i = 0; i < width; i += 1) {
+      for (let j = boundaryLength; j < tileSize; j += 1) {
+        // eslint-disable-next-line no-param-reassign
+        data[j * tileSize + i] = 0;
+      }
+    }
+  }
+  return data;
+}
+
 /**
  * Flips the bytes of TypedArray in place. Used to flipendianess
  * Adapted from https://github.com/zbjornson/node-bswap/blob/master/bswap.js

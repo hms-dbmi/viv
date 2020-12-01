@@ -10,6 +10,8 @@
 
 - Fix default component args API.
 - Fix tile padding issue.
+- Consistently fill in border tiles with 0's to prevent artifacting in tiffs.
+- Fix `numLevels` on tiff loader for `SubIFD`s.
 
 ## 0.7.0
 

@@ -3,7 +3,8 @@ import {
   isInTileBounds,
   byteSwapInplace,
   padTileWithZeros,
-  dimensionsFromOMEXML
+  dimensionsFromOMEXML,
+  fillWithZeros
 } from './utils';
 import { DTYPE_VALUES } from '../constants';
 
@@ -51,8 +52,10 @@ export default class OMETiffLoader {
     this.height = this.omexml.SizeY;
     this.tileSize = firstImage.getTileWidth();
     const { SubIFDs } = firstImage.fileDirectory;
-    this.numLevels = SubIFDs?.length || this.omexml.getNumberOfImages();
-    this.isBioFormats6Pyramid = SubIFDs;
+    this.numLevels = SubIFDs.length
+      ? SubIFDs.length + 1
+      : this.omexml.getNumberOfImages();
+    this.isBioFormats6Pyramid = Boolean(SubIFDs);
     this.isPyramid = this.numLevels > 1;
     this.dimensions = dimensionsFromOMEXML(this.omexml);
     // We use zarr's internal format.  It encodes endianness, but we leave it little for now
@@ -315,7 +318,7 @@ export default class OMETiffLoader {
     const { dtype } = this;
     const { TypedArray } = DTYPE_VALUES[dtype];
     const tile = await image.getTileOrStrip(x, y, 0, this.pool, signal);
-    const data = new TypedArray(tile.data);
+    let data = new TypedArray(tile.data);
     if (signal?.aborted) return null;
     /*
      * The endianness of JavaScript TypedArrays are determined by the endianness
@@ -340,13 +343,14 @@ export default class OMETiffLoader {
       if (data.length / width === this.tileSize) {
         trueHeight = this.tileSize;
       }
-      return padTileWithZeros(
+      data = padTileWithZeros(
         { data, width: trueWidth, height: trueHeight },
         this.tileSize,
         this.tileSize
       );
+    } else {
+      data = fillWithZeros(this, data, { x, y, z });
     }
-
     if (this.omexml.Type.startsWith('int')) {
       // Uint view isn't correct for underling buffer, need to take an
       // IntXArray view and cast to UintXArray.
