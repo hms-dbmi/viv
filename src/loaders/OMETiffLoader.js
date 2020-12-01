@@ -51,7 +51,9 @@ export default class OMETiffLoader {
     this.height = this.omexml.SizeY;
     this.tileSize = firstImage.getTileWidth();
     const { SubIFDs } = firstImage.fileDirectory;
-    this.numLevels = SubIFDs?.length || this.omexml.getNumberOfImages();
+    this.numLevels = SubIFDs?.length
+      ? SubIFDs.length + 1
+      : this.omexml.getNumberOfImages();
     this.isBioFormats6Pyramid = SubIFDs;
     this.isPyramid = this.numLevels > 1;
     this.dimensions = dimensionsFromOMEXML(this.omexml);
@@ -206,8 +208,12 @@ export default class OMETiffLoader {
         }
         const image = await tiff.getImage(pyramidIndex);
         // Flips bits for us for endianness.
-        const raster = await image.readRasters({ pool });
-        return raster[0];
+        const raster = await image.readRasters({
+          pool,
+          interleave: this.isInterleaved
+        });
+        console.log(raster);
+        return this.Interleaved ? raster : raster[0];
       })
     );
     // Get first selection * SizeZ * SizeT * SizeC + loaderSelection[0] size as proxy for image size.

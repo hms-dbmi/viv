@@ -2,6 +2,7 @@ import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
 
 import XRLayer from './XRLayer';
+import ArrayBitmapLayer from './ArrayBitmapLayer';
 import { to32BitFloat, onPointer } from './utils';
 
 const defaultProps = {
@@ -120,7 +121,10 @@ export default class ImageLayer extends CompositeLayer {
     const { dtype } = loader;
     const { data, width, height, unprojectLensBounds } = this.state;
     if (!(width && height)) return null;
-    return new XRLayer(this.props, {
+    const Layer =
+      loader.isRgb && loader.isInterleaved ? ArrayBitmapLayer : XRLayer;
+    console.log(data);
+    return new Layer(this.props, {
       channelData: { data, width, height },
       pickable,
       bounds: [0, height, width, 0],

@@ -1,4 +1,5 @@
 import XRLayer from '../XRLayer';
+import ArrayBitmapLayer from '../ArrayBitmapLayer';
 
 export function range(len) {
   return [...Array(len).keys()];
@@ -26,14 +27,17 @@ export function renderSubLayers(props) {
     unprojectLensBounds,
     isLensOn,
     lensSelection,
-    onClick
+    onClick,
+    loader
   } = props;
   // Only render in positive coorinate system
   if ([left, bottom, right, top].some(v => v < 0)) {
     return null;
   }
-  const xrl = new XRLayer(props, {
-    id: `XRLayer-${left}-${bottom}-${right}-${top}-${id}`,
+  const Layer =
+    loader.isRgb && loader.isInterleaved ? ArrayBitmapLayer : XRLayer;
+  const layer = new Layer(props, {
+    id: `tile-sub-layer-${left}-${bottom}-${right}-${top}-${id}`,
     bounds: [left, bottom, right, top],
     channelData: data,
     pickable,
@@ -55,5 +59,5 @@ export function renderSubLayers(props) {
     tileId: { x, y, z },
     onClick
   });
-  return xrl;
+  return layer;
 }
