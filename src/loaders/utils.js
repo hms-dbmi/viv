@@ -44,6 +44,15 @@ export function padTileWithZeros(tile, targetWidth, targetHeight) {
   return padded;
 }
 
+/**
+ * Fills in a tile with 0's if the tile is on the edge of an image as sometimes pyramidal tiff generators will
+ * fill this in with repeated parts of the image.
+ * and target height respectively.
+ * @param {Object} loader Loader object.
+ * @param {Object} data The array to be filled in.
+ * @param {Object} tile { x, y, z }
+ * @returns {TypedArray} TypedArray
+ */
 export function fillWithZeros(loader, data, tile) {
   const { x, y, z } = tile;
   const { tileSize } = loader;
