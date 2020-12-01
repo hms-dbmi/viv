@@ -123,7 +123,6 @@ export default class ImageLayer extends CompositeLayer {
     if (!(width && height)) return null;
     const Layer =
       loader.isRgb && loader.isInterleaved ? ArrayBitmapLayer : XRLayer;
-    console.log(data);
     return new Layer(this.props, {
       channelData: { data, width, height },
       pickable,

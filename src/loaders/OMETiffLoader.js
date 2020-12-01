@@ -208,12 +208,15 @@ export default class OMETiffLoader {
         }
         const image = await tiff.getImage(pyramidIndex);
         // Flips bits for us for endianness.
-        const raster = await image.readRasters({
-          pool,
-          interleave: this.isInterleaved
-        });
-        console.log(raster);
-        return this.Interleaved ? raster : raster[0];
+        const raster = !this.isInterleaved
+          ? await image.readRasters({
+              pool,
+              interleave: this.isInterleaved
+            })
+          : await image.readRGB({
+              pool
+            });
+        return this.isInterleaved ? raster : raster[0];
       })
     );
     // Get first selection * SizeZ * SizeT * SizeC + loaderSelection[0] size as proxy for image size.
@@ -322,10 +325,19 @@ export default class OMETiffLoader {
   }
 
   async _getChannel({ image, x, y, z, signal }) {
-    const { dtype } = this;
+    const { dtype, isInterleaved, isRgb } = this;
     const { TypedArray } = DTYPE_VALUES[dtype];
-    const tile = await image.getTileOrStrip(x, y, 0, this.pool, signal);
-    const data = new TypedArray(tile.data);
+    const tile = !(isInterleaved && isRgb)
+      ? await image.getTileOrStrip(x, y, 0, this.pool, signal)
+      : await image.readRGB({
+          window: [
+            x * this.tileSize,
+            y * this.tileSize,
+            (x + 1) * this.tileSize,
+            (y + 1) * this.tileSize
+          ]
+        });
+    const data = !(isInterleaved && isRgb) ? new TypedArray(tile.data) : tile;
     if (signal?.aborted) return null;
     /*
      * The endianness of JavaScript TypedArrays are determined by the endianness
@@ -338,7 +350,10 @@ export default class OMETiffLoader {
     }
 
     // If the tile data is not (tileSize x tileSize), pad the data with zeros
-    if (data.length < this.tileSize * this.tileSize) {
+    if (
+      data.length <
+      this.tileSize * this.tileSize * (isInterleaved && isRgb ? 3 : 1)
+    ) {
       const { height, width } = this.getRasterSize({ z });
       let trueHeight = height;
       let trueWidth = width;
