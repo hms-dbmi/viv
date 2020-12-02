@@ -10,6 +10,7 @@
 
 - Fix default component args API.
 - Fix tile padding issue.
+- Update preprint title in README.md
 
 ## 0.7.0
 
