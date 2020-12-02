@@ -34,9 +34,12 @@ export function renderSubLayers(props) {
     return null;
   }
   const { height, width } = loader.getRasterSize({ z: 0 });
+  // Tiles are exactly fitted to have height and width such that their bounds match that of the actual image (not some padded version).
+  // Thus the right/bottom given by deck.gl are incorrect since they assume tiles are of uniform sizes, which is not the case for us.
+  const bounds = [left, Math.min(height, bottom), Math.min(width, right), top]
   const xrl = new XRLayer(props, {
-    id: `XRLayer-${left}-${bottom}-${right}-${top}-${id}`,
-    bounds: [left, Math.min(height, bottom), Math.min(width, right), top],
+    id: `XRLayer-${bounds}-${id}`,
+    bounds,
     channelData: data,
     pickable,
     // Uncomment to help debugging - shades the tile being hovered over.

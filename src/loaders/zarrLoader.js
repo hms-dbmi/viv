@@ -1,6 +1,6 @@
 import { BoundsCheckError } from 'zarr';
 
-import { guessRgb, padTileWithZeros, byteSwapInplace } from './utils';
+import { guessRgb, truncateTiles, byteSwapInplace } from './utils';
 import { DTYPE_VALUES } from '../constants';
 import HTTPStore from './httpStore';
 
@@ -92,24 +92,11 @@ export default class ZarrLoader {
         // big endian
         byteSwapInplace(data);
       }
-      const width = source.chunks[xIndex];
-      const height = source.chunks[yIndex];
-      if (height < this.tileSize || width < this.tileSize) {
-        return padTileWithZeros(
-          { data, width, height },
-          this.tileSize,
-          this.tileSize
-        );
-      }
       return data;
     });
-    const data = await Promise.all(dataRequests);
+    const tileData = truncateTiles(await Promise.all(dataRequests), this, { x, y, z });
     if (source.store instanceof HTTPStore && signal?.aborted) return null;
-    return {
-      data,
-      width: this.tileSize,
-      height: this.tileSize
-    };
+    return tileData;
   }
 
   /**

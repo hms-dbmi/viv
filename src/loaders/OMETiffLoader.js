@@ -136,23 +136,10 @@ export default class OMETiffLoader {
     if (!this._tileInBounds({ x, y, z })) {
       return null;
     }
-    const { tiff, isBioFormats6Pyramid, omexml, tileSize } = this;
+    const { tiff, isBioFormats6Pyramid, omexml } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const pyramidOffset = z * SizeZ * SizeT * SizeC;
-    let height = tileSize;
-    let width = tileSize;
     let image;
-    const size = this.getRasterSize({ z });
-    const numTilesX = Math.ceil(size.width / tileSize);
-    const numTilesY = Math.ceil(size.height / tileSize);
-    if (x === numTilesX - 1) {
-      const paddedWidth = numTilesX * tileSize;
-      width = tileSize - (paddedWidth - size.width);
-    }
-    if (y === numTilesY - 1) {
-      const paddedHeight = numTilesY * tileSize;
-      height = tileSize - (paddedHeight - size.height);
-    }
     const tileRequests = loaderSelection.map(async sel => {
       const index = this._getIFDIndex(sel);
       const pyramidIndex = pyramidOffset + index;
@@ -174,13 +161,9 @@ export default class OMETiffLoader {
       image = await tiff.getImage(pyramidIndex);
       return this._getChannel({ image, x, y, z, signal });;
     });
-    const tiles = truncateTiles(await Promise.all(tileRequests), height, width, tileSize);
+    const tiles = truncateTiles(await Promise.all(tileRequests), this, { x, y, z });
     if (signal?.aborted) return null;
-    return {
-      data: tiles,
-      width,
-      height
-    };
+    return tiles;
   }
 
   /**
