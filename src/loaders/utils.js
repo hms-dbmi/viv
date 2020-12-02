@@ -23,33 +23,9 @@ export function guessRgb(shape) {
 }
 
 /**
- * Pads TypedArray on right and bottom with zeros out to target width
- * and target height respectively.
- * @param {Object} tile { data: TypedArray, width: number, height: number}
- * @param {Object} targetWidth number
- * @param {Object} targetHeight number
- * @returns {TypedArray} TypedArray
- */
-export function padTileWithZeros(tile, targetWidth, targetHeight) {
-  const { data, width, height } = tile;
-  // Create new TypedArray with same constructor as source
-  const padded = new data.constructor(targetWidth * targetHeight);
-  // Take strips (rows) from original tile data and fill padded tile using
-  // multiples of the tileSize as the offset.
-  for (let i = 0; i < height; i += 1) {
-    const offset = i * width;
-    const strip = data.subarray(offset, offset + width);
-    padded.set(strip, i * targetWidth);
-  }
-  return padded;
-}
-
-/**
- * Fills in a tile with 0's if the tile is on the edge of an image as sometimes pyramidal tiff generators will
- * fill this in with repeated parts of the image.
- * and target height respectively.
- * @param {Object} loader Loader object.
+ * Trunactes tiles on the edge to match the height/width reported by the image.
  * @param {Object} data The array to be filled in.
+ * @param {Object} loader Loader object.
  * @param {Object} tile { x, y, z }
  * @returns {TypedArray} TypedArray
  */
