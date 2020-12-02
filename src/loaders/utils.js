@@ -45,6 +45,30 @@ export function padTileWithZeros(tile, targetWidth, targetHeight) {
 }
 
 /**
+ * Fills in a tile with 0's if the tile is on the edge of an image as sometimes pyramidal tiff generators will
+ * fill this in with repeated parts of the image.
+ * and target height respectively.
+ * @param {Object} loader Loader object.
+ * @param {Object} data The array to be filled in.
+ * @param {Object} tile { x, y, z }
+ * @returns {TypedArray} TypedArray
+ */
+export function truncateTiles(data, height, width, tileSize) {
+  return data.map((d) => {
+    let truncated = d;
+    if ((width < tileSize || height < tileSize) && d.length !== width * height) {
+      truncated = new d.constructor(height * width);
+      for (let i = 0; i < width; i += 1) {
+        for (let j = 0; j < height; j += 1) {
+          truncated[j * width + i] = d[j * tileSize + i];
+        }
+      }
+    }
+    return truncated;
+  })
+}
+
+/**
  * Flips the bytes of TypedArray in place. Used to flipendianess
  * Adapted from https://github.com/zbjornson/node-bswap/blob/master/bswap.js
  * @param {TypedArray} src

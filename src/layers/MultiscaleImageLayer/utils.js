@@ -26,15 +26,17 @@ export function renderSubLayers(props) {
     unprojectLensBounds,
     isLensOn,
     lensSelection,
-    onClick
+    onClick,
+    loader
   } = props;
   // Only render in positive coorinate system
   if ([left, bottom, right, top].some(v => v < 0)) {
     return null;
   }
+  const { height, width } = loader.getRasterSize({ z: 0 });
   const xrl = new XRLayer(props, {
     id: `XRLayer-${left}-${bottom}-${right}-${top}-${id}`,
-    bounds: [left, bottom, right, top],
+    bounds: [left, Math.min(height, bottom), Math.min(width, right), top],
     channelData: data,
     pickable,
     // Uncomment to help debugging - shades the tile being hovered over.

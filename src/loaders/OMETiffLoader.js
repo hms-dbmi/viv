@@ -2,7 +2,7 @@ import OMEXML from './omeXML';
 import {
   isInTileBounds,
   byteSwapInplace,
-  padTileWithZeros,
+  truncateTiles,
   dimensionsFromOMEXML
 } from './utils';
 import { DTYPE_VALUES } from '../constants';
@@ -139,7 +139,20 @@ export default class OMETiffLoader {
     const { tiff, isBioFormats6Pyramid, omexml, tileSize } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const pyramidOffset = z * SizeZ * SizeT * SizeC;
+    let height = tileSize;
+    let width = tileSize;
     let image;
+    const size = this.getRasterSize({ z });
+    const numTilesX = Math.ceil(size.width / tileSize);
+    const numTilesY = Math.ceil(size.height / tileSize);
+    if (x === numTilesX - 1) {
+      const paddedWidth = numTilesX * tileSize;
+      width = tileSize - (paddedWidth - size.width);
+    }
+    if (y === numTilesY - 1) {
+      const paddedHeight = numTilesY * tileSize;
+      height = tileSize - (paddedHeight - size.height);
+    }
     const tileRequests = loaderSelection.map(async sel => {
       const index = this._getIFDIndex(sel);
       const pyramidIndex = pyramidOffset + index;
@@ -159,14 +172,14 @@ export default class OMETiffLoader {
         }
       }
       image = await tiff.getImage(pyramidIndex);
-      return this._getChannel({ image, x, y, z, signal });
+      return this._getChannel({ image, x, y, z, signal });;
     });
-    const tiles = await Promise.all(tileRequests);
+    const tiles = truncateTiles(await Promise.all(tileRequests), height, width, tileSize);
     if (signal?.aborted) return null;
     return {
       data: tiles,
-      width: tileSize,
-      height: tileSize
+      width,
+      height
     };
   }
 
@@ -311,7 +324,7 @@ export default class OMETiffLoader {
     };
   }
 
-  async _getChannel({ image, x, y, z, signal }) {
+  async _getChannel({ image, x, y, signal }) {
     const { dtype } = this;
     const { TypedArray } = DTYPE_VALUES[dtype];
     const tile = await image.getTileOrStrip(x, y, 0, this.pool, signal);
@@ -326,27 +339,6 @@ export default class OMETiffLoader {
     if (!image.littleEndian) {
       byteSwapInplace(data);
     }
-
-    // If the tile data is not (tileSize x tileSize), pad the data with zeros
-    if (data.length < this.tileSize * this.tileSize) {
-      const { height, width } = this.getRasterSize({ z });
-      let trueHeight = height;
-      let trueWidth = width;
-      // If height * tileSize is the size of the data, then the width is the tileSize.
-      if (data.length / height === this.tileSize) {
-        trueWidth = this.tileSize;
-      }
-      // If width * tileSize is the size of the data, then the height is the tileSize.
-      if (data.length / width === this.tileSize) {
-        trueHeight = this.tileSize;
-      }
-      return padTileWithZeros(
-        { data, width: trueWidth, height: trueHeight },
-        this.tileSize,
-        this.tileSize
-      );
-    }
-
     if (this.omexml.Type.startsWith('int')) {
       // Uint view isn't correct for underling buffer, need to take an
       // IntXArray view and cast to UintXArray.
