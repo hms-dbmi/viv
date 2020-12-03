@@ -31,7 +31,7 @@ export function guessRgb(shape) {
  */
 export function truncateTiles(data, loader, tile) {
   const { x, y, z } = tile;
-  const { tileSize } = loader;
+  const { tileSize, isInterleaved, isRgb } = loader;
   let height = tileSize;
   let width = tileSize;
   const size = loader.getRasterSize({ z });
@@ -46,16 +46,22 @@ export function truncateTiles(data, loader, tile) {
     height = tileSize - (paddedHeight - size.height);
   }
   const tileData = { height, width };
+  const isInterleavedAndRgb = isInterleaved && isRgb;
+  const interleavedIndexer = isInterleavedAndRgb ? 3 : 1;
   tileData.data = data.map(d => {
     let truncated = d;
     if (
       (width < tileSize || height < tileSize) &&
-      d.length !== width * height
+      d.length !== width * height * interleavedIndexer
     ) {
-      truncated = new d.constructor(height * width);
-      for (let i = 0; i < width; i += 1) {
-        for (let j = 0; j < height; j += 1) {
-          truncated[j * width + i] = d[j * tileSize + i];
+      truncated = new d.constructor(height * width * interleavedIndexer);
+      for (let j = 0; j < height; j += 1) {
+        for (let i = 0; i < width; i += 1) {
+          truncated[j * width * interleavedIndexer + i * interleavedIndexer] = d[j * tileSize * interleavedIndexer + i * interleavedIndexer];
+          if (isInterleavedAndRgb) {
+            truncated[j * width * interleavedIndexer + i * interleavedIndexer + 1] = d[j * tileSize * interleavedIndexer + i * interleavedIndexer + 1];
+            truncated[j * width * interleavedIndexer + i * interleavedIndexer + 2] = d[j * tileSize * interleavedIndexer + i * interleavedIndexer + 2];
+          }
         }
       }
     }
