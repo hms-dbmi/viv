@@ -211,7 +211,6 @@ export default class OMETiffLoader {
         const raster = !this.isInterleaved
           ? await image.readRasters({
               pool,
-              interleave: this.isInterleaved
             })
           : await image.readRGB({
               pool
@@ -335,7 +334,8 @@ export default class OMETiffLoader {
             y * this.tileSize,
             (x + 1) * this.tileSize,
             (y + 1) * this.tileSize
-          ]
+        ],
+        signal
         });
     const data = !(isInterleaved && isRgb) ? new TypedArray(tile.data) : tile;
     if (signal?.aborted) return null;
