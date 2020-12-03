@@ -5,6 +5,7 @@
 ### Added
 
 - Export a `getDefaultInitialViewState` function for getting a deafult inital view state given a loader and desired size of view.
+- Support interleaved RGB OME-TIFF files.
 
 ### Changed
 
