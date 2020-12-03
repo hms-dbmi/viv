@@ -19,7 +19,6 @@ export default class ArrayBitmapLayer extends BitmapLayer {
         height,
         data: [data]
       } = channelData;
-      // Browser object: Image, ImageData, HTMLCanvasElement, ImageBitmap
       this.setState({
         bitmapTexture: new Texture2D(gl, {
           width,
