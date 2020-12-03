@@ -106,11 +106,6 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       });
       if (tile) {
         tile.data = noWebGl2 ? to32BitFloat(tile.data) : tile.data;
-        if (tile.width !== tileSize || tile.height !== tileSize) {
-          console.warn(
-            `Tile data  { width: ${tile.width}, height: ${tile.height} } does not match tilesize: ${tileSize}`
-          );
-        }
       }
       return tile;
     };

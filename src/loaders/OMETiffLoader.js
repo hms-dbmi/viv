@@ -2,7 +2,7 @@ import OMEXML from './omeXML';
 import {
   isInTileBounds,
   byteSwapInplace,
-  padTileWithZeros,
+  truncateTiles,
   dimensionsFromOMEXML
 } from './utils';
 import { DTYPE_VALUES } from '../constants';
@@ -142,7 +142,7 @@ export default class OMETiffLoader {
     if (!this._tileInBounds({ x, y, z })) {
       return null;
     }
-    const { tiff, isBioFormats6Pyramid, omexml, tileSize } = this;
+    const { tiff, isBioFormats6Pyramid, omexml } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const pyramidOffset = z * SizeZ * SizeT * SizeC;
     let image;
@@ -167,13 +167,13 @@ export default class OMETiffLoader {
       image = await tiff.getImage(pyramidIndex);
       return this._getChannel({ image, x, y, z, signal });
     });
-    const tiles = await Promise.all(tileRequests);
+    const tiles = truncateTiles(await Promise.all(tileRequests), this, {
+      x,
+      y,
+      z
+    });
     if (signal?.aborted) return null;
-    return {
-      data: tiles,
-      width: tileSize,
-      height: tileSize
-    };
+    return tiles;
   }
 
   /**
@@ -323,7 +323,7 @@ export default class OMETiffLoader {
     };
   }
 
-  async _getChannel({ image, x, y, z, signal }) {
+  async _getChannel({ image, x, y, signal }) {
     const { dtype, isInterleaved, isRgb } = this;
     const { TypedArray } = DTYPE_VALUES[dtype];
     const tile = !(isInterleaved && isRgb)
@@ -348,30 +348,6 @@ export default class OMETiffLoader {
     if (!image.littleEndian) {
       byteSwapInplace(data);
     }
-
-    // If the tile data is not (tileSize x tileSize), pad the data with zeros
-    if (
-      data.length <
-      this.tileSize * this.tileSize * (isInterleaved && isRgb ? 3 : 1)
-    ) {
-      const { height, width } = this.getRasterSize({ z });
-      let trueHeight = height;
-      let trueWidth = width;
-      // If height * tileSize is the size of the data, then the width is the tileSize.
-      if (data.length / height === this.tileSize) {
-        trueWidth = this.tileSize;
-      }
-      // If width * tileSize is the size of the data, then the height is the tileSize.
-      if (data.length / width === this.tileSize) {
-        trueHeight = this.tileSize;
-      }
-      return padTileWithZeros(
-        { data, width: trueWidth, height: trueHeight },
-        this.tileSize,
-        this.tileSize
-      );
-    }
-
     if (this.omexml.Type.startsWith('int')) {
       // Uint view isn't correct for underling buffer, need to take an
       // IntXArray view and cast to UintXArray.

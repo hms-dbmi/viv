@@ -23,25 +23,45 @@ export function guessRgb(shape) {
 }
 
 /**
- * Pads TypedArray on right and bottom with zeros out to target width
- * and target height respectively.
- * @param {Object} tile { data: TypedArray, width: number, height: number}
- * @param {Object} targetWidth number
- * @param {Object} targetHeight number
+ * Trunactes tiles on the edge to match the height/width reported by the image.
+ * @param {Object} data The array to be filled in.
+ * @param {Object} loader Loader object.
+ * @param {Object} tile { x, y, z }
  * @returns {TypedArray} TypedArray
  */
-export function padTileWithZeros(tile, targetWidth, targetHeight) {
-  const { data, width, height } = tile;
-  // Create new TypedArray with same constructor as source
-  const padded = new data.constructor(targetWidth * targetHeight);
-  // Take strips (rows) from original tile data and fill padded tile using
-  // multiples of the tileSize as the offset.
-  for (let i = 0; i < height; i += 1) {
-    const offset = i * width;
-    const strip = data.subarray(offset, offset + width);
-    padded.set(strip, i * targetWidth);
+export function truncateTiles(data, loader, tile) {
+  const { x, y, z } = tile;
+  const { tileSize } = loader;
+  let height = tileSize;
+  let width = tileSize;
+  const size = loader.getRasterSize({ z });
+  const numTilesX = Math.ceil(size.width / tileSize);
+  const numTilesY = Math.ceil(size.height / tileSize);
+  if (x === numTilesX - 1) {
+    const paddedWidth = numTilesX * tileSize;
+    width = tileSize - (paddedWidth - size.width);
   }
-  return padded;
+  if (y === numTilesY - 1) {
+    const paddedHeight = numTilesY * tileSize;
+    height = tileSize - (paddedHeight - size.height);
+  }
+  const tileData = { height, width };
+  tileData.data = data.map(d => {
+    let truncated = d;
+    if (
+      (width < tileSize || height < tileSize) &&
+      d.length !== width * height
+    ) {
+      truncated = new d.constructor(height * width);
+      for (let i = 0; i < width; i += 1) {
+        for (let j = 0; j < height; j += 1) {
+          truncated[j * width + i] = d[j * tileSize + i];
+        }
+      }
+    }
+    return truncated;
+  });
+  return tileData;
 }
 
 /**

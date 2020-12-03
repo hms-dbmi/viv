@@ -9,7 +9,8 @@
 ### Changed
 
 - Fix default component args API.
-- Fix tile padding issue.
+- Change WebGL setting so that textures of non-multiple-of-4 length bind and display.
+- No longer pad tiles - instead truncate to the correct "raster size" so that the tile does not "bleed over."
 
 ## 0.7.0
 
