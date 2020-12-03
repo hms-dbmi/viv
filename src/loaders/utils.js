@@ -30,25 +30,28 @@ export function guessRgb(shape) {
  * @returns {TypedArray} TypedArray
  */
 export function truncateTiles(data, loader, tile) {
-  const { x, y, z } = tile
+  const { x, y, z } = tile;
   const { tileSize } = loader;
-   let height = tileSize;
-   let width = tileSize;
-   const size = loader.getRasterSize({ z });
-   const numTilesX = Math.ceil(size.width / tileSize);
-   const numTilesY = Math.ceil(size.height / tileSize);
-   if (x === numTilesX - 1) {
-     const paddedWidth = numTilesX * tileSize;
-     width = tileSize - (paddedWidth - size.width);
-   }
-   if (y === numTilesY - 1) {
-     const paddedHeight = numTilesY * tileSize;
-     height = tileSize - (paddedHeight - size.height);
-   }
-  const tileData = { height, width }
-  tileData.data = data.map((d) => {
+  let height = tileSize;
+  let width = tileSize;
+  const size = loader.getRasterSize({ z });
+  const numTilesX = Math.ceil(size.width / tileSize);
+  const numTilesY = Math.ceil(size.height / tileSize);
+  if (x === numTilesX - 1) {
+    const paddedWidth = numTilesX * tileSize;
+    width = tileSize - (paddedWidth - size.width);
+  }
+  if (y === numTilesY - 1) {
+    const paddedHeight = numTilesY * tileSize;
+    height = tileSize - (paddedHeight - size.height);
+  }
+  const tileData = { height, width };
+  tileData.data = data.map(d => {
     let truncated = d;
-    if ((width < tileSize || height < tileSize) && d.length !== width * height) {
+    if (
+      (width < tileSize || height < tileSize) &&
+      d.length !== width * height
+    ) {
       truncated = new d.constructor(height * width);
       for (let i = 0; i < width; i += 1) {
         for (let j = 0; j < height; j += 1) {
@@ -57,7 +60,7 @@ export function truncateTiles(data, loader, tile) {
       }
     }
     return truncated;
-  })
+  });
   return tileData;
 }
 

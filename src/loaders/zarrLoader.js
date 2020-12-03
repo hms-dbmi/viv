@@ -94,7 +94,11 @@ export default class ZarrLoader {
       }
       return data;
     });
-    const tileData = truncateTiles(await Promise.all(dataRequests), this, { x, y, z });
+    const tileData = truncateTiles(await Promise.all(dataRequests), this, {
+      x,
+      y,
+      z
+    });
     if (source.store instanceof HTTPStore && signal?.aborted) return null;
     return tileData;
   }

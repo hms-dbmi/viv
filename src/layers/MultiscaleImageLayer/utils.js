@@ -30,13 +30,18 @@ export function renderSubLayers(props) {
     loader
   } = props;
   // Only render in positive coorinate system
-  if ([left, bottom, right, top].some(v => v < 0)) {
+  if ([left, bottom, right, top].some(v => v < 0) || !data) {
     return null;
   }
   const { height, width } = loader.getRasterSize({ z: 0 });
   // Tiles are exactly fitted to have height and width such that their bounds match that of the actual image (not some padded version).
   // Thus the right/bottom given by deck.gl are incorrect since they assume tiles are of uniform sizes, which is not the case for us.
-  const bounds = [left, Math.min(height, bottom), Math.min(width, right), top]
+  const bounds = [
+    left,
+    data.height < loader.tileSize ? height : bottom,
+    data.width < loader.tileSize ? width : right,
+    top
+  ];
   const xrl = new XRLayer(props, {
     id: `XRLayer-${bounds}-${id}`,
     bounds,

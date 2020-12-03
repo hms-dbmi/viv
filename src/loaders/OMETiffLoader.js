@@ -159,9 +159,13 @@ export default class OMETiffLoader {
         }
       }
       image = await tiff.getImage(pyramidIndex);
-      return this._getChannel({ image, x, y, z, signal });;
+      return this._getChannel({ image, x, y, z, signal });
     });
-    const tiles = truncateTiles(await Promise.all(tileRequests), this, { x, y, z });
+    const tiles = truncateTiles(await Promise.all(tileRequests), this, {
+      x,
+      y,
+      z
+    });
     if (signal?.aborted) return null;
     return tiles;
   }
