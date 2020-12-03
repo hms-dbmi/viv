@@ -210,7 +210,7 @@ export default class OMETiffLoader {
         // Flips bits for us for endianness.
         const raster = !this.isInterleaved
           ? await image.readRasters({
-              pool,
+              pool
             })
           : await image.readRGB({
               pool
@@ -334,8 +334,8 @@ export default class OMETiffLoader {
             y * this.tileSize,
             (x + 1) * this.tileSize,
             (y + 1) * this.tileSize
-        ],
-        signal
+          ],
+          signal
         });
     const data = !(isInterleaved && isRgb) ? new TypedArray(tile.data) : tile;
     if (signal?.aborted) return null;

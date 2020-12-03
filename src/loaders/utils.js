@@ -57,10 +57,17 @@ export function truncateTiles(data, loader, tile) {
       truncated = new d.constructor(height * width * interleavedIndexer);
       for (let j = 0; j < height; j += 1) {
         for (let i = 0; i < width; i += 1) {
-          truncated[j * width * interleavedIndexer + i * interleavedIndexer] = d[j * tileSize * interleavedIndexer + i * interleavedIndexer];
+          truncated[j * width * interleavedIndexer + i * interleavedIndexer] =
+            d[j * tileSize * interleavedIndexer + i * interleavedIndexer];
           if (isInterleavedAndRgb) {
-            truncated[j * width * interleavedIndexer + i * interleavedIndexer + 1] = d[j * tileSize * interleavedIndexer + i * interleavedIndexer + 1];
-            truncated[j * width * interleavedIndexer + i * interleavedIndexer + 2] = d[j * tileSize * interleavedIndexer + i * interleavedIndexer + 2];
+            truncated[
+              j * width * interleavedIndexer + i * interleavedIndexer + 1
+            ] =
+              d[j * tileSize * interleavedIndexer + i * interleavedIndexer + 1];
+            truncated[
+              j * width * interleavedIndexer + i * interleavedIndexer + 2
+            ] =
+              d[j * tileSize * interleavedIndexer + i * interleavedIndexer + 2];
           }
         }
       }
