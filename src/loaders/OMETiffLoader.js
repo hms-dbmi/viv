@@ -407,11 +407,11 @@ export default class OMETiffLoader {
       return { data, width, height };
     }
     const truncated = data.map(d => {
-      const newData = new d.constructor(height * width);
+      const newData = new d.constructor(height * width * interleavedIndexer);
       // Take strips (rows) from original tile data and fill new smaller buffer
       for (let i = 0; i < height; i += 1) {
-        const offset = i * tileSize; // offset in tile
-        const strip = d.subarray(offset, (offset + width) * interleavedIndexer); // get strip with new width
+        const offset = i * tileSize * interleavedIndexer; // offset in tile
+        const strip = d.subarray(offset, offset + width * interleavedIndexer); // get strip with new width
         newData.set(strip, i * width * interleavedIndexer); // copy strip from input d to byte offset in truncated
       }
       return newData;

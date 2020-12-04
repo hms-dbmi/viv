@@ -87,7 +87,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       onClick,
       modelMatrix
     } = this.props;
-    const { tileSize, numLevels, dtype } = loader;
+    const { tileSize, numLevels, dtype, isInterleaved, isRgb } = loader;
     const { unprojectLensBounds } = this.state;
     const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z, signal }) => {
@@ -105,7 +105,10 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         signal
       });
       if (tile) {
-        tile.data = noWebGl2 ? to32BitFloat(tile.data) : tile.data;
+        tile.data =
+          noWebGl2 && !(isInterleaved && isRgb)
+            ? to32BitFloat(tile.data)
+            : tile.data;
       }
       return tile;
     };

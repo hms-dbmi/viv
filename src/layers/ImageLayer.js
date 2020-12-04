@@ -80,7 +80,11 @@ export default class ImageLayer extends CompositeLayer {
       const { loader, z, loaderSelection } = this.props;
       loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) =>
         this.setState({
-          data: !isWebGL2(this.context.gl) ? to32BitFloat(data) : data,
+          data:
+            !isWebGL2(this.context.gl) &&
+            !(loader.isInterleaved && loader.isRgb)
+              ? to32BitFloat(data)
+              : data,
           height,
           width
         })
