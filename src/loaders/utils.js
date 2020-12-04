@@ -23,48 +23,6 @@ export function guessRgb(shape) {
 }
 
 /**
- * Trunactes tiles on the edge to match the height/width reported by the image.
- * @param {Object} data The array to be filled in.
- * @param {Object} loader Loader object.
- * @param {Object} tile { x, y, z }
- * @returns {TypedArray} TypedArray
- */
-export function truncateTiles(data, loader, tile) {
-  const { x, y, z } = tile;
-  const { tileSize } = loader;
-  let height = tileSize;
-  let width = tileSize;
-  const size = loader.getRasterSize({ z });
-  const numTilesX = Math.ceil(size.width / tileSize);
-  const numTilesY = Math.ceil(size.height / tileSize);
-  if (x === numTilesX - 1) {
-    const paddedWidth = numTilesX * tileSize;
-    width = tileSize - (paddedWidth - size.width);
-  }
-  if (y === numTilesY - 1) {
-    const paddedHeight = numTilesY * tileSize;
-    height = tileSize - (paddedHeight - size.height);
-  }
-  const tileData = { height, width };
-  tileData.data = data.map(d => {
-    let truncated = d;
-    if (
-      (width < tileSize || height < tileSize) &&
-      d.length !== width * height
-    ) {
-      truncated = new d.constructor(height * width);
-      for (let i = 0; i < width; i += 1) {
-        for (let j = 0; j < height; j += 1) {
-          truncated[j * width + i] = d[j * tileSize + i];
-        }
-      }
-    }
-    return truncated;
-  });
-  return tileData;
-}
-
-/**
  * Flips the bytes of TypedArray in place. Used to flipendianess
  * Adapted from https://github.com/zbjornson/node-bswap/blob/master/bswap.js
  * @param {TypedArray} src
