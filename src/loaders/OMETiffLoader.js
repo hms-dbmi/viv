@@ -395,20 +395,23 @@ export default class OMETiffLoader {
       height = zoomLevelHeight % tileSize;
     }
     const isInterleavedAndRgb = isInterleaved && isRgb;
-    const interleavedIndexer = isInterleavedAndRgb ? 3 : 1;
+    const interleavedMultiplier = isInterleavedAndRgb ? 3 : 1;
     if (
       (width === tileSize && height === tileSize) ||
-      data[0].length === width * height * interleavedIndexer
+      data[0].length === width * height * interleavedMultiplier
     ) {
       return { data, width, height };
     }
     const truncated = data.map(d => {
-      const newData = new d.constructor(height * width * interleavedIndexer);
+      const newData = new d.constructor(height * width * interleavedMultiplier);
       // Take strips (rows) from original tile data and fill new smaller buffer
       for (let i = 0; i < height; i += 1) {
-        const offset = i * tileSize * interleavedIndexer; // offset in tile
-        const strip = d.subarray(offset, offset + width * interleavedIndexer); // get strip with new width
-        newData.set(strip, i * width * interleavedIndexer); // copy strip from input d to byte offset in truncated
+        const offset = i * tileSize * interleavedMultiplier; // offset in tile
+        const strip = d.subarray(
+          offset,
+          offset + width * interleavedMultiplier
+        ); // get strip with new width
+        newData.set(strip, i * width * interleavedMultiplier); // copy strip from input d to byte offset in truncated
       }
       return newData;
     });
