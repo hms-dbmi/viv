@@ -4,20 +4,20 @@ on: [push]
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         node-version: [14.x]
+        os: [windows-latest, ubuntu-latest]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm install
-    - run: npm run install:avivator
-    - run: sudo apt-get install xvfb # needed for tape-run
-    - run: xvfb-run --auto-servernum ./test.sh # for tape-run
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - run: npm run install:avivator
+      - run: sudo apt-get install xvfb # needed for tape-run
+      - run: xvfb-run --auto-servernum ./test.sh # for tape-run
