@@ -78,15 +78,14 @@ export default class ImageLayer extends CompositeLayer {
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
       const { loader, z, loaderSelection } = this.props;
-      loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) =>
+      loader.getRaster({ z, loaderSelection }).then(channelData =>
         this.setState({
           data:
             !isWebGL2(this.context.gl) &&
             !(loader.isInterleaved && loader.isRgb)
-              ? to32BitFloat(data)
-              : data,
-          height,
-          width
+              ? to32BitFloat(channelData.data)
+              : channelData.data,
+          ...channelData
         })
       );
     }
@@ -123,12 +122,12 @@ export default class ImageLayer extends CompositeLayer {
       modelMatrix
     } = this.props;
     const { dtype } = loader;
-    const { data, width, height, unprojectLensBounds } = this.state;
+    const { width, height, unprojectLensBounds } = this.state;
     if (!(width && height)) return null;
     const Layer =
       loader.isRgb && loader.isInterleaved ? ArrayBitmapLayer : XRLayer;
     return new Layer(this.props, {
-      channelData: { data, width, height },
+      channelData: this.state,
       pickable,
       bounds: [0, height, width, 0],
       sliderValues,

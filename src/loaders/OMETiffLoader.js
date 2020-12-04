@@ -165,7 +165,10 @@ export default class OMETiffLoader {
     const tiles = await Promise.all(tileRequests);
     const truncated = this._truncateTiles(tiles, { x, y, z });
     if (signal?.aborted) return null;
-    return truncated;
+    return {
+      ...truncated,
+      photometricInterpretation: image.fileDirectory.PhotometricInterpretation
+    };
   }
 
   /**
@@ -177,7 +180,7 @@ export default class OMETiffLoader {
 
    */
   async getRaster({ z, loaderSelection }) {
-    const { tiff, omexml, isBioFormats6Pyramid, pool } = this;
+    const { tiff, omexml, isBioFormats6Pyramid, pool, isInterleaved } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const rasters = await Promise.all(
       loaderSelection.map(async sel => {
@@ -200,14 +203,11 @@ export default class OMETiffLoader {
         }
         const image = await tiff.getImage(pyramidIndex);
         // Flips bits for us for endianness.
-        const raster = !this.isInterleaved
-          ? await image.readRasters({
-              pool
-            })
-          : await image.readRGB({
-              pool
-            });
-        return this.isInterleaved ? raster : raster[0];
+        const raster = await image.readRasters({
+          pool,
+          interleave: isInterleaved
+        });
+        return isInterleaved ? raster : raster[0];
       })
     );
     // Get first selection * SizeZ * SizeT * SizeC + loaderSelection[0] size as proxy for image size.
@@ -236,7 +236,8 @@ export default class OMETiffLoader {
     return {
       data,
       width,
-      height
+      height,
+      photometricInterpretation: image.fileDirectory.PhotometricInterpretation
     };
   }
 
@@ -316,20 +317,10 @@ export default class OMETiffLoader {
   }
 
   async _getChannel({ image, x, y, signal }) {
-    const { dtype, isInterleaved, isRgb } = this;
+    const { dtype } = this;
     const { TypedArray } = DTYPE_VALUES[dtype];
-    const tile = !(isInterleaved && isRgb)
-      ? await image.getTileOrStrip(x, y, 0, this.pool, signal)
-      : await image.readRGB({
-          window: [
-            x * this.tileSize,
-            y * this.tileSize,
-            (x + 1) * this.tileSize,
-            (y + 1) * this.tileSize
-          ],
-          signal
-        });
-    const data = !(isInterleaved && isRgb) ? new TypedArray(tile.data) : tile;
+    const tile = await image.getTileOrStrip(x, y, 0, this.pool, signal);
+    const data = new TypedArray(tile.data);
     if (signal?.aborted) return null;
     /*
      * The endianness of JavaScript TypedArrays are determined by the endianness
@@ -351,7 +342,6 @@ export default class OMETiffLoader {
       }
       return new Uint32Array(new Int32Array(data.buffer));
     }
-
     return data;
   }
 

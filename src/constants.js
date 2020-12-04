@@ -41,3 +41,16 @@ export const DTYPE_VALUES = {
     TypedArray: Float32Array
   }
 };
+
+// From https://github.com/geotiffjs/geotiff.js/blob/8ef472f41b51d18074aece2300b6a8ad91a21ae1/src/globals.js#L202-L213
+export const PHOTOMETRIC_INTERPRETATIONS = {
+  WhiteIsZero: 0,
+  BlackIsZero: 1,
+  RGB: 2,
+  Palette: 3,
+  TransparencyMask: 4,
+  CMYK: 5,
+  YCbCr: 6,
+  CIELab: 8,
+  ICCLab: 9
+};
