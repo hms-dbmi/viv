@@ -165,9 +165,12 @@ export default class OMETiffLoader {
     const tiles = await Promise.all(tileRequests);
     const truncated = this._truncateTiles(tiles, { x, y, z });
     if (signal?.aborted) return null;
+    const {
+      fileDirectory: { PhotometricInterpretation }
+    } = image;
     return {
       ...truncated,
-      photometricInterpretation: image.fileDirectory.PhotometricInterpretation
+      photometricInterpretation: PhotometricInterpretation
     };
   }
 
@@ -233,11 +236,14 @@ export default class OMETiffLoader {
     } else {
       data = rasters;
     }
+    const {
+      fileDirectory: { PhotometricInterpretation }
+    } = image;
     return {
       data,
       width,
       height,
-      photometricInterpretation: image.fileDirectory.PhotometricInterpretation
+      photometricInterpretation: PhotometricInterpretation
     };
   }
 

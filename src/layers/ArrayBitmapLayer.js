@@ -17,7 +17,7 @@ export default class ArrayBitmapLayer extends BitmapLayer {
       channelData: { photometricInterpretation }
     } = this.props;
     let photometricInterpretationShader;
-    // This is a port to the GPU of https://github.com/geotiffjs/geotiff.js/blob/master/src/rgb.js
+    // This is a port to the GPU of a subset of https://github.com/geotiffjs/geotiff.js/blob/master/src/rgb.js
     // Safari was too slow doing this off of the GPU and it is noticably faster on other browsers as well.
     switch (photometricInterpretation) {
       case PHOTOMETRIC_INTERPRETATIONS.RGB:
