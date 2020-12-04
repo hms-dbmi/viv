@@ -1,6 +1,6 @@
 import { BoundsCheckError } from 'zarr';
 
-import { guessRgb, truncateTiles, byteSwapInplace } from './utils';
+import { guessRgb, byteSwapInplace } from './utils';
 import { DTYPE_VALUES } from '../constants';
 import HTTPStore from './httpStore';
 
@@ -94,13 +94,11 @@ export default class ZarrLoader {
       }
       return data;
     });
-    const tileData = truncateTiles(await Promise.all(dataRequests), this, {
-      x,
-      y,
-      z
-    });
+    const data = await Promise.all(dataRequests);
     if (source.store instanceof HTTPStore && signal?.aborted) return null;
-    return tileData;
+    const width = source.chunks[xIndex];
+    const height = source.chunks[yIndex];
+    return { data, width, height };
   }
 
   /**

@@ -1,6 +1,6 @@
 # Viv [![npm version](https://badge.fury.io/js/%40hms-dbmi%2Fviv.svg)](https://badge.fury.io/js/%40hms-dbmi%2Fviv)
 
-A library for multiscale visualization of high-resolution multiplexed tissue data on the web. Directly renders Bio-Formats-compatible Zarr and OME-TIFF.
+A library for multiscale visualization of high-resolution multiplexed bioimaging data on the web. Directly renders Bio-Formats-compatible Zarr and OME-TIFF.
 Written in JavaScript and built on Deck.gl with modern web technologies.
 
 ## Installation
@@ -15,7 +15,7 @@ Viv is a JavaScript library providing utilities for rendering primary imaging da
 
 More details can be found in our preprint describing the Viv library and related work. Please cite this preprint in your research:
 
-> Trevor Manz, Ilan Gold, Nathan Heath Patterson, Chuck McCallum, Mark S Keller, Bruce W Herr II, Katy Börner, Jeffrey M Spraggins, Nils Gehlenborg, "Viv: Multiscale Visualization of High-resolution Multiplexed Tissue Data on the Web." **OSF Preprints** (2020), [doi:10.31219/osf.io/wd2gu](https://doi.org/10.31219/osf.io/wd2gu)
+> Trevor Manz, Ilan Gold, Nathan Heath Patterson, Chuck McCallum, Mark S Keller, Bruce W Herr II, Katy Börner, Jeffrey M Spraggins, Nils Gehlenborg, "[Viv: Multiscale Visualization of High-resolution Multiplexed Bioimaging Data on the Web](https://osf.io/wd2gu/)." **OSF Preprints** (2020), [doi:10.31219/osf.io/wd2gu](https://doi.org/10.31219/osf.io/wd2gu)
 
 ## Avivator
 

@@ -1,10 +1,5 @@
 import OMEXML from './omeXML';
-import {
-  isInTileBounds,
-  byteSwapInplace,
-  truncateTiles,
-  dimensionsFromOMEXML
-} from './utils';
+import { isInTileBounds, byteSwapInplace, dimensionsFromOMEXML } from './utils';
 import { DTYPE_VALUES } from '../constants';
 
 const DTYPE_LOOKUP = {
@@ -167,13 +162,10 @@ export default class OMETiffLoader {
       image = await tiff.getImage(pyramidIndex);
       return this._getChannel({ image, x, y, z, signal });
     });
-    const tiles = truncateTiles(await Promise.all(tileRequests), this, {
-      x,
-      y,
-      z
-    });
+    const tiles = await Promise.all(tileRequests);
+    const truncated = this._truncateTiles(tiles, { x, y, z });
     if (signal?.aborted) return null;
-    return tiles;
+    return truncated;
   }
 
   /**
@@ -381,5 +373,49 @@ export default class OMETiffLoader {
     if (offsets.length > 0) {
       tiff.ifdRequests[index] = tiff.parseFileDirectoryAt(offsets[index]);
     }
+  }
+
+  /**
+   * Trunactes tiles on the edge to match the height/width reported by the image.
+   * @param {tileData: TypedArray[]} data The array to be filled in.
+   * @param {Object} tile { x, y, z }
+   * @returns {TypedArray} TypedArray
+   */
+  _truncateTiles(data, tile) {
+    const { x, y, z } = tile;
+    const { tileSize, isInterleaved, isRgb } = this;
+    let height = tileSize;
+    let width = tileSize;
+    const {
+      height: zoomLevelHeight,
+      width: zoomLevelWidth
+    } = this.getRasterSize({ z });
+    const maxXTileCoord = Math.floor(zoomLevelWidth / tileSize);
+    const maxYTileCoord = Math.floor(zoomLevelHeight / tileSize);
+    if (x === maxXTileCoord) {
+      width = zoomLevelWidth % tileSize;
+    }
+    if (y === maxYTileCoord) {
+      height = zoomLevelHeight % tileSize;
+    }
+    const isInterleavedAndRgb = isInterleaved && isRgb;
+    const interleavedIndexer = isInterleavedAndRgb ? 3 : 1;
+    if (
+      (width === tileSize && height === tileSize) ||
+      data[0].length === width * height * interleavedIndexer
+    ) {
+      return { data, width, height };
+    }
+    const truncated = data.map(d => {
+      const newData = new d.constructor(height * width);
+      // Take strips (rows) from original tile data and fill new smaller buffer
+      for (let i = 0; i < height; i += 1) {
+        const offset = i * tileSize; // offset in tile
+        const strip = d.subarray(offset, (offset + width) * interleavedIndexer); // get strip with new width
+        newData.set(strip, i * width * interleavedIndexer); // copy strip from input d to byte offset in truncated
+      }
+      return newData;
+    });
+    return { data: truncated, width, height };
   }
 }
