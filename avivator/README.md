@@ -9,10 +9,11 @@ Avivator has been tested with the following dependency versions:
 - NodeJS 14.0.0
 - NPM 6.14.4
 - Firefox Developer Edition 84.0b8
+- Zsh 5.7.1
 
 ## Installation guide
 
-To install Avivator, run the following commands in the `avivator/` directory.
+To install Avivator, run the following commands in a `zsh` or `bash` shell in the `avivator/` directory.
 
 First, install the NPM dependencies for Viv (typical time: 29.63 seconds):
 
