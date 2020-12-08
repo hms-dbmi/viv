@@ -46,7 +46,7 @@ If the demo has been built successfully, the demo site will contain a visualizat
 
 ## Instructions for use
 
-To use Avivator to visualize your own imaging data, use the URL input to provide a URL to an OME-TIFF/Bioformats-Zarr.
+To use Avivator to visualize your own imaging data, use the URL input in the web application to provide a URL to an OME-TIFF/Bioformats-Zarr.
 
 To learn more about working with OME-TIFF files or Bioformats-Zarr stores, please visit the [tutorial](../tutorial/README.md).
 
