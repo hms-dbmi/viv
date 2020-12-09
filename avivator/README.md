@@ -12,7 +12,7 @@ Avivator has been tested with the following dependency versions:
 - one of:
     - Firefox Developer Edition 84.0b8
     - Firefox 80.0.1
-    - Safari 13.1.1
+    - Safari 13.1.1 (and later)
     - Google Chrome 87.0.4280.88
 
 
@@ -54,4 +54,3 @@ If the demo has been built successfully, the demo site will contain a visualizat
 To use Avivator to visualize your own imaging data, use the URL input in the web application to provide a URL to an OME-TIFF/Bioformats-Zarr.
 
 To learn more about working with OME-TIFF files or Bioformats-Zarr stores, please visit the [tutorial](../tutorial/README.md).
-
