@@ -1,0 +1,45 @@
+name: Node.js CI
+
+on: [push]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies for Viv
+        run: npm install
+      - name: Install dependencies for Avivator
+        run: npm run install:avivator
+      - name: Build Avivator and Viv
+        run: npm run build && npm run build:avivator
+  test-linux:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies for Viv
+        run: npm install
+      - name: Install dependencies for Avivator
+        run: npm run install:avivator
+      - name: Install dependencies needed for testing with tape
+        run: sudo apt-get install xvfb # needed for tape-run
+      - name: Test library
+        run: xvfb-run --auto-servernum ./test.sh # for tape-run
