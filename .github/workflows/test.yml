@@ -43,7 +43,6 @@ jobs:
       - name: Install dependencies for Avivator
         run: npm run install:avivator
       - name: Install dependencies needed for testing
-        if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get install xvfb # needed for tape-run
       - name: Test library
         run: xvfb-run --auto-servernum ./test.sh # for tape-run
