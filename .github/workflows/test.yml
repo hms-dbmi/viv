@@ -4,12 +4,11 @@ on: [push]
 
 jobs:
   build-windows:
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
 
     strategy:
       matrix:
         node-version: [14.x]
-        os: [windows-latest]
 
     steps:
       - uses: actions/checkout@v2
