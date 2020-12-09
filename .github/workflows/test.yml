@@ -22,7 +22,7 @@ jobs:
         run: npm run install:avivator
       - name: Build Avivator and Viv
         run: npm run build && npm run build:avivator
-
+        
  test-linux:
     runs-on: ubuntu-latest
 
