@@ -48,14 +48,14 @@ function RoutedAvivator(props) {
     };
     return (
       <ThemeProvider theme={darkTheme}>
-        <Avivator source={urlSrouce} history={history} />
+        <Avivator source={urlSrouce} history={history} isRandomSource={false} />
       </ThemeProvider>
     );
   }
   const source = getRandomSource();
   return (
     <ThemeProvider theme={darkTheme}>
-      <Avivator source={source} history={history} />
+      <Avivator source={source} history={history} isRandomSource />
     </ThemeProvider>
   );
 }

@@ -40,7 +40,6 @@ import {
   GLOBAL_SLIDER_DIMENSION_FIELDS,
   COLOR_PALLETE
 } from './constants';
-import sources from './source-info';
 import './index.css';
 
 const initialChannels = {
@@ -59,7 +58,7 @@ const initialChannels = {
  * @param {Object} args.sources A list of sources for a dropdown menu, like [{ url, description }]
  * */
 export default function Avivator(props) {
-  const { history, source: initSource } = props;
+  const { history, source: initSource, isRandomSource } = props;
 
   const viewSize = useWindowSize();
 
@@ -77,7 +76,7 @@ export default function Avivator(props) {
     message: null
   });
   const [noImageUrlSnackbarIsOn, toggleNoImageUrlSnackbar] = useState(
-    sources.map(s => s.urlOrFile).indexOf(initSource.urlOrFile) >= 0
+    isRandomSource
   );
 
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
