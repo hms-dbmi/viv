@@ -59,7 +59,7 @@ const initialChannels = {
  * @param {Object} args.sources A list of sources for a dropdown menu, like [{ url, description }]
  * */
 export default function Avivator(props) {
-  const { history, source: initSource } = props;
+  const { history, source: initSource, isDemoImage } = props;
 
   const viewSize = useWindowSize();
 
@@ -77,7 +77,7 @@ export default function Avivator(props) {
     message: null
   });
   const [noImageUrlSnackbarIsOn, toggleNoImageUrlSnackbar] = useState(
-    sources.map(s => s.urlOrFile).indexOf(initSource.urlOrFile) >= 0
+    isDemoImage
   );
 
   const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);

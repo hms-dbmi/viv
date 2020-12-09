@@ -5,6 +5,7 @@
 ### Added
 
 - Export a `getDefaultInitialViewState` function for getting a deafult inital view state given a loader and desired size of view.
+- Added a README file for Avivator at `avivator/README.md`.
 
 ### Changed
 
@@ -13,6 +14,7 @@
 - No longer pad tiles - instead truncate to the correct "raster size" so that the tile does not "bleed over."
 - Update preprint title in README.md
 - Switch to Github Actions
+- Don't show snackbar if image provided is one of our demos.
 
 ## 0.7.0
 
