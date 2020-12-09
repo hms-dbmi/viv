@@ -307,19 +307,26 @@ export default class OMETiffLoader {
     const { dtype, tileSize, pool } = this;
     const { TypedArray } = DTYPE_VALUES[dtype];
     let data;
-    if (image.getTileWidth() !== tileSize || image.getTileHeight() !== tileSize) {
+    if (
+      image.getTileWidth() !== tileSize ||
+      image.getTileHeight() !== tileSize
+    ) {
       // readRasters handles byte swapping for endianness.
-      [data] = await image.readRasters({ window: [x, y, (x + 1), (y + 1)].map(i => i * tileSize), pool, signal })
+      [data] = await image.readRasters({
+        window: [x, y, x + 1, y + 1].map(i => i * tileSize),
+        pool,
+        signal
+      });
     } else {
       const tile = await image.getTileOrStrip(x, y, 0, pool, signal);
       data = new TypedArray(tile.data);
       if (signal?.aborted) return null;
       /*
-      * The endianness of JavaScript TypedArrays are determined by the endianness
-      * of the end-users' hardware. Nearly all desktop computers are x86 (little endian),
-      * so we flip bytes in place for big-endian buffers. This is substantially faster than using
-      * the DataView API.
-      */
+       * The endianness of JavaScript TypedArrays are determined by the endianness
+       * of the end-users' hardware. Nearly all desktop computers are x86 (little endian),
+       * so we flip bytes in place for big-endian buffers. This is substantially faster than using
+       * the DataView API.
+       */
       if (!image.littleEndian) {
         byteSwapInplace(data);
       }

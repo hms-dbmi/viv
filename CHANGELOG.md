@@ -13,6 +13,7 @@
 - No longer pad tiles - instead truncate to the correct "raster size" so that the tile does not "bleed over."
 - Update preprint title in README.md
 - Fall back to `readRasters` for TIFF when tile size is not correct.
+
 ## 0.7.0
 
 ### Added
