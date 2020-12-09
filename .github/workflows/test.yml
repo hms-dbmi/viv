@@ -17,7 +17,16 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install
-      - run: npm run install:avivator
-      - run: sudo apt-get install xvfb # needed for tape-run
-      - run: xvfb-run --auto-servernum ./test.sh # for tape-run
+      - name: Install dependencies for Viv
+        run: npm install
+      - name: Install dependencies for Avivator
+        run: npm run install:avivator
+      - name: Install dependencies needed for testing (only on Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get install xvfb # needed for tape-run
+      - name: Test library (only on Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: xvfb-run --auto-servernum ./test.sh # for tape-run
+      - name: Build Avivator (only on Windows)
+        if: matrix.os == 'windows-laters'
+        run: npm run build:avivator
