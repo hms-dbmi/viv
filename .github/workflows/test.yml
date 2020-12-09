@@ -24,13 +24,12 @@ jobs:
       - name: Build Avivator and Viv
         run: npm run build && npm run build:avivator
 
-  test-linux:
-    runs-on: ${{ matrix.os }}
+ test-linux:
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [14.x]
-        os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v2
