@@ -158,7 +158,7 @@ export default class OMETiffLoader {
       return this._getChannel({ image, x, y, z, signal });
     });
     const data = await Promise.all(tileRequests);
-    const { height, width } = this._getExpectedTileSizeForTiff({
+    const { height, width } = this._getTileExtent({
       x,
       y,
       z
@@ -308,7 +308,7 @@ export default class OMETiffLoader {
 
   async _getChannel({ image, x, y, z, signal }) {
     const { tileSize, pool } = this;
-    const { height, width } = this._getExpectedTileSizeForTiff({
+    const { height, width } = this._getTileExtent({
       x,
       y,
       z
@@ -370,7 +370,7 @@ export default class OMETiffLoader {
    * @param {Object} tile { x, y, z }
    * @returns {TypedArray} TypedArray
    */
-  _getExpectedTileSizeForTiff({ x, y, z }) {
+  _getTileExtent({ x, y, z }) {
     const { tileSize } = this;
     let height = tileSize;
     let width = tileSize;
