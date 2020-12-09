@@ -158,7 +158,11 @@ export default class OMETiffLoader {
       return this._getChannel({ image, x, y, z, signal });
     });
     const data = await Promise.all(tileRequests);
-    const { height, width } = this._getTileSize({ x, y, z });
+    const { height, width } = this._getExpectedTileSizeForTiff({
+      x,
+      y,
+      z
+    });
     if (signal?.aborted) return null;
     return { data, height, width };
   }
@@ -168,8 +172,7 @@ export default class OMETiffLoader {
    * @param {number} z positive integer (0 === highest zoom level)
    * @param {Array} loaderSelection, Array of number Arrays specifying channel selections
    * @returns {Object} data: TypedArray[], width: number, height: number
-    * Default is `{data: [], width, height}`.
-
+   * Default is `{data: [], width, height}`.
    */
   async getRaster({ z, loaderSelection }) {
     const { tiff, omexml, isBioFormats6Pyramid, pool } = this;
@@ -232,7 +235,6 @@ export default class OMETiffLoader {
   /**
    * Returns image width and height (at pyramid level z) without fetching data.
    * This information is inferrable from the provided omexml.
-   * This is only used by the OverviewLayer for inferring the box size.
    * It is NOT the actual pixel-size but rather the image size
    * without any padding.
    * @param {number} z positive integer (0 === highest zoom level)
@@ -306,7 +308,12 @@ export default class OMETiffLoader {
 
   async _getChannel({ image, x, y, z, signal }) {
     const { tileSize, pool } = this;
-    const { height, width } = this._getTileSize({ x, y, z });
+    const { height, width } = this._getExpectedTileSizeForTiff({
+      x,
+      y,
+      z
+    });
+    // Passing in the height and width explicitly prevents resampling that geotiff does without such parameters.
     const [data] = await image.readRasters({
       window: [
         x * tileSize,
@@ -355,7 +362,15 @@ export default class OMETiffLoader {
     }
   }
 
-  _getTileSize({ x, y, z }) {
+  /**
+   * For a given resolution level, z, the expected tile size on the boundary
+   * of the image should be exactly enough to fit the image bounds at the resolution level.
+   * This function returns that size or the parametrized tileSize from TIFF file.
+   * @param {tileData: TypedArray[]} data The array to be filled in.
+   * @param {Object} tile { x, y, z }
+   * @returns {TypedArray} TypedArray
+   */
+  _getExpectedTileSizeForTiff({ x, y, z }) {
     const { tileSize } = this;
     let height = tileSize;
     let width = tileSize;
