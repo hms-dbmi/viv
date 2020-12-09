@@ -1,6 +1,5 @@
 import OMEXML from './omeXML';
-import { isInTileBounds, byteSwapInplace, dimensionsFromOMEXML } from './utils';
-import { DTYPE_VALUES } from '../constants';
+import { isInTileBounds, dimensionsFromOMEXML } from './utils';
 
 const DTYPE_LOOKUP = {
   uint8: '<u1',
@@ -46,7 +45,9 @@ export default class OMETiffLoader {
     this.height = this.omexml.SizeY;
     this.tileSize = firstImage.getTileWidth();
     const { SubIFDs } = firstImage.fileDirectory;
-    this.numLevels = SubIFDs?.length || this.omexml.getNumberOfImages();
+    this.numLevels = SubIFDs
+      ? SubIFDs.length + 1
+      : this.omexml.getNumberOfImages();
     this.isBioFormats6Pyramid = SubIFDs;
     this.isPyramid = this.numLevels > 1;
     this.dimensions = dimensionsFromOMEXML(this.omexml);
@@ -156,10 +157,14 @@ export default class OMETiffLoader {
       image = await tiff.getImage(pyramidIndex);
       return this._getChannel({ image, x, y, z, signal });
     });
-    const tiles = await Promise.all(tileRequests);
-    const truncated = this._truncateTiles(tiles, { x, y, z });
+    const data = await Promise.all(tileRequests);
+    const { height, width } = this._getTileExtent({
+      x,
+      y,
+      z
+    });
     if (signal?.aborted) return null;
-    return truncated;
+    return { data, height, width };
   }
 
   /**
@@ -167,8 +172,7 @@ export default class OMETiffLoader {
    * @param {number} z positive integer (0 === highest zoom level)
    * @param {Array} loaderSelection, Array of number Arrays specifying channel selections
    * @returns {Object} data: TypedArray[], width: number, height: number
-    * Default is `{data: [], width, height}`.
-
+   * Default is `{data: [], width, height}`.
    */
   async getRaster({ z, loaderSelection }) {
     const { tiff, omexml, isBioFormats6Pyramid, pool } = this;
@@ -231,7 +235,6 @@ export default class OMETiffLoader {
   /**
    * Returns image width and height (at pyramid level z) without fetching data.
    * This information is inferrable from the provided omexml.
-   * This is only used by the OverviewLayer for inferring the box size.
    * It is NOT the actual pixel-size but rather the image size
    * without any padding.
    * @param {number} z positive integer (0 === highest zoom level)
@@ -303,21 +306,27 @@ export default class OMETiffLoader {
     };
   }
 
-  async _getChannel({ image, x, y, signal }) {
-    const { dtype } = this;
-    const { TypedArray } = DTYPE_VALUES[dtype];
-    const tile = await image.getTileOrStrip(x, y, 0, this.pool, signal);
-    const data = new TypedArray(tile.data);
+  async _getChannel({ image, x, y, z, signal }) {
+    const { tileSize, pool } = this;
+    const { height, width } = this._getTileExtent({
+      x,
+      y,
+      z
+    });
+    // Passing in the height and width explicitly prevents resampling that geotiff does without such parameters.
+    const [data] = await image.readRasters({
+      window: [
+        x * tileSize,
+        y * tileSize,
+        x * tileSize + width,
+        y * tileSize + height
+      ],
+      pool,
+      signal,
+      width,
+      height
+    });
     if (signal?.aborted) return null;
-    /*
-     * The endianness of JavaScript TypedArrays are determined by the endianness
-     * of the end-users' hardware. Nearly all desktop computers are x86 (little endian),
-     * so we flip bytes in place for big-endian buffers. This is substantially faster than using
-     * the DataView API.
-     */
-    if (!image.littleEndian) {
-      byteSwapInplace(data);
-    }
     if (this.omexml.Type.startsWith('int')) {
       // Uint view isn't correct for underling buffer, need to take an
       // IntXArray view and cast to UintXArray.
@@ -354,13 +363,14 @@ export default class OMETiffLoader {
   }
 
   /**
-   * Trunactes tiles on the edge to match the height/width reported by the image.
+   * For a given resolution level, z, the expected tile size on the boundary
+   * of the image should be exactly enough to fit the image bounds at the resolution level.
+   * This function returns that size or the parametrized tileSize from TIFF file.
    * @param {tileData: TypedArray[]} data The array to be filled in.
    * @param {Object} tile { x, y, z }
    * @returns {TypedArray} TypedArray
    */
-  _truncateTiles(data, tile) {
-    const { x, y, z } = tile;
+  _getTileExtent({ x, y, z }) {
     const { tileSize } = this;
     let height = tileSize;
     let width = tileSize;
@@ -376,22 +386,6 @@ export default class OMETiffLoader {
     if (y === maxYTileCoord) {
       height = zoomLevelHeight % tileSize;
     }
-    if (
-      (width === tileSize && height === tileSize) ||
-      data[0].length === width * height
-    ) {
-      return { data, width, height };
-    }
-    const truncated = data.map(d => {
-      const newData = new d.constructor(height * width);
-      // Take strips (rows) from original tile data and fill new smaller buffer
-      for (let i = 0; i < height; i += 1) {
-        const offset = i * tileSize; // offset in tile
-        const strip = d.subarray(offset, offset + width); // get strip with new width
-        newData.set(strip, i * width); // copy strip from input d to byte offset in truncated
-      }
-      return newData;
-    });
-    return { data: truncated, width, height };
+    return { height, width };
   }
 }
