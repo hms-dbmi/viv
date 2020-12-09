@@ -55,7 +55,7 @@ function RoutedAvivator(props) {
   const source = getRandomSource();
   return (
     <ThemeProvider theme={darkTheme}>
-      <Avivator source={source} history={history} />
+      <Avivator source={source} history={history} isDemoImage />
     </ThemeProvider>
   );
 }

@@ -6,7 +6,7 @@ end() { echo travis_fold':'end:$1; }
 die() { set +v; echo "$*" 1>&2 ; sleep 1; exit 1; }
 
 start changelog
-if [ "$TRAVIS_BRANCH" != 'master' ]; then
+if [ "$GITHUB_REF" != 'refs/heads/master' ]; then
   diff CHANGELOG.md <(curl "https://raw.githubusercontent.com/hms-dbmi/viv/master/CHANGELOG.md") \
     && die 'Update CHANGELOG.md'
 fi

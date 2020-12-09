@@ -6,13 +6,16 @@
 
 - Export a `getDefaultInitialViewState` function for getting a deafult inital view state given a loader and desired size of view.
 - Support interleaved RGB OME-TIFF files.
+- Added a README file for Avivator at `avivator/README.md`.
 
 ### Changed
 
 - Fix default component args API.
 - Change WebGL setting so that textures of non-multiple-of-4 length bind and display.
-- No longer pad tiles - instead truncate to the correct "raster size" so that the tile does not "bleed over."
 - Update preprint title in README.md
+- Use `readRasters` for TIFF for fetching tiles so that we are robust to non-uniformly sized tiles - thus we no longer need to "pad tiles."
+- Switch to Github Actions
+- Don't show snackbar if image provided is one of our demos.
 
 ## 0.7.0
 
