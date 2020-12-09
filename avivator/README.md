@@ -11,7 +11,7 @@ Avivator has been tested with the following dependency versions:
 - Zsh 5.7.1
 - one of:
     - Firefox Developer Edition 84.0b8
-    - Firefox 80.0.1
+    - Firefox 80.0.1 (and later)
     - Safari 13.1.1 (and later)
     - Google Chrome 87.0.4280.88
 
