@@ -3,7 +3,7 @@ name: Node.js CI
 on: [push]
 
 jobs:
-  build-windows:
+  - build-windows:
     runs-on: windows-latest
 
     strategy:
@@ -22,7 +22,7 @@ jobs:
         run: npm run install:avivator
       - name: Build Avivator and Viv
         run: npm run build && npm run build:avivator
- test-linux:
+  - test-linux:
     runs-on: ubuntu-latest
 
     strategy:
