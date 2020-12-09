@@ -1,6 +1,5 @@
 import OMEXML from './omeXML';
-import { isInTileBounds, byteSwapInplace, dimensionsFromOMEXML } from './utils';
-import { DTYPE_VALUES } from '../constants';
+import { isInTileBounds, dimensionsFromOMEXML } from './utils';
 
 const DTYPE_LOOKUP = {
   uint8: '<u1',
@@ -46,7 +45,9 @@ export default class OMETiffLoader {
     this.height = this.omexml.SizeY;
     this.tileSize = firstImage.getTileWidth();
     const { SubIFDs } = firstImage.fileDirectory;
-    this.numLevels = SubIFDs?.length || this.omexml.getNumberOfImages();
+    this.numLevels = SubIFDs
+      ? SubIFDs.length + 1
+      : this.omexml.getNumberOfImages();
     this.isBioFormats6Pyramid = SubIFDs;
     this.isPyramid = this.numLevels > 1;
     this.dimensions = dimensionsFromOMEXML(this.omexml);
@@ -156,10 +157,10 @@ export default class OMETiffLoader {
       image = await tiff.getImage(pyramidIndex);
       return this._getChannel({ image, x, y, z, signal });
     });
-    const tiles = await Promise.all(tileRequests);
-    const truncated = this._truncateTiles(tiles, { x, y, z });
+    const data = await Promise.all(tileRequests);
+    const { height, width } = this._getTileSize({ x, y, z });
     if (signal?.aborted) return null;
-    return truncated;
+    return { data, height, width };
   }
 
   /**
@@ -303,34 +304,21 @@ export default class OMETiffLoader {
     };
   }
 
-  async _getChannel({ image, x, y, signal }) {
-    const { dtype, tileSize, pool } = this;
-    const { TypedArray } = DTYPE_VALUES[dtype];
-    let data;
-    if (
-      image.getTileWidth() !== tileSize ||
-      image.getTileHeight() !== tileSize
-    ) {
-      // readRasters handles byte swapping for endianness.
-      [data] = await image.readRasters({
-        window: [x, y, x + 1, y + 1].map(i => i * tileSize),
-        pool,
-        signal
-      });
-    } else {
-      const tile = await image.getTileOrStrip(x, y, 0, pool, signal);
-      data = new TypedArray(tile.data);
-      if (signal?.aborted) return null;
-      /*
-       * The endianness of JavaScript TypedArrays are determined by the endianness
-       * of the end-users' hardware. Nearly all desktop computers are x86 (little endian),
-       * so we flip bytes in place for big-endian buffers. This is substantially faster than using
-       * the DataView API.
-       */
-      if (!image.littleEndian) {
-        byteSwapInplace(data);
-      }
-    }
+  async _getChannel({ image, x, y, z, signal }) {
+    const { tileSize, pool } = this;
+    const { height, width } = this._getTileSize({ x, y, z });
+    const [data] = await image.readRasters({
+      window: [
+        x * tileSize,
+        y * tileSize,
+        x * tileSize + width,
+        y * tileSize + height
+      ],
+      pool,
+      signal,
+      width,
+      height
+    });
     if (signal?.aborted) return null;
     if (this.omexml.Type.startsWith('int')) {
       // Uint view isn't correct for underling buffer, need to take an
@@ -367,14 +355,7 @@ export default class OMETiffLoader {
     }
   }
 
-  /**
-   * Trunactes tiles on the edge to match the height/width reported by the image.
-   * @param {tileData: TypedArray[]} data The array to be filled in.
-   * @param {Object} tile { x, y, z }
-   * @returns {TypedArray} TypedArray
-   */
-  _truncateTiles(data, tile) {
-    const { x, y, z } = tile;
+  _getTileSize({ x, y, z }) {
     const { tileSize } = this;
     let height = tileSize;
     let width = tileSize;
@@ -390,22 +371,6 @@ export default class OMETiffLoader {
     if (y === maxYTileCoord) {
       height = zoomLevelHeight % tileSize;
     }
-    if (
-      (width === tileSize && height === tileSize) ||
-      data[0].length === width * height
-    ) {
-      return { data, width, height };
-    }
-    const truncated = data.map(d => {
-      const newData = new d.constructor(height * width);
-      // Take strips (rows) from original tile data and fill new smaller buffer
-      for (let i = 0; i < height; i += 1) {
-        const offset = i * tileSize; // offset in tile
-        const strip = d.subarray(offset, offset + width); // get strip with new width
-        newData.set(strip, i * width); // copy strip from input d to byte offset in truncated
-      }
-      return newData;
-    });
-    return { data: truncated, width, height };
+    return { height, width };
   }
 }
