@@ -16,7 +16,7 @@ Avivator has been tested with the following dependency versions:
     - Google Chrome 87.0.4280.88
 
 
-## Installation guide
+## Development installation guide
 
 To install Avivator, run the following commands in a `zsh` or `bash` shell in the `avivator/` directory.
 
