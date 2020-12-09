@@ -2,7 +2,7 @@
 
 Avivator is a lightweight "batteries-included" WebGL viewer for remote imaging data, built around Viv.
 
-## System requirements
+## Development system requirements
 
 Avivator has been tested with the following dependency versions:
 - Operating system: macOS 10.15.5
