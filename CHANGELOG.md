@@ -5,6 +5,7 @@
 ### Added
 
 - Export a `getDefaultInitialViewState` function for getting a deafult inital view state given a loader and desired size of view.
+- Added a README file for Avivator at `avivator/README.md`.
 
 ### Changed
 
