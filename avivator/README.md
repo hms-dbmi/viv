@@ -1,6 +1,6 @@
 # Avivator
 
-Avivator is a lightweight "batteries-included" WebGL viewer for remote imaging data, built around Viv.
+Avivator is a lightweight "batteries-included" WebGL viewer for remote imaging data, built around Viv. A hosted instance of Avivator can be accessed at  [avivator.gehlenborglab.org]( avivator.gehlenborglab.org ).
 
 ## Development system requirements
 
