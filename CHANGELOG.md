@@ -12,7 +12,6 @@
 - Change WebGL setting so that textures of non-multiple-of-4 length bind and display.
 - No longer pad tiles - instead truncate to the correct "raster size" so that the tile does not "bleed over."
 - Update preprint title in README.md
-- Fix demo source snackbar in Avivator.
 
 ## 0.7.0
 
