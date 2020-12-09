@@ -27,6 +27,6 @@ jobs:
       - name: Test library (only on Linux)
         if: matrix.os == 'ubuntu-latest'
         run: xvfb-run --auto-servernum ./test.sh # for tape-run
-      - name: Build Avivator (only on Windows)
+      - name: Build Avivator and Viv (only on Windows)
         if: matrix.os == 'windows-laters'
-        run: npm run build:avivator
+        run: npm run build && npm run build:avivator
