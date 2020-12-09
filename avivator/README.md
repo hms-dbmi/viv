@@ -9,6 +9,9 @@ Avivator has been tested with the following dependency versions:
 - NodeJS 14.0.0
 - NPM 6.14.4
 - Firefox Developer Edition 84.0b8
+- Firefox 80.0.1
+- Safari 13.1.1
+- Google Chrome 87.0.4280.88
 - Zsh 5.7.1
 
 ## Installation guide
