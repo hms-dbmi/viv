@@ -76,6 +76,9 @@ For the `LuCa-7color_Scan1.qptiff` image, `6 = max(log2(ceil(12480 / 512)), log2
 There is currently [no "auto" feature for inferring the number of pyramid resolutions](https://github.com/ome/bioformats/issues/3644).
 Without the compression set, i.e `-compression LZW`, the output image will be uncompressed.
 
+There is a [2GB limit on the total amount of data](https://docs.openmicroscopy.org/bio-formats/6.4.0/about/bug-reporting.html#common-issues-to-check) that may be read into memory for the `bfconvert` cli tool.
+Therefore for larger images, please use `bioformats2raw + raw2ometiff`.
+
 > NOTE: Viv currently uses [`geotiff.js`](https://geotiffjs.github.io/) for accessing data from remote TIFFs
 > over HTTP and support the three lossless compression options supported
 > by `raw2ometiff` - `LZW`, `zlib`, and `Uncompressed` as well as `jpeg` compression for 8 bit data. Support
