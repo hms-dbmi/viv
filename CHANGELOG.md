@@ -4,6 +4,8 @@
 
 ### Added
 
+- Document support for `bfconvert` as a cli tool for generating image pyramids as well as the new pyramidal tiff spec.
+
 ### Changed
 
 ## 0.8.0
