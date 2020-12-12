@@ -52,10 +52,22 @@ const defaultProps = {
 };
 
 /**
- * This layer serves as the workhorse of the project, handling all the rendering.  Much of it is
- * adapted from BitmapLayer in DeckGL.
- * XR = eXtended Range i.e more than the standard 8-bit RGBA data format
- * (16/32 bit floats/ints/uints with more than 3/4 channels).
+ * This layer renders multi-channel high bit-depth imagery.
+ * @param {Object} props
+ * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
+ * @param {Array} props.colorValues List of [r, g, b] values for each channel.
+ * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @param {number} props.opacity Opacity of the layer.
+ * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
+ * @param {Function} props.onHover Hook function from deck.gl to handle hover objects.
+ * @param {boolean} props.isLensOn Whether or not to use the lens.
+ * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
+ * @param {number} props.lensBorderColor RGB color of the border of the lens.
+ * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * @param {number} props.onClick Hook function from deck.gl to handle clicked-on objects.
+ * @param {number} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @param {Object} props.channelData { height, width, data } object where data is an array of typed arrays containing image data.
  */
 export default class XRLayer extends Layer {
   /**
