@@ -14,7 +14,7 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 export default class ArrayBitmapLayer extends BitmapLayer {
   _getModel(gl) {
     const {
-      channelData: { photometricInterpretation }
+      loader: { photometricInterpretation }
     } = this.props;
     let photometricInterpretationShader;
     // This is a port to the GPU of a subset of https://github.com/geotiffjs/geotiff.js/blob/master/src/rgb.js

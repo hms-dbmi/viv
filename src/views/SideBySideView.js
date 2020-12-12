@@ -1,7 +1,13 @@
 import { PolygonLayer } from '@deck.gl/layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 
-import { MultiscaleImageLayer, ImageLayer, ScaleBarLayer } from '../layers';
+import {
+  MultiscaleImageLayer,
+  ImageLayer,
+  ScaleBarLayer,
+  ArrayBitmapLayer,
+  XRLayer
+} from '../layers';
 import VivView from './VivView';
 import { getVivId, makeBoundingBox } from './utils';
 /**
@@ -108,15 +114,19 @@ export default class SideBySideView extends VivView {
     const layerViewState = viewStates[id];
     const boundingBox = makeBoundingBox({ ...layerViewState, height, width });
     const layers = [];
+    const subLayer =
+      loader.isInterleaved && loader.isRgb ? ArrayBitmapLayer : XRLayer;
 
     const detailLayer = loader.isPyramid
       ? new MultiscaleImageLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
-          viewportId: id
+          viewportId: id,
+          subLayer
         })
       : new ImageLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
-          viewportId: id
+          viewportId: id,
+          subLayer
         });
     layers.push(detailLayer);
 

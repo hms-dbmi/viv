@@ -38,6 +38,8 @@ export default class OMETiffLoader {
         unit: this.omexml.PhysicalSizeYUnit
       }
     };
+    this.photometricInterpretation =
+      firstImage.fileDirectory.PhotometricInterpretation;
     this.software = firstImage.fileDirectory.Software;
     this.offsets = offsets || [];
     this.channelNames = this.omexml.getChannelNames();
@@ -168,14 +170,10 @@ export default class OMETiffLoader {
       z
     });
     if (signal?.aborted) return null;
-    const {
-      fileDirectory: { PhotometricInterpretation }
-    } = image;
     return {
       data,
       height,
-      width,
-      photometricInterpretation: PhotometricInterpretation
+      width
     };
   }
 
@@ -240,14 +238,10 @@ export default class OMETiffLoader {
     } else {
       data = rasters;
     }
-    const {
-      fileDirectory: { PhotometricInterpretation }
-    } = image;
     return {
       data,
       width,
-      height,
-      photometricInterpretation: PhotometricInterpretation
+      height
     };
   }
 

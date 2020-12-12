@@ -2,7 +2,6 @@ import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
 
 import XRLayer from './XRLayer';
-import ArrayBitmapLayer from './ArrayBitmapLayer';
 import { to32BitFloat, onPointer } from './utils';
 
 const defaultProps = {
@@ -29,7 +28,8 @@ const defaultProps = {
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
-  onClick: { type: 'function', value: null, compare: true }
+  onClick: { type: 'function', value: null, compare: true },
+  subLayer: { type: 'object', value: XRLayer, compare: true }
 };
 
 /**
@@ -51,6 +51,7 @@ const defaultProps = {
  * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  * @param {number} props.onClick Hook function from deck.gl to handle clicked-on objects.
  * @param {number} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @param {number} props.subLayer Default is XRLayer for multi-channel imagery but could be ArrayBitmapLayer for example if `loader.isInterleaved && loader.isRgb`
  */
 export default class ImageLayer extends CompositeLayer {
   initializeState() {
@@ -124,8 +125,7 @@ export default class ImageLayer extends CompositeLayer {
     const { dtype } = loader;
     const { width, height, unprojectLensBounds } = this.state;
     if (!(width && height)) return null;
-    const Layer =
-      loader.isRgb && loader.isInterleaved ? ArrayBitmapLayer : XRLayer;
+    const { subLayer: Layer } = this.props;
     return new Layer(this.props, {
       channelData: this.state,
       pickable,

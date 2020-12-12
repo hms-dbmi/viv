@@ -3,6 +3,7 @@ import { isWebGL2 } from '@luma.gl/core';
 import { Matrix4 } from 'math.gl';
 
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
+import XRLayer from '../XRLayer';
 import ImageLayer from '../ImageLayer';
 import { to32BitFloat, onPointer } from '../utils';
 
@@ -22,7 +23,8 @@ const defaultProps = {
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   maxRequests: { type: 'number', value: 10, compare: true },
-  onClick: { type: 'function', value: null, compare: true }
+  onClick: { type: 'function', value: null, compare: true },
+  subLayer: { type: 'object', value: XRLayer, compare: true }
 };
 
 /**
@@ -48,6 +50,7 @@ const defaultProps = {
  * @param {number} props.maxRequests Maximum parallel ongoing requests allowed before aborting.
  * @param {number} props.onClick Hook function from deck.gl to handle clicked-on objects.
  * @param {number} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @param {number} props.subLayer Default is XRLayer for multi-channel imagery but could be ArrayBitmapLayer for example if `loader.isInterleaved && loader.isRgb`
  */
 
 export default class MultiscaleImageLayer extends CompositeLayer {
