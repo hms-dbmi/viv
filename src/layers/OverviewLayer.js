@@ -1,8 +1,6 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { PolygonLayer } from '@deck.gl/layers';
 import { Matrix4 } from 'math.gl';
-import XRLayer from './XRLayer';
-import ArrayBitmapLayer from './ArrayBitmapLayer';
 
 import ImageLayer from './ImageLayer';
 
@@ -68,13 +66,10 @@ export default class OverviewLayer extends CompositeLayer {
     const { width, height } = loader.getRasterSize({
       z: 0
     });
-    const subLayer =
-      loader.isInterleaved && loader.isRgb ? ArrayBitmapLayer : XRLayer;
     const overview = new ImageLayer(this.props, {
       id: `viewport-${id}`,
       modelMatrix: new Matrix4().scale(2 ** (numLevels - 1) * overviewScale),
-      z: numLevels - 1,
-      subLayer
+      z: numLevels - 1
     });
     const boundingBoxOutline = new PolygonLayer({
       id: `bounding-box-overview-${id}`,

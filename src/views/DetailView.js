@@ -1,10 +1,4 @@
-import {
-  MultiscaleImageLayer,
-  ImageLayer,
-  ScaleBarLayer,
-  ArrayBitmapLayer,
-  XRLayer
-} from '../layers';
+import { MultiscaleImageLayer, ImageLayer, ScaleBarLayer } from '../layers';
 import VivView from './VivView';
 import { getVivId } from './utils';
 
@@ -17,18 +11,15 @@ export default class DetailView extends VivView {
     const { id, height, width } = this;
     const layerViewState = viewStates[id];
     const layers = [];
-    const subLayer =
-      loader.isInterleaved && loader.isRgb ? ArrayBitmapLayer : XRLayer;
+
     const detailLayer = loader.isPyramid
       ? new MultiscaleImageLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
-          viewportId: id,
-          subLayer
+          viewportId: id
         })
       : new ImageLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
-          viewportId: id,
-          subLayer
+          viewportId: id
         });
     layers.push(detailLayer);
 
