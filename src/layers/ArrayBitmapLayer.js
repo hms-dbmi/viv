@@ -11,16 +11,6 @@ const DEFAULT_TEXTURE_PARAMETERS = {
   [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
 };
 
-/**
- * This layer renders RGB interleaved data.
- * @param {Object} props
- * @param {Function} props.onHover Hook function from deck.gl to handle hover objects.
- * @param {Function} props.onClick Hook function from deck.gl to handle clicked-on objects.
- * @param {Object} props.loader A loader with the property `photometricInterpretation`.
- * @param {Object} props.channelData { height, width, data } object where data is an array of typed arrays containing image data.
- *
- */
-
 export default class ArrayBitmapLayer extends BitmapLayer {
   _getModel(gl) {
     const {
