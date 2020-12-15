@@ -39,6 +39,8 @@ export default class OMETiffLoader {
       }
     };
     this.software = firstImage.fileDirectory.Software;
+    this.photometricInterpretation =
+      firstImage.fileDirectory.PhotometricInterpretation;
     this.offsets = offsets || [];
     this.channelNames = this.omexml.getChannelNames();
     this.width = this.omexml.SizeX;
@@ -136,7 +138,7 @@ export default class OMETiffLoader {
     if (!this._tileInBounds({ x, y, z })) {
       return null;
     }
-    const { tiff, isBioFormats6Pyramid, omexml } = this;
+    const { tiff, isBioFormats6Pyramid, omexml, isInterleaved, isRgb } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const pyramidOffset = z * SizeZ * SizeT * SizeC;
     let image;
@@ -168,14 +170,10 @@ export default class OMETiffLoader {
       z
     });
     if (signal?.aborted) return null;
-    const {
-      fileDirectory: { PhotometricInterpretation }
-    } = image;
     return {
-      data,
+      data: isInterleaved && isRgb ? data[0] : data,
       height,
-      width,
-      photometricInterpretation: PhotometricInterpretation
+      width
     };
   }
 
@@ -187,7 +185,14 @@ export default class OMETiffLoader {
    * Default is `{data: [], width, height}`.
    */
   async getRaster({ z, loaderSelection }) {
-    const { tiff, omexml, isBioFormats6Pyramid, pool, isInterleaved } = this;
+    const {
+      tiff,
+      omexml,
+      isBioFormats6Pyramid,
+      pool,
+      isInterleaved,
+      isRgb
+    } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const rasters = await Promise.all(
       loaderSelection.map(async sel => {
@@ -240,14 +245,10 @@ export default class OMETiffLoader {
     } else {
       data = rasters;
     }
-    const {
-      fileDirectory: { PhotometricInterpretation }
-    } = image;
     return {
-      data,
+      data: isInterleaved && isRgb ? data[0] : data,
       width,
-      height,
-      photometricInterpretation: PhotometricInterpretation
+      height
     };
   }
 

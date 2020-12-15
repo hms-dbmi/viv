@@ -21,14 +21,9 @@ import {
   getChannelStats
 } from './loaders';
 import HTTPStore from './loaders/httpStore';
-import {
-  DTYPE_VALUES,
-  MAX_SLIDERS_AND_CHANNELS,
-  PHOTOMETRIC_INTERPRETATIONS
-} from './constants';
+import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from './constants';
 
 export {
-  PHOTOMETRIC_INTERPRETATIONS,
   DTYPE_VALUES,
   MAX_SLIDERS_AND_CHANNELS,
   ScaleBarLayer,

@@ -2,7 +2,7 @@ import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
 
 import XRLayer from './XRLayer';
-import ArrayBitmapLayer from './ArrayBitmapLayer';
+import BitmapLayer from './BitmapLayer';
 import { to32BitFloat, onPointer } from './utils';
 
 const defaultProps = {
@@ -78,14 +78,11 @@ export default class ImageLayer extends CompositeLayer {
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
       const { loader, z, loaderSelection } = this.props;
-      loader.getRaster({ z, loaderSelection }).then(channelData =>
+      loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) =>
         this.setState({
-          data:
-            !isWebGL2(this.context.gl) &&
-            !(loader.isInterleaved && loader.isRgb)
-              ? to32BitFloat(channelData.data)
-              : channelData.data,
-          ...channelData
+          data: !isWebGL2(this.context.gl) ? to32BitFloat(data) : data,
+          height,
+          width
         })
       );
     }
@@ -124,20 +121,32 @@ export default class ImageLayer extends CompositeLayer {
     const { dtype } = loader;
     const { width, height, unprojectLensBounds } = this.state;
     if (!(width && height)) return null;
-    const Layer =
-      loader.isRgb && loader.isInterleaved ? ArrayBitmapLayer : XRLayer;
-    return new Layer(this.props, {
+    const bounds = [0, height, width, 0];
+    const sharedLayerProps = {
+      bounds,
+      id: `image-sub-layer-${bounds}-${id}-${z}`,
+      onHover,
+      pickable,
+      onClick,
+      modelMatrix,
+      opacity,
+      visible
+    };
+    const { isRgb, isInterleaved, photometricInterpretation } = loader;
+    if (isRgb && isInterleaved) {
+      return new BitmapLayer(this.props, {
+        image: this.state,
+        photometricInterpretation,
+        ...sharedLayerProps
+      });
+    }
+    return new XRLayer(this.props, {
       channelData: this.state,
       pickable,
-      bounds: [0, height, width, 0],
       sliderValues,
       colorValues,
       channelIsOn,
       domain,
-      id: `XR-Static-Layer-${0}-${height}-${width}-${0}-${z}-${id}`,
-      coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-      opacity,
-      visible,
       dtype,
       colormap,
       unprojectLensBounds,
@@ -145,9 +154,7 @@ export default class ImageLayer extends CompositeLayer {
       lensSelection,
       lensBorderColor,
       lensRadius,
-      onClick,
-      onHover,
-      modelMatrix
+      ...sharedLayerProps
     });
   }
 }
