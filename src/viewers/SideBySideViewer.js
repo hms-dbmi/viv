@@ -41,7 +41,7 @@ const SideBySideViewer = props => {
     lensBorderRadius = 0.02
   } = props;
   const viewState =
-    initialViewState || getDefaultInitialViewState(loader, { height, width });
+    initialViewState || getDefaultInitialViewState(loader, { height, width }, .5);
   const detailViewLeft = new SideBySideView({
     initialViewState: { ...viewState, id: 'left' },
     linkedIds: ['right'],

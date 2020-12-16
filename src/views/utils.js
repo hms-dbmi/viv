@@ -25,32 +25,21 @@ export function makeBoundingBox(viewState) {
 }
 
 /**
- * Create an initial view state that centers the image in the view at the right zoom level.
- * @param {loader} Object The loader of the image for which the view state is desired.
- * @param {viewSize} Object { height, width } object for deducing the right zoom level to center the image.
+ * Create an initial view state that centers the image in the view at the zoom level that fills the screen.
+ * @param {Object} loader The loader of the image for which the view state is desired.
+ * @param {Object} viewSize { height, width } object for deducing the right zoom level to center the image.
+ * @param {Object} zoomBackOff An positive number for controls how far zoomed out from "full screen" it should be (default is 0).
+ * SideBySideViewer and PictureInPictureViewer use .5 when setting viewState automatically.
  * @returns {ViewState} A default initial view state that centers the image within the view: { target: [x, y, 0], zoom: -zoom }.
  */
-export function getDefaultInitialViewState(loader, viewSize) {
+export function getDefaultInitialViewState(loader, viewSize, zoomBackOff = 0) {
   const { height, width } = loader.getRasterSize({
     z: 0
   });
-  // Get a reasonable initial zoom level for pyramids based on screen size.
-  const { isPyramid } = loader;
-  let zoom = 0;
-  let size = Infinity;
-  // viewSize is not in the dependencies array becuase we only want to use it when the source changes.
-  if (isPyramid) {
-    while (size >= Math.max(...Object.values(viewSize))) {
-      const rasterSize = loader.getRasterSize({
-        z: zoom
-      });
-      size = Math.max(...Object.values(rasterSize));
-      zoom += 1;
-    }
-  }
+   const zoom = Math.log2(Math.min(viewSize.width / width, viewSize.height / height)) - zoomBackOff;
   const loaderInitialViewState = {
-    target: [height / 2, width / 2, 0],
-    zoom: isPyramid ? -zoom : -1.5
+    target: [width / 2, height / 2, 0],
+    zoom
   };
   return loaderInitialViewState;
 }

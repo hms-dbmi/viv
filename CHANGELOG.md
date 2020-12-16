@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Update `getDefaultInitialViewState` to return floating point zoom that fills the screen by default.
+
 ## 0.8.0
 
 ### Added
