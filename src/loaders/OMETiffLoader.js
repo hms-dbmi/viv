@@ -138,7 +138,7 @@ export default class OMETiffLoader {
     if (!this._tileInBounds({ x, y, z })) {
       return null;
     }
-    const { tiff, isBioFormats6Pyramid, omexml, isInterleaved, isRgb } = this;
+    const { tiff, isBioFormats6Pyramid, omexml } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const pyramidOffset = z * SizeZ * SizeT * SizeC;
     let image;
@@ -171,7 +171,7 @@ export default class OMETiffLoader {
     });
     if (signal?.aborted) return null;
     return {
-      data: isInterleaved && isRgb ? data[0] : data,
+      data,
       height,
       width
     };
@@ -185,14 +185,7 @@ export default class OMETiffLoader {
    * Default is `{data: [], width, height}`.
    */
   async getRaster({ z, loaderSelection }) {
-    const {
-      tiff,
-      omexml,
-      isBioFormats6Pyramid,
-      pool,
-      isInterleaved,
-      isRgb
-    } = this;
+    const { tiff, omexml, isBioFormats6Pyramid, pool, isInterleaved } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const rasters = await Promise.all(
       loaderSelection.map(async sel => {
@@ -246,7 +239,7 @@ export default class OMETiffLoader {
       data = rasters;
     }
     return {
-      data: isInterleaved && isRgb ? data[0] : data,
+      data,
       width,
       height
     };

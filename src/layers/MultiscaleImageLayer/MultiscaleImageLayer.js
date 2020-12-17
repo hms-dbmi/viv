@@ -1,6 +1,7 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
 import { Matrix4 } from 'math.gl';
+import GL from '@luma.gl/constants';
 
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
@@ -104,11 +105,22 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         loaderSelection,
         signal
       });
+      const isInterleavedAndRGB = isInterleaved && isRgb;
       if (tile) {
         tile.data =
-          noWebGl2 && !(isInterleaved && isRgb)
+          // eslint-disable-next-line no-nested-ternary
+          noWebGl2 && !isInterleavedAndRGB
             ? to32BitFloat(tile.data)
+            : isInterleavedAndRGB
+            ? tile.data[0]
             : tile.data;
+      }
+      if (tile.data.length === tile.width * tile.height * 3) {
+        return {
+          ...tile,
+          format: GL.RGB,
+          dataFormat: GL.RGB
+        };
       }
       return tile;
     };

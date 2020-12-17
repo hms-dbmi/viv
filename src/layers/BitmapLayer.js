@@ -1,13 +1,7 @@
 import { BitmapLayer as BaseBitmapLayer } from '@deck.gl/layers';
-import { Texture2D, Model, Geometry } from '@luma.gl/core';
+import { COORDINATE_SYSTEM } from '@deck.gl/core';
+import { Model, Geometry } from '@luma.gl/core';
 import GL from '@luma.gl/constants';
-
-const DEFAULT_TEXTURE_PARAMETERS = {
-  [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
-  [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
-  [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-  [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
-};
 
 const PHOTOMETRIC_INTERPRETATIONS = {
   WhiteIsZero: 0,
@@ -19,6 +13,14 @@ const PHOTOMETRIC_INTERPRETATIONS = {
   YCbCr: 6,
   CIELab: 8,
   ICCLab: 9
+};
+
+const defaultProps = {
+  pickable: true,
+  coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+  channelData: { type: 'object', value: {}, compare: true },
+  bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
+  opacity: { type: 'number', value: 1, compare: true }
 };
 
 const getPhotometricInterpretationShader = photometricInterpretation => {
@@ -63,6 +65,12 @@ export default class BitmapLayer extends BaseBitmapLayer {
     if (!gl) {
       return null;
     }
+    // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
+    // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
+    // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
+    // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
+    gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
+    gl.pixelStorei(GL.PACK_ALIGNMENT, 1);
 
     /*
       0,0 --- 1,0
@@ -82,38 +90,9 @@ export default class BitmapLayer extends BaseBitmapLayer {
       }
     });
   }
-
-  loadTexture() {
-    const { gl } = this.context;
-    // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
-    // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
-    // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
-    // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
-    gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
-    gl.pixelStorei(GL.PACK_ALIGNMENT, 1);
-    const { image } = this.props;
-    const { data, height, width } = image;
-    this.setState({
-      // If the image is RGBA (4 channels), we do not need to use a texture.
-      bitmapTexture:
-        data.length === width * height * 4
-          ? image
-          : new Texture2D(gl, {
-              width,
-              height,
-              data,
-              format: GL.RGB,
-              dataFormat: GL.RGB,
-              type: GL.UNSIGNED_BYTE,
-              mipmaps: false,
-              parameters: {
-                ...DEFAULT_TEXTURE_PARAMETERS
-              }
-            })
-    });
-  }
 }
 
 BitmapLayer.layerName = 'BitmapLayer';
 // From https://github.com/geotiffjs/geotiff.js/blob/8ef472f41b51d18074aece2300b6a8ad91a21ae1/src/globals.js#L202-L213
 BitmapLayer.PHOTOMETRIC_INTERPRETATIONS = PHOTOMETRIC_INTERPRETATIONS;
+BitmapLayer.defaultProps = defaultProps;

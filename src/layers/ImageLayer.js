@@ -1,5 +1,6 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
+import GL from '@luma.gl/constants';
 
 import XRLayer from './XRLayer';
 import BitmapLayer from './BitmapLayer';
@@ -78,13 +79,36 @@ export default class ImageLayer extends CompositeLayer {
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
       const { loader, z, loaderSelection } = this.props;
-      loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) =>
-        this.setState({
-          data: !isWebGL2(this.context.gl) ? to32BitFloat(data) : data,
-          height,
-          width
-        })
-      );
+      loader.getRaster({ z, loaderSelection }).then(imageData => {
+        const isInterleavedAndRGB = loader.isInterleaved && loader.isRgb;
+        // eslint-disable-next-line no-param-reassign
+        const data =
+          // eslint-disable-next-line no-nested-ternary
+          isInterleavedAndRGB
+            ? imageData.data[0]
+            : !isWebGL2(this.context.gl)
+            ? to32BitFloat(imageData.data)
+            : imageData.data;
+        const { height, width } = imageData;
+        if (
+          data.length === imageData.width * imageData.height * 3 &&
+          isInterleavedAndRGB
+        ) {
+          this.setState({
+            data,
+            height,
+            width,
+            format: GL.RGB,
+            dataFormat: GL.RGB
+          });
+        } else {
+          this.setState({
+            data,
+            height,
+            width
+          });
+        }
+      });
     }
   }
 
