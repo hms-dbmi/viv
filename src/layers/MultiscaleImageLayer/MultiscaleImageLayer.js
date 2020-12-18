@@ -105,22 +105,18 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         loaderSelection,
         signal
       });
-      const isInterleavedAndRGB = isInterleaved && isRgb;
-      if (tile) {
-        tile.data =
-          // eslint-disable-next-line no-nested-ternary
-          noWebGl2 && !isInterleavedAndRGB
-            ? to32BitFloat(tile.data)
-            : isInterleavedAndRGB
-            ? tile.data[0]
-            : tile.data;
+      if (isInterleaved && isRgb) {
+        // eslint-disable-next-line prefer-destructuring
+        tile.data = tile.data[0];
+        if (tile.data.length === tile.width * tile.height * 3) {
+          tile.format = GL.RGB;
+          tile.dataFormat = GL.RGB; // is this not properly inferred?
+        }
+        // can just return early, no need  to check for webgl2
+        return tile;
       }
-      if (tile.data.length === tile.width * tile.height * 3) {
-        return {
-          ...tile,
-          format: GL.RGB,
-          dataFormat: GL.RGB
-        };
+      if (noWebGl2) {
+        tile.data = to32BitFloat(tile.data);
       }
       return tile;
     };

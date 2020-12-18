@@ -18,7 +18,6 @@ const PHOTOMETRIC_INTERPRETATIONS = {
 const defaultProps = {
   pickable: true,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-  channelData: { type: 'object', value: {}, compare: true },
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
   opacity: { type: 'number', value: 1, compare: true }
 };

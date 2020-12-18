@@ -79,35 +79,24 @@ export default class ImageLayer extends CompositeLayer {
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
       const { loader, z, loaderSelection } = this.props;
-      loader.getRaster({ z, loaderSelection }).then(imageData => {
-        const isInterleavedAndRGB = loader.isInterleaved && loader.isRgb;
-        // eslint-disable-next-line no-param-reassign
-        const data =
-          // eslint-disable-next-line no-nested-ternary
-          isInterleavedAndRGB
-            ? imageData.data[0]
-            : !isWebGL2(this.context.gl)
-            ? to32BitFloat(imageData.data)
-            : imageData.data;
-        const { height, width } = imageData;
-        if (
-          data.length === imageData.width * imageData.height * 3 &&
-          isInterleavedAndRGB
-        ) {
-          this.setState({
-            data,
-            height,
-            width,
-            format: GL.RGB,
-            dataFormat: GL.RGB
-          });
-        } else {
-          this.setState({
-            data,
-            height,
-            width
-          });
+      loader.getRaster({ z, loaderSelection }).then(raster => {
+        /* eslint-disable no-param-reassign */
+        if (loader.isInterleaved && loader.isRgb) {
+          // data is for BitmapLayer and needs to be of form { data: Uint8Array, width, height };
+          // eslint-disable-next-line prefer-destructuring
+          raster.data = raster.data[0];
+          if (raster.data.length === raster.width * raster.height * 3) {
+            // data is RGB (not RGBA) and need to update texture formats
+            raster.format = GL.RGB;
+            raster.dataFormat = GL.RGB;
+          }
+        } else if (!isWebGL2(this.context.gl)) {
+          // data is for XLRLayer in non-WebGL2 evironment
+          // we need to convert data to compatible textures
+          raster.data = to32BitFloat(raster.data);
         }
+        this.setState(raster);
+        /* eslint-disable no-param-reassign */
       });
     }
   }
