@@ -44,23 +44,21 @@ export function renderSubLayers(props) {
     data.width < loader.tileSize ? width : right,
     top
   ];
-  const sharedLayerProps = {
-    bounds,
-    id: `tile-sub-layer-${bounds}-${id}`,
-    tileId: { x, y, z },
-    onHover,
-    pickable,
-    onClick,
-    modelMatrix,
-    opacity,
-    visible
-  };
   const { isRgb, isInterleaved, photometricInterpretation } = loader;
   if (isRgb && isInterleaved) {
     return new BitmapLayer(props, {
       image: data,
       photometricInterpretation,
-      ...sharedLayerProps
+      // Shared props with XRLayer:
+      bounds,
+      id: `tile-sub-layer-${bounds}-${id}`,
+      tileId: { x, y, z },
+      onHover,
+      pickable,
+      onClick,
+      modelMatrix,
+      opacity,
+      visible
     });
   }
   return new XRLayer(props, {
@@ -77,6 +75,15 @@ export function renderSubLayers(props) {
     unprojectLensBounds,
     isLensOn,
     lensSelection,
-    ...sharedLayerProps
+    // Shared props with BitmapLayer:
+    bounds,
+    id: `tile-sub-layer-${bounds}-${id}`,
+    tileId: { x, y, z },
+    onHover,
+    pickable,
+    onClick,
+    modelMatrix,
+    opacity,
+    visible
   });
 }

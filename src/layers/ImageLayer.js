@@ -135,27 +135,24 @@ export default class ImageLayer extends CompositeLayer {
     const { width, height, unprojectLensBounds } = this.state;
     if (!(width && height)) return null;
     const bounds = [0, height, width, 0];
-    const sharedLayerProps = {
-      bounds,
-      id: `image-sub-layer-${bounds}-${id}-${z}`,
-      onHover,
-      pickable,
-      onClick,
-      modelMatrix,
-      opacity,
-      visible
-    };
     const { isRgb, isInterleaved, photometricInterpretation } = loader;
     if (isRgb && isInterleaved) {
       return new BitmapLayer(this.props, {
         image: this.state,
         photometricInterpretation,
-        ...sharedLayerProps
+        // Shared props with XRLayer:
+        bounds,
+        id: `image-sub-layer-${bounds}-${id}-${z}`,
+        onHover,
+        pickable,
+        onClick,
+        modelMatrix,
+        opacity,
+        visible
       });
     }
     return new XRLayer(this.props, {
       channelData: this.state,
-      pickable,
       sliderValues,
       colorValues,
       channelIsOn,
@@ -167,7 +164,15 @@ export default class ImageLayer extends CompositeLayer {
       lensSelection,
       lensBorderColor,
       lensRadius,
-      ...sharedLayerProps
+      // Shared props with BitmapLayer:
+      bounds,
+      id: `image-sub-layer-${bounds}-${id}-${z}`,
+      onHover,
+      pickable,
+      onClick,
+      modelMatrix,
+      opacity,
+      visible
     });
   }
 }
