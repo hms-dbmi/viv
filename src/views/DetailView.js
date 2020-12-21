@@ -4,6 +4,7 @@ import { getVivId } from './utils';
 
 /**
  * This class generates a MultiscaleImageLayer and a view for use in the VivViewer as a detailed view.
+ * It takes the same arguments for its constructor as its base class VivView.
  * */
 export default class DetailView extends VivView {
   getLayers({ props, viewStates }) {

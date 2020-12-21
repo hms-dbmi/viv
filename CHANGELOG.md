@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Fix documentation of instances where spreading is used in the arguments for a function.
+
 ## 0.8.0
 
 ### Added

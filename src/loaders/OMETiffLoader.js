@@ -64,9 +64,10 @@ export default class OMETiffLoader {
 
   /**
    * Returns an IFD index for a given loader selection.
-   * @param {number} z Z axis selection.
-   * @param {number} time Time axis selection.
-   * @param {String} channel Channel axis selection.
+   * @param {object} args
+   * @param {number} args.z Z axis selection.
+   * @param {number} args.time Time axis selection.
+   * @param {String} args.channel Channel axis selection.
    * @returns {number} IFD index.
    */
   _getIFDIndex({ z = 0, channel, time = 0 }) {
@@ -121,10 +122,12 @@ export default class OMETiffLoader {
 
   /**
    * Returns image tiles at tile-position (x, y) at pyramidal level z.
-   * @param {number} x positive integer
-   * @param {number} y positive integer
-   * @param {number} z positive integer (0 === highest zoom level)
-   * @param {Array} loaderSelection, Array of number Arrays specifying channel selections
+   * @param {object} args
+   * @param {number} args.x positive integer
+   * @param {number} args.y positive integer
+   * @param {number} args.z positive integer (0 === highest zoom level)
+   * @param {Array} args.loaderSelection, Array of number Arrays specifying channel selections
+   * @param {Array} args.signal AbortSignal object
    * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize).
    * Default is `{data: [], width: tileSize, height: tileSize}`.
    */
@@ -169,8 +172,9 @@ export default class OMETiffLoader {
 
   /**
    * Returns full image panes (at level z if pyramid)
-   * @param {number} z positive integer (0 === highest zoom level)
-   * @param {Array} loaderSelection, Array of number Arrays specifying channel selections
+   * @param {object} args
+   * @param {number} args.z positive integer (0 === highest zoom level)
+   * @param {Array} args.loaderSelection, Array of number Arrays specifying channel selections
    * @returns {Object} data: TypedArray[], width: number, height: number
    * Default is `{data: [], width, height}`.
    */
@@ -237,7 +241,8 @@ export default class OMETiffLoader {
    * This information is inferrable from the provided omexml.
    * It is NOT the actual pixel-size but rather the image size
    * without any padding.
-   * @param {number} z positive integer (0 === highest zoom level)
+   * @param {object} args
+   * @param {number} args.z positive integer (0 === highest zoom level)
    * @returns {Object} width: number, height: number
    */
   getRasterSize({ z }) {

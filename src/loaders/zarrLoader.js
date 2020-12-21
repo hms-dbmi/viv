@@ -57,10 +57,12 @@ export default class ZarrLoader {
 
   /**
    * Returns image tiles at tile-position (x, y) at pyramidal level z.
-   * @param {number} x positive integer
-   * @param {number} y positive integer
-   * @param {number} z positive integer (0 === highest zoom level)
-   * @param {Array} loaderSelection, Array of valid dimension selections
+   * @param {number} args
+   * @param {number} args.x positive integer
+   * @param {number} args.y positive integer
+   * @param {number} args.z positive integer (0 === highest zoom level)
+   * @param {Array} args.loaderSelection Array of valid dimension selections
+   * @param {Array} args.signal AbortSignal object
    * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize)
    */
   async getTile({ x, y, z, loaderSelection = [], signal }) {
@@ -103,8 +105,9 @@ export default class ZarrLoader {
 
   /**
    * Returns full image panes (at level z if pyramid)
-   * @param {number} z positive integer (0 === highest zoom level)
-   * @param {Array} loaderSelection, Array of valid dimension selections
+   * @param {number} args
+   * @param {number} args.z positive integer (0 === highest zoom level)
+   * @param {Array} args.loaderSelection, Array of valid dimension selections
    * @returns {Object} data: TypedArray[], width: number, height: number
    */
   async getRaster({ z, loaderSelection = [] }) {
@@ -143,7 +146,8 @@ export default class ZarrLoader {
 
   /**
    * Returns image width and height (at pyramid level z) without fetching data
-   * @param {number} z positive integer (0 === highest zoom level)
+   * @param {object} args
+   * @param {number} args.z positive integer (0 === highest zoom level)
    * @returns {Object} width: number, height: number
    */
   getRasterSize({ z }) {
