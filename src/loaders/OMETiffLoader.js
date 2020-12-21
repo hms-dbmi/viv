@@ -39,13 +39,15 @@ export default class OMETiffLoader {
       }
     };
     this.software = firstImage.fileDirectory.Software;
+    this.photometricInterpretation =
+      firstImage.fileDirectory.PhotometricInterpretation;
     this.offsets = offsets || [];
     this.channelNames = this.omexml.getChannelNames();
     this.width = this.omexml.SizeX;
     this.height = this.omexml.SizeY;
     this.tileSize = firstImage.getTileWidth();
     const { SubIFDs } = firstImage.fileDirectory;
-    this.numLevels = SubIFDs
+    this.numLevels = SubIFDs?.length
       ? SubIFDs.length + 1
       : this.omexml.getNumberOfImages();
     this.isBioFormats6Pyramid = SubIFDs;
@@ -59,7 +61,11 @@ export default class OMETiffLoader {
     // we flag that as rgb.
     this.isRgb =
       this.omexml.SamplesPerPixel === 3 ||
-      (this.channelNames.length === 3 && this.omexml.Type === 'uint8');
+      (this.channelNames.length === 3 && this.omexml.Type === 'uint8') ||
+      (this.omexml.SizeC === 3 &&
+        this.channelNames.length === 1 &&
+        this.omexml.Interleaved);
+    this.isInterleaved = this.omexml.Interleaved;
   }
 
   /**
@@ -164,7 +170,11 @@ export default class OMETiffLoader {
       z
     });
     if (signal?.aborted) return null;
-    return { data, height, width };
+    return {
+      data,
+      height,
+      width
+    };
   }
 
   /**
@@ -175,7 +185,7 @@ export default class OMETiffLoader {
    * Default is `{data: [], width, height}`.
    */
   async getRaster({ z, loaderSelection }) {
-    const { tiff, omexml, isBioFormats6Pyramid, pool } = this;
+    const { tiff, omexml, isBioFormats6Pyramid, pool, isInterleaved } = this;
     const { SizeZ, SizeT, SizeC } = omexml;
     const rasters = await Promise.all(
       loaderSelection.map(async sel => {
@@ -198,8 +208,11 @@ export default class OMETiffLoader {
         }
         const image = await tiff.getImage(pyramidIndex);
         // Flips bits for us for endianness.
-        const raster = await image.readRasters({ pool });
-        return raster[0];
+        const raster = await image.readRasters({
+          pool,
+          interleave: isInterleaved
+        });
+        return isInterleaved ? raster : raster[0];
       })
     );
     // Get first selection * SizeZ * SizeT * SizeC + loaderSelection[0] size as proxy for image size.
@@ -307,14 +320,14 @@ export default class OMETiffLoader {
   }
 
   async _getChannel({ image, x, y, z, signal }) {
-    const { tileSize, pool } = this;
+    const { tileSize, pool, isInterleaved: interleave } = this;
     const { height, width } = this._getTileExtent({
       x,
       y,
       z
     });
     // Passing in the height and width explicitly prevents resampling that geotiff does without such parameters.
-    const [data] = await image.readRasters({
+    const rasters = await image.readRasters({
       window: [
         x * tileSize,
         y * tileSize,
@@ -324,8 +337,10 @@ export default class OMETiffLoader {
       pool,
       signal,
       width,
-      height
+      height,
+      interleave
     });
+    const data = interleave ? rasters : rasters[0];
     if (signal?.aborted) return null;
     if (this.omexml.Type.startsWith('int')) {
       // Uint view isn't correct for underling buffer, need to take an
@@ -338,7 +353,6 @@ export default class OMETiffLoader {
       }
       return new Uint32Array(new Int32Array(data.buffer));
     }
-
     return data;
   }
 

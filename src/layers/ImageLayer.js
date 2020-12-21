@@ -1,7 +1,9 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
+import GL from '@luma.gl/constants';
 
 import XRLayer from './XRLayer';
+import BitmapLayer from './BitmapLayer';
 import { to32BitFloat, onPointer } from './utils';
 
 const defaultProps = {
@@ -77,13 +79,25 @@ export default class ImageLayer extends CompositeLayer {
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
       const { loader, z, loaderSelection } = this.props;
-      loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) =>
-        this.setState({
-          data: !isWebGL2(this.context.gl) ? to32BitFloat(data) : data,
-          height,
-          width
-        })
-      );
+      loader.getRaster({ z, loaderSelection }).then(raster => {
+        /* eslint-disable no-param-reassign */
+        if (loader.isInterleaved && loader.isRgb) {
+          // data is for BitmapLayer and needs to be of form { data: Uint8Array, width, height };
+          // eslint-disable-next-line prefer-destructuring
+          raster.data = raster.data[0];
+          if (raster.data.length === raster.width * raster.height * 3) {
+            // data is RGB (not RGBA) and need to update texture formats
+            raster.format = GL.RGB;
+            raster.dataFormat = GL.RGB;
+          }
+        } else if (!isWebGL2(this.context.gl)) {
+          // data is for XLRLayer in non-WebGL2 evironment
+          // we need to convert data to compatible textures
+          raster.data = to32BitFloat(raster.data);
+        }
+        this.setState({ ...raster });
+        /* eslint-disable no-param-reassign */
+      });
     }
   }
 
@@ -118,20 +132,31 @@ export default class ImageLayer extends CompositeLayer {
       modelMatrix
     } = this.props;
     const { dtype } = loader;
-    const { data, width, height, unprojectLensBounds } = this.state;
+    const { width, height, data, unprojectLensBounds } = this.state;
     if (!(width && height)) return null;
+    const bounds = [0, height, width, 0];
+    const { isRgb, isInterleaved, photometricInterpretation } = loader;
+    if (isRgb && isInterleaved) {
+      return new BitmapLayer(this.props, {
+        image: this.state,
+        photometricInterpretation,
+        // Shared props with XRLayer:
+        bounds,
+        id: `image-sub-layer-${bounds}-${id}-${z}`,
+        onHover,
+        pickable,
+        onClick,
+        modelMatrix,
+        opacity,
+        visible
+      });
+    }
     return new XRLayer(this.props, {
-      channelData: { data, width, height },
-      pickable,
-      bounds: [0, height, width, 0],
+      channelData: { data, height, width },
       sliderValues,
       colorValues,
       channelIsOn,
       domain,
-      id: `XR-Static-Layer-${0}-${height}-${width}-${0}-${z}-${id}`,
-      coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-      opacity,
-      visible,
       dtype,
       colormap,
       unprojectLensBounds,
@@ -139,9 +164,15 @@ export default class ImageLayer extends CompositeLayer {
       lensSelection,
       lensBorderColor,
       lensRadius,
-      onClick,
+      // Shared props with BitmapLayer:
+      bounds,
+      id: `image-sub-layer-${bounds}-${id}-${z}`,
       onHover,
-      modelMatrix
+      pickable,
+      onClick,
+      modelMatrix,
+      opacity,
+      visible
     });
   }
 }
