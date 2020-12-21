@@ -19,6 +19,7 @@ export default class OMEXML {
     this.SizeC = Number.parseInt(Pixels['@_SizeC']);
     this.SizeX = Number.parseInt(Pixels['@_SizeX']);
     this.SizeY = Number.parseInt(Pixels['@_SizeY']);
+    this.Interleaved = Pixels['@_Interleaved'] === 'true';
     this.DimensionOrder = Pixels['@_DimensionOrder'];
     this.Type = Pixels['@_Type'];
     const PhysicalSizeYUnit = Pixels['@_PhysicalSizeYUnit'];

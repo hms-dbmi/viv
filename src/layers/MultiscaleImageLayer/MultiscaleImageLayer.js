@@ -1,6 +1,7 @@
 import { CompositeLayer } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
 import { Matrix4 } from 'math.gl';
+import GL from '@luma.gl/constants';
 
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
@@ -87,7 +88,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       onClick,
       modelMatrix
     } = this.props;
-    const { tileSize, numLevels, dtype } = loader;
+    const { tileSize, numLevels, dtype, isInterleaved, isRgb } = loader;
     const { unprojectLensBounds } = this.state;
     const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z, signal }) => {
@@ -104,8 +105,18 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         loaderSelection,
         signal
       });
-      if (tile) {
-        tile.data = noWebGl2 ? to32BitFloat(tile.data) : tile.data;
+      if (isInterleaved && isRgb) {
+        // eslint-disable-next-line prefer-destructuring
+        tile.data = tile.data[0];
+        if (tile.data.length === tile.width * tile.height * 3) {
+          tile.format = GL.RGB;
+          tile.dataFormat = GL.RGB; // is this not properly inferred?
+        }
+        // can just return early, no need  to check for webgl2
+        return tile;
+      }
+      if (noWebGl2) {
+        tile.data = to32BitFloat(tile.data);
       }
       return tile;
     };

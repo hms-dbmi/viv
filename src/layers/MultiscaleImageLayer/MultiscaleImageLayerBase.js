@@ -3,7 +3,6 @@ import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import { renderSubLayers } from './utils';
 
 const defaultProps = {
-  ...TileLayer.defaultProps,
   pickable: true,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   sliderValues: { type: 'array', value: [], compare: true },
