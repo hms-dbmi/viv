@@ -36,7 +36,9 @@ export function getDefaultInitialViewState(loader, viewSize, zoomBackOff = 0) {
   const { height, width } = loader.getRasterSize({
     z: 0
   });
-   const zoom = Math.log2(Math.min(viewSize.width / width, viewSize.height / height)) - zoomBackOff;
+  const zoom =
+    Math.log2(Math.min(viewSize.width / width, viewSize.height / height)) -
+    zoomBackOff;
   const loaderInitialViewState = {
     target: [width / 2, height / 2, 0],
     zoom
