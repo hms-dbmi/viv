@@ -95,7 +95,7 @@ export default class ImageLayer extends CompositeLayer {
           // we need to convert data to compatible textures
           raster.data = to32BitFloat(raster.data);
         }
-        this.setState(raster);
+        this.setState({ ...raster });
         /* eslint-disable no-param-reassign */
       });
     }
@@ -132,7 +132,7 @@ export default class ImageLayer extends CompositeLayer {
       modelMatrix
     } = this.props;
     const { dtype } = loader;
-    const { width, height, unprojectLensBounds } = this.state;
+    const { width, height, data, unprojectLensBounds } = this.state;
     if (!(width && height)) return null;
     const bounds = [0, height, width, 0];
     const { isRgb, isInterleaved, photometricInterpretation } = loader;
@@ -152,7 +152,7 @@ export default class ImageLayer extends CompositeLayer {
       });
     }
     return new XRLayer(this.props, {
-      channelData: this.state,
+      channelData: { data, height, width },
       sliderValues,
       colorValues,
       channelIsOn,
