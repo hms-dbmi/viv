@@ -9,12 +9,13 @@ import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
  * @param {Array} props.colorValues List of [r, g, b] values for each channel.
  * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
  * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
- * @param {Object} props.loader Loader to be used for fetching data.  It must have the properies `dtype`, `numLevels`, and `tileSize` and implement `getTile` and `getRaster`.
+ * @param {Object} props.loader Loader to be used for fetching data.  It must have the properies `dtype`, `numLevels`, `isPyramid`, and `tileSize` and implement `getTile`, `getRaster`, and `getRasterSize`.
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {Object} props.overview Allows you to pass settings into the OverviewView: { scale, margin, position, minimumWidth, maximumWidth,
- * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.
+ * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.  See http://viv.gehlenborglab.org/#overviewview for defaults.
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
- * @param {Object} props.hoverHooks Object including the allowable hooks - right now only accepting a function with key handleValue like { handleValue: (valueArray) => {} }
+ * @param {Object} props.hoverHooks Object including the allowable hooks - right now only accepting a function with key handleValue like { handleValue: (valueArray) => {} } where valueArray
+ * has the pixel values for the image under the hover location.
  * @param {number} props.initialViewState Object like { target: [x, y, 0], zoom: -zoom } for initializing where the viewer looks (optional - this can be inferred from height/width/loader).
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
