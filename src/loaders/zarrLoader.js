@@ -146,7 +146,7 @@ export default class ZarrLoader {
 
   /**
    * Returns image width and height (at pyramid level z) without fetching data
-   * @param {object} args
+   * @param {Object} args
    * @param {number} args.z positive integer (0 === highest zoom level)
    * @returns {Object} width: number, height: number
    */

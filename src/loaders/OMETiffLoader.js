@@ -64,7 +64,7 @@ export default class OMETiffLoader {
 
   /**
    * Returns an IFD index for a given loader selection.
-   * @param {object} args
+   * @param {Object} args
    * @param {number} args.z Z axis selection.
    * @param {number} args.time Time axis selection.
    * @param {String} args.channel Channel axis selection.
@@ -122,7 +122,7 @@ export default class OMETiffLoader {
 
   /**
    * Returns image tiles at tile-position (x, y) at pyramidal level z.
-   * @param {object} args
+   * @param {Object} args
    * @param {number} args.x positive integer
    * @param {number} args.y positive integer
    * @param {number} args.z positive integer (0 === highest zoom level)
@@ -172,7 +172,7 @@ export default class OMETiffLoader {
 
   /**
    * Returns full image panes (at level z if pyramid)
-   * @param {object} args
+   * @param {Object} args
    * @param {number} args.z positive integer (0 === highest zoom level)
    * @param {Array} args.loaderSelection, Array of number Arrays specifying channel selections
    * @returns {Object} data: TypedArray[], width: number, height: number
@@ -241,7 +241,7 @@ export default class OMETiffLoader {
    * This information is inferrable from the provided omexml.
    * It is NOT the actual pixel-size but rather the image size
    * without any padding.
-   * @param {object} args
+   * @param {Object} args
    * @param {number} args.z positive integer (0 === highest zoom level)
    * @returns {Object} width: number, height: number
    */
