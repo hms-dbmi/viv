@@ -7,6 +7,7 @@
 ### Changed
 
 - Update `getDefaultInitialViewState` to return floating point zoom that fills the screen by default.
+- Fix documentation of instances where spreading is used in the arguments for a function.
 
 ## 0.8.0
 

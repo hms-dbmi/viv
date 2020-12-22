@@ -9,7 +9,7 @@ import { SideBySideView, getDefaultInitialViewState } from '../views';
  * @param {Array} props.colorValues List of [r, g, b] values for each channel.
  * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
  * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
- * @param {Object} props.loader Loader to be used for fetching data.  It must have the properies `dtype`, `numLevels`, `isRgb`, `isInterleaved`, and `tileSize` and implement `getTile` and `getRaster`.
+ * @param {Object} props.loader Loader to be used for fetching data.  It must have the properies `dtype`, `numLevels`, `isRgb`, `isInterleaved`, and `tileSize` and implement `getTile`, `getRasterSize`, and `getRaster`.
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {Boolean} props.zoomLock Whether or not lock the zooms of the two views.
  * @param {Boolean} props.panLock Whether or not lock the pans of the two views.

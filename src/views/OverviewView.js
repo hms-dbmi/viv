@@ -4,12 +4,13 @@ import { OverviewLayer } from '../layers';
 import { makeBoundingBox, getVivId } from './utils';
 
 /**
- * This class generates a OverviewLayer and a view for use in the VivViewer as an overview to a Detailview (they must be used in conjection)
+ * This class generates a OverviewLayer and a view for use in the VivViewer as an overview to a Detailview (they must be used in conjection).
+ * From the base class VivView, only the initialViewState argument is used.  This class uses private methods to position its x and y from the
+ * additional arguments:
  * @param {Object} args
- * @param {Object} args.viewState ViewState object: { target: [x, y, 0], zoom: -zoom }.
  * @param {Object} args.height Width of the view.
  * @param {Object} args.width Height of the view.
- * @param {Object} props.loader Loader to be used for inferring zoom level and fetching data.  It must have the properies `dtype`, `numLevels`, and `tileSize` and implement `getTile` and `getRaster`.
+ * @param {Object} args.loader Loader to be used for inferring zoom level and fetching data.  It must have the properies `dtype`, `numLevels`, and `tileSize` and implement `getTile` and `getRaster`.
  * @param {number} args.detailHeight Height of the detail view.
  * @param {number} args.detailWidth Width of the detail view.
  * @param {number} args.scale Scale of this viewport relative to the detail. Default is .2.
