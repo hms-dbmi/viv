@@ -15,7 +15,8 @@ import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
  * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
  * @param {Object} props.hoverHooks Object including the allowable hooks - right now only accepting a function with key handleValue like { handleValue: (valueArray) => {} }
- * @param {number} props.initialViewState Object like { target: [x, y, 0], zoom: -zoom } for initializing where the viewer looks (optional - this can be inferred from height/width/loader).
+ * @param {number} props.initialViewState Object like { target: [x, y, 0], zoom: -zoom } for initializing where the viewer looks (optional - this is inferred from height/width/loader
+ * internally by default using getDefaultInitialViewState).
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
  * @param {boolean} props.isLensOn Whether or not to use the lens (deafult false).
