@@ -1,6 +1,9 @@
 import { MultiscaleImageLayer, ImageLayer, ScaleBarLayer } from '../layers';
 import VivView from './VivView';
 import { getVivId } from './utils';
+import { OVERVIEW_VIEW_ID } from './OverviewView';
+
+export const DETAIL_VIEW_ID = 'detail';
 
 /**
  * This class generates a MultiscaleImageLayer and a view for use in the VivViewer as a detailed view.
@@ -51,7 +54,7 @@ export default class DetailView extends VivView {
    * @returns {ViewState} ViewState for this class (or null by default if the ids do not match).
    */
   filterViewState({ viewState, currentViewState }) {
-    if (viewState.id === 'overview') {
+    if (viewState.id === OVERVIEW_VIEW_ID) {
       const { target } = viewState;
       if (target) {
         return { ...currentViewState, target };

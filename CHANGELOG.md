@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add a click handler to the overview that centers the detail view on the click position. The handler can be turned off by setting the `PictureInPictureViewer` property `clickCenter` to `false`.
+
 ### Changed
 
 - Fix documentation of instances where spreading is used in the arguments for a function.

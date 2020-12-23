@@ -1,6 +1,6 @@
 import React from 'react'; // eslint-disable-line import/no-unresolved
 import VivViewer from './VivViewer';
-import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
+import { DetailView, OverviewView, getDefaultInitialViewState, DETAIL_VIEW_ID, OVERVIEW_VIEW_ID } from '../views';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -50,7 +50,7 @@ const PictureInPictureViewer = props => {
   } = props;
   const viewState =
     initialViewState || getDefaultInitialViewState(loader, { height, width });
-  const detailViewState = { ...viewState, id: 'detail' };
+  const detailViewState = { ...viewState, id: DETAIL_VIEW_ID };
   const detailView = new DetailView({
     initialViewState: detailViewState,
     height,
@@ -72,7 +72,7 @@ const PictureInPictureViewer = props => {
   const views = [detailView];
   const layerProps = [layerConfig];
   if (overviewOn && loader) {
-    const overviewViewState = { ...viewState, id: 'overview' };
+    const overviewViewState = { ...viewState, id: OVERVIEW_VIEW_ID };
     const overviewView = new OverviewView({
       initialViewState: overviewViewState,
       loader,

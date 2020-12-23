@@ -4,17 +4,19 @@ import VivView from './VivView';
 import { OverviewLayer } from '../layers';
 import { makeBoundingBox, getVivId } from './utils';
 
+export const OVERVIEW_VIEW_ID = 'overview';
+
 class OverviewState {
 }
 
 class OverviewController extends Controller {
   constructor(props) {
     super(OverviewState, props);
-    this.events = ["click"];
+    this.events = ['click'];
   }
 
   handleEvent(event) {
-    if (event.type !== "click") {
+    if (event.type !== 'click') {
       return;
     }
     let [x, y] = this.getCenter(event);
@@ -26,7 +28,7 @@ class OverviewController extends Controller {
     x *= scaleFactor;
     y *= scaleFactor;
     if (this.onViewStateChange) {
-      this.onViewStateChange({ viewState: { Overview: { target: [x, y, 0] } } });
+      this.onViewStateChange({ viewState: { target: [x, y, 0] } });
     }
   }
 }
