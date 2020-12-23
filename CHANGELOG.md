@@ -7,6 +7,7 @@
 ### Changed
 
 - Fix documentation of instances where spreading is used in the arguments for a function.
+- GH actions allow for running on PR as well as push (so that forked repos run tests).
 
 ## 0.8.0
 
