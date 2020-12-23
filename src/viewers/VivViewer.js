@@ -3,11 +3,17 @@ import DeckGL from '@deck.gl/react';
 import { getVivId } from '../views/utils';
 
 /**
+ * @callback ViewStateChange
+ * @param {Object} event
+ */
+
+/**
  * This component handles rendering the various views within the DeckGL contenxt.
  * @param {Object} props
  * @param {Array} props.layerProps  Props for the layers in each view.
  * @param {Array} props.randomize Whether or not to randomize which view goes first (for dynamic rendering).
  * @param {VivView} props.views Various VivViews to render.
+ * @param {ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * */
 export default class VivViewer extends PureComponent {
   constructor(props) {
@@ -44,9 +50,11 @@ export default class VivViewer extends PureComponent {
    * This updates the viewState as a callback to the viewport changing in DeckGL
    * (hence the need for storing viewState in state).
    */
-  _onViewStateChange({ viewId, viewState, oldViewState }) {
+  _onViewStateChange({ viewId, viewState, interactionState, oldViewState }) {
     // Save the view state and trigger rerender.
-    const { views } = this.props;
+    const { views, onViewStateChange } = this.props;
+    // eslint-disable-next-line no-param-reassign
+    viewState = (onViewStateChange && onViewStateChange({ viewId, viewState, interactionState, oldViewState })) || viewState;
     this.setState(prevState => {
       const viewStates = {};
       views.forEach(view => {
@@ -59,6 +67,7 @@ export default class VivViewer extends PureComponent {
       });
       return { viewStates };
     });
+    return viewState;
   }
 
   /**

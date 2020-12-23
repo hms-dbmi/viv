@@ -3,6 +3,11 @@ import VivViewer from './VivViewer';
 import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
 
 /**
+ * @callback ViewStateChange
+ * @param {Object} event
+ */
+
+/**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
  * @param {Object} props
  * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
@@ -16,14 +21,16 @@ import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
  * @param {Object} props.hoverHooks Object including the allowable hooks - right now only accepting a function with key handleValue like { handleValue: (valueArray) => {} } where valueArray
  * has the pixel values for the image under the hover location.
- * @param {number} props.initialViewState Object like { target: [x, y, 0], zoom: -zoom } for initializing where the viewer looks (optional - this can be inferred from height/width/loader).
+ * @param {Object} props.initialViewState Object like { target: [x, y, 0], zoom: -zoom } for initializing where the viewer looks (optional - this can be inferred from height/width/loader).
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
- * @param {boolean} props.isLensOn Whether or not to use the lens (deafult false).
- * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens (default 0).
- * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
- * @param {number} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
- * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * @param {boolean} [props.isLensOn] Whether or not to use the lens (deafult false).
+ * @param {number} [props.lensSelection] Numeric index of the channel to be focused on by the lens (default 0).
+ * @param {number} [props.lensRadius] Pixel radius of the lens (default: 100).
+ * @param {Array} [props.lensBorderColor] RGB color of the border of the lens (default [255, 255, 255]).
+ * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
+ * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
+ * @param {ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state.
  */
 
 const PictureInPictureViewer = props => {
@@ -44,7 +51,8 @@ const PictureInPictureViewer = props => {
     lensSelection = 0,
     lensRadius = 100,
     lensBorderColor = [255, 255, 255],
-    lensBorderRadius = 0.02
+    lensBorderRadius = 0.02,
+    onViewStateChange
   } = props;
   const viewState =
     initialViewState || getDefaultInitialViewState(loader, { height, width });
@@ -83,7 +91,7 @@ const PictureInPictureViewer = props => {
   }
   if (!loader) return null;
   return (
-    <VivViewer layerProps={layerProps} views={views} hoverHooks={hoverHooks} />
+    <VivViewer layerProps={layerProps} views={views} hoverHooks={hoverHooks} onViewStateChange={onViewStateChange} />
   );
 };
 
