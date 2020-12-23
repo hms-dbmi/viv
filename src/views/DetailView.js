@@ -52,7 +52,7 @@ export default class DetailView extends VivView {
    */
   filterViewState({ viewState, currentViewState }) {
     if (viewState.id === 'overview') {
-      const target = viewState.navigation?.target;
+      const { target } = viewState;
       if (target) {
         return { ...currentViewState, target };
       }
