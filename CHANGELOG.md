@@ -4,6 +4,8 @@
 
 ### Added
 
+- Property `onViewStateChange` of all viewers accepts a callback for deck.gl view state changes.
+
 ### Changed
 
 - Fix documentation of instances where spreading is used in the arguments for a function.
@@ -12,7 +14,7 @@
 
 ### Added
 
-- Export a `getDefaultInitialViewState` function for getting a deafult inital view state given a loader and desired size of view.
+- Export a `getDefaultInitialViewState` function for getting a default initial view state given a loader and desired size of view.
 - Support interleaved RGB OME-TIFF files.
 - Added a README file for Avivator at `avivator/README.md`.
 

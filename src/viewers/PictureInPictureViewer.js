@@ -3,11 +3,6 @@ import VivViewer from './VivViewer';
 import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
 
 /**
- * @callback ViewStateChange
- * @param {Object} event
- */
-
-/**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
  * @param {Object} props
  * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
@@ -30,7 +25,7 @@ import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
  * @param {Array} [props.lensBorderColor] RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
- * @param {ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state.
+ * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state.
  */
 
 const PictureInPictureViewer = props => {

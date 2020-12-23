@@ -3,11 +3,6 @@ import VivViewer from './VivViewer';
 import { SideBySideView, getDefaultInitialViewState } from '../views';
 
 /**
- * @callback ViewStateChange
- * @param {Object} event
- */
-
-/**
  * This component provides a side-by-side VivViewer with linked zoom/pan.
  * @param {Object} props
  * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
@@ -25,7 +20,7 @@ import { SideBySideView, getDefaultInitialViewState } from '../views';
  * @param {number} [props.lensSelection] Numeric index of the channel to be focused on by the lens (default 0).
  * @param {Array} [props.lensBorderColor] RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
- * @param {ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state.
+ * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state.
 */
 const SideBySideViewer = props => {
   const {
