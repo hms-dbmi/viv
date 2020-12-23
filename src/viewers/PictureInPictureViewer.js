@@ -24,6 +24,7 @@ import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
  * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
  * @param {number} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * @param {Boolean} [props.clickCenter] Click to center the default view. Default is true.
  */
 
 const PictureInPictureViewer = props => {
@@ -44,7 +45,8 @@ const PictureInPictureViewer = props => {
     lensSelection = 0,
     lensRadius = 100,
     lensBorderColor = [255, 255, 255],
-    lensBorderRadius = 0.02
+    lensBorderRadius = 0.02,
+    clickCenter = true
   } = props;
   const viewState =
     initialViewState || getDefaultInitialViewState(loader, { height, width });
@@ -76,6 +78,7 @@ const PictureInPictureViewer = props => {
       loader,
       detailHeight: height,
       detailWidth: width,
+      clickCenter,
       ...overview
     });
     views.push(overviewView);

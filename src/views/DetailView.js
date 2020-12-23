@@ -43,4 +43,20 @@ export default class DetailView extends VivView {
 
     return layers;
   }
+
+  /**
+   * Create a viewState for this class, checking the id to make sure this class and viewState match.
+   * @param {Object} args
+   * @param {ViewState} args.ViewState ViewState object.
+   * @returns {ViewState} ViewState for this class (or null by default if the ids do not match).
+   */
+  filterViewState({ viewState, currentViewState }) {
+    if (viewState.id === 'overview') {
+      const target = viewState.navigation?.target;
+      if (target) {
+        return { ...currentViewState, target };
+      }
+    }
+    return super.filterViewState({ viewState });
+  }
 }
