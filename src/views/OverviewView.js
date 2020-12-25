@@ -6,8 +6,7 @@ import { makeBoundingBox, getVivId } from './utils';
 
 export const OVERVIEW_VIEW_ID = 'overview';
 
-class OverviewState {
-}
+class OverviewState {}
 
 class OverviewController extends Controller {
   constructor(props) {
@@ -64,7 +63,7 @@ export default class OverviewView extends VivView {
     maximumWidth = 350,
     minimumHeight = 150,
     maximumHeight = 350,
-    clickCenter = true
+    clickCenter = true,
   }) {
     super({ initialViewState });
     this.margin = margin;
@@ -79,7 +78,7 @@ export default class OverviewView extends VivView {
       minimumWidth,
       maximumWidth,
       minimumHeight,
-      maximumHeight
+      maximumHeight,
     });
     this._setXY();
     this.clickCenter = clickCenter;
@@ -95,12 +94,12 @@ export default class OverviewView extends VivView {
     minimumWidth,
     maximumWidth,
     minimumHeight,
-    maximumHeight
+    maximumHeight,
   }) {
     const { loader } = this;
     const { numLevels } = loader;
     const { width: rasterWidth, height: rasterHeight } = loader.getRasterSize({
-      z: 0
+      z: 0,
     });
     this._imageWidth = rasterWidth;
     this._imageHeight = rasterHeight;
@@ -167,7 +166,7 @@ export default class OverviewView extends VivView {
       width,
       x,
       y,
-      clear: true
+      clear: true,
     });
   }
 
@@ -180,7 +179,7 @@ export default class OverviewView extends VivView {
       id,
       loader,
       height,
-      width
+      width,
     } = this;
     const { numLevels } = loader;
     return {
@@ -189,7 +188,7 @@ export default class OverviewView extends VivView {
       width,
       id,
       target: [(_imageWidth * scale) / 2, (_imageHeight * scale) / 2, 0],
-      zoom: -(numLevels - 1)
+      zoom: -(numLevels - 1),
     };
   }
 
@@ -200,14 +199,14 @@ export default class OverviewView extends VivView {
     }
     const { id, scale, loader } = this;
     // Scale the bounding box.
-    const boundingBox = makeBoundingBox(detail).map(coords =>
-      coords.map(e => e * scale)
+    const boundingBox = makeBoundingBox(detail).map((coords) =>
+      coords.map((e) => e * scale)
     );
     const overviewLayer = new OverviewLayer(props, {
       id: `${loader.type}${getVivId(id)}`,
       boundingBox,
       overviewScale: scale,
-      zoom: -overview.zoom
+      zoom: -overview.zoom,
     });
     return [overviewLayer];
   }

@@ -19,11 +19,11 @@ export default class DetailView extends VivView {
     const detailLayer = loader.isPyramid
       ? new MultiscaleImageLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
-          viewportId: id
+          viewportId: id,
         })
       : new ImageLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
-          viewportId: id
+          viewportId: id,
         });
     layers.push(detailLayer);
 
@@ -38,7 +38,7 @@ export default class DetailView extends VivView {
             loader,
             unit,
             size: value,
-            viewState: { ...layerViewState, height, width }
+            viewState: { ...layerViewState, height, width },
           })
         );
       }
