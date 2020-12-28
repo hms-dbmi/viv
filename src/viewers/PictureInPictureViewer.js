@@ -86,7 +86,12 @@ const PictureInPictureViewer = props => {
   }
   if (!loader) return null;
   return (
-    <VivViewer layerProps={layerProps} views={views} hoverHooks={hoverHooks} onViewStateChange={onViewStateChange} />
+    <VivViewer
+      layerProps={layerProps}
+      views={views}
+      hoverHooks={hoverHooks}
+      onViewStateChange={onViewStateChange}
+    />
   );
 };
 

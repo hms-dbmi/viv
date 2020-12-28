@@ -88,6 +88,8 @@
     "zarr": "^0.3.0"
   },
   "prettier": {
-    "singleQuote": true
+    "singleQuote": true,
+    "trailingComma": "none",
+    "arrowParens": "avoid"
   }
 }

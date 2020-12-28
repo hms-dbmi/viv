@@ -21,7 +21,7 @@ import { SideBySideView, getDefaultInitialViewState } from '../views';
  * @param {Array} [props.lensBorderColor] RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state.
-*/
+ */
 const SideBySideViewer = props => {
   const {
     loader,
@@ -77,7 +77,12 @@ const SideBySideViewer = props => {
   const views = [detailViewRight, detailViewLeft];
   const layerProps = [layerConfig, layerConfig];
   return loader ? (
-    <VivViewer layerProps={layerProps} views={views} randomize onViewStateChange={onViewStateChange} />
+    <VivViewer
+      layerProps={layerProps}
+      views={views}
+      randomize
+      onViewStateChange={onViewStateChange}
+    />
   ) : null;
 };
 

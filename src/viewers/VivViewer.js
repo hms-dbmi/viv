@@ -54,7 +54,15 @@ export default class VivViewer extends PureComponent {
     // Save the view state and trigger rerender.
     const { views, onViewStateChange } = this.props;
     // eslint-disable-next-line no-param-reassign
-    viewState = (onViewStateChange && onViewStateChange({ viewId, viewState, interactionState, oldViewState })) || viewState;
+    viewState =
+      (onViewStateChange &&
+        onViewStateChange({
+          viewId,
+          viewState,
+          interactionState,
+          oldViewState
+        })) ||
+      viewState;
     this.setState(prevState => {
       const viewStates = {};
       views.forEach(view => {
