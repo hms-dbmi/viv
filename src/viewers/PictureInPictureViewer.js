@@ -5,7 +5,7 @@ import {
   OverviewView,
   getDefaultInitialViewState,
   DETAIL_VIEW_ID,
-  OVERVIEW_VIEW_ID,
+  OVERVIEW_VIEW_ID
 } from '../views';
 
 /**
@@ -33,7 +33,7 @@ import {
  * @param {Boolean} [props.clickCenter] Click to center the default view. Default is true.
  */
 
-const PictureInPictureViewer = (props) => {
+const PictureInPictureViewer = props => {
   const {
     loader,
     sliderValues,
@@ -52,7 +52,7 @@ const PictureInPictureViewer = (props) => {
     lensRadius = 100,
     lensBorderColor = [255, 255, 255],
     lensBorderRadius = 0.02,
-    clickCenter = true,
+    clickCenter = true
   } = props;
   const viewState =
     initialViewState || getDefaultInitialViewState(loader, { height, width });
@@ -60,7 +60,7 @@ const PictureInPictureViewer = (props) => {
   const detailView = new DetailView({
     initialViewState: detailViewState,
     height,
-    width,
+    width
   });
   const layerConfig = {
     loader,
@@ -73,7 +73,7 @@ const PictureInPictureViewer = (props) => {
     lensSelection,
     lensRadius,
     lensBorderColor,
-    lensBorderRadius,
+    lensBorderRadius
   };
   const views = [detailView];
   const layerProps = [layerConfig];
@@ -85,7 +85,7 @@ const PictureInPictureViewer = (props) => {
       detailHeight: height,
       detailWidth: width,
       clickCenter,
-      ...overview,
+      ...overview
     });
     views.push(overviewView);
     layerProps.push(layerConfig);
