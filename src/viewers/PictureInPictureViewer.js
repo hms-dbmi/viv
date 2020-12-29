@@ -1,6 +1,12 @@
 import React from 'react'; // eslint-disable-line import/no-unresolved
 import VivViewer from './VivViewer';
-import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
+import {
+  DetailView,
+  OverviewView,
+  getDefaultInitialViewState,
+  DETAIL_VIEW_ID,
+  OVERVIEW_VIEW_ID
+} from '../views';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -25,6 +31,7 @@ import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
  * @param {Array} [props.lensBorderColor] RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
+ * @param {Boolean} [props.clickCenter] Click to center the default view. Default is true.
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state.
  */
 
@@ -47,11 +54,12 @@ const PictureInPictureViewer = props => {
     lensRadius = 100,
     lensBorderColor = [255, 255, 255],
     lensBorderRadius = 0.02,
+    clickCenter = true,
     onViewStateChange
   } = props;
   const viewState =
     initialViewState || getDefaultInitialViewState(loader, { height, width });
-  const detailViewState = { ...viewState, id: 'detail' };
+  const detailViewState = { ...viewState, id: DETAIL_VIEW_ID };
   const detailView = new DetailView({
     initialViewState: detailViewState,
     height,
@@ -73,12 +81,13 @@ const PictureInPictureViewer = props => {
   const views = [detailView];
   const layerProps = [layerConfig];
   if (overviewOn && loader) {
-    const overviewViewState = { ...viewState, id: 'overview' };
+    const overviewViewState = { ...viewState, id: OVERVIEW_VIEW_ID };
     const overviewView = new OverviewView({
       initialViewState: overviewViewState,
       loader,
       detailHeight: height,
       detailWidth: width,
+      clickCenter,
       ...overview
     });
     views.push(overviewView);

@@ -1,10 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
-import { DetailView } from '../../../src/views';
+import { DetailView, DETAIL_VIEW_ID } from '../../../src/views';
 import { generateViewTests, defaultArguments } from './VivView.spec';
 import { MultiscaleImageLayer, ScaleBarLayer } from '../../../src/layers';
 
-const id = 'detail';
+const id = DETAIL_VIEW_ID;
 const detailViewArguments = { ...defaultArguments };
 detailViewArguments.initialViewState = { ...defaultArguments.initialViewState };
 detailViewArguments.initialViewState.id = id;
