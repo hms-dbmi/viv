@@ -32,7 +32,7 @@ import {
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
  * @param {Boolean} [props.clickCenter] Click to center the default view. Default is true.
- * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state.
+ * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  */
 
 const PictureInPictureViewer = props => {
