@@ -116,6 +116,12 @@ export default class OMETiffLoader {
     }
   }
 
+  /**
+   * Returns a tiff image object for a given loader selection + pyramid level.
+   * @param {Object} loaderSelection A lodaer selection
+   * @param {number} z Pyramidal resolution level.
+   * @returns {Object} Tiff Image object containing parsed IFD.
+   */
   async getImages(loaderSelection, z) {
     const { tiff, isBioFormats6Pyramid } = this;
     const imageRequests = loaderSelection.map(async sel => {
@@ -194,7 +200,6 @@ export default class OMETiffLoader {
   async getRaster({ z, loaderSelection }) {
     const { pool, isInterleaved } = this;
     const images = await this.getImages(loaderSelection, z);
-    console.log(images);
     const rasters = await Promise.all(
       images.map(async image => {
         const raster = await image.readRasters({
