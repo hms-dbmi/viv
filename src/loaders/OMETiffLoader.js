@@ -77,38 +77,48 @@ export default class OMETiffLoader {
   _getIFDIndex({ z = 0, channel, time = 0 }, zIndex = 0) {
     let channelIndex;
     // Without names, enforce a numeric channel indexing scheme
-    if (this.channelNames.every(v => !v)) {
+    const channelNames = this.dimensions.find(dim => dim.field === 'channel')
+      .values;
+    if (channelNames.every(v => !v)) {
       console.warn(
         'No channel names found in OMEXML.  Please be sure to use numeric indexing.'
       );
       channelIndex = channel;
     } else if (typeof channel === 'string') {
-      channelIndex = this.channelNames.indexOf(channel);
+      channelIndex = channelNames.indexOf(channel);
     } else if (typeof channel === 'number') {
       channelIndex = channel;
     } else {
       throw new Error('Channel selection must be numeric index or string');
     }
-    const { SizeZ, SizeT, SizeC, DimensionOrder } = this.omexml;
-    const pyramidOffset = zIndex * SizeZ * SizeT * SizeC;
-    switch (DimensionOrder) {
-      case 'XYZCT': {
-        return pyramidOffset + time * SizeZ * SizeC + channelIndex * SizeZ + z;
+    const sizeZ = this.dimensions.find(dim => dim.field === 'z').values.length;
+    const sizeT = this.dimensions.find(dim => dim.field === 'time').values
+      .length;
+    const sizeC = this.dimensions.find(dim => dim.field === 'channel').values
+      .length;
+    const dimensionOrder = this.dimensions
+      .map(dim => dim.field[0])
+      .reverse()
+      .join('');
+    const pyramidOffset = zIndex * sizeZ * sizeT * sizeC;
+    switch (dimensionOrder) {
+      case 'xyzct': {
+        return pyramidOffset + time * sizeZ * sizeC + channelIndex * sizeZ + z;
       }
-      case 'XYZTC': {
-        return pyramidOffset + channelIndex * SizeZ * SizeT + time * SizeZ + z;
+      case 'xyztc': {
+        return pyramidOffset + channelIndex * sizeZ * sizeT + time * sizeZ + z;
       }
-      case 'XYCTZ': {
-        return pyramidOffset + z * SizeC * SizeT + time * SizeC + channelIndex;
+      case 'xyctz': {
+        return pyramidOffset + z * sizeC * sizeT + time * sizeC + channelIndex;
       }
-      case 'XYCZT': {
-        return pyramidOffset + time * SizeC * SizeZ + z * SizeC + channelIndex;
+      case 'xyczt': {
+        return pyramidOffset + time * sizeC * sizeZ + z * sizeC + channelIndex;
       }
-      case 'XYTCZ': {
-        return pyramidOffset + z * SizeT * SizeC + channelIndex * SizeT + time;
+      case 'xytcz': {
+        return pyramidOffset + z * sizeT * sizeC + channelIndex * sizeT + time;
       }
-      case 'XYTZC': {
-        return pyramidOffset + channelIndex * SizeT * SizeZ + z * SizeT + time;
+      case 'xytzc': {
+        return pyramidOffset + channelIndex * sizeT * sizeZ + z * sizeT + time;
       }
       default: {
         throw new Error('Dimension order is required for OMETIFF');
