@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.8.1
+
+### Added
+
 - Property `onViewStateChange` of all viewers accepts a callback for deck.gl view state changes.
 - Add a click handler to the overview that centers the detail view on the click position. The handler can be turned off by setting the `PictureInPictureViewer` property `clickCenter` to `false`.
 
