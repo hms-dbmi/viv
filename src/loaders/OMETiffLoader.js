@@ -69,14 +69,12 @@ export default class OMETiffLoader {
   }
 
   /**
-   * Returns an IFD index for a given loader selection.
-   * @param {Object} args
-   * @param {number} args.z Z axis selection.
-   * @param {number} args.time Time axis selection.
-   * @param {String} args.channel Channel axis selection.
+   * Returns an IFD index for a given loader selection + pyramid leel..
+   * @param {Object} loaderSelection A lodaer selection
+   * @param {number} zIndex Pyramidal resolution level.
    * @returns {number} IFD index.
    */
-  _getIFDIndex({ z = 0, channel, time = 0 }) {
+  _getIFDIndex({ z = 0, channel, time = 0 }, zIndex = 0) {
     let channelIndex;
     // Without names, enforce a numeric channel indexing scheme
     if (this.channelNames.every(v => !v)) {
@@ -92,29 +90,55 @@ export default class OMETiffLoader {
       throw new Error('Channel selection must be numeric index or string');
     }
     const { SizeZ, SizeT, SizeC, DimensionOrder } = this.omexml;
+    const pyramidOffset = zIndex * SizeZ * SizeT * SizeC;
     switch (DimensionOrder) {
       case 'XYZCT': {
-        return time * SizeZ * SizeC + channelIndex * SizeZ + z;
+        return pyramidOffset + time * SizeZ * SizeC + channelIndex * SizeZ + z;
       }
       case 'XYZTC': {
-        return channelIndex * SizeZ * SizeT + time * SizeZ + z;
+        return pyramidOffset + channelIndex * SizeZ * SizeT + time * SizeZ + z;
       }
       case 'XYCTZ': {
-        return z * SizeC * SizeT + time * SizeC + channelIndex;
+        return pyramidOffset + z * SizeC * SizeT + time * SizeC + channelIndex;
       }
       case 'XYCZT': {
-        return time * SizeC * SizeZ + z * SizeC + channelIndex;
+        return pyramidOffset + time * SizeC * SizeZ + z * SizeC + channelIndex;
       }
       case 'XYTCZ': {
-        return z * SizeT * SizeC + channelIndex * SizeT + time;
+        return pyramidOffset + z * SizeT * SizeC + channelIndex * SizeT + time;
       }
       case 'XYTZC': {
-        return channelIndex * SizeT * SizeZ + z * SizeT + time;
+        return pyramidOffset + channelIndex * SizeT * SizeZ + z * SizeT + time;
       }
       default: {
         throw new Error('Dimension order is required for OMETIFF');
       }
     }
+  }
+
+  async getImages(loaderSelection, z) {
+    const { tiff, isBioFormats6Pyramid } = this;
+    const imageRequests = loaderSelection.map(async sel => {
+      const pyramidIndex = this._getIFDIndex(sel, z);
+      const index = this._getIFDIndex(sel);
+      // We need to put the request for parsing the file directory into this array.
+      // This allows us to get tiff pages directly based on offset without parsing everything.
+      if (!isBioFormats6Pyramid) {
+        this._parseIFD(pyramidIndex);
+      } else {
+        // Pyramids with large z-stacks + large numbers of channels could get slow
+        // so we allow for offsets for the lowest-resolution images ("parentImage").
+        this._parseIFD(index);
+        const parentImage = await tiff.getImage(index);
+        if (z !== 0) {
+          tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
+            parentImage.fileDirectory.SubIFDs[z - 1]
+          );
+        }
+      }
+      return tiff.getImage(pyramidIndex);
+    });
+    return Promise.all(imageRequests);
   }
 
   /**
@@ -141,29 +165,8 @@ export default class OMETiffLoader {
     if (!this._tileInBounds({ x, y, z })) {
       return null;
     }
-    const { tiff, isBioFormats6Pyramid, omexml } = this;
-    const { SizeZ, SizeT, SizeC } = omexml;
-    const pyramidOffset = z * SizeZ * SizeT * SizeC;
-    let image;
-    const tileRequests = loaderSelection.map(async sel => {
-      const index = this._getIFDIndex(sel);
-      const pyramidIndex = pyramidOffset + index;
-      // We need to put the request for parsing the file directory into this array.
-      // This allows us to get tiff pages directly based on offset without parsing everything.
-      if (!isBioFormats6Pyramid) {
-        this._parseIFD(pyramidIndex);
-      } else {
-        // Pyramids with large z-stacks + large numbers of channels could get slow
-        // so we allow for offsets for the lowest-resolution images ("parentImage").
-        this._parseIFD(index);
-        const parentImage = await tiff.getImage(index);
-        if (z !== 0) {
-          tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
-            parentImage.fileDirectory.SubIFDs[z - 1]
-          );
-        }
-      }
-      image = await tiff.getImage(pyramidIndex);
+    const images = await this.getImages(loaderSelection, z);
+    const tileRequests = images.map(async image => {
       return this._getChannel({ image, x, y, z, signal });
     });
     const data = await Promise.all(tileRequests);
@@ -189,29 +192,11 @@ export default class OMETiffLoader {
    * Default is `{data: [], width, height}`.
    */
   async getRaster({ z, loaderSelection }) {
-    const { tiff, omexml, isBioFormats6Pyramid, pool, isInterleaved } = this;
-    const { SizeZ, SizeT, SizeC } = omexml;
+    const { pool, isInterleaved } = this;
+    const images = await this.getImages(loaderSelection, z);
+    console.log(images);
     const rasters = await Promise.all(
-      loaderSelection.map(async sel => {
-        const index = this._getIFDIndex(sel);
-        const pyramidIndex = z * SizeZ * SizeT * SizeC + index;
-        // We need to put the request for parsing the file directory into this array.
-        // This allows us to get tiff pages directly based on offset without parsing everything.
-        if (!isBioFormats6Pyramid) {
-          this._parseIFD(pyramidIndex);
-        } else {
-          // Pyramids with large z-stacks + large numbers of channels could get slow
-          // so we allow for offsets for the initial images ("parentImage").
-          this._parseIFD(index);
-          const parentImage = await tiff.getImage(index);
-          if (z !== 0) {
-            tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
-              parentImage.fileDirectory.SubIFDs[z - 1]
-            );
-          }
-        }
-        const image = await tiff.getImage(pyramidIndex);
-        // Flips bits for us for endianness.
+      images.map(async image => {
         const raster = await image.readRasters({
           pool,
           interleave: isInterleaved
@@ -223,9 +208,7 @@ export default class OMETiffLoader {
     if (!loaderSelection || loaderSelection.length === 0) {
       return { data: [], ...this.getRasterSize({ z }) };
     }
-    const image = await tiff.getImage(
-      z * SizeZ * SizeT * SizeC + this._getIFDIndex(loaderSelection[0])
-    );
+    const [image] = images;
     const width = image.getWidth();
     const height = image.getHeight();
 
