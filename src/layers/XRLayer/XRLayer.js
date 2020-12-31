@@ -11,8 +11,8 @@ import fs2 from './xr-layer-fragment.webgl2.glsl';
 import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
 import { lens, channels } from './shader-modules';
-import { DTYPE_VALUES } from '../../constants';
-import { padColorsAndSliders } from '../utils';
+import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from '../../constants';
+import { padColorsAndSliders, range } from '../utils';
 
 const SHADER_MODULES = [
   { fs: fs1, fscmap: fsColormap1, vs: vs1 },
@@ -23,7 +23,10 @@ function getShaderProps({ colormap, dtype }, gl) {
   const isWebGL1 = !isWebGL2(gl);
   const mod = isWebGL1 ? SHADER_MODULES[0] : SHADER_MODULES[1];
   return {
-    fs: colormap ? mod.fscmap : mod.fs,
+    fs: (colormap ? mod.fscmap : mod.fs).replace(
+      /MAX_SLIDERS_AND_CHANNELS/g,
+      String(MAX_SLIDERS_AND_CHANNELS)
+    ),
     vs: mod.vs,
     defines: {
       SAMPLER_TYPE: dtype === '<f4' || isWebGL1 ? 'sampler2D' : 'usampler2D',
@@ -264,14 +267,7 @@ export default class XRLayer extends Layer {
    * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadChannelTextures(channelData) {
-    const textures = {
-      channel0: null,
-      channel1: null,
-      channel2: null,
-      channel3: null,
-      channel4: null,
-      channel5: null
-    };
+    const textures = {};
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex && tex.delete());
     }
@@ -280,12 +276,11 @@ export default class XRLayer extends Layer {
       Object.keys(channelData).length > 0 &&
       channelData.data
     ) {
-      channelData.data.forEach((d, i) => {
-        textures[`channel${i}`] = this.dataToTexture(
-          d,
-          channelData.width,
-          channelData.height
-        );
+      range(MAX_SLIDERS_AND_CHANNELS).forEach(i => {
+        const data = channelData.data[i];
+        textures[`channel${i}`] = data
+          ? this.dataToTexture(data, channelData.width, channelData.height)
+          : null;
       }, this);
       this.setState({ textures });
     }

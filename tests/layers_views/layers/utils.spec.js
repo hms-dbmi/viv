@@ -23,8 +23,55 @@ test('padWithDefault test', t => {
 
 test('padColorsAndSliders test', t => {
   const expectedNoDomain = {
-    paddedSliderValues: [0, 5, 0, 5, 255, 255, 255, 255, 255, 255, 255, 255],
-    paddedColorValues: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    paddedSliderValues: [
+      0,
+      5,
+      0,
+      5,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255
+    ],
+    paddedColorValues: [
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
   };
   const expectedChannelOff = {
     paddedSliderValues: [
@@ -39,9 +86,43 @@ test('padColorsAndSliders test', t => {
       255,
       255,
       255,
+      255,
+      255,
+      255,
+      255,
+      255,
+      255,
       255
     ],
-    paddedColorValues: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    paddedColorValues: [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
   };
   const expectedDomain = {
     paddedSliderValues: [
@@ -56,9 +137,43 @@ test('padColorsAndSliders test', t => {
       1000,
       1000,
       1000,
+      1000,
+      1000,
+      1000,
+      1000,
+      1000,
+      1000,
       1000
     ],
-    paddedColorValues: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    paddedColorValues: [
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
   };
   const expected16Bit = {
     paddedSliderValues: [
@@ -73,9 +188,43 @@ test('padColorsAndSliders test', t => {
       2 ** 16 - 1,
       2 ** 16 - 1,
       2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
       2 ** 16 - 1
     ],
-    paddedColorValues: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    paddedColorValues: [
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
   };
 
   t.deepEqual(

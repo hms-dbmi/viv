@@ -10,7 +10,8 @@ import AddIcon from '@material-ui/icons/Add';
 import {
   SideBySideViewer,
   PictureInPictureViewer,
-  getChannelStats
+  getChannelStats,
+  MAX_SLIDERS_AND_CHANNELS
 } from '../../dist';
 import {
   createLoader,
@@ -34,13 +35,11 @@ import {
 import { DropzoneWrapper } from './components/Dropzone';
 
 import {
-  MAX_CHANNELS,
   DEFAULT_OVERVIEW,
   FILL_PIXEL_VALUE,
   GLOBAL_SLIDER_DIMENSION_FIELDS,
   COLOR_PALLETE
 } from './constants';
-import sources from './source-info';
 import './index.css';
 
 const initialChannels = {
@@ -382,7 +381,7 @@ export default function Avivator(props) {
           )}
           {!isRgb && (
             <Button
-              disabled={ids.length === MAX_CHANNELS || isLoading}
+              disabled={ids.length === MAX_SLIDERS_AND_CHANNELS || isLoading}
               onClick={handleChannelAdd}
               fullWidth
               variant="outlined"

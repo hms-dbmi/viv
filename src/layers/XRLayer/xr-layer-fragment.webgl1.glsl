@@ -2,19 +2,21 @@
 precision highp float;
 
 // our texture
-uniform sampler2D channel0;
-uniform sampler2D channel1;
-uniform sampler2D channel2;
-uniform sampler2D channel3;
-uniform sampler2D channel4;
-uniform sampler2D channel5;
+uniform SAMPLER_TYPE channel0;
+uniform SAMPLER_TYPE channel1;
+uniform SAMPLER_TYPE channel2;
+uniform SAMPLER_TYPE channel3;
+uniform SAMPLER_TYPE channel4;
+uniform SAMPLER_TYPE channel5;
+uniform SAMPLER_TYPE channel6;
+uniform SAMPLER_TYPE channel7;
+uniform SAMPLER_TYPE channel8;
 
 // range
-uniform vec2 sliderValues[6];
+uniform vec2 sliderValues[MAX_SLIDERS_AND_CHANNELS];
 
 // color
-uniform vec3 colorValues[6];
-uniform float intensityArray[6];
+uniform vec3 colorValues[MAX_SLIDERS_AND_CHANNELS];
 
 // opacity
 uniform float opacity;
@@ -40,6 +42,9 @@ void main() {
   float intensityValue3 = sample_and_apply_sliders(channel3, vTexCoord, sliderValues[3]);
   float intensityValue4 = sample_and_apply_sliders(channel4, vTexCoord, sliderValues[4]);
   float intensityValue5 = sample_and_apply_sliders(channel5, vTexCoord, sliderValues[5]);
+  float intensityValue6 = sample_and_apply_sliders(channel6, vTexCoord, sliderValues[6]);
+  float intensityValue7 = sample_and_apply_sliders(channel7, vTexCoord, sliderValues[7]);
+  float intensityValue8 = sample_and_apply_sliders(channel8, vTexCoord, sliderValues[8]);
 
   // Find out if the frag is in bounds of the lens.
   bool isFragInLensBounds = frag_in_lens_bounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);
@@ -54,6 +59,9 @@ void main() {
   rgbCombo += process_channel_intensity(intensityValue3, colorValues[3], 3, inLensAndUseLens, lensSelection);
   rgbCombo += process_channel_intensity(intensityValue4, colorValues[4], 4, inLensAndUseLens, lensSelection);
   rgbCombo += process_channel_intensity(intensityValue5, colorValues[5], 5, inLensAndUseLens, lensSelection);
+  rgbCombo += process_channel_intensity(intensityValue3, colorValues[6], 6, inLensAndUseLens, lensSelection);
+  rgbCombo += process_channel_intensity(intensityValue4, colorValues[7], 7, inLensAndUseLens, lensSelection);
+  rgbCombo += process_channel_intensity(intensityValue5, colorValues[8], 8, inLensAndUseLens, lensSelection);
 
   // Ternaries are faster than checking this first and then returning/breaking out of shader.
   rgbCombo = (isLensOn && isFragOnLensBounds) ? lensBorderColor : rgbCombo;

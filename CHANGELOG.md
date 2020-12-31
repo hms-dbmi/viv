@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Increase maximum number of channels to 9.
+
 ## 0.8.1
 
 ### Added

@@ -4,7 +4,7 @@ export const MAX_COLOR_INTENSITY = 255;
 
 export const DEFAULT_COLOR_OFF = [0, 0, 0];
 
-export const MAX_SLIDERS_AND_CHANNELS = 6;
+export const MAX_SLIDERS_AND_CHANNELS = 9;
 
 export const DEFAULT_FONT_FAMILY =
   "-apple-system, 'Helvetica Neue', Arial, sans-serif";
