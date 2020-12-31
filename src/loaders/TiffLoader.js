@@ -71,6 +71,27 @@ export default class TiffLoader {
   }
 
   /**
+   * Returns image width and height (at pyramid level z) without fetching data.
+   * This information is inferrable from the provided metadata.
+   * It is NOT the actual pixel-size but rather the image size
+   * without any padding.
+   * This needs to be implemented by all classes inheriting this loader.
+   * @param {Object} args
+   * @param {number} args.z positive integer (0 === highest zoom level)
+   * @returns {Object} width: number, height: number
+   */
+  // eslint-disable-next-line class-methods-use-this,no-unused-vars,no-empty-function
+  getRasterSize({ z }) {}
+
+  /**
+   * Get the metadata associated with an OMETiff image layer, in a human-readable format.
+   * This needs to be implemented by all classes inheriting this loader.
+   * @returns {Object} Metadata keys mapped to values.
+   */
+  // eslint-disable-next-line class-methods-use-this,no-unused-vars,no-empty-function
+  getMetadata() {}
+
+  /**
    * Returns image tiles at tile-position (x, y) at pyramidal level z.
    * @param {Object} args
    * @param {number} args.x positive integer
@@ -136,27 +157,6 @@ export default class TiffLoader {
       height
     };
   }
-
-  /**
-   * Returns image width and height (at pyramid level z) without fetching data.
-   * This information is inferrable from the provided metadata.
-   * It is NOT the actual pixel-size but rather the image size
-   * without any padding.
-   * This needs to be implemented by all classes inheriting this loader.
-   * @param {Object} args
-   * @param {number} args.z positive integer (0 === highest zoom level)
-   * @returns {Object} width: number, height: number
-   */
-  // eslint-disable-next-line class-methods-use-this,no-unused-vars,no-empty-function
-  getRasterSize({ z }) {}
-
-  /**
-   * Get the metadata associated with an OMETiff image layer, in a human-readable format.
-   * This needs to be implemented by all classes inheriting this loader.
-   * @returns {Object} Metadata keys mapped to values.
-   */
-  // eslint-disable-next-line class-methods-use-this,no-unused-vars,no-empty-function
-  getMetadata() {}
 
   async _getChannel({ image, x, y, z, signal }) {
     const { tileSize, pool, isInterleaved: interleave } = this;
