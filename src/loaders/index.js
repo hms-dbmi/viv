@@ -171,12 +171,35 @@ export async function createOMETiffLoader({
   const firstImage = await tiff.getImage(0);
   const pool = new Pool();
   const omexmlString = firstImage.fileDirectory.ImageDescription;
+  const metadata = new OMEXML(omexmlString);
+  const dimensions = dimensionsFromOMEXML(metadata);
+  const channelNames = metadata.getChannelNames();
+  const isRgb =
+    metadata.SamplesPerPixel === 3 ||
+    (channelNames.length === 3 && metadata.Type === 'uint8') ||
+    (metadata.SizeC === 3 && channelNames.length === 1 && metadata.Interleaved);
+  const isInterleaved = metadata.Interleaved;
+  const DTYPE_LOOKUP = {
+    uint8: '<u1',
+    uint16: '<u2',
+    uint32: '<u4',
+    float: '<f4',
+    // TODO: we currently need to cast these dtypes to their uint counterparts.
+    int8: '<u1',
+    int16: '<u2',
+    int32: '<u4'
+  };
+  const dtype = DTYPE_LOOKUP[metadata.Type];
   return new OMETiffLoader({
     tiff,
     pool,
     firstImage,
-    omexmlString,
-    offsets
+    dimensions,
+    offsets,
+    metadata,
+    isRgb,
+    isInterleaved,
+    dtype
   });
 }
 

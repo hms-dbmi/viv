@@ -65,7 +65,7 @@ export async function createLoader(
       // Non-Bioformats6 pyramids use Image tags for pyramid levels and do not have offsets
       // built in to the format for them, hence the ternary.
       const {
-        omexml: { SizeZ, SizeT, SizeC },
+        metadata: { SizeZ, SizeT, SizeC },
         isBioFormats6Pyramid,
         isPyramid
       } = loader;
