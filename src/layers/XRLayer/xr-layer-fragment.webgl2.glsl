@@ -5,7 +5,6 @@ precision highp int;
 precision highp SAMPLER_TYPE;
 
 // our texture
-// our texture
 uniform SAMPLER_TYPE channel0;
 uniform SAMPLER_TYPE channel1;
 uniform SAMPLER_TYPE channel2;
