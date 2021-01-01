@@ -2,12 +2,7 @@ import TiffLoader from './TiffLoader';
 
 /**
  * This class serves as a wrapper for fetching tiff data from a file server.
- * @param {Object} args
- * @param {Object} args.tiff geotiffjs tiff object.
- * @param {Object} args.pool Pool that implements a `decode` function.
- * @param {Object} args.firstImage First image (geotiff Image object) in the tiff (containing base-resolution data).
- * @param {String} args.omexmlString Raw OMEXML as a string.
- * @param {Array} args.offsets The offsets of each IFD in the tiff.
+ * Inherites from TiffLoader and implements the necessary methods.
  * */
 export default class OMETiffLoader extends TiffLoader {
   constructor(args) {
@@ -21,7 +16,7 @@ export default class OMETiffLoader extends TiffLoader {
   }
 
   async getImages(loaderSelection, z) {
-    const { tiff, isBioFormats6Pyramid } = this;
+    const { _tiff, isBioFormats6Pyramid } = this;
     const imageRequests = loaderSelection.map(async sel => {
       const pyramidIndex = this._getIFDIndex(sel, z);
       const index = this._getIFDIndex(sel);
@@ -33,14 +28,14 @@ export default class OMETiffLoader extends TiffLoader {
         // Pyramids with large z-stacks + large numbers of channels could get slow
         // so we allow for offsets for the lowest-resolution images ("parentImage").
         this._parseIFD(index);
-        const parentImage = await tiff.getImage(index);
+        const parentImage = await _tiff.getImage(index);
         if (z !== 0) {
-          tiff.ifdRequests[pyramidIndex] = tiff.parseFileDirectoryAt(
+          _tiff.ifdRequests[pyramidIndex] = _tiff.parseFileDirectoryAt(
             parentImage.fileDirectory.SubIFDs[z - 1]
           );
         }
       }
-      return tiff.getImage(pyramidIndex);
+      return _tiff.getImage(pyramidIndex);
     });
     return Promise.all(imageRequests);
   }

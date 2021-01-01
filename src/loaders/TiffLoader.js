@@ -6,8 +6,15 @@ import { isInTileBounds } from './utils';
  * @param {Object} args.tiff geotiffjs tiff object.
  * @param {Object} args.pool Pool that implements a `decode` function.
  * @param {Object} args.firstImage First image (geotiff Image object) in the tiff (containing base-resolution data).
- * @param {String} args.omexmlString Raw OMEXML as a string.
+ * @param {Object} args.dimensions Dimensions for the loader.
+ * @param {Object} args.metadata The metadata object
  * @param {Array} args.offsets The offsets of each IFD in the tiff.
+ * @param {Boolean} args.isRgb Whether or not this tiff represents an rgb image.
+ * @param {Boolean} args.isInterleaved Whether or not this tiff represents an interleaved image.
+ * @param {String} args.dtype The dtype of the image like <u2 or <f4.
+ * @param {Object} args.physicalSizes An object like { x: { value, unit }, y: { value, unit } } where the first keys,
+ * x and y for example, are from the `dimensions and the value is the length and the unit is the units for the value
+ * to be interpreted in, like mm for millimeters.
  * */
 export default class TiffLoader {
   constructor({
@@ -19,36 +26,28 @@ export default class TiffLoader {
     metadata,
     isRgb,
     isInterleaved,
-    dtype
+    dtype,
+    physicalSizes
   }) {
-    this.pool = pool;
-    this.tiff = tiff;
+    this.physicalSizes = physicalSizes;
     this.type = 'ome-tiff';
     // get first image's description, which contains OMEXML
     this.metadata = metadata;
-    this.physicalSizes = {
-      x: {
-        value: this.metadata.PhysicalSizeX,
-        unit: this.metadata.PhysicalSizeXUnit
-      },
-      y: {
-        value: this.metadata.PhysicalSizeY,
-        unit: this.metadata.PhysicalSizeYUnit
-      }
-    };
+    this.dimensions = dimensions;
+    this.dtype = dtype;
+    this.isRgb = isRgb;
+    this.isInterleaved = isInterleaved;
     this.photometricInterpretation =
       firstImage.fileDirectory.PhotometricInterpretation;
-    this.offsets = offsets || [];
     this.tileSize = firstImage.getTileWidth();
     const { SubIFDs } = firstImage.fileDirectory;
     this.numLevels = SubIFDs?.length
       ? SubIFDs.length + 1
       : this.metadata.getNumberOfImages();
     this.isPyramid = this.numLevels > 1;
-    this.dimensions = dimensions;
-    this.dtype = dtype;
-    this.isRgb = isRgb;
-    this.isInterleaved = isInterleaved;
+    this._offsets = offsets || [];
+    this._pool = pool;
+    this._tiff = tiff;
   }
 
   /**
@@ -98,7 +97,7 @@ export default class TiffLoader {
    * @param {number} args.y positive integer
    * @param {number} args.z positive integer (0 === highest zoom level)
    * @param {Array} args.loaderSelection, Array of number Arrays specifying channel selections
-   * @param {Array} args.signal AbortSignal object
+   * @param {AbortSignal} args.signal
    * @returns {Object} data: TypedArray[], width: number (tileSize), height: number (tileSize).
    * Default is `{data: [], width: tileSize, height: tileSize}`.
    */
@@ -108,7 +107,7 @@ export default class TiffLoader {
     }
     const images = await this.getImages(loaderSelection, z);
     const tileRequests = images.map(async image => {
-      return this._getChannel({ image, x, y, z, signal });
+      return this._getChannelTile({ image, x, y, z, signal });
     });
     const data = await Promise.all(tileRequests);
     const { height, width } = this._getTileExtent({
@@ -133,12 +132,12 @@ export default class TiffLoader {
    * Default is `{data: [], width, height}`.
    */
   async getRaster({ z, loaderSelection }) {
-    const { pool, isInterleaved } = this;
+    const { _pool, isInterleaved } = this;
     const images = await this.getImages(loaderSelection, z);
     const data = await Promise.all(
       images.map(async image => {
         const raster = await image.readRasters({
-          pool,
+          _pool,
           interleave: isInterleaved
         });
         return isInterleaved ? raster : raster[0];
@@ -158,8 +157,17 @@ export default class TiffLoader {
     };
   }
 
-  async _getChannel({ image, x, y, z, signal }) {
-    const { tileSize, pool, isInterleaved: interleave } = this;
+  /**
+   * Get a channel's tile.
+   * @param {Object} args {x, y, z} to check.
+   * @param {number} args.x
+   * @param {number} args.y
+   * @param {number} args.z
+   * @param {Object} args.image geotiff.js image object.
+   * @param {AbortSignal} args.signal
+   */
+  async _getChannelTile({ image, x, y, z, signal }) {
+    const { tileSize, _pool, isInterleaved: interleave } = this;
     const { height, width } = this._getTileExtent({
       x,
       y,
@@ -173,7 +181,7 @@ export default class TiffLoader {
         x * tileSize + width,
         y * tileSize + height
       ],
-      pool,
+      _pool,
       signal,
       width,
       height,
@@ -184,6 +192,13 @@ export default class TiffLoader {
     return data;
   }
 
+  /**
+   * Check for whether or not the tile is in bounds
+   * @param {Object} tile {x, y, z} to check.
+   * @param {number} tile.x
+   * @param {number} tile.y
+   * @param {number} tile.z
+   */
   _tileInBounds({ x, y, z }) {
     const { tileSize, numLevels } = this;
     const { width, height } = this.getRasterSize({ z: 0 });
@@ -198,10 +213,14 @@ export default class TiffLoader {
     });
   }
 
+  /**
+   * Wrapper for calling parseFileDirectoryAt from geotiff.js when there is an `offsets` array.
+   * @param {number} index Which IFD to parse.
+   */
   _parseIFD(index) {
-    const { tiff, offsets } = this;
-    if (offsets.length > 0) {
-      tiff.ifdRequests[index] = tiff.parseFileDirectoryAt(offsets[index]);
+    const { _tiff, _offsets } = this;
+    if (_offsets.length > 0) {
+      _tiff.ifdRequests[index] = _tiff.parseFileDirectoryAt(_offsets[index]);
     }
   }
 

@@ -190,6 +190,16 @@ export async function createOMETiffLoader({
     int32: '<u4'
   };
   const dtype = DTYPE_LOOKUP[metadata.Type];
+  const physicalSizes = {
+    x: {
+      value: metadata.PhysicalSizeX,
+      unit: metadata.PhysicalSizeXUnit
+    },
+    y: {
+      value: metadata.PhysicalSizeY,
+      unit: metadata.PhysicalSizeYUnit
+    }
+  };
   return new OMETiffLoader({
     tiff,
     pool,
@@ -199,7 +209,8 @@ export async function createOMETiffLoader({
     metadata,
     isRgb,
     isInterleaved,
-    dtype
+    dtype,
+    physicalSizes
   });
 }
 
