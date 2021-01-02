@@ -12,7 +12,7 @@ export default class OMETiffLoader extends TiffLoader {
         fileDirectory: { SubIFDs }
       }
     } = args;
-    this.isBioFormats6Pyramid = SubIFDs;
+    this.isBioFormats6Pyramid = Boolean(SubIFDs);
     this.type = 'ome-tiff';
   }
 
