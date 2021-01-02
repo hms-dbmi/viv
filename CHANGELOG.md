@@ -4,6 +4,8 @@
 
 ### Added
 
+- Create a `TiffLoader` base class that `OmeTiffLoader` inherits from and extends.
+
 ### Changed
 
 ## 0.8.1
