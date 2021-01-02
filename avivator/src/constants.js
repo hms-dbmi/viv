@@ -16,7 +16,7 @@ export const COLORMAP_OPTIONS = [
   'density',
   'inferno'
 ];
-export const COLOR_PALLETE = [
+export const COLOR_PALETTE = [
   [0, 0, 255],
   [0, 255, 0],
   [255, 0, 255],

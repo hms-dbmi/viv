@@ -4,7 +4,7 @@ import LensIcon from '@material-ui/icons/Lens';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import { COLOR_PALLETE } from '../constants';
+import { COLOR_PALETTE } from '../constants';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -30,7 +30,7 @@ const ColorPalette = ({ handleChange }) => {
   const classes = useStyles();
   return (
     <div className={classes.container} aria-label="color-swatch">
-      {COLOR_PALLETE.map(color => {
+      {COLOR_PALETTE.map(color => {
         return (
           <IconButton
             className={classes.button}

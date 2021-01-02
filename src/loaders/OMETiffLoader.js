@@ -15,7 +15,7 @@ export default class OMETiffLoader extends TiffLoader {
     this.isBioFormats6Pyramid = SubIFDs;
   }
 
-  async getImages(loaderSelection, z) {
+  async getImages(loaderSelection, z = 0) {
     const { _tiff, isBioFormats6Pyramid } = this;
     const imageRequests = loaderSelection.map(async sel => {
       const pyramidIndex = this._getIFDIndex(sel, z);

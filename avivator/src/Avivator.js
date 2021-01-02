@@ -38,7 +38,7 @@ import {
   DEFAULT_OVERVIEW,
   FILL_PIXEL_VALUE,
   GLOBAL_SLIDER_DIMENSION_FIELDS,
-  COLOR_PALLETE
+  COLOR_PALETTE
 } from './constants';
 import sources from './source-info';
 import './index.css';
@@ -126,11 +126,26 @@ export default function Avivator(props) {
           });
           domains = stats.map(stat => stat.domain);
           sliders = stats.map(stat => stat.autoSliders);
+          // Tiff files can convey the black -> color colormaps in the IFD.
+          let colorPalette = COLOR_PALETTE;
+          if (nextLoader.type === 'ome-tiff') {
+            const images = await nextLoader.getImages(selections);
+            const colormaps = images.map(i => i.fileDirectory.ColorMap);
+            if (colormaps.every(map => map)) {
+              colorPalette = colormaps.map(map =>
+                [
+                  Math.max(...map.slice(0, 256)),
+                  Math.max(...map.slice(256, 512)),
+                  Math.max(...map.slice(512, 768))
+                ].map(i => Math.floor(i / 256))
+              );
+            }
+          }
           // If there is only one channel, use white.
           colors =
             stats.length === 1
               ? [[255, 255, 255]]
-              : stats.map((_, i) => COLOR_PALLETE[i]);
+              : stats.map((_, i) => colorPalette[i]);
         } else if (isRgb || channelOptions.length === 1) {
           // RGB should not use a lens.
           isLensOn && toggleIsLensOn(); // eslint-disable-line no-unused-expressions

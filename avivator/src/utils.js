@@ -5,7 +5,7 @@ import {
   getChannelStats
 } from '../../dist';
 
-import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
+import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALETTE } from './constants';
 
 const MAX_CHANNELS_FOR_SNACKBAR_WARNING = 40;
 
@@ -233,7 +233,7 @@ export function channelsReducer(state, { index, value, type }) {
         selections,
         sliders,
         domains,
-        colors: colors || selections.map((sel, i) => COLOR_PALLETE[i]),
+        colors: colors || selections.map((sel, i) => COLOR_PALETTE[i]),
         isOn: isOn || Array(n).fill(true),
         ids: range(n).map(() => String(Math.random()))
       };

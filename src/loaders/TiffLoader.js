@@ -54,7 +54,7 @@ export default class TiffLoader {
    * Returns a tiff image object for a given loader selection + pyramid level.
    * This is implemented by all classes that inherit from the tiff loader.
    * @param {Object} loaderSelection A lodaer selection
-   * @param {number} z Pyramidal resolution level.
+   * @param {number} z Pyramidal resolution level (default is implemented by loader, should be 0 unless noted otherwise).
    * @returns {Object} Tiff Image object containing parsed IFD.
    */
   // eslint-disable-next-line class-methods-use-this,no-unused-vars,no-empty-function
