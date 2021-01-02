@@ -19,7 +19,8 @@ import {
   ZarrLoader,
   createOMETiffLoader,
   OMETiffLoader,
-  getChannelStats
+  getChannelStats,
+  TiffLoader
 } from './loaders';
 import HTTPStore from './loaders/httpStore';
 import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from './constants';
@@ -43,6 +44,7 @@ export {
   ImageLayer,
   ZarrLoader,
   OMETiffLoader,
+  TiffLoader,
   createOMETiffLoader,
   createZarrLoader,
   createBioformatsZarrLoader,

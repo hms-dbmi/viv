@@ -24,6 +24,7 @@ toc:
 - ScaleBarLayer
 - name: Loaders
 - createOMETiffLoader
+- TiffLoader
 - OMETiffLoader
 - ZarrLoader
 - name: Internal

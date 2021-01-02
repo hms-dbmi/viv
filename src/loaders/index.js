@@ -3,6 +3,7 @@ import { fromBlob, fromUrl } from 'geotiff';
 import Pool from './Pool';
 import ZarrLoader from './zarrLoader';
 import OMETiffLoader from './OMETiffLoader';
+import TiffLoader from './TiffLoader';
 import { getChannelStats, getJson, dimensionsFromOMEXML } from './utils';
 import OMEXML from './omeXML';
 import FileStore from './fileStore';
@@ -214,4 +215,4 @@ export async function createOMETiffLoader({
   });
 }
 
-export { ZarrLoader, OMETiffLoader, getChannelStats };
+export { ZarrLoader, OMETiffLoader, TiffLoader, getChannelStats };

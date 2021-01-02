@@ -1,7 +1,7 @@
 import { isInTileBounds } from './utils';
 
 /**
- * This class serves as a wrapper for fetching tiff data from a file server.
+ * This class serves as a wrapper for reading tiff data.
  * @param {Object} args
  * @param {Object} args.tiff geotiffjs tiff object.
  * @param {Object} args.pool Pool that implements a `decode` function.

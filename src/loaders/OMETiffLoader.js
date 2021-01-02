@@ -1,7 +1,7 @@
 import TiffLoader from './TiffLoader';
 
 /**
- * This class serves as a wrapper for fetching tiff data from a file server.
+ * This class serves as a wrapper for reading ome-tiff data.
  * Inherites from TiffLoader and implements the necessary methods.
  * */
 export default class OMETiffLoader extends TiffLoader {
