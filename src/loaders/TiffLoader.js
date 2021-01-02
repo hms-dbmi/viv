@@ -30,7 +30,6 @@ export default class TiffLoader {
     physicalSizes
   }) {
     this.physicalSizes = physicalSizes;
-    this.type = 'ome-tiff';
     // get first image's description, which contains OMEXML
     this.metadata = metadata;
     this.dimensions = dimensions;

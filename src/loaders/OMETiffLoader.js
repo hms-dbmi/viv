@@ -13,6 +13,7 @@ export default class OMETiffLoader extends TiffLoader {
       }
     } = args;
     this.isBioFormats6Pyramid = SubIFDs;
+    this.type = 'ome-tiff';
   }
 
   async getImages(loaderSelection, z = 0) {
