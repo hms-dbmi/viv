@@ -14,6 +14,7 @@
 
 - Property `onViewStateChange` of all viewers accepts a callback for deck.gl view state changes.
 - Add a click handler to the overview that centers the detail view on the click position. The handler can be turned off by setting the `PictureInPictureViewer` property `clickCenter` to `false`.
+- Support interleaved RGB OME-TIFF files.
 
 ### Changed
 
@@ -25,7 +26,6 @@
 ### Added
 
 - Export a `getDefaultInitialViewState` function for getting a default initial view state given a loader and desired size of view.
-- Support interleaved RGB OME-TIFF files.
 - Added a README file for Avivator at `avivator/README.md`.
 
 ### Changed
