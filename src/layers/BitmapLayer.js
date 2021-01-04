@@ -74,7 +74,6 @@ const getTransparentColor = photometricInterpretation => {
 };
 
 class BitmapLayerWrapper extends BaseBitmapLayer {
-
   _getModel(gl) {
     const { photometricInterpretation } = this.props;
     // This is a port to the GPU of a subset of https://github.com/geotiffjs/geotiff.js/blob/master/src/rgb.js
@@ -116,7 +115,7 @@ export default class BitmapLayer extends CompositeLayer {
     // See: https://github.com/visgl/deck.gl/pull/5197
     gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
     gl.pixelStorei(GL.PACK_ALIGNMENT, 1);
-    super.initializeState(args)
+    super.initializeState(args);
   }
 
   renderLayers() {
