@@ -74,6 +74,7 @@ const getTransparentColor = photometricInterpretation => {
 };
 
 class BitmapLayerWrapper extends BaseBitmapLayer {
+
   _getModel(gl) {
     const { photometricInterpretation } = this.props;
     // This is a port to the GPU of a subset of https://github.com/geotiffjs/geotiff.js/blob/master/src/rgb.js
@@ -84,12 +85,6 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
     if (!gl) {
       return null;
     }
-    // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
-    // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
-    // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
-    // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
-    gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
-    gl.pixelStorei(GL.PACK_ALIGNMENT, 1);
 
     /*
       0,0 --- 1,0
@@ -111,6 +106,19 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
   }
 }
 export default class BitmapLayer extends CompositeLayer {
+  initializeState(args) {
+    const { gl } = this.context;
+    // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
+    // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
+    // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
+    // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
+    // This needs to be called here and not in the BitmapLayerWrapper because the `image` prop is converted to a texture outside of the layer, as controlled by the `image` type.
+    // See: https://github.com/visgl/deck.gl/pull/5197
+    gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
+    gl.pixelStorei(GL.PACK_ALIGNMENT, 1);
+    super.initializeState(args)
+  }
+
   renderLayers() {
     const { photometricInterpretation } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
@@ -124,5 +132,10 @@ export default class BitmapLayer extends CompositeLayer {
 BitmapLayer.layerName = 'BitmapLayer';
 // From https://github.com/geotiffjs/geotiff.js/blob/8ef472f41b51d18074aece2300b6a8ad91a21ae1/src/globals.js#L202-L213
 BitmapLayer.PHOTOMETRIC_INTERPRETATIONS = PHOTOMETRIC_INTERPRETATIONS;
-BitmapLayer.defaultProps = defaultProps;
+BitmapLayer.defaultProps = {
+  ...defaultProps,
+  // We don't want this layer to bind the texture so the type should not be `image`.
+  image: { type: 'object', value: {}, compare: true }
+};
 BitmapLayerWrapper.defaultProps = defaultProps;
+BitmapLayerWrapper.layerName = 'BitmapLayerWrapper';
