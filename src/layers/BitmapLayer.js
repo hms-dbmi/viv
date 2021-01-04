@@ -1,6 +1,5 @@
-// eslint-disable-next-line max-classes-per-file
 import { BitmapLayer as BaseBitmapLayer } from '@deck.gl/layers';
-import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
+import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import { Model, Geometry } from '@luma.gl/core';
 import GL from '@luma.gl/constants';
 
@@ -17,7 +16,6 @@ const PHOTOMETRIC_INTERPRETATIONS = {
 };
 
 const defaultProps = {
-  ...BaseBitmapLayer.defaultProps,
   pickable: true,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
@@ -55,25 +53,7 @@ const getPhotometricInterpretationShader = photometricInterpretation => {
   }
 };
 
-const  getTransparentColor = (photometricInterpretation) => {
- switch (photometricInterpretation) {
-   case PHOTOMETRIC_INTERPRETATIONS.RGB:
-     return [0, 0, 0, 0];
-   case PHOTOMETRIC_INTERPRETATIONS.WhiteIsZero:
-     return [255, 255, 255, 0];
-   case PHOTOMETRIC_INTERPRETATIONS.BlackIsZero:
-     return [0, 0, 0, 0];
-   case PHOTOMETRIC_INTERPRETATIONS.YCbCr:
-     return [16, 128, 128, 0];
-   default:
-     console.error(
-       'Unsupported photometric interpretation or none provided.  No transformation will be done to image data'
-     );
-     return [0, 0, 0, 0];
- }
-}
-
-class BitmapLayerWrapper extends BaseBitmapLayer {
+export default class BitmapLayer extends BaseBitmapLayer {
   _getModel(gl) {
     const { photometricInterpretation } = this.props;
     // This is a port to the GPU of a subset of https://github.com/geotiffjs/geotiff.js/blob/master/src/rgb.js
@@ -110,19 +90,8 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
     });
   }
 }
-export default class BitmapLayer extends CompositeLayer {
-  renderLayers() {
-    const { photometricInterpretation } = this.props;
-    const transparentColor = getTransparentColor(photometricInterpretation);
-    return new BitmapLayerWrapper(this.props, {
-      transparentColor,
-      id: `${this.props.id}-wrapped`
-    });
-  }
-}
 
 BitmapLayer.layerName = 'BitmapLayer';
 // From https://github.com/geotiffjs/geotiff.js/blob/8ef472f41b51d18074aece2300b6a8ad91a21ae1/src/globals.js#L202-L213
 BitmapLayer.PHOTOMETRIC_INTERPRETATIONS = PHOTOMETRIC_INTERPRETATIONS;
 BitmapLayer.defaultProps = defaultProps;
-BitmapLayerWrapper.defaultProps = defaultProps;

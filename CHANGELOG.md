@@ -6,8 +6,6 @@
 
 ### Changed
 
-- Fix opacity with photometric interpretations.
-
 ## 0.8.1
 
 ### Added
