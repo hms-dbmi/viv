@@ -170,8 +170,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         modelMatrix: layerModelMatrix.scale(2 ** (numLevels - 1)),
         visible:
           opacity === 1 &&
-          -numLevels < this.context.viewport.zoom &&
-            (!viewportId || this.context.viewport.id === viewportId),
+          (!viewportId || this.context.viewport.id === viewportId),
         z: numLevels - 1,
         pickable: true,
         onHover,
