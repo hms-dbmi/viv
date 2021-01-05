@@ -128,7 +128,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       tileSize,
       onClick,
       extent: [0, 0, width, height],
-      // See the above note within getTileData for why these are necessary.
+      // See the above note within getTileData for why the division with 512 and the rounding necessary.
       minZoom: Math.round(-(numLevels - 1) + Math.log2(512 / tileSize)),
       maxZoom: Math.min(0, Math.round(Math.log2(512 / tileSize))),
       colorValues,
