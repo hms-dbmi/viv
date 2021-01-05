@@ -128,7 +128,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       tileSize,
       onClick,
       extent: [0, 0, width, height],
-      minZoom: -(numLevels - 1),
+      minZoom: Math.round(-(numLevels - 1) + Math.log2(512 / tileSize)),
       maxZoom: Math.min(0, Math.round(Math.log2(512 / tileSize))),
       colorValues,
       sliderValues,
@@ -170,8 +170,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         modelMatrix: layerModelMatrix.scale(2 ** (numLevels - 1)),
         visible:
           opacity === 1 &&
-          -numLevels < this.context.viewport.zoom &&
-            (!viewportId || this.context.viewport.id === viewportId),
+          (!viewportId || this.context.viewport.id === viewportId),
         z: numLevels - 1,
         pickable: true,
         onHover,

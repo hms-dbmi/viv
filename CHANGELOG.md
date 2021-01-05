@@ -7,7 +7,8 @@
 ### Changed
 
 - Fix opacity with photometric interpretations.
-- Only show background image when opacity is 1 and we are within the higher levels of the image pyramid.
+- Only show background image when opacity is 1 (and viewport is correct).
+- Fix `minZoom` calculation bug in `MultiscaleImageLayer`
 
 ## 0.8.1
 
