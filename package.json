@@ -65,6 +65,7 @@
     "prettier": "^1.19.1",
     "promise.prototype.finally": "^3.1.2",
     "rollup": "^2.32.1",
+    "rollup-plugin-copy": "^3.3.0",
     "rollup-plugin-glslify": "^1.2.0",
     "rollup-plugin-web-worker-loader": "^1.4.0",
     "tap-spec": "^5.0.0",

@@ -4,6 +4,8 @@
 
 ### Added
 
+- TypeScript declarations for exported symbols
+
 ### Changed
 
 ## 0.8.2
