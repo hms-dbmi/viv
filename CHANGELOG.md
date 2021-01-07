@@ -3,6 +3,7 @@
 ## In Progress
 
 ### Added
+- Issue templates for Github.
 
 ### Changed
 
