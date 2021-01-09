@@ -57,7 +57,7 @@ const defaultProps = {
  * @param {array} props.transparentColor A color to be considered "transparent" when useTransparentColor is true.
  * In other words, any fragment shader output equal to transparentColor will have opacity 0 when useTransparentColor is true.
  * This parameter is ignored when using colormaps because each colormap has its own transparent color that is calculated on the shader (default is [0, 0, 0, 0]).
- * @param {boolean} props.useTransparentColor Whether or nor to use the transparentColor prop (or the automatically calculated transparent color when)
+ * @param {boolean} props.useTransparentColor Whether or nor to use the transparentColor prop or the automatically calculated transparent color when
  * colormap is set (default is false).
  */
 export default class ImageLayer extends CompositeLayer {
