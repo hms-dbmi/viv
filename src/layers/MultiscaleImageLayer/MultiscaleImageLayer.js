@@ -25,7 +25,7 @@ const defaultProps = {
   maxRequests: { type: 'number', value: 10, compare: true },
   onClick: { type: 'function', value: null, compare: true },
   transparentColor: { type: 'array', value: [0, 0, 0, 0], compare: true },
-  useTransparentColor: { type: 'boolean', value: false, compare: true }
+  useTransparentColor: { type: 'boolean', value: true, compare: true }
 };
 
 /**
@@ -53,6 +53,7 @@ const defaultProps = {
  * @param {number} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
  * @param {number} props.transparentColor A color to be considered "transparent" when useTransparentColor is true.
  * In other words, any fragment shader output equal to transparentColor will have opacity 0 when useTransparentColor is true.
+ * This parameter is ignored when using colormaps (because each colormap has its own transparent color that is calculated on the shader).
  * @param {number} props.useTransparentColor Math.gl Matrix4 object containing an affine transformation to be applied to the image.
  */
 

@@ -94,6 +94,6 @@ vec4 apply_transparency(vec3 color, bool useTransparentColor, vec4 transparentCo
   return vec4(color, (color == transparentColor.rgb && useTransparentColor) ? 0.0 : opacity);
 }
 
-vec4 colormap(float intensity, float opacity) {
-  return vec4(COLORMAP_FUNCTION(min(1.0,intensity)).xyz, opacity);
+vec4 colormap(float intensity, float opacity, bool useTransparentColor) {
+  return apply_transparency(COLORMAP_FUNCTION(min(1.0,intensity)).xyz, useTransparentColor, COLORMAP_FUNCTION(0.0), opacity);
 }
