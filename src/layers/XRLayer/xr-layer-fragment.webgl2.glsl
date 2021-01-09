@@ -66,7 +66,7 @@ void main() {
 
   // Ternaries are faster than checking this first and then returning/breaking out of shader.
   rgbCombo = (isLensOn && isFragOnLensBounds) ? lensBorderColor : rgbCombo;
-  color = apply_transparency(rgbCombo, useTransparentColor, transparentColor, opacity);
+  color = apply_opacity(rgbCombo, useTransparentColor, transparentColor, opacity);
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(color, geometry);
 }
