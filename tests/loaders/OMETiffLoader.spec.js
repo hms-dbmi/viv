@@ -4,7 +4,7 @@ import { fromFile } from 'geotiff';
 import OMETiffLoader from '../../src/loaders/OMETiffLoader';
 
 test('OME-TIFF Properties', async t => {
-  t.plan(4);
+  t.plan(3);
   try {
     const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
     const firstImage = await tiff.getImage();
@@ -14,13 +14,11 @@ test('OME-TIFF Properties', async t => {
       pool: { decode: () => new Promise([]) },
       firstImage,
       omexmlString,
-      offsets: [8, 2712, 4394]
     });
-    const { width, height, isPyramid, offsets } = loader;
+    const { width, height, isPyramid } = loader;
     t.equal(width, 439);
     t.equal(height, 167);
     t.equal(isPyramid, false);
-    t.deepEqual(offsets, [8, 2712, 4394]);
     t.end();
   } catch (e) {
     t.fail(e);
@@ -38,7 +36,6 @@ test('OME-TIFF Selection', async t => {
       pool: { decode: () => new Promise([]) },
       firstImage,
       omexmlString,
-      offsets: [8, 2712, 4394]
     });
     const selection = loader._getIFDIndex({ channel: 1 });
 

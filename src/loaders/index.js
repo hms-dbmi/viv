@@ -3,7 +3,7 @@ import { fromBlob, fromUrl } from 'geotiff';
 import Pool from './Pool';
 import ZarrLoader from './zarrLoader';
 import OMETiffLoader from './OMETiffLoader';
-import { getChannelStats, getJson, dimensionsFromOMEXML } from './utils';
+import { getChannelStats, getJson, dimensionsFromOMEXML, createOffsetsProxy } from './utils';
 import OMEXML from './omeXML';
 import FileStore from './fileStore';
 import HTTPStore from './httpStore';
@@ -168,6 +168,13 @@ export async function createOMETiffLoader({
   } else {
     tiff = await fromUrl(urlOrFile, headers);
   }
+
+  if (offsets.length > 0) {
+    // Performance enhancement if offsets are provided. This proxy allows 
+    // direct access of images in the tiff using the pre-computed offsets.
+    tiff = createOffsetsProxy(tiff, offsets);
+  }
+
   const firstImage = await tiff.getImage(0);
   const pool = new Pool();
   const omexmlString = firstImage.fileDirectory.ImageDescription;
@@ -176,7 +183,6 @@ export async function createOMETiffLoader({
     pool,
     firstImage,
     omexmlString,
-    offsets
   });
 }
 
