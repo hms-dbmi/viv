@@ -30,7 +30,9 @@ const defaultProps = {
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
-  onClick: { type: 'function', value: null, compare: true }
+  onClick: { type: 'function', value: null, compare: true },
+  transparentColor: { type: 'array', value: [0, 0, 0, 0], compare: true },
+  useTransparentColor: { type: 'boolean', value: false, compare: true }
 };
 
 /**
@@ -52,6 +54,9 @@ const defaultProps = {
  * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  * @param {number} props.onClick Hook function from deck.gl to handle clicked-on objects.
  * @param {number} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @param {number} props.transparentColor A color to be considered "transparent" when useTransparentColor is true.
+ * In other words, any fragment shader output equal to transparentColor will have opacity 0 when useTransparentColor is true.
+ * @param {number} props.useTransparentColor Math.gl Matrix4 object containing an affine transformation to be applied to the image.
  */
 export default class ImageLayer extends CompositeLayer {
   initializeState() {
@@ -129,7 +134,9 @@ export default class ImageLayer extends CompositeLayer {
       id,
       onClick,
       onHover,
-      modelMatrix
+      modelMatrix,
+      transparentColor,
+      useTransparentColor
     } = this.props;
     const { dtype } = loader;
     const { width, height, data, unprojectLensBounds } = this.state;
@@ -172,7 +179,9 @@ export default class ImageLayer extends CompositeLayer {
       onClick,
       modelMatrix,
       opacity,
-      visible
+      visible,
+      transparentColor,
+      useTransparentColor
     });
   }
 }

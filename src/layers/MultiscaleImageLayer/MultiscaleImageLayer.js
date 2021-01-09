@@ -23,7 +23,9 @@ const defaultProps = {
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   maxRequests: { type: 'number', value: 10, compare: true },
-  onClick: { type: 'function', value: null, compare: true }
+  onClick: { type: 'function', value: null, compare: true },
+  transparentColor: { type: 'array', value: [0, 0, 0, 0], compare: true },
+  useTransparentColor: { type: 'boolean', value: false, compare: true }
 };
 
 /**
@@ -49,6 +51,9 @@ const defaultProps = {
  * @param {number} props.maxRequests Maximum parallel ongoing requests allowed before aborting.
  * @param {number} props.onClick Hook function from deck.gl to handle clicked-on objects.
  * @param {number} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @param {number} props.transparentColor A color to be considered "transparent" when useTransparentColor is true.
+ * In other words, any fragment shader output equal to transparentColor will have opacity 0 when useTransparentColor is true.
+ * @param {number} props.useTransparentColor Math.gl Matrix4 object containing an affine transformation to be applied to the image.
  */
 
 export default class MultiscaleImageLayer extends CompositeLayer {
@@ -86,7 +91,9 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       lensBorderRadius,
       maxRequests,
       onClick,
-      modelMatrix
+      modelMatrix,
+      transparentColor,
+      useTransparentColor
     } = this.props;
     const { tileSize, numLevels, dtype, isInterleaved, isRgb } = loader;
     const { unprojectLensBounds } = this.state;
@@ -156,7 +163,9 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       lensSelection,
       lensBorderColor,
       lensBorderRadius,
-      modelMatrix
+      modelMatrix,
+      transparentColor,
+      useTransparentColor
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity
@@ -171,7 +180,11 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         modelMatrix: layerModelMatrix.scale(2 ** (numLevels - 1)),
         visible:
           opacity === 1 &&
-          (!viewportId || this.context.viewport.id === viewportId),
+          (!viewportId || this.context.viewport.id === viewportId) &&
+          // If we are using transparent color to be opacity 0, we shouldn't show the background image
+          // since the background image might not have the same color output from the fragment shader
+          // as the tiled layer at a high resolution level.
+          !useTransparentColor,
         z: numLevels - 1,
         pickable: true,
         onHover,
