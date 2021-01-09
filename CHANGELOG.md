@@ -6,6 +6,7 @@
 - Issue templates for Github.
 
 ### Changed
+- Use an ES6 Proxy to handle OME-TIFF `offsets`.
 
 ## 0.8.2
 
