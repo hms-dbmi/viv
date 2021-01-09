@@ -195,7 +195,7 @@ export function joinUrlParts(...args) {
  * @param {Array} offsets pre computed offsets.
  */
 export function createOffsetsProxy(tiff, offsets) {
-  const get = (target, key, reciever) => {
+  const get = (target, key, receiver) => {
     if (key === 'getImage') {
       return index => {
         // No need to index if already requested.
@@ -203,12 +203,12 @@ export function createOffsetsProxy(tiff, offsets) {
           return target.getImage(index);
         }
         // Directly add ifd request using offsets
-        target.ifdRequests[index] = target.parseFileDirectoryAt(offsets[index]);
+        target.ifdRequests[index] = target.parseFileDirectoryAt(offsets[index]); // eslint-disable-line no-param-reassign
         return target.getImage(index);
       };
     }
-    // restores normal behavior for all other
-    return Reflect.get(target, key, reciever);
+    // Restores normal 'get' behavior for rest of target.
+    return Reflect.get(target, key, receiver);
   };
   return new Proxy(tiff, { get });
 }
