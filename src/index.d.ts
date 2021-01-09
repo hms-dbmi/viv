@@ -46,12 +46,34 @@ export class XRLayer extends Layer {
   dataToTexture(data, width, height);
 }
 
+interface VivViewProps {
+  initialViewState: any;
+  x?: number;
+  y?: number;
+  height: any;
+  width: any;
+}
+
+export class VivView {
+  width: number;
+  height: number;
+  initialViewState: any;
+  id: string;
+  x: number;
+  y: number;
+  constructor(props: VivViewProps);
+  getDeckGlView();
+  filterViewState({ viewState });
+  getLayers({ viewStates, props });
+}
+
 export default class DetailView extends VivView {
   getLayers({ props, viewStates }): any[];
   filterViewState({ viewState, currentViewState });
 }
 
-type OverviewViewProps = {
+// Doesn't inherit from VivViewProps because that's the currently documented situation.
+interface OverviewViewProps {
   initialViewState: any;
   loader: any;
   detailHeight: number;
@@ -64,7 +86,7 @@ type OverviewViewProps = {
   minimumHeight?: number;
   maximumHeight?: number;
   clickCenter?: boolean;
-};
+}
 
 export class OverviewView extends VivView {
   margin: number;
@@ -78,20 +100,7 @@ export class OverviewView extends VivView {
   scale: number;
   _imageWidth: number;
   _imageHeight: number;
-  constructor({
-    initialViewState,
-    loader,
-    detailHeight,
-    detailWidth,
-    scale,
-    margin,
-    position,
-    minimumWidth,
-    maximumWidth,
-    minimumHeight,
-    maximumHeight,
-    clickCenter
-  }: OverviewViewProps);
+  constructor(props: OverviewViewProps);
   _setHeightWidthScale({
     detailWidth,
     detailHeight,
@@ -107,110 +116,25 @@ export class OverviewView extends VivView {
   getLayers({ viewStates, props }): any[];
 }
 
-type SideBySideViewProps = {
-  initialViewState: any;
-  x: number;
-  y: number;
-  height: number;
-  width: number;
+interface SideBySideViewProps extends VivViewProps {
   linkedIds?: any[];
   panLock?: boolean;
   zoomLock?: boolean;
   viewportOutlineColor?: number[];
   viewportOutlineWidth?: number;
-};
+}
 
 export default class SideBySideView extends VivView {
-  constructor({
-    initialViewState,
-    x,
-    y,
-    height,
-    width,
-    linkedIds,
-    panLock,
-    zoomLock,
-    viewportOutlineColor,
-    viewportOutlineWidth
-  }: SideBySideViewProps);
+  constructor(props: SideBySideViewProps);
 }
 
-type VivViewProps = {
-  initialViewState: any;
-  x?: number;
-  y?: number;
-  height: any;
-  width: any;
-};
-
-export class VivView {
-  width: number;
-  height: number;
-  initialViewState: any;
-  id: string;
-  x: number;
-  y: number;
-  constructor({ initialViewState, x, y, height, width }: VivViewProps);
-  getDeckGlView();
-  filterViewState({ viewState });
-  getLayers({ viewStates, props });
-}
-
-type PictureInPictureViewerProps = {
-  sliderValues: number[][];
-  colorValues: number[][];
-  channelIsOn: boolean[];
-  colormap: string;
-  loader: any;
-  loaderSelection: any[];
-  overview: any;
-  overviewOn: boolean;
-  hoverHooks: any;
-  initialViewState: any;
-  height: number;
-  width: number;
-  isLensOn: boolean;
-  lensSelection: number;
-  lensRadius: number;
-  lensBorderColor: number[];
-  lensBorderRadius: number;
-  lensBorderRadius: number;
-  clickCenter: boolean;
-  onViewStateChange: any;
-};
-
-export const PictureInPictureViewer: (
-  props: PictureInPictureViewerProps
-) => JSX.Element;
-
-type SideBySideViewerProps = {
-  sliderValues: number[][];
-  colorValues: number[][];
-  channelIsOn: boolean[];
-  colormap: string;
-  loader: any;
-  loaderSelection: any[];
-  zoomLock: boolean;
-  panLock: boolean;
-  initialViewState: any;
-  height: number;
-  width: number;
-  isLensOn: boolean;
-  lensSelection: number;
-  lensBorderColor: number[];
-  lensBorderRadius: number;
-  onViewStateChange: any;
-};
-
-export const SideBySideViewer: (props: SideBySideViewerProps) => JSX.Element;
-
-type VivViewerProps = {
+interface VivViewerProps {
   layerProps: any;
   randomize?: any;
   views: any[];
   onViewStateChange?: any;
   hoverHooks?: { handleValue?: any };
-};
+}
 
 export class VivViewer extends PureComponent<VivViewerProps> {
   constructor(props: VivViewerProps);
@@ -222,6 +146,43 @@ export class VivViewer extends PureComponent<VivViewerProps> {
   render(): JSX.Element;
 }
 
+interface CommonViewerProps {
+  sliderValues: number[][];
+  colorValues: number[][];
+  channelIsOn: boolean[];
+  colormap: string;
+  loader: any;
+  loaderSelection: any[];
+  initialViewState: any;
+  height: number;
+  width: number;
+  isLensOn: boolean;
+  lensSelection: number;
+  lensRadius: number;
+  lensBorderColor: number[];
+  lensBorderRadius: number;
+  lensBorderRadius: number;
+  onViewStateChange?: any;
+}
+
+interface PictureInPictureViewerProps extends CommonViewerProps {
+  overview: any;
+  overviewOn: boolean;
+  hoverHooks?: { handleValue?: any };
+  clickCenter: boolean;
+}
+
+export const PictureInPictureViewer: (
+  props: PictureInPictureViewerProps
+) => JSX.Element;
+
+interface SideBySideViewerProps extends CommonViewerProps {
+  zoomLock: boolean;
+  panLock: boolean;
+}
+
+export const SideBySideViewer: (props: SideBySideViewerProps) => JSX.Element;
+
 export default class HTTPStore {
   constructor(url: any, options?: {});
   getItem(key: any, options?: {}): Promise<ArrayBuffer>;
@@ -229,58 +190,28 @@ export default class HTTPStore {
 
 export default class OMETiffLoader {
   constructor({ tiff, pool, firstImage, omexmlString, offsets });
-  _getIFDIndex({
-    z,
-    channel,
-    time
-  }: {
-    z: number;
-    time: number;
-    channel: string;
-  }): number;
+  _getIFDIndex(args: { z: number; time: number; channel: string }): number;
   onTileError(err: Error): void;
-  getTile({
-    x,
-    y,
-    z,
-    loaderSelection,
-    signal
-  }: {
+  getTile(args: {
     x: number;
     y: number;
     z: number;
     loaderSelection: any[];
     signal: any;
   }): Promise<any>;
-  getRaster({
-    z,
-    loaderSelection
-  }: {
-    z: number;
-    loaderSelection: any[];
-  }): Promise<any>;
+  getRaster(args: { z: number; loaderSelection: any[] }): Promise<any>;
   getRasterSize({ z }: { z: number }): { width: number; height: number };
   getMetadata();
-  _getChannel({
-    image,
-    x,
-    y,
-    z,
-    signal
-  }: {
+  _getChannel(args: {
     image: any;
     x: number;
     y: number;
     z: number;
     signal: any;
   }): Promise<any>;
-  _tileInBounds({ x, y, z }: { x: number; y: number; z: number }): boolean;
+  _tileInBounds(args: { x: number; y: number; z: number }): boolean;
   _parseIFD(index: number): void;
-  _getTileExtent({
-    x,
-    y,
-    z
-  }: {
+  _getTileExtent(args: {
     x: number;
     y: number;
     z: number;
@@ -288,13 +219,7 @@ export default class OMETiffLoader {
 }
 
 export default class ZarrLoader {
-  constructor({
-    data,
-    dimensions,
-    isRgb,
-    scale,
-    translate
-  }: {
+  constructor(props: {
     data: any;
     dimensions: any;
     isRgb: any;
@@ -306,13 +231,7 @@ export default class ZarrLoader {
   });
   get isPyramid(): boolean;
   get base();
-  getTile({
-    x,
-    y,
-    z,
-    loaderSelection,
-    signal
-  }: {
+  getTile(args: {
     x: number;
     y: number;
     z: number;
@@ -335,11 +254,7 @@ export function createBioformatsZarrLoader({
   fetchOptions?: any;
 }): Promise<ZarrLoader>;
 
-export function createOMETiffLoader({
-  urlOrFile,
-  offsets,
-  headers
-}: {
+export function createOMETiffLoader(props: {
   urlOrFile: string;
   offsets?: any[];
   headers?: any;
@@ -354,10 +269,7 @@ export function createZarrLoader({
   translate
 }): Promise<ZarrLoader>;
 
-export function getChannelStats({
-  loader,
-  loaderSelection
-}: {
+export function getChannelStats(args: {
   loader: any;
   loaderSelection: any[];
 }): any[];
