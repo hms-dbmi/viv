@@ -41,20 +41,21 @@ const defaultProps = {
  * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getTile`, `dtype`, `numLevels`, and `tileSize`, and `getRaster`.
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {String} props.id Unique identifier for this layer.
- * @param {String} props.onTileError Custom override for handle tile fetching errors.
- * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
+ * @param {function} props.onTileError Custom override for handle tile fetching errors.
+ * @param {function} props.onHover Hook function from deck.gl to handle hover objects.
  * @param {boolean} props.isLensOn Whether or not to use the lens.
  * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
  * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
- * @param {number} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
+ * @param {Array} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  * @param {number} props.maxRequests Maximum parallel ongoing requests allowed before aborting.
- * @param {number} props.onClick Hook function from deck.gl to handle clicked-on objects.
- * @param {number} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
- * @param {number} props.transparentColor A color to be considered "transparent" when useTransparentColor is true.
+ * @param {function} props.onClick Hook function from deck.gl to handle clicked-on objects.
+ * @param {Object} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @param {Array} props.transparentColor A RGBA color to be considered "transparent" when useTransparentColor is true.
  * In other words, any fragment shader output equal to transparentColor will have opacity 0 when useTransparentColor is true.
- * This parameter is ignored when using colormaps (because each colormap has its own transparent color that is calculated on the shader).
- * @param {number} props.useTransparentColor Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * This parameter is ignored when using colormaps because each colormap has its own transparent color that is calculated on the shader (default is [0, 0, 0, 0]).
+ * @param {boolean} props.useTransparentColor Whether or nor to use the transparentColor prop (or the automatically calculated transparent color when)
+ * colormap is set (default is false).
  */
 
 export default class MultiscaleImageLayer extends CompositeLayer {
