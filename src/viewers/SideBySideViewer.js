@@ -20,6 +20,11 @@ import { SideBySideView, getDefaultInitialViewState } from '../views';
  * @param {number} [props.lensSelection] Numeric index of the channel to be focused on by the lens (default 0).
  * @param {Array} [props.lensBorderColor] RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
+ * @param {Array} [props.transparentColor] A RGBA color to be considered "transparent" when useTransparentColor is true.
+ * In other words, any fragment shader output equal to transparentColor will have opacity 0 when useTransparentColor is true.
+ * This parameter is ignored when using colormaps because each colormap has its own transparent color that is calculated on the shader (default is [0, 0, 0, 0]).
+ * @param {boolean} [props.useTransparentColor] Whether or nor to use the transparentColor prop or the automatically calculated transparent color when
+ * colormap is set (default is false).
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  */
 const SideBySideViewer = props => {
@@ -40,6 +45,8 @@ const SideBySideViewer = props => {
     lensRadius = 100,
     lensBorderColor = [255, 255, 255],
     lensBorderRadius = 0.02,
+    transparentColor = [0, 0, 0, 0],
+    useTransparentColor = false,
     onViewStateChange
   } = props;
   const viewState =
@@ -72,7 +79,9 @@ const SideBySideViewer = props => {
     lensSelection,
     lensRadius,
     lensBorderColor,
-    lensBorderRadius
+    lensBorderRadius,
+    transparentColor,
+    useTransparentColor
   };
   const views = [detailViewRight, detailViewLeft];
   const layerProps = [layerConfig, layerConfig];
