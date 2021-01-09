@@ -25,7 +25,7 @@ const defaultProps = {
   maxRequests: { type: 'number', value: 10, compare: true },
   onClick: { type: 'function', value: null, compare: true },
   transparentColor: { type: 'array', value: [0, 0, 0, 0], compare: true },
-  useTransparentColor: { type: 'boolean', value: true, compare: true }
+  useTransparentColor: { type: 'boolean', value: false, compare: true }
 };
 
 /**
@@ -182,9 +182,9 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         visible:
           opacity === 1 &&
           (!viewportId || this.context.viewport.id === viewportId) &&
-          // If we are using transparent color to be opacity 0, we shouldn't show the background image
+          // If we are using a transparent color, we shouldn't show the background image
           // since the background image might not have the same color output from the fragment shader
-          // as the tiled layer at a high resolution level.
+          // as the tiled layer at a higher resolution level.
           !useTransparentColor,
         z: numLevels - 1,
         pickable: true,
