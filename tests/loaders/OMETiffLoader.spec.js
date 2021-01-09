@@ -13,7 +13,7 @@ test('OME-TIFF Properties', async t => {
       tiff,
       pool: { decode: () => new Promise([]) },
       firstImage,
-      omexmlString,
+      omexmlString
     });
     const { width, height, isPyramid } = loader;
     t.equal(width, 439);
@@ -35,7 +35,7 @@ test('OME-TIFF Selection', async t => {
       tiff,
       pool: { decode: () => new Promise([]) },
       firstImage,
-      omexmlString,
+      omexmlString
     });
     const selection = loader._getIFDIndex({ channel: 1 });
 

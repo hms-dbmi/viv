@@ -188,9 +188,8 @@ export function joinUrlParts(...args) {
     .join('/');
 }
 
-
 /**
- * Wraps a GeoTIFF object in an ES6 Proxy to eagarly parse the fileDirectory 
+ * Wraps a GeoTIFF object in an ES6 Proxy to eagarly parse the fileDirectory
  * use suplemental pre-computed offsets.
  * @param {Object} tiff GeoTIFF
  * @param {Array} offsets pre computed offsets.
@@ -198,7 +197,7 @@ export function joinUrlParts(...args) {
 export function createOffsetsProxy(tiff, offsets) {
   const get = (target, key, reciever) => {
     if (key === 'getImage') {
-      return (index) => {
+      return index => {
         // No need to index if already requested.
         if (index in target.ifdRequests) {
           return target.getImage(index);
@@ -206,10 +205,10 @@ export function createOffsetsProxy(tiff, offsets) {
         // Directly add ifd request using offsets
         target.ifdRequests[index] = target.parseFileDirectoryAt(offsets[index]);
         return target.getImage(index);
-      }
+      };
     }
-    // restores normal behavior for all other 
+    // restores normal behavior for all other
     return Reflect.get(target, key, reciever);
-  }
+  };
   return new Proxy(tiff, { get });
 }
