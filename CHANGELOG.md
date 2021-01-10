@@ -6,6 +6,7 @@
 - Issue templates for Github.
 
 ### Changed
+- Allow for `tileLayer` zoom level to be offset by model matrix scaling.
 
 ## 0.8.2
 

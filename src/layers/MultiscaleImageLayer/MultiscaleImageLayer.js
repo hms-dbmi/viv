@@ -125,7 +125,10 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       id: `Tiled-Image-${id}`,
       getTileData,
       dtype,
-      tileSize,
+      // If you scale a matrix up or down, that is like zooming in or out and after
+      // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
+      // tileSize controls the zoom level that the tile indexer thinks you are at for fetching tiles.
+      tileSize: modelMatrix ? tileSize * (1 / modelMatrix.getScale()[0]) : tileSize,
       onClick,
       extent: [0, 0, width, height],
       // See the above note within getTileData for why the division with 512 and the rounding necessary.
