@@ -4,6 +4,7 @@
 
 ### Added
 
+- Document support for `bfconvert` as a cli tool for generating image pyramids as well as the new pyramidal tiff spec.
 - Issue templates for Github.
 - Add `transparentColor` and `useTransparentColor` to allow the layer to set a color to be "transparent" (or use the automatically calculated one when colormaps are set).
 
