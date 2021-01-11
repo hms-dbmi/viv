@@ -23,7 +23,8 @@ const defaultProps = {
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   maxRequests: { type: 'number', value: 10, compare: true },
-  onClick: { type: 'function', value: null, compare: true }
+  onClick: { type: 'function', value: null, compare: true },
+  transparentColor: { type: 'array', value: null, compare: true }
 };
 
 /**
@@ -39,16 +40,20 @@ const defaultProps = {
  * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getTile`, `dtype`, `numLevels`, and `tileSize`, and `getRaster`.
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {String} props.id Unique identifier for this layer.
- * @param {String} props.onTileError Custom override for handle tile fetching errors.
- * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
+ * @param {function} props.onTileError Custom override for handle tile fetching errors.
+ * @param {function} props.onHover Hook function from deck.gl to handle hover objects.
  * @param {boolean} props.isLensOn Whether or not to use the lens.
  * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
  * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
- * @param {number} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
+ * @param {Array} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  * @param {number} props.maxRequests Maximum parallel ongoing requests allowed before aborting.
- * @param {number} props.onClick Hook function from deck.gl to handle clicked-on objects.
- * @param {number} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @param {function} props.onClick Hook function from deck.gl to handle clicked-on objects.
+ * @param {Object} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @param {Array} props.transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
+ * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
+ * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
+ * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  */
 
 export default class MultiscaleImageLayer extends CompositeLayer {
@@ -86,7 +91,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       lensBorderRadius,
       maxRequests,
       onClick,
-      modelMatrix
+      modelMatrix,
+      transparentColor
     } = this.props;
     const { tileSize, numLevels, dtype, isInterleaved, isRgb } = loader;
     const { unprojectLensBounds } = this.state;
@@ -159,7 +165,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       lensSelection,
       lensBorderColor,
       lensBorderRadius,
-      modelMatrix
+      modelMatrix,
+      transparentColor
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity
@@ -174,7 +181,11 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         modelMatrix: layerModelMatrix.scale(2 ** (numLevels - 1)),
         visible:
           opacity === 1 &&
-          (!viewportId || this.context.viewport.id === viewportId),
+          (!viewportId || this.context.viewport.id === viewportId) &&
+          // If we are using a transparent color, we shouldn't show the background image
+          // since the background image might not have the same color output from the fragment shader
+          // as the tiled layer at a higher resolution level.
+          !transparentColor,
         z: numLevels - 1,
         pickable: true,
         onHover,

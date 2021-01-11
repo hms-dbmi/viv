@@ -24,21 +24,29 @@ const defaultProps = {
   opacity: { type: 'number', value: 1, compare: true }
 };
 
-const getPhotometricInterpretationShader = photometricInterpretation => {
+const getPhotometricInterpretationShader = (
+  photometricInterpretation,
+  tansparentColorInHook
+) => {
+  const useTransparentColor = tansparentColorInHook ? 'true' : 'false';
+  const transparentColorVector = `vec3(${(tansparentColorInHook || [0, 0, 0])
+    .map(i => String(i / 255))
+    .join(',')})`;
   switch (photometricInterpretation) {
     case PHOTOMETRIC_INTERPRETATIONS.RGB:
-      return '';
+      return `color[3] = (${useTransparentColor} && (color.rgb == ${transparentColorVector})) ? 0.0 : color.a;`;
     case PHOTOMETRIC_INTERPRETATIONS.WhiteIsZero:
       return `\
           float value = 1.0 - (color.r / 256.0);
-          color = vec4(value, value, value, color.a);
+          color = vec4(value, value, value, (${useTransparentColor} && vec3(value, value, value) == ${transparentColorVector}) ? 0.0 : color.a);
         `;
     case PHOTOMETRIC_INTERPRETATIONS.BlackIsZero:
       return `\
           float value = (color.r / 256.0);
-          color = vec4(value, value, value, color.a);
+          color = vec4(value, value, value, (${useTransparentColor} && vec3(value, value, value) == ${transparentColorVector}) ? 0.0 : color.a);
         `;
     case PHOTOMETRIC_INTERPRETATIONS.YCbCr:
+      // We need to use an epsilon because the conversion to RGB is not perfect.
       return `\
           float y = color[0];
           float cb = color[1];
@@ -46,6 +54,7 @@ const getPhotometricInterpretationShader = photometricInterpretation => {
           color[0] = (y + (1.40200 * (cr - .5)));
           color[1] = (y - (0.34414 * (cb - .5)) - (0.71414 * (cr - .5)));
           color[2] = (y + (1.77200 * (cb - .5)));
+          color[3] = (${useTransparentColor} && distance(color.rgb, ${transparentColorVector}) < 0.01) ? 0.0 : color.a;
         `;
     default:
       console.error(
@@ -75,11 +84,12 @@ const getTransparentColor = photometricInterpretation => {
 
 class BitmapLayerWrapper extends BaseBitmapLayer {
   _getModel(gl) {
-    const { photometricInterpretation } = this.props;
+    const { photometricInterpretation, tansparentColorInHook } = this.props;
     // This is a port to the GPU of a subset of https://github.com/geotiffjs/geotiff.js/blob/master/src/rgb.js
     // Safari was too slow doing this off of the GPU and it is noticably faster on other browsers as well.
     const photometricInterpretationShader = getPhotometricInterpretationShader(
-      photometricInterpretation
+      photometricInterpretation,
+      tansparentColorInHook
     );
     if (!gl) {
       return null;
@@ -119,10 +129,18 @@ export default class BitmapLayer extends CompositeLayer {
   }
 
   renderLayers() {
-    const { photometricInterpretation } = this.props;
+    const {
+      photometricInterpretation,
+      transparentColor: tansparentColorInHook
+    } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
     return new BitmapLayerWrapper(this.props, {
+      // transparentColor is a prop applied to the original image data by deck.gl's
+      // BitmapLayer and needs to be in the original colorspace.  It is used to determine
+      // what color is "transparent" in the original color space (i.e what shows when opacity is 0).
       transparentColor,
+      // This is our transparentColor props which needs to be applied in the hook that converts to the RGB space.
+      tansparentColorInHook,
       id: `${this.props.id}-wrapped`
     });
   }

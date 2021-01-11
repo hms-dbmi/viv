@@ -30,7 +30,8 @@ const defaultProps = {
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
-  onClick: { type: 'function', value: null, compare: true }
+  onClick: { type: 'function', value: null, compare: true },
+  transparentColor: { type: 'array', value: null, compare: true }
 };
 
 /**
@@ -44,14 +45,18 @@ const defaultProps = {
  * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @param {string} props.viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
  * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
- * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
+ * @param {function} props.onHover Hook function from deck.gl to handle hover objects.
  * @param {boolean} props.isLensOn Whether or not to use the lens.
  * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
  * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
- * @param {number} props.lensBorderColor RGB color of the border of the lens.
+ * @param {Array} props.lensBorderColor RGB color of the border of the lens.
  * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
- * @param {number} props.onClick Hook function from deck.gl to handle clicked-on objects.
- * @param {number} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @param {function} props.onClick Hook function from deck.gl to handle clicked-on objects.
+ * @param {Object} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @param {Array} props.transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
+ * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
+ * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
+ * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  */
 export default class ImageLayer extends CompositeLayer {
   initializeState() {
@@ -129,7 +134,8 @@ export default class ImageLayer extends CompositeLayer {
       id,
       onClick,
       onHover,
-      modelMatrix
+      modelMatrix,
+      transparentColor
     } = this.props;
     const { dtype } = loader;
     const { width, height, data, unprojectLensBounds } = this.state;
@@ -172,7 +178,8 @@ export default class ImageLayer extends CompositeLayer {
       onClick,
       modelMatrix,
       opacity,
-      visible
+      visible,
+      transparentColor
     });
   }
 }
