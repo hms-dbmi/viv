@@ -60,16 +60,20 @@ $ bioformats2raw LuCa-7color_Scan1.qptiff n5_tile_directory/
 $ raw2ometiff n5_tile_directory/ LuCa-7color_Scan1.ome.tif
 ```
 
-`LZW` is the default if you do not specify a `--compression` option (the syntax requires an "=" sign, like `--compression=zlib`).
+> Note:  `LZW` is the default if you do not specify a `--compression` option (the syntax requires an "=" sign, like `--compression=zlib`).
 
-You may also use the [standard Bioformats tool (Bioformats >= 6.0.0), `bfconvert`](https://docs.openmicroscopy.org/bio-formats/6.4.0/users/comlinetools/conversion.html)
+You may also use [`bfconvert` (Bioformats >= 6.0.0)](https://docs.openmicroscopy.org/bio-formats/6.4.0/users/comlinetools/conversion.html) to generate an image pyramid.
 to generate your image pyramid.
 
 ```bash
 $ bfconvert -tilex 512 -tiley 512 -pyramid-resolutions 6 -pyramid-scale 2  -compression LZW LuCa-7color_Scan1.qptiff LuCa-7color_Scan1.ome.tif
 ```
 
-All of the arguments `-tilex 512, -tiley 512 -pyramid-resolutions 6 -pyramid-scale 2` are necessary. The `-pyramid-scale` argument must be 2, the tile sizes must be identical (ideally
+All the above arguments are necessary except for `-compression` which is optional (default uncompressed). In order for an image to be compatible with Viv:
+
+ - `-pyramid-scale` must be 2
+ - `-tilex` must equal `-tiley` (ideally a power of 2)
+ - `-pyramid-resolutions` must be computed using the image dimensions and tile size. For example, for a `4096 x 4096` with tile size of `512`, `3 = log2(ceil(4096 / 512))` resolutions should work well.
 a power of 2), and the `-pyramid-resolutions` argument should be adjusted to match the size of your image and your choice of tile size.
 For example, if you have a `4096 x 4096` and tile size of `512`, `3 = log2(ceil(4096 / 512))` resolutions should work well.
 For the `LuCa-7color_Scan1.qptiff` image, `6 = max(log2(ceil(12480 / 512)), log2(ceil(17280 / 512)))` resolutions work best as the image is `12480 x 17280` in size.
