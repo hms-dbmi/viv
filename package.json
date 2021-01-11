@@ -1,6 +1,6 @@
 {
   "name": "@hms-dbmi/viv",
-  "version": "0.8.0",
+  "version": "0.8.2",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "files": [
@@ -88,6 +88,8 @@
     "zarr": "^0.3.0"
   },
   "prettier": {
-    "singleQuote": true
+    "singleQuote": true,
+    "trailingComma": "none",
+    "arrowParens": "avoid"
   }
 }

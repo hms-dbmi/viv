@@ -32,6 +32,9 @@ uniform int lensSelection;
 uniform vec3 lensBorderColor;
 uniform float lensBorderRadius;
 
+// uniform for making a transparent color.
+uniform vec3 transparentColor;
+uniform bool useTransparentColor;
 
 in vec2 vTexCoord;
 
@@ -63,8 +66,7 @@ void main() {
 
   // Ternaries are faster than checking this first and then returning/breaking out of shader.
   rgbCombo = (isLensOn && isFragOnLensBounds) ? lensBorderColor : rgbCombo;
-
-  color = vec4(rgbCombo, opacity);
+  color = apply_opacity(rgbCombo, useTransparentColor, transparentColor, opacity);
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(color, geometry);
 }

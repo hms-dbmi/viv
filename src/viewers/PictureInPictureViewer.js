@@ -1,6 +1,12 @@
 import React from 'react'; // eslint-disable-line import/no-unresolved
 import VivViewer from './VivViewer';
-import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
+import {
+  DetailView,
+  OverviewView,
+  getDefaultInitialViewState,
+  DETAIL_VIEW_ID,
+  OVERVIEW_VIEW_ID
+} from '../views';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -20,11 +26,18 @@ import { DetailView, OverviewView, getDefaultInitialViewState } from '../views';
  * internally by default using getDefaultInitialViewState).
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
- * @param {boolean} props.isLensOn Whether or not to use the lens (deafult false).
- * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens (default 0).
- * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
- * @param {number} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
- * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * @param {boolean} [props.isLensOn] Whether or not to use the lens (deafult false).
+ * @param {number} [props.lensSelection] Numeric index of the channel to be focused on by the lens (default 0).
+ * @param {number} [props.lensRadius] Pixel radius of the lens (default: 100).
+ * @param {Array} [props.lensBorderColor] RGB color of the border of the lens (default [255, 255, 255]).
+ * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
+ * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
+ * @param {Boolean} [props.clickCenter] Click to center the default view. Default is true.
+ * @param {Array} [props.transparentColor] An RGB (0-255 range) color to be considered "transparent" if provided.
+ * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
+ * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
+ * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
+ * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  */
 
 const PictureInPictureViewer = props => {
@@ -45,12 +58,14 @@ const PictureInPictureViewer = props => {
     lensSelection = 0,
     lensRadius = 100,
     lensBorderColor = [255, 255, 255],
-    lensBorderRadius = 0.02
+    lensBorderRadius = 0.02,
+    clickCenter = true,
+    transparentColor,
+    onViewStateChange
   } = props;
   const viewState =
-    initialViewState ||
-    getDefaultInitialViewState(loader, { height, width }, 0.5);
-  const detailViewState = { ...viewState, id: 'detail' };
+    initialViewState || getDefaultInitialViewState(loader, { height, width });
+  const detailViewState = { ...viewState, id: DETAIL_VIEW_ID };
   const detailView = new DetailView({
     initialViewState: detailViewState,
     height,
@@ -67,17 +82,19 @@ const PictureInPictureViewer = props => {
     lensSelection,
     lensRadius,
     lensBorderColor,
-    lensBorderRadius
+    lensBorderRadius,
+    transparentColor
   };
   const views = [detailView];
   const layerProps = [layerConfig];
   if (overviewOn && loader) {
-    const overviewViewState = { ...viewState, id: 'overview' };
+    const overviewViewState = { ...viewState, id: OVERVIEW_VIEW_ID };
     const overviewView = new OverviewView({
       initialViewState: overviewViewState,
       loader,
       detailHeight: height,
       detailWidth: width,
+      clickCenter,
       ...overview
     });
     views.push(overviewView);
@@ -85,7 +102,12 @@ const PictureInPictureViewer = props => {
   }
   if (!loader) return null;
   return (
-    <VivViewer layerProps={layerProps} views={views} hoverHooks={hoverHooks} />
+    <VivViewer
+      layerProps={layerProps}
+      views={views}
+      hoverHooks={hoverHooks}
+      onViewStateChange={onViewStateChange}
+    />
   );
 };
 
