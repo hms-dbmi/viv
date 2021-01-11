@@ -32,11 +32,10 @@ import {
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
  * @param {Boolean} [props.clickCenter] Click to center the default view. Default is true.
- * @param {Array} [props.transparentColor] A RGBA color to be considered "transparent" when useTransparentColor is true.
- * In other words, any fragment shader output equal to transparentColor will have opacity 0 when useTransparentColor is true.
- * This parameter is ignored when using colormaps because each colormap has its own transparent color that is calculated on the shader (default is [0, 0, 0, 0]).
- * @param {boolean} [props.useTransparentColor] Whether or nor to use the transparentColor prop or the automatically calculated transparent color when
- * colormap is set (default is false).
+ * @param {Array} [props.transparentColor] An RGB (0-255 range) color to be considered "transparent" if provided.
+ * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
+ * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
+ * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  */
 
@@ -60,8 +59,7 @@ const PictureInPictureViewer = props => {
     lensBorderColor = [255, 255, 255],
     lensBorderRadius = 0.02,
     clickCenter = true,
-    transparentColor = [0, 0, 0, 0],
-    useTransparentColor = false,
+    transparentColor,
     onViewStateChange
   } = props;
   const viewState =
@@ -84,8 +82,7 @@ const PictureInPictureViewer = props => {
     lensRadius,
     lensBorderColor,
     lensBorderRadius,
-    transparentColor,
-    useTransparentColor
+    transparentColor
   };
   const views = [detailView];
   const layerProps = [layerConfig];

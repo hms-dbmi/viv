@@ -32,9 +32,9 @@ uniform int lensSelection;
 uniform vec3 lensBorderColor;
 uniform float lensBorderRadius;
 
-// uniforms for making a transparent color.
+// uniform for making a transparent color.
+uniform vec3 transparentColor;
 uniform bool useTransparentColor;
-uniform vec4 transparentColor;
 
 in vec2 vTexCoord;
 

@@ -31,8 +31,7 @@ const defaultProps = {
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   onClick: { type: 'function', value: null, compare: true },
-  transparentColor: { type: 'array', value: [0, 0, 0, 0], compare: true },
-  useTransparentColor: { type: 'boolean', value: false, compare: true }
+  transparentColor: { type: 'array', value: null, compare: true }
 };
 
 /**
@@ -54,11 +53,10 @@ const defaultProps = {
  * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  * @param {function} props.onClick Hook function from deck.gl to handle clicked-on objects.
  * @param {Object} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
- * @param {array} props.transparentColor A color to be considered "transparent" when useTransparentColor is true.
- * In other words, any fragment shader output equal to transparentColor will have opacity 0 when useTransparentColor is true.
- * This parameter is ignored when using colormaps because each colormap has its own transparent color that is calculated on the shader (default is [0, 0, 0, 0]).
- * @param {boolean} props.useTransparentColor Whether or nor to use the transparentColor prop or the automatically calculated transparent color when
- * colormap is set (default is false).
+ * @param {Array} props.transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
+ * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
+ * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
+ * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  */
 export default class ImageLayer extends CompositeLayer {
   initializeState() {
@@ -137,8 +135,7 @@ export default class ImageLayer extends CompositeLayer {
       onClick,
       onHover,
       modelMatrix,
-      transparentColor,
-      useTransparentColor
+      transparentColor
     } = this.props;
     const { dtype } = loader;
     const { width, height, data, unprojectLensBounds } = this.state;
@@ -182,8 +179,7 @@ export default class ImageLayer extends CompositeLayer {
       modelMatrix,
       opacity,
       visible,
-      transparentColor,
-      useTransparentColor
+      transparentColor
     });
   }
 }

@@ -22,8 +22,7 @@ const defaultProps = {
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
-  transparentColor: { type: 'array', value: [0, 0, 0, 0], compare: true },
-  useTransparentColor: { type: 'boolean', value: false, compare: true }
+  transparentColor: { type: 'array', value: null, compare: true }
 };
 
 /**

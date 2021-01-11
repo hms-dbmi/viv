@@ -24,8 +24,7 @@ const defaultProps = {
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   maxRequests: { type: 'number', value: 10, compare: true },
   onClick: { type: 'function', value: null, compare: true },
-  transparentColor: { type: 'array', value: [0, 0, 0, 0], compare: true },
-  useTransparentColor: { type: 'boolean', value: false, compare: true }
+  transparentColor: { type: 'array', value: null, compare: true }
 };
 
 /**
@@ -51,11 +50,10 @@ const defaultProps = {
  * @param {number} props.maxRequests Maximum parallel ongoing requests allowed before aborting.
  * @param {function} props.onClick Hook function from deck.gl to handle clicked-on objects.
  * @param {Object} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
- * @param {Array} props.transparentColor A RGBA color to be considered "transparent" when useTransparentColor is true.
- * In other words, any fragment shader output equal to transparentColor will have opacity 0 when useTransparentColor is true.
- * This parameter is ignored when using colormaps because each colormap has its own transparent color that is calculated on the shader (default is [0, 0, 0, 0]).
- * @param {boolean} props.useTransparentColor Whether or nor to use the transparentColor prop or the automatically calculated transparent color when
- * colormap is set (default is false).
+ * @param {Array} props.transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
+ * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
+ * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
+ * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  */
 
 export default class MultiscaleImageLayer extends CompositeLayer {
@@ -94,8 +92,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       maxRequests,
       onClick,
       modelMatrix,
-      transparentColor,
-      useTransparentColor
+      transparentColor
     } = this.props;
     const { tileSize, numLevels, dtype, isInterleaved, isRgb } = loader;
     const { unprojectLensBounds } = this.state;
@@ -166,8 +163,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       lensBorderColor,
       lensBorderRadius,
       modelMatrix,
-      transparentColor,
-      useTransparentColor
+      transparentColor
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity
@@ -186,7 +182,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
           // If we are using a transparent color, we shouldn't show the background image
           // since the background image might not have the same color output from the fragment shader
           // as the tiled layer at a higher resolution level.
-          !useTransparentColor,
+          !transparentColor,
         z: numLevels - 1,
         pickable: true,
         onHover,
