@@ -9,11 +9,12 @@ import { SideBySideView, getDefaultInitialViewState } from '../views';
  * @param {Array} props.colorValues List of [r, g, b] values for each channel.
  * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
  * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
- * @param {Object} props.loader Loader to be used for fetching data.  It must have the properies `dtype`, `numLevels`, `isPyramid`, and `tileSize` and implement `getTile`, `getRaster`, and `getRasterSize`.
+ * @param {Object} props.loader Loader to be used for fetching data.  It must have the properies `dtype`, `numLevels`, `isRgb`, `isInterleaved`, and `tileSize` and implement `getTile`, `getRasterSize`, and `getRaster`.
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {Boolean} props.zoomLock Whether or not lock the zooms of the two views.
  * @param {Boolean} props.panLock Whether or not lock the pans of the two views.
- * @param {Object} props.initialViewState Object like { target: [x, y, 0], zoom: -zoom } for initializing where the viewer looks (optional - this can be inferred from height/width/loader).
+ * @param {number} props.initialViewState Object like { target: [x, y, 0], zoom: -zoom } for initializing where the viewer looks (optional - this is inferred from height/width/loader
+ * internally by default using getDefaultInitialViewState).
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
  * @param {boolean} [props.isLensOn] Whether or not to use the lens deafult (false).
@@ -48,7 +49,8 @@ const SideBySideViewer = props => {
     onViewStateChange
   } = props;
   const viewState =
-    initialViewState || getDefaultInitialViewState(loader, { height, width });
+    initialViewState ||
+    getDefaultInitialViewState(loader, { height, width }, 0.5);
   const detailViewLeft = new SideBySideView({
     initialViewState: { ...viewState, id: 'left' },
     linkedIds: ['right'],
