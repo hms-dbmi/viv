@@ -60,35 +60,60 @@ $ bioformats2raw LuCa-7color_Scan1.qptiff n5_tile_directory/
 $ raw2ometiff n5_tile_directory/ LuCa-7color_Scan1.ome.tif
 ```
 
+> Note:  `LZW` is the default if you do not specify a `--compression` option (the syntax requires an "=" sign, like `--compression=zlib`).
+
+You may also use [`bfconvert` (Bioformats >= 6.0.0)](https://docs.openmicroscopy.org/bio-formats/6.4.0/users/comlinetools/conversion.html) to generate an image pyramid.
+to generate your image pyramid.
+
+```bash
+$ bfconvert -tilex 512 -tiley 512 -pyramid-resolutions 6 -pyramid-scale 2  -compression LZW LuCa-7color_Scan1.qptiff LuCa-7color_Scan1.ome.tif
+```
+
+All the above arguments are necessary except for `-compression` which is optional (default uncompressed). In order for an image to be compatible with Viv:
+
+ - `-pyramid-scale` must be 2
+ - `-tilex` must equal `-tiley` (ideally a power of 2)
+ - `-pyramid-resolutions` must be computed using the image dimensions and tile size. For example, for a `4096 x 4096` with tile size of `512`, `3 = log2(ceil(4096 / 512))` resolutions should work well.
+a power of 2), and the `-pyramid-resolutions` argument should be adjusted to match the size of your image and your choice of tile size.
+For example, if you have a `4096 x 4096` and tile size of `512`, `3 = log2(ceil(4096 / 512))` resolutions should work well.
+For the `LuCa-7color_Scan1.qptiff` image, `6 = max(log2(ceil(12480 / 512)), log2(ceil(17280 / 512)))` resolutions work best as the image is `12480 x 17280` in size.
+There is currently [no "auto" feature for inferring the number of pyramid resolutions](https://github.com/ome/bioformats/issues/3644).
+Without the compression set, i.e `-compression LZW`, the output image will be uncompressed.
+
+There is a [2GB limit on the total amount of data](https://docs.openmicroscopy.org/bio-formats/6.4.0/about/bug-reporting.html#common-issues-to-check) that may be read into memory for the `bfconvert` cli tool.
+Therefore for larger images, please use `bioformats2raw + raw2ometiff`.
+
 > NOTE: Viv currently uses [`geotiff.js`](https://geotiffjs.github.io/) for accessing data from remote TIFFs
 > over HTTP and support the three lossless compression options supported
-> by `raw2ometiff` - `LZW`, `zlib`, and `Uncompressed`. `LZW` is the default if you
-> do not specify a `--compression` option (the syntax requires an "=" sign, like `--compression=zlib`).
+> by `raw2ometiff` - `LZW`, `zlib`, and `Uncompressed` as well as `jpeg` compression for 8 bit data. Support
+> for JPEG-2000 for >8 bit data is planned. Please open an issue if you would like this more immediately.
 
 ### Viewing in Avivator
 
 There are a few different ways to view your data in Avivator.
 
-If you have an OME-TIFF or Bio-Formats "raw" Zarr output saved locally, you may simply drag and drop 
+If you have an OME-TIFF or Bio-Formats "raw" Zarr output saved locally, you may simply drag and drop
 the file (or directory) over the canvas or use the "Choose file" button to view your data.
-Note that this action does **NOT** necessarily load the entire dataset into memory. Viv still works as normal and will retrieve data tiles based on the viewport for an image pyramid and/or a specific channel/z/time selection. 
+Note that this action does **NOT** necessarily load the entire dataset into memory. Viv still works as normal and will retrieve data tiles based on the viewport for an image pyramid and/or a specific channel/z/time selection.
 
 If you followed **Option 1** above, you may drag and drop the `LuCa-7color_Scan1/` directory created via `bioformats2raw`
 into Avivator. If you followed **Option 2**, simply select the `LuCa-7color_Scan1.ome.tif` to view in Avivator.
 
-> NOTE: Large Zarr-based image pyramids may take a bit longer to load initially using this method. We recommend using a simple web 
-> server (see below) if you experience issues with Zarr loading times. Additionally, support for drag-and-drop for Zarr-based 
+> NOTE: Large Zarr-based image pyramids may take a bit longer to load initially using this method. We recommend using a simple web
+> server (see below) if you experience issues with Zarr loading times. Additionally, support for drag-and-drop for Zarr-based
 > images is only currently supported in Chrome, Firefox, and Microsoft Edge. If using Safari, please use a web-server.
 
-Otherwise Avivator relies on access to data over HTTP, and you can serve data locally using a simple web-server. 
+Otherwise Avivator relies on access to data over HTTP, and you can serve data locally using a simple web-server.
 It's easiest to use [`http-server`](https://github.com/http-party/http-server#readme) to start a web-server locally, which can be installed via `npm` or `Homebrew` if using a Mac.
 
 > NOTE: If your OME-TIFF image has many [TIFF IFDs](https://en.wikipedia.org/wiki/TIFF#Multiple_subfiles), which correspond to indvidual time-z-channel sub-images, please generate an `offsets.json` file as well for remote HTTP viewing.
 > This file contains the byte offsets to each IFD and allows fast interaction with remote data:
+>
 > ```bash
 > $ pip install generate-tiff-offsets
 > $ generate_tiff_offsets --input_file my_tiff_file.ome.tiff
 > ```
+>
 > For viewing in Avivator, this file should live adjacent to the OME-TIFF file in its folder and will be automatically recognized and used.
 > For use with Viv's loaders/layers, you need to fetch the `offsets.json` and pass it in as an argument to the [loader](http://viv.gehlenborglab.org/#createometiffloader).
 > Please see [this sample](http://viv.gehlenborglab.org/#getting-started) for help getting started.
@@ -118,7 +143,7 @@ link by appending an `image_url` query parameter:
 - http://avivator.gehlenborglab.org/?image_url=http://localhost:8000/LuCa-7color_Scan1.ome.tif (OME-TIFF)
 
 > Troubleshooting: Viv relies on cross-origin requests to retrieve data from servers. The `--cors='*'` flag is important to ensure
-> that the appropriate `Access-Control-Allow-Origin` response is sent from your local server.  In addition, web servers must allow
+> that the appropriate `Access-Control-Allow-Origin` response is sent from your local server. In addition, web servers must allow
 > [HTTP range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests) to support viewing OME-TIFF images.
 > Range requests are allowed by default by `http-server` but may need to be enabled explicitly for your production web server.
 

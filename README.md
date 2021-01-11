@@ -5,25 +5,27 @@ Written in JavaScript and built on Deck.gl with modern web technologies.
 
 ## About
 
-Viv is a JavaScript library providing utilities for rendering primary imaging data. Viv supports WebGL-based multi-channel rendering of both pyramidal and non-pyramidal images. The rendering components of Viv are provided as Deck.gl layers, making it easy to compose images with existing layers and efficiently update rendering properties within a reactive paradigm. 
+Viv is a JavaScript library providing utilities for rendering primary imaging data. Viv supports WebGL-based multi-channel rendering of both pyramidal and non-pyramidal images. The rendering components of Viv are provided as Deck.gl layers, making it easy to compose images with existing layers and efficiently update rendering properties within a reactive paradigm.
 
 More details can be found in our preprint describing the Viv library and related work. Please cite this preprint in your research:
 
 > Trevor Manz, Ilan Gold, Nathan Heath Patterson, Chuck McCallum, Mark S Keller, Bruce W Herr II, Katy Börner, Jeffrey M Spraggins, Nils Gehlenborg, "[Viv: Multiscale Visualization of High-resolution Multiplexed Bioimaging Data on the Web](https://osf.io/wd2gu/)." **OSF Preprints** (2020), [doi:10.31219/osf.io/wd2gu](https://doi.org/10.31219/osf.io/wd2gu)
 
-### Related Software 
+### Related Software
 
-  - **Avivator** Included in this repository is [`Avivator`](http://avivator.gehlenborglab.org), a lightweight viewer for remote imaging data. Avivator is a purely client-side program that only requires access to [Bio-Formats-compatiable Zarr](./tutorial#option-1-create-a-bio-formats-raw-zarr) or OME-TIFF data over HTTP or on local disk.
-  - **Vizarr** [Vizarr](https://github.com/hms-dbmi/vizarr) is a minimal, purely client-side program for viewing Zarr-based images built with Viv. It exposes a Python API using the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) and can be directly embedded in Jupyter Notebooks or Google Colab Notebooks.
-  - **Viv benchmark** A [set of scripts](https://github.com/hms-dbmi/viv-tile-benchmark) to benchmark Viv's retrieval of image tiles from pyramidal OME-TIFF files and Zarr stores via HTTP1 and HTTP2.
+- **Avivator** Included in this repository is [`Avivator`](http://avivator.gehlenborglab.org), a lightweight viewer for remote imaging data. Avivator is a purely client-side program that only requires access to [Bio-Formats-compatiable Zarr](./tutorial#option-1-create-a-bio-formats-raw-zarr) or OME-TIFF data over HTTP or on local disk.
+- **Vizarr** [Vizarr](https://github.com/hms-dbmi/vizarr) is a minimal, purely client-side program for viewing Zarr-based images built with Viv. It exposes a Python API using the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) and can be directly embedded in Jupyter Notebooks or Google Colab Notebooks.
+- **Viv benchmark** A [set of scripts](https://github.com/hms-dbmi/viv-tile-benchmark) to benchmark Viv's retrieval of image tiles from pyramidal OME-TIFF files and Zarr stores via HTTP1 and HTTP2.
 
 ## Supported Data Formats
-
 
 Viv supports a subset of formats that can be generated with the [`bioformats2raw` + `raw2ometiff` pipeline](https://www.glencoesoftware.com/blog/2019/12/09/converting-whole-slide-images-to-OME-TIFF.html):
 
 - OME-TIFF files (pyramidal)
 - Bioformats-compatible Zarr stores (pyramidal)
+
+For OME-TIFF, Viv supports any pyramid that implements the [OME design spec for TIFF pyramids](https://ome.github.io/design/OME005/)(which the `bioformats2raw` + `raw2ometiff` pipeline provides).
+Non-pyramidal images are also supported provided the individual texture can be uploaded to the GPU (< `4096 x 4096` in pixel size).
 
 Please see the [tutorial](./tutorial/README.md) for more information on these formats.
 
@@ -48,7 +50,7 @@ $ npm start # Starts rollup build (for Viv) & dev server for Avivator
 
 Please install the [Prettier plug-in](https://prettier.io/docs/en/editors.html) for your preferred editor. Badly formatted code will fail on Travis.
 
-To run unit and integration tests locally, use `npm test`. For full prodcution test (including linting and formatting checks), 
+To run unit and integration tests locally, use `npm test`. For full prodcution test (including linting and formatting checks),
 use `npm run test:prod`.
 
 ## Build

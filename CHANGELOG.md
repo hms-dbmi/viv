@@ -4,12 +4,14 @@
 
 ### Added
 
+- Document support for `bfconvert` as a cli tool for generating image pyramids as well as the new pyramidal tiff spec.
 - Issue templates for Github.
 - Add `transparentColor` to allow the layer to set a color to be "transparent" (or use the automatically calculated one when colormaps are set).
 
 ### Changed
 
 - Adjust the zoom level for tile layer if scaled.
+- Update `getDefaultInitialViewState` to return floating point zoom that fills the screen by default.
 
 ## 0.8.2
 
