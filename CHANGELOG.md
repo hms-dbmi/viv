@@ -3,7 +3,9 @@
 ## In Progress
 
 ### Added
+
 - Issue templates for Github.
+- Add `transparentColor` and `useTransparentColor` to allow the layer to set a color to be "transparent" (or use the automatically calculated one when colormaps are set).
 
 ### Changed
 
