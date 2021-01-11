@@ -9,7 +9,7 @@
 
 ### Changed
 
-- Allow for `tileLayer` zoom level to be offset by model matrix scaling.
+- Adjust the zoom level for tile layer if scaled.
 
 ## 0.8.2
 
