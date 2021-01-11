@@ -3,7 +3,6 @@ import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import { renderSubLayers } from './utils';
 
 const defaultProps = {
-  ...TileLayer.defaultProps,
   pickable: true,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   sliderValues: { type: 'array', value: [], compare: true },
@@ -22,7 +21,8 @@ const defaultProps = {
   lensSelection: { type: 'number', value: 0, compare: true },
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
-  lensBorderRadius: { type: 'number', value: 0.02, compare: true }
+  lensBorderRadius: { type: 'number', value: 0.02, compare: true },
+  transparentColor: { type: 'array', value: null, compare: true }
 };
 
 /**

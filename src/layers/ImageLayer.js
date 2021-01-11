@@ -1,7 +1,9 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { isWebGL2 } from '@luma.gl/core';
+import GL from '@luma.gl/constants';
 
 import XRLayer from './XRLayer';
+import BitmapLayer from './BitmapLayer';
 import { to32BitFloat, onPointer } from './utils';
 
 const defaultProps = {
@@ -28,7 +30,8 @@ const defaultProps = {
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
-  onClick: { type: 'function', value: null, compare: true }
+  onClick: { type: 'function', value: null, compare: true },
+  transparentColor: { type: 'array', value: null, compare: true }
 };
 
 /**
@@ -42,14 +45,18 @@ const defaultProps = {
  * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @param {string} props.viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
  * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
- * @param {String} props.onHover Hook function from deck.gl to handle hover objects.
+ * @param {function} props.onHover Hook function from deck.gl to handle hover objects.
  * @param {boolean} props.isLensOn Whether or not to use the lens.
  * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
  * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
- * @param {number} props.lensBorderColor RGB color of the border of the lens.
+ * @param {Array} props.lensBorderColor RGB color of the border of the lens.
  * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
- * @param {number} props.onClick Hook function from deck.gl to handle clicked-on objects.
- * @param {number} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @param {function} props.onClick Hook function from deck.gl to handle clicked-on objects.
+ * @param {Object} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @param {Array} props.transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
+ * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
+ * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
+ * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  */
 export default class ImageLayer extends CompositeLayer {
   initializeState() {
@@ -77,13 +84,25 @@ export default class ImageLayer extends CompositeLayer {
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
       const { loader, z, loaderSelection } = this.props;
-      loader.getRaster({ z, loaderSelection }).then(({ data, width, height }) =>
-        this.setState({
-          data: !isWebGL2(this.context.gl) ? to32BitFloat(data) : data,
-          height,
-          width
-        })
-      );
+      loader.getRaster({ z, loaderSelection }).then(raster => {
+        /* eslint-disable no-param-reassign */
+        if (loader.isInterleaved && loader.isRgb) {
+          // data is for BitmapLayer and needs to be of form { data: Uint8Array, width, height };
+          // eslint-disable-next-line prefer-destructuring
+          raster.data = raster.data[0];
+          if (raster.data.length === raster.width * raster.height * 3) {
+            // data is RGB (not RGBA) and need to update texture formats
+            raster.format = GL.RGB;
+            raster.dataFormat = GL.RGB;
+          }
+        } else if (!isWebGL2(this.context.gl)) {
+          // data is for XLRLayer in non-WebGL2 evironment
+          // we need to convert data to compatible textures
+          raster.data = to32BitFloat(raster.data);
+        }
+        this.setState({ ...raster });
+        /* eslint-disable no-param-reassign */
+      });
     }
   }
 
@@ -115,23 +134,35 @@ export default class ImageLayer extends CompositeLayer {
       id,
       onClick,
       onHover,
-      modelMatrix
+      modelMatrix,
+      transparentColor
     } = this.props;
     const { dtype } = loader;
-    const { data, width, height, unprojectLensBounds } = this.state;
+    const { width, height, data, unprojectLensBounds } = this.state;
     if (!(width && height)) return null;
+    const bounds = [0, height, width, 0];
+    const { isRgb, isInterleaved, photometricInterpretation } = loader;
+    if (isRgb && isInterleaved) {
+      return new BitmapLayer(this.props, {
+        image: this.state,
+        photometricInterpretation,
+        // Shared props with XRLayer:
+        bounds,
+        id: `image-sub-layer-${bounds}-${id}-${z}`,
+        onHover,
+        pickable,
+        onClick,
+        modelMatrix,
+        opacity,
+        visible
+      });
+    }
     return new XRLayer(this.props, {
-      channelData: { data, width, height },
-      pickable,
-      bounds: [0, height, width, 0],
+      channelData: { data, height, width },
       sliderValues,
       colorValues,
       channelIsOn,
       domain,
-      id: `XR-Static-Layer-${0}-${height}-${width}-${0}-${z}-${id}`,
-      coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-      opacity,
-      visible,
       dtype,
       colormap,
       unprojectLensBounds,
@@ -139,9 +170,16 @@ export default class ImageLayer extends CompositeLayer {
       lensSelection,
       lensBorderColor,
       lensRadius,
-      onClick,
+      // Shared props with BitmapLayer:
+      bounds,
+      id: `image-sub-layer-${bounds}-${id}-${z}`,
       onHover,
-      modelMatrix
+      pickable,
+      onClick,
+      modelMatrix,
+      opacity,
+      visible,
+      transparentColor
     });
   }
 }

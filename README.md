@@ -19,7 +19,7 @@ More details can be found in our preprint describing the Viv library and related
 
 ## Supported Data Formats
 
-Viv supports a subset of formats that can be generated with the [`bioformats2raw` + `raw2ometiff` pipeline](<(https://www.glencoesoftware.com/blog/2019/12/09/converting-whole-slide-images-to-OME-TIFF.html)):
+Viv supports a subset of formats that can be generated with the [`bioformats2raw` + `raw2ometiff` pipeline](https://www.glencoesoftware.com/blog/2019/12/09/converting-whole-slide-images-to-OME-TIFF.html):
 
 - OME-TIFF files (pyramidal)
 - Bioformats-compatible Zarr stores (pyramidal)
