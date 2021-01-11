@@ -64,7 +64,8 @@ const PictureInPictureViewer = props => {
     onViewStateChange
   } = props;
   const viewState =
-    initialViewState || getDefaultInitialViewState(loader, { height, width });
+    initialViewState ||
+    getDefaultInitialViewState(loader, { height, width }, 0.5);
   const detailViewState = { ...viewState, id: DETAIL_VIEW_ID };
   const detailView = new DetailView({
     initialViewState: detailViewState,
