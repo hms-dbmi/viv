@@ -24,8 +24,8 @@ Viv supports a subset of formats that can be generated with the [`bioformats2raw
 - OME-TIFF files (pyramidal)
 - Bioformats-compatible Zarr stores (pyramidal)
 
-For OME-TIFF, Viv supports any pyramid that implements the [OME design spec for TIFF pyramids](https://ome.github.io/design/OME005/)(which the `bioformats2raw` + `raw2ometiff` pipeline does)
-as well as any non-pyramidal OME-TIFF files provided it can be rendered as an individual texture by the GPU (< `4096 x 4096` in pixel size).
+For OME-TIFF, Viv supports any pyramid that implements the [OME design spec for TIFF pyramids](https://ome.github.io/design/OME005/)(which the `bioformats2raw` + `raw2ometiff` pipeline provides).
+Non-pyramidal images are also supported provided the individual texture can be uploaded to the GPU (< `4096 x 4096` in pixel size).
 
 Please see the [tutorial](./tutorial/README.md) for more information on these formats.
 
