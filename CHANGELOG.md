@@ -12,6 +12,7 @@
 
 - Adjust the zoom level for tile layer if scaled.
 - Update `getDefaultInitialViewState` to return floating point zoom that fills the screen by default.
+- Upgrade geotiff to fix out-of-range requests issue.
 
 ## 0.8.2
 
