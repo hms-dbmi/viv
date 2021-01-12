@@ -7,6 +7,9 @@ import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
 import { to32BitFloat, onPointer } from '../utils';
 
+// From https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
+const DECK_GL_TILE_SIZE = 512;
+
 const defaultProps = {
   pickable: true,
   onHover: { type: 'function', value: null, compare: false },
@@ -107,7 +110,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         // which felt odd to me to beign with.
         // The image-tile example works without, this but I have a feeling there is something
         // going on with our pyramids and/or rendering that is different.
-        z: Math.round(-z + Math.log2(512 / tileSize)),
+        z: Math.round(-z + Math.log2(DECK_GL_TILE_SIZE / tileSize)),
         loaderSelection,
         signal
       });
@@ -143,9 +146,11 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         : tileSize,
       onClick,
       extent: [0, 0, width, height],
-      // See the above note within getTileData for why the division with 512 and the rounding necessary.
-      minZoom: Math.round(-(numLevels - 1) + Math.log2(512 / tileSize)),
-      maxZoom: Math.round(Math.log2(512 / tileSize)),
+      // See the above note within getTileData for why the division with DECK_GL_TILE_SIZE and the rounding necessary.
+      minZoom: Math.round(
+        -(numLevels - 1) + Math.log2(DECK_GL_TILE_SIZE / tileSize)
+      ),
+      maxZoom: Math.round(Math.log2(DECK_GL_TILE_SIZE / tileSize)),
       colorValues,
       sliderValues,
       channelIsOn,
