@@ -99,18 +99,18 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     } = this.props;
     const { tileSize, numLevels, dtype, isInterleaved, isRgb } = loader;
     const { unprojectLensBounds } = this.state;
+    // This is basically to invert:
+    // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
+    // The z level can be wrong for showing the correct scales because of the calculation deck.gl does
+    // so we need to invert it for fetching tiles and minZoom/maxZoom.
+    const zoomOffset = Math.log2(DECK_GL_TILE_SIZE / tileSize);
     const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z, signal }) => {
       const tile = await loader.getTile({
         x,
         y,
-        // I don't fully undertstand why this works, but I have a sense.
-        // It's basically to cancel out:
-        // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128,
-        // which felt odd to me to beign with.
-        // The image-tile example works without, this but I have a feeling there is something
-        // going on with our pyramids and/or rendering that is different.
-        z: Math.round(-z + Math.log2(DECK_GL_TILE_SIZE / tileSize)),
+        // See the above note within for why the use of zoomOffset and the rounding necessary.
+        z: Math.round(-z + zoomOffset),
         loaderSelection,
         signal
       });
@@ -146,11 +146,9 @@ export default class MultiscaleImageLayer extends CompositeLayer {
         : tileSize,
       onClick,
       extent: [0, 0, width, height],
-      // See the above note within getTileData for why the division with DECK_GL_TILE_SIZE and the rounding necessary.
-      minZoom: Math.round(
-        -(numLevels - 1) + Math.log2(DECK_GL_TILE_SIZE / tileSize)
-      ),
-      maxZoom: Math.round(Math.log2(DECK_GL_TILE_SIZE / tileSize)),
+      // See the above note within for why the use of zoomOffset and the rounding necessary.
+      minZoom: Math.round(-(numLevels - 1) + zoomOffset),
+      maxZoom: Math.round(zoomOffset),
       colorValues,
       sliderValues,
       channelIsOn,
