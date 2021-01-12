@@ -4,7 +4,7 @@ import { OrthographicView } from '@deck.gl/core';
 /**
  * This class generates a layer and a view for use in the VivViewer
  * @param {Object} args
- * @param {Object} args.initialViewState ViewState object: { target: [x, y, 0], zoom: -zoom }.
+ * @param {string} args.id id for this VivView.
  * @param {Object} args.height Width of the view.
  * @param {Object} args.width Height of the view.
  * @param {string} args.id Id for the current view
@@ -12,11 +12,9 @@ import { OrthographicView } from '@deck.gl/core';
  * @param {number} args.y Y (top-left) location on the screen for the current view
  */
 export default class VivView {
-  constructor({ initialViewState, x = 0, y = 0, height, width }) {
-    const { id } = initialViewState;
+  constructor({ id, x = 0, y = 0, height, width }) {
     this.width = width;
     this.height = height;
-    this.initialViewState = initialViewState;
     this.id = id;
     this.x = x;
     this.y = y;

@@ -15,7 +15,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {Boolean} props.zoomLock Whether or not lock the zooms of the two views.
  * @param {Boolean} props.panLock Whether or not lock the pans of the two views.
- * @param {number} props.initialViewState Object like { target: [x, y, 0], zoom: -zoom } for initializing where the viewer looks (optional - this is inferred from height/width/loader
+ * @param {Object} props.viewStates List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }] for initializing where the viewer looks (optional - this is inferred from height/width/loader
  * internally by default using getDefaultInitialViewState).
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
@@ -36,7 +36,7 @@ const SideBySideViewer = props => {
     sliderValues,
     colorValues,
     channelIsOn,
-    initialViewState,
+    viewStates: viewStatesProp,
     colormap,
     panLock,
     loaderSelection,
@@ -57,11 +57,22 @@ const SideBySideViewer = props => {
     oldLoaderSelection,
     onViewportLoad
   } = useGlobalSelection(loaderSelection, transitionFields);
-  const viewState =
-    initialViewState ||
-    getDefaultInitialViewState(loader, { height, width }, 0.5);
+  let viewStates;
+  if (viewStatesProp) {
+    viewStates = viewStatesProp;
+  } else {
+    const defaultViewState = getDefaultInitialViewState(
+      loader,
+      { height, width },
+      0.5
+    );
+    viewStates = [
+      { ...defaultViewState, id: 'left' },
+      { ...defaultViewState, id: 'right' }
+    ];
+  }
   const detailViewLeft = new SideBySideView({
-    initialViewState: { ...viewState, id: 'left' },
+    id: 'left',
     linkedIds: ['right'],
     panLock,
     zoomLock,
@@ -69,7 +80,7 @@ const SideBySideViewer = props => {
     width: width / 2
   });
   const detailViewRight = new SideBySideView({
-    initialViewState: { ...viewState, id: 'right' },
+    id: 'right',
     x: width / 2,
     linkedIds: ['left'],
     panLock,
@@ -102,6 +113,7 @@ const SideBySideViewer = props => {
       views={views}
       randomize
       onViewStateChange={onViewStateChange}
+      viewStates={viewStates}
     />
   ) : null;
 };

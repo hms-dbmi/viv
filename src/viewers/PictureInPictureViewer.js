@@ -24,7 +24,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
  * @param {Object} props.hoverHooks Object including the allowable hooks - right now only accepting a function with key handleValue like { handleValue: (valueArray) => {} } where valueArray
  * has the pixel values for the image under the hover location.
- * @param {number} props.initialViewState Object like { target: [x, y, 0], zoom: -zoom } for initializing where the viewer looks (optional - this is inferred from height/width/loader
+ * @param {Object} [props.viewState] Object like { target: [x, y, 0], zoom: -zoom } for setting where the viewer looks (optional - this is inferred from height/width/loader
  * internally by default using getDefaultInitialViewState).
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
@@ -49,7 +49,7 @@ const PictureInPictureViewer = props => {
     sliderValues,
     colorValues,
     channelIsOn,
-    initialViewState,
+    viewState,
     colormap,
     overview,
     overviewOn,
@@ -72,12 +72,10 @@ const PictureInPictureViewer = props => {
     oldLoaderSelection,
     onViewportLoad
   } = useGlobalSelection(loaderSelection, transitionFields);
-  const viewState =
-    initialViewState ||
-    getDefaultInitialViewState(loader, { height, width }, 0.5);
-  const detailViewState = { ...viewState, id: DETAIL_VIEW_ID };
+  const baseViewState =
+    viewState || getDefaultInitialViewState(loader, { height, width }, 0.5);
   const detailView = new DetailView({
-    initialViewState: detailViewState,
+    id: DETAIL_VIEW_ID,
     height,
     width
   });
@@ -100,10 +98,11 @@ const PictureInPictureViewer = props => {
   };
   const views = [detailView];
   const layerProps = [layerConfig];
+  const viewStates = [{ ...baseViewState, id: DETAIL_VIEW_ID }];
   if (overviewOn && loader) {
-    const overviewViewState = { ...viewState, id: OVERVIEW_VIEW_ID };
+    const overviewViewState = { ...baseViewState, id: OVERVIEW_VIEW_ID };
     const overviewView = new OverviewView({
-      initialViewState: overviewViewState,
+      id: OVERVIEW_VIEW_ID,
       loader,
       detailHeight: height,
       detailWidth: width,
@@ -112,12 +111,14 @@ const PictureInPictureViewer = props => {
     });
     views.push(overviewView);
     layerProps.push(layerConfig);
+    viewStates.push(overviewViewState);
   }
   if (!loader) return null;
   return (
     <VivViewer
       layerProps={layerProps}
       views={views}
+      viewStates={viewStates}
       hoverHooks={hoverHooks}
       onViewStateChange={onViewStateChange}
     />

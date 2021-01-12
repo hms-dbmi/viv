@@ -37,7 +37,7 @@ class OverviewController extends Controller {
  * From the base class VivView, only the initialViewState argument is used.  This class uses private methods to position its x and y from the
  * additional arguments:
  * @param {Object} args
- * @param {Object} args.initialViewState ViewState object: { target: [x, y, 0], zoom: -zoom }.
+ * @param {string} args.id id for this VivView.
  * @param {Object} args.loader Loader to be used for inferring zoom level and fetching data.  It must have the properies `dtype`, `numLevels`, and `tileSize` and implement `getTile` and `getRaster`.
  * @param {number} args.detailHeight Height of the detail view.
  * @param {number} args.detailWidth Width of the detail view.
@@ -52,7 +52,7 @@ class OverviewController extends Controller {
  * */
 export default class OverviewView extends VivView {
   constructor({
-    initialViewState,
+    id,
     loader,
     detailHeight,
     detailWidth,
@@ -65,7 +65,7 @@ export default class OverviewView extends VivView {
     maximumHeight = 350,
     clickCenter = true
   }) {
-    super({ initialViewState });
+    super({ id });
     this.margin = margin;
     this.loader = loader;
     this.position = position;
