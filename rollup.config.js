@@ -1,45 +1,53 @@
+import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import sucrase from '@rollup/plugin-sucrase';
-
 import workerLoader from 'rollup-plugin-web-worker-loader';
 import glslify from 'rollup-plugin-glslify';
 
 import pkg from './package.json';
-const external = [
-  ...Object.keys(pkg.peerDependencies),
-  ...Object.keys(pkg.dependencies),
-  ...Object.keys(pkg.devDependencies),
-];
 
-const config = (test) => {
-  if (!test) {
+const getConfig = test => {
+  // Our test runners are commonjs-based or require cjs (browserify + tape-run).
+  if (test) {
     return {
-      input: 'src/index.js',
-      output: { file: 'dist/index.js', format: 'esm' }
-    }
+      input: `tests/${test}/index.spec.js`,
+      output: { format: 'cjs' },
+    };
   }
-  return {
-    input: `tests/${test}/index.spec.js`,
-    output: { format: 'cjs' }
-  }
-}
 
+  // Library build is a modern ESM target intended to be injested by a bundler.
+  return {
+    input: 'src/index.js',
+    output: { file: 'dist/index.js', format: 'esm' },
+  };
+};
+
+const config = getConfig(process.env.TEST);
 export default {
-  ...config(process.env.TEST),
-  external,
+  input: config.input,
+  output: config.output,
+  external: [
+    ...Object.keys(pkg.peerDependencies),
+    ...Object.keys(pkg.dependencies),
+    ...Object.keys(pkg.devDependencies),
+  ],
   plugins: [
-    resolve(),
+    /*
+     *  Required only because the 'rollup-plugin-web-worker-loader" inlines
+     *  code from "geotiff/src/compression". Geotiff uses an older version
+     *  of pako that doesn't have an esm export. We need a plugin to transform
+     *  to esm, and here we are explicit that it's just pako.
+     */
+    resolve({ include: 'node_modules/geotiff' }),
+    commonjs({ include: 'node_modules/pako/**/*.js' }),
+
+    // import fs from './shader.glsl' --> const fs = "<compiled-shader>"
     glslify(),
-    workerLoader({
-      targetPlatform: 'browser',
-      inline: true,
-    }),
-    sucrase({
-      exclude: "node_modules/*",
-      transforms: ['jsx'],
-      production: true,
-    }),
-    commonjs(),
+
+    // Inlines JS source for a Web-Worker as a base64-encoded string.
+    workerLoader({ targetPlatform: 'browser', inline: true }),
+
+    // Compiles TS (also transpiles JS source and applies JSX transforms)
+    typescript({ include: 'src/**/*', target: 'es2018' }),
   ]
-}
+};
