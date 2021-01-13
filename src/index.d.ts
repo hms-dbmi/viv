@@ -1,3 +1,4 @@
+// The next line is only needed if ESLint TypeScript plugins aren't specified.
 /* eslint-disable no-unused-vars */
 import { JSX, PureComponent } from 'react';
 import { CompositeLayer, Layer } from '@deck.gl/core';
@@ -67,7 +68,7 @@ export class VivView {
   getLayers({ viewStates, props });
 }
 
-export default class DetailView extends VivView {
+export class DetailView extends VivView {
   getLayers({ props, viewStates }): any[];
   filterViewState({ viewState, currentViewState });
 }
@@ -124,7 +125,7 @@ interface SideBySideViewProps extends VivViewProps {
   viewportOutlineWidth?: number;
 }
 
-export default class SideBySideView extends VivView {
+export class SideBySideView extends VivView {
   constructor(props: SideBySideViewProps);
 }
 
@@ -183,12 +184,12 @@ interface SideBySideViewerProps extends CommonViewerProps {
 
 export const SideBySideViewer: (props: SideBySideViewerProps) => JSX.Element;
 
-export default class HTTPStore {
+export class HTTPStore {
   constructor(url: any, options?: {});
   getItem(key: any, options?: {}): Promise<ArrayBuffer>;
 }
 
-export default class OMETiffLoader {
+export class OMETiffLoader {
   constructor({ tiff, pool, firstImage, omexmlString, offsets });
   _getIFDIndex(args: { z: number; time: number; channel: string }): number;
   onTileError(err: Error): void;
@@ -218,7 +219,7 @@ export default class OMETiffLoader {
   }): { width: number; height: number };
 }
 
-export default class ZarrLoader {
+export class ZarrLoader {
   constructor(props: {
     data: any;
     dimensions: any;
