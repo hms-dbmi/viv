@@ -95,7 +95,10 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       maxRequests,
       onClick,
       modelMatrix,
-      transparentColor
+      transparentColor,
+      excludeBackground,
+      onViewportLoad,
+      refinementStrategy
     } = this.props;
     const { tileSize, numLevels, dtype, isInterleaved, isRgb } = loader;
     const { unprojectLensBounds } = this.state;
@@ -156,7 +159,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       domain,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
       // multiple rendered sublayers (some of which have been cached) from overlapping
-      refinementStrategy: opacity === 1 ? 'best-available' : 'no-overlap',
+      refinementStrategy:
+        refinementStrategy || (opacity === 1 ? 'best-available' : 'no-overlap'),
       // TileLayer checks `changeFlags.updateTriggersChanged.getTileData` to see if tile cache
       // needs to be re-created. We want to trigger this behavior if the loader changes.
       // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
@@ -175,7 +179,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       lensBorderColor,
       lensBorderRadius,
       modelMatrix,
-      transparentColor
+      transparentColor,
+      onViewportLoad
     });
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity
@@ -185,6 +190,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     const layerModelMatrix = modelMatrix ? modelMatrix.clone() : new Matrix4();
     const baseLayer =
       implementsGetRaster &&
+      !excludeBackground &&
       new ImageLayer(this.props, {
         id: `Background-Image-${id}`,
         modelMatrix: layerModelMatrix.scale(2 ** (numLevels - 1)),

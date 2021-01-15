@@ -1,4 +1,4 @@
-import React from 'react'; // eslint-disable-line import/no-unresolved
+import React, { useState } from 'react'; // eslint-disable-line import/no-unresolved
 import VivViewer from './VivViewer';
 import {
   DetailView,
@@ -7,6 +7,35 @@ import {
   DETAIL_VIEW_ID,
   OVERVIEW_VIEW_ID
 } from '../views';
+import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
+
+function useGlobalSelection(loaderSelection) {
+  // viewportSelection is the last selection that had an onViewportLoad callback.
+  const [viewportSelection, setViewportSelection] = useState(loaderSelection);
+  let onViewportLoad;
+  let newLoaderSelection = null;
+  let oldLoaderSelection = loaderSelection;
+  if (
+    loaderSelection?.length &&
+    viewportSelection?.length &&
+    GLOBAL_SLIDER_DIMENSION_FIELDS.some(
+      f => loaderSelection[0][f] !== viewportSelection[0][f]
+    )
+  ) {
+    // onViewportLoad is a property of TileLayer that is passed through:
+    // https://deck.gl/docs/api-reference/geo-layers/tile-layer#onviewportload
+    onViewportLoad = () => {
+      // Slightly delay to avoid issues with a render in the middle of a deck.gl layer state update.
+      setTimeout(() => {
+        setViewportSelection(loaderSelection);
+      }, 0);
+    };
+    // Set newLoaderSelection to cause the creation of an extra tile layer.
+    newLoaderSelection = loaderSelection;
+    oldLoaderSelection = viewportSelection;
+  }
+  return { newLoaderSelection, oldLoaderSelection, onViewportLoad };
+}
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -63,6 +92,11 @@ const PictureInPictureViewer = props => {
     transparentColor,
     onViewStateChange
   } = props;
+  const {
+    newLoaderSelection,
+    oldLoaderSelection,
+    onViewportLoad
+  } = useGlobalSelection(loaderSelection);
   const viewState =
     initialViewState ||
     getDefaultInitialViewState(loader, { height, width }, 0.5);
@@ -77,7 +111,10 @@ const PictureInPictureViewer = props => {
     sliderValues,
     colorValues,
     channelIsOn,
-    loaderSelection,
+    loaderSelection: oldLoaderSelection,
+    newLoaderSelection,
+    onViewportLoad,
+    transitionFields: GLOBAL_SLIDER_DIMENSION_FIELDS,
     colormap,
     isLensOn,
     lensSelection,

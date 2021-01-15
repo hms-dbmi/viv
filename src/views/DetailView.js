@@ -11,21 +11,48 @@ export const DETAIL_VIEW_ID = 'detail';
  * */
 export default class DetailView extends VivView {
   getLayers({ props, viewStates }) {
-    const { loader } = props;
+    const {
+      loader,
+      loaderSelection,
+      newLoaderSelection,
+      onViewportLoad,
+      transitionFields
+    } = props;
     const { id, height, width } = this;
     const layerViewState = viewStates[id];
     const layers = [];
 
-    const detailLayer = loader.isPyramid
-      ? new MultiscaleImageLayer(props, {
+    if (loader.isPyramid) {
+      layers.push(
+        ...[loaderSelection, newLoaderSelection]
+          .filter(s => s)
+          .map((s, i) => {
+            const suffix = transitionFields.map(f => s[0][f]).join('-');
+            const newProps =
+              i !== 0
+                ? {
+                    onViewportLoad,
+                    refinementStrategy: 'never',
+                    excludeBackground: true
+                  }
+                : {};
+            return new MultiscaleImageLayer({
+              ...props,
+              ...newProps,
+              loaderSelection: s,
+              id: `${loader.type}${getVivId(id)}-${suffix}`,
+              viewportId: id
+            });
+          })
+      );
+    } else {
+      layers.push(
+        new ImageLayer(props, {
           id: `${loader.type}${getVivId(id)}`,
           viewportId: id
         })
-      : new ImageLayer(props, {
-          id: `${loader.type}${getVivId(id)}`,
-          viewportId: id
-        });
-    layers.push(detailLayer);
+      );
+    }
 
     const { physicalSizes } = loader;
     if (physicalSizes) {
