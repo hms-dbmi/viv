@@ -22,12 +22,15 @@ export default class DetailView extends VivView {
     const layerViewState = viewStates[id];
     const layers = [];
 
+    // Create at least one layer even without loaderSelection so that the tests pass.
     if (loader.isPyramid) {
       layers.push(
         ...[loaderSelection, newLoaderSelection]
-          .filter(s => s)
+          .filter((s, i) => i === 0 || s)
           .map((s, i) => {
-            const suffix = transitionFields.map(f => s[0][f]).join('-');
+            const suffix = s
+              ? `-${transitionFields.map(f => s[0][f]).join('-')}`
+              : '';
             const newProps =
               i !== 0
                 ? {
@@ -40,7 +43,7 @@ export default class DetailView extends VivView {
               ...props,
               ...newProps,
               loaderSelection: s,
-              id: `${loader.type}${getVivId(id)}-${suffix}`,
+              id: `${loader.type}${getVivId(id)}${suffix}`,
               viewportId: id
             });
           })
