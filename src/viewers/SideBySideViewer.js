@@ -1,6 +1,8 @@
 import React from 'react'; // eslint-disable-line import/no-unresolved
 import VivViewer from './VivViewer';
 import { SideBySideView, getDefaultInitialViewState } from '../views';
+import useGlobalSelection from './global-selection-hook';
+import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 
 /**
  * This component provides a side-by-side VivViewer with linked zoom/pan.
@@ -48,6 +50,11 @@ const SideBySideViewer = props => {
     transparentColor,
     onViewStateChange
   } = props;
+  const {
+    newLoaderSelection,
+    oldLoaderSelection,
+    onViewportLoad
+  } = useGlobalSelection(loaderSelection);
   const viewState =
     initialViewState ||
     getDefaultInitialViewState(loader, { height, width }, 0.5);
@@ -73,7 +80,10 @@ const SideBySideViewer = props => {
     sliderValues,
     colorValues,
     channelIsOn,
-    loaderSelection,
+    loaderSelection: oldLoaderSelection,
+    newLoaderSelection,
+    onViewportLoad,
+    transitionFields: GLOBAL_SLIDER_DIMENSION_FIELDS,
     colormap,
     isLensOn,
     lensSelection,

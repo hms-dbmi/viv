@@ -1,6 +1,6 @@
-import { MultiscaleImageLayer, ImageLayer, ScaleBarLayer } from '../layers';
+import { ScaleBarLayer } from '../layers';
 import VivView from './VivView';
-import { getVivId } from './utils';
+import { getDetailLayers, getVivId } from './utils';
 import { OVERVIEW_VIEW_ID } from './OverviewView';
 
 export const DETAIL_VIEW_ID = 'detail';
@@ -11,51 +11,10 @@ export const DETAIL_VIEW_ID = 'detail';
  * */
 export default class DetailView extends VivView {
   getLayers({ props, viewStates }) {
-    const {
-      loader,
-      loaderSelection,
-      newLoaderSelection,
-      onViewportLoad,
-      transitionFields
-    } = props;
+    const { loader } = props;
     const { id, height, width } = this;
     const layerViewState = viewStates[id];
-    const layers = [];
-
-    // Create at least one layer even without loaderSelection so that the tests pass.
-    if (loader.isPyramid) {
-      layers.push(
-        ...[loaderSelection, newLoaderSelection]
-          .filter((s, i) => i === 0 || s)
-          .map((s, i) => {
-            const suffix = s
-              ? `-${transitionFields.map(f => s[0][f]).join('-')}`
-              : '';
-            const newProps =
-              i !== 0
-                ? {
-                    onViewportLoad,
-                    refinementStrategy: 'never',
-                    excludeBackground: true
-                  }
-                : {};
-            return new MultiscaleImageLayer({
-              ...props,
-              ...newProps,
-              loaderSelection: s,
-              id: `${loader.type}${getVivId(id)}${suffix}`,
-              viewportId: id
-            });
-          })
-      );
-    } else {
-      layers.push(
-        new ImageLayer(props, {
-          id: `${loader.type}${getVivId(id)}`,
-          viewportId: id
-        })
-      );
-    }
+    const layers = getDetailLayers(id, props);
 
     const { physicalSizes } = loader;
     if (physicalSizes) {
