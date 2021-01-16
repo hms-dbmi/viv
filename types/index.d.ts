@@ -1,5 +1,4 @@
 type SupportedTypedArray = Uint8Array | Uint16Array | Uint32Array | Float32Array;
-type 
 
 interface LayerData {
   data: SupportedTypedArray;
