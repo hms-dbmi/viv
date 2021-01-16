@@ -1,4 +1,5 @@
 import parser from 'fast-xml-parser';
+import { ensureArray, intToRgba } from './utils';
 
 // WARNING: Changes to the parser options _will_ effect the types in types/omexml.d.ts.
 const PARSER_OPTIONS = {
@@ -16,27 +17,6 @@ const PARSER_OPTIONS = {
 
 const parse = (str: string): ParserResult.Root =>
   parser.parse(str, PARSER_OPTIONS);
-
-function ensureArray<T>(x: T | T[]) {
-  return Array.isArray(x) ? x : [x];
-}
-
-type RGBA = [r: number, g: number, b: number, a: number];
-// Adapted from: https://github.com/ome/ome-zarr-py/blob/db60b8272e0fe005920f8a296d4828b7a32e663e/ome_zarr/conversions.py#L16
-function intToRgba(int: number): RGBA {
-  if (!Number.isInteger(int)) {
-    throw Error('Not an integer.');
-  }
-
-  // Write number to int32 representation (4 bytes).
-  const buffer = new ArrayBuffer(4);
-  const view = new DataView(buffer);
-  view.setInt32(0, int, false); // offset === 0, littleEndian === false
-
-  // Take u8 view and extract number for each byte (1 byte for R/G/B/A).
-  const bytes = new Uint8Array(buffer);
-  return Array.from(bytes) as RGBA;
-}
 
 export function fromString(str: string) {
   const res = parse(str);
