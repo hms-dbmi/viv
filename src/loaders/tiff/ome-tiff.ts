@@ -1,14 +1,13 @@
 import type { GeoTIFF, GeoTIFFImage } from 'geotiff';
 import { fromString } from '../omexml';
 
+import TiffPixelSource from './pixel-source';
+import { checkProxies } from './lib/proxies';
 import {
   getLegacyIndexer,
   getSubIFDIndexer,
   getPixelSourceMeta
 } from './lib/utils';
-import TiffPixelSource from './pixel-source';
-
-import { checkProxies } from './lib/proxies';
 
 export type OmeTiffSelection = { t: number; c: number; z: number };
 

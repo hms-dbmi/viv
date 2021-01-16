@@ -2,6 +2,8 @@ import type { GeoTIFF } from 'geotiff';
 import type Pool from './Pool';
 
 const VIV_PROXY_KEY = '__viv';
+const OFFSETS_PROXY_KEY = `${VIV_PROXY_KEY}-offsets` as const;
+const POOL_PROXY_KEY = `${VIV_PROXY_KEY}-decoder-pool` as const;
 
 /*
  * Inspect if the GeoTIFF source is wrapped in our proxies,
@@ -36,7 +38,6 @@ function isProxy(tiff: GeoTIFF, proxyFlag: string) {
  * ifdRequest for an 'index' manually, GeoTIFF will await that request
  * rather than traversing the file system remotely.
  */
-const OFFSETS_PROXY_KEY = `${VIV_PROXY_KEY}-offsets` as const;
 export function createOffsetsProxy(tiff: GeoTIFF, offsets: number[]) {
   const get = (target: GeoTIFF, key: any) => {
     // Intercept `tiff.getImage`
@@ -69,7 +70,6 @@ export function createOffsetsProxy(tiff: GeoTIFF, offsets: number[]) {
  *
  * > tiff.readRasters({ window }) -> tiff.readRasters({ window, pool });
  */
-const POOL_PROXY_KEY = `${VIV_PROXY_KEY}-decoder-pool` as const;
 export function createPoolProxy(tiff: GeoTIFF, pool: Pool) {
   const get = (target: GeoTIFF, key: any) => {
     // Intercept calls to `image.readRasters`
