@@ -64,7 +64,23 @@ export function getSubIFDIndexer(tiff: GeoTIFF, rootMeta: OMEXML) {
     if (!SubIFDs) {
       throw Error('Indexing Error: OME-TIFF is missing SubIFDs.');
     }
-    return SubIFDs[pyramidLevel - 1];
+
+    /*
+    * We just need to create an "index" that is unique to this selection,
+    * since we mutate the tiff.ifdRequest manually below using the actual 
+    * SubIFD. 
+    * 
+    * We can just use the SubIFD as our index (since it identifies the image 
+    * uniquely) and we immediately call the tiff.getImage.
+    * 
+    * > const index = await this.indexer(selection);
+    * > const image = await this.tiff.getImage(index);
+    */
+
+    const index = SubIFDs[pyramidLevel - 1];
+    tiff.ifdRequests[index] = tiff.parseFileDirectoryAt(index);
+
+    return index;
   };
 }
 
