@@ -3,25 +3,34 @@ import type { GeoTIFF } from 'geotiff';
 
 import { createPoolProxy, createOffsetsProxy, checkProxies } from './lib/proxies';
 import Pool from './lib/Pool';
-import { load } from './ome-tiff';
+
+import { load as loadOmeTiff } from './ome-tiff';
 
 interface TiffOptions {
   pool?: boolean;
   headers?: object;
   offsets?: number[];
+  type?: 'ome-tiff';
 }
 
-export async function loadOmeTiff(source: string | File, options: TiffOptions = {}) {
+export async function loadTiff(source: string | File, opts: TiffOptions = {}) {
+  const {
+    headers,
+    offsets,
+    pool = true,
+    type = 'ome-tiff',
+  } = opts;
+
   let tiff: GeoTIFF;
 
   // Create tiff source
   if (typeof source === 'string') {
-    tiff = await fromUrl(source, options.headers);
+    tiff = await fromUrl(source, headers);
   } else {
     tiff = await fromBlob(source);
   }
 
-  if (options.pool) {
+  if (pool) {
     /*
      * Creates a worker pool to decode tiff tiles. Wraps tiff
      * in a Proxy that injects 'pool' into `tiff.readRasters`.
@@ -29,13 +38,13 @@ export async function loadOmeTiff(source: string | File, options: TiffOptions = 
     tiff = createPoolProxy(tiff, new Pool());
   }
 
-  if (options.offsets) {
+  if (offsets) {
     /*
      * Performance enhancement. If offsets are provided, we
      * create a proxy that intercepts calls to `tiff.getImage`
      * and injects the pre-computed offsets.
      */
-    tiff = createOffsetsProxy(tiff, options.offsets);
+    tiff = createOffsetsProxy(tiff, offsets);
   }
 
   /*
@@ -44,5 +53,9 @@ export async function loadOmeTiff(source: string | File, options: TiffOptions = 
   */
   checkProxies(tiff);
 
-  return load(tiff);
+  if (type !== 'ome-tiff') {
+    throw Error('Only ome-tiff is supported.')
+  }
+
+  return loadOmeTiff(tiff);
 }
