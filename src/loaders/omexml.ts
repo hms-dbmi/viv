@@ -12,7 +12,7 @@ const PARSER_OPTIONS = {
   parseAttributeValue: true,
 
   // Forces attributes to be parsed
-  ignoreAttributes: false,  
+  ignoreAttributes: false
 };
 
 const parse = (str: string): ParserResult.Root =>

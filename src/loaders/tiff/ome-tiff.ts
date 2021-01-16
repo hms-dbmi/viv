@@ -11,7 +11,6 @@ import {
 export type OmeTiffSelection = { t: number; c: number; z: number };
 
 export async function load(tiff: GeoTIFF) {
-
   // Get first image from tiff and inspect OME-XML metadata
   const firstImage = await tiff.getImage(0);
   const { ImageDescription, SubIFDs } = firstImage.fileDirectory;
@@ -24,7 +23,10 @@ export async function load(tiff: GeoTIFF) {
    * format we have.
    */
   let levels;
-  let pyramidIndexer: (sel: OmeTiffSelection, level: number) => Promise<GeoTIFFImage>;
+  let pyramidIndexer: (
+    sel: OmeTiffSelection,
+    level: number
+  ) => Promise<GeoTIFFImage>;
 
   if (SubIFDs) {
     // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.

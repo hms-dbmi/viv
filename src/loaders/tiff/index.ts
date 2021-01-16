@@ -1,7 +1,11 @@
 import { fromUrl, fromBlob } from 'geotiff';
 import type { GeoTIFF } from 'geotiff';
 
-import { createPoolProxy, createOffsetsProxy, checkProxies } from './lib/proxies';
+import {
+  createPoolProxy,
+  createOffsetsProxy,
+  checkProxies
+} from './lib/proxies';
 import Pool from './lib/Pool';
 
 import { load as loadOmeTiff } from './ome-tiff';
@@ -14,12 +18,7 @@ interface TiffOptions {
 }
 
 export async function loadTiff(source: string | File, opts: TiffOptions = {}) {
-  const {
-    headers,
-    offsets,
-    pool = true,
-    type = 'ome-tiff',
-  } = opts;
+  const { headers, offsets, pool = true, type = 'ome-tiff' } = opts;
 
   let tiff: GeoTIFF;
 
@@ -48,13 +47,13 @@ export async function loadTiff(source: string | File, opts: TiffOptions = {}) {
   }
 
   /*
-  * Inspect tiff source for our performance enhancing proxies.
-  * Prints warnings to console if `offsets` or `pool` are missing.
-  */
+   * Inspect tiff source for our performance enhancing proxies.
+   * Prints warnings to console if `offsets` or `pool` are missing.
+   */
   checkProxies(tiff);
 
   if (type !== 'ome-tiff') {
-    throw Error('Only ome-tiff is supported.')
+    throw Error('Only ome-tiff is supported.');
   }
 
   return loadOmeTiff(tiff);
