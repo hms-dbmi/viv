@@ -9,6 +9,10 @@ declare module 'geotiff' {
     parseFileDirectoryAt(offset: number): Promise<ImageFileDirectory>;
     readRasters(options?: RasterOptions): Promise<SupportedTypedArray>;
     ifdRequests: { [key: number]: Promise<ImageFileDirectory> };
+    dataView: DataView;
+    littleEndian: boolean;
+    cache: any;
+    source: any;
   }
 
   interface Pool {
@@ -28,7 +32,15 @@ declare module 'geotiff' {
   }
   
   type RasterData = [SupportedTypedArray] & { width: number, height: number };
-  interface GeoTIFFImage {
+  class GeoTIFFImage {
+    constructor(
+      fileDirectory: FileDirectory,
+      geoKeyDirectory: any,
+      dataView: DataView,
+      littleEndian: boolean,
+      cache: any,
+      source: any
+    );
     fileDirectory: FileDirectory;
     getBoundingBox(): number[];
     getFileDirectory(): FileDirectory;
@@ -49,6 +61,7 @@ declare module 'geotiff' {
 
   interface ImageFileDirectory {
     fileDirectory: FileDirectory;
+    geoKeyDirectory: any;
   }
 
 }

@@ -1,7 +1,7 @@
 import { fromUrl, fromBlob } from 'geotiff';
 import type { GeoTIFF } from 'geotiff';
 
-import { createPoolProxy, createOffsetsProxy } from './lib/proxies';
+import { createPoolProxy, createOffsetsProxy, checkProxies } from './lib/proxies';
 import Pool from './lib/Pool';
 import { load } from './ome-tiff';
 
@@ -11,7 +11,7 @@ interface TiffOptions {
   offsets?: number[];
 }
 
-export async function loadOmeTiff(source: string | File, options: TiffOptions) {
+export async function loadOmeTiff(source: string | File, options: TiffOptions = {}) {
   let tiff: GeoTIFF;
 
   // Create tiff source
@@ -21,13 +21,12 @@ export async function loadOmeTiff(source: string | File, options: TiffOptions) {
     tiff = await fromBlob(source);
   }
 
-  if (options.pool ?? true) {
+  if (options.pool) {
     /*
      * Creates a worker pool to decode tiff tiles. Wraps tiff
      * in a Proxy that injects 'pool' into `tiff.readRasters`.
      */
-    const pool = new Pool();
-    tiff = createPoolProxy(tiff, pool);
+    tiff = createPoolProxy(tiff, new Pool());
   }
 
   if (options.offsets) {
@@ -38,6 +37,12 @@ export async function loadOmeTiff(source: string | File, options: TiffOptions) {
      */
     tiff = createOffsetsProxy(tiff, options.offsets);
   }
+
+  /*
+  * Inspect tiff source for our performance enhancing proxies.
+  * Prints warnings to console if `offsets` or `pool` are missing.
+  */
+  checkProxies(tiff);
 
   return load(tiff);
 }

@@ -1,6 +1,6 @@
 import test from 'tape';
 
-import { getChannelStats } from '../../src/loaders/utils';
+import { intToRgba, getChannelStats } from '../../src/loaders/utils';
 
 test('getChannelStats: Small', t => {
   t.plan(6);
@@ -63,4 +63,10 @@ test('getChannelStats: Large Array', t => {
   } catch (e) {
     t.fail(e);
   }
+});
+
+test('Convert int to RGBA color', t => {
+  t.plan(2);
+  t.deepEqual(intToRgba(0), [0, 0, 0, 0]);
+  t.deepEqual(intToRgba(100100), [0, 1, 135, 4]);
 });

@@ -2,7 +2,6 @@ import type { GeoTIFF, GeoTIFFImage } from 'geotiff';
 import { fromString } from '../omexml';
 
 import TiffPixelSource from './pixel-source';
-import { checkProxies } from './lib/proxies';
 import {
   getLegacyIndexer,
   getSubIFDIndexer,
@@ -12,8 +11,6 @@ import {
 export type OmeTiffSelection = { t: number; c: number; z: number };
 
 export async function load(tiff: GeoTIFF) {
-  // Inspect tiff source for our performance enhancing proxies.
-  checkProxies(tiff);
 
   // Get first image from tiff and inspect OME-XML metadata
   const firstImage = await tiff.getImage(0);
