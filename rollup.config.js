@@ -1,6 +1,7 @@
 import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+
 import workerLoader from 'rollup-plugin-web-worker-loader';
 import glslify from 'rollup-plugin-glslify';
 
@@ -48,6 +49,7 @@ export default {
     workerLoader({ targetPlatform: 'browser', inline: true }),
 
     // Compiles TS (also transpiles JS source and applies JSX transforms)
-    typescript({ include: 'src/**/*', target: 'es2018' }),
+    typescript({ include: ['src/**/*', 'types/*'], target: 'es2018' }),
+
   ]
 };
