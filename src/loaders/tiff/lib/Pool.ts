@@ -15,6 +15,7 @@ export default class Pool {
   workers: Worker[];
   idleWorkers: Worker[];
   waitQueue: any[];
+  decoder: null;
 
   /**
    * @constructor
@@ -26,6 +27,7 @@ export default class Pool {
     this.workers = [];
     this.idleWorkers = [];
     this.waitQueue = [];
+    this.decoder = null;
 
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < size; ++i) {
@@ -40,10 +42,7 @@ export default class Pool {
    * @param {ArrayBuffer} buffer the array buffer of bytes to decode.
    * @returns {Promise.<ArrayBuffer>} the decoded result as a `Promise`
    */
-  async decode(
-    fileDirectory: FileDirectory,
-    buffer: ArrayBuffer
-  ): Promise<ArrayBuffer> {
+  async decode(fileDirectory: FileDirectory, buffer: ArrayBuffer) {
     const currentWorker = await this.waitForWorker();
     return new Promise((resolve, reject) => {
       currentWorker.onmessage = event => {
@@ -57,7 +56,7 @@ export default class Pool {
         reject(error);
       };
       currentWorker.postMessage(['decode', fileDirectory, buffer], [buffer]);
-    });
+    }) as Promise<ArrayBuffer>;
   }
 
   async waitForWorker() {
