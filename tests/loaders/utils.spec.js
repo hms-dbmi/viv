@@ -1,23 +1,16 @@
 import test from 'tape';
 
-import { getChannelStats, joinUrlParts } from '../../src/loaders/utils';
+import { getChannelStats } from '../../src/loaders/utils';
 
-test('getChannelStats: Small', async t => {
+test('getChannelStats: Small', t => {
   t.plan(6);
   try {
-    const loader = {
-      isPyramid: false,
-      getRaster: async () => {
-        return {
-          data: [
-            [0, 1, 2, 3],
-            [0, 2, 0, 2],
-            [0, 0, 1, 1]
-          ]
-        };
-      }
-    };
-    const channelStats = await getChannelStats({ loader });
+    const data = [
+      [0, 1, 2, 3],
+      [0, 2, 0, 2],
+      [0, 0, 1, 1]
+    ];
+    const channelStats = data.map(arr => getChannelStats(arr));
     const means = channelStats.map(stat => stat.mean);
     const domains = channelStats.map(stat => stat.domain);
     const standardDeviations = channelStats.map(stat => stat.sd);
@@ -41,21 +34,15 @@ test('getChannelStats: Small', async t => {
   }
 });
 
-test('getChannelStatsStats: Large Array', async t => {
+test('getChannelStats: Large Array', t => {
   t.plan(6);
   try {
-    const loader = {
-      isPyramid: false,
-      getRaster: async () => {
-        return {
-          data: [
-            [0, 1, 2, 3, 7, 8, 9, 10, 4, 5, 6, 11],
-            [0, 1, 5, 6, 7, 2, 9, 10, 3, 4, 8, 11, 12]
-          ]
-        };
-      }
-    };
-    const channelStats = await getChannelStats({ loader });
+    const data = [
+      [0, 1, 2, 3, 7, 8, 9, 10, 4, 5, 6, 11],
+      [0, 1, 5, 6, 7, 2, 9, 10, 3, 4, 8, 11, 12]
+    ];
+    const channelStats = data.map(arr => getChannelStats(arr));
+
     const means = channelStats.map(stat => stat.mean);
     const domains = channelStats.map(stat => stat.domain);
     const standardDeviations = channelStats.map(stat => stat.sd);
@@ -76,24 +63,4 @@ test('getChannelStatsStats: Large Array', async t => {
   } catch (e) {
     t.fail(e);
   }
-});
-
-test('URL join suffixes', t => {
-  t.equal(
-    joinUrlParts('https://example.com', 'bla'),
-    'https://example.com/bla'
-  );
-  t.equal(
-    joinUrlParts('https://example.com/my-store', 'arr.zarr'),
-    'https://example.com/my-store/arr.zarr'
-  );
-  t.equal(
-    joinUrlParts('https://example.com/', 'arr.zarr'),
-    'https://example.com/arr.zarr'
-  );
-  t.equal(
-    joinUrlParts('https://example.com/', '', 'arr.zarr'),
-    'https://example.com/arr.zarr'
-  );
-  t.end();
 });
