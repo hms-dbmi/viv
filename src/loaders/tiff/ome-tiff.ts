@@ -1,4 +1,4 @@
-import type { GeoTIFF } from 'geotiff';
+import type { GeoTIFF, GeoTIFFImage } from 'geotiff';
 import { fromString } from '../omexml';
 
 import {
@@ -28,7 +28,7 @@ export async function load(tiff: GeoTIFF) {
    * format we have.
    */
   let levels;
-  let pyramidIndexer: (sel: OmeTiffSelection, level: number) => Promise<number>;
+  let pyramidIndexer: (sel: OmeTiffSelection, level: number) => Promise<GeoTIFFImage>;
 
   if (SubIFDs) {
     // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.
@@ -37,7 +37,7 @@ export async function load(tiff: GeoTIFF) {
   } else {
     // Image is legacy format; resolutions are stored as separate images.
     levels = omexml.length;
-    pyramidIndexer = getLegacyIndexer(omexml);
+    pyramidIndexer = getLegacyIndexer(tiff, omexml);
   }
 
   // TODO: The OmeTIFF loader only works for the _first_ image in the metadata.
@@ -48,7 +48,7 @@ export async function load(tiff: GeoTIFF) {
   const data = Array.from({ length: levels }).map((_, i) => {
     const shape = getShape(i);
     const indexer = (sel: OmeTiffSelection) => pyramidIndexer(sel, i);
-    return new TiffPixelSource(tiff, indexer, tileSize, shape, labels);
+    return new TiffPixelSource(indexer, tileSize, shape, labels);
   });
 
   return {

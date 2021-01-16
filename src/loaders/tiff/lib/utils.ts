@@ -1,4 +1,5 @@
-import type { GeoTIFF } from 'geotiff';
+import { GeoTIFFImage } from 'geotiff';
+import type { GeoTIFF, ImageFileDirectory } from 'geotiff';
 import type { OmeTiffSelection } from '../ome-tiff';
 import type { OMEXML } from '../../omexml';
 import { getDims } from '../../zarr/lib/utils';
@@ -36,15 +37,15 @@ function getIFDIndexer(imgMeta: OMEXML[0]): (sel: OmeTiffSelection) => number {
 
 // TODO: Indexers assume first image in metadata. Need to compute offsets differently
 // for other images in the OME-XML.
-export function getLegacyIndexer(rootMeta: OMEXML) {
+export function getLegacyIndexer(tiff: GeoTIFF, rootMeta: OMEXML) {
   const imgMeta = rootMeta[0];
   const ifdIndexer = getIFDIndexer(imgMeta);
 
-  return async (sel: OmeTiffSelection, pyramidLevel: number) => {
+  return (sel: OmeTiffSelection, pyramidLevel: number) => {
     const imgOffset = ifdIndexer(sel);
     const { SizeT, SizeC, SizeZ } = imgMeta.Pixels;
     const pyramidOffset = pyramidLevel * SizeZ * SizeT * SizeC;
-    return imgOffset + pyramidOffset;
+    return tiff.getImage(imgOffset + pyramidOffset);
   };
 }
 
@@ -52,35 +53,40 @@ export function getSubIFDIndexer(tiff: GeoTIFF, rootMeta: OMEXML) {
   const imgMeta = rootMeta[0];
   const ifdIndexer = getIFDIndexer(imgMeta);
 
+  /*
+  * Here we create a custom IFDRequest cache, rather than mutating 
+  * the tiff with random offsets. The ifdRequests are cached in an 
+  * ES6 Map that maps a unique key (e.g. `0-0-0-0`) to the ifdRequest.
+  */
+  const ifdCache: Map<string, ImageFileDirectory> = new Map();
+
   return async (sel: OmeTiffSelection, pyramidLevel: number) => {
     const offset = ifdIndexer(sel);
 
     // It's the highest resolution, no need to look up SubIFDs.
-    if (pyramidLevel === 0) return offset;
+    const baseImage = await tiff.getImage(offset);
+    if (pyramidLevel === 0) return baseImage;
 
     // Lookup SubIFDs from the base image, and return offset to selection.
-    const baseImage = await tiff.getImage(offset);
     const { SubIFDs } = baseImage.fileDirectory;
     if (!SubIFDs) {
       throw Error('Indexing Error: OME-TIFF is missing SubIFDs.');
     }
 
-    /*
-    * We just need to create an "index" that is unique to this selection,
-    * since we mutate the tiff.ifdRequest manually below using the actual 
-    * SubIFD. 
-    * 
-    * We can just use the SubIFD as our index (since it identifies the image 
-    * uniquely) and we immediately call the tiff.getImage.
-    * 
-    * > const index = await this.indexer(selection);
-    * > const image = await this.tiff.getImage(index);
-    */
+    const key = `${sel.t}-${sel.z}-${sel.c}-${pyramidLevel}`;
+    let ifd = ifdCache.get(key);
+    if (!ifd) {
+      // Only create a new request if we don't have the key.
+      ifd = await tiff.parseFileDirectoryAt(SubIFDs[pyramidLevel - 1]);
+      ifdCache.set(key, ifd);
+    }
 
-    const index = SubIFDs[pyramidLevel - 1];
-    tiff.ifdRequests[index] = tiff.parseFileDirectoryAt(index);
-
-    return index;
+    // Create a new image object manually from ifd
+    // https://github.com/geotiffjs/geotiff.js/blob/8ef472f41b51d18074aece2300b6a8ad91a21ae1/src/geotiff.js#L447-L453
+    return new GeoTIFFImage(
+      ifd.fileDirectory, ifd.geoKeyDirectory, tiff.dataView,
+      tiff.littleEndian, tiff.cache, tiff.source,
+    );
   };
 }
 

@@ -1,23 +1,19 @@
-import type { GeoTIFF } from 'geotiff';
+import type { GeoTIFFImage } from 'geotiff';
 
 class TiffPixelSource<S> implements PixelSource<S> {
-  private _tiff: GeoTIFF;
-  private _indexer: (sel: S) => Promise<number>;
+  private _indexer: (sel: S) => Promise<GeoTIFFImage>;
 
   constructor(
-    tiff: GeoTIFF,
-    indexer: (sel: S) => Promise<number>,
+    indexer: (sel: S) => Promise<GeoTIFFImage>,
     public tileSize: number,
     public shape: number[],
     public labels: string[]
   ) {
-    this._tiff = tiff;
     this._indexer = indexer;
   }
 
   async getRaster({ selection }: RasterSelection<S>) {
-    const index = await this._indexer(selection);
-    const image = await this._tiff.getImage(index);
+    const image = await this._indexer(selection);
     const data = await image.readRasters();
     return {
       data: data[0],
@@ -32,8 +28,7 @@ class TiffPixelSource<S> implements PixelSource<S> {
     const y0 = y * this.tileSize;
     const window = [x0, y0, x0 + width, y0 + height];
 
-    const index = await this._indexer(selection);
-    const image = await this._tiff.getImage(index);
+    const image = await this._indexer(selection);
     const data = await image.readRasters({ window, width, height });
 
     return {
