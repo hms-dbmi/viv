@@ -120,5 +120,19 @@ export function getPixelSourceMeta({ Pixels }: OMEXML[0]) {
     return s;
   };
 
+  if (Pixels.PhysicalSizeX && Pixels.PhysicalSizeY) {
+    const physicalSizes = {
+      x: {
+        size: Pixels.PhysicalSizeX,
+        unit: Pixels.PhysicalSizeXUnit 
+      },
+      y: {
+        size: Pixels.PhysicalSizeY,
+        unit: Pixels.PhysicalSizeYUnit,
+      }
+    }
+    return { labels, getShape, physicalSizes };
+  }
+
   return { labels, getShape };
 }

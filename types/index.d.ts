@@ -17,10 +17,21 @@ interface TileSelection<S> {
   signal?: S;
 }
 
+interface PhysicalSize {
+  size: number;
+  unit: string;
+}
+
+interface PixelSourceMeta {
+  physicalSizes?: { [key: string]: PhysicalSize; };
+  photometricInterpretation?: number;
+}
+
 interface PixelSource<S> {
   getRaster(sel: RasterSelection<S>): Promise<LayerData>;
   getTile(sel: TileSelection<S>): Promise<LayerData>;
   shape: number[];
   labels: string[];
   tileSize: number;
+  meta?: PixelSourceMeta;
 }

@@ -4,7 +4,7 @@ import { fromFile } from 'geotiff';
 import { load } from '../../src/loaders/tiff/ome-tiff';
 
 test('Creates correct TiffPixelSource for OME-TIFF.', async t => {
-  t.plan(3);
+  t.plan(5);
   try {
     const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
     const { data } = await load(tiff);
@@ -20,6 +20,8 @@ test('Creates correct TiffPixelSource for OME-TIFF.', async t => {
       [1, 3, 1, 167, 439],
       'shape should match dimensions.'
     );
+    t.equal(base.meta.photometricInterpretation, 1, 'Photometric interpretation is 1.');
+    t.equal(base.meta.physicalSizes, undefined, 'No physical sizes.');
   } catch (e) {
     t.fail(e);
   }
@@ -56,6 +58,7 @@ test('Correct OME-XML.', async t => {
     const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
     const { metadata } = await load(tiff);
     const { Name, Pixels } = metadata;
+    console.log(Pixels)
     t.equal(
       Name,
       'multi-channel.ome.tif',

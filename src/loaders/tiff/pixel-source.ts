@@ -7,7 +7,8 @@ class TiffPixelSource<S> implements PixelSource<S> {
     indexer: (sel: S) => Promise<GeoTIFFImage>,
     public tileSize: number,
     public shape: number[],
-    public labels: string[]
+    public labels: string[],
+    public meta?: PixelSourceMeta,
   ) {
     this._indexer = indexer;
   }

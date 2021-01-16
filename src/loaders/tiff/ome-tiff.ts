@@ -13,7 +13,11 @@ export type OmeTiffSelection = { t: number; c: number; z: number };
 export async function load(tiff: GeoTIFF) {
   // Get first image from tiff and inspect OME-XML metadata
   const firstImage = await tiff.getImage(0);
-  const { ImageDescription, SubIFDs } = firstImage.fileDirectory;
+  const {
+    ImageDescription,
+    SubIFDs,
+    PhotometricInterpretation: photometricInterpretation,
+  } = firstImage.fileDirectory;
   const omexml = fromString(ImageDescription);
 
   /*
@@ -40,13 +44,15 @@ export async function load(tiff: GeoTIFF) {
 
   // TODO: The OmeTIFF loader only works for the _first_ image in the metadata.
   const imgMeta = omexml[0];
-  const { labels, getShape } = getPixelSourceMeta(imgMeta);
+  const { labels, getShape, physicalSizes } = getPixelSourceMeta(imgMeta);
   const tileSize = firstImage.getTileWidth();
+  const meta = { photometricInterpretation, physicalSizes };
 
   const data = Array.from({ length: levels }).map((_, i) => {
     const shape = getShape(i);
     const indexer = (sel: OmeTiffSelection) => pyramidIndexer(sel, i);
-    return new TiffPixelSource(indexer, tileSize, shape, labels);
+    const source = new TiffPixelSource(indexer, tileSize, shape, labels, meta);
+    return source;
   });
 
   return {

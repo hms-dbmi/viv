@@ -56,7 +56,8 @@ declare module 'geotiff' {
 
   interface FileDirectory {
     ImageDescription: string;
-    SubIFDs?: number[]
+    SubIFDs?: number[];
+    PhotometricInterpretation?: number;
   }
 
   interface ImageFileDirectory {
