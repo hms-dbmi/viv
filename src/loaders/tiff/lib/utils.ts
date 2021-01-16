@@ -54,9 +54,9 @@ export function getSubIFDIndexer(tiff: GeoTIFF, rootMeta: OMEXML) {
   const ifdIndexer = getIFDIndexer(imgMeta);
 
   /*
-  * Here we create a custom IFDRequest cache, rather than mutating 
-  * the tiff with random offsets. The ifdRequests are cached in an 
-  * ES6 Map that maps a unique key (e.g. `0-0-0-0`) to the ifdRequest.
+  * Here we create a custom IFD cache, rather than mutating tiff.ifdRequests 
+  * with random offsets. The IFDs are cached in an ES6 Map that maps a unique
+  * key (e.g. `${z}-${t}-${c}-${pyramidlevel}`) to the corresponding IFD.
   */
   const ifdCache: Map<string, ImageFileDirectory> = new Map();
 
@@ -81,7 +81,7 @@ export function getSubIFDIndexer(tiff: GeoTIFF, rootMeta: OMEXML) {
       ifdCache.set(key, ifd);
     }
 
-    // Create a new image object manually from ifd
+    // Create a new image object manually from IFD
     // https://github.com/geotiffjs/geotiff.js/blob/8ef472f41b51d18074aece2300b6a8ad91a21ae1/src/geotiff.js#L447-L453
     return new GeoTIFFImage(
       ifd.fileDirectory, ifd.geoKeyDirectory, tiff.dataView,

@@ -1,7 +1,8 @@
 import { fromUrl, fromBlob } from 'geotiff';
 import type { GeoTIFF } from 'geotiff';
 
-import { addProxies } from './lib/proxies';
+import { createPoolProxy, createOffsetsProxy } from './lib/proxies';
+import Pool from './lib/Pool';
 import { load } from './ome-tiff';
 
 interface TiffOptions {
@@ -20,8 +21,23 @@ export async function loadOmeTiff(source: string | File, options: TiffOptions) {
     tiff = await fromBlob(source);
   }
 
-  // Optionally wrap tiff with performance-enhancing proxies.
-  tiff = addProxies(tiff, options.pool ?? true, options.offsets);
+  if (options.pool ?? true) {
+    /*
+     * Creates a worker pool to decode tiff tiles. Wraps tiff
+     * in a Proxy that injects 'pool' into `tiff.readRasters`.
+     */
+    const pool = new Pool();
+    tiff = createPoolProxy(tiff, pool);
+  }
+
+  if (options.offsets) {
+    /*
+     * Performance enhancement. If offsets are provided, we
+     * create a proxy that intercepts calls to `tiff.getImage`
+     * and injects the pre-computed offsets.
+     */
+    tiff = createOffsetsProxy(tiff, options.offsets);
+  }
 
   return load(tiff);
 }
