@@ -8,7 +8,7 @@ class TiffPixelSource<S> implements PixelSource<S> {
     public tileSize: number,
     public shape: number[],
     public labels: string[],
-    public meta?: PixelSourceMeta,
+    public meta?: PixelSourceMeta
   ) {
     this._indexer = indexer;
   }

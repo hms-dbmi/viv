@@ -31,13 +31,13 @@ export function getPixelSourceMeta({ Pixels }: OMEXML[0]) {
     const physicalSizes = {
       x: {
         size: Pixels.PhysicalSizeX,
-        unit: Pixels.PhysicalSizeXUnit 
+        unit: Pixels.PhysicalSizeXUnit
       },
       y: {
         size: Pixels.PhysicalSizeY,
-        unit: Pixels.PhysicalSizeYUnit,
+        unit: Pixels.PhysicalSizeYUnit
       }
-    }
+    };
     return { labels, getShape, physicalSizes };
   }
 

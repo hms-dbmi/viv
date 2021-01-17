@@ -4,25 +4,24 @@ import type { OmeTiffSelection } from '../ome-tiff';
 import type { OMEXML } from '../../omexml';
 
 /*
-* An "indexer" for a GeoTIFF-based source is a function that takes a
-* "selection" (e.g. { z, t, c }) and returns a Promise for the GeoTIFFImage
-* object corresponding to that selection. 
-*
-* For OME-TIFF images, the "selection" object is the same regardless of
-* the format version. However, modern version of Bioformats have a different
-* memory layout for pyramidal resolutions. Thus, we have two different "indexers"
-* depending on which format version is detected.
-*
-* TODO: We currently only support indexing the first image in the OME-TIFF with 
-* our indexers. There can be multiple images in an OME-TIFF, so supporting these
-* images will require extending these indexers or creating new methods.
-*/
-
+ * An "indexer" for a GeoTIFF-based source is a function that takes a
+ * "selection" (e.g. { z, t, c }) and returns a Promise for the GeoTIFFImage
+ * object corresponding to that selection.
+ *
+ * For OME-TIFF images, the "selection" object is the same regardless of
+ * the format version. However, modern version of Bioformats have a different
+ * memory layout for pyramidal resolutions. Thus, we have two different "indexers"
+ * depending on which format version is detected.
+ *
+ * TODO: We currently only support indexing the first image in the OME-TIFF with
+ * our indexers. There can be multiple images in an OME-TIFF, so supporting these
+ * images will require extending these indexers or creating new methods.
+ */
 
 /*
-* Returns an indexer for legacy Bioformats images. This assumes that 
-* downsampled resolutions are stored sequentially in the OME-TIFF.
-*/
+ * Returns an indexer for legacy Bioformats images. This assumes that
+ * downsampled resolutions are stored sequentially in the OME-TIFF.
+ */
 export function getLegacyIndexer(tiff: GeoTIFF, rootMeta: OMEXML) {
   const imgMeta = rootMeta[0];
   const { SizeT, SizeC, SizeZ } = imgMeta.Pixels;
@@ -39,19 +38,19 @@ export function getLegacyIndexer(tiff: GeoTIFF, rootMeta: OMEXML) {
 }
 
 /*
-* Returns an indexer for modern Bioforamts images that store multiscale
-* resolutions using SubIFDs.
-*
-* The ifdIndexer returns the 'index' to the base resolution for a
-* particular 'selection'. The SubIFDs to the downsampled resolutions
-* of the 'selection' are stored within the `baseImage.fileDirectory`.
-* We use the SubIFDs to get the IFD for the corresponding sub-resolution.
-* 
-* NOTE: This function create a custom IFD cache rather than mutating
-* `GeoTIFF.ifdRequests` with a random offset. The IFDs are cached in 
-* an ES6 Map that maps a string key that identifies the selection uniquely
-* to the corresponding IFD.
-*/
+ * Returns an indexer for modern Bioforamts images that store multiscale
+ * resolutions using SubIFDs.
+ *
+ * The ifdIndexer returns the 'index' to the base resolution for a
+ * particular 'selection'. The SubIFDs to the downsampled resolutions
+ * of the 'selection' are stored within the `baseImage.fileDirectory`.
+ * We use the SubIFDs to get the IFD for the corresponding sub-resolution.
+ *
+ * NOTE: This function create a custom IFD cache rather than mutating
+ * `GeoTIFF.ifdRequests` with a random offset. The IFDs are cached in
+ * an ES6 Map that maps a string key that identifies the selection uniquely
+ * to the corresponding IFD.
+ */
 export function getSubIFDIndexer(tiff: GeoTIFF, rootMeta: OMEXML) {
   const imgMeta = rootMeta[0];
   const ifdIndexer = getIFDIndexer(imgMeta);
@@ -95,9 +94,9 @@ export function getSubIFDIndexer(tiff: GeoTIFF, rootMeta: OMEXML) {
 }
 
 /*
-* Returns a function that computes the image index based on the dimension
-* order and dimension sizes.
-*/
+ * Returns a function that computes the image index based on the dimension
+ * order and dimension sizes.
+ */
 function getIFDIndexer(imgMeta: OMEXML[0]): (sel: OmeTiffSelection) => number {
   const { SizeC, SizeZ, SizeT, DimensionOrder } = imgMeta.Pixels;
   switch (DimensionOrder) {
@@ -120,9 +119,7 @@ function getIFDIndexer(imgMeta: OMEXML[0]): (sel: OmeTiffSelection) => number {
       return ({ t, c, z }) => c * SizeT * SizeZ + z * SizeT + t;
     }
     default: {
-      throw new Error(
-        `Invalid OME-XML DimensionOrder, got ${DimensionOrder}.`
-      );
+      throw new Error(`Invalid OME-XML DimensionOrder, got ${DimensionOrder}.`);
     }
   }
 }

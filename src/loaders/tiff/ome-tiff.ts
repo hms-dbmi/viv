@@ -13,15 +13,13 @@ export async function load(tiff: GeoTIFF) {
   const {
     ImageDescription,
     SubIFDs,
-    PhotometricInterpretation: photometricInterpretation,
+    PhotometricInterpretation: photometricInterpretation
   } = firstImage.fileDirectory;
   const omexml = fromString(ImageDescription);
 
   /*
    * Image pyramids are stored differently between versions of Bioformats.
-   * Thus we need a different indexer (function that returns the offset to an
-   * image based on a 'selection' and pyramid level) depending on which
-   * format we have.
+   * Thus we need a different indexer depending on which format we have.
    */
   let levels;
   let pyramidIndexer: (
