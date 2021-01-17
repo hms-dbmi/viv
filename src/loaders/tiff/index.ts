@@ -8,17 +8,19 @@ import {
 } from './lib/proxies';
 import Pool from './lib/Pool';
 
-import { load as loadOmeTiff } from './ome-tiff';
+import { load } from './ome-tiff';
 
 interface TiffOptions {
   pool?: boolean;
   headers?: object;
   offsets?: number[];
-  type?: 'ome-tiff';
 }
 
-export async function loadTiff(source: string | File, opts: TiffOptions = {}) {
-  const { headers, offsets, pool = true, type = 'ome-tiff' } = opts;
+export async function loadOmeTiff(
+  source: string | File,
+  opts: TiffOptions = {}
+) {
+  const { headers, offsets, pool = true } = opts;
 
   let tiff: GeoTIFF;
 
@@ -52,9 +54,5 @@ export async function loadTiff(source: string | File, opts: TiffOptions = {}) {
    */
   checkProxies(tiff);
 
-  if (type !== 'ome-tiff') {
-    throw Error('Only ome-tiff is supported.');
-  }
-
-  return loadOmeTiff(tiff);
+  return load(tiff);
 }

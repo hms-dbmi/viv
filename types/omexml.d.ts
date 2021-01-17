@@ -29,8 +29,8 @@ declare module ParserResult {
   type Size<Names> = `Size${Names}`;
 
   type PixelAttrs = 
-    Attrs<PhysicalSize<'X' | 'Y'> | 'SignificantBits' | Size<'T' | 'C' | 'Z' | 'Y' | 'X'>, number> &
-    Attrs<PhysicalSizeUnit<'X' | 'Y'>, UnitsLength> &
+    Attrs<PhysicalSize<'X' | 'Y' | 'Z'> | 'SignificantBits' | Size<'T' | 'C' | 'Z' | 'Y' | 'X'>, number> &
+    Attrs<PhysicalSizeUnit<'X' | 'Y' | 'Z'>, UnitsLength> &
     Attrs<'BigEndian' | 'Interleaved', boolean> & {
       ID: string;
       DimensionOrder: DimensionOrder,

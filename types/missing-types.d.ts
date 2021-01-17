@@ -1,5 +1,6 @@
 
 declare module 'geotiff' {
+  import type { TypedArray } from 'zarr';
 
   function fromUrl(url: string, headers?: object): Promise<GeoTIFF>;
   function fromBlob(blob: Blob): Promise<GeoTIFF>;
@@ -29,9 +30,10 @@ declare module 'geotiff' {
     height?: number;
     resampleMethod?: string;
     enableAlpha?: boolean;
+    signal?: AbortSignal;
   }
   
-  type RasterData = [SupportedTypedArray] & { width: number, height: number };
+  type RasterData = (TypedArray | TypedArray[]) & { width: number, height: number };
   class GeoTIFFImage {
     constructor(
       fileDirectory: FileDirectory,

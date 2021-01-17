@@ -1,13 +1,16 @@
-import type { GeoTIFFImage } from 'geotiff';
+import type { GeoTIFFImage, RasterOptions } from 'geotiff';
+import type { TypedArray } from 'zarr';
+import { isInterleaved } from '../utils';
 
-class TiffPixelSource<S> implements PixelSource<S> {
-  private _indexer: (sel: S) => Promise<GeoTIFFImage>;
+class TiffPixelSource<S extends Array<string>> implements PixelSource<S> {
+  private _indexer: (sel: PixelSourceSelection<S>) => Promise<GeoTIFFImage>;
 
   constructor(
-    indexer: (sel: S) => Promise<GeoTIFFImage>,
+    indexer: (sel: PixelSourceSelection<S>) => Promise<GeoTIFFImage>,
+    public dtype: SupportedDtype,
     public tileSize: number,
     public shape: number[],
-    public labels: string[],
+    public labels: Labels<S>,
     public meta?: PixelSourceMeta
   ) {
     this._indexer = indexer;
@@ -15,35 +18,61 @@ class TiffPixelSource<S> implements PixelSource<S> {
 
   async getRaster({ selection }: RasterSelection<S>) {
     const image = await this._indexer(selection);
-    const data = await image.readRasters();
-    return {
-      data: data[0],
-      width: data.width,
-      height: data.height
-    };
+    return this._readRasters(image);
   }
 
-  async getTile({ x, y, selection }: TileSelection<S>) {
+  async getTile({ x, y, selection, signal }: TileSelection<S>) {
     const { height, width } = this._getTileExtent(x, y);
     const x0 = x * this.tileSize;
     const y0 = y * this.tileSize;
     const window = [x0, y0, x0 + width, y0 + height];
 
     const image = await this._indexer(selection);
-    const data = await image.readRasters({ window, width, height });
+    return this._readRasters(image, { window, width, height, signal });
+  }
+
+  private async _readRasters(image: GeoTIFFImage, props?: RasterOptions) {
+    const interleave = isInterleaved(this.shape);
+    const raster = await image.readRasters({ interleave, ...props });
+
+    /*
+     * geotiff.js returns objects with different structure
+     * depending on `interleave`. It's weird, but this seems to work.
+     */
+    let data = (interleave ? raster : raster[0]) as TypedArray;
+
+    /*
+     * GeoTiff.js returns Uint32Array when the tiff has 32 significant bits,
+     * even if the image is Float32. The underlying ArrayBuffer is correct, but
+     * we need to take a different TypeArray view of the buffer.
+     */
+    if (this.dtype === 'Float32') {
+      data = new Float32Array(data.buffer);
+    }
+
+    // geotiff.js returns the correct TypedArray but need to cast to Uint for viv.
+    if (data.constructor.name.startsWith('Int')) {
+      const suffix = data.constructor.name.slice(1); // nt8Array | nt16Array | nt32Array
+      const name = `Ui${suffix}` as
+        | 'Uint8Array'
+        | 'Uint16Array'
+        | 'Uint32Array';
+      data = new globalThis[name](data);
+    }
 
     return {
-      data: data[0],
-      width: data.width,
-      height: data.height
-    };
+      data: data,
+      width: raster.width,
+      height: raster.height
+    } as LayerData;
   }
 
   /*
    * Computes tile size given x, y coord.
    */
   private _getTileExtent(x: number, y: number) {
-    const [h, w] = this.shape.slice(-2);
+    const interleave = isInterleaved(this.shape);
+    const [h, w] = this.shape.slice(interleave ? -3 : -2);
     let height = this.tileSize;
     let width = this.tileSize;
     const maxXTileCoord = Math.floor(w / this.tileSize);
