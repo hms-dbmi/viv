@@ -1,16 +1,17 @@
 import React, { PureComponent } from 'react'; // eslint-disable-line import/no-unresolved
 import DeckGL from '@deck.gl/react';
-import isEqual from 'lodash/isEqual';
+// No need to use the ES6 or React variants.
+import equal from 'fast-deep-equal';
 import { getVivId } from '../views/utils';
 
 const areViewStatesEqual = (viewState, otherViewState) => {
   return (
-    otherViewState &&
-    viewState &&
-    isEqual(viewState.target, otherViewState.target) &&
-    viewState.zoom === otherViewState.zoom
+    otherViewState === viewState ||
+    (equal(viewState?.target, otherViewState?.target) &&
+      viewState?.zoom === otherViewState?.zoom)
   );
 };
+
 /**
  * @callback ViewStateChange
  * @param {Object} event
@@ -22,6 +23,7 @@ const areViewStatesEqual = (viewState, otherViewState) => {
  * @param {Array} props.layerProps  Props for the layers in each view.
  * @param {Array} props.randomize Whether or not to randomize which view goes first (for dynamic rendering).
  * @param {VivView} props.views Various VivViews to render.
+ * @param {Array} props.viewStates List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }]
  * @param {ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * */
 export default class VivViewer extends PureComponent {
@@ -92,8 +94,8 @@ export default class VivViewer extends PureComponent {
     const { views } = props;
     // Only update state if the previous viewState prop does not match the current one
     // so that people can update viewState
-    if (
-      views.some(view => {
+    const changed = views
+      .filter(view => {
         const prevViewState = prevProps.viewStates.find(
           viewState => viewState.id === view.id
         );
@@ -101,24 +103,29 @@ export default class VivViewer extends PureComponent {
           viewState => viewState.id === view.id
         );
         return (
-          prevViewState &&
           currViewState &&
-          !areViewStatesEqual(currViewState, prevViewState)
+          (!prevViewState || !areViewStatesEqual(currViewState, prevViewState))
         );
       })
-    ) {
+      .map(view => view.id);
+    if (changed.length) {
+      const { viewStates: prevStates } = this.state;
       const viewStates = {};
       views.forEach(view => {
-        const { height, width } = view;
-        const viewState = props.viewStates.find(v => v.id === view.id);
-        viewStates[view.id] = view.filterViewState({
-          viewState: {
-            ...viewState,
-            height,
-            width,
-            id: view.id
-          }
-        });
+        if (changed.includes(view.id)) {
+          const { height, width } = view;
+          const viewState = props.viewStates.find(v => v.id === view.id);
+          viewStates[view.id] = view.filterViewState({
+            viewState: {
+              ...viewState,
+              height,
+              width,
+              id: view.id
+            }
+          });
+        } else {
+          viewStates[view.id] = prevStates[view.id];
+        }
       });
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState({ viewStates });

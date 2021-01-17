@@ -1,7 +1,15 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
-import { OverviewView, DETAIL_VIEW_ID, OVERVIEW_VIEW_ID } from '../../../src/views';
-import { generateViewTests, defaultArguments } from './VivView.spec';
+import {
+  OverviewView,
+  DETAIL_VIEW_ID,
+  OVERVIEW_VIEW_ID
+} from '../../../src/views';
+import {
+  generateViewTests,
+  defaultArguments,
+  defaultViewState
+} from './VivView.spec';
 import { OverviewLayer } from '../../../src/layers';
 
 const id = OVERVIEW_VIEW_ID;
@@ -14,14 +22,14 @@ const loader = {
 };
 const overviewViewArguments = {
   ...defaultArguments,
+  id,
   loader,
   detailHeight: 1000,
   detailWidth: 500
 };
-overviewViewArguments.initialViewState = {
-  ...defaultArguments.initialViewState
+const overviewViewState = {
+  ...defaultViewState
 };
-overviewViewArguments.initialViewState.id = OVERVIEW_VIEW_ID;
 
 const linkedViewIds = [DETAIL_VIEW_ID];
 
@@ -32,8 +40,8 @@ test(`OverviewView layer type check.`, t => {
   const layers = view.getLayers({
     props: { loader },
     viewStates: {
-      [id]: overviewViewArguments.initialViewState,
-      detail: overviewViewArguments.initialViewState
+      [id]: overviewViewState,
+      [DETAIL_VIEW_ID]: overviewViewState
     }
   });
   t.ok(

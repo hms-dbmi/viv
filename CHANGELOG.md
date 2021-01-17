@@ -13,6 +13,7 @@
 - Adjust the zoom level for tile layer if scaled.
 - Update `getDefaultInitialViewState` to return floating point zoom that fills the screen by default.
 - Upgrade geotiff to fix out-of-range requests issue.
+- Changed `initialViewState` to `viewState` in `PictureInPictureViewer` and to `viewStates` in the other viewers. The new properties control the deck.gl view state at any time and not just when the components are created.
 - Fix `maxZoom` bug.
 - Smooth transitions for global selection changes.
 - GH actions allow for running on PR as well as push (so that forked repos run tests).

@@ -5,28 +5,25 @@ import { VivView } from '../../../src/views';
 import { getVivId } from '../../../src/views/utils';
 
 export const defaultArguments = {
-  initialViewState: {
-    target: [5000, 5000, 0],
-    zoom: -4,
-    id: 'foo'
-  },
+  id: 'foo',
   x: 100,
   y: 50,
   height: 500,
   width: 1000
 };
 
+export const defaultViewState = {
+  target: [5000, 5000, 0],
+  zoom: -4
+};
+
 export function generateViewTests(ViewType, args, linkedViewIds = []) {
   test(`${ViewType.name} constructor test`, t => {
     const view = new ViewType(args);
-    const { height, width, x, y } = view;
-    t.equal(
-      view.id,
-      args.initialViewState.id,
-      `${ViewType.name} constructor should destructure initialViewState for id.`
-    );
+    const { id, height, width, x, y } = view;
+    t.ok(id, `${ViewType.name} should have its id.`);
     t.ok(height, `${ViewType.name} should have its height.`);
-    t.ok(width, `${ViewType.name} should  haveits width.`);
+    t.ok(width, `${ViewType.name} should  have its width.`);
     t.ok(x, `${ViewType.name} should have its x position.`);
     t.ok(y, `${ViewType.name} should have its y position.`);
     t.end();
@@ -61,10 +58,10 @@ export function generateViewTests(ViewType, args, linkedViewIds = []) {
 
   test(`${ViewType.name} layer test`, t => {
     const view = new ViewType(args);
-    const viewStates = { [view.id]: defaultArguments.initialViewState };
+    const viewStates = { [view.id]: defaultViewState };
     linkedViewIds.forEach(id => {
       // endow linked views with some properties
-      viewStates[id] = defaultArguments.initialViewState;
+      viewStates[id] = defaultViewState;
     });
     const layers = view.getLayers({
       props: { loader: { type: 'loads', isPyramid: true } },
