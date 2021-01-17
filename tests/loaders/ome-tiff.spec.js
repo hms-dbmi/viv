@@ -58,7 +58,6 @@ test('Correct OME-XML.', async t => {
     const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
     const { metadata } = await load(tiff);
     const { Name, Pixels } = metadata;
-    console.log(Pixels)
     t.equal(
       Name,
       'multi-channel.ome.tif',
