@@ -2,7 +2,7 @@ import type { GeoTIFFImage, RasterOptions } from 'geotiff';
 import type { TypedArray } from 'zarr';
 import { isInterleaved } from '../utils';
 
-class TiffPixelSource<S extends Array<string>> implements PixelSource<S> {
+class TiffPixelSource<S extends string[]> implements PixelSource<S> {
   private _indexer: (sel: PixelSourceSelection<S>) => Promise<GeoTIFFImage>;
 
   constructor(

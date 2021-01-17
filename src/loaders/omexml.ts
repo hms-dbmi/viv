@@ -31,13 +31,36 @@ export function fromString(str: string) {
       return { ...c.attr };
     });
     const { AquisitionDate = '', Description = '' } = img;
-    return {
+    const image = {
       ...img.attr,
       AquisitionDate,
       Description,
       Pixels: {
         ...img.Pixels.attr,
         Channels
+      }
+    };
+    return {
+      ...image,
+      format() {
+        const { Pixels } = image;
+
+        const sizes = (['X', 'Y', 'Z'] as const)
+          .map(name => {
+            const size = Pixels[`PhysicalSize${name}` as const];
+            const unit = Pixels[`PhysicalSize${name}Unit` as const];
+            return size && unit ? `${size} ${unit}` : '-';
+          })
+          .join(' x ');
+
+        return {
+          'Acquisition Date': image.AquisitionDate,
+          'Dimensions (XY)': `${Pixels.SizeX} x ${Pixels.SizeY}`,
+          'Pixels Type': Pixels.Type,
+          'Pixels Size (XYZ)': sizes,
+          'Z-sections/Timepoints': `${Pixels.SizeZ} x ${Pixels.SizeT}`,
+          Channels: Pixels.SizeC
+        };
       }
     };
   });

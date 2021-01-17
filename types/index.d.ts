@@ -30,11 +30,9 @@ interface PixelSourceMeta {
   photometricInterpretation?: number;
 }
 
-type Labels<S extends Array<string>> = [...S, 'y', 'x'] | [...S, 'y', 'x', '_c'];
+type Labels<S extends string[]> = [...S, 'y', 'x'] | [...S, 'y', 'x', '_c'];
 
-type Test = Labels<['t']>;
-
-interface PixelSource<S extends Array<string>> {
+interface PixelSource<S extends string[]> {
   getRaster(sel: RasterSelection<S>): Promise<LayerData>;
   getTile(sel: TileSelection<S>): Promise<LayerData>;
   shape: number[];

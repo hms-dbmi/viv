@@ -116,3 +116,13 @@ export function intToRgba(int: number): RGBA {
   const bytes = new Uint8Array(buffer);
   return Array.from(bytes) as RGBA;
 }
+
+/*
+ * Helper method to determine whether pixel data is interleaved or not.
+ * > isInterleaved([1, 24, 24]) === false;
+ * > isInterleaved([1, 24, 24, 3]) === true;
+ */
+export function isInterleaved(shape: number[]) {
+  const lastDimSize = shape[shape.length - 1];
+  return lastDimSize === 3 || lastDimSize === 4;
+}
