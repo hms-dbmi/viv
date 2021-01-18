@@ -1,4 +1,4 @@
-import { getDims } from '../../zarr/lib/utils';
+import { getDims } from '../../utils';
 import type { OMEXML } from '../../omexml';
 
 const DTYPE_LOOKUP = {

@@ -11,9 +11,9 @@ import Pool from './lib/Pool';
 import { load } from './ome-tiff';
 
 interface TiffOptions {
-  pool?: boolean;
   headers?: object;
   offsets?: number[];
+  pool?: boolean;
 }
 
 export async function loadOmeTiff(
