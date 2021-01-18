@@ -104,7 +104,7 @@ export default class SideBySideView extends VivView {
     } = this;
     const layerViewState = viewStates[id];
     const boundingBox = makeBoundingBox({ ...layerViewState, height, width });
-    const layers = getDetailLayers(id, props);
+    const layers = getImageLayers(id, props);
 
     const border = new PolygonLayer({
       id: `viewport-outline-${loader.type}${getVivId(id)}`,
