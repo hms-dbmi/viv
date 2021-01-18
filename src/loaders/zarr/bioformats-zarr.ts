@@ -18,8 +18,10 @@ export async function load(
   const { data } = await loadMultiscales(root, '0');
 
   const labels = guessBioformatsLabels(data[0], imgMeta);
+  const pyramid = data.map(arr => new ZarrPixelSource(arr, labels))
+
   return {
-    data: data.map(arr => new ZarrPixelSource(arr, labels)),
+    data: pyramid.filter(d => pyramid[0].tileSize === d.tileSize),
     metadata: imgMeta
   };
 }

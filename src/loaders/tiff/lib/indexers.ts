@@ -1,5 +1,4 @@
-import { GeoTIFFImage } from 'geotiff';
-import type { GeoTIFF, ImageFileDirectory } from 'geotiff';
+import type { GeoTIFFImage, GeoTIFF, ImageFileDirectory } from 'geotiff';
 import type { OmeTiffSelection } from '../ome-tiff';
 import type { OMEXML } from '../../omexml';
 
@@ -82,14 +81,14 @@ export function getSubIFDIndexer(tiff: GeoTIFF, rootMeta: OMEXML) {
 
     // Create a new image object manually from IFD
     // https://github.com/geotiffjs/geotiff.js/blob/8ef472f41b51d18074aece2300b6a8ad91a21ae1/src/geotiff.js#L447-L453
-    return new GeoTIFFImage(
+    return new (baseImage.constructor as any)(
       ifd.fileDirectory,
       ifd.geoKeyDirectory,
       tiff.dataView,
       tiff.littleEndian,
       tiff.cache,
       tiff.source
-    );
+    ) as GeoTIFFImage;
   };
 }
 
