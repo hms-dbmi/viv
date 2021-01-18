@@ -3,6 +3,7 @@ import { getRootPrefix } from './lib/utils';
 
 import { load as loadBioformats } from './bioformats-zarr';
 import { load as loadOme } from './ome-zarr';
+import { createAbortSignalProxy } from './lib/proxies';
 
 interface ZarrOptions {
   fetchOptions?: RequestInit;
@@ -19,7 +20,8 @@ export async function loadBioformatsZarr(
 
   if (typeof source === 'string') {
     const url = source.endsWith('/') ? source.slice(-1) : source;
-    const store = new HTTPStore(url + '/' + ZARR_DIR, fetchOptions);
+    let store = new HTTPStore(url + '/' + ZARR_DIR, fetchOptions);
+    store = createAbortSignalProxy(store);
     const xmlSource = await fetch(url + '/' + METADATA, fetchOptions);
     return loadBioformats(store, xmlSource);
   }
@@ -56,7 +58,8 @@ export async function loadOmeZarr(
   source: string,
   options: ZarrOptions & { type?: 'multiscales' }
 ) {
-  const store = new HTTPStore(source, options.fetchOptions);
+  let store = new HTTPStore(source, options.fetchOptions);
+  store = createAbortSignalProxy(store);
 
   if (options?.type !== 'multiscales') {
     throw Error('Only multiscale OME-Zarr is supported.');

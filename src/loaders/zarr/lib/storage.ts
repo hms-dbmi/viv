@@ -50,19 +50,28 @@ export class FileStore
 }
 
 
-export class HTTPStore
-  extends ReadOnlyStore
-  implements AsyncStore<ArrayBuffer> {
+export class HTTPStore extends ReadOnlyStore implements AsyncStore<ArrayBuffer> {
+  private _signal: AbortSignal | undefined;
+
   constructor(public url: string, public options?: RequestInit) {
     super();
+    this._signal = undefined;
   }
 
-  async getItem(key: string, options?: RequestInit) {
+  async getItem(key: string) {
     const url = joinUrlParts(this.url, key) as string;
-    if (this.options || options) {
-      options = { ...this.options, ...options };
+
+    /*
+    * If custom request options or a valid signal, 
+    * pass the signal to the fetch request.
+    */
+    let options: undefined | RequestInit;
+    if (this.options || this._signal) {
+      options = { ...this.options, signal: this._signal };
     }
+
     const value = await fetch(url, options);
+
     if (value.status === 404) {
       throw new KeyError(key);
     } else if (value.status !== 200) {
@@ -71,12 +80,17 @@ export class HTTPStore
     return value.arrayBuffer();
   }
 
-  async containsItem(key: string, options?: RequestInit) {
+  async containsItem(key: string) {
     const url = joinUrlParts(this.url, key) as string;
-    if (this.options || options) {
-      options = { ...this.options, ...options };
-    }
-    const value = await fetch(url, options);
+    const value = await fetch(url, this.options);
     return value.status === 200;
+  }
+
+  __vivAddSignal(signal: AbortSignal) {
+    this._signal = signal;
+  }
+
+  __vivClearSignal() {
+    this._signal = undefined;
   }
 }

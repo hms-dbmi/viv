@@ -1,9 +1,10 @@
 import { isInterleaved } from '../utils';
 import { getIndexer } from './lib/indexer';
-import { ABORT_SIGNAL_PROXY_KEY } from './lib/proxies';
+import type { HTTPStore } from './lib/storage';
 
 import type { ZarrArray } from 'zarr';
 import type { RawArray } from 'zarr/dist/types/rawArray';
+import type { AsyncStore } from 'zarr/dist/types/storage/types';
 
 const DTYPE_LOOKUP = {
   u1: 'Uint8',
@@ -75,18 +76,18 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     const { x, y, selection, signal } = props;
     const sel = this._chunkIndex(selection, x, y);
 
-    const { store } = this._data;
+    const store = this._data.store as HTTPStore | AsyncStore<ArrayBuffer>;
 
-    // Injects `signal` into store.getItem
-    if (signal && (<any>store)[ABORT_SIGNAL_PROXY_KEY]) {
-      (<any>store).__vivAddSignal(signal);
+    // Injects `signal` prior to zarr.js calling `store.getItem`
+    if (signal && ('__vivAddSignal' in store)) {
+      store.__vivAddSignal(signal);
     }
 
     const { data, shape } = (await this._data.getRawChunk(sel)) as RawArray;
 
-    // Clears signal from inner closure.
-    if ((<any>store)[ABORT_SIGNAL_PROXY_KEY]) {
-      (<any>store).__vivClearSignal();
+    // Clear signal from HTTPStore
+    if ('__vivClearSignal' in store) {
+      store.__vivClearSignal();
     }
 
     const [width, height] = shape;
