@@ -56,7 +56,7 @@ export function getDefaultInitialViewState(loader, viewSize, zoomBackOff = 0) {
  * @param {Object} props The layer properties.
  * @returns {Array} An array of layers.
  */
-export function getDetailLayers(id, props) {
+export function getImageLayers(id, props) {
   const {
     loader,
     loaderSelection,
