@@ -3,10 +3,11 @@ import type { ZarrArray } from 'zarr';
 import type { OMEXML } from '../../omexml';
 import { getLabels } from '../../utils';
 
+
 /*
 * Fetches key from zarr store and returns parsed object.
 */
-export async function getJson<T>(
+export async function getJson<T=any>(
   store: ZarrArray['store'],
   key: string
 ): Promise<T> {
@@ -24,7 +25,7 @@ export async function getJson<T>(
  */
 function isOmeZarr(dataShape: number[], Pixels: OMEXML[0]['Pixels']) {
   const { SizeT, SizeC, SizeZ, SizeY, SizeX } = Pixels;
-  // OME-Zarr dim order is always ['t', 'c', 'z', 'y', 'x'];
+  // OME-Zarr dim order is always ['t', 'c', 'z', 'y', 'x']
   const omeZarrShape = [SizeT, SizeC, SizeZ, SizeY, SizeX];
   return dataShape.every((size, i) => omeZarrShape[i] === size);
 }

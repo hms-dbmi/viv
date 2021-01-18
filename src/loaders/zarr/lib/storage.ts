@@ -49,6 +49,7 @@ export class FileStore
   }
 }
 
+
 export class HTTPStore
   extends ReadOnlyStore
   implements AsyncStore<ArrayBuffer> {

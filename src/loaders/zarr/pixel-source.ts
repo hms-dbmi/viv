@@ -1,5 +1,6 @@
 import { isInterleaved } from '../utils';
 import { getIndexer } from './lib/indexer';
+import { ABORT_SIGNAL_PROXY_KEY } from './lib/proxies';
 
 import type { ZarrArray } from 'zarr';
 import type { RawArray } from 'zarr/dist/types/rawArray';
@@ -14,6 +15,13 @@ const DTYPE_LOOKUP = {
 type ZarrIndexer<S extends string[]> = (
   sel: { [K in S[number]]: number } | number[]
 ) => number[];
+
+interface ZarrTileSelection {
+  x: number;
+  y: number;
+  selection: number[];
+  signal?: AbortSignal;
+}
 
 class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
   private _data: ZarrArray;
@@ -63,14 +71,24 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     return { data, width, height } as LayerData;
   }
 
-  // TODO: handle signal
-  async getTile({
-    x,
-    y,
-    selection
-  }: TileSelection<S> | { x: number; y: number; selection: number[] }) {
+  async getTile(props: TileSelection<S> | ZarrTileSelection) {
+    const { x, y, selection, signal } = props;
     const sel = this._chunkIndex(selection, x, y);
+
+    const { store } = this._data;
+
+    // Injects `signal` into store.getItem
+    if (signal && (<any>store)[ABORT_SIGNAL_PROXY_KEY]) {
+      (<any>store).__vivAddSignal(signal);
+    }
+
     const { data, shape } = (await this._data.getRawChunk(sel)) as RawArray;
+
+    // Clears signal from inner closure.
+    if ((<any>store)[ABORT_SIGNAL_PROXY_KEY]) {
+      (<any>store).__vivClearSignal();
+    }
+
     const [width, height] = shape;
     return { data, width, height } as LayerData;
   }
