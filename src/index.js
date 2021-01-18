@@ -13,15 +13,6 @@ import {
   SideBySideView,
   getDefaultInitialViewState
 } from './views';
-import {
-  createZarrLoader,
-  createBioformatsZarrLoader,
-  ZarrLoader,
-  createOMETiffLoader,
-  OMETiffLoader,
-  getChannelStats
-} from './loaders';
-import HTTPStore from './loaders/httpStore';
 import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from './constants';
 
 export {
@@ -37,14 +28,9 @@ export {
   PictureInPictureViewer,
   getDefaultInitialViewState,
   SideBySideView,
-  getChannelStats,
   SideBySideViewer,
   DetailView,
   ImageLayer,
-  ZarrLoader,
-  OMETiffLoader,
-  createOMETiffLoader,
-  createZarrLoader,
-  createBioformatsZarrLoader,
-  HTTPStore
 };
+
+export * from './loaders';

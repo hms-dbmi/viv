@@ -49,7 +49,7 @@ export default {
     workerLoader({ targetPlatform: 'browser', inline: true }),
 
     // Compiles TS (also transpiles JS source and applies JSX transforms)
-    typescript({ include: ['src/**/*', 'types/*'], target: 'es2018' }),
+    typescript({ include: ['src/**/*'], target: 'es2018' }),
 
   ]
 };

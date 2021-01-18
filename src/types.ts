@@ -1,4 +1,3 @@
-
 export type SupportedDtype = 'Uint8' | 'Uint16' | 'Uint32' | 'Float32';
 export type SupportedTypedArray = InstanceType<typeof globalThis[`${SupportedDtype}Array`]>;
 
@@ -8,7 +7,7 @@ export interface LayerData {
   height: number;
 }
 
-type PixelSourceSelection<S extends string[]> = { [K in S[number]]: number };
+export type PixelSourceSelection<S extends string[]> = { [K in S[number]]: number };
 
 export interface RasterSelection<S extends string[]> {
   selection: PixelSourceSelection<S>;
@@ -26,7 +25,7 @@ interface PhysicalSize {
   unit: string;
 }
 
-interface PixelSourceMeta {
+export interface PixelSourceMeta {
   physicalSizes?: { [key: string]: PhysicalSize; };
   photometricInterpretation?: number;
 }

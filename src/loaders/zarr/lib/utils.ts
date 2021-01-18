@@ -3,7 +3,7 @@ import type { ZarrArray } from 'zarr';
 import type { OMEXML } from '../../omexml';
 import { getLabels } from '../../utils';
 
-import type { Ome } from '../types';
+import type { RootAttrs } from '../ome-zarr';
 
 /*
 * Fetches key from zarr store and returns parsed object.
@@ -92,7 +92,7 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
   const rootAttrs = (await getJson(
     store,
     path + '/.zattrs'
-  )) as Ome.RootAttrs;
+  )) as RootAttrs;
 
   let paths = ['0'];
   if ('multiscales' in rootAttrs) {

@@ -11,7 +11,7 @@
     "allowSyntheticDefaultImports": true,
     "importsNotUsedAsValues": "error",
     "outDir": "dist",
-    "rootDir": "./",
+    "rootDir": "src/",
     "declarationDir": "dist/types",
     "declaration": true
   }
