@@ -6,6 +6,15 @@ import type { ZarrArray } from 'zarr';
 import type { RawArray } from 'zarr/dist/types/rawArray';
 import type { AsyncStore } from 'zarr/dist/types/storage/types';
 
+import type {
+  PixelSource,
+  Labels,
+  RasterSelection,
+  PixelSourceSelection,
+  LayerData,
+  TileSelection,
+} from '../../types';
+
 const DTYPE_LOOKUP = {
   u1: 'Uint8',
   u2: 'Uint16',

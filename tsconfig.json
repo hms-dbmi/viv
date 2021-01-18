@@ -1,5 +1,5 @@
 {
-  "include": ["src", "types"],
+  "include": ["src"],
   "compilerOptions": {
     "module": "esnext",
     "target": "esnext",
@@ -11,6 +11,8 @@
     "allowSyntheticDefaultImports": true,
     "importsNotUsedAsValues": "error",
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "./",
+    "declarationDir": "dist/types",
+    "declaration": true
   }
 }

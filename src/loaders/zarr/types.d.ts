@@ -1,17 +1,17 @@
-declare module Ome {
+export namespace Ome {
 
   interface Channel {
-    active: boolean;
-    color: string;
-    label: string;
-    window: {
-      min?: number;
-      max?: number;
-      start: number;
-      end: number;
-    };
+      active: boolean;
+      color: string;
+      label: string;
+      window: {
+        min?: number;
+        max?: number;
+        start: number;
+        end: number;
+      };
   };
-
+    
   interface Omero {
     channels: Channel[];
     rdefs: {
@@ -21,15 +21,15 @@ declare module Ome {
     };
     name?: string;
   };
-
+    
   interface Multiscale {
     datasets: { path: string }[];
     version?: string;
   };
-
+    
   interface RootAttrs {
     omero: Omero;
     multiscales: Multiscale[];
   };
-
+      
 }

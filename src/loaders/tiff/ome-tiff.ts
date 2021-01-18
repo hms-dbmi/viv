@@ -1,8 +1,8 @@
-import type { GeoTIFF, GeoTIFFImage } from 'geotiff';
+import type { GeoTIFF } from 'geotiff';
 import { fromString } from '../omexml';
 
 import TiffPixelSource from './pixel-source';
-import { getLegacyIndexer, getSubIFDIndexer } from './lib/indexers';
+import { getLegacyIndexer, getSubIFDIndexer, OmeTiffIndexer } from './lib/indexers';
 import { getPixelSourceMeta } from './lib/utils';
 
 export type OmeTiffSelection = { t: number; c: number; z: number };
@@ -22,10 +22,7 @@ export async function load(tiff: GeoTIFF) {
    * Thus we need a different indexer depending on which format we have.
    */
   let levels;
-  let pyramidIndexer: (
-    sel: OmeTiffSelection,
-    level: number
-  ) => Promise<GeoTIFFImage>;
+  let pyramidIndexer: OmeTiffIndexer;
 
   if (SubIFDs) {
     // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.

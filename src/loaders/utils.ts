@@ -1,6 +1,7 @@
 import quickselect from 'quickselect';
 import type { TypedArray } from 'zarr';
 import type { OMEXML } from './omexml';
+import type { Labels } from '../types';
 
 
 /**
@@ -119,15 +120,8 @@ export function isInterleaved(shape: number[]) {
 * > imgMeta.Pixels.DimensionOrder === 'XYCZT'
 * > getLabels(imgMeta.Pixels) === ['t', 'z', 'c', 'y', 'x']
 */
-export function getLabels(Pixels: OMEXML[0]['Pixels']) {
-  const { DimensionOrder } = Pixels;
-  return DimensionOrder.toLowerCase().split('').reverse() as (
-    | 't'
-    | 'c'
-    | 'z'
-    | 'y'
-    | 'x'
-  )[];
+export function getLabels(dimOrder: OMEXML[0]['Pixels']['DimensionOrder']) {
+  return dimOrder.toLowerCase().split('').reverse() as Labels<['t', 'c', 'z']>;
 }
 
 /*

@@ -3,13 +3,14 @@
   "version": "0.8.2",
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "types": "dist/types/src/index.d.ts",
   "files": [
     "dist",
     "src"
   ],
   "description": "High bit depth, high resolution, many channels, low overhead",
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup -c && tsc --emitDeclarationOnly",
     "build:w": "rollup -c --watch",
     "start": "concurrently \"npm run build:w\" \"cd avivator && npm start\"",
     "install:avivator": "cd avivator && npm install",

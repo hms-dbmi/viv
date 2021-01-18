@@ -1,4 +1,4 @@
-import { getDims } from '../../utils';
+import { getDims, getLabels } from '../../utils';
 import type { OMEXML } from '../../omexml';
 
 const DTYPE_LOOKUP = {
@@ -12,12 +12,9 @@ const DTYPE_LOOKUP = {
   int32: 'Uint32'
 } as const;
 
-type OmeLabels = Labels<['t', 'c', 'z']>;
 export function getPixelSourceMeta({ Pixels }: OMEXML[0]) {
   // e.g. 'XYZCT' -> ['t', 'c', 'z', 'y', 'x']
-  const labels = Pixels.DimensionOrder.toLowerCase()
-    .split('')
-    .reverse() as OmeLabels;
+  const labels = getLabels(Pixels.DimensionOrder);
 
   // Compute "shape" of image
   const dims = getDims(labels);

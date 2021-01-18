@@ -3,6 +3,7 @@ import type { ZarrArray } from 'zarr';
 import type { OMEXML } from '../../omexml';
 import { getLabels } from '../../utils';
 
+import type { Ome } from '../types';
 
 /*
 * Fetches key from zarr store and returns parsed object.
@@ -39,21 +40,20 @@ function isOmeZarr(dataShape: number[], Pixels: OMEXML[0]['Pixels']) {
  * This is fragile code, and will only be executed if someone
  * tries to specify different dimension orders.
  */
-type UppercaseDimName = Uppercase<ReturnType<typeof getLabels>[number]>;
 export function guessBioformatsLabels(
   { shape }: ZarrArray,
   { Pixels }: OMEXML[0]
 ) {
   if (isOmeZarr(shape, Pixels)) {
     // It's an OME-Zarr Image,
-    return ['t', 'c', 'z', 'y', 'x'] as Labels<['t', 'c', 'z']>;
+    return getLabels('XYZCT');
   }
 
   // Guess labels derived from OME-XML
-  const labels = getLabels(Pixels);
+  const labels = getLabels(Pixels.DimensionOrder);
   labels.forEach((lower, i) => {
-    const label = lower.toUpperCase() as UppercaseDimName;
-    const xmlSize = Pixels[`Size${label}` as const];
+    const label = lower.toUpperCase();
+    const xmlSize = (<any>Pixels)[`Size${label}`] as number;
     if (!xmlSize) {
       throw Error(`Dimension ${label} is invalid for OME-XML.`);
     }
@@ -62,7 +62,7 @@ export function guessBioformatsLabels(
     }
   });
 
-  return labels as Labels<['t', 'c', 'z']>;
+  return labels;
 }
 
 

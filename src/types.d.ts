@@ -1,7 +1,8 @@
-type SupportedDtype = 'Uint8' | 'Uint16' | 'Uint32' | 'Float32';
-type SupportedTypedArray = InstanceType<typeof globalThis[`${SupportedDtype}Array`]>;
 
-interface LayerData {
+export type SupportedDtype = 'Uint8' | 'Uint16' | 'Uint32' | 'Float32';
+export type SupportedTypedArray = InstanceType<typeof globalThis[`${SupportedDtype}Array`]>;
+
+export interface LayerData {
   data: SupportedTypedArray;
   width: number;
   height: number;
@@ -9,11 +10,11 @@ interface LayerData {
 
 type PixelSourceSelection<S extends string[]> = { [K in S[number]]: number };
 
-interface RasterSelection<S extends string[]> {
+export interface RasterSelection<S extends string[]> {
   selection: PixelSourceSelection<S>;
 }
 
-interface TileSelection<S extends string[]> {
+export interface TileSelection<S extends string[]> {
   x: number;
   y: number;
   selection: PixelSourceSelection<S>;
@@ -30,9 +31,9 @@ interface PixelSourceMeta {
   photometricInterpretation?: number;
 }
 
-type Labels<S extends string[]> = [...S, 'y', 'x'] | [...S, 'y', 'x', '_c'];
+export type Labels<S extends string[]> = [...S, 'y', 'x'] | [...S, 'y', 'x', '_c'];
 
-interface PixelSource<S extends string[]> {
+export interface PixelSource<S extends string[]> {
   getRaster(sel: RasterSelection<S>): Promise<LayerData>;
   getTile(sel: TileSelection<S>): Promise<LayerData>;
   shape: number[];
