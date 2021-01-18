@@ -2,7 +2,6 @@
 import test from 'tape-catch';
 import { range } from '../../../src/layers/MultiscaleImageLayer/utils';
 import { padWithDefault, padColorsAndSliders } from '../../../src/layers/utils';
-import { isInTileBounds } from '../../../src/loaders/utils';
 
 test('range test', t => {
   const expected = [0, 1, 2];
@@ -142,46 +141,6 @@ test('padColorsAndSliders test', t => {
     }),
     expected16Bit,
     'Pads with high bit depth'
-  );
-  t.end();
-});
-
-test('isInTileBounds test', t => {
-  t.ok(
-    isInTileBounds({
-      x: 0,
-      y: 0,
-      z: 0,
-      width: 10,
-      height: 10,
-      tileSize: 2,
-      numLevels: 5
-    }),
-    'Tile indices are in bounds given image dimensions'
-  );
-  t.notOk(
-    isInTileBounds({
-      x: 0,
-      y: 0,
-      z: 6,
-      width: 10,
-      height: 10,
-      tileSize: 2,
-      numLevels: 5
-    }),
-    'Tile indices are out of bounds because zoom level is less than minZoom'
-  );
-  t.notOk(
-    isInTileBounds({
-      x: 5,
-      y: 5,
-      z: 0,
-      width: 10,
-      height: 10,
-      tileSize: 2,
-      numLevels: 5
-    }),
-    'Tile indices are out of bounds because tile indices are too big for image dimensions.'
   );
   t.end();
 });

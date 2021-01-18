@@ -135,6 +135,9 @@ export function getLabels(dimOrder: OMEXML[0]['Pixels']['DimensionOrder']) {
 */
 export function getDims<S extends string>(labels: S[]) {
   const lookup = new Map(labels.map((name, i) => [name, i]));
+  if (lookup.size !== labels.length) {
+    throw Error('Labels must be unique, found duplicated label.');
+  }
   return (name: S) => {
     const index = lookup.get(name);
     if (index === undefined) {

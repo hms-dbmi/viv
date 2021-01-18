@@ -4,7 +4,7 @@ import { fromFile } from 'geotiff';
 import { load } from '../../src/loaders/tiff/ome-tiff';
 
 test('Creates correct TiffPixelSource for OME-TIFF.', async t => {
-  t.plan(5);
+  t.plan(6);
   try {
     const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
     const { data } = await load(tiff);
@@ -26,13 +26,14 @@ test('Creates correct TiffPixelSource for OME-TIFF.', async t => {
       'Photometric interpretation is 1.'
     );
     t.equal(base.meta.physicalSizes, undefined, 'No physical sizes.');
+    t.equal(base.dtype, 'Uint8', 'Data should be cast from int8 to uint8');
   } catch (e) {
     t.fail(e);
   }
 });
 
 test('Get raster data.', async t => {
-  t.plan(10);
+  t.plan(13);
   try {
     const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
     const { data } = await load(tiff);
@@ -44,6 +45,7 @@ test('Get raster data.', async t => {
       t.equal(layerData.width, 439);
       t.equal(layerData.height, 167);
       t.equal(layerData.data.length, 439 * 167);
+      t.equal(layerData.data.constructor.name, 'Uint8Array');
     }
 
     try {

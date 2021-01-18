@@ -13,12 +13,9 @@ export async function getJson<T=any>(
   key: string
 ): Promise<T> {
   const buf = await store.getItem(key);
-  if (buf instanceof ArrayBuffer) {
-    const text = new TextDecoder().decode(buf);
-    const json = JSON.parse(text);
-    return json as T;
-  }
-  return (buf as unknown) as T;
+  const text = new TextDecoder().decode(buf as ArrayBuffer);
+  const json = JSON.parse(text);
+  return json as T;
 }
 
 /*
@@ -88,7 +85,7 @@ export function getRootPrefix(files: { path: string }[], rootName: string) {
 
 
 export async function loadMultiscales(store: ZarrArray['store'], path = '') {
-  path = path.endsWith('/') ? path.slice(-1) : path;
+  path = path.endsWith('/') ? path.slice(0, -1) : path;
   const rootAttrs = (await getJson(
     store,
     path + '/.zattrs'
