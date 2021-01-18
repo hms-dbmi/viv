@@ -28,6 +28,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
+ * @param {Array} [transitionFields] A string array indicating which fields require a transition: Default: ['time', 'z'].
  */
 const SideBySideViewer = props => {
   const {
@@ -48,13 +49,14 @@ const SideBySideViewer = props => {
     lensBorderColor = [255, 255, 255],
     lensBorderRadius = 0.02,
     transparentColor,
-    onViewStateChange
+    onViewStateChange,
+    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS
   } = props;
   const {
     newLoaderSelection,
     oldLoaderSelection,
     onViewportLoad
-  } = useGlobalSelection(loaderSelection);
+  } = useGlobalSelection(loaderSelection, transitionFields);
   const viewState =
     initialViewState ||
     getDefaultInitialViewState(loader, { height, width }, 0.5);
@@ -83,7 +85,7 @@ const SideBySideViewer = props => {
     loaderSelection: oldLoaderSelection,
     newLoaderSelection,
     onViewportLoad,
-    transitionFields: GLOBAL_SLIDER_DIMENSION_FIELDS,
+    transitionFields,
     colormap,
     isLensOn,
     lensSelection,

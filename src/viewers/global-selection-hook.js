@@ -1,7 +1,6 @@
 import { useState } from 'react'; // eslint-disable-line import/no-unresolved
-import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 
-export default function useGlobalSelection(loaderSelection) {
+export default function useGlobalSelection(loaderSelection, transitionFields) {
   // viewportSelection is the last selection that had an onViewportLoad callback.
   const [viewportSelection, setViewportSelection] = useState(loaderSelection);
   let onViewportLoad;
@@ -10,7 +9,7 @@ export default function useGlobalSelection(loaderSelection) {
   if (
     loaderSelection?.length &&
     viewportSelection?.length &&
-    GLOBAL_SLIDER_DIMENSION_FIELDS.some(
+    transitionFields.some(
       f => loaderSelection[0][f] !== viewportSelection[0][f]
     )
   ) {

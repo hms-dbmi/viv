@@ -27,7 +27,8 @@ const defaultProps = {
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   maxRequests: { type: 'number', value: 10, compare: true },
   onClick: { type: 'function', value: null, compare: true },
-  transparentColor: { type: 'array', value: null, compare: true }
+  transparentColor: { type: 'array', value: null, compare: true },
+  refinementStrategy: { type: 'string', value: null, compare: true }
 };
 
 /**
