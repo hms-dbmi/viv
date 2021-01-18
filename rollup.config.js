@@ -28,6 +28,7 @@ export default {
   input: config.input,
   output: config.output,
   external: [
+    ...['fs/promises', 'path'], // for testing
     ...Object.keys(pkg.peerDependencies),
     ...Object.keys(pkg.dependencies),
     ...Object.keys(pkg.devDependencies),
