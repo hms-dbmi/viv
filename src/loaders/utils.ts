@@ -2,31 +2,14 @@ import quickselect from 'quickselect';
 import type { TypedArray } from 'zarr';
 import type { OMEXML } from './omexml';
 
-/**
- * Flips the bytes of TypedArray in place. Used to flipendianess
- * Adapted from https://github.com/zbjornson/node-bswap/blob/master/bswap.js
- * @param {TypedArray} src
- * @returns {void}
- */
-export function byteSwapInplace(src: TypedArray) {
-  const b = src.BYTES_PER_ELEMENT;
-  const flipper = new Uint8Array(src.buffer, src.byteOffset, src.length * b);
-  const numFlips = b / 2;
-  const endByteIndex = b - 1;
-  let t = 0;
-  for (let i = 0; i < flipper.length; i += b) {
-    for (let j = 0; j < numFlips; j += 1) {
-      t = flipper[i + j];
-      flipper[i + j] = flipper[i + endByteIndex - j];
-      flipper[i + endByteIndex - j] = t;
-    }
-  }
-}
+export const VIV_PROXY_KEY = '__viv'
+
 
 /**
  * Computes statics from layer data.
- * This is helpful for generating histograms or scaling sliders to a reasonable range.
- * Also provided are "autoSliders" which are slider bounds that should give a good initial image.
+ * This is helpful for generating histograms or scaling sliders to a
+ * reasonable range. Also provided are "autoSliders" which are slider
+ * bounds that should give a good initial image.
  */
 export function getChannelStats(arr: TypedArray) {
   let len = arr.length;
@@ -100,10 +83,14 @@ export function ensureArray<T>(x: T | T[]) {
   return Array.isArray(x) ? x : [x];
 }
 
-type RGBA = [r: number, g: number, b: number, a: number];
-
-// Adapted from: https://github.com/ome/ome-zarr-py/blob/db60b8272e0fe005920f8a296d4828b7a32e663e/ome_zarr/conversions.py#L16
-export function intToRgba(int: number): RGBA {
+/*
+* Converts 32-bit integer color representation to RGBA tuple.
+* Used to serialize colors from OME-XML metadata.
+* 
+* > console.log(intToRgba(100100));
+* > // [0, 1, 135, 4]
+*/
+export function intToRgba(int: number) {
   if (!Number.isInteger(int)) {
     throw Error('Not an integer.');
   }
@@ -115,7 +102,7 @@ export function intToRgba(int: number): RGBA {
 
   // Take u8 view and extract number for each byte (1 byte for R/G/B/A).
   const bytes = new Uint8Array(buffer);
-  return Array.from(bytes) as RGBA;
+  return Array.from(bytes) as [number, number, number, number];
 }
 
 /*

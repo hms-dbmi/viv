@@ -1,7 +1,7 @@
 import type { GeoTIFF } from 'geotiff';
 import type Pool from './Pool';
 
-const VIV_PROXY_KEY = '__viv';
+import { VIV_PROXY_KEY } from '../../utils';
 const OFFSETS_PROXY_KEY = `${VIV_PROXY_KEY}-offsets` as const;
 const POOL_PROXY_KEY = `${VIV_PROXY_KEY}-decoder-pool` as const;
 
