@@ -14,7 +14,7 @@ export default class DetailView extends VivView {
     const { loader } = props;
     const { id, height, width } = this;
     const layerViewState = viewStates[id];
-    const layers = getDetailLayers(id, props);
+    const layers = getImageLayers(id, props);
 
     const { physicalSizes } = loader;
     if (physicalSizes) {
