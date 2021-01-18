@@ -1,5 +1,6 @@
 import quickselect from 'quickselect';
 import type { TypedArray } from 'zarr';
+import type { OMEXML } from './omexml';
 
 /**
  * Flips the bytes of TypedArray in place. Used to flipendianess
@@ -125,4 +126,41 @@ export function intToRgba(int: number): RGBA {
 export function isInterleaved(shape: number[]) {
   const lastDimSize = shape[shape.length - 1];
   return lastDimSize === 3 || lastDimSize === 4;
+}
+
+
+/*
+* Creates typed labels from DimensionOrder.
+* > imgMeta.Pixels.DimensionOrder === 'XYCZT'
+* > getLabels(imgMeta.Pixels) === ['t', 'z', 'c', 'y', 'x']
+*/
+export function getLabels(Pixels: OMEXML[0]['Pixels']) {
+  const { DimensionOrder } = Pixels;
+  return DimensionOrder.toLowerCase().split('').reverse() as (
+    | 't'
+    | 'c'
+    | 'z'
+    | 'y'
+    | 'x'
+  )[];
+}
+
+/*
+* Creates an ES6 map of 'label' -> index
+* > const labels = ['a', 'b', 'c', 'd'];
+* > const dims = getDims(labels);
+* > dims('a') === 0;
+* > dims('b') === 1;
+* > dims('c') === 2;
+* > dims('hi!'); // throws
+*/
+export function getDims<S extends string>(labels: S[]) {
+  const lookup = new Map(labels.map((name, i) => [name, i]));
+  return (name: S) => {
+    const index = lookup.get(name);
+    if (index === undefined) {
+      throw Error('Invalid dimension.');
+    }
+    return index;
+  };
 }
