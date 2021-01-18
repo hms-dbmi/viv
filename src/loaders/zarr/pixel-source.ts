@@ -68,7 +68,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
   async getRaster({ selection }: RasterSelection<S> | { selection: number[] }) {
     const sel = this._chunkIndex(selection, null, null);
     const { data, shape } = (await this._data.getRaw(sel)) as RawArray;
-    const [width, height] = shape;
+    const [height, width] = shape;
     return { data, width, height } as LayerData;
   }
 
@@ -90,7 +90,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
       store.__vivClearSignal();
     }
 
-    const [width, height] = shape;
+    const [height, width] = shape;
     return { data, width, height } as LayerData;
   }
 }
