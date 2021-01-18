@@ -2,8 +2,6 @@ import quickselect from 'quickselect';
 import type { TypedArray } from 'zarr';
 import type { OMEXML } from './omexml';
 
-export const VIV_PROXY_KEY = '__viv'
-
 
 /**
  * Computes statics from layer data.
