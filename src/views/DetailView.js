@@ -1,6 +1,6 @@
 import { ScaleBarLayer } from '../layers';
 import VivView from './VivView';
-import { getDetailLayers, getVivId } from './utils';
+import { getImageLayers, getVivId } from './utils';
 import { OVERVIEW_VIEW_ID } from './OverviewView';
 
 export const DETAIL_VIEW_ID = 'detail';
