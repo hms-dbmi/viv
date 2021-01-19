@@ -103,7 +103,9 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z, signal }) => {
       // Early return if no loaderSelection
-      if (!loaderSelection || loaderSelection.length === 0) return null;
+      if (!loaderSelection || loaderSelection.length === 0) {
+        return null;
+      }
 
       // I don't fully undertstand why this works, but I have a sense.
       // It's basically to cancel out:
@@ -114,8 +116,15 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       z = Math.round(-z + Math.log2(512 / tileSize));
       const getTile = selection =>
         loader[z].getTile({ x, y, selection, signal });
-      const tiles = await Promsise.all(loaderSelection.map(getTile));
 
+      const promises = Promise.all(loaderSelection.map(getTile));
+
+      // If the signal is aborted, return null before awaiting the data.
+      if (signal?.aborted) {
+        return null;
+      }
+
+      const tiles = await promises;
       const tile = {
         data: tiles.map(d => d.data),
         width: tiles[0].width,
