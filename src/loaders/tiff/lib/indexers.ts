@@ -64,7 +64,7 @@ export function getSubIFDIndexer(
 ): OmeTiffIndexer {
   const imgMeta = rootMeta[0];
   const ifdIndexer = getIFDIndexer(imgMeta);
-  const ifdCache: Map<string, ImageFileDirectory> = new Map();
+  const ifdCache: Map<string, Promise<ImageFileDirectory>> = new Map();
 
   return async (sel: OmeTiffSelection, pyramidLevel: number) => {
     const index = ifdIndexer(sel);
@@ -82,13 +82,12 @@ export function getSubIFDIndexer(
 
     // Get IFD for the selection at the pyramidal level
     const key = `${sel.t}-${sel.c}-${sel.z}-${pyramidLevel}`;
-    let ifd = ifdCache.get(key);
-    if (!ifd) {
+    if (!ifdCache.has(key)) {
       // Only create a new request if we don't have the key.
       const subIfdOffset = SubIFDs[pyramidLevel - 1];
-      ifd = await tiff.parseFileDirectoryAt(subIfdOffset);
-      ifdCache.set(key, ifd);
+      ifdCache.set(key, tiff.parseFileDirectoryAt(subIfdOffset));
     }
+    const ifd = await ifdCache.get(key) as ImageFileDirectory;
 
     // Create a new image object manually from IFD
     // https://github.com/geotiffjs/geotiff.js/blob/8ef472f41b51d18074aece2300b6a8ad91a21ae1/src/geotiff.js#L447-L453
