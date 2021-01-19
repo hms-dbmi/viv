@@ -1,7 +1,7 @@
 import quickselect from 'quickselect';
 import type { TypedArray } from 'zarr';
 import type { OMEXML } from './omexml';
-import type { Labels } from '../types';
+import type { Labels, PixelSource } from '../types';
 
 /**
  * Computes statics from layer data.
@@ -153,8 +153,8 @@ export function getDims<S extends string>(labels: S[]) {
 }
 
 
-export function getImageSize(shape: number[]) {
-  const interleaved = isInterleaved(shape);
-  const [height, width] = shape.slice(interleaved ? -3 : -2);
+export function getImageSize<T extends string[]>(source: PixelSource<T>) {
+  const interleaved = isInterleaved(source.shape);
+  const [height, width] = source.shape.slice(interleaved ? -3 : -2);
   return { height, width };
 }
