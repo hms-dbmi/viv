@@ -14,6 +14,7 @@
 - Update `getDefaultInitialViewState` to return floating point zoom that fills the screen by default.
 - Fix `maxZoom` bug.
 - Smooth transitions for global selection changes.
+- GH actions allow for running on PR as well as push (so that forked repos run tests).
 
 ## 0.8.2
 
