@@ -18,18 +18,14 @@ toc:
 - SideBySideView
 - name: Utility Methods
 - getChannelStats
+- getDefaultInitialViewState
 - name: Layers
 - MultiscaleImageLayer
 - ImageLayer
 - ScaleBarLayer
+- XRLayer
 - name: Loaders
 - createOMETiffLoader
 - OMETiffLoader
 - ZarrLoader
-- name: Internal
-- XRLayer
-- OverviewLayer
-- MultiscaleImageLayerBase
-- makeBoundingBox
-- Pool
 

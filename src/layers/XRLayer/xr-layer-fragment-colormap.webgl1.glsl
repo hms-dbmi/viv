@@ -17,6 +17,9 @@ uniform vec2 sliderValues[6];
 uniform float opacity;
 uniform float divisor;
 
+// uniforms for making a transparent color.
+uniform bool useTransparentColor;
+
 varying vec2 vTexCoord;
 
 
@@ -37,7 +40,7 @@ void main() {
   intensityCombo += max(0.0,intensityValue4);
   intensityCombo += max(0.0,intensityValue5);
 
-  gl_FragColor = colormap(intensityCombo, opacity);
+  gl_FragColor = colormap(intensityCombo, opacity, useTransparentColor);
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }

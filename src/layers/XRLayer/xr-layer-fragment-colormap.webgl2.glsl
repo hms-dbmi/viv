@@ -18,6 +18,9 @@ uniform vec2 sliderValues[6];
 // opacity
 uniform float opacity;
 
+// uniforms for making a transparent color.
+uniform bool useTransparentColor;
+
 in vec2 vTexCoord;
 
 out vec4 color;
@@ -37,7 +40,7 @@ void main() {
   for(int i = 0; i < 6; i++) {
     intensityCombo += max(0.0,intensityArray[i]);
   }
-  color = colormap(intensityCombo, opacity);
+  color = colormap(intensityCombo, opacity, useTransparentColor);
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(color, geometry);
 }

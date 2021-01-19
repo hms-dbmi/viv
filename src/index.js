@@ -2,7 +2,9 @@ import {
   MultiscaleImageLayer,
   ImageLayer,
   ScaleBarLayer,
-  XRLayer
+  XRLayer,
+  OverviewLayer,
+  BitmapLayer
 } from './layers';
 import { VivViewer, PictureInPictureViewer, SideBySideViewer } from './viewers';
 import {
@@ -29,6 +31,8 @@ export {
   ScaleBarLayer,
   MultiscaleImageLayer,
   XRLayer,
+  OverviewLayer,
+  BitmapLayer,
   VivViewer,
   VivView,
   OverviewView,

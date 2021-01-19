@@ -4,17 +4,46 @@
 
 ### Added
 
+- Document support for `bfconvert` as a cli tool for generating image pyramids as well as the new pyramidal tiff spec.
+- Issue templates for Github.
+- Add `transparentColor` to allow the layer to set a color to be "transparent" (or use the automatically calculated one when colormaps are set).
+
+### Changed
+
+- Adjust the zoom level for tile layer if scaled.
+- Update `getDefaultInitialViewState` to return floating point zoom that fills the screen by default.
+- Fix `maxZoom` bug.
+- Smooth transitions for global selection changes.
+- GH actions allow for running on PR as well as push (so that forked repos run tests).
+
+## 0.8.2
+
+### Added
+
+### Changed
+
+- Fix opacity with photometric interpretations.
+- Only show background image when opacity is 1 (and viewport id prop matches that of the current viewport).
+- Fix `minZoom` calculation bug in `MultiscaleImageLayer`.
+
+## 0.8.1
+
+### Added
+
+- Property `onViewStateChange` of all viewers accepts a callback for deck.gl view state changes.
+- Add a click handler to the overview that centers the detail view on the click position. The handler can be turned off by setting the `PictureInPictureViewer` property `clickCenter` to `false`.
+- Support interleaved RGB OME-TIFF files.
+
 ### Changed
 
 - Fix documentation of instances where spreading is used in the arguments for a function.
-- GH actions allow for running on PR as well as push (so that forked repos run tests).
+- Fix link to bioformats in README
 
 ## 0.8.0
 
 ### Added
 
-- Export a `getDefaultInitialViewState` function for getting a deafult inital view state given a loader and desired size of view.
-- Support interleaved RGB OME-TIFF files.
+- Export a `getDefaultInitialViewState` function for getting a default initial view state given a loader and desired size of view.
 - Added a README file for Avivator at `avivator/README.md`.
 
 ### Changed

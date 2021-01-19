@@ -1,10 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
-import { OverviewView } from '../../../src/views';
+import { OverviewView, DETAIL_VIEW_ID, OVERVIEW_VIEW_ID } from '../../../src/views';
 import { generateViewTests, defaultArguments } from './VivView.spec';
 import { OverviewLayer } from '../../../src/layers';
 
-const id = 'overview';
+const id = OVERVIEW_VIEW_ID;
 const loader = {
   type: 'loads',
   numLevels: 7,
@@ -21,9 +21,9 @@ const overviewViewArguments = {
 overviewViewArguments.initialViewState = {
   ...defaultArguments.initialViewState
 };
-overviewViewArguments.initialViewState.id = 'overview';
+overviewViewArguments.initialViewState.id = OVERVIEW_VIEW_ID;
 
-const linkedViewIds = ['detail'];
+const linkedViewIds = [DETAIL_VIEW_ID];
 
 generateViewTests(OverviewView, overviewViewArguments, linkedViewIds);
 

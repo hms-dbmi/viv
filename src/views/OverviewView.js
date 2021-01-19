@@ -1,25 +1,54 @@
-import { OrthographicView } from '@deck.gl/core';
+/* eslint-disable max-classes-per-file */
+import { Controller, OrthographicView } from '@deck.gl/core';
 import VivView from './VivView';
 import { OverviewLayer } from '../layers';
 import { makeBoundingBox, getVivId } from './utils';
+
+export const OVERVIEW_VIEW_ID = 'overview';
+
+class OverviewState {}
+
+class OverviewController extends Controller {
+  constructor(props) {
+    super(OverviewState, props);
+    this.events = ['click'];
+  }
+
+  handleEvent(event) {
+    if (event.type !== 'click') {
+      return;
+    }
+    let [x, y] = this.getCenter(event);
+    const { width, height, zoom, scale } = this.controllerStateProps;
+    if (x < 0 || y < 0 || x > width || y > height) {
+      return;
+    }
+    const scaleFactor = 1 / (2 ** zoom * scale);
+    x *= scaleFactor;
+    y *= scaleFactor;
+    if (this.onViewStateChange) {
+      this.onViewStateChange({ viewState: { target: [x, y, 0] } });
+    }
+  }
+}
 
 /**
  * This class generates a OverviewLayer and a view for use in the VivViewer as an overview to a Detailview (they must be used in conjection).
  * From the base class VivView, only the initialViewState argument is used.  This class uses private methods to position its x and y from the
  * additional arguments:
  * @param {Object} args
- * @param {Object} args.height Width of the view.
- * @param {Object} args.width Height of the view.
+ * @param {Object} args.initialViewState ViewState object: { target: [x, y, 0], zoom: -zoom }.
  * @param {Object} args.loader Loader to be used for inferring zoom level and fetching data.  It must have the properies `dtype`, `numLevels`, and `tileSize` and implement `getTile` and `getRaster`.
  * @param {number} args.detailHeight Height of the detail view.
  * @param {number} args.detailWidth Width of the detail view.
- * @param {number} args.scale Scale of this viewport relative to the detail. Default is .2.
- * @param {number} args.margin Margin to be offset from the the corner of the other viewport. Default is 25.
- * @param {string} args.position Location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."  Default is 'bottom-right'.
- * @param {number} args.minimumWidth Absolute lower bound for how small the viewport should scale. Default is 150.
- * @param {number} args.maximumWidth Absolute upper bound for how large the viewport should scale. Default is 350.
- * @param {number} args.minimumHeight Absolute lower bound for how small the viewport should scale. Default is 150.
- * @param {number} args.maximumHeight Absolute upper bound for how large the viewport should scale. Default is 350.
+ * @param {number} [args.scale] Scale of this viewport relative to the detail. Default is .2.
+ * @param {number} [args.margin] Margin to be offset from the the corner of the other viewport. Default is 25.
+ * @param {string} [args.position] Location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."  Default is 'bottom-right'.
+ * @param {number} [args.minimumWidth] Absolute lower bound for how small the viewport should scale. Default is 150.
+ * @param {number} [args.maximumWidth] Absolute upper bound for how large the viewport should scale. Default is 350.
+ * @param {number} [args.minimumHeight] Absolute lower bound for how small the viewport should scale. Default is 150.
+ * @param {number} [args.maximumHeight] Absolute upper bound for how large the viewport should scale. Default is 350.
+ * @param {Boolean} [args.clickCenter] Click to center the default view. Default is true.
  * */
 export default class OverviewView extends VivView {
   constructor({
@@ -33,7 +62,8 @@ export default class OverviewView extends VivView {
     minimumWidth = 150,
     maximumWidth = 350,
     minimumHeight = 150,
-    maximumHeight = 350
+    maximumHeight = 350,
+    clickCenter = true
   }) {
     super({ initialViewState });
     this.margin = margin;
@@ -51,6 +81,7 @@ export default class OverviewView extends VivView {
       maximumHeight
     });
     this._setXY();
+    this.clickCenter = clickCenter;
   }
 
   /**
@@ -126,10 +157,11 @@ export default class OverviewView extends VivView {
   }
 
   getDeckGlView() {
-    const { x, y, id, height, width } = this;
+    const { x, y, id, height, width, scale, clickCenter } = this;
+    const controller = clickCenter && { type: OverviewController, scale };
     return new OrthographicView({
       id,
-      controller: false,
+      controller,
       height,
       width,
       x,

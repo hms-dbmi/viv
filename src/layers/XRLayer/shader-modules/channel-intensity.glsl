@@ -90,6 +90,10 @@ vec3 process_channel_intensity(float intensity, vec3 colorValues, int channelInd
   return hsv_to_rgb(hsvCombo);
 }
 
-vec4 colormap(float intensity, float opacity) {
-  return vec4(COLORMAP_FUNCTION(min(1.0,intensity)).xyz, opacity);
+vec4 apply_opacity(vec3 color, bool useTransparentColor, vec3 transparentColor, float opacity){
+  return vec4(color, (color == transparentColor && useTransparentColor) ? 0.0 : opacity);
+}
+
+vec4 colormap(float intensity, float opacity, bool useTransparentColor) {
+  return apply_opacity(COLORMAP_FUNCTION(min(1.0,intensity)).xyz, useTransparentColor, COLORMAP_FUNCTION(0.0).xyz, opacity);
 }
