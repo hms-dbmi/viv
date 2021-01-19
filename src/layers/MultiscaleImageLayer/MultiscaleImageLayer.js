@@ -28,7 +28,8 @@ const defaultProps = {
   maxRequests: { type: 'number', value: 10, compare: true },
   onClick: { type: 'function', value: null, compare: true },
   transparentColor: { type: 'array', value: null, compare: true },
-  refinementStrategy: { type: 'string', value: null, compare: true }
+  refinementStrategy: { type: 'string', value: null, compare: true },
+  excludeBackground: { type: 'boolean', value: false, compare: true }
 };
 
 /**
@@ -58,6 +59,8 @@ const defaultProps = {
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
+ * @param {string} props.refinementStrategy 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
+ * @param {boolean} props.excludeBackground Whether to exclude the background image. The background image is also excluded for opacity!=1.
  */
 
 export default class MultiscaleImageLayer extends CompositeLayer {

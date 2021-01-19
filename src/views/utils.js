@@ -58,12 +58,13 @@ export function getDefaultInitialViewState(loader, viewSize, zoomBackOff = 0) {
  */
 export function getImageLayers(id, props) {
   const {
-    loader,
     loaderSelection,
     newLoaderSelection,
     onViewportLoad,
-    transitionFields
+    transitionFields,
+    ...layerProps
   } = props;
+  const { loader } = layerProps;
   // Create at least one layer even without loaderSelection so that the tests pass.
   if (loader.isPyramid) {
     return [loaderSelection, newLoaderSelection]
@@ -81,7 +82,7 @@ export function getImageLayers(id, props) {
               }
             : {};
         return new MultiscaleImageLayer({
-          ...props,
+          ...layerProps,
           ...newProps,
           loaderSelection: s,
           id: `${loader.type}${getVivId(id)}${suffix}`,
@@ -90,9 +91,10 @@ export function getImageLayers(id, props) {
       });
   }
   return [
-    new ImageLayer(props, {
+    new ImageLayer(layerProps, {
       id: `${loader.type}${getVivId(id)}`,
-      viewportId: id
+      viewportId: id,
+      loaderSelection
     })
   ];
 }
