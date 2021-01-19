@@ -3,7 +3,7 @@ import { PolygonLayer } from '@deck.gl/layers';
 import { Matrix4 } from 'math.gl';
 
 import ImageLayer from './ImageLayer';
-import { isInterleaved } from '../loaders/utils';
+import { getImageSize } from '../loaders/utils';
 
 const defaultProps = {
   pickable: true,
