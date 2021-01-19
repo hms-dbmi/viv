@@ -61,8 +61,9 @@ export class FileStore
   }
 }
 
-
-export class HTTPStore extends ReadOnlyStore implements AsyncStore<ArrayBuffer> {
+export class HTTPStore
+  extends ReadOnlyStore
+  implements AsyncStore<ArrayBuffer> {
   private _signal: AbortSignal | undefined;
 
   constructor(public url: string, public options?: RequestInit) {
@@ -74,9 +75,9 @@ export class HTTPStore extends ReadOnlyStore implements AsyncStore<ArrayBuffer> 
     const url = joinUrlParts(this.url, key) as string;
 
     /*
-    * If custom request options or a valid signal, 
-    * pass the signal to the fetch request.
-    */
+     * If custom request options or a valid signal,
+     * pass the signal to the fetch request.
+     */
     let options: undefined | RequestInit;
     if (this.options || this._signal) {
       options = { ...this.options, signal: this._signal };

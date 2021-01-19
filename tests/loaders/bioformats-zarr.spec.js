@@ -31,7 +31,6 @@ test('Creates correct ZarrPixelSource.', async t => {
   }
 });
 
-
 test('Get raster data.', async t => {
   t.plan(10);
   try {
@@ -55,7 +54,6 @@ test('Get raster data.', async t => {
     t.fail(e);
   }
 });
-
 
 test('Correct OME-XML.', async t => {
   t.plan(9);

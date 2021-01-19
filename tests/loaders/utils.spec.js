@@ -1,6 +1,10 @@
 import test from 'tape';
 
-import { intToRgba, getChannelStats, isInterleaved } from '../../src/loaders/utils';
+import {
+  intToRgba,
+  getChannelStats,
+  isInterleaved
+} from '../../src/loaders/utils';
 
 test('getChannelStats: Small', t => {
   t.plan(6);
@@ -71,9 +75,8 @@ test('Convert int to RGBA color', t => {
   t.deepEqual(intToRgba(100100), [0, 1, 135, 4]);
 });
 
-
 test('isInterleaved', t => {
-  t.plan(4)
+  t.plan(4);
   t.ok(isInterleaved([1, 2, 400, 400, 4]));
   t.ok(isInterleaved([1, 2, 400, 400, 3]));
   t.ok(!isInterleaved([1, 2, 400, 400]));

@@ -12,7 +12,7 @@ import type {
   RasterSelection,
   PixelSourceSelection,
   LayerData,
-  TileSelection,
+  TileSelection
 } from '../../types';
 
 const DTYPE_LOOKUP = {
@@ -88,7 +88,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     const store = this._data.store as HTTPStore | AsyncStore<ArrayBuffer>;
 
     // Injects `signal` prior to zarr.js calling `store.getItem`
-    if (signal && ('__vivAddSignal' in store)) {
+    if (signal && '__vivAddSignal' in store) {
       store.__vivAddSignal(signal);
     }
 

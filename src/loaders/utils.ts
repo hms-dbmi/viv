@@ -1,8 +1,6 @@
 import quickselect from 'quickselect';
 import type { TypedArray } from 'zarr';
 import type { OMEXML } from './omexml';
-import type { Labels } from '../types';
-
 
 /**
  * Computes statics from layer data.
@@ -83,12 +81,12 @@ export function ensureArray<T>(x: T | T[]) {
 }
 
 /*
-* Converts 32-bit integer color representation to RGBA tuple.
-* Used to serialize colors from OME-XML metadata.
-* 
-* > console.log(intToRgba(100100));
-* > // [0, 1, 135, 4]
-*/
+ * Converts 32-bit integer color representation to RGBA tuple.
+ * Used to serialize colors from OME-XML metadata.
+ *
+ * > console.log(intToRgba(100100));
+ * > // [0, 1, 135, 4]
+ */
 export function intToRgba(int: number) {
   if (!Number.isInteger(int)) {
     throw Error('Not an integer.');
@@ -114,25 +112,35 @@ export function isInterleaved(shape: number[]) {
   return lastDimSize === 3 || lastDimSize === 4;
 }
 
+type ReverseSplit<S extends string, D extends string> = string extends S
+  ? string[]
+  : S extends ''
+  ? []
+  : S extends `${infer T}${D}${infer U}`
+  ? [...ReverseSplit<U, D>, T]
+  : [S];
 
 /*
-* Creates typed labels from DimensionOrder.
-* > imgMeta.Pixels.DimensionOrder === 'XYCZT'
-* > getLabels(imgMeta.Pixels) === ['t', 'z', 'c', 'y', 'x']
-*/
+ * Creates typed labels from DimensionOrder.
+ * > imgMeta.Pixels.DimensionOrder === 'XYCZT'
+ * > getLabels(imgMeta.Pixels) === ['t', 'z', 'c', 'y', 'x']
+ */
 export function getLabels(dimOrder: OMEXML[0]['Pixels']['DimensionOrder']) {
-  return dimOrder.toLowerCase().split('').reverse() as Labels<['t', 'c', 'z']>;
+  return dimOrder.toLowerCase().split('').reverse() as ReverseSplit<
+    Lowercase<typeof dimOrder>,
+    ''
+  >;
 }
 
 /*
-* Creates an ES6 map of 'label' -> index
-* > const labels = ['a', 'b', 'c', 'd'];
-* > const dims = getDims(labels);
-* > dims('a') === 0;
-* > dims('b') === 1;
-* > dims('c') === 2;
-* > dims('hi!'); // throws
-*/
+ * Creates an ES6 map of 'label' -> index
+ * > const labels = ['a', 'b', 'c', 'd'];
+ * > const dims = getDims(labels);
+ * > dims('a') === 0;
+ * > dims('b') === 1;
+ * > dims('c') === 2;
+ * > dims('hi!'); // throws
+ */
 export function getDims<S extends string>(labels: S[]) {
   const lookup = new Map(labels.map((name, i) => [name, i]));
   if (lookup.size !== labels.length) {

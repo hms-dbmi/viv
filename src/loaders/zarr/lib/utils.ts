@@ -6,9 +6,9 @@ import { getLabels } from '../../utils';
 import type { RootAttrs } from '../ome-zarr';
 
 /*
-* Fetches key from zarr store and returns parsed object.
-*/
-export async function getJson<T=any>(
+ * Fetches key from zarr store and returns parsed object.
+ */
+export async function getJson<T = any>(
   store: ZarrArray['store'],
   key: string
 ): Promise<T> {
@@ -62,7 +62,6 @@ export function guessBioformatsLabels(
   return labels;
 }
 
-
 /*
  * Looks for the first file with root path and returns the full path prefix.
  *
@@ -83,13 +82,9 @@ export function getRootPrefix(files: { path: string }[], rootName: string) {
   return first.path.slice(prefixLength);
 }
 
-
 export async function loadMultiscales(store: ZarrArray['store'], path = '') {
   path = path.endsWith('/') ? path.slice(0, -1) : path;
-  const rootAttrs = (await getJson(
-    store,
-    path + '/.zattrs'
-  )) as RootAttrs;
+  const rootAttrs = (await getJson(store, path + '/.zattrs')) as RootAttrs;
 
   let paths = ['0'];
   if ('multiscales' in rootAttrs) {

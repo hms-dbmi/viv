@@ -1,4 +1,3 @@
-
 declare module 'geotiff' {
   import type { TypedArray } from 'zarr';
 
@@ -17,7 +16,10 @@ declare module 'geotiff' {
   }
 
   interface Pool {
-    decode(fileDirectory: FileDirectory, buffer: ArrayBuffer): Promise<ArrayBuffer>;
+    decode(
+      fileDirectory: FileDirectory,
+      buffer: ArrayBuffer
+    ): Promise<ArrayBuffer>;
   }
 
   interface RasterOptions {
@@ -32,8 +34,11 @@ declare module 'geotiff' {
     enableAlpha?: boolean;
     signal?: AbortSignal;
   }
-  
-  type RasterData = (TypedArray | TypedArray[]) & { width: number, height: number };
+
+  type RasterData = (TypedArray | TypedArray[]) & {
+    width: number;
+    height: number;
+  };
   class GeoTIFFImage {
     constructor(
       fileDirectory: FileDirectory,
@@ -55,7 +60,6 @@ declare module 'geotiff' {
     readRasters(options?: RasterOptions): Promise<RasterData>;
   }
 
-
   interface FileDirectory {
     ImageDescription: string;
     SubIFDs?: number[];
@@ -66,7 +70,6 @@ declare module 'geotiff' {
     fileDirectory: FileDirectory;
     geoKeyDirectory: any;
   }
-
 }
 
 // Imported in src/loaders/tiff/Pool/decoder.worker.js
@@ -74,24 +77,31 @@ declare module 'geotiff/src/compression' {
   import type { FileDirectory } from 'geotiff';
 
   interface Decoder {
-    decode(fileDirectory: FileDirectory, buffer: ArrayBuffer): Promise<ArrayBuffer>;
+    decode(
+      fileDirectory: FileDirectory,
+      buffer: ArrayBuffer
+    ): Promise<ArrayBuffer>;
   }
   export function getDecoder(fileDirectory: FileDirectory): Decoder;
 }
 
-
 declare module 'quickselect' {
-  function quickselect<T>(arr: ArrayLike<T>, k?: number, left?: number, right?: number, compareFn?: (a: T, b: T) => void) {}
+  function quickselect<T>(
+    arr: ArrayLike<T>,
+    k?: number,
+    left?: number,
+    right?: number,
+    compareFn?: (a: T, b: T) => void
+  ) {}
   export default quickselect;
 }
 
-
 /*
-* Adds types for imports from `rollup-plugin-web-worker-loader`
-*
-* import Worker from 'web-worker:./some-url'
-* const worker = new Worker();
-*/
+ * Adds types for imports from `rollup-plugin-web-worker-loader`
+ *
+ * import Worker from 'web-worker:./some-url'
+ * const worker = new Worker();
+ */
 declare module 'web-worker:*' {
   class WorkerLoader extends Worker {
     constructor() {}
@@ -100,11 +110,11 @@ declare module 'web-worker:*' {
 }
 
 /*
-* Adds types for files imported by 'rollup-plugin-glslify'
-*
-* import fs from 'my-shader.glsl';
-* (typeof fs === string) === true
-*/
+ * Adds types for files imported by 'rollup-plugin-glslify'
+ *
+ * import fs from 'my-shader.glsl';
+ * (typeof fs === string) === true
+ */
 declare module '**/*.glsl' {
   const value: string;
   export default string;

@@ -51,7 +51,6 @@ export async function loadBioformatsZarr(
   return loadBioformats(store, xmlFile);
 }
 
-
 export async function loadOmeZarr(
   source: string,
   options: ZarrOptions & { type?: 'multiscales' }
@@ -62,5 +61,5 @@ export async function loadOmeZarr(
     throw Error('Only multiscale OME-Zarr is supported.');
   }
 
-  return loadOme(store)
+  return loadOme(store);
 }

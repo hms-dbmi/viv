@@ -30,7 +30,7 @@ export {
   SideBySideView,
   SideBySideViewer,
   DetailView,
-  ImageLayer,
+  ImageLayer
 };
 
 export * from './loaders';

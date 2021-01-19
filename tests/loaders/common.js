@@ -9,23 +9,23 @@ export class FileSystemStore {
   constructor(fp) {
     this.root = fp;
   }
- 
+
   async getItem(key) {
-   const fp = path.join(this.root, key);
-   try {
-     const value = await fs.readFile(fp, null);
-     return value;
-   } catch (err) {
-     if (err.code === 'ENOENT') {
-       throw new KeyError(key);
-     }
-     throw err;
-   }
+    const fp = path.join(this.root, key);
+    try {
+      const value = await fs.readFile(fp, null);
+      return value;
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        throw new KeyError(key);
+      }
+      throw err;
+    }
   }
- 
+
   containsItem(key) {
     return this.getItem(key)
       .then(_ => true)
       .catch(_ => false);
   }
- }
+}

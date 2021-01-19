@@ -2,7 +2,10 @@ import type { GeoTIFFImage, GeoTIFF, ImageFileDirectory } from 'geotiff';
 import type { OmeTiffSelection } from '../ome-tiff';
 import type { OMEXML } from '../../omexml';
 
-export type OmeTiffIndexer = (sel: OmeTiffSelection, z: number) => Promise<GeoTIFFImage>;
+export type OmeTiffIndexer = (
+  sel: OmeTiffSelection,
+  z: number
+) => Promise<GeoTIFFImage>;
 
 /*
  * An "indexer" for a GeoTIFF-based source is a function that takes a
@@ -23,7 +26,10 @@ export type OmeTiffIndexer = (sel: OmeTiffSelection, z: number) => Promise<GeoTI
  * Returns an indexer for legacy Bioformats images. This assumes that
  * downsampled resolutions are stored sequentially in the OME-TIFF.
  */
-export function getLegacyIndexer(tiff: GeoTIFF, rootMeta: OMEXML): OmeTiffIndexer {
+export function getLegacyIndexer(
+  tiff: GeoTIFF,
+  rootMeta: OMEXML
+): OmeTiffIndexer {
   const imgMeta = rootMeta[0];
   const { SizeT, SizeC, SizeZ } = imgMeta.Pixels;
   const ifdIndexer = getIFDIndexer(imgMeta);
@@ -52,7 +58,10 @@ export function getLegacyIndexer(tiff: GeoTIFF, rootMeta: OMEXML): OmeTiffIndexe
  * an ES6 Map that maps a string key that identifies the selection uniquely
  * to the corresponding IFD.
  */
-export function getSubIFDIndexer(tiff: GeoTIFF, rootMeta: OMEXML): OmeTiffIndexer {
+export function getSubIFDIndexer(
+  tiff: GeoTIFF,
+  rootMeta: OMEXML
+): OmeTiffIndexer {
   const imgMeta = rootMeta[0];
   const ifdIndexer = getIFDIndexer(imgMeta);
   const ifdCache: Map<string, ImageFileDirectory> = new Map();

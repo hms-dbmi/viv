@@ -2,7 +2,11 @@ import type { GeoTIFF } from 'geotiff';
 import { fromString } from '../omexml';
 
 import TiffPixelSource from './pixel-source';
-import { getLegacyIndexer, getSubIFDIndexer, OmeTiffIndexer } from './lib/indexers';
+import {
+  getLegacyIndexer,
+  getSubIFDIndexer,
+  OmeTiffIndexer
+} from './lib/indexers';
 import { getPixelSourceMeta } from './lib/utils';
 
 export type OmeTiffSelection = { t: number; c: number; z: number };

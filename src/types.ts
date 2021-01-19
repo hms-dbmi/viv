@@ -1,5 +1,7 @@
 export type SupportedDtype = 'Uint8' | 'Uint16' | 'Uint32' | 'Float32';
-export type SupportedTypedArray = InstanceType<typeof globalThis[`${SupportedDtype}Array`]>;
+export type SupportedTypedArray = InstanceType<
+  typeof globalThis[`${SupportedDtype}Array`]
+>;
 
 export interface LayerData {
   data: SupportedTypedArray;
@@ -7,7 +9,9 @@ export interface LayerData {
   height: number;
 }
 
-export type PixelSourceSelection<S extends string[]> = { [K in S[number]]: number };
+export type PixelSourceSelection<S extends string[]> = {
+  [K in S[number]]: number;
+};
 
 export interface RasterSelection<S extends string[]> {
   selection: PixelSourceSelection<S>;
@@ -26,11 +30,13 @@ interface PhysicalSize {
 }
 
 export interface PixelSourceMeta {
-  physicalSizes?: { [key: string]: PhysicalSize; };
+  physicalSizes?: { [key: string]: PhysicalSize };
   photometricInterpretation?: number;
 }
 
-export type Labels<S extends string[]> = [...S, 'y', 'x'] | [...S, 'y', 'x', '_c'];
+export type Labels<S extends string[]> =
+  | readonly [...S, 'y', 'x']
+  | readonly [...S, 'y', 'x', '_c'];
 
 export interface PixelSource<S extends string[]> {
   getRaster(sel: RasterSelection<S>): Promise<LayerData>;

@@ -2,7 +2,7 @@ import type { GeoTIFFImage, RasterOptions } from 'geotiff';
 import type { TypedArray } from 'zarr';
 import { isInterleaved } from '../utils';
 
-import type { 
+import type {
   PixelSource,
   PixelSourceSelection,
   PixelSourceMeta,
@@ -10,7 +10,7 @@ import type {
   Labels,
   RasterSelection,
   TileSelection,
-  LayerData,
+  LayerData
 } from '../../types';
 
 class TiffPixelSource<S extends string[]> implements PixelSource<S> {
