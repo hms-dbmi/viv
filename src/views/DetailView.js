@@ -1,6 +1,6 @@
-import { MultiscaleImageLayer, ImageLayer, ScaleBarLayer } from '../layers';
+import { ScaleBarLayer } from '../layers';
 import VivView from './VivView';
-import { getVivId } from './utils';
+import { getImageLayers, getVivId } from './utils';
 import { OVERVIEW_VIEW_ID } from './OverviewView';
 
 export const DETAIL_VIEW_ID = 'detail';
@@ -14,18 +14,7 @@ export default class DetailView extends VivView {
     const { loader } = props;
     const { id, height, width } = this;
     const layerViewState = viewStates[id];
-    const layers = [];
-
-    const detailLayer = loader.isPyramid
-      ? new MultiscaleImageLayer(props, {
-          id: `${loader.type}${getVivId(id)}`,
-          viewportId: id
-        })
-      : new ImageLayer(props, {
-          id: `${loader.type}${getVivId(id)}`,
-          viewportId: id
-        });
-    layers.push(detailLayer);
+    const layers = getImageLayers(id, props);
 
     const { physicalSizes } = loader;
     if (physicalSizes) {

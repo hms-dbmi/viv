@@ -7,6 +7,8 @@ import {
   DETAIL_VIEW_ID,
   OVERVIEW_VIEW_ID
 } from '../views';
+import useGlobalSelection from './global-selection-hook';
+import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -38,6 +40,7 @@ import {
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
+ * @param {Array} [transitionFields] A string array indicating which fields require a transition: Default: ['time', 'z'].
  */
 
 const PictureInPictureViewer = props => {
@@ -61,8 +64,14 @@ const PictureInPictureViewer = props => {
     lensBorderRadius = 0.02,
     clickCenter = true,
     transparentColor,
-    onViewStateChange
+    onViewStateChange,
+    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS
   } = props;
+  const {
+    newLoaderSelection,
+    oldLoaderSelection,
+    onViewportLoad
+  } = useGlobalSelection(loaderSelection, transitionFields);
   const viewState =
     initialViewState ||
     getDefaultInitialViewState(loader, { height, width }, 0.5);
@@ -77,7 +86,10 @@ const PictureInPictureViewer = props => {
     sliderValues,
     colorValues,
     channelIsOn,
-    loaderSelection,
+    loaderSelection: oldLoaderSelection,
+    newLoaderSelection,
+    onViewportLoad,
+    transitionFields,
     colormap,
     isLensOn,
     lensSelection,

@@ -3,7 +3,8 @@ import {
   ImageLayer,
   ScaleBarLayer,
   XRLayer,
-  OverviewLayer
+  OverviewLayer,
+  BitmapLayer
 } from './layers';
 import { VivViewer, PictureInPictureViewer, SideBySideViewer } from './viewers';
 import {
@@ -31,6 +32,7 @@ export {
   MultiscaleImageLayer,
   XRLayer,
   OverviewLayer,
+  BitmapLayer,
   VivViewer,
   VivView,
   OverviewView,

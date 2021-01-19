@@ -41,3 +41,5 @@ export const DTYPE_VALUES = {
     TypedArray: Float32Array
   }
 };
+
+export const GLOBAL_SLIDER_DIMENSION_FIELDS = ['z', 'time'];
