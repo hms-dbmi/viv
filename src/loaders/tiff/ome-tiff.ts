@@ -9,7 +9,7 @@ import {
 } from './lib/indexers';
 import { getPixelSourceMeta } from './lib/utils';
 
-interface OmeTiffSelection {
+export interface OmeTiffSelection {
   t: number;
   c: number;
   z: number;

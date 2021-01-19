@@ -1,7 +1,7 @@
 import type { ZarrArray } from 'zarr';
 
 import { fromString } from '../omexml';
-import { guessBioformatsLabels, loadMultiscales } from './lib/utils';
+import { guessBioformatsLabels, loadMultiscales, trimPyramid } from './lib/utils';
 import ZarrPixelSource from './pixel-source';
 
 export async function load(
@@ -21,7 +21,7 @@ export async function load(
   const pyramid = data.map(arr => new ZarrPixelSource(arr, labels));
 
   return {
-    data: pyramid.filter(d => pyramid[0].tileSize === d.tileSize),
+    data: trimPyramid(pyramid),
     metadata: imgMeta
   };
 }
