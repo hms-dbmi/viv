@@ -103,8 +103,7 @@ export default class VivViewer extends PureComponent {
           viewState => viewState.id === view.id
         );
         return (
-          currViewState &&
-          (!prevViewState || !areViewStatesEqual(currViewState, prevViewState))
+          currViewState && !areViewStatesEqual(currViewState, prevViewState)
         );
       })
       .map(view => view.id);

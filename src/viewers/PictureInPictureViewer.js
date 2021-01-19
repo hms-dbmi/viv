@@ -24,7 +24,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
  * @param {Object} props.hoverHooks Object including the allowable hooks - right now only accepting a function with key handleValue like { handleValue: (valueArray) => {} } where valueArray
  * has the pixel values for the image under the hover location.
- * @param {Array} [props.viewStates] Array of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'detail' }] for setting where the viewer looks (optional - this is inferred from height/width/loader
+ * @param {Array} [props.viewStates] Array of objects like [{ target: [x, y, 0], zoom: -zoom, id: DETAIL_VIEW_ID }] for setting where the viewer looks (optional - this is inferred from height/width/loader
  * internally by default using getDefaultInitialViewState).
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
@@ -73,7 +73,7 @@ const PictureInPictureViewer = props => {
     onViewportLoad
   } = useGlobalSelection(loaderSelection, transitionFields);
   const baseViewState =
-    viewStatesProp.find(v => v.id === DETAIL_VIEW_ID) ||
+    viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID) ||
     getDefaultInitialViewState(loader, { height, width }, 0.5);
   const detailView = new DetailView({
     id: DETAIL_VIEW_ID,
@@ -102,7 +102,7 @@ const PictureInPictureViewer = props => {
   const viewStates = [{ ...baseViewState, id: DETAIL_VIEW_ID }];
   if (overviewOn && loader) {
     // It's unclear why this is needed because OverviewView.filterViewState sets "zoom" and "target".
-    const overviewViewState = viewStatesProp.find(
+    const overviewViewState = viewStatesProp?.find(
       v => v.id === OVERVIEW_VIEW_ID
     ) || { ...baseViewState, id: OVERVIEW_VIEW_ID };
     const overviewView = new OverviewView({
