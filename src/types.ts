@@ -35,8 +35,8 @@ export interface PixelSourceMeta {
 }
 
 export type Labels<S extends string[]> =
-  | readonly [...S, 'y', 'x']
-  | readonly [...S, 'y', 'x', '_c'];
+  | [...S, 'y', 'x']
+  | [...S, 'y', 'x', '_c'];
 
 export interface PixelSource<S extends string[]> {
   getRaster(sel: RasterSelection<S>): Promise<LayerData>;

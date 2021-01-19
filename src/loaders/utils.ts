@@ -1,6 +1,7 @@
 import quickselect from 'quickselect';
 import type { TypedArray } from 'zarr';
 import type { OMEXML } from './omexml';
+import type { Labels } from '../types';
 
 /**
  * Computes statics from layer data.
@@ -112,23 +113,19 @@ export function isInterleaved(shape: number[]) {
   return lastDimSize === 3 || lastDimSize === 4;
 }
 
-type ReverseSplit<S extends string, D extends string> = string extends S
-  ? string[]
-  : S extends ''
-  ? []
-  : S extends `${infer T}${D}${infer U}`
-  ? [...ReverseSplit<U, D>, T]
-  : [S];
-
 /*
  * Creates typed labels from DimensionOrder.
  * > imgMeta.Pixels.DimensionOrder === 'XYCZT'
  * > getLabels(imgMeta.Pixels) === ['t', 'z', 'c', 'y', 'x']
  */
+type Sel<
+  Dim extends string
+> = Dim extends `${infer Z}${infer x}${infer A}${infer B}${infer C}`
+  ? [C, B, A]
+  : 'error';
 export function getLabels(dimOrder: OMEXML[0]['Pixels']['DimensionOrder']) {
-  return dimOrder.toLowerCase().split('').reverse() as ReverseSplit<
-    Lowercase<typeof dimOrder>,
-    ''
+  return dimOrder.toLowerCase().split('').reverse() as Labels<
+    Sel<Lowercase<typeof dimOrder>>
   >;
 }
 

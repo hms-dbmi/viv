@@ -67,7 +67,13 @@ export function fromString(str: string) {
 }
 
 export type OMEXML = ReturnType<typeof fromString>;
-
+export type DimensionOrder =
+  | 'XYZCT'
+  | 'XYZTC'
+  | 'XYCTZ'
+  | 'XYCZT'
+  | 'XYTCZ'
+  | 'XYTZC';
 // VERY incomplete type declaration for OMEXML object returned from 'fast-xml-parser'
 declare module ParserResult {
   // Structure of node is determined by the PARSER_OPTIONS.
@@ -103,13 +109,7 @@ declare module ParserResult {
     | 'double'
     | 'complex'
     | 'double-complex';
-  type DimensionOrder =
-    | 'XYZCT'
-    | 'XYZTC'
-    | 'XYCTZ'
-    | 'XYCZT'
-    | 'XYTCZ'
-    | 'XYTZC';
+
   type UnitsLength =
     | 'Ym'
     | 'Zm'

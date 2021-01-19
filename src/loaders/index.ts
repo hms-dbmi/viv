@@ -1,5 +1,3 @@
-import { loadBioformatsZarr } from './zarr';
-
 export { loadOmeTiff } from './tiff';
 export { loadBioformatsZarr, loadOmeZarr } from './zarr';
 export { getChannelStats } from './utils';

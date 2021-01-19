@@ -9,7 +9,11 @@ import {
 } from './lib/indexers';
 import { getPixelSourceMeta } from './lib/utils';
 
-export type OmeTiffSelection = { t: number; c: number; z: number };
+interface OmeTiffSelection {
+  t: number;
+  c: number;
+  z: number;
+}
 
 export async function load(tiff: GeoTIFF) {
   // Get first image from tiff and inspect OME-XML metadata
