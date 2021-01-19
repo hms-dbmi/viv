@@ -1,13 +1,11 @@
 import { test } from 'tape';
 import fs from 'fs/promises';
-
 import { FileSystemStore } from './common';
-const FIXTURE = 'tests/loaders/fixtures/bioformats-zarr/';
-
 import { load } from '../../src/loaders/zarr/bioformats-zarr';
 
-const store = new FileSystemStore(FIXTURE + 'data.zarr');
-const meta = fs.readFile(FIXTURE + 'METADATA.ome.xml').then(b => b.toString());
+const FIXTURE = 'tests/loaders/fixtures/bioformats-zarr';
+const store = new FileSystemStore(`${FIXTURE}/data.zarr`);
+const meta = fs.readFile(`${FIXTURE}/METADATA.ome.xml`).then(b => b.toString());
 
 test('Creates correct ZarrPixelSource.', async t => {
   t.plan(4);
@@ -37,9 +35,9 @@ test('Get raster data.', async t => {
     const { data } = await load(store, await meta);
     const [base] = data;
 
-    for (let c = 0; c < 3; c++) {
+    for (let c = 0; c < 3; c+=1) {
       const selection = { c, z: 0, t: 0 };
-      const layerData = await base.getRaster({ selection });
+      const layerData = await base.getRaster({ selection }); // eslint-disable-line no-await-in-loop
       t.equal(layerData.width, 439);
       t.equal(layerData.height, 167);
       t.equal(layerData.data.length, 439 * 167);

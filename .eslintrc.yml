@@ -9,6 +9,9 @@ plugins:
 settings:
   react:
     version: detect
+  import/resolver:
+    node:
+      extensions: ['.js', '.ts']
 rules:
   no-console: [2, { "allow": ["warn", "error", "info", "groupCollapsed", "groupEnd"] }]
   # My practice is to use "log" for messages I intend to clean up before merging.
@@ -21,3 +24,5 @@ rules:
   import/no-extraneous-dependencies: [2, { "devDependencies": ["tests/**/*.js"]}]
   # For some locations, just having a dev dependency is sufficient.
   no-underscore-dangle: [0]
+  # https://github.com/benmosher/eslint-plugin-import/issues/1615#issuecomment-577500405
+  import/extensions: ['error', 'ignorePackages', { js: 'never', ts: 'never' }]

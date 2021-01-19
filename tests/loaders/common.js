@@ -25,7 +25,7 @@ export class FileSystemStore {
 
   containsItem(key) {
     return this.getItem(key)
-      .then(_ => true)
-      .catch(_ => false);
+      .then(() => true)
+      .catch(() => false);
   }
 }

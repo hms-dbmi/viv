@@ -1,14 +1,13 @@
 import { test } from 'tape';
 import { FileSystemStore } from './common';
-
-const FIXTURE = 'tests/loaders/fixtures/bioformats-zarr/';
 import { loadMultiscales } from '../../src/loaders/zarr/lib/utils';
 import { getIndexer } from '../../src/loaders/zarr/lib/indexer';
 
+const FIXTURE = 'tests/loaders/fixtures/bioformats-zarr';
 test('Loads zarr-multiscales', async t => {
   t.plan(1);
   try {
-    const store = new FileSystemStore(FIXTURE + 'data.zarr');
+    const store = new FileSystemStore(`${FIXTURE}/data.zarr`);
     const { data } = await loadMultiscales(store, '0');
     t.equal(data.length, 2, 'Should have two multiscale images.');
   } catch (e) {

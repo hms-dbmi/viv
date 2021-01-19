@@ -101,7 +101,7 @@ export default class OverviewView extends VivView {
     const numLevels = this.loader.length;
     const {
       width: rasterWidth,
-      height: rasterWidth
+      height: rasterHeight
     } = getImageSize(this.loader[0].shape);
 
     this._imageWidth = rasterWidth;

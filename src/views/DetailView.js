@@ -17,16 +17,16 @@ export default class DetailView extends VivView {
     const layers = [];
 
     const detailLayer = 
-      data.length === 1
+      loader.length === 1
         ? new ImageLayer(props, {
             id: getVivId(id),
             viewportId: id,
-            loader: data[0], // loader is just a pixel source
+            loader: loader[0], // loader is just a pixel source
           })
         : new MultiscaleImageLayer(props, {
             id: getVivId(id),
             viewportId: id,
-            loader: data,
+            loader,
           });
     layers.push(detailLayer);
 

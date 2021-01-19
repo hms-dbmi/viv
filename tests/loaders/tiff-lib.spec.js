@@ -11,7 +11,7 @@ import {
  * rollup-plugin-web-worker-loader relies on `atob` which isn't in Node.
  * This is a shim for "Pool" for testing the proxies.
  */
-class Pool {
+const pool = {
   async decode(fileDirectory, buffer) {
     const decoder = getDecoder(fileDirectory);
     const result = await decoder.decode(fileDirectory, buffer);
@@ -34,7 +34,7 @@ test('Inspect tiff proxies.', async t => {
       'Regular tiff should not have any proxies.'
     );
 
-    tiff = createPoolProxy(tiff, new Pool());
+    tiff = createPoolProxy(tiff, pool);
     t.equal(tiff['__viv-decoder-pool'], true, 'Should have pool proxy.');
     t.equal(tiff['__viv-offsets'], undefined, 'Should not have offsets proxy.');
 
