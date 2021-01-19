@@ -12,7 +12,7 @@
     "importsNotUsedAsValues": "error",
     "outDir": "dist",
     "rootDir": "src/",
-    "declarationDir": "dist/types",
+    "declarationDir": "dist/",
     "declaration": true
   }
 }
