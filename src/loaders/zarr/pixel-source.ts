@@ -1,7 +1,8 @@
+import { BoundsCheckError } from 'zarr';
 import { isInterleaved } from '../utils';
 import { getIndexer } from './lib/indexer';
-import type { HTTPStore } from './lib/storage';
 
+import type { HTTPStore } from './lib/storage';
 import type { ZarrArray } from 'zarr';
 import type { RawArray } from 'zarr/dist/types/rawArray';
 import type { AsyncStore } from 'zarr/dist/types/storage/types';
@@ -101,6 +102,13 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
 
     const [height, width] = shape;
     return { data, width, height } as LayerData;
+  }
+
+  onTileError(err: Error) {
+    if (!(err instanceof BoundsCheckError)) {
+      // Rethrow error if something other than tile being requested is out of bounds.
+      throw err;
+    }
   }
 }
 

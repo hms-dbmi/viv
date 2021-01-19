@@ -41,6 +41,7 @@ export type Labels<S extends string[]> =
 export interface PixelSource<S extends string[]> {
   getRaster(sel: RasterSelection<S>): Promise<LayerData>;
   getTile(sel: TileSelection<S>): Promise<LayerData>;
+  onTileError(err: Error): void;
   shape: number[];
   dtype: SupportedDtype;
   labels: Labels<S>;

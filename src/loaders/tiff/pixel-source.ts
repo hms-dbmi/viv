@@ -96,6 +96,11 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
     }
     return { height, width };
   }
+
+  onTileError(err: Error) {
+    console.error(err);
+  }
+
 }
 
 export default TiffPixelSource;
