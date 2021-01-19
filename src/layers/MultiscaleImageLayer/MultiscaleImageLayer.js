@@ -6,6 +6,7 @@ import GL from '@luma.gl/constants';
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
 import { to32BitFloat, onPointer } from '../utils';
+import { getImageSize, isInterleaved } from '../../loaders/utils';
 
 const defaultProps = {
   pickable: true,
@@ -37,7 +38,7 @@ const defaultProps = {
  * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @param {string} props.viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
- * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getTile`, `dtype`, `numLevels`, and `tileSize`, and `getRaster`.
+ * @param {Object} props.loader image pyramid: PixelSource[].
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {String} props.id Unique identifier for this layer.
  * @param {function} props.onTileError Custom override for handle tile fetching errors.
@@ -94,24 +95,34 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       modelMatrix,
       transparentColor
     } = this.props;
-    const { tileSize, numLevels, dtype, isInterleaved, isRgb } = loader;
+
+    // Get properties from highest resolution
+    const { tileSize, dtype } = loader[0];
+
     const { unprojectLensBounds } = this.state;
     const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z, signal }) => {
-      const tile = await loader.getTile({
-        x,
-        y,
-        // I don't fully undertstand why this works, but I have a sense.
-        // It's basically to cancel out:
-        // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128,
-        // which felt odd to me to beign with.
-        // The image-tile example works without, this but I have a feeling there is something
-        // going on with our pyramids and/or rendering that is different.
-        z: Math.round(-z + Math.log2(512 / tileSize)),
-        loaderSelection,
-        signal
-      });
-      if (isInterleaved && isRgb) {
+
+      // Early return if no loaderSelection 
+      if (!loaderSelection || loaderSelection.length === 0) return null;
+
+      // I don't fully undertstand why this works, but I have a sense.
+      // It's basically to cancel out:
+      // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128,
+      // which felt odd to me to beign with.
+      // The image-tile example works without, this but I have a feeling there is something
+      // going on with our pyramids and/or rendering that is different.
+      z = Math.round(-z + Math.log2(512 / tileSize));
+      const getTile = (selection) => loader[z].getTile({ x, y, selection, signal });
+      const tiles = await Promsise.all(loaderSelection.map(getTile));
+
+      const tile = {
+        data: tiles.map(d => d.data),
+        width: tiles[0].width,
+        height: tiles[0].height
+      };
+
+      if (isInterleaved(loader)) {
         // eslint-disable-next-line prefer-destructuring
         tile.data = tile.data[0];
         if (tile.data.length === tile.width * tile.height * 3) {
@@ -126,7 +137,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       }
       return tile;
     };
-    const { height, width } = loader.getRasterSize({ z: 0 });
+
+    const { height, width } = getImageSize(loader[0]);
     const tiledLayer = new MultiscaleImageLayerBase(this.props, {
       id: `Tiled-Image-${id}`,
       getTileData,
@@ -135,7 +147,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       onClick,
       extent: [0, 0, width, height],
       // See the above note within getTileData for why the division with 512 and the rounding necessary.
-      minZoom: Math.round(-(numLevels - 1) + Math.log2(512 / tileSize)),
+      minZoom: Math.round(-(loader.length - 1) + Math.log2(512 / tileSize)),
       maxZoom: Math.min(0, Math.round(Math.log2(512 / tileSize))),
       colorValues,
       sliderValues,
@@ -151,7 +163,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       updateTriggers: {
         getTileData: [loader, loaderSelection]
       },
-      onTileError: onTileError || loader.onTileError,
+      onTileError: onTileError || loader[0].onTileError,
       opacity,
       colormap,
       viewportId,
@@ -165,17 +177,20 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       modelMatrix,
       transparentColor
     });
+
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity
     // paramteter set to anything but 1, but we always use it for situations where
     // we are zoomed out too far.
-    const implementsGetRaster = typeof loader.getRaster === 'function';
+    const lowestResolution = loader[loader.length - 1];
+    const implementsGetRaster = typeof lowestResolution.getRaster === 'function';
     const layerModelMatrix = modelMatrix ? modelMatrix.clone() : new Matrix4();
     const baseLayer =
       implementsGetRaster &&
       new ImageLayer(this.props, {
         id: `Background-Image-${id}`,
-        modelMatrix: layerModelMatrix.scale(2 ** (numLevels - 1)),
+        loader: lowestResolution,
+        modelMatrix: layerModelMatrix.scale(2 ** (loader.length - 1)),
         visible:
           opacity === 1 &&
           (!viewportId || this.context.viewport.id === viewportId) &&
@@ -183,7 +198,6 @@ export default class MultiscaleImageLayer extends CompositeLayer {
           // since the background image might not have the same color output from the fragment shader
           // as the tiled layer at a higher resolution level.
           !transparentColor,
-        z: numLevels - 1,
         pickable: true,
         onHover,
         onClick

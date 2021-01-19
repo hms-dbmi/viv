@@ -5,6 +5,7 @@ import GL from '@luma.gl/constants';
 import XRLayer from './XRLayer';
 import BitmapLayer from './BitmapLayer';
 import { to32BitFloat, onPointer } from './utils';
+import { isInterleaved } from '../loaders/utils';
 
 const defaultProps = {
   pickable: true,
@@ -20,11 +21,10 @@ const defaultProps = {
     type: 'object',
     value: {
       getRaster: async () => ({ data: [], height: 0, width: 0 }),
-      dtype: '<u2'
+      dtype: 'Uint16'
     },
     compare: true
   },
-  z: { type: 'number', value: 0, compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true },
   lensRadius: { type: 'number', value: 100, compare: true },
@@ -44,7 +44,7 @@ const defaultProps = {
  * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @param {string} props.viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
- * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
+ * @param {Object} props.loader PixelSource
  * @param {function} props.onHover Hook function from deck.gl to handle hover objects.
  * @param {boolean} props.isLensOn Whether or not to use the lens.
  * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
@@ -81,12 +81,21 @@ export default class ImageLayer extends CompositeLayer {
       typeof propsChanged === 'string' && propsChanged.includes('props.loader');
     const loaderSelectionChanged =
       props.loaderSelection !== oldProps.loaderSelection;
+
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
-      const { loader, z, loaderSelection } = this.props;
-      loader.getRaster({ z, loaderSelection }).then(raster => {
-        /* eslint-disable no-param-reassign */
-        if (loader.isInterleaved && loader.isRgb) {
+      const { loader, loaderSelection } = this.props;
+      const getRaster = (selection) => loader.getRaster({ selection });
+      const dataPromises = loaderSelection.map(getRaster);
+
+      Promise.all(dataPromises).then(rasters => {
+        const raster = {
+          data: rasters.map(d => d.data),
+          width: rasters[0].width,
+          height: rasters[0].height
+        };
+
+        if (isInterleaved(loader)) {
           // data is for BitmapLayer and needs to be of form { data: Uint8Array, width, height };
           // eslint-disable-next-line prefer-destructuring
           raster.data = raster.data[0];
@@ -100,8 +109,8 @@ export default class ImageLayer extends CompositeLayer {
           // we need to convert data to compatible textures
           raster.data = to32BitFloat(raster.data);
         }
+
         this.setState({ ...raster });
-        /* eslint-disable no-param-reassign */
       });
     }
   }
@@ -124,7 +133,6 @@ export default class ImageLayer extends CompositeLayer {
       sliderValues,
       colorValues,
       channelIsOn,
-      z,
       domain,
       pickable,
       isLensOn,
@@ -137,18 +145,18 @@ export default class ImageLayer extends CompositeLayer {
       modelMatrix,
       transparentColor
     } = this.props;
-    const { dtype } = loader;
+    const { dtype, photometricInterpretation } = loader;
     const { width, height, data, unprojectLensBounds } = this.state;
     if (!(width && height)) return null;
+
     const bounds = [0, height, width, 0];
-    const { isRgb, isInterleaved, photometricInterpretation } = loader;
-    if (isRgb && isInterleaved) {
+    if (isInterleaved(loader)) {
       return new BitmapLayer(this.props, {
         image: this.state,
         photometricInterpretation,
         // Shared props with XRLayer:
         bounds,
-        id: `image-sub-layer-${bounds}-${id}-${z}`,
+        id: `image-sub-layer-${bounds}-${id}`,
         onHover,
         pickable,
         onClick,
@@ -172,7 +180,7 @@ export default class ImageLayer extends CompositeLayer {
       lensRadius,
       // Shared props with BitmapLayer:
       bounds,
-      id: `image-sub-layer-${bounds}-${id}-${z}`,
+      id: `image-sub-layer-${bounds}-${id}`,
       onHover,
       pickable,
       onClick,

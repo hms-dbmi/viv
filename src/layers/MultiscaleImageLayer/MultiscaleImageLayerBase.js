@@ -13,7 +13,7 @@ const defaultProps = {
   renderSubLayers: { type: 'function', value: renderSubLayers, compare: false },
   opacity: { type: 'number', value: 1, compare: true },
   colormap: { type: 'string', value: '', compare: true },
-  dtype: { type: 'string', value: '<u2', compare: true },
+  dtype: { type: 'string', value: 'Uint16', compare: true },
   domain: { type: 'array', value: [], compare: true },
   viewportId: { type: 'string', value: '', compare: true },
   unprojectLensBounds: { type: 'array', value: [0, 0, 0, 0], compare: true },
