@@ -67,7 +67,7 @@ export function generateViewTests(ViewType, args, linkedViewIds = []) {
       viewStates[id] = defaultArguments.initialViewState;
     });
     const layers = view.getLayers({
-      props: { loader: { type: 'loads', isPyramid: true } },
+      props: { loader: [{ type: 'loads' }] },
       viewStates
     });
     layers &&

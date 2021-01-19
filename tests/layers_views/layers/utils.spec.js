@@ -88,7 +88,7 @@ test('padColorsAndSliders test', t => {
         [255, 255, 0]
       ],
       channelIsOn: [true, true],
-      dtype: '<u1'
+      dtype: 'Uint8'
     }),
     expectedNoDomain,
     'Pads with no domain provided'
@@ -104,7 +104,7 @@ test('padColorsAndSliders test', t => {
         [255, 255, 0]
       ],
       channelIsOn: [true, false],
-      dtype: '<u1'
+      dtype: 'Uint8'
     }),
     expectedChannelOff,
     'Pads with one channel turned off'
@@ -121,7 +121,7 @@ test('padColorsAndSliders test', t => {
       ],
       channelIsOn: [true, true],
       domain: [0, 1000],
-      dtype: '<u1'
+      dtype: 'Uint8'
     }),
     expectedDomain,
     'Pads with provided domain value'
@@ -137,7 +137,7 @@ test('padColorsAndSliders test', t => {
         [255, 255, 0]
       ],
       channelIsOn: [true, true],
-      dtype: '<u2'
+      dtype: 'Uint16'
     }),
     expected16Bit,
     'Pads with high bit depth'

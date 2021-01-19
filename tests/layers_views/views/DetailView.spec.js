@@ -13,10 +13,14 @@ generateViewTests(DetailView, detailViewArguments);
 
 test(`DetailView layer type and props check`, t => {
   const view = new DetailView(detailViewArguments);
-  const loader = { type: 'loads', isPyramid: true };
+  const loader = { type: 'loads' };
   const layers = view.getLayers({
     props: {
-      loader: { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } } }
+      loader: [
+        { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } }},
+        { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } }},
+        { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } }},
+      ]
     },
     viewStates: {
       detail: {
