@@ -16,32 +16,32 @@ export default class DetailView extends VivView {
     const layerViewState = viewStates[id];
     const layers = [];
 
-    const detailLayer = loader.isPyramid
-      ? new MultiscaleImageLayer(props, {
-          id: `${loader.type}${getVivId(id)}`,
-          viewportId: id
-        })
-      : new ImageLayer(props, {
-          id: `${loader.type}${getVivId(id)}`,
-          viewportId: id
-        });
+    const detailLayer = 
+      data.length === 1
+        ? new ImageLayer(props, {
+            id: getVivId(id),
+            viewportId: id,
+            loader: data[0], // loader is just a pixel source
+          })
+        : new MultiscaleImageLayer(props, {
+            id: getVivId(id),
+            viewportId: id,
+            loader: data,
+          });
     layers.push(detailLayer);
 
-    const { physicalSizes } = loader;
-    if (physicalSizes) {
-      const { x } = physicalSizes;
-      const { unit, value } = x;
-      if (unit && value) {
-        layers.push(
-          new ScaleBarLayer({
-            id: getVivId(id),
-            loader,
-            unit,
-            size: value,
-            viewState: { ...layerViewState, height, width }
-          })
-        );
-      }
+    // Inspect the first pixel source for physical sizes
+    const { physicalSizes } = loader[0];
+    if (physicalSizes?.x) {
+      layers.push(
+        new ScaleBarLayer({
+          id: getVivId(id),
+          loader,
+          unit: physicalSizes.x.unit,
+          size: physicalSizes.x.value,
+          viewState: { ...layerViewState, height, width }
+        })
+      );
     }
 
     return layers;

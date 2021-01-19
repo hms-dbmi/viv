@@ -4,6 +4,8 @@ import VivView from './VivView';
 import { OverviewLayer } from '../layers';
 import { makeBoundingBox, getVivId } from './utils';
 
+import { getImageSize } from '../loaders/utils';
+
 export const OVERVIEW_VIEW_ID = 'overview';
 
 class OverviewState {}
@@ -38,7 +40,7 @@ class OverviewController extends Controller {
  * additional arguments:
  * @param {Object} args
  * @param {Object} args.initialViewState ViewState object: { target: [x, y, 0], zoom: -zoom }.
- * @param {Object} args.loader Loader to be used for inferring zoom level and fetching data.  It must have the properies `dtype`, `numLevels`, and `tileSize` and implement `getTile` and `getRaster`.
+ * @param {Object} args.loader PixelSource[]
  * @param {number} args.detailHeight Height of the detail view.
  * @param {number} args.detailWidth Width of the detail view.
  * @param {number} [args.scale] Scale of this viewport relative to the detail. Default is .2.
@@ -96,13 +98,15 @@ export default class OverviewView extends VivView {
     minimumHeight,
     maximumHeight
   }) {
-    const { loader } = this;
-    const { numLevels } = loader;
-    const { width: rasterWidth, height: rasterHeight } = loader.getRasterSize({
-      z: 0
-    });
+    const numLevels = this.loader.length;
+    const {
+      width: rasterWidth,
+      height: rasterWidth
+    } = getImageSize(this.loader[0].shape);
+
     this._imageWidth = rasterWidth;
     this._imageHeight = rasterHeight;
+
     if (rasterWidth > rasterHeight) {
       const heightWidthRatio = rasterHeight / rasterWidth;
       this.width = Math.min(
@@ -157,38 +161,29 @@ export default class OverviewView extends VivView {
   }
 
   getDeckGlView() {
-    const { x, y, id, height, width, scale, clickCenter } = this;
+    const { scale, clickCenter } = this;
     const controller = clickCenter && { type: OverviewController, scale };
     return new OrthographicView({
-      id,
       controller,
-      height,
-      width,
-      x,
-      y,
+      id: this.id,
+      height: this.height,
+      width: this.width,
+      x: this.x,
+      y: this.y,
       clear: true
     });
   }
 
   filterViewState({ viewState }) {
     // Scale the view as the overviewScale changes with screen resizing - basically, do not react to any view state changes.
-    const {
-      _imageWidth,
-      _imageHeight,
-      scale,
-      id,
-      loader,
-      height,
-      width
-    } = this;
-    const { numLevels } = loader;
+    const { _imageWidth, _imageHeight, scale } = this;
     return {
       ...viewState,
-      height,
-      width,
-      id,
+      height: this.height,
+      width: this.width,
+      id: this.id,
       target: [(_imageWidth * scale) / 2, (_imageHeight * scale) / 2, 0],
-      zoom: -(numLevels - 1)
+      zoom: -(this.loader.length - 1)
     };
   }
 
@@ -197,15 +192,14 @@ export default class OverviewView extends VivView {
     if (!detail) {
       throw new Error('Overview requires a viewState with id detail');
     }
-    const { id, scale, loader } = this;
     // Scale the bounding box.
     const boundingBox = makeBoundingBox(detail).map(coords =>
-      coords.map(e => e * scale)
+      coords.map(e => e * this.scale)
     );
     const overviewLayer = new OverviewLayer(props, {
-      id: `${loader.type}${getVivId(id)}`,
+      id: getVivId(this.id),
       boundingBox,
-      overviewScale: scale,
+      overviewScale: this.scale,
       zoom: -overview.zoom
     });
     return [overviewLayer];

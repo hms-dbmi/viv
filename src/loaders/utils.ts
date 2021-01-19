@@ -120,7 +120,7 @@ export function isInterleaved(shape: number[]) {
  */
 type Sel<
   Dim extends string
-> = Dim extends `${infer Z}${infer x}${infer A}${infer B}${infer C}`
+> = Dim extends `${infer Z}${infer X}${infer A}${infer B}${infer C}`
   ? [C, B, A]
   : 'error';
 export function getLabels(dimOrder: OMEXML[0]['Pixels']['DimensionOrder']) {
@@ -150,4 +150,11 @@ export function getDims<S extends string>(labels: S[]) {
     }
     return index;
   };
+}
+
+
+export function getImageSize(shape: number[]) {
+  const interleaved = isInterleaved(shape);
+  const [height, width] = shape.slice(interleaved ? -3 : -2);
+  return { height, width };
 }

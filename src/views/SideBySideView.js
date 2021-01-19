@@ -106,19 +106,22 @@ export default class SideBySideView extends VivView {
     const boundingBox = makeBoundingBox({ ...layerViewState, height, width });
     const layers = [];
 
-    const detailLayer = loader.isPyramid
-      ? new MultiscaleImageLayer(props, {
-          id: `${loader.type}${getVivId(id)}`,
-          viewportId: id
-        })
-      : new ImageLayer(props, {
-          id: `${loader.type}${getVivId(id)}`,
-          viewportId: id
-        });
+    const detailLayer =
+      loader.length === 1
+        ? new ImageLayer(props, {
+            id: getVivId(id),
+            viewportId: id,
+            loader: loader[0]
+          })
+        : new MultiscaleImageLayer(props, {
+            id: getVivId(id),
+            viewportId: id,
+            loader: loader,
+          });
     layers.push(detailLayer);
 
     const border = new PolygonLayer({
-      id: `viewport-outline-${loader.type}${getVivId(id)}`,
+      id: `viewport-outline-${getVivId(id)}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [boundingBox],
       getPolygon: f => f,
@@ -130,20 +133,16 @@ export default class SideBySideView extends VivView {
     layers.push(border);
 
     const { physicalSizes } = loader;
-    if (physicalSizes) {
-      const { x } = physicalSizes;
-      const { unit, value } = x;
-      if (unit && value) {
-        layers.push(
-          new ScaleBarLayer({
-            id: getVivId(id),
-            loader,
-            unit,
-            size: value,
-            viewState: { ...layerViewState, height, width }
-          })
-        );
-      }
+    if (physicalSizes?.x) {
+      layers.push(
+        new ScaleBarLayer({
+          id: getVivId(id),
+          loader,
+          unit: physicalSizes.x.unit,
+          size: physicalSizes.x.value,
+          viewState: { ...layerViewState, height, width }
+        })
+      );
     }
 
     return layers;
