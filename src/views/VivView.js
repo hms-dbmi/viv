@@ -32,7 +32,7 @@ export default class VivView {
       height: this.height,
       width: this.width,
       x: this.x,
-      y: this.y,
+      y: this.y
     });
   }
 

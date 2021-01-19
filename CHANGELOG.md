@@ -11,6 +11,10 @@
 ### Changed
 
 - Update `getDefaultInitialViewState` to return floating point zoom that fills the screen by default.
+- Rewrite data loaders as `PixelSource` | `PixelSource[]`. Introduce `ZarrPixelSource` and `TiffPixelSource`
+to support other types of images. Migrate `src/loaders` to TypeScript.
+- Add `loadBioforamtsZarr`, `loadOmeZarr`, and `loadOmeTiff` utilities.
+- Add predictive, fully typed OME-XML response from `fast-xml-parser`.
 
 ## 0.8.2
 

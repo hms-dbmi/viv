@@ -116,7 +116,7 @@ export default class SideBySideView extends VivView {
         : new MultiscaleImageLayer(props, {
             id: getVivId(id),
             viewportId: id,
-            loader, // array of pixel sources
+            loader // array of pixel sources
           });
     layers.push(detailLayer);
 

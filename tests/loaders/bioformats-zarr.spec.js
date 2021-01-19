@@ -35,7 +35,7 @@ test('Get raster data.', async t => {
     const { data } = await load(store, await meta);
     const [base] = data;
 
-    for (let c = 0; c < 3; c+=1) {
+    for (let c = 0; c < 3; c += 1) {
       const selection = { c, z: 0, t: 0 };
       const layerData = await base.getRaster({ selection }); // eslint-disable-line no-await-in-loop
       t.equal(layerData.width, 439);

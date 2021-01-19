@@ -17,7 +17,7 @@ const pool = {
     const result = await decoder.decode(fileDirectory, buffer);
     return result;
   }
-}
+};
 
 test('Inspect tiff proxies.', async t => {
   t.plan(6);

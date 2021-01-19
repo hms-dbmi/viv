@@ -1,7 +1,11 @@
 import type { ZarrArray } from 'zarr';
 
 import { fromString } from '../omexml';
-import { guessBioformatsLabels, loadMultiscales, trimPyramid } from './lib/utils';
+import {
+  guessBioformatsLabels,
+  loadMultiscales,
+  trimPyramid
+} from './lib/utils';
 import ZarrPixelSource from './pixel-source';
 
 export async function load(

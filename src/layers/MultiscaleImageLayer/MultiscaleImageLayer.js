@@ -102,8 +102,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     const { unprojectLensBounds } = this.state;
     const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z, signal }) => {
-
-      // Early return if no loaderSelection 
+      // Early return if no loaderSelection
       if (!loaderSelection || loaderSelection.length === 0) return null;
 
       // I don't fully undertstand why this works, but I have a sense.
@@ -113,7 +112,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       // The image-tile example works without, this but I have a feeling there is something
       // going on with our pyramids and/or rendering that is different.
       z = Math.round(-z + Math.log2(512 / tileSize));
-      const getTile = (selection) => loader[z].getTile({ x, y, selection, signal });
+      const getTile = selection =>
+        loader[z].getTile({ x, y, selection, signal });
       const tiles = await Promsise.all(loaderSelection.map(getTile));
 
       const tile = {
@@ -183,7 +183,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     // paramteter set to anything but 1, but we always use it for situations where
     // we are zoomed out too far.
     const lowestResolution = loader[loader.length - 1];
-    const implementsGetRaster = typeof lowestResolution.getRaster === 'function';
+    const implementsGetRaster =
+      typeof lowestResolution.getRaster === 'function';
     const layerModelMatrix = modelMatrix ? modelMatrix.clone() : new Matrix4();
     const baseLayer =
       implementsGetRaster &&

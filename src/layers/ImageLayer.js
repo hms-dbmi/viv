@@ -81,11 +81,11 @@ export default class ImageLayer extends CompositeLayer {
       typeof propsChanged === 'string' && propsChanged.includes('props.loader');
     const loaderSelectionChanged =
       props.loaderSelection !== oldProps.loaderSelection;
-    
+
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
       const { loader, loaderSelection = [] } = this.props;
-      const getRaster = (selection) => loader.getRaster({ selection });
+      const getRaster = selection => loader.getRaster({ selection });
       const dataPromises = loaderSelection.map(getRaster);
 
       Promise.all(dataPromises).then(rasters => {

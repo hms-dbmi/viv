@@ -101,11 +101,11 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
 }
 
 /*
-* Downsampled resolutions in zarr-based image pyramids might have different
-* chunk sizes which aren't supported by our image layers.
-* 
-* This function trims the pyramid to just levels with the same tilesize. 
-*/
+ * Downsampled resolutions in zarr-based image pyramids might have different
+ * chunk sizes which aren't supported by our image layers.
+ *
+ * This function trims the pyramid to just levels with the same tilesize.
+ */
 export function trimPyramid<S extends string[]>(pyramid: PixelSource<S>[]) {
   return pyramid.filter(level => pyramid[0].tileSize === level.tileSize);
 }
