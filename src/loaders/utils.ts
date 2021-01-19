@@ -157,3 +157,5 @@ export function getImageSize<T extends string[]>(source: PixelSource<T>) {
   const [height, width] = source.shape.slice(interleaved ? -3 : -2);
   return { height, width };
 }
+
+export const SIGNAL_ABORTED = '__vivSignalAborted';

@@ -1,6 +1,8 @@
 import { KeyError } from 'zarr';
 import type { AsyncStore } from 'zarr/dist/types/storage/types';
 
+import { SIGNAL_ABORTED } from '../../utils';
+
 /**
  * Preserves (double) slashes earlier in the path, so this works better
  * for URLs. From https://stackoverflow.com/a/46427607/4178400
@@ -72,7 +74,7 @@ export class HTTPStore
   }
 
   async getItem(key: string) {
-    const url = joinUrlParts(this.url, key) as string;
+    const url = joinUrlParts(this.url, key);
 
     /*
      * If custom request options or a valid signal,
@@ -85,6 +87,13 @@ export class HTTPStore
 
     const value = await fetch(url, options);
 
+    /*
+     * Throw our custom abort signal value to pick up in getTileData.
+     */
+    if (this._signal?.aborted) {
+      throw SIGNAL_ABORTED;
+    }
+
     if (value.status === 404) {
       throw new KeyError(key);
     } else if (value.status !== 200) {
@@ -94,7 +103,7 @@ export class HTTPStore
   }
 
   async containsItem(key: string) {
-    const url = joinUrlParts(this.url, key) as string;
+    const url = joinUrlParts(this.url, key);
     const value = await fetch(url, this.options);
     return value.status === 200;
   }

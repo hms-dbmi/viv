@@ -6,7 +6,11 @@ import GL from '@luma.gl/constants';
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
 import { to32BitFloat, onPointer } from '../utils';
-import { getImageSize, isInterleaved } from '../../loaders/utils';
+import {
+  getImageSize,
+  isInterleaved,
+  SIGNAL_ABORTED
+} from '../../loaders/utils';
 
 const defaultProps = {
   pickable: true,
@@ -114,37 +118,56 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       // The image-tile example works without, this but I have a feeling there is something
       // going on with our pyramids and/or rendering that is different.
       z = Math.round(-z + Math.log2(512 / tileSize));
-      const getTile = selection =>
-        loader[z].getTile({ x, y, selection, signal });
-
-      const promises = Promise.all(loaderSelection.map(getTile));
-
-      // If the signal is aborted, return null before awaiting the data.
-      if (signal?.aborted) {
-        return null;
-      }
-
-      const tiles = await promises;
-      const tile = {
-        data: tiles.map(d => d.data),
-        width: tiles[0].width,
-        height: tiles[0].height
+      const getTile = selection => {
+        const config = { x, y, selection, signal };
+        return loader[z].getTile(config);
       };
 
-      if (isInterleaved(loader)) {
-        // eslint-disable-next-line prefer-destructuring
-        tile.data = tile.data[0];
-        if (tile.data.length === tile.width * tile.height * 3) {
-          tile.format = GL.RGB;
-          tile.dataFormat = GL.RGB; // is this not properly inferred?
+      try {
+        /*
+         * Try to request the tile data. The pixels sources can throw
+         * special SIGNAL_ABORTED string that we pick up in the catch
+         * block to return null to deck.gl.
+         *
+         * This means that our pixels sources _always_ have the same
+         * return type, and optional throw for performance.
+         */
+        const tiles = await Promise.all(loaderSelection.map(getTile));
+
+        const tile = {
+          data: tiles.map(d => d.data),
+          width: tiles[0].width,
+          height: tiles[0].height
+        };
+
+        if (isInterleaved(loader)) {
+          // eslint-disable-next-line prefer-destructuring
+          tile.data = tile.data[0];
+          if (tile.data.length === tile.width * tile.height * 3) {
+            tile.format = GL.RGB;
+            tile.dataFormat = GL.RGB; // is this not properly inferred?
+          }
+          // can just return early, no need  to check for webgl2
+          return tile;
         }
-        // can just return early, no need  to check for webgl2
+
+        if (noWebGl2) {
+          tile.data = to32BitFloat(tile.data);
+        }
+
         return tile;
+      } catch (err) {
+        /*
+         * Signal is aborted. We handle the custom value thrown
+         * by our pixel sources here and return falsy to deck.gl.
+         */
+        if (err === SIGNAL_ABORTED) {
+          return null;
+        }
+
+        // We should propagate all other thrown values/errors
+        throw err;
       }
-      if (noWebGl2) {
-        tile.data = to32BitFloat(tile.data);
-      }
-      return tile;
     };
 
     const { height, width } = getImageSize(loader[0]);

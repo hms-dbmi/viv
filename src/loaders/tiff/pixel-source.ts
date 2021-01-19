@@ -1,6 +1,6 @@
 import type { GeoTIFFImage, RasterOptions } from 'geotiff';
 import type { TypedArray } from 'zarr';
-import { isInterleaved } from '../utils';
+import { isInterleaved, SIGNAL_ABORTED } from '../utils';
 
 import type {
   PixelSource,
@@ -46,6 +46,10 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
     const interleave = isInterleaved(this.shape);
     const raster = await image.readRasters({ interleave, ...props });
 
+    if (props?.signal?.aborted) {
+      throw SIGNAL_ABORTED;
+    }
+
     /*
      * geotiff.js returns objects with different structure
      * depending on `interleave`. It's weird, but this seems to work.
@@ -62,7 +66,7 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
     }
 
     // geotiff.js returns the correct TypedArray but need to cast to Uint for viv.
-    if (data.constructor.name.startsWith('Int')) {
+    if (data?.constructor.name.startsWith('Int')) {
       const suffix = data.constructor.name.slice(1); // nt8Array | nt16Array | nt32Array
       const name = `Ui${suffix}` as
         | 'Uint8Array'
