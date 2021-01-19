@@ -26,6 +26,6 @@ export const COLOR_PALLETE = [
   [255, 255, 255],
   [255, 0, 0]
 ];
-export const GLOBAL_SLIDER_DIMENSION_FIELDS = ['z', 'time'];
+export const GLOBAL_SLIDER_DIMENSION_FIELDS = ['z', 't'];
 export const INITIAL_SLIDER_VALUE = [1500, 20000];
 export const FILL_PIXEL_VALUE = '----';

@@ -36,7 +36,7 @@ function LensSelect({
           onChange={e => handleSelection(e.target.value)}
         >
           {channelOptions.map((opt, i) => (
-            <option key={opt} value={i}>
+            <option key={opt ?? i} value={i}>
               {opt}
             </option>
           ))}
