@@ -80,7 +80,7 @@ export function getRootPrefix(files: { path: string }[], rootName: string) {
     throw Error('Could not find root in store.');
   }
   const prefixLength = first.path.indexOf(rootName) + rootName.length;
-  return first.path.slice(prefixLength);
+  return first.path.slice(0, prefixLength);
 }
 
 export async function loadMultiscales(store: ZarrArray['store'], path = '') {

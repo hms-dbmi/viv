@@ -59,7 +59,8 @@ export class FileStore
   }
 
   async containsItem(key: string) {
-    return this._map.has(key);
+    const path = this._key(key);
+    return this._map.has(path);
   }
 }
 
