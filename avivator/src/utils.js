@@ -77,12 +77,13 @@ export async function createLoader(
     return source;
 
   } catch (e) {
+
     if (e instanceof UnsupportedBrowserError) {
       handleLoaderError(e.message);
     } else {
       handleLoaderError(null);
     }
-    return null;
+    return { data: null }
   }
 }
 

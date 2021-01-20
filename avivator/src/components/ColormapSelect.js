@@ -22,7 +22,7 @@ function ColormapSelect({ value, handleChange, disabled }) {
         disabled={disabled}
       >
         <option aria-label="None" value="" />
-        {COLORMAP_OPTIONS.map(name => (
+        {COLORMAP_OPTIONS.map((name) => (
           <option key={name} value={name}>
             {name}
           </option>

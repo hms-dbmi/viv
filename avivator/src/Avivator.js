@@ -299,6 +299,7 @@ export default function Avivator(props) {
         item
       >
         <ChannelController
+          key={`channel-controller-${name}-${id}-${i}`}
           name={name}
           channelOptions={channelOptions}
           isOn={isOn[i]}

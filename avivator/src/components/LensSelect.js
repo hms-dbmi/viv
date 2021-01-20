@@ -36,7 +36,8 @@ function LensSelect({
           onChange={e => handleSelection(e.target.value)}
         >
           {channelOptions.map((opt, i) => (
-            <option key={opt ?? i} value={i}>
+            // eslint-disable-next-line react/no-array-index-key
+            <option key={opt + i} value={i}>
               {opt}
             </option>
           ))}
