@@ -7,8 +7,8 @@ import { getVivId } from '../views/utils';
 const areViewStatesEqual = (viewState, otherViewState) => {
   return (
     otherViewState === viewState ||
-    (equal(viewState?.target, otherViewState?.target) &&
-      viewState?.zoom === otherViewState?.zoom)
+    (viewState?.zoom === otherViewState?.zoom &&
+      equal(viewState?.target, otherViewState?.target))
   );
 };
 
@@ -94,38 +94,34 @@ export default class VivViewer extends PureComponent {
     const { views } = props;
     // Only update state if the previous viewState prop does not match the current one
     // so that people can update viewState
-    const changed = views
-      .filter(view => {
-        const prevViewState = prevProps.viewStates.find(
-          viewState => viewState.id === view.id
-        );
-        const currViewState = props.viewStates.find(
-          viewState => viewState.id === view.id
-        );
-        return (
-          currViewState && !areViewStatesEqual(currViewState, prevViewState)
-        );
-      })
-      .map(view => view.id);
-    if (changed.length) {
-      const { viewStates: prevStates } = this.state;
-      const viewStates = {};
-      views.forEach(view => {
-        if (changed.includes(view.id)) {
-          const { height, width } = view;
-          const viewState = props.viewStates.find(v => v.id === view.id);
-          viewStates[view.id] = view.filterViewState({
-            viewState: {
-              ...viewState,
-              height,
-              width,
-              id: view.id
-            }
-          });
-        } else {
-          viewStates[view.id] = prevStates[view.id];
+    // eslint-disable-next-line react/destructuring-assignment
+    const viewStates = { ...this.state.viewStates };
+    let anyChanged = false;
+    views.forEach(view => {
+      const currViewState = props.viewStates?.find(
+        viewState => viewState.id === view.id
+      );
+      if (!currViewState) {
+        return;
+      }
+      const prevViewState = prevProps.viewStates?.find(
+        viewState => viewState.id === view.id
+      );
+      if (areViewStatesEqual(currViewState, prevViewState)) {
+        return;
+      }
+      anyChanged = true;
+      const { height, width } = view;
+      viewStates[view.id] = view.filterViewState({
+        viewState: {
+          ...currViewState,
+          height,
+          width,
+          id: view.id
         }
       });
+    });
+    if (anyChanged) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState({ viewStates });
     }
