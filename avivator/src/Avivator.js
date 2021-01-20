@@ -196,8 +196,9 @@ export default function Avivator(props) {
     // Only update image on screen on a mouseup event for the same reason as above.
     if (mouseUp) {
       const stats = await Promise.all(
-        loaderSelections.map(selection => getSingleSelectionStats({ loader, selection }))
+        loaderSelection.map(selection => getSingleSelectionStats({ loader, selection }))
       );
+      console.log(stats)
       const domains = stats.map(stat => stat.domain);
       const sliders = stats.map(stat => stat.autoSliders);
       const { colors, isOn } = channels;

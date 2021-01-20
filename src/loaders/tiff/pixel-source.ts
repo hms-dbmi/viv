@@ -1,6 +1,6 @@
 import type { GeoTIFFImage, RasterOptions } from 'geotiff';
 import type { TypedArray } from 'zarr';
-import { isInterleaved, SIGNAL_ABORTED } from '../utils';
+import { getImageSize, isInterleaved, SIGNAL_ABORTED } from '../utils';
 
 import type {
   PixelSource,
@@ -86,17 +86,19 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
    * Computes tile size given x, y coord.
    */
   private _getTileExtent(x: number, y: number) {
-    const interleave = isInterleaved(this.shape);
-    const [h, w] = this.shape.slice(interleave ? -3 : -2);
+    const {
+      height: zoomLevelHeight,
+      width: zoomLevelWidth
+    } = getImageSize(this);
     let height = this.tileSize;
     let width = this.tileSize;
-    const maxXTileCoord = Math.floor(w / this.tileSize);
-    const maxYTileCoord = Math.floor(h / this.tileSize);
+    const maxXTileCoord = Math.floor(zoomLevelWidth / this.tileSize);
+    const maxYTileCoord = Math.floor(zoomLevelHeight / this.tileSize);
     if (x === maxXTileCoord) {
-      width = w % this.tileSize;
+      width = zoomLevelWidth % this.tileSize;
     }
     if (y === maxYTileCoord) {
-      height = h % this.tileSize;
+      height = zoomLevelHeight % this.tileSize;
     }
     return { height, width };
   }
