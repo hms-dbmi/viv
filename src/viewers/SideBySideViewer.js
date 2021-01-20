@@ -1,4 +1,4 @@
-import React from 'react'; // eslint-disable-line import/no-unresolved
+import React, { useMemo } from 'react'; // eslint-disable-line import/no-unresolved
 import VivViewer from './VivViewer';
 import { SideBySideView, getDefaultInitialViewState } from '../views';
 import useGlobalSelection from './global-selection-hook';
@@ -57,20 +57,22 @@ const SideBySideViewer = props => {
     oldLoaderSelection,
     onViewportLoad
   } = useGlobalSelection(loaderSelection, transitionFields);
-  let viewStates;
-  if (viewStatesProp) {
-    viewStates = viewStatesProp;
-  } else {
+  const viewStates = useMemo(() => {
+    if (viewStatesProp) {
+      return viewStatesProp;
+    }
     const defaultViewState = getDefaultInitialViewState(
       loader,
-      { height, width },
+      { height, width: width / 2 },
       0.5
     );
-    viewStates = [
+    return [
       { ...defaultViewState, id: 'left' },
       { ...defaultViewState, id: 'right' }
     ];
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loader, viewStatesProp]);
+
   const detailViewLeft = new SideBySideView({
     id: 'left',
     linkedIds: ['right'],

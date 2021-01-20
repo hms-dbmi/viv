@@ -1,4 +1,4 @@
-import React from 'react'; // eslint-disable-line import/no-unresolved
+import React, { useMemo } from 'react'; // eslint-disable-line import/no-unresolved
 import VivViewer from './VivViewer';
 import {
   DetailView,
@@ -72,9 +72,14 @@ const PictureInPictureViewer = props => {
     oldLoaderSelection,
     onViewportLoad
   } = useGlobalSelection(loaderSelection, transitionFields);
-  const baseViewState =
-    viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID) ||
-    getDefaultInitialViewState(loader, { height, width }, 0.5);
+  const baseViewState = useMemo(() => {
+    return (
+      viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID) ||
+      getDefaultInitialViewState(loader, { height, width }, 0.5)
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loader, viewStatesProp]);
+
   const detailView = new DetailView({
     id: DETAIL_VIEW_ID,
     height,
