@@ -72,13 +72,14 @@ const PictureInPictureViewer = props => {
     oldLoaderSelection,
     onViewportLoad
   } = useGlobalSelection(loaderSelection, transitionFields);
+  const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
   const baseViewState = useMemo(() => {
     return (
-      viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID) ||
+      detailViewState ||
       getDefaultInitialViewState(loader, { height, width }, 0.5)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loader, viewStatesProp]);
+  }, [loader, detailViewState]);
 
   const detailView = new DetailView({
     id: DETAIL_VIEW_ID,

@@ -57,8 +57,10 @@ const SideBySideViewer = props => {
     oldLoaderSelection,
     onViewportLoad
   } = useGlobalSelection(loaderSelection, transitionFields);
+  const leftViewState = viewStatesProp?.find(v => v.id === 'left');
+  const rightViewState = viewStatesProp?.find(v => v.id === 'right');
   const viewStates = useMemo(() => {
-    if (viewStatesProp) {
+    if (leftViewState && rightViewState) {
       return viewStatesProp;
     }
     const defaultViewState = getDefaultInitialViewState(
@@ -67,11 +69,11 @@ const SideBySideViewer = props => {
       0.5
     );
     return [
-      { ...defaultViewState, id: 'left' },
-      { ...defaultViewState, id: 'right' }
+      leftViewState || { ...defaultViewState, id: 'left' },
+      rightViewState || { ...defaultViewState, id: 'right' }
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loader, viewStatesProp]);
+  }, [loader, leftViewState, rightViewState]);
 
   const detailViewLeft = new SideBySideView({
     id: 'left',
