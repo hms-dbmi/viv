@@ -12,7 +12,9 @@ import {
   OverviewView,
   DetailView,
   SideBySideView,
-  getDefaultInitialViewState
+  getDefaultInitialViewState,
+  DETAIL_VIEW_ID,
+  OVERVIEW_VIEW_ID
 } from './views';
 import {
   createZarrLoader,
@@ -39,6 +41,8 @@ export {
   PictureInPictureViewer,
   getDefaultInitialViewState,
   SideBySideView,
+  DETAIL_VIEW_ID,
+  OVERVIEW_VIEW_ID,
   getChannelStats,
   SideBySideViewer,
   DetailView,

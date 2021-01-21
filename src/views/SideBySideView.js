@@ -17,7 +17,7 @@ import { getImageLayers, getVivId, makeBoundingBox } from './utils';
  * */
 export default class SideBySideView extends VivView {
   constructor({
-    initialViewState,
+    id,
     x,
     y,
     height,
@@ -28,7 +28,7 @@ export default class SideBySideView extends VivView {
     viewportOutlineColor = [255, 255, 255],
     viewportOutlineWidth = 10
   }) {
-    super({ initialViewState, x, y, height, width });
+    super({ id, x, y, height, width });
     this.linkedIds = linkedIds;
     this.panLock = panLock;
     this.zoomLock = zoomLock;

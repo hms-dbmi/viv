@@ -1,6 +1,16 @@
 import React, { PureComponent } from 'react'; // eslint-disable-line import/no-unresolved
 import DeckGL from '@deck.gl/react';
+// No need to use the ES6 or React variants.
+import equal from 'fast-deep-equal';
 import { getVivId } from '../views/utils';
+
+const areViewStatesEqual = (viewState, otherViewState) => {
+  return (
+    otherViewState === viewState ||
+    (viewState?.zoom === otherViewState?.zoom &&
+      equal(viewState?.target, otherViewState?.target))
+  );
+};
 
 /**
  * @callback ViewStateChange
@@ -13,6 +23,7 @@ import { getVivId } from '../views/utils';
  * @param {Array} props.layerProps  Props for the layers in each view.
  * @param {Array} props.randomize Whether or not to randomize which view goes first (for dynamic rendering).
  * @param {VivView} props.views Various VivViews to render.
+ * @param {Array} props.viewStates List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }]
  * @param {ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * */
 export default class VivViewer extends PureComponent {
@@ -22,10 +33,10 @@ export default class VivViewer extends PureComponent {
       viewStates: {}
     };
     const { viewStates } = this.state;
-    const { views } = this.props;
+    const { views, viewStates: initialViewStates } = this.props;
     views.forEach(view => {
       viewStates[view.id] = view.filterViewState({
-        viewState: view.initialViewState
+        viewState: initialViewStates.find(v => v.id === view.id)
       });
     });
     this._onViewStateChange = this._onViewStateChange.bind(this);
@@ -78,13 +89,51 @@ export default class VivViewer extends PureComponent {
     return viewState;
   }
 
+  componentDidUpdate(prevProps) {
+    const { props } = this;
+    const { views } = props;
+    // Only update state if the previous viewState prop does not match the current one
+    // so that people can update viewState
+    // eslint-disable-next-line react/destructuring-assignment
+    const viewStates = { ...this.state.viewStates };
+    let anyChanged = false;
+    views.forEach(view => {
+      const currViewState = props.viewStates?.find(
+        viewState => viewState.id === view.id
+      );
+      if (!currViewState) {
+        return;
+      }
+      const prevViewState = prevProps.viewStates?.find(
+        viewState => viewState.id === view.id
+      );
+      if (areViewStatesEqual(currViewState, prevViewState)) {
+        return;
+      }
+      anyChanged = true;
+      const { height, width } = view;
+      viewStates[view.id] = view.filterViewState({
+        viewState: {
+          ...currViewState,
+          height,
+          width,
+          id: view.id
+        }
+      });
+    });
+    if (anyChanged) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ viewStates });
+    }
+  }
+
   /**
    * This updates the viewStates' height and width with the newest height and
    * width on any call where the viewStates changes (i.e resize events),
    * using the previous state (falling back on the view's initial state) for target x and y, zoom level etc.
    */
   static getDerivedStateFromProps(props, prevState) {
-    const { views } = props;
+    const { views, viewStates: viewStatesProps } = props;
     // Update internal viewState on view changes as well as height and width changes.
     // Maybe we should add x/y too?
     if (
@@ -101,7 +150,8 @@ export default class VivViewer extends PureComponent {
         const currentViewState = prevState.viewStates[view.id];
         viewStates[view.id] = view.filterViewState({
           viewState: {
-            ...(currentViewState || view.initialViewState),
+            ...(currentViewState ||
+              viewStatesProps.find(v => v.id === view.id)),
             height,
             width,
             id: view.id
