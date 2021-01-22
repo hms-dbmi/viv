@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Upgrade deck.gl to 8.4.0-beta.1 to handle aborting tiles after selection better.
+
 ## 0.8.3
 
 ### Added
