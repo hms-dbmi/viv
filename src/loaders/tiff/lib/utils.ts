@@ -12,7 +12,7 @@ const DTYPE_LOOKUP = {
   int32: 'Uint32'
 } as const;
 
-export function getPixelSourceMeta({ Pixels }: OMEXML[0]) {
+export function getOmePixelSourceMeta({ Pixels }: OMEXML[0]) {
   // e.g. 'XYZCT' -> ['t', 'c', 'z', 'y', 'x']
   const labels = getLabels(Pixels.DimensionOrder);
 

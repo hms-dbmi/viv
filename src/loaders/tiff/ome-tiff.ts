@@ -3,11 +3,11 @@ import { fromString } from '../omexml';
 
 import TiffPixelSource from './pixel-source';
 import {
-  getLegacyIndexer,
-  getSubIFDIndexer,
+  getOmeLegacyIndexer,
+  getOmeSubIFDIndexer,
   OmeTiffIndexer
 } from './lib/indexers';
-import { getPixelSourceMeta } from './lib/utils';
+import { getOmePixelSourceMeta } from './lib/utils';
 
 export interface OmeTiffSelection {
   t: number;
@@ -35,24 +35,24 @@ export async function load(tiff: GeoTIFF) {
   if (SubIFDs) {
     // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.
     levels = SubIFDs.length;
-    pyramidIndexer = getSubIFDIndexer(tiff, omexml);
+    pyramidIndexer = getOmeSubIFDIndexer(tiff, omexml);
   } else {
     // Image is legacy format; resolutions are stored as separate images.
     levels = omexml.length;
-    pyramidIndexer = getLegacyIndexer(tiff, omexml);
+    pyramidIndexer = getOmeLegacyIndexer(tiff, omexml);
   }
 
   // TODO: The OmeTIFF loader only works for the _first_ image in the metadata.
   const imgMeta = omexml[0];
-  const { labels, getShape, physicalSizes, dtype } = getPixelSourceMeta(
+  const { labels, getShape, physicalSizes, dtype } = getOmePixelSourceMeta(
     imgMeta
   );
   const tileSize = firstImage.getTileWidth();
   const meta = { photometricInterpretation, physicalSizes };
 
-  const data = Array.from({ length: levels }).map((_, i) => {
-    const shape = getShape(i);
-    const indexer = (sel: OmeTiffSelection) => pyramidIndexer(sel, i);
+  const data = Array.from({ length: levels }).map((_, resolution) => {
+    const shape = getShape(resolution);
+    const indexer = (sel: OmeTiffSelection) => pyramidIndexer(sel, resolution);
     const source = new TiffPixelSource(
       indexer,
       dtype,

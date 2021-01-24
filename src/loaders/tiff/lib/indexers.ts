@@ -26,13 +26,13 @@ export type OmeTiffIndexer = (
  * Returns an indexer for legacy Bioformats images. This assumes that
  * downsampled resolutions are stored sequentially in the OME-TIFF.
  */
-export function getLegacyIndexer(
+export function getOmeLegacyIndexer(
   tiff: GeoTIFF,
   rootMeta: OMEXML
 ): OmeTiffIndexer {
   const imgMeta = rootMeta[0];
   const { SizeT, SizeC, SizeZ } = imgMeta.Pixels;
-  const ifdIndexer = getIFDIndexer(imgMeta);
+  const ifdIndexer = getOmeIFDIndexer(imgMeta);
 
   return (sel: OmeTiffSelection, pyramidLevel: number) => {
     // Get IFD index at base pyramid level
@@ -58,12 +58,12 @@ export function getLegacyIndexer(
  * an ES6 Map that maps a string key that identifies the selection uniquely
  * to the corresponding IFD.
  */
-export function getSubIFDIndexer(
+export function getOmeSubIFDIndexer(
   tiff: GeoTIFF,
   rootMeta: OMEXML
 ): OmeTiffIndexer {
   const imgMeta = rootMeta[0];
-  const ifdIndexer = getIFDIndexer(imgMeta);
+  const ifdIndexer = getOmeIFDIndexer(imgMeta);
   const ifdCache: Map<string, Promise<ImageFileDirectory>> = new Map();
 
   return async (sel: OmeTiffSelection, pyramidLevel: number) => {
@@ -106,7 +106,7 @@ export function getSubIFDIndexer(
  * Returns a function that computes the image index based on the dimension
  * order and dimension sizes.
  */
-function getIFDIndexer(imgMeta: OMEXML[0]): (sel: OmeTiffSelection) => number {
+function getOmeIFDIndexer(imgMeta: OMEXML[0]): (sel: OmeTiffSelection) => number {
   const { SizeC, SizeZ, SizeT, DimensionOrder } = imgMeta.Pixels;
   switch (DimensionOrder) {
     case 'XYZCT': {
