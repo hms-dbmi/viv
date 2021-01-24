@@ -106,7 +106,9 @@ export function getOmeSubIFDIndexer(
  * Returns a function that computes the image index based on the dimension
  * order and dimension sizes.
  */
-function getOmeIFDIndexer(imgMeta: OMEXML[0]): (sel: OmeTiffSelection) => number {
+function getOmeIFDIndexer(
+  imgMeta: OMEXML[0]
+): (sel: OmeTiffSelection) => number {
   const { SizeC, SizeZ, SizeT, DimensionOrder } = imgMeta.Pixels;
   switch (DimensionOrder) {
     case 'XYZCT': {

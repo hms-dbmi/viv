@@ -25,7 +25,7 @@ export function checkProxies(tiff: GeoTIFF) {
  * > isProxy(tiff, POOL_PROXY_KEY) === true; // true
  */
 function isProxy(tiff: GeoTIFF, proxyFlag: string) {
-  return (<any>tiff)[proxyFlag] as boolean;
+  return (tiff as any)[proxyFlag] as boolean;
 }
 
 /*

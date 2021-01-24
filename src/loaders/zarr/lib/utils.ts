@@ -51,7 +51,7 @@ export function guessBioformatsLabels(
   const labels = getLabels(Pixels.DimensionOrder);
   labels.forEach((lower, i) => {
     const label = lower.toUpperCase();
-    const xmlSize = (<any>Pixels)[`Size${label}`] as number;
+    const xmlSize = (Pixels as any)[`Size${label}`] as number;
     if (!xmlSize) {
       throw Error(`Dimension ${label} is invalid for OME-XML.`);
     }
@@ -105,7 +105,7 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
  * chunk sizes which aren't supported by our image layers.
  *
  * This function trims the pyramid to just levels with the same tilesize.
- * 
+ *
  */
 export function trimPyramid<S extends string[]>(pyramid: PixelSource<S>[]) {
   return pyramid.filter(level => pyramid[0].tileSize === level.tileSize);

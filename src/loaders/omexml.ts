@@ -15,8 +15,7 @@ const PARSER_OPTIONS = {
   ignoreAttributes: false
 };
 
-const parse = (str: string): ParserResult.Root =>
-  parser.parse(str, PARSER_OPTIONS);
+const parse = (str: string): Root => parser.parse(str, PARSER_OPTIONS);
 
 export function fromString(str: string) {
   const res = parse(str);
@@ -74,117 +73,115 @@ export type DimensionOrder =
   | 'XYCZT'
   | 'XYTCZ'
   | 'XYTZC';
-// VERY incomplete type declaration for OMEXML object returned from 'fast-xml-parser'
-declare module ParserResult {
-  // Structure of node is determined by the PARSER_OPTIONS.
-  type Node<T, A> = T & { attr: A };
-  type Attrs<Fields extends string, T = string> = { [K in Fields]: T };
 
-  type OMEAttrs = Attrs<'xmlns' | 'xmlns:xsi' | 'xsi:schemaLocation'>;
-  type OME = Node<{ Insturment: Insturment; Image: Image | Image[] }, OMEAttrs>;
+// Structure of node is determined by the PARSER_OPTIONS.
+type Node<T, A> = T & { attr: A };
+type Attrs<Fields extends string, T = string> = { [K in Fields]: T };
 
-  type Insturment = Node<
-    { Objective: Node<{}, Attrs<'ID' | 'Model' | 'NominalMagnification'>> },
-    Attrs<'ID'>
-  >;
+type OMEAttrs = Attrs<'xmlns' | 'xmlns:xsi' | 'xsi:schemaLocation'>;
+type OME = Node<{ Insturment: Insturment; Image: Image | Image[] }, OMEAttrs>;
 
-  interface ImageNodes {
-    AquisitionDate?: string;
-    Description?: string;
-    Pixels: Pixels;
-    InstrumentRef: Node<{}, { ID: string }>;
-    ObjectiveSettings: Node<{}, { ID: string }>;
-  }
-  type Image = Node<ImageNodes, Attrs<'ID' | 'Name'>>;
+type Insturment = Node<
+  { Objective: Node<{}, Attrs<'ID' | 'Model' | 'NominalMagnification'>> },
+  Attrs<'ID'>
+>;
 
-  type PixelType =
-    | 'int8'
-    | 'int16'
-    | 'int32'
-    | 'uint8'
-    | 'uint16'
-    | 'uint32'
-    | 'float'
-    | 'bit'
-    | 'double'
-    | 'complex'
-    | 'double-complex';
+interface ImageNodes {
+  AquisitionDate?: string;
+  Description?: string;
+  Pixels: Pixels;
+  InstrumentRef: Node<{}, { ID: string }>;
+  ObjectiveSettings: Node<{}, { ID: string }>;
+}
+type Image = Node<ImageNodes, Attrs<'ID' | 'Name'>>;
 
-  type UnitsLength =
-    | 'Ym'
-    | 'Zm'
-    | 'Em'
-    | 'Pm'
-    | 'Tm'
-    | 'Gm'
-    | 'Mm'
-    | 'km'
-    | 'hm'
-    | 'dam'
-    | 'm'
-    | 'dm'
-    | 'cm'
-    | 'mm'
-    | 'µm'
-    | 'nm'
-    | 'pm'
-    | 'fm'
-    | 'am'
-    | 'zm'
-    | 'ym'
-    | 'Å'
-    | 'thou'
-    | 'li'
-    | 'in'
-    | 'ft'
-    | 'yd'
-    | 'mi'
-    | 'ua'
-    | 'ly'
-    | 'pc'
-    | 'pt'
-    | 'pixel'
-    | 'reference frame';
+type PixelType =
+  | 'int8'
+  | 'int16'
+  | 'int32'
+  | 'uint8'
+  | 'uint16'
+  | 'uint32'
+  | 'float'
+  | 'bit'
+  | 'double'
+  | 'complex'
+  | 'double-complex';
 
-  type PhysicalSize<Name extends string> = `PhysicalSize${Name}`;
-  type PhysicalSizeUnit<Name extends string> = `PhysicalSize${Name}Unit`;
-  type Size<Names extends string> = `Size${Names}`;
+type UnitsLength =
+  | 'Ym'
+  | 'Zm'
+  | 'Em'
+  | 'Pm'
+  | 'Tm'
+  | 'Gm'
+  | 'Mm'
+  | 'km'
+  | 'hm'
+  | 'dam'
+  | 'm'
+  | 'dm'
+  | 'cm'
+  | 'mm'
+  | 'µm'
+  | 'nm'
+  | 'pm'
+  | 'fm'
+  | 'am'
+  | 'zm'
+  | 'ym'
+  | 'Å'
+  | 'thou'
+  | 'li'
+  | 'in'
+  | 'ft'
+  | 'yd'
+  | 'mi'
+  | 'ua'
+  | 'ly'
+  | 'pc'
+  | 'pt'
+  | 'pixel'
+  | 'reference frame';
 
-  type PixelAttrs = Attrs<
-    | PhysicalSize<'X' | 'Y' | 'Z'>
-    | 'SignificantBits'
-    | Size<'T' | 'C' | 'Z' | 'Y' | 'X'>,
-    number
-  > &
-    Attrs<PhysicalSizeUnit<'X' | 'Y' | 'Z'>, UnitsLength> &
-    Attrs<'BigEndian' | 'Interleaved', boolean> & {
+type PhysicalSize<Name extends string> = `PhysicalSize${Name}`;
+type PhysicalSizeUnit<Name extends string> = `PhysicalSize${Name}Unit`;
+type Size<Names extends string> = `Size${Names}`;
+
+type PixelAttrs = Attrs<
+  | PhysicalSize<'X' | 'Y' | 'Z'>
+  | 'SignificantBits'
+  | Size<'T' | 'C' | 'Z' | 'Y' | 'X'>,
+  number
+> &
+  Attrs<PhysicalSizeUnit<'X' | 'Y' | 'Z'>, UnitsLength> &
+  Attrs<'BigEndian' | 'Interleaved', boolean> & {
+    ID: string;
+    DimensionOrder: DimensionOrder;
+    Type: PixelType;
+  };
+
+type Pixels = Node<
+  {
+    Channel: Channel | Channel[];
+    TiffData: Node<{}, Attrs<'IFD' | 'PlaneCount'>>;
+  },
+  PixelAttrs
+>;
+
+type ChannelAttrs =
+  | {
       ID: string;
-      DimensionOrder: DimensionOrder;
-      Type: PixelType;
+      SamplesPerPixel: number;
+      Name?: string;
+    }
+  | {
+      ID: string;
+      SamplesPerPixel: number;
+      Name?: string;
+      Color: number;
     };
 
-  type Pixels = Node<
-    {
-      Channel: Channel | Channel[];
-      TiffData: Node<{}, Attrs<'IFD' | 'PlaneCount'>>;
-    },
-    PixelAttrs
-  >;
+type Channel = Node<{}, ChannelAttrs>;
 
-  type ChannelAttrs =
-    | {
-        ID: string;
-        SamplesPerPixel: number;
-        Name?: string;
-      }
-    | {
-        ID: string;
-        SamplesPerPixel: number;
-        Name?: string;
-        Color: number;
-      };
-
-  type Channel = Node<{}, ChannelAttrs>;
-
-  export type Root = { OME: OME };
-}
+type Root = { OME: OME };
