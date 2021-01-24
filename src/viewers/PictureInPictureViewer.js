@@ -1,4 +1,4 @@
-import React from 'react'; // eslint-disable-line import/no-unresolved
+import React, { useMemo } from 'react'; // eslint-disable-line import/no-unresolved
 import VivViewer from './VivViewer';
 import {
   DetailView,
@@ -7,6 +7,8 @@ import {
   DETAIL_VIEW_ID,
   OVERVIEW_VIEW_ID
 } from '../views';
+import useGlobalSelection from './global-selection-hook';
+import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -22,7 +24,7 @@ import {
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
  * @param {Object} props.hoverHooks Object including the allowable hooks - right now only accepting a function with key handleValue like { handleValue: (valueArray) => {} } where valueArray
  * has the pixel values for the image under the hover location.
- * @param {number} props.initialViewState Object like { target: [x, y, 0], zoom: -zoom } for initializing where the viewer looks (optional - this is inferred from height/width/loader
+ * @param {Array} [props.viewStates] Array of objects like [{ target: [x, y, 0], zoom: -zoom, id: DETAIL_VIEW_ID }] for setting where the viewer looks (optional - this is inferred from height/width/loader
  * internally by default using getDefaultInitialViewState).
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
@@ -38,6 +40,7 @@ import {
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
+ * @param {Array} [transitionFields] A string array indicating which fields require a transition: Default: ['time', 'z'].
  */
 
 const PictureInPictureViewer = props => {
@@ -46,7 +49,7 @@ const PictureInPictureViewer = props => {
     sliderValues,
     colorValues,
     channelIsOn,
-    initialViewState,
+    viewStates: viewStatesProp,
     colormap,
     overview,
     overviewOn,
@@ -61,14 +64,25 @@ const PictureInPictureViewer = props => {
     lensBorderRadius = 0.02,
     clickCenter = true,
     transparentColor,
-    onViewStateChange
+    onViewStateChange,
+    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS
   } = props;
-  const viewState =
-    initialViewState ||
-    getDefaultInitialViewState(loader, { height, width }, 0.5);
-  const detailViewState = { ...viewState, id: DETAIL_VIEW_ID };
+  const {
+    newLoaderSelection,
+    oldLoaderSelection,
+    onViewportLoad
+  } = useGlobalSelection(loaderSelection, transitionFields);
+  const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
+  const baseViewState = useMemo(() => {
+    return (
+      detailViewState ||
+      getDefaultInitialViewState(loader, { height, width }, 0.5)
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loader, detailViewState]);
+
   const detailView = new DetailView({
-    initialViewState: detailViewState,
+    id: DETAIL_VIEW_ID,
     height,
     width
   });
@@ -77,7 +91,10 @@ const PictureInPictureViewer = props => {
     sliderValues,
     colorValues,
     channelIsOn,
-    loaderSelection,
+    loaderSelection: oldLoaderSelection,
+    newLoaderSelection,
+    onViewportLoad,
+    transitionFields,
     colormap,
     isLensOn,
     lensSelection,
@@ -88,10 +105,14 @@ const PictureInPictureViewer = props => {
   };
   const views = [detailView];
   const layerProps = [layerConfig];
+  const viewStates = [{ ...baseViewState, id: DETAIL_VIEW_ID }];
   if (overviewOn && loader) {
-    const overviewViewState = { ...viewState, id: OVERVIEW_VIEW_ID };
+    // It's unclear why this is needed because OverviewView.filterViewState sets "zoom" and "target".
+    const overviewViewState = viewStatesProp?.find(
+      v => v.id === OVERVIEW_VIEW_ID
+    ) || { ...baseViewState, id: OVERVIEW_VIEW_ID };
     const overviewView = new OverviewView({
-      initialViewState: overviewViewState,
+      id: OVERVIEW_VIEW_ID,
       loader,
       detailHeight: height,
       detailWidth: width,
@@ -100,12 +121,14 @@ const PictureInPictureViewer = props => {
     });
     views.push(overviewView);
     layerProps.push(layerConfig);
+    viewStates.push(overviewViewState);
   }
   if (!loader) return null;
   return (
     <VivViewer
       layerProps={layerProps}
       views={views}
+      viewStates={viewStates}
       hoverHooks={hoverHooks}
       onViewStateChange={onViewStateChange}
     />

@@ -3,7 +3,8 @@ import {
   ImageLayer,
   ScaleBarLayer,
   XRLayer,
-  OverviewLayer
+  OverviewLayer,
+  BitmapLayer
 } from './layers';
 import { VivViewer, PictureInPictureViewer, SideBySideViewer } from './viewers';
 import {
@@ -11,7 +12,9 @@ import {
   OverviewView,
   DetailView,
   SideBySideView,
-  getDefaultInitialViewState
+  getDefaultInitialViewState,
+  DETAIL_VIEW_ID,
+  OVERVIEW_VIEW_ID
 } from './views';
 import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from './constants';
 
@@ -22,12 +25,15 @@ export {
   MultiscaleImageLayer,
   XRLayer,
   OverviewLayer,
+  BitmapLayer,
   VivViewer,
   VivView,
   OverviewView,
   PictureInPictureViewer,
   getDefaultInitialViewState,
   SideBySideView,
+  DETAIL_VIEW_ID,
+  OVERVIEW_VIEW_ID,
   SideBySideViewer,
   DetailView,
   ImageLayer

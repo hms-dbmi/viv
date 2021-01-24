@@ -37,3 +37,5 @@ export const DTYPE_VALUES = {
     max: 3.4 * 10 ** 38
   }
 } as const;
+
+export const GLOBAL_SLIDER_DIMENSION_FIELDS = ['z', 't'];

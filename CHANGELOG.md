@@ -4,17 +4,29 @@
 
 ### Added
 
+### Changed
+
+## 0.8.3
+
+### Added
+
 - Document support for `bfconvert` as a cli tool for generating image pyramids as well as the new pyramidal tiff spec.
 - Issue templates for Github.
-- Add `transparentColor` and `useTransparentColor` to allow the layer to set a color to be "transparent" (or use the automatically calculated one when colormaps are set).
+- Add `transparentColor` to allow the layer to set a color to be "transparent" (or use the automatically calculated one when colormaps are set).
 
 ### Changed
 
+- Adjust the zoom level for tile layer if scaled.
 - Update `getDefaultInitialViewState` to return floating point zoom that fills the screen by default.
 - Rewrite data loaders as `PixelSource` | `PixelSource[]`. Introduce `ZarrPixelSource` and `TiffPixelSource`
 to support other types of images. Migrate `src/loaders` to TypeScript.
 - Add `loadBioforamtsZarr`, `loadOmeZarr`, and `loadOmeTiff` utilities.
 - Add predictive, fully typed OME-XML response from `fast-xml-parser`.
+- Upgrade geotiff to fix out-of-range requests issue.
+- Changed `initialViewState` to `viewState` in `PictureInPictureViewer` and to `viewStates` in the other viewers. The new properties control the deck.gl view state at any time and not just when the components are created.
+- Fix `maxZoom` bug.
+- Smooth transitions for global selection changes.
+- GH actions allow for running on PR as well as push (so that forked repos run tests).
 
 ## 0.8.2
 

@@ -12,6 +12,9 @@ import {
   SIGNAL_ABORTED
 } from '../../loaders/utils';
 
+// From https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
+const DECK_GL_TILE_SIZE = 512;
+
 const defaultProps = {
   pickable: true,
   onHover: { type: 'function', value: null, compare: false },
@@ -29,7 +32,9 @@ const defaultProps = {
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   maxRequests: { type: 'number', value: 10, compare: true },
   onClick: { type: 'function', value: null, compare: true },
-  transparentColor: { type: 'array', value: null, compare: true }
+  transparentColor: { type: 'array', value: null, compare: true },
+  refinementStrategy: { type: 'string', value: null, compare: true },
+  excludeBackground: { type: 'boolean', value: false, compare: true }
 };
 
 /**
@@ -59,6 +64,8 @@ const defaultProps = {
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
+ * @param {string} props.refinementStrategy 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
+ * @param {boolean} props.excludeBackground Whether to exclude the background image. The background image is also excluded for opacity!=1.
  */
 
 export default class MultiscaleImageLayer extends CompositeLayer {
@@ -97,13 +104,21 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       maxRequests,
       onClick,
       modelMatrix,
-      transparentColor
+      transparentColor,
+      excludeBackground,
+      onViewportLoad,
+      refinementStrategy
     } = this.props;
 
     // Get properties from highest resolution
     const { tileSize, dtype } = loader[0];
 
     const { unprojectLensBounds } = this.state;
+    // This is basically to invert:
+    // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
+    // The z level can be wrong for showing the correct scales because of the calculation deck.gl does
+    // so we need to invert it for fetching tiles and minZoom/maxZoom.
+    const zoomOffset = Math.log2(DECK_GL_TILE_SIZE / tileSize);
     const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z, signal }) => {
       // Early return if no loaderSelection
@@ -117,10 +132,10 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       // which felt odd to me to beign with.
       // The image-tile example works without, this but I have a feeling there is something
       // going on with our pyramids and/or rendering that is different.
-      z = Math.round(-z + Math.log2(512 / tileSize));
+      const resolution = Math.round(-z + zoomOffset);
       const getTile = selection => {
         const config = { x, y, selection, signal };
-        return loader[z].getTile(config);
+        return loader[resolution].getTile(config);
       };
 
       try {
@@ -175,12 +190,21 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       id: `Tiled-Image-${id}`,
       getTileData,
       dtype,
-      tileSize,
+      // If you scale a matrix up or down, that is like zooming in or out.  After
+      // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128,
+      // tileSize controls the zoom level that the tile indexer thinks you are at for fetching tiles.
+      // Because the indexing offsets `z` by math.log2(TILE_SIZE / tileSize), passing in
+      // tileSize * (1 / modelMatrix.getScale()[0]) from this layer as below to TileLayer gives an offset of
+      // math.log2(TILE_SIZE / (tileSize * (1 / modelMatrix.getScale()[0]))) = math.log2(TILE_SIZE / tileSize) + Math.log2(modelMatrix.getScale()[0])
+      // as desired so that the z level used for indexing the tiles is larger (i.e more zoomed in) if the image is scaled larger, and vice-versa if scaled smaller.
+      tileSize: modelMatrix
+        ? tileSize * (1 / modelMatrix.getScale()[0])
+        : tileSize,
       onClick,
       extent: [0, 0, width, height],
-      // See the above note within getTileData for why the division with 512 and the rounding necessary.
-      minZoom: Math.round(-(loader.length - 1) + Math.log2(512 / tileSize)),
-      maxZoom: Math.min(0, Math.round(Math.log2(512 / tileSize))),
+      // See the above note within for why the use of zoomOffset and the rounding necessary.
+      minZoom: Math.round(-(loader.length - 1) + zoomOffset),
+      maxZoom: Math.round(zoomOffset),
       colorValues,
       sliderValues,
       channelIsOn,
@@ -188,7 +212,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       domain,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
       // multiple rendered sublayers (some of which have been cached) from overlapping
-      refinementStrategy: opacity === 1 ? 'best-available' : 'no-overlap',
+      refinementStrategy:
+        refinementStrategy || (opacity === 1 ? 'best-available' : 'no-overlap'),
       // TileLayer checks `changeFlags.updateTriggersChanged.getTileData` to see if tile cache
       // needs to be re-created. We want to trigger this behavior if the loader changes.
       // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
@@ -207,7 +232,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       lensBorderColor,
       lensBorderRadius,
       modelMatrix,
-      transparentColor
+      transparentColor,
+      onViewportLoad
     });
 
     // This gives us a background image and also solves the current
@@ -220,6 +246,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     const layerModelMatrix = modelMatrix ? modelMatrix.clone() : new Matrix4();
     const baseLayer =
       implementsGetRaster &&
+      !excludeBackground &&
       new ImageLayer(this.props, {
         id: `Background-Image-${id}`,
         loader: lowestResolution,

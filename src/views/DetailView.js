@@ -1,6 +1,6 @@
-import { MultiscaleImageLayer, ImageLayer, ScaleBarLayer } from '../layers';
+import { ScaleBarLayer } from '../layers';
 import VivView from './VivView';
-import { getVivId } from './utils';
+import { getImageLayers, getVivId } from './utils';
 import { OVERVIEW_VIEW_ID } from './OverviewView';
 
 export const DETAIL_VIEW_ID = 'detail';
@@ -14,21 +14,7 @@ export default class DetailView extends VivView {
     const { loader } = props;
     const { id, height, width } = this;
     const layerViewState = viewStates[id];
-    const layers = [];
-
-    const detailLayer =
-      loader.length === 1
-        ? new ImageLayer(props, {
-            id: getVivId(id),
-            viewportId: id,
-            loader: loader[0] // loader is just a pixel source
-          })
-        : new MultiscaleImageLayer(props, {
-            id: getVivId(id),
-            viewportId: id,
-            loader
-          });
-    layers.push(detailLayer);
+    const layers = getImageLayers(id, props);
 
     // Inspect the first pixel source for physical sizes
     const { physicalSizes } = loader[0];

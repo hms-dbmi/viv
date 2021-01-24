@@ -1,6 +1,8 @@
-import React from 'react'; // eslint-disable-line import/no-unresolved
+import React, { useMemo } from 'react'; // eslint-disable-line import/no-unresolved
 import VivViewer from './VivViewer';
 import { SideBySideView, getDefaultInitialViewState } from '../views';
+import useGlobalSelection from './global-selection-hook';
+import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 
 /**
  * This component provides a side-by-side VivViewer with linked zoom/pan.
@@ -13,7 +15,7 @@ import { SideBySideView, getDefaultInitialViewState } from '../views';
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {Boolean} props.zoomLock Whether or not lock the zooms of the two views.
  * @param {Boolean} props.panLock Whether or not lock the pans of the two views.
- * @param {number} props.initialViewState Object like { target: [x, y, 0], zoom: -zoom } for initializing where the viewer looks (optional - this is inferred from height/width/loader
+ * @param {Array} [props.viewStates] List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }] for initializing where the viewer looks (optional - this is inferred from height/width/loader
  * internally by default using getDefaultInitialViewState).
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
@@ -26,6 +28,7 @@ import { SideBySideView, getDefaultInitialViewState } from '../views';
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
+ * @param {Array} [transitionFields] A string array indicating which fields require a transition: Default: ['time', 'z'].
  */
 const SideBySideViewer = props => {
   const {
@@ -33,7 +36,7 @@ const SideBySideViewer = props => {
     sliderValues,
     colorValues,
     channelIsOn,
-    initialViewState,
+    viewStates: viewStatesProp,
     colormap,
     panLock,
     loaderSelection,
@@ -46,13 +49,34 @@ const SideBySideViewer = props => {
     lensBorderColor = [255, 255, 255],
     lensBorderRadius = 0.02,
     transparentColor,
-    onViewStateChange
+    onViewStateChange,
+    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS
   } = props;
-  const viewState =
-    initialViewState ||
-    getDefaultInitialViewState(loader, { height, width }, 0.5);
+  const {
+    newLoaderSelection,
+    oldLoaderSelection,
+    onViewportLoad
+  } = useGlobalSelection(loaderSelection, transitionFields);
+  const leftViewState = viewStatesProp?.find(v => v.id === 'left');
+  const rightViewState = viewStatesProp?.find(v => v.id === 'right');
+  const viewStates = useMemo(() => {
+    if (leftViewState && rightViewState) {
+      return viewStatesProp;
+    }
+    const defaultViewState = getDefaultInitialViewState(
+      loader,
+      { height, width: width / 2 },
+      0.5
+    );
+    return [
+      leftViewState || { ...defaultViewState, id: 'left' },
+      rightViewState || { ...defaultViewState, id: 'right' }
+    ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loader, leftViewState, rightViewState]);
+
   const detailViewLeft = new SideBySideView({
-    initialViewState: { ...viewState, id: 'left' },
+    id: 'left',
     linkedIds: ['right'],
     panLock,
     zoomLock,
@@ -60,7 +84,7 @@ const SideBySideViewer = props => {
     width: width / 2
   });
   const detailViewRight = new SideBySideView({
-    initialViewState: { ...viewState, id: 'right' },
+    id: 'right',
     x: width / 2,
     linkedIds: ['left'],
     panLock,
@@ -73,7 +97,10 @@ const SideBySideViewer = props => {
     sliderValues,
     colorValues,
     channelIsOn,
-    loaderSelection,
+    loaderSelection: oldLoaderSelection,
+    newLoaderSelection,
+    onViewportLoad,
+    transitionFields,
     colormap,
     isLensOn,
     lensSelection,
@@ -90,6 +117,7 @@ const SideBySideViewer = props => {
       views={views}
       randomize
       onViewStateChange={onViewStateChange}
+      viewStates={viewStates}
     />
   ) : null;
 };

@@ -1,6 +1,10 @@
 import { OrthographicView } from '@deck.gl/core';
 import { getImageSize } from '../loaders/utils';
 
+// Do not import from '../layers' because that causes a circular dependency.
+import MultiscaleImageLayer from '../layers/MultiscaleImageLayer';
+import ImageLayer from '../layers/ImageLayer';
+
 export function getVivId(id) {
   return `-#${id}#`;
 }
@@ -44,4 +48,55 @@ export function getDefaultInitialViewState(loader, viewSize, zoomBackOff = 0) {
     zoom
   };
   return loaderInitialViewState;
+}
+
+/**
+ * Creates the layers for viewing an image in detail.
+ * @param {string} id The identifier of the view.
+ * @param {Object} props The layer properties.
+ * @returns {Array} An array of layers.
+ */
+export function getImageLayers(id, props) {
+  const {
+    loaderSelection,
+    newLoaderSelection,
+    onViewportLoad,
+    transitionFields,
+    ...layerProps
+  } = props;
+  const { loader } = layerProps;
+  // Create at least one layer even without loaderSelection so that the tests pass.
+  if (Array.isArray(loader)) { // isPyramid
+    return [loaderSelection, newLoaderSelection]
+      .filter((s, i) => i === 0 || s)
+      .map((s, i) => {
+        const suffix = s
+          ? `-${transitionFields.map(f => s[0][f]).join('-')}`
+          : '';
+        const newProps =
+          i !== 0
+            ? {
+                onViewportLoad,
+                refinementStrategy: 'never',
+                excludeBackground: true
+              }
+            : {};
+        return new MultiscaleImageLayer({
+          ...layerProps,
+          ...newProps,
+          loaderSelection: s,
+          id: `${loader.type}${getVivId(id)}${suffix}`,
+          viewportId: id,
+          loader // array of pixel sources
+        });
+      });
+  }
+  return [
+    new ImageLayer(layerProps, {
+      id: `${loader.type}${getVivId(id)}`,
+      viewportId: id,
+      loaderSelection,
+      loader: loader[0], // should just be a pixel source
+    })
+  ];
 }
