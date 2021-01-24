@@ -31,7 +31,7 @@ export function makeBoundingBox(viewState) {
 
 /**
  * Create an initial view state that centers the image in the viewport at the zoom level that fills the dimensions in `viewSize`.
- * @param {Object} loader The loader of the image for which the view state is desired.
+ * @param {Object} loader PixelSource[]
  * @param {Object} viewSize { height, width } object giving dimensions of the viewport for deducing the right zoom level to center the image.
  * @param {Object} zoomBackOff A positive number which controls how far zoomed out the view state is from filling the entire viewport (default is 0 so the image fully fills the view).
  * SideBySideViewer and PictureInPictureViewer use .5 when setting viewState automatically in their default behavior, so the viewport is slightly zoomed out from the image
@@ -65,38 +65,40 @@ export function getImageLayers(id, props) {
     ...layerProps
   } = props;
   const { loader } = layerProps;
+
   // Create at least one layer even without loaderSelection so that the tests pass.
-  if (Array.isArray(loader)) { // isPyramid
-    return [loaderSelection, newLoaderSelection]
-      .filter((s, i) => i === 0 || s)
-      .map((s, i) => {
-        const suffix = s
-          ? `-${transitionFields.map(f => s[0][f]).join('-')}`
-          : '';
-        const newProps =
-          i !== 0
-            ? {
-                onViewportLoad,
-                refinementStrategy: 'never',
-                excludeBackground: true
-              }
-            : {};
-        return new MultiscaleImageLayer({
-          ...layerProps,
-          ...newProps,
-          loaderSelection: s,
-          id: `${loader.type}${getVivId(id)}${suffix}`,
-          viewportId: id,
-          loader // array of pixel sources
-        });
-      });
+  if (loader.length === 1) {
+    return [
+      new ImageLayer(layerProps, {
+        id: `${loader.type}${getVivId(id)}`,
+        viewportId: id,
+        loaderSelection,
+        loader: loader[0] // should just be a pixel source
+      })
+    ];
   }
-  return [
-    new ImageLayer(layerProps, {
-      id: `${loader.type}${getVivId(id)}`,
-      viewportId: id,
-      loaderSelection,
-      loader: loader[0], // should just be a pixel source
-    })
-  ];
+  // isPyramid
+  return [loaderSelection, newLoaderSelection]
+    .filter((s, i) => i === 0 || s)
+    .map((s, i) => {
+      const suffix = s
+        ? `-${transitionFields.map(f => s[0][f]).join('-')}`
+        : '';
+      const newProps =
+        i !== 0
+          ? {
+              onViewportLoad,
+              refinementStrategy: 'never',
+              excludeBackground: true
+            }
+          : {};
+      return new MultiscaleImageLayer({
+        ...layerProps,
+        ...newProps,
+        loaderSelection: s,
+        id: `${loader.type}${getVivId(id)}${suffix}`,
+        viewportId: id,
+        loader // array of pixel sources
+      });
+    });
 }

@@ -35,7 +35,7 @@ test(`DetailView layer type and props check`, t => {
   );
   t.ok(
     layers[1] instanceof ScaleBarLayer,
-    'DetailView layer should be MultiscaleImageLayer.'
+    'DetailView layer should be ScaleBarLayer.'
   );
   t.equal(
     layers[0].props.viewportId,
