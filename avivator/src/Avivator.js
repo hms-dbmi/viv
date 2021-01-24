@@ -198,9 +198,8 @@ export default function Avivator(props) {
       const stats = await Promise.all(
         loaderSelection.map(selection => getSingleSelectionStats({ loader, selection }))
       );
-      console.log(stats)
       const domains = stats.map(stat => stat.domain);
-      const sliders = stats.map(stat => stat.autoSliders);
+      const sliders = stats.map(stat => stat.slider);
       const { colors, isOn } = channels;
       dispatch({
         type: 'RESET_CHANNELS',
