@@ -34,7 +34,7 @@ export async function load(tiff: GeoTIFF) {
 
   if (SubIFDs) {
     // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.
-    levels = SubIFDs.length;
+    levels = SubIFDs.length + 1;
     pyramidIndexer = getOmeSubIFDIndexer(tiff, omexml);
   } else {
     // Image is legacy format; resolutions are stored as separate images.
