@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Fix z-slider broken by transition fields.
+
 ## 0.8.3
 
 ### Added

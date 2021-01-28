@@ -31,7 +31,8 @@ const defaultProps = {
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   onClick: { type: 'function', value: null, compare: true },
-  transparentColor: { type: 'array', value: null, compare: true }
+  transparentColor: { type: 'array', value: null, compare: true },
+  onViewportLoad: { type: 'function', value: null, compare: true }
 };
 
 /**
@@ -57,6 +58,7 @@ const defaultProps = {
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
+ * @param {function} props.onViewportLoad Function that gets called when the data im the viewport loads.
  */
 export default class ImageLayer extends CompositeLayer {
   initializeState() {
@@ -83,7 +85,7 @@ export default class ImageLayer extends CompositeLayer {
       props.loaderSelection !== oldProps.loaderSelection;
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
-      const { loader, z, loaderSelection } = this.props;
+      const { loader, z, loaderSelection, onViewportLoad } = this.props;
       loader.getRaster({ z, loaderSelection }).then(raster => {
         /* eslint-disable no-param-reassign */
         if (loader.isInterleaved && loader.isRgb) {
@@ -99,6 +101,9 @@ export default class ImageLayer extends CompositeLayer {
           // data is for XLRLayer in non-WebGL2 evironment
           // we need to convert data to compatible textures
           raster.data = to32BitFloat(raster.data);
+        }
+        if (onViewportLoad) {
+          onViewportLoad(raster);
         }
         this.setState({ ...raster });
         /* eslint-disable no-param-reassign */
