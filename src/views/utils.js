@@ -65,12 +65,14 @@ export function getImageLayers(id, props) {
     ...layerProps
   } = props;
   const { loader } = layerProps;
+  // Grab name of PixelSource if a class instance (works for Tiff & Zarr).
+  const sourceName = loader[0]?.constructor?.name;
 
   // Create at least one layer even without loaderSelection so that the tests pass.
   if (loader.length === 1) {
     return [
       new ImageLayer(layerProps, {
-        id: `${loader.type}${getVivId(id)}`,
+        id: `${sourceName}${getVivId(id)}`,
         viewportId: id,
         loaderSelection,
         loader: loader[0] // should just be a pixel source
@@ -96,7 +98,7 @@ export function getImageLayers(id, props) {
         ...layerProps,
         ...newProps,
         loaderSelection: s,
-        id: `${loader.type}${getVivId(id)}${suffix}`,
+        id: `${sourceName}${getVivId(id)}${suffix}`,
         viewportId: id,
         loader // array of pixel sources
       });
