@@ -4,10 +4,14 @@ import type { OMEXML } from './omexml';
 import type { Labels, PixelSource } from '../types';
 
 /**
- * Computes statics from layer data.
- * This is helpful for generating histograms or scaling sliders to a
- * reasonable range. Also provided are "autoSliders" which are slider
- * bounds that should give a good initial image.
+ * Computes statics from pixel data.
+ * 
+ * This is helpful for generating histograms 
+ * or scaling sliders to reasonable range. Also provided are
+ * "autoSliders" which are slider bounds that should give a 
+ * good initial image.
+ * @param {TypedArray} arr
+ * @return {{ mean: number, sd: number, q1: number, q3: number, median: number, domain: number[], autoSliders: number[] }}
  */
 export function getChannelStats(arr: TypedArray) {
   let len = arr.length;

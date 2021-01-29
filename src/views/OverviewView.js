@@ -40,7 +40,7 @@ class OverviewController extends Controller {
  * additional arguments:
  * @param {Object} args
  * @param {Object} args.id for thie VivView
- * @param {Object} args.loader PixelSource[]
+ * @param {Object} args.loader PixelSource[], where each PixelSource is decreasing in shape. If length == 1, not multiscale.
  * @param {number} args.detailHeight Height of the detail view.
  * @param {number} args.detailWidth Width of the detail view.
  * @param {number} [args.scale] Scale of this viewport relative to the detail. Default is .2.

@@ -47,7 +47,7 @@ const defaultProps = {
  * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @param {string} props.viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
- * @param {Object} props.loader image pyramid: PixelSource[].
+ * @param {Array} props.loader Image pyramid. PixelSource[], where each PixelSource is decreasing in shape.
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {String} props.id Unique identifier for this layer.
  * @param {function} props.onTileError Custom override for handle tile fetching errors.

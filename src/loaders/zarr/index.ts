@@ -8,6 +8,14 @@ interface ZarrOptions {
   fetchOptions?: RequestInit;
 }
 
+/**
+ * Opens root directory generated via `bioformats2raw --file_type=zarr`. Uses OME-XML metadata, 
+ * and assumes first image. This function is the zarr-equivalent to using loadOmeTiff.
+ * 
+ * @param {string} source url
+ * @param {{ fetchOptions: (undefined | RequestInit) }} options
+ * @return {Promise<{ data: ZarrPixelSource[], metadata: ImageMeta }>} data source and associated OMEXML metadata.
+ */
 export async function loadBioformatsZarr(
   source: string | (File & { path: string })[],
   options: ZarrOptions = {}
@@ -51,6 +59,14 @@ export async function loadBioformatsZarr(
   return loadBioformats(store, xmlFile);
 }
 
+
+/**
+ * Opens root of multiscale OME-Zarr via URL.
+ * 
+ * @param {string} source url
+ * @param {{ fetchOptions: (undefined | RequestInit) }} options
+ * @return {Promise<{ data: ZarrPixelSource[], metadata: RootAttrs }>} data source and associated OME-Zarr metadata.
+ */
 export async function loadOmeZarr(
   source: string,
   options: ZarrOptions & { type?: 'multiscales' }

@@ -44,7 +44,7 @@ const defaultProps = {
  * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @param {string} props.viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
- * @param {Object} props.loader PixelSource
+ * @param {Object} props.loader PixelSource. Represents an N-dimensional image.
  * @param {function} props.onHover Hook function from deck.gl to handle hover objects.
  * @param {boolean} props.isLensOn Whether or not to use the lens.
  * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.

@@ -24,8 +24,10 @@ toc:
 - ImageLayer
 - ScaleBarLayer
 - XRLayer
+- BitmapLayer
+- OverviewLayer
 - name: Loaders
-- createOMETiffLoader
-- OMETiffLoader
-- ZarrLoader
-
+- loadOmeTiff
+- loadOmeZarr
+- loadBioformatsZarr
+- name: Misc

@@ -44,7 +44,7 @@ const defaultProps = {
  * @param {number} props.opacity Opacity of the layer.
  * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
- * @param {Object} props.loader Image pyramid: PixelSource[]
+ * @param {Array} props.loader PixelSource[]. Assumes multiscale if loader.length > 1.
  * @param {Array} props.boundingBoxColor [r, g, b] color of the bounding box (default: [255, 0, 0]).
  * @param {number} props.boundingBoxOutlineWidth Width of the bounding box in px (default: 1).
  * @param {Array} props.viewportOutlineColor [r, g, b] color of the outline (default: [255, 190, 0]).
