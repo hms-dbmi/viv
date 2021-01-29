@@ -41,7 +41,7 @@
     "react-dom": "^16.12.0"
   },
   "devDependencies": {
-    "@deck.gl/test-utils": "^8.4.0-beta.1",
+    "@deck.gl/test-utils": "^8.4.0-beta.3",
     "@luma.gl/gltools": "^8.4.0-beta.1",
     "@luma.gl/test-utils": "^8.4.0-beta.1",
     "@probe.gl/test-utils": "^3.3.0",
@@ -73,11 +73,11 @@
     "tape-run": "^8.0.0"
   },
   "dependencies": {
-    "@deck.gl/core": "^8.4.0-beta.1",
-    "@deck.gl/geo-layers": "^8.4.0-beta.1",
-    "@deck.gl/layers": "^8.4.0-beta.1",
-    "@deck.gl/mesh-layers": "^8.4.0-beta.1",
-    "@deck.gl/react": "^8.4.0-beta.1",
+    "@deck.gl/core": "^8.4.0-beta.3",
+    "@deck.gl/geo-layers": "^8.4.0-beta.3",
+    "@deck.gl/layers": "^8.4.0-beta.3",
+    "@deck.gl/mesh-layers": "^8.4.0-beta.3",
+    "@deck.gl/react": "^8.4.0-beta.3",
     "@luma.gl/constants": "^8.4.0-beta.1",
     "@luma.gl/core": "^8.4.0-beta.1",
     "@luma.gl/shadertools": "^8.4.0-beta.1",
