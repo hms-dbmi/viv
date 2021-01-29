@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { fromBlob, fromFile, fromUrl } from 'geotiff';
+
 import {
   loadOmeTiff,
   loadBioformatsZarr,
@@ -24,6 +26,24 @@ class UnsupportedBrowserError extends Error {
     super(message);
     this.name = 'UnsupportedBrowserError';
   }
+}
+
+
+/**
+ * 
+ * @param {string | File} src 
+ * @param {import('../../src/loaders/omexml').OMEXML[0]} imgMeta 
+ * @param {number} levels
+ */
+async function getTotalImageCount(src, imgMeta, levels) {
+  const from = typeof src === 'string' ? fromUrl : fromBlob;
+  const tiff = await from(src);
+  const { Pixels: { SizeC, SizeT, SizeZ } } = imgMeta;
+  const numImagesPerResolution = SizeC * SizeT * SizeZ  
+
+  const firstImage = await tiff.getImage(0);
+  const hasSubIFDs = Boolean(firstImage?.fileDirectory?.SubIFDs);
+  return numImagesPerResolution * (hasSubIFDs ? 1 : levels);
 }
 
 
@@ -57,7 +77,7 @@ export async function createLoader(
       // Show a warning if the total number of channels/images exceeds a fixed amount.
       // Non-Bioformats6 pyramids use Image tags for pyramid levels and do not have offsets
       // built in to the format for them, hence the ternary.
-      const totalImageCount = 1;
+      const totalImageCount = await getTotalImageCount(urlOrFile, source.metadata, source.data.length);
       if (isOffsets404 && totalImageCount > MAX_CHANNELS_FOR_SNACKBAR_WARNING) {
         handleOffsetsNotFound(true);
       }

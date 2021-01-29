@@ -18,11 +18,11 @@ interface TiffOptions {
 
 /**
  * Opens an OME-TIFF via URL and returns data source and associated metadata for first image.
- * 
+ *
  * @param {(string | File)} source url or File object.
- * @param {{ headers: (undefined | Headers), offsets: (undefined | number[]), pool: (undefined | boolean ) }} opts 
- * Options for initializing a tiff pixel source. Headers are passed to each underlying fetch request. Offests are 
- * a performance enhancment to index the remote tiff source using pre-computed byte-offsets. Pool indicates whether a 
+ * @param {{ headers: (undefined | Headers), offsets: (undefined | number[]), pool: (undefined | boolean ) }} opts
+ * Options for initializing a tiff pixel source. Headers are passed to each underlying fetch request. Offests are
+ * a performance enhancment to index the remote tiff source using pre-computed byte-offsets. Pool indicates whether a
  * multi-threaded pool of image decoders should be used to decode tiles (default = true).
  * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>} data source and associated OME-Zarr metadata.
  */
