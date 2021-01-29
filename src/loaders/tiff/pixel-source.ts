@@ -10,7 +10,7 @@ import type {
   Labels,
   RasterSelection,
   TileSelection,
-  LayerData
+  PixelData
 } from '../../types';
 
 class TiffPixelSource<S extends string[]> implements PixelSource<S> {
@@ -79,7 +79,7 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
       data: data,
       width: raster.width,
       height: raster.height
-    } as LayerData;
+    } as PixelData;
   }
 
   /*

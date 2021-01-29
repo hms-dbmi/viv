@@ -41,11 +41,11 @@ test('Get raster data.', async t => {
 
     for (let c = 0; c < 3; c += 1) {
       const selection = { c, z: 0, t: 0 };
-      const layerData = await base.getRaster({ selection }); // eslint-disable-line no-await-in-loop
-      t.equal(layerData.width, 439);
-      t.equal(layerData.height, 167);
-      t.equal(layerData.data.length, 439 * 167);
-      t.equal(layerData.data.constructor.name, 'Uint8Array');
+      const pixelData = await base.getRaster({ selection }); // eslint-disable-line no-await-in-loop
+      t.equal(pixelData.width, 439);
+      t.equal(pixelData.height, 167);
+      t.equal(pixelData.data.length, 439 * 167);
+      t.equal(pixelData.data.constructor.name, 'Uint8Array');
     }
 
     try {

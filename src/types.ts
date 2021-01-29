@@ -3,7 +3,7 @@ export type SupportedTypedArray = InstanceType<
   typeof globalThis[`${SupportedDtype}Array`]
 >;
 
-export interface LayerData {
+export interface PixelData {
   data: SupportedTypedArray;
   width: number;
   height: number;
@@ -39,8 +39,8 @@ export type Labels<S extends string[]> =
   | [...S, 'y', 'x', '_c'];
 
 export interface PixelSource<S extends string[]> {
-  getRaster(sel: RasterSelection<S>): Promise<LayerData>;
-  getTile(sel: TileSelection<S>): Promise<LayerData>;
+  getRaster(sel: RasterSelection<S>): Promise<PixelData>;
+  getTile(sel: TileSelection<S>): Promise<PixelData>;
   onTileError(err: Error): void;
   shape: number[];
   dtype: SupportedDtype;

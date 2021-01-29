@@ -12,7 +12,7 @@ import type {
   Labels,
   RasterSelection,
   PixelSourceSelection,
-  LayerData,
+  PixelData,
   TileSelection
 } from '../../types';
 
@@ -79,7 +79,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     const sel = this._chunkIndex(selection, null, null);
     const { data, shape } = (await this._data.getRaw(sel)) as RawArray;
     const [height, width] = shape;
-    return { data, width, height } as LayerData;
+    return { data, width, height } as PixelData;
   }
 
   async getTile(props: TileSelection<S> | ZarrTileSelection) {
@@ -101,7 +101,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     }
 
     const [height, width] = shape;
-    return { data, width, height } as LayerData;
+    return { data, width, height } as PixelData;
   }
 
   onTileError(err: Error) {
