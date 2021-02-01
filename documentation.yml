@@ -3,7 +3,7 @@ toc:
   file: README.md
 - name: Getting Started
   file: docs/SAMPLES.md
-- name: More in Depth
+- name: API Structure
   file: docs/API_STRUCTURE.md
 - name: Data preparation
   file: tutorial/README.md
