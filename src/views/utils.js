@@ -69,17 +69,8 @@ export function getImageLayers(id, props) {
   const sourceName = loader[0]?.constructor?.name;
 
   // Create at least one layer even without loaderSelection so that the tests pass.
-  if (loader.length === 1) {
-    return [
-      new ImageLayer(layerProps, {
-        id: `${sourceName}${getVivId(id)}`,
-        viewportId: id,
-        loaderSelection,
-        loader: loader[0] // should just be a pixel source
-      })
-    ];
-  }
-  // isPyramid
+  const Layer = loader.length > 1 ? MultiscaleImageLayer : ImageLayer;
+  const layerLoader = loader.length > 1 ? loader : loader[0];
   return [loaderSelection, newLoaderSelection]
     .filter((s, i) => i === 0 || s)
     .map((s, i) => {
@@ -89,18 +80,20 @@ export function getImageLayers(id, props) {
       const newProps =
         i !== 0
           ? {
-              onViewportLoad,
-              refinementStrategy: 'never',
-              excludeBackground: true
+              onViewportLoad
             }
           : {};
-      return new MultiscaleImageLayer({
+      if (loader.length > 1 && i !== 0) {
+        newProps.refinementStrategy = 'never';
+        newProps.excludeBackground = true;
+      }
+      return new Layer({
         ...layerProps,
         ...newProps,
         loaderSelection: s,
         id: `${sourceName}${getVivId(id)}${suffix}`,
         viewportId: id,
-        loader // array of pixel sources
+        loader: layerLoader
       });
     });
 }
