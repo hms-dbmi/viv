@@ -1,4 +1,3 @@
-// eslint-disable-next-line max-classes-per-file
 import { OrthographicView } from '@deck.gl/core';
 
 /**
@@ -25,14 +24,13 @@ export default class VivView {
    * @returns {View} The DeckGL View for this class.
    */
   getDeckGlView() {
-    const { height, width, id, x, y } = this;
     return new OrthographicView({
-      id,
       controller: true,
-      height,
-      width,
-      x,
-      y
+      id: this.id,
+      height: this.height,
+      width: this.width,
+      x: this.x,
+      y: this.y
     });
   }
 

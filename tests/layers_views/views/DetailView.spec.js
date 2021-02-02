@@ -13,10 +13,14 @@ generateViewTests(DetailView, detailViewArguments);
 
 test(`DetailView layer type and props check`, t => {
   const view = new DetailView(detailViewArguments);
-  const loader = { type: 'loads', isPyramid: true };
+  const loader = { type: 'loads' };
   const layers = view.getLayers({
     props: {
-      loader: { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } } }
+      loader: [
+        { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } }},
+        { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } }},
+        { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } }},
+      ]
     },
     viewStates: {
       detail: {
@@ -31,7 +35,7 @@ test(`DetailView layer type and props check`, t => {
   );
   t.ok(
     layers[1] instanceof ScaleBarLayer,
-    'DetailView layer should be MultiscaleImageLayer.'
+    'DetailView layer should be ScaleBarLayer.'
   );
   t.equal(
     layers[0].props.viewportId,

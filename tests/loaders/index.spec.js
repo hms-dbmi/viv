@@ -1,3 +1,7 @@
 import './utils.spec';
-import './OMETiffLoader.spec';
-import './zarrLoader.spec';
+
+import './ome-tiff.spec';
+import './tiff-lib.spec';
+
+import './bioformats-zarr.spec';
+import './zarr-lib.spec';

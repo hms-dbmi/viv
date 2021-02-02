@@ -4,16 +4,55 @@ import { PolygonLayer } from '@deck.gl/layers';
 
 import { SideBySideView } from '../../../src/views';
 import { generateViewTests, defaultArguments } from './VivView.spec';
-import { MultiscaleImageLayer, ScaleBarLayer } from '../../../src/layers';
+import { MultiscaleImageLayer, ImageLayer, ScaleBarLayer } from '../../../src/layers';
 
 generateViewTests(SideBySideView, defaultArguments);
 
 test(`SideBySideView layer type and props check`, t => {
   const view = new SideBySideView(defaultArguments);
-  const loader = { type: 'loads', isPyramid: true };
+  const loader = { type: 'loads' };
   const layers = view.getLayers({
     props: {
-      loader: { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } } }
+      loader: 
+        [{ ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } } }],
+    },
+    viewStates: {
+      foo: {
+        target: [0, 0, 0],
+        zoom: 0
+      }
+    }
+  });
+  t.ok(
+    layers[0] instanceof ImageLayer,
+    'SideBySideView layer should be MultiscaleImageLayer.'
+  );
+  t.ok(
+    layers[1] instanceof PolygonLayer,
+    'SideBySideView layer should be PolygonLayer.'
+  );
+  t.ok(
+    layers[2] instanceof ScaleBarLayer,
+    'DetailView layer should be ScaleBarLayer.'
+  );
+  t.equal(
+    layers[0].props.viewportId,
+    view.id,
+    'SideBySideView id should be passed down to layer as ViewportId.'
+  );
+  t.end();
+});
+
+
+test(`SideBySideView layer with multiscale`, t => {
+  const view = new SideBySideView(defaultArguments);
+  const loader = { type: 'loads' };
+  const layers = view.getLayers({
+    props: {
+      loader: [
+        { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } } },
+        { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } } }
+      ],
     },
     viewStates: {
       foo: {
@@ -28,11 +67,11 @@ test(`SideBySideView layer type and props check`, t => {
   );
   t.ok(
     layers[1] instanceof PolygonLayer,
-    'SideBySideView layer should be MultiscaleImageLayer.'
+    'SideBySideView layer should be PolygonLayer.'
   );
   t.ok(
     layers[2] instanceof ScaleBarLayer,
-    'DetailView layer should be MultiscaleImageLayer.'
+    'DetailView layer should be ScaleBarLayer.'
   );
   t.equal(
     layers[0].props.viewportId,

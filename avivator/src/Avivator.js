@@ -18,7 +18,9 @@ import {
   useWindowSize,
   buildDefaultSelection,
   getNameFromUrl,
-  getSingleSelectionStats
+  getSingleSelectionStats,
+  guessRgb,
+  range
 } from './utils';
 
 import ChannelController from './components/ChannelController';
@@ -40,7 +42,6 @@ import {
   GLOBAL_SLIDER_DIMENSION_FIELDS,
   COLOR_PALLETE
 } from './constants';
-import sources from './source-info';
 import './index.css';
 
 const initialChannels = {
@@ -64,6 +65,7 @@ export default function Avivator(props) {
   const viewSize = useWindowSize();
 
   const [loader, setLoader] = useState({});
+  const [metadata, setMetadata] = useState(null);
   const [lensSelection, setLensSelection] = useState(0);
   const [source, setSource] = useState(initSource);
   const [colormap, setColormap] = useState('');
@@ -92,17 +94,16 @@ export default function Avivator(props) {
     async function changeLoader() {
       setIsLoading(true);
       const { urlOrFile } = source;
-      const nextLoader = await createLoader(
+      const { data: nextLoader, metadata: nextMeta } = await createLoader(
         urlOrFile,
         toggleOffsetsSnackbar,
         message => setLoaderErrorSnackbar({ on: true, message })
       );
+      
       if (nextLoader) {
-        const { dimensions: newDimensions, isRgb } = nextLoader;
-        const selections = buildDefaultSelection(newDimensions);
-        const channelOptions = newDimensions.filter(
-          j => j.field === 'channel'
-        )[0]?.values;
+        const selections = buildDefaultSelection(nextLoader[0]);
+        const { Channels } = nextMeta.Pixels;
+        const channelOptions = Channels.map((c, i) => c.Name ?? 'Channel ' + i);
         // Default RGB.
         let sliders = [
           [0, 255],
@@ -119,11 +120,16 @@ export default function Avivator(props) {
           [0, 255, 0],
           [0, 0, 255]
         ];
+
+        const source = nextLoader[nextLoader.length - 1];
+        const isRgb = guessRgb(nextMeta);
         if (!isRgb) {
-          const stats = await getChannelStats({
-            loader: nextLoader,
-            loaderSelection: selections
-          });
+          
+          const stats = await Promise.all(selections.map(async selection => {
+            const raster = await source.getRaster({ selection });
+            return getChannelStats(raster.data);
+          }));
+
           domains = stats.map(stat => stat.domain);
           sliders = stats.map(stat => stat.autoSliders);
           // If there is only one channel, use white.
@@ -135,6 +141,14 @@ export default function Avivator(props) {
           // RGB should not use a lens.
           isLensOn && toggleIsLensOn(); // eslint-disable-line no-unused-expressions
         }
+
+        const { labels, shape } = source;
+        const newDimensions = labels.map((l, i) => {
+          return {
+            field: l, 
+            values: l === 'c' ? channelOptions : range(shape[i]),
+          }
+        })
         setDimensions(newDimensions);
         dispatch({
           type: 'RESET_CHANNELS',
@@ -146,6 +160,7 @@ export default function Avivator(props) {
           }
         });
         setLoader(nextLoader);
+        setMetadata(nextMeta);
         setIsLoading(false);
         setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
         // Set the global selections (needed for the UI). All selections have the same global selection.
@@ -180,9 +195,11 @@ export default function Avivator(props) {
     const mouseUp = event.type === 'mouseup';
     // Only update image on screen on a mouseup event for the same reason as above.
     if (mouseUp) {
-      const stats = await getChannelStats({ loader, loaderSelection });
+      const stats = await Promise.all(
+        loaderSelection.map(selection => getSingleSelectionStats({ loader, selection }))
+      );
       const domains = stats.map(stat => stat.domain);
-      const sliders = stats.map(stat => stat.autoSliders);
+      const sliders = stats.map(stat => stat.slider);
       const { colors, isOn } = channels;
       dispatch({
         type: 'RESET_CHANNELS',
@@ -203,7 +220,7 @@ export default function Avivator(props) {
    */
   const handleControllerChange = async (index, type, value) => {
     if (type === 'CHANGE_CHANNEL') {
-      const [channelDim] = dimensions.filter(d => d.field === 'channel');
+      const [channelDim] = dimensions.filter(d => d.field === 'c');
       const { field, values } = channelDim;
       const dimIndex = values.indexOf(value);
       const selection = { ...globalSelections, [field]: dimIndex };
@@ -261,15 +278,20 @@ export default function Avivator(props) {
       }
     });
   };
-  const { isPyramid, isRgb, dtype } = loader;
+
+  const isPyramid = loader.length > 0;
+  const isRgb = metadata && guessRgb(metadata);
+  const dtype = loader[0];
+
+
   const { colors, sliders, isOn, ids, selections, domains } = channels;
   const globalControlDimensions = dimensions?.filter(dimension =>
     GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dimension.field)
   );
-  const channelOptions = dimensions.filter(j => j.field === 'channel')[0]
+  const channelOptions = dimensions.filter(j => j.field === 'c')[0]
     ?.values;
   const channelControllers = ids.map((id, i) => {
-    const name = channelOptions[selections[i].channel];
+    const name = channelOptions[selections[i].c];
     return (
       <Grid
         key={`channel-controller-${name}-${id}`}
@@ -277,6 +299,7 @@ export default function Avivator(props) {
         item
       >
         <ChannelController
+          key={`channel-controller-${name}-${id}-${i}`}
           name={name}
           channelOptions={channelOptions}
           isOn={isOn[i]}
@@ -367,7 +390,7 @@ export default function Avivator(props) {
               handleSelection={setLensSelection}
               isOn={isLensOn}
               channelOptions={selections.map(
-                sel => channelOptions[sel.channel]
+                sel => channelOptions[sel.c]
               )}
               lensSelection={lensSelection}
             />

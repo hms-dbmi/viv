@@ -28,13 +28,13 @@ test('ImageLayer', t => {
       channelIsOn: [true, false],
       loader: {
         getRaster: async () => ({
-          data: [new Uint32Array([0, 2, 1, 2]), new Uint32Array([1, 2, 1, 2])],
+          data: new Uint32Array([0, 2, 1, 2]),
           width: 2,
           height: 2
         }),
-        dtype: '<u4'
+        dtype: 'Uint32'
       },
-      loaderSelection: null
+      loaderSelection: [{}, {}]
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
   });
@@ -60,7 +60,7 @@ test('ImageLayer', t => {
     target: [2, 2, 0],
     zoom: 0
   });
-  let state = {};
+  let state = { data: [], width: 0, height: 0 };
   const testCases = [
     {
       props: {
@@ -74,14 +74,12 @@ test('ImageLayer', t => {
         ],
         channelIsOn: [true, false],
         loader: {
-          getRaster: async ({ loaderSelection }) => {
-            state = {
-              data: loaderSelection.map(() => new Uint32Array([0, 2, 1, 2])),
-              width: 2,
-              height: 2
-            };
+          getRaster: async () => {
+            state.data.push(new Uint32Array([0, 2, 1, 2]))
+            state.width = 2;
+            state.width = 2;
           },
-          dtype: '<u4'
+          dtype: 'Uint32'
         },
         loaderSelection: []
       },

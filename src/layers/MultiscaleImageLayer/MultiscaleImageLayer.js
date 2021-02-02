@@ -6,6 +6,11 @@ import GL from '@luma.gl/constants';
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
 import { to32BitFloat, onPointer } from '../utils';
+import {
+  getImageSize,
+  isInterleaved,
+  SIGNAL_ABORTED
+} from '../../loaders/utils';
 
 // From https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
 const DECK_GL_TILE_SIZE = 512;
@@ -42,7 +47,7 @@ const defaultProps = {
  * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @param {string} props.viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
- * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getTile`, `dtype`, `numLevels`, and `tileSize`, and `getRaster`.
+ * @param {Array} props.loader Image pyramid. PixelSource[], where each PixelSource is decreasing in shape.
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {String} props.id Unique identifier for this layer.
  * @param {function} props.onTileError Custom override for handle tile fetching errors.
@@ -104,7 +109,10 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       onViewportLoad,
       refinementStrategy
     } = this.props;
-    const { tileSize, numLevels, dtype, isInterleaved, isRgb } = loader;
+
+    // Get properties from highest resolution
+    const { tileSize, dtype } = loader[0];
+
     const { unprojectLensBounds } = this.state;
     // This is basically to invert:
     // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
@@ -113,30 +121,71 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     const zoomOffset = Math.log2(DECK_GL_TILE_SIZE / tileSize);
     const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z, signal }) => {
-      const tile = await loader.getTile({
-        x,
-        y,
-        // See the above note within for why the use of zoomOffset and the rounding necessary.
-        z: Math.round(-z + zoomOffset),
-        loaderSelection,
-        signal
-      });
-      if (isInterleaved && isRgb) {
-        // eslint-disable-next-line prefer-destructuring
-        tile.data = tile.data[0];
-        if (tile.data.length === tile.width * tile.height * 3) {
-          tile.format = GL.RGB;
-          tile.dataFormat = GL.RGB; // is this not properly inferred?
+      // Early return if no loaderSelection
+      if (!loaderSelection || loaderSelection.length === 0) {
+        return null;
+      }
+
+      // I don't fully undertstand why this works, but I have a sense.
+      // It's basically to cancel out:
+      // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128,
+      // which felt odd to me to beign with.
+      // The image-tile example works without, this but I have a feeling there is something
+      // going on with our pyramids and/or rendering that is different.
+      const resolution = Math.round(-z + zoomOffset);
+      const getTile = selection => {
+        const config = { x, y, selection, signal };
+        return loader[resolution].getTile(config);
+      };
+
+      try {
+        /*
+         * Try to request the tile data. The pixels sources can throw
+         * special SIGNAL_ABORTED string that we pick up in the catch
+         * block to return null to deck.gl.
+         *
+         * This means that our pixels sources _always_ have the same
+         * return type, and optional throw for performance.
+         */
+        const tiles = await Promise.all(loaderSelection.map(getTile));
+
+        const tile = {
+          data: tiles.map(d => d.data),
+          width: tiles[0].width,
+          height: tiles[0].height
+        };
+
+        if (isInterleaved(loader)) {
+          // eslint-disable-next-line prefer-destructuring
+          tile.data = tile.data[0];
+          if (tile.data.length === tile.width * tile.height * 3) {
+            tile.format = GL.RGB;
+            tile.dataFormat = GL.RGB; // is this not properly inferred?
+          }
+          // can just return early, no need  to check for webgl2
+          return tile;
         }
-        // can just return early, no need  to check for webgl2
+
+        if (noWebGl2) {
+          tile.data = to32BitFloat(tile.data);
+        }
+
         return tile;
+      } catch (err) {
+        /*
+         * Signal is aborted. We handle the custom value thrown
+         * by our pixel sources here and return falsy to deck.gl.
+         */
+        if (err === SIGNAL_ABORTED) {
+          return null;
+        }
+
+        // We should propagate all other thrown values/errors
+        throw err;
       }
-      if (noWebGl2) {
-        tile.data = to32BitFloat(tile.data);
-      }
-      return tile;
     };
-    const { height, width } = loader.getRasterSize({ z: 0 });
+
+    const { height, width } = getImageSize(loader[0]);
     const tiledLayer = new MultiscaleImageLayerBase(this.props, {
       id: `Tiled-Image-${id}`,
       getTileData,
@@ -154,7 +203,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       onClick,
       extent: [0, 0, width, height],
       // See the above note within for why the use of zoomOffset and the rounding necessary.
-      minZoom: Math.round(-(numLevels - 1) + zoomOffset),
+      minZoom: Math.round(-(loader.length - 1) + zoomOffset),
       maxZoom: Math.round(zoomOffset),
       colorValues,
       sliderValues,
@@ -171,7 +220,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       updateTriggers: {
         getTileData: [loader, loaderSelection]
       },
-      onTileError: onTileError || loader.onTileError,
+      onTileError: onTileError || loader[0].onTileError,
       opacity,
       colormap,
       viewportId,
@@ -186,18 +235,22 @@ export default class MultiscaleImageLayer extends CompositeLayer {
       transparentColor,
       onViewportLoad
     });
+
     // This gives us a background image and also solves the current
     // minZoom funny business.  We don't use it for the background if we have an opacity
     // paramteter set to anything but 1, but we always use it for situations where
     // we are zoomed out too far.
-    const implementsGetRaster = typeof loader.getRaster === 'function';
+    const lowestResolution = loader[loader.length - 1];
+    const implementsGetRaster =
+      typeof lowestResolution.getRaster === 'function';
     const layerModelMatrix = modelMatrix ? modelMatrix.clone() : new Matrix4();
     const baseLayer =
       implementsGetRaster &&
       !excludeBackground &&
       new ImageLayer(this.props, {
         id: `Background-Image-${id}`,
-        modelMatrix: layerModelMatrix.scale(2 ** (numLevels - 1)),
+        loader: lowestResolution,
+        modelMatrix: layerModelMatrix.scale(2 ** (loader.length - 1)),
         visible:
           opacity === 1 &&
           (!viewportId || this.context.viewport.id === viewportId) &&
@@ -205,7 +258,6 @@ export default class MultiscaleImageLayer extends CompositeLayer {
           // since the background image might not have the same color output from the fragment shader
           // as the tiled layer at a higher resolution level.
           !transparentColor,
-        z: numLevels - 1,
         pickable: true,
         onHover,
         onClick
