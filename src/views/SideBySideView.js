@@ -107,7 +107,7 @@ export default class SideBySideView extends VivView {
     const layers = getImageLayers(id, props);
 
     const border = new PolygonLayer({
-      id: `viewport-outline-${loader.type}${getVivId(id)}`,
+      id: `viewport-outline-${getVivId(id)}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [boundingBox],
       getPolygon: f => f,
@@ -118,21 +118,17 @@ export default class SideBySideView extends VivView {
     });
     layers.push(border);
 
-    const { physicalSizes } = loader;
-    if (physicalSizes) {
-      const { x } = physicalSizes;
-      const { unit, value } = x;
-      if (unit && value) {
-        layers.push(
-          new ScaleBarLayer({
-            id: getVivId(id),
-            loader,
-            unit,
-            size: value,
-            viewState: { ...layerViewState, height, width }
-          })
-        );
-      }
+    const { physicalSizes } = loader[0];
+    if (physicalSizes?.x) {
+      layers.push(
+        new ScaleBarLayer({
+          id: getVivId(id),
+          loader,
+          unit: physicalSizes.x.unit,
+          size: physicalSizes.x.value,
+          viewState: { ...layerViewState, height, width }
+        })
+      );
     }
 
     return layers;

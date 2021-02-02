@@ -1,4 +1,6 @@
 import { OrthographicView } from '@deck.gl/core';
+import { getImageSize } from '../loaders/utils';
+
 // Do not import from '../layers' because that causes a circular dependency.
 import MultiscaleImageLayer from '../layers/MultiscaleImageLayer';
 import ImageLayer from '../layers/ImageLayer';
@@ -29,7 +31,7 @@ export function makeBoundingBox(viewState) {
 
 /**
  * Create an initial view state that centers the image in the viewport at the zoom level that fills the dimensions in `viewSize`.
- * @param {Object} loader The loader of the image for which the view state is desired.
+ * @param {Object} loader PixelSource[]
  * @param {Object} viewSize { height, width } object giving dimensions of the viewport for deducing the right zoom level to center the image.
  * @param {Object} zoomBackOff A positive number which controls how far zoomed out the view state is from filling the entire viewport (default is 0 so the image fully fills the view).
  * SideBySideViewer and PictureInPictureViewer use .5 when setting viewState automatically in their default behavior, so the viewport is slightly zoomed out from the image
@@ -37,9 +39,7 @@ export function makeBoundingBox(viewState) {
  * @returns {ViewState} A default initial view state that centers the image within the view: { target: [x, y, 0], zoom: -zoom }.
  */
 export function getDefaultInitialViewState(loader, viewSize, zoomBackOff = 0) {
-  const { height, width } = loader.getRasterSize({
-    z: 0
-  });
+  const { width, height } = getImageSize(loader[0]);
   const zoom =
     Math.log2(Math.min(viewSize.width / width, viewSize.height / height)) -
     zoomBackOff;
@@ -65,36 +65,42 @@ export function getImageLayers(id, props) {
     ...layerProps
   } = props;
   const { loader } = layerProps;
+  // Grab name of PixelSource if a class instance (works for Tiff & Zarr).
+  const sourceName = loader[0]?.constructor?.name;
+
   // Create at least one layer even without loaderSelection so that the tests pass.
-  if (loader.isPyramid) {
-    return [loaderSelection, newLoaderSelection]
-      .filter((s, i) => i === 0 || s)
-      .map((s, i) => {
-        const suffix = s
-          ? `-${transitionFields.map(f => s[0][f]).join('-')}`
-          : '';
-        const newProps =
-          i !== 0
-            ? {
-                onViewportLoad,
-                refinementStrategy: 'never',
-                excludeBackground: true
-              }
-            : {};
-        return new MultiscaleImageLayer({
-          ...layerProps,
-          ...newProps,
-          loaderSelection: s,
-          id: `${loader.type}${getVivId(id)}${suffix}`,
-          viewportId: id
-        });
-      });
+  if (loader.length === 1) {
+    return [
+      new ImageLayer(layerProps, {
+        id: `${sourceName}${getVivId(id)}`,
+        viewportId: id,
+        loaderSelection,
+        loader: loader[0] // should just be a pixel source
+      })
+    ];
   }
-  return [
-    new ImageLayer(layerProps, {
-      id: `${loader.type}${getVivId(id)}`,
-      viewportId: id,
-      loaderSelection
-    })
-  ];
+  // isPyramid
+  return [loaderSelection, newLoaderSelection]
+    .filter((s, i) => i === 0 || s)
+    .map((s, i) => {
+      const suffix = s
+        ? `-${transitionFields.map(f => s[0][f]).join('-')}`
+        : '';
+      const newProps =
+        i !== 0
+          ? {
+              onViewportLoad,
+              refinementStrategy: 'never',
+              excludeBackground: true
+            }
+          : {};
+      return new MultiscaleImageLayer({
+        ...layerProps,
+        ...newProps,
+        loaderSelection: s,
+        id: `${sourceName}${getVivId(id)}${suffix}`,
+        viewportId: id,
+        loader // array of pixel sources
+      });
+    });
 }

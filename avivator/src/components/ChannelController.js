@@ -68,7 +68,7 @@ function ChannelController({
   const classes = useStyles();
   const [min, max] = domain;
   // If the min/max range is and the dtype is float, make the step size smaller so sliders are smoother.
-  const step = max - min < 500 && dtype === '<f4' ? (max - min) / 500 : 1;
+  const step = max - min < 500 && dtype === 'Float32' ? (max - min) / 500 : 1;
   return (
     <Grid
       container

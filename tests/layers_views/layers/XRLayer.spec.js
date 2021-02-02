@@ -27,7 +27,7 @@ test('XRLayer', t => {
         width: 2,
         height: 2
       },
-      dtype: '<u4'
+      dtype: 'Uint32'
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
   });

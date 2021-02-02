@@ -13,13 +13,15 @@ import {
 import { OverviewLayer } from '../../../src/layers';
 
 const id = OVERVIEW_VIEW_ID;
-const loader = {
-  type: 'loads',
-  numLevels: 7,
-  getRasterSize: () => {
-    return { height: 50000, width: 20000 };
-  }
-};
+const loader = [
+  { shape: [50000, 20000] },
+  { shape: [25000, 10000] },
+  { shape: [12500, 5000] },
+  { shape: [6250, 2500] },
+  { shape: [3125, 1250] },
+  { shape: [1562, 625] },
+];
+
 const overviewViewArguments = {
   ...defaultArguments,
   id,
@@ -71,13 +73,11 @@ test(`OverviewView respects maximumHeight and minimumHeight when height > width.
 
 test(`OverviewView respects maximumWidth and minimumWidth when width > height.`, t => {
   const minimumWidth = 350;
-  const loaderWidth = {
-    type: 'loads',
-    numLevels: 7,
-    getRasterSize: () => {
-      return { height: 10000, width: 20000 };
-    }
-  };
+  const loaderWidth = [
+    { type: 'loads', shape: [10000, 20000], },
+    { type: 'loads', shape: [5000, 10000], },
+    { type: 'loads', shape: [2500, 5000], }
+  ];
   let view = new OverviewView({
     ...overviewViewArguments,
     loader: loaderWidth,
@@ -117,10 +117,9 @@ test(`OverviewView maintains viewState.`, t => {
     zoom: 0
   });
   const { height, width } = view;
-  const { numLevels } = loader;
   t.equal(
     viewState1.zoom,
-    -(numLevels - 1),
+    -(loader.length - 1),
     'Zoom level is the number of levels of the image pyramid minus one.'
   );
   t.equal(
