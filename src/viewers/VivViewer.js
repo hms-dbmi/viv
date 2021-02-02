@@ -184,15 +184,12 @@ export default class VivViewer extends PureComponent {
     if (!data) {
       return null;
     }
+
     let dataCoords;
     // Tiled layer needs a custom layerZoomScale.
     if (sourceLayer.id.includes('Tiled')) {
-      const {
-        loader: { tileSize }
-      } = layer.props;
-      const {
-        tileId: { z }
-      } = sourceLayer.props;
+      const { tileSize } = layer.props.loader[0];
+      const { z } = sourceLayer.props.tileId;
       // The zoomed out layer needs to use the fixed zoom at which it is rendered.
       // See: https://github.com/visgl/deck.gl/blob/2b15bc459c6534ea38ce1153f254ce0901f51d6f/modules/geo-layers/src/tile-layer/utils.js#L130.
       const layerZoomScale = Math.max(

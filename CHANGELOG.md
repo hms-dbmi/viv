@@ -7,6 +7,11 @@
 ### Changed
 
 - Fix z-slider broken by transition fields.
+- Upgrade deck.gl to 8.4.0-beta.1 to handle aborting tiles after selection better.
+- Rewrite data loaders as `PixelSource` | `PixelSource[]`. Introduce `ZarrPixelSource` and `TiffPixelSource`
+to support other types of images. Migrate `src/loaders` to TypeScript.
+- Add `loadBioforamtsZarr`, `loadOmeZarr`, and `loadOmeTiff` utilities.
+- Add predictive, fully typed OME-XML response from `fast-xml-parser`.
 
 ## 0.8.3
 

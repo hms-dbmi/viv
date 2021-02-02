@@ -3,6 +3,7 @@ import { PolygonLayer } from '@deck.gl/layers';
 import { Matrix4 } from 'math.gl';
 
 import ImageLayer from './ImageLayer';
+import { getImageSize } from '../loaders/utils';
 
 const defaultProps = {
   pickable: true,
@@ -43,7 +44,7 @@ const defaultProps = {
  * @param {number} props.opacity Opacity of the layer.
  * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
- * @param {Object} props.loader Loader to be used for fetching data.  It must implement/return `getRaster` and `dtype`.
+ * @param {Array} props.loader PixelSource[]. Assumes multiscale if loader.length > 1.
  * @param {Array} props.boundingBoxColor [r, g, b] color of the bounding box (default: [255, 0, 0]).
  * @param {number} props.boundingBoxOutlineWidth Width of the bounding box in px (default: 1).
  * @param {Array} props.viewportOutlineColor [r, g, b] color of the outline (default: [255, 190, 0]).
@@ -62,14 +63,15 @@ export default class OverviewLayer extends CompositeLayer {
       viewportOutlineWidth,
       overviewScale
     } = this.props;
-    const { numLevels } = loader;
-    const { width, height } = loader.getRasterSize({
-      z: 0
-    });
+
+    const { width, height } = getImageSize(loader[0]);
+    const z = loader.length - 1;
+    const lowestResolution = loader[z];
+
     const overview = new ImageLayer(this.props, {
       id: `viewport-${id}`,
-      modelMatrix: new Matrix4().scale(2 ** (numLevels - 1) * overviewScale),
-      z: numLevels - 1
+      modelMatrix: new Matrix4().scale(2 ** z * overviewScale),
+      loader: lowestResolution
     });
     const boundingBoxOutline = new PolygonLayer({
       id: `bounding-box-overview-${id}`,

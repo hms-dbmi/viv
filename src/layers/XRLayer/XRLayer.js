@@ -26,7 +26,8 @@ function getShaderProps({ colormap, dtype }, gl) {
     fs: colormap ? mod.fscmap : mod.fs,
     vs: mod.vs,
     defines: {
-      SAMPLER_TYPE: dtype === '<f4' || isWebGL1 ? 'sampler2D' : 'usampler2D',
+      SAMPLER_TYPE:
+        dtype === 'Float32' || isWebGL1 ? 'sampler2D' : 'usampler2D',
       COLORMAP_FUNCTION: colormap || 'viridis'
     },
     modules: [project32, picking, channels, lens]
@@ -42,7 +43,7 @@ const defaultProps = {
   sliderValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
-  dtype: { type: 'string', value: '<u2', compare: true },
+  dtype: { type: 'string', value: 'Uint16', compare: true },
   colormap: { type: 'string', value: '', compare: true },
   isLensOn: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true },
