@@ -6,6 +6,12 @@
 
 ### Changed
 
+- Upgrade deck.gl to 8.4.0-beta.1 to handle aborting tiles after selection better.
+- Rewrite data loaders as `PixelSource` | `PixelSource[]`. Introduce `ZarrPixelSource` and `TiffPixelSource`
+to support other types of images. Migrate `src/loaders` to TypeScript.
+- Add `loadBioforamtsZarr`, `loadOmeZarr`, and `loadOmeTiff` utilities.
+- Add predictive, fully typed OME-XML response from `fast-xml-parser`.
+
 ## 0.8.3
 
 ### Added
@@ -18,10 +24,6 @@
 
 - Adjust the zoom level for tile layer if scaled.
 - Update `getDefaultInitialViewState` to return floating point zoom that fills the screen by default.
-- Rewrite data loaders as `PixelSource` | `PixelSource[]`. Introduce `ZarrPixelSource` and `TiffPixelSource`
-to support other types of images. Migrate `src/loaders` to TypeScript.
-- Add `loadBioforamtsZarr`, `loadOmeZarr`, and `loadOmeTiff` utilities.
-- Add predictive, fully typed OME-XML response from `fast-xml-parser`.
 - Upgrade geotiff to fix out-of-range requests issue.
 - Changed `initialViewState` to `viewState` in `PictureInPictureViewer` and to `viewStates` in the other viewers. The new properties control the deck.gl view state at any time and not just when the components are created.
 - Fix `maxZoom` bug.
