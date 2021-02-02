@@ -83,7 +83,7 @@ export function getImageLayers(id, props) {
               onViewportLoad
             }
           : {};
-      if (loader.isPyramid && i !== 0) {
+      if (loader.length > 1 && i !== 0) {
         newProps.refinementStrategy = 'never';
         newProps.excludeBackground = true;
       }
