@@ -93,7 +93,7 @@ export function getImageLayers(id, props) {
         loaderSelection: s,
         id: `${sourceName}${getVivId(id)}${suffix}`,
         viewportId: id,
-        loader: layerLoader,
+        loader: layerLoader
       });
     });
 }

@@ -4,6 +4,8 @@
 
 ### Added
 
+- `onViewportLoad` prop for `ImageLayer` for handling when the data for the viewport has loaded.
+
 ### Changed
 
 - Fix z-slider broken by transition fields.
