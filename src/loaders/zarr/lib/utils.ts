@@ -1,23 +1,10 @@
-import { openArray } from 'zarr';
+import { openGroup } from 'zarr';
 import type { ZarrArray } from 'zarr';
 import type { OMEXML } from '../../omexml';
-import { getLabels, isInterleaved } from '../../utils';
+import { getLabels } from '../../utils';
 
 import type { RootAttrs } from '../ome-zarr';
 import type { PixelSource } from '../../../types';
-
-/*
- * Fetches key from zarr store and returns parsed object.
- */
-export async function getJson<T = any>(
-  store: ZarrArray['store'],
-  key: string
-): Promise<T> {
-  const buf = await store.getItem(key);
-  const text = new TextDecoder().decode(buf as ArrayBuffer);
-  const json = JSON.parse(text);
-  return json as T;
-}
 
 /*
  * Returns true if data shape is that expected for OME-Zarr.
@@ -84,18 +71,18 @@ export function getRootPrefix(files: { path: string }[], rootName: string) {
 }
 
 export async function loadMultiscales(store: ZarrArray['store'], path = '') {
-  path = path.endsWith('/') ? path.slice(0, -1) : path;
-  const rootAttrs = (await getJson(store, path + '/.zattrs')) as RootAttrs;
+  const grp = await openGroup(store, path);
+  const rootAttrs = (await grp.attrs.asObject()) as RootAttrs;
 
   let paths = ['0'];
   if ('multiscales' in rootAttrs) {
     const { datasets } = rootAttrs.multiscales[0];
-    paths = datasets.map(d => path + '/' + d.path);
+    paths = datasets.map(d => d.path);
   }
 
-  const data = paths.map(path => openArray({ store, path, mode: 'r' }));
+  const data = paths.map(path => grp.getItem(path));
   return {
-    data: await Promise.all(data),
+    data: (await Promise.all(data)) as ZarrArray[],
     rootAttrs
   };
 }
