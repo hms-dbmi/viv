@@ -11,8 +11,7 @@ import fs2 from './xr-layer-fragment.webgl2.glsl';
 import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
 import { lens, channels } from './shader-modules';
-import { DTYPE_VALUES } from '../../constants';
-import { padColorsAndSliders } from '../utils';
+import { padColorsAndSliders, getDtypeAttrs } from '../utils';
 
 const SHADER_MODULES = [
   { fs: fs1, fscmap: fsColormap1, vs: vs1 },
@@ -302,8 +301,7 @@ export default class XRLayer extends Layer {
   dataToTexture(data, width, height) {
     const { gl } = this.context;
     const noWebGL2 = !isWebGL2(gl);
-    const { dtype } = this.props;
-    const { format, dataFormat, type } = DTYPE_VALUES[dtype];
+    const { format, dataFormat, type } = getDtypeAttrs(this.props.dtype);
     const texture = new Texture2D(this.context.gl, {
       width,
       height,

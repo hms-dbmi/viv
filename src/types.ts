@@ -1,4 +1,11 @@
-export type SupportedDtype = 'Uint8' | 'Uint16' | 'Uint32' | 'Float32';
+export type SupportedDtype =
+  | 'Uint8'
+  | 'Uint16'
+  | 'Uint32'
+  | 'Int8'
+  | 'Int16'
+  | 'Int32'
+  | 'Float32';
 export type SupportedTypedArray = InstanceType<
   typeof globalThis[`${SupportedDtype}Array`]
 >;

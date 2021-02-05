@@ -5,7 +5,7 @@ import GL from '@luma.gl/constants';
 
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
-import { to32BitFloat, onPointer } from '../utils';
+import { onPointer, int2UintArray, isIntArray } from '../utils';
 import {
   getImageSize,
   isInterleaved,
@@ -166,8 +166,15 @@ export default class MultiscaleImageLayer extends CompositeLayer {
           return tile;
         }
 
+        // Viv's shaders don't work for signed arrays, need to cast to Uint
+        if (isIntArray(tile.data[0])) {
+          tile.data = tile.data.map(d => int2UintArray(d));
+        }
+
+        // Need to cast data regardless of dtype f32 if not WebGL
+        // TODO: skip if already float32? This copies the data...
         if (noWebGl2) {
-          tile.data = to32BitFloat(tile.data);
+          tile.data = tile.data.map(d => new Float32Array(d));
         }
 
         return tile;

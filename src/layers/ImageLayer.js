@@ -4,7 +4,7 @@ import GL from '@luma.gl/constants';
 
 import XRLayer from './XRLayer';
 import BitmapLayer from './BitmapLayer';
-import { to32BitFloat, onPointer } from './utils';
+import { onPointer, isIntArray, int2UintArray } from './utils';
 import { isInterleaved } from '../loaders/utils';
 
 const defaultProps = {
@@ -106,11 +106,18 @@ export default class ImageLayer extends CompositeLayer {
             raster.format = GL.RGB;
             raster.dataFormat = GL.RGB;
           }
-        } else if (!isWebGL2(this.context.gl)) {
+        } else {
           // data is for XLRLayer in non-WebGL2 evironment
-          // we need to convert data to compatible textures
-          raster.data = to32BitFloat(raster.data);
+          if (isIntArray(raster.data[0])) {
+            raster.data = raster.data.map(d => int2UintArray(d));
+          }
+
+          if (!isWebGL2(this.context.gl)) {
+            // we need to convert data to compatible textures
+            raster.data = raster.data.map(d => new Float32Array(d));
+          }
         }
+
         if (onViewportLoad) {
           onViewportLoad(raster);
         }

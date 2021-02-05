@@ -31,7 +31,7 @@ export function padColorsAndSliders({
   const colors = colorValues.map((color, i) =>
     channelIsOn[i] ? color.map(c => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
   );
-  const maxSliderValue = (domain && domain[1]) || DTYPE_VALUES[dtype].max;
+  const maxSliderValue = (domain && domain[1]) || getDtypeAttrs(dtype).max;
   const sliders = sliderValues.map((slider, i) =>
     channelIsOn[i] ? slider : [maxSliderValue, maxSliderValue]
   );
@@ -61,11 +61,38 @@ export function padColorsAndSliders({
   return paddedColorsAndSliders;
 }
 
-export function to32BitFloat(data) {
-  const data32bit = data.map(arr => {
-    return new Float32Array(arr);
-  });
-  return data32bit;
+/**
+ *
+ * @param {import('../types').SupportedTypedArray} data
+ */
+export function isIntArray(data) {
+  return data.constructor.name.startsWith('Int');
+}
+
+/**
+ * Get same constants properties for Int as Uint.
+ * @param {import('../types').SupportedDtype} dtype
+ */
+export function getDtypeAttrs(dtype) {
+  // We cast all IntArray buffers to Uint, so any dtype
+  // that is a Int array we want to get the constant 
+  // values for the Uint counterpart.
+  if (dtype.startsWith('Int')) {
+    dtype = `Ui${dtype.slice(1)}`;
+  }
+  return DTYPE_VALUES[dtype];
+}
+
+/**
+ *
+ * @param {Int8Array | Int16Array | Int32Array} data
+ * @returns {Uint8Array | Uint16Array | Uint32Array}
+ */
+export function int2UintArray(data) {
+  const suffix = data.constructor.name.slice(1); // nt8Array | nt16ARray | nt32Array
+  const name = `Ui${suffix}`;
+  const ctr = globalThis[name];
+  return new ctr(data);
 }
 
 export function onPointer(layer) {
