@@ -14,19 +14,22 @@ export const DTYPE_VALUES = {
     format: GL.R8UI,
     dataFormat: GL.RED_INTEGER,
     type: GL.UNSIGNED_BYTE,
-    max: 2 ** 8 - 1
+    max: 2 ** 8 - 1,
+    sampler: 'usampler2D'
   },
   Uint16: {
     format: GL.R16UI,
     dataFormat: GL.RED_INTEGER,
     type: GL.UNSIGNED_SHORT,
-    max: 2 ** 16 - 1
+    max: 2 ** 16 - 1,
+    sampler: 'usampler2D'
   },
   Uint32: {
     format: GL.R32UI,
     dataFormat: GL.RED_INTEGER,
     type: GL.UNSIGNED_INT,
-    max: 2 ** 32 - 1
+    max: 2 ** 32 - 1,
+    sampler: 'usampler2D'
   },
   Float32: {
     format: GL.R32F,
@@ -34,7 +37,29 @@ export const DTYPE_VALUES = {
     type: GL.FLOAT,
     // Not sure what to do about this one - a good use case for channel stats, I suppose:
     // https://en.wikipedia.org/wiki/Single-precision_floating-point_format.
-    max: 3.4 * 10 ** 38
+    max: 3.4 * 10 ** 38,
+    sampler: 'sampler2D'
+  },
+  Int8: {
+    format: GL.R8I,
+    dataFormat: GL.RED_INTEGER,
+    type: GL.BYTE,
+    max: 2 ** (8 - 1) - 1,
+    sampler: 'isampler2D'
+  },
+  Int16: {
+    format: GL.R16I,
+    dataFormat: GL.RED_INTEGER,
+    type: GL.SHORT,
+    max: 2 ** (16 - 1) - 1,
+    sampler: 'isampler2D'
+  },
+  Int32: {
+    format: GL.R32I,
+    dataFormat: GL.RED_INTEGER,
+    type: GL.INT,
+    max: 2 ** (32 - 1) - 1,
+    sampler: 'isampler2D'
   }
 } as const;
 

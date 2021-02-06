@@ -1,7 +1,7 @@
 import { openArray } from 'zarr';
 import type { ZarrArray } from 'zarr';
 import type { OMEXML } from '../../omexml';
-import { getLabels, isInterleaved } from '../../utils';
+import { getLabels } from '../../utils';
 
 import type { RootAttrs } from '../ome-zarr';
 import type { PixelSource } from '../../../types';

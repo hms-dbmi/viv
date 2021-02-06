@@ -1,11 +1,10 @@
 import { CompositeLayer } from '@deck.gl/core';
-import { isWebGL2 } from '@luma.gl/core';
 import { Matrix4 } from 'math.gl';
 import GL from '@luma.gl/constants';
 
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
-import { to32BitFloat, onPointer } from '../utils';
+import { onPointer } from '../utils';
 import {
   getImageSize,
   isInterleaved,
@@ -119,7 +118,6 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     // The z level can be wrong for showing the correct scales because of the calculation deck.gl does
     // so we need to invert it for fetching tiles and minZoom/maxZoom.
     const zoomOffset = Math.log2(DECK_GL_TILE_SIZE / tileSize);
-    const noWebGl2 = !isWebGL2(this.context.gl);
     const getTileData = async ({ x, y, z, signal }) => {
       // Early return if no loaderSelection
       if (!loaderSelection || loaderSelection.length === 0) {
@@ -164,10 +162,6 @@ export default class MultiscaleImageLayer extends CompositeLayer {
           }
           // can just return early, no need  to check for webgl2
           return tile;
-        }
-
-        if (noWebGl2) {
-          tile.data = to32BitFloat(tile.data);
         }
 
         return tile;
