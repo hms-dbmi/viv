@@ -310,16 +310,11 @@ export default class XRLayer extends Layer {
    */
   dataToTexture(data, width, height) {
     const attrs = getRenderingAttrs(this.props.dtype, this.context.gl);
-    if (attrs?.cast) {
-      // Without WebGL2, we need to cast the TypedArray returned
-      // from the pixel sources for a WebGL1-compatible
-      // texture.
-      data = attrs.cast(data);
-    }
     return new Texture2D(this.context.gl, {
       width,
       height,
-      data,
+      // data is cast in WebGL1 environment
+      data: attrs.cast?.(data) ?? data,
       // we don't want or need mimaps
       mipmaps: false,
       parameters: {
