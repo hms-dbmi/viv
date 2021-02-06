@@ -30,7 +30,7 @@ test('Creates correct ZarrPixelSource.', async t => {
 });
 
 test('Get raster data.', async t => {
-  t.plan(10);
+  t.plan(13);
   try {
     const { data } = await load(store, await meta);
     const [base] = data;
@@ -41,6 +41,7 @@ test('Get raster data.', async t => {
       t.equal(pixelData.width, 439);
       t.equal(pixelData.height, 167);
       t.equal(pixelData.data.length, 439 * 167);
+      t.equal(pixelData.data.constructor.name, 'Int8Array');
     }
 
     try {
