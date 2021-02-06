@@ -14,6 +14,7 @@
 to support other types of images. Migrate `src/loaders` to TypeScript.
 - Add `loadBioforamtsZarr`, `loadOmeZarr`, and `loadOmeTiff` utilities.
 - Add predictive, fully typed OME-XML response from `fast-xml-parser`.
+- Remove casting of Int8Array, Int16Array, and Int32Array to Uint. Support texture on shader.
 
 ## 0.8.3
 
