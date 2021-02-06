@@ -16,6 +16,19 @@ export function padWithDefault(arr, defaultValue, padWidth) {
   return arr;
 }
 
+/**
+ * (Safely) get GL values for associated dtype.
+ * @param {keyof typeof import('../constants').DTYPE_VALUES} dtype
+ */
+export function getDtypeValues(dtype) {
+  const values = DTYPE_VALUES[dtype];
+  if (!values) {
+    const valid = Object.keys(DTYPE_VALUES);
+    throw Error(`Dtype not supported, got ${dtype}. Must be one of ${valid}.`);
+  }
+  return values;
+}
+
 export function padColorsAndSliders({
   sliderValues,
   colorValues,
@@ -102,17 +115,4 @@ export function onPointer(layer) {
   } else {
     layer.setState({ unprojectLensBounds: [0, 0, 0, 0] });
   }
-}
-
-/**
- * Get GL values for associated dtype.
- * @param {keyof typeof import('../constants').DTYPE_VALUES} dtype
- */
-export function getDtypeValues(dtype) {
-  const values = DTYPE_VALUES[dtype];
-  if (!values) {
-    const valid = Object.keys(DTYPE_VALUES);
-    throw Error(`Dtype not supported, got ${dtype}. Must be one of ${valid}.`);
-  }
-  return values;
 }
