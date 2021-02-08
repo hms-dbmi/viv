@@ -17,6 +17,25 @@ More details can be found in our preprint describing the Viv library and related
 - **Vizarr** [Vizarr](https://github.com/hms-dbmi/vizarr) is a minimal, purely client-side program for viewing Zarr-based images built with Viv. It exposes a Python API using the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) and can be directly embedded in Jupyter Notebooks or Google Colab Notebooks.
 - **Viv benchmark** A [set of scripts](https://github.com/hms-dbmi/viv-tile-benchmark) to benchmark Viv's retrieval of image tiles from pyramidal OME-TIFF files and Zarr stores via HTTP1 and HTTP2.
 
+### Tools Built with Viv
+
+#### Vitessce
+- http://vitessce.io
+
+#### OME-NGFF:
+- https://blog.openmicroscopy.org/file-formats/community/2020/11/04/zarr-data/
+- https://blog.openmicroscopy.org/file-formats/community/2020/12/01/zarr-hcs/ 
+
+#### ImJoy:
+- https://imjoy.io/docs/#/i2k_tutorial?id=open-integration-with-imjoy  
+
+#### Galaxy:
+- The Avivator image viewer will be included as the default visualization for OME-TIFF files: https://github.com/galaxyproject/galaxy/pull/10534
+
+#### HuBMAP CCF EUI:
+- https://github.com/hubmapconsortium/ccf-ui
+
+
 ## Supported Data Formats
 
 Viv supports a subset of formats that can be generated with the [`bioformats2raw` + `raw2ometiff` pipeline](https://www.glencoesoftware.com/blog/2019/12/09/converting-whole-slide-images-to-OME-TIFF.html):
