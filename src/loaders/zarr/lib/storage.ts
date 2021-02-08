@@ -1,7 +1,5 @@
 import { KeyError } from 'zarr';
-import type { AsyncStore } from 'zarr/dist/types/storage/types';
-
-import { SIGNAL_ABORTED } from '../../utils';
+import type { AsyncStore } from 'zarr/types/storage/types';
 
 /**
  * Preserves (double) slashes earlier in the path, so this works better
@@ -61,59 +59,5 @@ export class FileStore
   async containsItem(key: string) {
     const path = this._key(key);
     return this._map.has(path);
-  }
-}
-
-export class HTTPStore
-  extends ReadOnlyStore
-  implements AsyncStore<ArrayBuffer> {
-  private _signal: AbortSignal | undefined;
-
-  constructor(public url: string, public options?: RequestInit) {
-    super();
-    this._signal = undefined;
-  }
-
-  async getItem(key: string) {
-    const url = joinUrlParts(this.url, key);
-
-    /*
-     * If custom request options or a valid signal,
-     * pass the signal to the fetch request.
-     */
-    let options: undefined | RequestInit;
-    if (this.options || this._signal) {
-      options = { ...this.options, signal: this._signal };
-    }
-
-    const value = await fetch(url, options);
-
-    /*
-     * Throw our custom abort signal value to pick up in getTileData.
-     */
-    if (this._signal?.aborted) {
-      throw SIGNAL_ABORTED;
-    }
-
-    if (value.status === 404) {
-      throw new KeyError(key);
-    } else if (value.status !== 200) {
-      throw Error(`HTTPError: ${JSON.stringify(value.status)}.`);
-    }
-    return value.arrayBuffer();
-  }
-
-  async containsItem(key: string) {
-    const url = joinUrlParts(this.url, key);
-    const value = await fetch(url, this.options);
-    return value.status === 200;
-  }
-
-  __vivAddSignal(signal: AbortSignal) {
-    this._signal = signal;
-  }
-
-  __vivClearSignal() {
-    this._signal = undefined;
   }
 }

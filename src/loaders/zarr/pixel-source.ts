@@ -2,10 +2,8 @@ import { BoundsCheckError } from 'zarr';
 import { isInterleaved } from '../utils';
 import { getIndexer } from './lib/indexer';
 
-import type { HTTPStore } from './lib/storage';
 import type { ZarrArray } from 'zarr';
-import type { RawArray } from 'zarr/dist/types/rawArray';
-import type { AsyncStore } from 'zarr/dist/types/storage/types';
+import type { RawArray } from 'zarr/types/rawArray';
 
 import type {
   PixelSource,
@@ -89,19 +87,9 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     const { x, y, selection, signal } = props;
     const sel = this._chunkIndex(selection, x, y);
 
-    const store = this._data.store as HTTPStore | AsyncStore<ArrayBuffer>;
-
-    // Injects `signal` prior to zarr.js calling `store.getItem`
-    if (signal && '__vivAddSignal' in store) {
-      store.__vivAddSignal(signal);
-    }
-
-    const { data, shape } = (await this._data.getRawChunk(sel)) as RawArray;
-
-    // Clear signal from HTTPStore
-    if ('__vivClearSignal' in store) {
-      store.__vivClearSignal();
-    }
+    const { data, shape } = (await this._data.getRawChunk(sel, {
+      storeOptions: { signal }
+    })) as RawArray;
 
     const [height, width] = shape;
     return { data, width, height } as PixelData;
