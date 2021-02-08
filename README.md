@@ -17,7 +17,7 @@ More details can be found in our preprint describing the Viv library and related
   - **Vizarr** [Vizarr](https://github.com/hms-dbmi/vizarr) is a minimal, purely client-side program for viewing Zarr-based images built with Viv. It exposes a Python API using the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) and can be directly embedded in Jupyter Notebooks or Google Colab Notebooks.
   - **Viv benchmark** A [set of scripts](https://github.com/hms-dbmi/viv-tile-benchmark) to benchmark Viv's retrieval of image tiles from pyramidal OME-TIFF files and Zarr stores via HTTP1 and HTTP2.
 
-### 3rd Party Tools
+### Tools Built with Viv
 
 #### Vitessce
 - http://vitessce.io
