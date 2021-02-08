@@ -14,6 +14,7 @@
 to support other types of images. Migrate `src/loaders` to TypeScript.
 - Add `loadBioforamtsZarr`, `loadOmeZarr`, and `loadOmeTiff` utilities.
 - Add predictive, fully typed OME-XML response from `fast-xml-parser`.
+- Upgrade Zarr.js to v0.4.
 
 ## 0.8.3
 

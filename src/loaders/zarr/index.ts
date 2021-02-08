@@ -1,4 +1,5 @@
-import { HTTPStore, FileStore } from './lib/storage';
+import { FileStore } from './lib/storage';
+import { HTTPStore } from 'zarr';
 import { getRootPrefix } from './lib/utils';
 
 import { load as loadBioformats } from './bioformats-zarr';
@@ -20,15 +21,13 @@ export async function loadBioformatsZarr(
   source: string | (File & { path: string })[],
   options: ZarrOptions = {}
 ) {
-  const { fetchOptions } = options;
-
   const METADATA = 'METADATA.ome.xml';
   const ZARR_DIR = 'data.zarr';
 
   if (typeof source === 'string') {
     const url = source.endsWith('/') ? source.slice(0, -1) : source;
-    const store = new HTTPStore(url + '/' + ZARR_DIR, fetchOptions);
-    const xmlSource = await fetch(url + '/' + METADATA, fetchOptions);
+    const store = new HTTPStore(url + '/' + ZARR_DIR, options);
+    const xmlSource = await fetch(url + '/' + METADATA, options.fetchOptions);
     return loadBioformats(store, xmlSource);
   }
 
@@ -70,7 +69,7 @@ export async function loadOmeZarr(
   source: string,
   options: ZarrOptions & { type?: 'multiscales' }
 ) {
-  const store = new HTTPStore(source, options.fetchOptions);
+  const store = new HTTPStore(source, options);
 
   if (options?.type !== 'multiscales') {
     throw Error('Only multiscale OME-Zarr is supported.');
