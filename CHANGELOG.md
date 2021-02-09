@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.9.0
+
+### Added
+
 - `onViewportLoad` prop for `ImageLayer` for handling when the data for the viewport has loaded.
 
 ### Changed
