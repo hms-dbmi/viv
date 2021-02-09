@@ -18,7 +18,10 @@ const DTYPE_LOOKUP = {
   u1: 'Uint8',
   u2: 'Uint16',
   u4: 'Uint32',
-  f4: 'Float32'
+  f4: 'Float32',
+  i1: 'Int8',
+  i2: 'Int16',
+  i4: 'Int32'
 } as const;
 
 type ZarrIndexer<S extends string[]> = (

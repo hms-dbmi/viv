@@ -1,4 +1,6 @@
-export type SupportedDtype = 'Uint8' | 'Uint16' | 'Uint32' | 'Float32';
+import type { DTYPE_VALUES } from './constants';
+
+export type SupportedDtype = keyof typeof DTYPE_VALUES;
 export type SupportedTypedArray = InstanceType<
   typeof globalThis[`${SupportedDtype}Array`]
 >;

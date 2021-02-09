@@ -11,27 +11,27 @@ import fs2 from './xr-layer-fragment.webgl2.glsl';
 import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
 import { lens, channels } from './shader-modules';
-import { DTYPE_VALUES } from '../../constants';
-import { padColorsAndSliders } from '../utils';
+import { padColorsAndSliders, getDtypeValues } from '../utils';
 
 const SHADER_MODULES = [
   { fs: fs1, fscmap: fsColormap1, vs: vs1 },
   { fs: fs2, fscmap: fsColormap2, vs: vs2 }
 ];
 
-function getShaderProps({ colormap, dtype }, gl) {
-  const isWebGL1 = !isWebGL2(gl);
-  const mod = isWebGL1 ? SHADER_MODULES[0] : SHADER_MODULES[1];
-  return {
-    fs: colormap ? mod.fscmap : mod.fs,
-    vs: mod.vs,
-    defines: {
-      SAMPLER_TYPE:
-        dtype === 'Float32' || isWebGL1 ? 'sampler2D' : 'usampler2D',
-      COLORMAP_FUNCTION: colormap || 'viridis'
-    },
-    modules: [project32, picking, channels, lens]
-  };
+function getRenderingAttrs(dtype, gl) {
+  if (!isWebGL2(gl)) {
+    // WebGL1
+    return {
+      format: GL.LUMINANCE,
+      dataFormat: GL.LUMINANCE,
+      type: GL.FLOAT,
+      sampler: 'sampler2D',
+      shaderModule: SHADER_MODULES[0],
+      cast: data => new Float32Array(data)
+    };
+  }
+  const values = getDtypeValues(dtype);
+  return { ...values, shaderModule: SHADER_MODULES[1] };
 }
 
 const defaultProps = {
@@ -65,8 +65,17 @@ export default class XRLayer extends Layer {
    * replaces `usampler` with `sampler` if the data is not an unsigned integer
    */
   getShaders() {
-    const shaderProps = getShaderProps(this.props, this.context.gl);
-    return super.getShaders(shaderProps);
+    const { colormap, dtype } = this.props;
+    const { shaderModule, sampler } = getRenderingAttrs(dtype, this.context.gl);
+    return super.getShaders({
+      fs: colormap ? shaderModule.fscmap : shaderModule.fs,
+      vs: shaderModule.vs,
+      defines: {
+        SAMPLER_TYPE: sampler,
+        COLORMAP_FUNCTION: colormap || 'viridis'
+      },
+      modules: [project32, picking, channels, lens]
+    });
   }
 
   /**
@@ -300,14 +309,12 @@ export default class XRLayer extends Layer {
    * This function creates textures from the data
    */
   dataToTexture(data, width, height) {
-    const { gl } = this.context;
-    const noWebGL2 = !isWebGL2(gl);
-    const { dtype } = this.props;
-    const { format, dataFormat, type } = DTYPE_VALUES[dtype];
-    const texture = new Texture2D(this.context.gl, {
+    const attrs = getRenderingAttrs(this.props.dtype, this.context.gl);
+    return new Texture2D(this.context.gl, {
       width,
       height,
-      data,
+      // data is cast in WebGL1 environment
+      data: attrs.cast?.(data) ?? data,
       // we don't want or need mimaps
       mipmaps: false,
       parameters: {
@@ -318,11 +325,10 @@ export default class XRLayer extends Layer {
         [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
         [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
       },
-      format: noWebGL2 ? GL.LUMINANCE : format,
-      dataFormat: noWebGL2 ? GL.LUMINANCE : dataFormat,
-      type: noWebGL2 ? GL.FLOAT : type
+      format: attrs.format,
+      dataFormat: attrs.dataFormat,
+      type: attrs.type
     });
-    return texture;
   }
 }
 

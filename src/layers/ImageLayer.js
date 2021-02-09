@@ -1,10 +1,9 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
-import { isWebGL2 } from '@luma.gl/core';
 import GL from '@luma.gl/constants';
 
 import XRLayer from './XRLayer';
 import BitmapLayer from './BitmapLayer';
-import { to32BitFloat, onPointer } from './utils';
+import { onPointer } from './utils';
 import { isInterleaved } from '../loaders/utils';
 
 const defaultProps = {
@@ -106,11 +105,8 @@ export default class ImageLayer extends CompositeLayer {
             raster.format = GL.RGB;
             raster.dataFormat = GL.RGB;
           }
-        } else if (!isWebGL2(this.context.gl)) {
-          // data is for XLRLayer in non-WebGL2 evironment
-          // we need to convert data to compatible textures
-          raster.data = to32BitFloat(raster.data);
         }
+
         if (onViewportLoad) {
           onViewportLoad(raster);
         }

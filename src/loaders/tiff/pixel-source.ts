@@ -65,16 +65,6 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
       data = new Float32Array(data.buffer);
     }
 
-    // geotiff.js returns the correct TypedArray but need to cast to Uint for viv.
-    if (data?.constructor.name.startsWith('Int')) {
-      const suffix = data.constructor.name.slice(1); // nt8Array | nt16Array | nt32Array
-      const name = `Ui${suffix}` as
-        | 'Uint8Array'
-        | 'Uint16Array'
-        | 'Uint32Array';
-      data = new globalThis[name](data);
-    }
-
     return {
       data: data,
       width: raster.width,

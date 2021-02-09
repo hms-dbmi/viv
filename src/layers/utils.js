@@ -16,6 +16,19 @@ export function padWithDefault(arr, defaultValue, padWidth) {
   return arr;
 }
 
+/**
+ * (Safely) get GL values for associated dtype.
+ * @param {keyof typeof import('../constants').DTYPE_VALUES} dtype
+ */
+export function getDtypeValues(dtype) {
+  const values = DTYPE_VALUES[dtype];
+  if (!values) {
+    const valid = Object.keys(DTYPE_VALUES);
+    throw Error(`Dtype not supported, got ${dtype}. Must be one of ${valid}.`);
+  }
+  return values;
+}
+
 export function padColorsAndSliders({
   sliderValues,
   colorValues,
@@ -31,7 +44,7 @@ export function padColorsAndSliders({
   const colors = colorValues.map((color, i) =>
     channelIsOn[i] ? color.map(c => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
   );
-  const maxSliderValue = (domain && domain[1]) || DTYPE_VALUES[dtype].max;
+  const maxSliderValue = (domain && domain[1]) || getDtypeValues(dtype).max;
   const sliders = sliderValues.map((slider, i) =>
     channelIsOn[i] ? slider : [maxSliderValue, maxSliderValue]
   );
@@ -59,13 +72,6 @@ export function padColorsAndSliders({
   };
 
   return paddedColorsAndSliders;
-}
-
-export function to32BitFloat(data) {
-  const data32bit = data.map(arr => {
-    return new Float32Array(arr);
-  });
-  return data32bit;
 }
 
 export function onPointer(layer) {

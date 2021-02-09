@@ -6,10 +6,9 @@ const DTYPE_LOOKUP = {
   uint16: 'Uint16',
   uint32: 'Uint32',
   float: 'Float32',
-  // TODO: we currently need to cast these dtypes to their uint counterparts.
-  int8: 'Uint8',
-  int16: 'Uint16',
-  int32: 'Uint32'
+  int8: 'Int8',
+  int16: 'Int16',
+  int32: 'Int32'
 } as const;
 
 export function getOmePixelSourceMeta({ Pixels }: OMEXML[0]) {
