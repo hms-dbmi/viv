@@ -9,6 +9,13 @@ export const MAX_SLIDERS_AND_CHANNELS = 6;
 export const DEFAULT_FONT_FAMILY =
   "-apple-system, 'Helvetica Neue', Arial, sans-serif";
 
+/**
+ * @deprecated We plan to remove `DTYPE_VALUES` as a part of Viv's public API as it
+ * leaks internal implementation details. If this is something your project relies
+ * on please open an issue for further discuession.
+ *
+ * More info can be found here: https://github.com/hms-dbmi/viv/pull/372#discussion_r571707517
+ */
 export const DTYPE_VALUES = {
   Uint8: {
     format: GL.R8UI,
