@@ -12,7 +12,7 @@ export const DEFAULT_FONT_FAMILY =
 /**
  * @deprecated We plan to remove `DTYPE_VALUES` as a part of Viv's public API as it
  * leaks internal implementation details. If this is something your project relies
- * on please open an issue for further discuession.
+ * on, please open an issue for further discussion.
  *
  * More info can be found here: https://github.com/hms-dbmi/viv/pull/372#discussion_r571707517
  */
