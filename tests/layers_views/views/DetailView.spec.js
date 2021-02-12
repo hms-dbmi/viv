@@ -45,7 +45,7 @@ test(`DetailView layer type and props check`, t => {
   t.end();
 });
 
-test(`DetailView layer type and props check`, t => {
+test(`DetailView does not render scale bar without physical size`, t => {
   const view = new DetailView(detailViewArguments);
   const loader = { type: 'loads' };
   const layers = view.getLayers({

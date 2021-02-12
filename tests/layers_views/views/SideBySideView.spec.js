@@ -85,7 +85,7 @@ test(`SideBySideView layer with multiscale`, t => {
   t.end();
 });
 
-test(`SideBySideView layer without physical size scale bar`, t => {
+test(`SideBySideView layer does not render scale bar without physical size`, t => {
   const view = new SideBySideView(defaultArguments);
   const loader = { type: 'loads' };
   const layers = view.getLayers({
