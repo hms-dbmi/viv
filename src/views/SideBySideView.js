@@ -118,7 +118,9 @@ export default class SideBySideView extends VivView {
     });
     layers.push(border);
 
-    const { meta: { physicalSizes } } = loader[0];
+    const {
+      meta: { physicalSizes }
+    } = loader[0];
     if (physicalSizes?.x) {
       layers.push(
         new ScaleBarLayer({
