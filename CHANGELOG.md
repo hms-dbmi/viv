@@ -7,6 +7,7 @@
 ### Changed
 - Export `defaults` from `tiff/pixel-source.ts` and `zarr/pixel-source.ts` as `TiffPixelSource` and `ZarrPixelSource`.
 - Copy array-like selection for `ZarrPixelSource` rather than mutating.
+- Fix scale bar bug in `View` to match new loaders.
 
 ## 0.9.0
 
