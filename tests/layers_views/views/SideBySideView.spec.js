@@ -4,7 +4,11 @@ import { PolygonLayer } from '@deck.gl/layers';
 
 import { SideBySideView } from '../../../src/views';
 import { generateViewTests, defaultArguments } from './VivView.spec';
-import { MultiscaleImageLayer, ImageLayer, ScaleBarLayer } from '../../../src/layers';
+import {
+  MultiscaleImageLayer,
+  ImageLayer,
+  ScaleBarLayer
+} from '../../../src/layers';
 
 generateViewTests(SideBySideView, defaultArguments);
 
@@ -13,8 +17,9 @@ test(`SideBySideView layer type and props check`, t => {
   const loader = { type: 'loads' };
   const layers = view.getLayers({
     props: {
-      loader: 
-        [{ ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } } }],
+      loader: [
+        { ...loader, meta: { physicalSizes: { x: { value: 1, unit: 'cm' } } } }
+      ]
     },
     viewStates: {
       foo: {
@@ -43,16 +48,15 @@ test(`SideBySideView layer type and props check`, t => {
   t.end();
 });
 
-
 test(`SideBySideView layer with multiscale`, t => {
   const view = new SideBySideView(defaultArguments);
   const loader = { type: 'loads' };
   const layers = view.getLayers({
     props: {
       loader: [
-        { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } } },
-        { ...loader, physicalSizes: { x: { value: 1, unit: 'cm' } } }
-      ],
+        { ...loader, meta: { physicalSizes: { x: { value: 1, unit: 'cm' } } } },
+        { ...loader, meta: { physicalSizes: { x: { value: 1, unit: 'cm' } } } }
+      ]
     },
     viewStates: {
       foo: {
@@ -77,6 +81,35 @@ test(`SideBySideView layer with multiscale`, t => {
     layers[0].props.viewportId,
     view.id,
     'SideBySideView id should be passed down to layer as ViewportId.'
+  );
+  t.end();
+});
+
+test(`SideBySideView layer does not render scale bar without physical size`, t => {
+  const view = new SideBySideView(defaultArguments);
+  const loader = { type: 'loads' };
+  const layers = view.getLayers({
+    props: {
+      loader: [loader, loader]
+    },
+    viewStates: {
+      foo: {
+        target: [0, 0, 0],
+        zoom: 0
+      }
+    }
+  });
+  t.ok(
+    layers[0] instanceof MultiscaleImageLayer,
+    'SideBySideView layer should be MultiscaleImageLayer.'
+  );
+  t.ok(
+    layers[1] instanceof PolygonLayer,
+    'SideBySideView layer should be PolygonLayer.'
+  );
+  t.ok(
+    layers.length === 2,
+    'SideBySideView should not have more than PolygonLayer and MultiscaleImageLayer'
   );
   t.end();
 });

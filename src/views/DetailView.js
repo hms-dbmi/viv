@@ -17,14 +17,14 @@ export default class DetailView extends VivView {
     const layers = getImageLayers(id, props);
 
     // Inspect the first pixel source for physical sizes
-    const { physicalSizes } = loader[0];
-    if (physicalSizes?.x) {
+    if (loader[0]?.meta?.physicalSizes?.x) {
+      const { size, unit } = loader[0].meta.physicalSizes.x;
       layers.push(
         new ScaleBarLayer({
           id: getVivId(id),
           loader,
-          unit: physicalSizes.x.unit,
-          size: physicalSizes.x.value,
+          unit,
+          size,
           viewState: { ...layerViewState, height, width }
         })
       );
