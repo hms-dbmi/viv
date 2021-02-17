@@ -162,4 +162,10 @@ export function getImageSize<T extends string[]>(source: PixelSource<T>) {
   return { height, width };
 }
 
+export function getChunkSize<T extends string[]>(source: PixelSource<T>) {
+  const interleaved = isInterleaved(source.shape);
+  const [height, width] = source.chunks.slice(interleaved ? -3 : -2);
+  return { height, width };
+}
+
 export const SIGNAL_ABORTED = '__vivSignalAborted';

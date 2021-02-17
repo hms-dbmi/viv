@@ -52,6 +52,10 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     return this._data.shape;
   }
 
+  get chunks() {
+    return this._data.chunks;
+  }
+
   get dtype() {
     const suffix = this._data.dtype.slice(1) as keyof typeof DTYPE_LOOKUP;
     if (!(suffix in DTYPE_LOOKUP)) {

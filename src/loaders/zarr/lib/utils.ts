@@ -1,7 +1,7 @@
 import { openGroup } from 'zarr';
 import type { ZarrArray } from 'zarr';
 import type { OMEXML } from '../../omexml';
-import { getLabels } from '../../utils';
+import { getLabels, getImageSize, getChunkSize } from '../../utils';
 
 import type { RootAttrs } from '../ome-zarr';
 import type { PixelSource } from '../../../types';
@@ -95,5 +95,26 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
  *
  */
 export function trimPyramid<S extends string[]>(pyramid: PixelSource<S>[]) {
-  return pyramid.filter(level => pyramid[0].tileSize === level.tileSize);
+  const { width: level0Width, height: level0Height } = getImageSize(pyramid[0]);
+  return pyramid.filter((level, index) => {
+    const { height: currLevelHeight, width: currLevelWidth } = getImageSize(
+      level
+    );
+    const { height: currChunkHeight, width: currChunkWidth } = getChunkSize(
+      level
+    );
+    // If the shape and chunk size of the zarr store at downsampled levels
+    // match the power-of-2 downsampling that is used to render tiles
+    // we can render these levels of the pyramid.
+    /* eslint-disable no-bitwise */
+    const canRenderLowResolutionLevel =
+      [currLevelHeight, currChunkHeight].every(
+        h => h === level0Height >> index
+      ) &&
+      [currLevelWidth, currChunkWidth].every(w => w === level0Width >> index);
+    /* eslint-disable no-bitwise */
+    return (
+      canRenderLowResolutionLevel || pyramid[0].tileSize === level.tileSize
+    );
+  });
 }

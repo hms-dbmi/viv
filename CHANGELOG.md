@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Allow `trimPyramid` to return zarr `ZarrPixelSource`s that can be rendered properly but have different `tileSize` than base resolution.
+
 ## 0.9.1
 
 ### Added
