@@ -86,8 +86,13 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
   };
 }
 
+function prevPowerOf2(x: number) {
+  return 2 ** Math.floor(Math.log2(x));
+}
+
 export function guessTileSize(arr: ZarrArray) {
   const interleaved = isInterleaved(arr.shape);
   const [yChunk, xChunk] = arr.chunks.slice(interleaved ? -3 : -2);
-  return Math.min(yChunk, xChunk);
+  const size = Math.min(yChunk, xChunk);
+  return prevPowerOf2(size);
 }
