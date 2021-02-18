@@ -1,5 +1,5 @@
 import type { ZarrArray } from 'zarr';
-import { loadMultiscales, trimPyramid } from './lib/utils';
+import { loadMultiscales, guessTileSize } from './lib/utils';
 import ZarrPixelSource from './pixel-source';
 import type { Labels } from '../../types';
 
@@ -38,9 +38,10 @@ export interface RootAttrs {
 export async function load(store: ZarrArray['store']) {
   const { data, rootAttrs } = await loadMultiscales(store);
   const labels = ['t', 'c', 'z', 'y', 'x'] as Labels<['t', 'c', 'z']>;
-  const pyramid = data.map(arr => new ZarrPixelSource(arr, labels));
+  const tileSize = guessTileSize(data[0]);
+  const pyramid = data.map(arr => new ZarrPixelSource(arr, labels, tileSize));
   return {
-    data: trimPyramid(pyramid),
+    data: pyramid,
     metadata: rootAttrs
   };
 }

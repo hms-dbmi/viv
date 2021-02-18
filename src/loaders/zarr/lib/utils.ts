@@ -1,10 +1,9 @@
 import { openGroup } from 'zarr';
 import type { ZarrArray } from 'zarr';
 import type { OMEXML } from '../../omexml';
-import { getLabels } from '../../utils';
+import { getLabels, isInterleaved } from '../../utils';
 
 import type { RootAttrs } from '../ome-zarr';
-import type { PixelSource } from '../../../types';
 
 /*
  * Returns true if data shape is that expected for OME-Zarr.
@@ -87,13 +86,8 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
   };
 }
 
-/*
- * Downsampled resolutions in zarr-based image pyramids might have different
- * chunk sizes which aren't supported by our image layers.
- *
- * This function trims the pyramid to just levels with the same tilesize.
- *
- */
-export function trimPyramid<S extends string[]>(pyramid: PixelSource<S>[]) {
-  return pyramid.filter(level => pyramid[0].tileSize === level.tileSize);
+export function guessTileSize(arr: ZarrArray) {
+  const interleaved = isInterleaved(arr.shape);
+  const [yChunk, xChunk] = arr.chunks.slice(interleaved ? -3 : -2);
+  return Math.min(yChunk, xChunk);
 }
