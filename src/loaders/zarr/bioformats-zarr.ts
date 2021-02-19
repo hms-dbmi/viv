@@ -4,7 +4,7 @@ import { fromString } from '../omexml';
 import {
   guessBioformatsLabels,
   loadMultiscales,
-  trimPyramid
+  guessTileSize
 } from './lib/utils';
 import ZarrPixelSource from './pixel-source';
 
@@ -22,10 +22,11 @@ export async function load(
   const { data } = await loadMultiscales(root, '0');
 
   const labels = guessBioformatsLabels(data[0], imgMeta);
-  const pyramid = data.map(arr => new ZarrPixelSource(arr, labels));
+  const tileSize = guessTileSize(data[0]);
+  const pyramid = data.map(arr => new ZarrPixelSource(arr, labels, tileSize));
 
   return {
-    data: trimPyramid(pyramid),
+    data: pyramid,
     metadata: imgMeta
   };
 }
