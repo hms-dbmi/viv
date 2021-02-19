@@ -81,12 +81,26 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     return sel;
   }
 
+  /**
+   * Converts x, y tile indices to zarr dimension Slices within image bounds.
+   */
   private _getSlices(x: number, y: number) {
     const { height, width } = getImageSize(this);
-    return [
-      slice(x * this.tileSize, Math.min((x + 1) * this.tileSize, width)),
-      slice(y * this.tileSize, Math.min((y + 1) * this.tileSize, height))
+    const [xStart, xStop] = [
+      x * this.tileSize,
+      Math.min((x + 1) * this.tileSize, width)
     ];
+    const [yStart, yStop] = [
+      y * this.tileSize,
+      Math.min((y + 1) * this.tileSize, height)
+    ];
+    // Deck.gl can sometimes request edge tiles that don't exist. We throw
+    // a BoundsCheckError which is picked up in `ZarrPixelSource.onTileError`
+    // and ignored by deck.gl.
+    if (xStart === xStop || yStart === yStop) {
+      throw new BoundsCheckError('Tile slice is zero-sized.');
+    }
+    return [slice(xStart, xStop), slice(yStart, yStop)];
   }
 
   async getRaster({ selection }: RasterSelection<S> | { selection: number[] }) {

@@ -94,5 +94,6 @@ export function guessTileSize(arr: ZarrArray) {
   const interleaved = isInterleaved(arr.shape);
   const [yChunk, xChunk] = arr.chunks.slice(interleaved ? -3 : -2);
   const size = Math.min(yChunk, xChunk);
+  // deck.gl requirement for power-of-two tile size.
   return prevPowerOf2(size);
 }
