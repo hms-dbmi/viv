@@ -6,6 +6,12 @@
 
 ### Changed
 
+## 0.9.2
+
+### Added
+
+### Changed
+
 - Remove `trimPyramid` and require declaration of `tileSize` in `ZarrPixelSource`.
 
 ## 0.9.1
