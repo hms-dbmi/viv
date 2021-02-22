@@ -4,7 +4,7 @@
 
 ### Added
 
-- Support OME `double` (i.e `Float64`) datatype
+- Support OME `double` (and in general, double-precision floating point) datatype
 
 ### Changed
 
