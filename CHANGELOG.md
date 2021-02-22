@@ -4,6 +4,8 @@
 
 ### Added
 
+- Support OME `double` (i.e `Float64`) datatype
+
 ### Changed
 
 ## 0.9.2
