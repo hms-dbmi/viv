@@ -1,4 +1,5 @@
 import GL from '@luma.gl/constants';
+import type { TypedArray } from 'zarr';
 
 export const MAX_COLOR_INTENSITY = 255;
 
@@ -77,7 +78,7 @@ export const DTYPE_VALUES = {
     // https://en.wikipedia.org/wiki/Single-precision_floating-point_format.
     max: 3.4 * 10 ** 38,
     sampler: 'sampler2D',
-    cast: data => new Float32Array(data)
+    cast: (data: TypedArray) => new Float32Array(data)
   }
 } as const;
 
