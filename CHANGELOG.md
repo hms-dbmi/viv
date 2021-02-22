@@ -4,7 +4,7 @@
 
 ### Added
 
-- Support OME `double` (and in general, double-precision floating point) datatype
+- Support `Float64` (OME `double`) datatype by casting array data to `Float32`. 
 
 ### Changed
 
