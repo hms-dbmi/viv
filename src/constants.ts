@@ -67,6 +67,17 @@ export const DTYPE_VALUES = {
     type: GL.INT,
     max: 2 ** (32 - 1) - 1,
     sampler: 'isampler2D'
+  },
+  // Cast Float64 as 32 bit float point so it can be rendered.
+  Float64: {
+    format: GL.R32F,
+    dataFormat: GL.RED,
+    type: GL.FLOAT,
+    // Not sure what to do about this one - a good use case for channel stats, I suppose:
+    // https://en.wikipedia.org/wiki/Single-precision_floating-point_format.
+    max: 3.4 * 10 ** 38,
+    sampler: 'sampler2D',
+    cast: data => new Float32Array(data)
   }
 } as const;
 

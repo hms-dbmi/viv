@@ -6,6 +6,7 @@ const DTYPE_LOOKUP = {
   uint16: 'Uint16',
   uint32: 'Uint32',
   float: 'Float32',
+  double: 'Float64',
   int8: 'Int8',
   int16: 'Int16',
   int32: 'Int32'
