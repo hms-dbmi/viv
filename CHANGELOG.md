@@ -4,6 +4,8 @@
 
 ### Added
 
+- Support `Float64` (OME `double`) datatype by casting array data to `Float32`. 
+
 ### Changed
 
 ## 0.9.2

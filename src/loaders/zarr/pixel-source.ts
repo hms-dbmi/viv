@@ -19,6 +19,7 @@ const DTYPE_LOOKUP = {
   u2: 'Uint16',
   u4: 'Uint32',
   f4: 'Float32',
+  f8: 'Float64',
   i1: 'Int8',
   i2: 'Int16',
   i4: 'Int32'
