@@ -174,19 +174,15 @@ export default class VivViewer extends PureComponent {
   // eslint-disable-next-line consistent-return
   onHover(info, event) {
     const { sourceLayer, coordinate, layer } = info;
-    const { onHover } = this.props;
+    const { onHover, hoverHooks } = this.props;
+    const { handleValue = () => {}, hanldeCoordnate = console.log } = hoverHooks;
     if (onHover) {
       onHover(info, event);
     }
     if (!coordinate) {
       return null;
     }
-    const { hoverHooks } = this.props;
     if (!hoverHooks) {
-      return null;
-    }
-    const { handleValue } = hoverHooks;
-    if (!handleValue) {
       return null;
     }
     const { channelData, bounds } = sourceLayer.props;
@@ -225,6 +221,7 @@ export default class VivViewer extends PureComponent {
     const coords = dataCoords[1] * width + dataCoords[0];
     const hoverData = data.map(d => d[coords]);
     handleValue(hoverData);
+    hanldeCoordnate(coordinate);
   }
 
   /**
