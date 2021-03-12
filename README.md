@@ -58,6 +58,9 @@ Initial load time for OME-TIFFs can be optimized by generating a special `offset
 $ npm install @hms-dbmi/viv
 ```
 
+You will also need to install deck.gl dependencies as they are listed as `peerDependencies` here.
+This is in order to prevent users from installing multiple versions of deck.gl.
+
 ## Development
 
 ```bash

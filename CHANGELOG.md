@@ -8,6 +8,8 @@
 
 ### Changed
 
+- Make deck.gl a peer dependency (similar to React).
+
 ## 0.9.2
 
 ### Added

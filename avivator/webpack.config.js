@@ -24,7 +24,7 @@ module.exports = {
       {
         test: /\.css$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader']
-      },
+      }
     ]
   },
   resolve: {
@@ -34,11 +34,18 @@ module.exports = {
       events: false,
       url: false,
       https: false,
-      http: false,
+      http: false
     },
     alias: {
       react: path.resolve(__dirname, 'node_modules/react'),
       'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+      '@deck.gl/core': path.resolve(__dirname, 'node_modules/@deck.gl/core'),
+      '@deck.gl/geo-layers': path.resolve(__dirname, 'node_modules/@deck.gl/geo-layers'),
+      '@deck.gl/layers': path.resolve(__dirname, 'node_modules/@deck.gl/layers'),
+      '@deck.gl/react': path.resolve(__dirname, 'node_modules/@deck.gl/react'),
+      '@luma.gl/constants': path.resolve(__dirname, 'node_modules/@luma.gl/constants'),
+      '@luma.gl/core': path.resolve(__dirname, 'node_modules/@luma.gl/core'),
+      '@luma.gl/shadertools': path.resolve(__dirname, 'node_modules/@luma.gl/shadertools'),
     }
   },
   plugins: [

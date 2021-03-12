@@ -11,7 +11,7 @@ import {
   SideBySideViewer,
   PictureInPictureViewer,
   getChannelStats
-} from '../../dist';
+} from '@hms-dbmi/viv';
 import {
   createLoader,
   channelsReducer,
