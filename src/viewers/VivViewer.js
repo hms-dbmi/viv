@@ -175,7 +175,7 @@ export default class VivViewer extends PureComponent {
   onHover(info, event) {
     const { sourceLayer, coordinate, layer } = info;
     const { onHover, hoverHooks } = this.props;
-    const { handleValue = () => {}, hanldeCoordnate = () => {} } = hoverHooks;
+    const { handleValue = () => {}, handleCoordnate = () => {} } = hoverHooks;
     if (onHover) {
       onHover(info, event);
     }
@@ -221,7 +221,7 @@ export default class VivViewer extends PureComponent {
     const coords = dataCoords[1] * width + dataCoords[0];
     const hoverData = data.map(d => d[coords]);
     handleValue(hoverData);
-    hanldeCoordnate(coordinate);
+    handleCoordnate(coordinate);
   }
 
   /**
