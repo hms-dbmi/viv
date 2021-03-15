@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@deck.gl/test-utils": "^8.4.0",
+    "@luma.gl/core": "^8.4.0",
     "@luma.gl/gltools": "^8.4.0",
     "@luma.gl/test-utils": "^8.4.0",
     "@probe.gl/test-utils": "^3.3.0",
@@ -59,6 +60,7 @@
     "abortcontroller-polyfill": "^1.5.0",
     "browserify": "^17.0.0",
     "concurrently": "^5.3.0",
+    "deck.gl": "^8.4.0",
     "documentation": "^13.1.0",
     "eslint": "^7.12.1",
     "eslint-config-airbnb": "^18.2.0",
