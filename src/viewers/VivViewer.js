@@ -175,14 +175,13 @@ export default class VivViewer extends PureComponent {
   onHover(info, event) {
     const { sourceLayer, coordinate, layer } = info;
     const { onHover, hoverHooks } = this.props;
-    const { handleValue = () => {}, handleCoordnate = () => {} } = hoverHooks;
     if (onHover) {
       onHover(info, event);
     }
-    if (!coordinate) {
+    if (!hoverHooks) {
       return null;
     }
-    if (!hoverHooks) {
+    if (!coordinate) {
       return null;
     }
     const { channelData, bounds } = sourceLayer.props;
@@ -193,7 +192,7 @@ export default class VivViewer extends PureComponent {
     if (!data) {
       return null;
     }
-
+    const { handleValue = () => {}, handleCoordnate = () => {} } = hoverHooks;
     let dataCoords;
     // Tiled layer needs a custom layerZoomScale.
     if (sourceLayer.id.includes('Tiled')) {
