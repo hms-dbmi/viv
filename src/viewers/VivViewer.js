@@ -18,6 +18,12 @@ const areViewStatesEqual = (viewState, otherViewState) => {
  */
 
 /**
+ * @callback Hover
+ * @param {Object} info
+ * @param {Object} event
+ */
+
+/**
  * This component handles rendering the various views within the DeckGL contenxt.
  * @param {Object} props
  * @param {Array} props.layerProps  Props for the layers in each view.
@@ -25,7 +31,9 @@ const areViewStatesEqual = (viewState, otherViewState) => {
  * @param {VivView} props.views Various VivViews to render.
  * @param {Array} props.viewStates List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }]
  * @param {ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
- * */
+ * @param {Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
+ *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
+ */
 export default class VivViewer extends PureComponent {
   constructor(props) {
     super(props);
@@ -164,7 +172,12 @@ export default class VivViewer extends PureComponent {
   }
 
   // eslint-disable-next-line consistent-return
-  onHover({ sourceLayer, coordinate, layer }) {
+  onHover(info, event) {
+    const { sourceLayer, coordinate, layer } = info;
+    const { onHover } = this.props;
+    if (onHover) {
+      onHover(info, event);
+    }
     if (!coordinate) {
       return null;
     }

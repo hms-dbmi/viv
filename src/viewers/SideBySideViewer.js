@@ -28,6 +28,8 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
+ * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
+ *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {Array} [props.transitionFields] A string array indicating which fields require a transition: Default: ['t', 'z'].
  */
 const SideBySideViewer = props => {
@@ -50,6 +52,7 @@ const SideBySideViewer = props => {
     lensBorderRadius = 0.02,
     transparentColor,
     onViewStateChange,
+    onHover,
     transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS
   } = props;
   const {
@@ -117,6 +120,7 @@ const SideBySideViewer = props => {
       views={views}
       randomize
       onViewStateChange={onViewStateChange}
+      onHover={onHover}
       viewStates={viewStates}
     />
   ) : null;
