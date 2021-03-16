@@ -58,14 +58,31 @@ function App() {
     load(url).then(setLoader);
   }, []);
 
+  const autoProps = useMemo(() => {
+    if(!loader) {
+      return props
+    }
+    // Use lowest level of the image pyramid for calculating stats.
+    const source = loader.data[loader.length - 1];
+    const stats = await Promise.all(props.selections.map(async selection => {
+      const raster = await source.getRaster({ selection });
+      return getChannelStats(raster.data);
+    }));
+    // These are calculated bounds for the sliders
+    // that could be used for display purposes.
+    // domains = stats.map(stat => stat.domain);
+    sliders = stats.map(stat => stat.autoSliders);
+    const newProps = { ...props, sliders };
+  }, [loader])
+
   if (!loader) return null;
   return (
     <PictureInPictureViewer
       loader={loader.data}
-      sliderValues={props.sliders}
-      colorValues={props.colors}
-      channelIsOn={props.isOn}
-      loaderSelection={props.selections}
+      sliderValues={autoProps.sliders}
+      colorValues={autoProps.colors}
+      channelIsOn={autoProps.isOn}
+      loaderSelection={autoProps.selections}
       height={1080}
       width={1920}
     />
