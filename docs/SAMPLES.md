@@ -71,6 +71,9 @@ function App() {
     // These are calculated bounds for the sliders
     // that could be used for display purposes.
     // domains = stats.map(stat => stat.domain);
+
+    // These are precalculated settings for the sliders that
+    // should render a good, "in focus" image initially.
     sliders = stats.map(stat => stat.autoSliders);
     const newProps = { ...props, sliders };
   }, [loader])
