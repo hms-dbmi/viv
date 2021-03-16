@@ -24,7 +24,7 @@ module.exports = {
       {
         test: /\.css$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader']
-      },
+      }
     ]
   },
   resolve: {
@@ -34,11 +34,11 @@ module.exports = {
       events: false,
       url: false,
       https: false,
-      http: false,
+      http: false
     },
     alias: {
       react: path.resolve(__dirname, 'node_modules/react'),
-      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom')
     }
   },
   plugins: [
