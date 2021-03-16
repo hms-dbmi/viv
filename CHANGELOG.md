@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.9.3
+
+### Added
+
 - Support `Float64` (OME `double`) datatype by casting array data to `Float32`. 
 - `onHover` prop for `VivViewer`, `PictureInPictureViewer`, `SideBySideViewer` for deck.gl callback.
 - Add `handleCoordnate` `hoverHook` for PIP.
