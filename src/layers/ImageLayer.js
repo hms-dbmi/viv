@@ -163,8 +163,7 @@ export default class ImageLayer extends CompositeLayer {
 
     const bounds = [0, height, width, 0];
     if (isInterleaved(loader)) {
-      return new BitmapLayer({
-        ...this.props,
+      return new BitmapLayer(this.props, {
         image: this.state,
         photometricInterpretation,
         // Shared props with XRLayer:

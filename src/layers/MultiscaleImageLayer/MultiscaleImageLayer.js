@@ -254,8 +254,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     const baseLayer =
       implementsGetRaster &&
       !excludeBackground &&
-      new ImageLayer({
-        ...this.props,
+      new ImageLayer(this.props, {
         id: `Background-Image-${id}`,
         loader: lowestResolution,
         modelMatrix: layerModelMatrix.scale(2 ** (loader.length - 1)),
