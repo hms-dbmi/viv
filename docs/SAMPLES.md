@@ -58,6 +58,8 @@ function App() {
     load(url).then(setLoader);
   }, []);
 
+  // Viv exposes the getChannelStats to produce nice initial settings
+  // so that users can have an "in focus" image immediately.
   const autoProps = useMemo(() => {
     if(!loader) {
       return props
