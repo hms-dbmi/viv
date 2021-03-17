@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-constructor */
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { LineLayer, TextLayer } from '@deck.gl/layers';
 import { range } from './utils';

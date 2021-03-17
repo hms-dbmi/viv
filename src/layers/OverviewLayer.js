@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-constructor */
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { PolygonLayer } from '@deck.gl/layers';
 import { Matrix4 } from 'math.gl';

@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-constructor */
 import { CompositeLayer } from '@deck.gl/core';
 import { Matrix4 } from 'math.gl';
 import GL from '@luma.gl/constants';
