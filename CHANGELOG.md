@@ -4,7 +4,7 @@
 
 ### Added
 
-- Add constructors to layer classes.
+- Add constructors to layer classes so that types are emitted properly.
 
 ### Changed
 
