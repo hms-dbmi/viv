@@ -48,18 +48,23 @@ const defaultProps = {
   position: { type: 'string', value: 'bottom-right', compare: true },
   length: { type: 'number', value: 0.085, compare: true }
 };
+  /**
+   * @typedef LayerProps
+   * @type {Object}
+   * @param {String} unit Physical unit size per pixel at full resolution.
+   * @param {Number} size Physical size of a pixel.
+   * @param {Array} boundingBox Boudning box of the view in which this should render.
+   * @param {id} id Id from the parent layer.
+   * @param {ViewState} viewState The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
+   * https://github.com/visgl/deck.gl/issues/4504
+   * @param {ViewState} length Value from 0 to 1 representing the portion of the view to be used for the length part of the scale bar.
+   */
+
 export default class ScaleBarLayer extends CompositeLayer {
   /**
    * This layer creates a scale bar using three LineLayers and a TextLayer.
    * Looks like: |--------| made up of three LineLayers (left tick, right tick, center length bar) and a bottom TextLayer
-   * @param {Object} props
-   * @param {String} props.unit Physical unit size per pixel at full resolution.
-   * @param {Number} props.size Physical size of a pixel.
-   * @param {Array} props.boundingBox Boudning box of the view in which this should render.
-   * @param {id} props.id Id from the parent layer.
-   * @param {ViewState} props.viewState The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
-   * https://github.com/visgl/deck.gl/issues/4504
-   * @param {ViewState} props.length Value from 0 to 1 representing the portion of the view to be used for the length part of the scale bar.
+   * @param {LayerProps} props
    */
   // eslint-disable-next-line no-useless-constructor, no-unused-vars
   constructor(props) {

@@ -35,31 +35,35 @@ const defaultProps = {
   onViewportLoad: { type: 'function', value: null, compare: true }
 };
 
+/**
+ * @typedef LayerProps
+ * @type {Object}
+ * @property {Array} sliderValues List of [begin, end] values to control each channel's ramp function.
+ * @property {Array} colorValues List of [r, g, b] values for each channel.
+ * @property {Array} channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @property {number} opacity Opacity of the layer.
+ * @property {string} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @property {Array} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
+ * @property {string} viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
+ * @property {Object} loader PixelSource. Represents an N-dimensional image.
+ * @property {function} onHover Hook function from deck.gl to handle hover objects.
+ * @property {boolean} isLensOn Whether or not to use the lens.
+ * @property {number} lensSelection Numeric index of the channel to be focused on by the lens.
+ * @property {number} lensRadius Pixel radius of the lens (default: 100).
+ * @property {Array} lensBorderColor RGB color of the border of the lens.
+ * @property {number} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * @property {function} onClick Hook function from deck.gl to handle clicked-on objects.
+ * @property {Object} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @property {Array} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
+ * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
+ * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
+ * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
+ * @property {function} onViewportLoad Function that gets called when the data in the viewport loads.
+ */
 export default class ImageLayer extends CompositeLayer {
   /**
    * This layer wraps XRLayer and generates a static image
-   * @param {Object} props
-   * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
-   * @param {Array} props.colorValues List of [r, g, b] values for each channel.
-   * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
-   * @param {number} props.opacity Opacity of the layer.
-   * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
-   * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
-   * @param {string} props.viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
-   * @param {Object} props.loader PixelSource. Represents an N-dimensional image.
-   * @param {function} props.onHover Hook function from deck.gl to handle hover objects.
-   * @param {boolean} props.isLensOn Whether or not to use the lens.
-   * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
-   * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
-   * @param {Array} props.lensBorderColor RGB color of the border of the lens.
-   * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
-   * @param {function} props.onClick Hook function from deck.gl to handle clicked-on objects.
-   * @param {Object} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
-   * @param {Array} props.transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
-   * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
-   * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
-   * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
-   * @param {function} props.onViewportLoad Function that gets called when the data in the viewport loads.
+   * @param {LayerProps} props
    */
   // eslint-disable-next-line no-useless-constructor, no-unused-vars
   constructor(props) {

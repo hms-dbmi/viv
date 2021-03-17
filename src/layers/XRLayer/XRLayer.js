@@ -60,6 +60,10 @@ const defaultProps = {
  * (16/32 bit floats/ints/uints with more than 3/4 channels).
  */
 export default class XRLayer extends Layer {
+  /**
+   * This layer generates a MultiscaleImageLayer (tiled) and a ImageLayer (background for the tiled layer)
+   * @param {LayerProps} props
+   */
   // eslint-disable-next-line no-useless-constructor, no-unused-vars
   constructor(props) {
     // needed for TypeScript types that are generated from the JSDoc
