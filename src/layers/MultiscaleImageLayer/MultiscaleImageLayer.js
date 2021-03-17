@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-constructor */
 import { CompositeLayer } from '@deck.gl/core';
 import { Matrix4 } from 'math.gl';
 import GL from '@luma.gl/constants';
@@ -36,38 +37,42 @@ const defaultProps = {
   excludeBackground: { type: 'boolean', value: false, compare: true }
 };
 
-/**
- * This layer generates a MultiscaleImageLayer (tiled) and a ImageLayer (background for the tiled layer)
- * @param {Object} props
- * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
- * @param {Array} props.colorValues List of [r, g, b] values for each channel.
- * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
- * @param {number} props.opacity Opacity of the layer.
- * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
- * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
- * @param {string} props.viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
- * @param {Array} props.loader Image pyramid. PixelSource[], where each PixelSource is decreasing in shape.
- * @param {Array} props.loaderSelection Selection to be used for fetching data.
- * @param {String} props.id Unique identifier for this layer.
- * @param {function} props.onTileError Custom override for handle tile fetching errors.
- * @param {function} props.onHover Hook function from deck.gl to handle hover objects.
- * @param {boolean} props.isLensOn Whether or not to use the lens.
- * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
- * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
- * @param {Array} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
- * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
- * @param {number} props.maxRequests Maximum parallel ongoing requests allowed before aborting.
- * @param {function} props.onClick Hook function from deck.gl to handle clicked-on objects.
- * @param {Object} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
- * @param {Array} props.transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
- * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
- * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
- * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
- * @param {string} props.refinementStrategy 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
- * @param {boolean} props.excludeBackground Whether to exclude the background image. The background image is also excluded for opacity!=1.
- */
-
 export default class MultiscaleImageLayer extends CompositeLayer {
+  /**
+   * This layer generates a MultiscaleImageLayer (tiled) and a ImageLayer (background for the tiled layer)
+   * @param {Object} props
+   * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
+   * @param {Array} props.colorValues List of [r, g, b] values for each channel.
+   * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
+   * @param {number} props.opacity Opacity of the layer.
+   * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+   * @param {Array} props.domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
+   * @param {string} props.viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
+   * @param {Array} props.loader Image pyramid. PixelSource[], where each PixelSource is decreasing in shape.
+   * @param {Array} props.loaderSelection Selection to be used for fetching data.
+   * @param {String} props.id Unique identifier for this layer.
+   * @param {function} props.onTileError Custom override for handle tile fetching errors.
+   * @param {function} props.onHover Hook function from deck.gl to handle hover objects.
+   * @param {boolean} props.isLensOn Whether or not to use the lens.
+   * @param {number} props.lensSelection Numeric index of the channel to be focused on by the lens.
+   * @param {number} props.lensRadius Pixel radius of the lens (default: 100).
+   * @param {Array} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
+   * @param {number} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+   * @param {number} props.maxRequests Maximum parallel ongoing requests allowed before aborting.
+   * @param {function} props.onClick Hook function from deck.gl to handle clicked-on objects.
+   * @param {Object} props.modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+   * @param {Array} props.transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
+   * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
+   * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
+   * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
+   * @param {string} props.refinementStrategy 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
+   * @param {boolean} props.excludeBackground Whether to exclude the background image. The background image is also excluded for opacity!=1.
+   */
+  constructor(props) {
+    // needed for TypeScript types that are generated from the JSDoc
+    super(props);
+  }
+
   initializeState() {
     this.state = {
       unprojectLensBounds: [0, 0, 0, 0]
@@ -180,7 +185,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     };
 
     const { height, width } = getImageSize(loader[0]);
-    const tiledLayer = new MultiscaleImageLayerBase(this.props, {
+    const tiledLayer = new MultiscaleImageLayerBase({
+      ...this.props,
       id: `Tiled-Image-${id}`,
       getTileData,
       dtype,
@@ -241,7 +247,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     const baseLayer =
       implementsGetRaster &&
       !excludeBackground &&
-      new ImageLayer(this.props, {
+      new ImageLayer({
+        ...this.props,
         id: `Background-Image-${id}`,
         loader: lowestResolution,
         modelMatrix: layerModelMatrix.scale(2 ** (loader.length - 1)),

@@ -29,6 +29,12 @@ const defaultProps = {
  * This layer serves as a proxy of sorts to the rendering done in renderSubLayers, reacting to viewport changes in a custom manner.
  */
 export default class MultiscaleImageLayerBase extends TileLayer {
+  // eslint-disable-next-line no-useless-constructor
+  constructor(props) {
+    // needed for TypeScript types that are generated from the JSDoc
+    super(props);
+  }
+
   /**
    * This function allows us to controls which viewport gets to update the Tileset2D.
    * This is a uniquely TileLayer issue since it updates based on viewport updates thanks

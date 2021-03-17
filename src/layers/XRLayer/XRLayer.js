@@ -60,6 +60,12 @@ const defaultProps = {
  * (16/32 bit floats/ints/uints with more than 3/4 channels).
  */
 export default class XRLayer extends Layer {
+  // eslint-disable-next-line no-useless-constructor
+  constructor(props) {
+    // needed for TypeScript types that are generated from the JSDoc
+    super(props);
+  }
+
   /**
    * This function chooses a shader (colormapping or not) and
    * replaces `usampler` with `sampler` if the data is not an unsigned integer

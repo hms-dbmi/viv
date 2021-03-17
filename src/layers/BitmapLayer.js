@@ -115,6 +115,12 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
   }
 }
 export default class BitmapLayer extends CompositeLayer {
+  // eslint-disable-next-line no-useless-constructor
+  constructor(props) {
+    // needed for TypeScript types that are generated from the JSDoc
+    super(props);
+  }
+
   initializeState(args) {
     const { gl } = this.context;
     // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
@@ -134,7 +140,8 @@ export default class BitmapLayer extends CompositeLayer {
       transparentColor: tansparentColorInHook
     } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
-    return new BitmapLayerWrapper(this.props, {
+    return new BitmapLayerWrapper({
+      ...this.props,
       // transparentColor is a prop applied to the original image data by deck.gl's
       // BitmapLayer and needs to be in the original colorspace.  It is used to determine
       // what color is "transparent" in the original color space (i.e what shows when opacity is 0).
