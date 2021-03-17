@@ -53,7 +53,7 @@ const defaultProps = {
   transparentColor: { type: 'array', value: null, compare: true }
 };
 
- /**
+/**
  * This layer generates a MultiscaleImageLayer (tiled) and a ImageLayer (background for the tiled layer)
  * @typedef LayerProps
  * @type {object}

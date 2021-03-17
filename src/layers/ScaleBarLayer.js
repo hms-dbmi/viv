@@ -48,17 +48,17 @@ const defaultProps = {
   position: { type: 'string', value: 'bottom-right', compare: true },
   length: { type: 'number', value: 0.085, compare: true }
 };
-  /**
-   * @typedef LayerProps
-   * @type {Object}
-   * @property {String} unit Physical unit size per pixel at full resolution.
-   * @property {Number} size Physical size of a pixel.
-   * @property {Array} boundingBox Boudning box of the view in which this should render.
-   * @property {id} id Id from the parent layer.
-   * @property {ViewState} viewState The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
-   * https://github.com/visgl/deck.gl/issues/4504
-   * @property {ViewState} length Value from 0 to 1 representing the portion of the view to be used for the length part of the scale bar.
-   */
+/**
+ * @typedef LayerProps
+ * @type {Object}
+ * @property {String} unit Physical unit size per pixel at full resolution.
+ * @property {Number} size Physical size of a pixel.
+ * @property {Array} boundingBox Boudning box of the view in which this should render.
+ * @property {id} id Id from the parent layer.
+ * @property {ViewState} viewState The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
+ * https://github.com/visgl/deck.gl/issues/4504
+ * @property {ViewState} length Value from 0 to 1 representing the portion of the view to be used for the length part of the scale bar.
+ */
 
 export default class ScaleBarLayer extends CompositeLayer {
   /**

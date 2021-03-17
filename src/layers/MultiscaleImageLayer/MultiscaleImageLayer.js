@@ -37,7 +37,7 @@ const defaultProps = {
   excludeBackground: { type: 'boolean', value: false, compare: true }
 };
 
- /**
+/**
  * This layer generates a MultiscaleImageLayer (tiled) and a ImageLayer (background for the tiled layer)
  * @typedef LayerProps
  * @type {object}

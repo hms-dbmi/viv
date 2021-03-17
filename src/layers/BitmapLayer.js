@@ -115,7 +115,7 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
   }
 }
 
- /**
+/**
  * @typedef LayerProps
  * @type {object}
  * @property {number} opacity Opacity of the layer.
