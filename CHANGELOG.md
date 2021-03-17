@@ -4,6 +4,8 @@
 
 ### Added
 
+- `getChannelStats` in snippet to show how to use it.
+
 ### Changed
 
 ## 0.9.3
