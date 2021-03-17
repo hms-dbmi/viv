@@ -63,8 +63,7 @@ export function renderSubLayers(props) {
       visible
     });
   }
-  return new XRLayer({
-    ...props,
+  return new XRLayer(props, {
     channelData: data,
     // Uncomment to help debugging - shades the tile being hovered over.
     // autoHighlight: true,
