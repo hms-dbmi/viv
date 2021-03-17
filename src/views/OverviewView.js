@@ -195,8 +195,7 @@ export default class OverviewView extends VivView {
     const boundingBox = makeBoundingBox(detail).map(coords =>
       coords.map(e => e * this.scale)
     );
-    const overviewLayer = new OverviewLayer({
-      ...props,
+    const overviewLayer = new OverviewLayer(props, {
       id: getVivId(this.id),
       boundingBox,
       overviewScale: this.scale,
