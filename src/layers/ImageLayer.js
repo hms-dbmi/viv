@@ -8,7 +8,7 @@ import { onPointer } from './utils';
 import { isInterleaved } from '../loaders/utils';
 
 const defaultProps = {
-  pickable: true,
+  pickable: { type: 'boolean', value: true, compare: true },
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   sliderValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },

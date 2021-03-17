@@ -16,7 +16,7 @@ import {
 const DECK_GL_TILE_SIZE = 512;
 
 const defaultProps = {
-  pickable: true,
+  pickable: { type: 'boolean', value: true, compare: true },
   onHover: { type: 'function', value: null, compare: false },
   sliderValues: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
@@ -265,7 +265,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
           // since the background image might not have the same color output from the fragment shader
           // as the tiled layer at a higher resolution level.
           !transparentColor,
-        pickable: true,
+        pickable: { type: 'boolean', value: true, compare: true },
         onHover,
         onClick
       });

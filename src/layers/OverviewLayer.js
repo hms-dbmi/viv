@@ -7,7 +7,7 @@ import ImageLayer from './ImageLayer';
 import { getImageSize } from '../loaders/utils';
 
 const defaultProps = {
-  pickable: true,
+  pickable: { type: 'boolean', value: true, compare: true },
   loader: {
     type: 'object',
     value: {

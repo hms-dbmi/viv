@@ -37,7 +37,7 @@ function getPosition(boundingBox, position, length) {
 }
 
 const defaultProps = {
-  pickable: true,
+  pickable: { type: 'boolean', value: true, compare: true },
   viewState: {
     type: 'object',
     value: { zoom: 0, target: [0, 0, 0] },

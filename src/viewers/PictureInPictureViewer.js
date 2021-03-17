@@ -33,7 +33,6 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {number} [props.lensRadius] Pixel radius of the lens (default: 100).
  * @param {Array} [props.lensBorderColor] RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
- * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
  * @param {Boolean} [props.clickCenter] Click to center the default view. Default is true.
  * @param {Array} [props.transparentColor] An RGB (0-255 range) color to be considered "transparent" if provided.
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
