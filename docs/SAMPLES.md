@@ -10,11 +10,11 @@ recognizes,
 - `http://localhost:8000/LuCa-7color_Scan1.ome.tif` (OME-TIFF)
 - `http://localhost:8000/LuCa-7color_Scan1/` (Bioformats-generated Zarr)
 
-
 ```javascript
 import React, { useState, useEffect, useMemo } from 'react';
 
 import {
+  getChannelStats,
   loadOmeTiff,
   loadBioformatsZarr,
   PictureInPictureViewer,
