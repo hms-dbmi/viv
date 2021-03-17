@@ -115,10 +115,11 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
   }
 }
 export default class BitmapLayer extends CompositeLayer {
-  // eslint-disable-next-line no-useless-constructor
+  // eslint-disable-next-line no-useless-constructor, no-unused-vars
   constructor(props) {
     // needed for TypeScript types that are generated from the JSDoc
-    super(props);
+    // eslint-disable-next-line prefer-rest-params
+    super(...arguments);
   }
 
   initializeState(args) {

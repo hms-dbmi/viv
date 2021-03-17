@@ -61,9 +61,11 @@ export default class ScaleBarLayer extends CompositeLayer {
    * https://github.com/visgl/deck.gl/issues/4504
    * @param {ViewState} props.length Value from 0 to 1 representing the portion of the view to be used for the length part of the scale bar.
    */
+  // eslint-disable-next-line no-useless-constructor, no-unused-vars
   constructor(props) {
     // needed for TypeScript types that are generated from the JSDoc
-    super(props);
+    // eslint-disable-next-line prefer-rest-params
+    super(...arguments);
   }
 
   renderLayers() {

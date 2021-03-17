@@ -68,9 +68,11 @@ export default class MultiscaleImageLayer extends CompositeLayer {
    * @param {string} props.refinementStrategy 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
    * @param {boolean} props.excludeBackground Whether to exclude the background image. The background image is also excluded for opacity!=1.
    */
+  // eslint-disable-next-line no-useless-constructor, no-unused-vars
   constructor(props) {
     // needed for TypeScript types that are generated from the JSDoc
-    super(props);
+    // eslint-disable-next-line prefer-rest-params
+    super(...arguments);
   }
 
   initializeState() {

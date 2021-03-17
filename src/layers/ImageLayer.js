@@ -61,9 +61,11 @@ export default class ImageLayer extends CompositeLayer {
    * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
    * @param {function} props.onViewportLoad Function that gets called when the data in the viewport loads.
    */
+  // eslint-disable-next-line no-useless-constructor, no-unused-vars
   constructor(props) {
     // needed for TypeScript types that are generated from the JSDoc
-    super(props);
+    // eslint-disable-next-line prefer-rest-params
+    super(...arguments);
   }
 
   initializeState() {

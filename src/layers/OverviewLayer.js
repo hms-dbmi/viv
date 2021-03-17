@@ -51,9 +51,11 @@ export default class OverviewLayer extends CompositeLayer {
    * @param {Array} props.viewportOutlineColor [r, g, b] color of the outline (default: [255, 190, 0]).
    * @param {number} props.viewportOutlineWidth Viewport outline width in px (default: 2).
    */
+  // eslint-disable-next-line no-useless-constructor, no-unused-vars
   constructor(props) {
     // needed for TypeScript types that are generated from the JSDoc
-    super(props);
+    // eslint-disable-next-line prefer-rest-params
+    super(...arguments);
   }
 
   renderLayers() {
