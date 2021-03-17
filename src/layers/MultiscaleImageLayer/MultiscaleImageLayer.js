@@ -193,8 +193,7 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     };
 
     const { height, width } = getImageSize(loader[0]);
-    const tiledLayer = new MultiscaleImageLayerBase({
-      ...this.props,
+    const tiledLayer = new MultiscaleImageLayerBase(this.props, {
       id: `Tiled-Image-${id}`,
       getTileData,
       dtype,

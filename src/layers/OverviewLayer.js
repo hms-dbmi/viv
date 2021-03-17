@@ -81,8 +81,7 @@ export default class OverviewLayer extends CompositeLayer {
     const z = loader.length - 1;
     const lowestResolution = loader[z];
 
-    const overview = new ImageLayer({
-      ...this.props,
+    const overview = new ImageLayer(this.props, {
       id: `viewport-${id}`,
       modelMatrix: new Matrix4().scale(2 ** z * overviewScale),
       loader: lowestResolution

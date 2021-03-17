@@ -178,8 +178,7 @@ export default class ImageLayer extends CompositeLayer {
         visible
       });
     }
-    return new XRLayer({
-      ...this.props,
+    return new XRLayer(this.props, {
       channelData: { data, height, width },
       sliderValues,
       colorValues,

@@ -141,8 +141,7 @@ export default class BitmapLayer extends CompositeLayer {
       transparentColor: tansparentColorInHook
     } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
-    return new BitmapLayerWrapper({
-      ...this.props,
+    return new BitmapLayerWrapper(this.props, {
       // transparentColor is a prop applied to the original image data by deck.gl's
       // BitmapLayer and needs to be in the original colorspace.  It is used to determine
       // what color is "transparent" in the original color space (i.e what shows when opacity is 0).
