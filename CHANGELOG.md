@@ -5,6 +5,7 @@
 ### Added
 
 - Add constructors to layer classes so that types are emitted properly.
+- `getChannelStats` in snippet to show how to use it.
 
 ### Changed
 

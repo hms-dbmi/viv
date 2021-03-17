@@ -10,11 +10,11 @@ recognizes,
 - `http://localhost:8000/LuCa-7color_Scan1.ome.tif` (OME-TIFF)
 - `http://localhost:8000/LuCa-7color_Scan1/` (Bioformats-generated Zarr)
 
-
 ```javascript
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import {
+  getChannelStats,
   loadOmeTiff,
   loadBioformatsZarr,
   PictureInPictureViewer,
@@ -58,14 +58,36 @@ function App() {
     load(url).then(setLoader);
   }, []);
 
+  // Viv exposes the getChannelStats to produce nice initial settings
+  // so that users can have an "in focus" image immediately.
+  const autoProps = useMemo(() => {
+    if(!loader) {
+      return props
+    }
+    // Use lowest level of the image pyramid for calculating stats.
+    const source = loader.data[loader.length - 1];
+    const stats = await Promise.all(props.selections.map(async selection => {
+      const raster = await source.getRaster({ selection });
+      return getChannelStats(raster.data);
+    }));
+    // These are calculated bounds for the sliders
+    // that could be used for display purposes.
+    // domains = stats.map(stat => stat.domain);
+
+    // These are precalculated settings for the sliders that
+    // should render a good, "in focus" image initially.
+    sliders = stats.map(stat => stat.autoSliders);
+    const newProps = { ...props, sliders };
+  }, [loader])
+
   if (!loader) return null;
   return (
     <PictureInPictureViewer
       loader={loader.data}
-      sliderValues={props.sliders}
-      colorValues={props.colors}
-      channelIsOn={props.isOn}
-      loaderSelection={props.selections}
+      sliderValues={autoProps.sliders}
+      colorValues={autoProps.colors}
+      channelIsOn={autoProps.isOn}
+      loaderSelection={autoProps.selections}
       height={1080}
       width={1920}
     />
