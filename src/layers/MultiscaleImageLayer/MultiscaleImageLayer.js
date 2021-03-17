@@ -38,7 +38,6 @@ const defaultProps = {
 };
 
 /**
- * This layer generates a MultiscaleImageLayer (tiled) and a ImageLayer (background for the tiled layer)
  * @typedef LayerProps
  * @type {object}
  * @property {Array} sliderValues List of [begin, end] values to control each channel's ramp function.
