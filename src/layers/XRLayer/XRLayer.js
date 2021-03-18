@@ -69,9 +69,9 @@ const defaultProps = {
  * @property {number=} lensRadius Pixel radius of the lens (default: 100).
  * @property {Array.<number>=} lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
  * @property {number=} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
- * @property {number} dtype Dtype for the layer.
+ * @property {string} dtype Dtype for the layer.
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
- * @property {Object} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
  * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.

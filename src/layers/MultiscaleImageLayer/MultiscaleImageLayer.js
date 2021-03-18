@@ -44,7 +44,7 @@ const defaultProps = {
  * @property {Array.<Array.<boolean>>} channelIsOn List of boolean values for each channel for whether or not it is visible.
  * @property {number=} opacity Opacity of the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
- * @property {Array=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
+ * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @property {string=} viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
  * @property {Array} loader Image pyramid. PixelSource[], where each PixelSource is decreasing in shape.
  * @property {Array} loaderSelection Selection to be used for fetching data.
