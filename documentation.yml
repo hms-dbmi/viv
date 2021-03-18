@@ -20,6 +20,7 @@ toc:
 - getChannelStats
 - getDefaultInitialViewState
 - name: Layers
+  file: docs/LAYERS_DOCS_NOTE.md
 - MultiscaleImageLayer
 - ImageLayer
 - ScaleBarLayer

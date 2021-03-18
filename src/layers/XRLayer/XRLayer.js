@@ -35,7 +35,7 @@ function getRenderingAttrs(dtype, gl) {
 }
 
 const defaultProps = {
-  pickable: true,
+  pickable: { type: 'boolean', value: true, compare: true },
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'object', value: {}, compare: true },
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
@@ -54,12 +54,33 @@ const defaultProps = {
 };
 
 /**
- * This layer serves as the workhorse of the project, handling all the rendering.  Much of it is
- * adapted from BitmapLayer in DeckGL.
- * XR = eXtended Range i.e more than the standard 8-bit RGBA data format
- * (16/32 bit floats/ints/uints with more than 3/4 channels).
+ * @typedef LayerProps
+ * @type {object}
+ * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
+ * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
+ * @property {Array.<Array.<boolean>>} channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @property {string} dtype Dtype for the layer.
+ * @property {number=} opacity Opacity of the layer.
+ * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @property {Array.<number>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
+ * @property {String=} id Unique identifier for this layer.
+ * @property {function=} onHover Hook function from deck.gl to handle hover objects.
+ * @property {boolean=} isLensOn Whether or not to use the lens.
+ * @property {number=} lensSelection Numeric index of the channel to be focused on by the lens.
+ * @property {number=} lensRadius Pixel radius of the lens (default: 100).
+ * @property {Array.<number>=} lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
+ * @property {number=} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
+ * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
+ * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
+ * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
+ * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  */
-export default class XRLayer extends Layer {
+/**
+ * @type {{ new(...props: LayerProps[]) }}
+ */
+const XRLayer = class extends Layer {
   /**
    * This function chooses a shader (colormapping or not) and
    * replaces `usampler` with `sampler` if the data is not an unsigned integer
@@ -330,7 +351,8 @@ export default class XRLayer extends Layer {
       type: attrs.type
     });
   }
-}
+};
 
 XRLayer.layerName = 'XRLayer';
 XRLayer.defaultProps = defaultProps;
+export default XRLayer;

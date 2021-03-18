@@ -4,6 +4,7 @@
 
 ### Added
 
+- Refactor JSDoc comments to properly annotate Layer classes with constructor signatures.
 - `getChannelStats` in snippet to show how to use it.
 
 ### Changed
@@ -12,7 +13,7 @@
 
 ### Added
 
-- Support `Float64` (OME `double`) datatype by casting array data to `Float32`. 
+- Support `Float64` (OME `double`) datatype by casting array data to `Float32`.
 - `onHover` prop for `VivViewer`, `PictureInPictureViewer`, `SideBySideViewer` for deck.gl callback.
 - Add `handleCoordnate` `hoverHook` for PIP.
 

@@ -36,7 +36,7 @@ function getPosition(boundingBox, position, length) {
 }
 
 const defaultProps = {
-  pickable: true,
+  pickable: { type: 'boolean', value: true, compare: true },
   viewState: {
     type: 'object',
     value: { zoom: 0, target: [0, 0, 0] },
@@ -47,20 +47,22 @@ const defaultProps = {
   position: { type: 'string', value: 'bottom-right', compare: true },
   length: { type: 'number', value: 0.085, compare: true }
 };
+/**
+ * @typedef LayerProps
+ * @type {Object}
+ * @property {String} unit Physical unit size per pixel at full resolution.
+ * @property {Number} size Physical size of a pixel.
+ * @property {Object} viewState The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
+ * https://github.com/visgl/deck.gl/issues/4504
+ * @property {Array=} boundingBox Boudning box of the view in which this should render.
+ * @property {string=} id Id from the parent layer.
+ * @property {number=} length Value from 0 to 1 representing the portion of the view to be used for the length part of the scale bar.
+ */
 
 /**
- * This layer creates a scale bar using three LineLayers and a TextLayer.
- * Looks like: |--------| made up of three LineLayers (left tick, right tick, center length bar) and a bottom TextLayer
- * @param {Object} props
- * @param {String} props.unit Physical unit size per pixel at full resolution.
- * @param {Number} props.size Physical size of a pixel.
- * @param {Array} props.boundingBox Boudning box of the view in which this should render.
- * @param {id} props.id Id from the parent layer.
- * @param {ViewState} props.viewState The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
- * https://github.com/visgl/deck.gl/issues/4504
- * @param {ViewState} props.length Value from 0 to 1 representing the portion of the view to be used for the length part of the scale bar.
+ * @type {{ new(...props: LayerProps[]) }}
  */
-export default class ScaleBarLayer extends CompositeLayer {
+const ScaleBarLayer = class extends CompositeLayer {
   renderLayers() {
     const { id, unit, size, position, viewState, length } = this.props;
     const boundingBox = makeBoundingBox(viewState);
@@ -135,7 +137,8 @@ export default class ScaleBarLayer extends CompositeLayer {
     });
     return [lengthBar, tickBoundsLeft, tickBoundsRight, textLayer];
   }
-}
+};
 
 ScaleBarLayer.layerName = 'ScaleBarLayer';
 ScaleBarLayer.defaultProps = defaultProps;
+export default ScaleBarLayer;

@@ -18,7 +18,7 @@ const PHOTOMETRIC_INTERPRETATIONS = {
 
 const defaultProps = {
   ...BaseBitmapLayer.defaultProps,
-  pickable: true,
+  pickable: { type: 'boolean', value: true, compare: true },
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
   opacity: { type: 'number', value: 1, compare: true }
@@ -114,7 +114,23 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
     });
   }
 }
-export default class BitmapLayer extends CompositeLayer {
+
+/**
+ * @typedef LayerProps
+ * @type {object}
+ * @property {number=} opacity Opacity of the layer.
+ * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
+ * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @property {String=} photometricInterpretation One of WhiteIsZero BlackIsZero YCbCr or RGB (default)
+ * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
+ * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
+ * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
+ * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
+ */
+/**
+ * @type {{ new(...props: LayerProps[]) }}
+ */
+const BitmapLayer = class extends CompositeLayer {
   initializeState(args) {
     const { gl } = this.context;
     // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
@@ -144,7 +160,7 @@ export default class BitmapLayer extends CompositeLayer {
       id: `${this.props.id}-wrapped`
     });
   }
-}
+};
 
 BitmapLayer.layerName = 'BitmapLayer';
 // From https://github.com/geotiffjs/geotiff.js/blob/8ef472f41b51d18074aece2300b6a8ad91a21ae1/src/globals.js#L202-L213
@@ -152,7 +168,9 @@ BitmapLayer.PHOTOMETRIC_INTERPRETATIONS = PHOTOMETRIC_INTERPRETATIONS;
 BitmapLayer.defaultProps = {
   ...defaultProps,
   // We don't want this layer to bind the texture so the type should not be `image`.
-  image: { type: 'object', value: {}, compare: true }
+  image: { type: 'object', value: {}, compare: true },
+  photometricInterpretation: { type: 'string', value: 'RGB', compare: true }
 };
 BitmapLayerWrapper.defaultProps = defaultProps;
 BitmapLayerWrapper.layerName = 'BitmapLayerWrapper';
+export default BitmapLayer;
