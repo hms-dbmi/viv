@@ -59,6 +59,7 @@ const defaultProps = {
  * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
  * @property {Array.<Array.<boolean>>} channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @property {string} dtype Dtype for the layer.
  * @property {number=} opacity Opacity of the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<number>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
@@ -69,7 +70,6 @@ const defaultProps = {
  * @property {number=} lensRadius Pixel radius of the lens (default: 100).
  * @property {Array.<number>=} lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
  * @property {number=} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
- * @property {string} dtype Dtype for the layer.
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
  * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.

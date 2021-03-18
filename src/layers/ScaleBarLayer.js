@@ -52,10 +52,10 @@ const defaultProps = {
  * @type {Object}
  * @property {String} unit Physical unit size per pixel at full resolution.
  * @property {Number} size Physical size of a pixel.
- * @property {Array=} boundingBox Boudning box of the view in which this should render.
- * @property {string=} id Id from the parent layer.
  * @property {Object} viewState The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
  * https://github.com/visgl/deck.gl/issues/4504
+ * @property {Array=} boundingBox Boudning box of the view in which this should render.
+ * @property {string=} id Id from the parent layer.
  * @property {number=} length Value from 0 to 1 representing the portion of the view to be used for the length part of the scale bar.
  */
 
