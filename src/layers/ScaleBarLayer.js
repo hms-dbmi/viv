@@ -59,19 +59,10 @@ const defaultProps = {
  * @property {number=} length Value from 0 to 1 representing the portion of the view to be used for the length part of the scale bar.
  */
 
-export default class ScaleBarLayer extends CompositeLayer {
-  /**
-   * This layer creates a scale bar using three LineLayers and a TextLayer.
-   * Looks like: |--------| made up of three LineLayers (left tick, right tick, center length bar) and a bottom TextLayer
-   * @param {LayerProps[]} props
-   */
-  // eslint-disable-next-line no-useless-constructor, no-unused-vars
-  constructor(...props) {
-    // needed for TypeScript types that are generated from the JSDoc
-    // eslint-disable-next-line prefer-rest-params
-    super(...arguments);
-  }
-
+/**
+ * @type {{ new(...props: LayerProps[]) }}
+ */
+const ScaleBarLayer = class extends CompositeLayer {
   renderLayers() {
     const { id, unit, size, position, viewState, length } = this.props;
     const boundingBox = makeBoundingBox(viewState);
@@ -146,7 +137,8 @@ export default class ScaleBarLayer extends CompositeLayer {
     });
     return [lengthBar, tickBoundsLeft, tickBoundsRight, textLayer];
   }
-}
+};
 
 ScaleBarLayer.layerName = 'ScaleBarLayer';
 ScaleBarLayer.defaultProps = defaultProps;
+export default ScaleBarLayer;

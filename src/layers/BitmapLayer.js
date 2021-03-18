@@ -126,19 +126,10 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  */
-export default class BitmapLayer extends CompositeLayer {
-  /**
-   * This layer extends deck.gl's BitmapLayer for RGB images to have extra funtionality,
-   * like transparent color and different color space mappings (YCbCr only for now).
-   * @param {LayerProps[]} props
-   */
-  // eslint-disable-next-line no-useless-constructor, no-unused-vars
-  constructor(...props) {
-    // needed for TypeScript types that are generated from the JSDoc
-    // eslint-disable-next-line prefer-rest-params
-    super(...arguments);
-  }
-
+/**
+ * @type {{ new(...props: LayerProps[]) }}
+ */
+const BitmapLayer = class extends CompositeLayer {
   initializeState(args) {
     const { gl } = this.context;
     // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
@@ -168,7 +159,7 @@ export default class BitmapLayer extends CompositeLayer {
       id: `${this.props.id}-wrapped`
     });
   }
-}
+};
 
 BitmapLayer.layerName = 'BitmapLayer';
 // From https://github.com/geotiffjs/geotiff.js/blob/8ef472f41b51d18074aece2300b6a8ad91a21ae1/src/globals.js#L202-L213
@@ -180,3 +171,4 @@ BitmapLayer.defaultProps = {
 };
 BitmapLayerWrapper.defaultProps = defaultProps;
 BitmapLayerWrapper.layerName = 'BitmapLayerWrapper';
+export default BitmapLayer;

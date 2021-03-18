@@ -67,18 +67,10 @@ const defaultProps = {
  * @property {boolean=} excludeBackground Whether to exclude the background image. The background image is also excluded for opacity!=1.
  */
 
-export default class MultiscaleImageLayer extends CompositeLayer {
-  /**
-   * This layer generates a MultiscaleImageLayer (tiled) and a ImageLayer (background for the tiled layer)
-   * @param {LayerProps[]} props
-   */
-  // eslint-disable-next-line no-useless-constructor, no-unused-vars
-  constructor(...props) {
-    // needed for TypeScript types that are generated from the JSDoc
-    // eslint-disable-next-line prefer-rest-params
-    super(...arguments);
-  }
-
+/**
+ * @type {{ new(...props: LayerProps[]) }}
+ */
+const MultiscaleImageLayer = class extends CompositeLayer {
   initializeState() {
     this.state = {
       unprojectLensBounds: [0, 0, 0, 0]
@@ -270,7 +262,8 @@ export default class MultiscaleImageLayer extends CompositeLayer {
     const layers = [baseLayer, tiledLayer];
     return layers;
   }
-}
+};
 
 MultiscaleImageLayer.layerName = 'MultiscaleImageLayer';
 MultiscaleImageLayer.defaultProps = defaultProps;
+export default MultiscaleImageLayer;

@@ -60,18 +60,11 @@ const defaultProps = {
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
  */
-export default class ImageLayer extends CompositeLayer {
-  /**
-   * This layer wraps XRLayer and generates a static image
-   * @param {LayerProps[]} props
-   */
-  // eslint-disable-next-line no-useless-constructor, no-unused-vars
-  constructor(...props) {
-    // needed for TypeScript types that are generated from the JSDoc
-    // eslint-disable-next-line prefer-rest-params
-    super(...arguments);
-  }
 
+/**
+ * @type {{ new(...props: LayerProps[]) }}
+ */
+const ImageLayer = class extends CompositeLayer {
   initializeState() {
     this.state = {
       unprojectLensBounds: [0, 0, 0, 0],
@@ -202,7 +195,8 @@ export default class ImageLayer extends CompositeLayer {
       transparentColor
     });
   }
-}
+};
 
 ImageLayer.layerName = 'ImageLayer';
 ImageLayer.defaultProps = defaultProps;
+export default ImageLayer;

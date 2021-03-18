@@ -51,18 +51,10 @@ const defaultProps = {
  * @property {number=} viewportOutlineWidth Viewport outline width in px (default: 2).
  */
 
-export default class OverviewLayer extends CompositeLayer {
-  /**
-   * This layer wraps a ImageLayer as an overview, as well as a bounding box of the detail view and a polygon boundary for the view
-   * @param {LayerProps[]} props
-   */
-  // eslint-disable-next-line no-useless-constructor, no-unused-vars
-  constructor(...props) {
-    // needed for TypeScript types that are generated from the JSDoc
-    // eslint-disable-next-line prefer-rest-params
-    super(...arguments);
-  }
-
+/**
+ * @type {{ new(...props: LayerProps[]) }}
+ */
+const OverviewLayer = class extends CompositeLayer {
   renderLayers() {
     const {
       loader,
@@ -115,7 +107,8 @@ export default class OverviewLayer extends CompositeLayer {
     const layers = [overview, boundingBoxOutline, viewportOutline];
     return layers;
   }
-}
+};
 
 OverviewLayer.layerName = 'OverviewLayer';
 OverviewLayer.defaultProps = defaultProps;
+export default OverviewLayer;

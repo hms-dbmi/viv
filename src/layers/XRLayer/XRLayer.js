@@ -77,21 +77,10 @@ const defaultProps = {
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  */
-export default class XRLayer extends Layer {
-  /**
-   * This layer serves as the workhorse of the project, handling all the rendering.  Much of it is
-   * adapted from BitmapLayer in DeckGL.
-   * XR = eXtended Range i.e more than the standard 8-bit RGBA data format
-   * (16/32 bit floats/ints/uints with more than 3/4 channels).
-   * @param {LayerProps[]} props
-   */
-  // eslint-disable-next-line no-useless-constructor, no-unused-vars
-  constructor(...props) {
-    // needed for TypeScript types that are generated from the JSDoc
-    // eslint-disable-next-line prefer-rest-params
-    super(...arguments);
-  }
-
+/**
+ * @type {{ new(...props: LayerProps[]) }}
+ */
+const XRLayer = class extends Layer {
   /**
    * This function chooses a shader (colormapping or not) and
    * replaces `usampler` with `sampler` if the data is not an unsigned integer
@@ -362,7 +351,8 @@ export default class XRLayer extends Layer {
       type: attrs.type
     });
   }
-}
+};
 
 XRLayer.layerName = 'XRLayer';
 XRLayer.defaultProps = defaultProps;
+export default XRLayer;
