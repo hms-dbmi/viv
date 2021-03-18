@@ -37,35 +37,36 @@ const defaultProps = {
 /**
  * @typedef LayerProps
  * @type {Object}
- * @property {Array} sliderValues List of [begin, end] values to control each channel's ramp function.
- * @property {Array} colorValues List of [r, g, b] values for each channel.
- * @property {Array} channelIsOn List of boolean values for each channel for whether or not it is visible.
- * @property {number} opacity Opacity of the layer.
- * @property {string} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
- * @property {Array} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
- * @property {string} viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
- * @property {Object} loader PixelSource. Represents an N-dimensional image.
- * @property {function} onHover Hook function from deck.gl to handle hover objects.
- * @property {boolean} isLensOn Whether or not to use the lens.
- * @property {number} lensSelection Numeric index of the channel to be focused on by the lens.
- * @property {number} lensRadius Pixel radius of the lens (default: 100).
- * @property {Array} lensBorderColor RGB color of the border of the lens.
- * @property {number} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
- * @property {function} onClick Hook function from deck.gl to handle clicked-on objects.
- * @property {Object} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
- * @property {Array} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
+ * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
+ * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
+ * @property {Array.<Array.<boolean>>} channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @property {number=} opacity Opacity of the layer.
+ * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
+ * @property {string=} viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
+ * @property {Array} loader PixelSource. Represents an N-dimensional image.
+ * @property {Array} loader Selection to be used for fetching data.
+ * @property {function=} onHover Hook function from deck.gl to handle hover objects.
+ * @property {boolean=} isLensOn Whether or not to use the lens.
+ * @property {number=} lensSelection Numeric index of the channel to be focused on by the lens.
+ * @property {number=} lensRadius Pixel radius of the lens (default: 100).
+ * @property {Array.<number>=} lensBorderColor RGB color of the border of the lens.
+ * @property {number=} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
+ * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
- * @property {function} onViewportLoad Function that gets called when the data in the viewport loads.
+ * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
  */
 export default class ImageLayer extends CompositeLayer {
   /**
    * This layer wraps XRLayer and generates a static image
-   * @param {LayerProps} props
+   * @param {LayerProps[]} props
    */
   // eslint-disable-next-line no-useless-constructor, no-unused-vars
-  constructor(props) {
+  constructor(...props) {
     // needed for TypeScript types that are generated from the JSDoc
     // eslint-disable-next-line prefer-rest-params
     super(...arguments);

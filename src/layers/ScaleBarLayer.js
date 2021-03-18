@@ -52,21 +52,21 @@ const defaultProps = {
  * @type {Object}
  * @property {String} unit Physical unit size per pixel at full resolution.
  * @property {Number} size Physical size of a pixel.
- * @property {Array} boundingBox Boudning box of the view in which this should render.
- * @property {id} id Id from the parent layer.
- * @property {ViewState} viewState The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
+ * @property {Array=} boundingBox Boudning box of the view in which this should render.
+ * @property {id=} id Id from the parent layer.
+ * @property {Object} viewState The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
  * https://github.com/visgl/deck.gl/issues/4504
- * @property {ViewState} length Value from 0 to 1 representing the portion of the view to be used for the length part of the scale bar.
+ * @property {number=} length Value from 0 to 1 representing the portion of the view to be used for the length part of the scale bar.
  */
 
 export default class ScaleBarLayer extends CompositeLayer {
   /**
    * This layer creates a scale bar using three LineLayers and a TextLayer.
    * Looks like: |--------| made up of three LineLayers (left tick, right tick, center length bar) and a bottom TextLayer
-   * @param {LayerProps} props
+   * @param {LayerProps[]} props
    */
   // eslint-disable-next-line no-useless-constructor, no-unused-vars
-  constructor(props) {
+  constructor(...props) {
     // needed for TypeScript types that are generated from the JSDoc
     // eslint-disable-next-line prefer-rest-params
     super(...arguments);

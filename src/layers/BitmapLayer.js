@@ -118,10 +118,10 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
 /**
  * @typedef LayerProps
  * @type {object}
- * @property {number} opacity Opacity of the layer.
- * @property {function} onClick Hook function from deck.gl to handle clicked-on objects.
- * @property {Object} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
- * @property {Array} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
+ * @property {number=} opacity Opacity of the layer.
+ * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
+ * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
+ * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
@@ -130,10 +130,10 @@ export default class BitmapLayer extends CompositeLayer {
   /**
    * This layer extends deck.gl's BitmapLayer for RGB images to have extra funtionality,
    * like transparent color and different color space mappings (YCbCr only for now).
-   * @param {LayerProps} props
+   * @param {LayerProps[]} props
    */
   // eslint-disable-next-line no-useless-constructor, no-unused-vars
-  constructor(props) {
+  constructor(...props) {
     // needed for TypeScript types that are generated from the JSDoc
     // eslint-disable-next-line prefer-rest-params
     super(...arguments);

@@ -30,7 +30,7 @@ const defaultProps = {
  */
 export default class MultiscaleImageLayerBase extends TileLayer {
   // eslint-disable-next-line no-useless-constructor, no-unused-vars
-  constructor(props) {
+  constructor(...props) {
     // needed for TypeScript types that are generated from the JSDoc
     // eslint-disable-next-line prefer-rest-params
     super(...arguments);
