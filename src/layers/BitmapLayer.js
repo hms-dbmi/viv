@@ -27,9 +27,8 @@ const getPhotometricInterpretationShader = (
   transparentColorInHook
 ) => {
   const useTransparentColor = transparentColorInHook ? 'true' : 'false';
-  const transparentColorVector = `vec3(${(
-    transparentColorInHook.slice(0, 3) || [0, 0, 0]
-  )
+  const transparentColorVector = `vec3(${(transparentColorInHook || [0, 0, 0])
+    .slice(0, 3)
     .map(i => String(i / 255))
     .join(',')})`;
   switch (photometricInterpretation) {
