@@ -156,7 +156,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
           height: tiles[0].height
         };
 
-        if (isInterleaved(loader)) {
+        if (isInterleaved(loader[resolution].shape)) {
           // eslint-disable-next-line prefer-destructuring
           tile.data = tile.data[0];
           if (tile.data.length === tile.width * tile.height * 3) {

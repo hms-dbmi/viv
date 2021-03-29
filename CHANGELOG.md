@@ -9,6 +9,8 @@
 
 ### Changed
 
+- Fix interleaved RGB image handling.
+
 ## 0.9.3
 
 ### Added

@@ -101,7 +101,7 @@ const ImageLayer = class extends CompositeLayer {
           height: rasters[0].height
         };
 
-        if (isInterleaved(loader)) {
+        if (isInterleaved(loader.shape)) {
           // data is for BitmapLayer and needs to be of form { data: Uint8Array, width, height };
           // eslint-disable-next-line prefer-destructuring
           raster.data = raster.data[0];
@@ -150,12 +150,13 @@ const ImageLayer = class extends CompositeLayer {
       modelMatrix,
       transparentColor
     } = this.props;
-    const { dtype, photometricInterpretation } = loader;
+    const { dtype } = loader;
     const { width, height, data, unprojectLensBounds } = this.state;
     if (!(width && height)) return null;
 
     const bounds = [0, height, width, 0];
-    if (isInterleaved(loader)) {
+    if (isInterleaved(loader.shape)) {
+      const { meta: { photometricInterpretation } } = loader;
       return new BitmapLayer(this.props, {
         image: this.state,
         photometricInterpretation,
