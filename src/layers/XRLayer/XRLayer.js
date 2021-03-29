@@ -265,7 +265,7 @@ const XRLayer = class extends Layer {
         bottomMouseBound,
         rightMouseBound,
         topMouseBound
-      ] = unprojectLensBounds;
+      ] = unprojectLensBounds || [0, 0, 0, 0];
       const [left, bottom, right, top] = bounds;
       const leftMouseBoundScaled = (leftMouseBound - left) / (right - left);
       const bottomMouseBoundScaled = (bottomMouseBound - top) / (bottom - top);
@@ -276,17 +276,17 @@ const XRLayer = class extends Layer {
           ...uniforms,
           colorValues: paddedColorValues,
           sliderValues: paddedSliderValues,
-          opacity,
+          opacity: opacity || 0,
           majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
           minorLensAxis: (bottomMouseBoundScaled - topMouseBoundScaled) / 2,
           lensCenter: [
             (rightMouseBoundScaled + leftMouseBoundScaled) / 2,
             (bottomMouseBoundScaled + topMouseBoundScaled) / 2
           ],
-          isLensOn,
-          lensSelection,
-          lensBorderColor,
-          lensBorderRadius,
+          isLensOn: isLensOn || false,
+          lensSelection: lensSelection || 0,
+          lensBorderColor: lensBorderColor || [0, 0, 0],
+          lensBorderRadius: lensBorderRadius || 0,
           transparentColor: (transparentColor || [0, 0, 0]).map(i => i / 255),
           useTransparentColor: Boolean(transparentColor),
           ...textures

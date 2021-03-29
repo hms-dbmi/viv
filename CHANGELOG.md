@@ -10,6 +10,7 @@
 ### Changed
 
 - Fix interleaved RGB image handling.
+- Add test for interleaved RGB images.
 
 ## 0.9.3
 
