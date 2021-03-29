@@ -47,7 +47,9 @@ export function renderSubLayers(props) {
     top
   ];
   if (isInterleaved(base.shape)) {
-    const { meta: { photometricInterpretation } } = base;
+    const {
+      meta: { photometricInterpretation }
+    } = base;
     return new BitmapLayer(props, {
       image: data,
       photometricInterpretation,
