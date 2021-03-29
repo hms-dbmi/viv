@@ -42,7 +42,13 @@ test('MultiscaleImageLayerBase', async t => {
       dtype: 'Uint32',
       getTileData
     },
-    onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
+    onBeforeUpdate: ({ testCase }) => t.comment(testCase.title),
+    onAfterUpdate: ({ subLayers }) =>
+      t.ok(
+        subLayers.length > 0
+          ? subLayers.every(layer => layer.constructor.name === 'XRLayer')
+          : true
+      )
   });
   await testLayerAsync({
     Layer: MultiscaleImageLayerBase,
@@ -89,8 +95,8 @@ test('MultiscaleImageLayerBaseBitmapLayer', async t => {
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title),
     onAfterUpdate: ({ subLayers }) =>
       t.ok(
-        subLayers?.length > 0
-          ? subLayers[0].constructor.name === 'BitmapLayer'
+        subLayers.length > 0
+          ? subLayers.every(layer => layer.constructor.name === 'BitmapLayer')
           : true
       )
   });
