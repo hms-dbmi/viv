@@ -28,7 +28,6 @@ const getPhotometricInterpretationShader = (
 ) => {
   const useTransparentColor = transparentColorInHook ? 'true' : 'false';
   const transparentColorVector = `vec3(${(transparentColorInHook || [0, 0, 0])
-    .slice(0, 3)
     .map(i => String(i / 255))
     .join(',')})`;
   switch (photometricInterpretation) {
@@ -168,7 +167,8 @@ BitmapLayer.defaultProps = {
   ...defaultProps,
   // We don't want this layer to bind the texture so the type should not be `image`.
   image: { type: 'object', value: {}, compare: true },
-  photometricInterpretation: { type: 'string', value: 'RGB', compare: true }
+  photometricInterpretation: { type: 'string', value: 'RGB', compare: true },
+  transparentColor: { type: 'array', value: [0, 0, 0], compare: true }
 };
 BitmapLayerWrapper.defaultProps = defaultProps;
 BitmapLayerWrapper.layerName = 'BitmapLayerWrapper';
