@@ -283,10 +283,10 @@ const XRLayer = class extends Layer {
             (rightMouseBoundScaled + leftMouseBoundScaled) / 2,
             (bottomMouseBoundScaled + topMouseBoundScaled) / 2
           ],
-          isLensOn: isLensOn || false,
-          lensSelection: lensSelection || 0,
-          lensBorderColor: lensBorderColor || [0, 0, 0],
-          lensBorderRadius: lensBorderRadius || 0,
+          isLensOn,
+          lensSelection,
+          lensBorderColor,
+          lensBorderRadius,
           transparentColor: (transparentColor || [0, 0, 0]).map(i => i / 255),
           useTransparentColor: Boolean(transparentColor),
           ...textures
