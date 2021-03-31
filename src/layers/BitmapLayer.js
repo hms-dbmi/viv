@@ -19,17 +19,15 @@ const PHOTOMETRIC_INTERPRETATIONS = {
 const defaultProps = {
   ...BaseBitmapLayer.defaultProps,
   pickable: { type: 'boolean', value: true, compare: true },
-  coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-  bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
-  opacity: { type: 'number', value: 1, compare: true }
+  coordinateSystem: COORDINATE_SYSTEM.CARTESIAN
 };
 
 const getPhotometricInterpretationShader = (
   photometricInterpretation,
-  tansparentColorInHook
+  transparentColorInHook
 ) => {
-  const useTransparentColor = tansparentColorInHook ? 'true' : 'false';
-  const transparentColorVector = `vec3(${(tansparentColorInHook || [0, 0, 0])
+  const useTransparentColor = transparentColorInHook ? 'true' : 'false';
+  const transparentColorVector = `vec3(${(transparentColorInHook || [0, 0, 0])
     .map(i => String(i / 255))
     .join(',')})`;
   switch (photometricInterpretation) {
@@ -84,12 +82,12 @@ const getTransparentColor = photometricInterpretation => {
 
 class BitmapLayerWrapper extends BaseBitmapLayer {
   _getModel(gl) {
-    const { photometricInterpretation, tansparentColorInHook } = this.props;
+    const { photometricInterpretation, transparentColorInHook } = this.props;
     // This is a port to the GPU of a subset of https://github.com/geotiffjs/geotiff.js/blob/master/src/rgb.js
     // Safari was too slow doing this off of the GPU and it is noticably faster on other browsers as well.
     const photometricInterpretationShader = getPhotometricInterpretationShader(
       photometricInterpretation,
-      tansparentColorInHook
+      transparentColorInHook
     );
     if (!gl) {
       return null;
@@ -121,7 +119,7 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
  * @property {number=} opacity Opacity of the layer.
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
- * @property {String=} photometricInterpretation One of WhiteIsZero BlackIsZero YCbCr or RGB (default)
+ * @property {number=} photometricInterpretation One of WhiteIsZero BlackIsZero YCbCr or RGB (default)
  * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
@@ -147,7 +145,7 @@ const BitmapLayer = class extends CompositeLayer {
   renderLayers() {
     const {
       photometricInterpretation,
-      transparentColor: tansparentColorInHook
+      transparentColor: transparentColorInHook
     } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
     return new BitmapLayerWrapper(this.props, {
@@ -156,7 +154,7 @@ const BitmapLayer = class extends CompositeLayer {
       // what color is "transparent" in the original color space (i.e what shows when opacity is 0).
       transparentColor,
       // This is our transparentColor props which needs to be applied in the hook that converts to the RGB space.
-      tansparentColorInHook,
+      transparentColorInHook,
       id: `${this.props.id}-wrapped`
     });
   }
@@ -169,7 +167,8 @@ BitmapLayer.defaultProps = {
   ...defaultProps,
   // We don't want this layer to bind the texture so the type should not be `image`.
   image: { type: 'object', value: {}, compare: true },
-  photometricInterpretation: { type: 'string', value: 'RGB', compare: true }
+  transparentColor: { type: 'array', value: [0, 0, 0], compare: true },
+  photometricInterpretation: { type: 'number', value: 2, compare: true }
 };
 BitmapLayerWrapper.defaultProps = defaultProps;
 BitmapLayerWrapper.layerName = 'BitmapLayerWrapper';

@@ -87,28 +87,16 @@ const MultiscaleImageLayer = class extends CompositeLayer {
   renderLayers() {
     const {
       loader,
-      sliderValues,
-      colorValues,
-      channelIsOn,
       loaderSelection,
-      domain,
       opacity,
-      colormap,
       viewportId,
       onTileError,
       onHover,
-      pickable,
       id,
-      isLensOn,
-      lensSelection,
-      lensBorderColor,
-      lensBorderRadius,
-      maxRequests,
       onClick,
       modelMatrix,
       transparentColor,
       excludeBackground,
-      onViewportLoad,
       refinementStrategy
     } = this.props;
 
@@ -156,7 +144,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
           height: tiles[0].height
         };
 
-        if (isInterleaved(loader)) {
+        if (isInterleaved(loader[resolution].shape)) {
           // eslint-disable-next-line prefer-destructuring
           tile.data = tile.data[0];
           if (tile.data.length === tile.width * tile.height * 3) {
@@ -197,16 +185,10 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       tileSize: modelMatrix
         ? tileSize * (1 / modelMatrix.getScale()[0])
         : tileSize,
-      onClick,
       extent: [0, 0, width, height],
       // See the above note within for why the use of zoomOffset and the rounding necessary.
       minZoom: Math.round(-(loader.length - 1) + zoomOffset),
       maxZoom: Math.round(zoomOffset),
-      colorValues,
-      sliderValues,
-      channelIsOn,
-      maxRequests,
-      domain,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
       // multiple rendered sublayers (some of which have been cached) from overlapping
       refinementStrategy:
@@ -218,19 +200,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         getTileData: [loader, loaderSelection]
       },
       onTileError: onTileError || loader[0].onTileError,
-      opacity,
-      colormap,
-      viewportId,
-      onHover,
-      pickable,
-      unprojectLensBounds,
-      isLensOn,
-      lensSelection,
-      lensBorderColor,
-      lensBorderRadius,
-      modelMatrix,
-      transparentColor,
-      onViewportLoad
+      unprojectLensBounds
     });
 
     // This gives us a background image and also solves the current

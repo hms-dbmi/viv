@@ -101,7 +101,7 @@ const ImageLayer = class extends CompositeLayer {
           height: rasters[0].height
         };
 
-        if (isInterleaved(loader)) {
+        if (isInterleaved(loader.shape)) {
           // data is for BitmapLayer and needs to be of form { data: Uint8Array, width, height };
           // eslint-disable-next-line prefer-destructuring
           raster.data = raster.data[0];
@@ -130,69 +130,28 @@ const ImageLayer = class extends CompositeLayer {
   }
 
   renderLayers() {
-    const {
-      loader,
-      visible,
-      opacity,
-      colormap,
-      sliderValues,
-      colorValues,
-      channelIsOn,
-      domain,
-      pickable,
-      isLensOn,
-      lensSelection,
-      lensBorderColor,
-      lensRadius,
-      id,
-      onClick,
-      onHover,
-      modelMatrix,
-      transparentColor
-    } = this.props;
-    const { dtype, photometricInterpretation } = loader;
-    const { width, height, data, unprojectLensBounds } = this.state;
+    const { loader, id } = this.props;
+    const { dtype } = loader;
+    const { width, height, data } = this.state;
     if (!(width && height)) return null;
 
     const bounds = [0, height, width, 0];
-    if (isInterleaved(loader)) {
+    if (isInterleaved(loader.shape)) {
+      const { photometricInterpretation = 2 } = loader.meta;
       return new BitmapLayer(this.props, {
         image: this.state,
         photometricInterpretation,
         // Shared props with XRLayer:
         bounds,
-        id: `image-sub-layer-${bounds}-${id}`,
-        onHover,
-        pickable,
-        onClick,
-        modelMatrix,
-        opacity,
-        visible
+        id: `image-sub-layer-${bounds}-${id}`
       });
     }
     return new XRLayer(this.props, {
       channelData: { data, height, width },
-      sliderValues,
-      colorValues,
-      channelIsOn,
-      domain,
-      dtype,
-      colormap,
-      unprojectLensBounds,
-      isLensOn,
-      lensSelection,
-      lensBorderColor,
-      lensRadius,
       // Shared props with BitmapLayer:
       bounds,
       id: `image-sub-layer-${bounds}-${id}`,
-      onHover,
-      pickable,
-      onClick,
-      modelMatrix,
-      opacity,
-      visible,
-      transparentColor
+      dtype
     });
   }
 };
