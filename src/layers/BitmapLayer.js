@@ -121,7 +121,7 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
  * @property {number=} opacity Opacity of the layer.
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
- * @property {String=} photometricInterpretation One of WhiteIsZero BlackIsZero YCbCr or RGB (default)
+ * @property {number=} photometricInterpretation One of WhiteIsZero BlackIsZero YCbCr or RGB (default)
  * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
@@ -169,7 +169,7 @@ BitmapLayer.defaultProps = {
   ...defaultProps,
   // We don't want this layer to bind the texture so the type should not be `image`.
   image: { type: 'object', value: {}, compare: true },
-  photometricInterpretation: { type: 'string', value: 'RGB', compare: true }
+  photometricInterpretation: { type: 'number', value: 2, compare: true }
 };
 BitmapLayerWrapper.defaultProps = defaultProps;
 BitmapLayerWrapper.layerName = 'BitmapLayerWrapper';
