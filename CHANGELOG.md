@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.9.4
+
+### Added
+
 - Refactor JSDoc comments to properly annotate Layer classes with constructor signatures.
 - `getChannelStats` in snippet to show how to use it.
 
