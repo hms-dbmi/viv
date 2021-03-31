@@ -130,28 +130,9 @@ const ImageLayer = class extends CompositeLayer {
   }
 
   renderLayers() {
-    const {
-      loader,
-      visible,
-      opacity,
-      colormap,
-      sliderValues,
-      colorValues,
-      channelIsOn,
-      domain,
-      pickable,
-      isLensOn,
-      lensSelection,
-      lensBorderColor,
-      lensRadius,
-      id,
-      onClick,
-      onHover,
-      modelMatrix,
-      transparentColor
-    } = this.props;
+    const { loader, id } = this.props;
     const { dtype } = loader;
-    const { width, height, data, unprojectLensBounds } = this.state;
+    const { width, height, data } = this.state;
     if (!(width && height)) return null;
 
     const bounds = [0, height, width, 0];
@@ -162,38 +143,15 @@ const ImageLayer = class extends CompositeLayer {
         photometricInterpretation,
         // Shared props with XRLayer:
         bounds,
-        id: `image-sub-layer-${bounds}-${id}`,
-        onHover,
-        pickable,
-        onClick,
-        modelMatrix,
-        opacity,
-        visible
+        id: `image-sub-layer-${bounds}-${id}`
       });
     }
     return new XRLayer(this.props, {
       channelData: { data, height, width },
-      sliderValues,
-      colorValues,
-      channelIsOn,
-      domain,
-      dtype,
-      colormap,
-      unprojectLensBounds,
-      isLensOn,
-      lensSelection,
-      lensBorderColor,
-      lensRadius,
       // Shared props with BitmapLayer:
       bounds,
       id: `image-sub-layer-${bounds}-${id}`,
-      onHover,
-      pickable,
-      onClick,
-      modelMatrix,
-      opacity,
-      visible,
-      transparentColor
+      dtype
     });
   }
 };

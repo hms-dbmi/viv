@@ -13,25 +13,7 @@ export function renderSubLayers(props) {
     y,
     z
   } = props.tile;
-  const {
-    colorValues,
-    sliderValues,
-    channelIsOn,
-    visible,
-    opacity,
-    data,
-    colormap,
-    dtype,
-    id,
-    onHover,
-    pickable,
-    unprojectLensBounds,
-    isLensOn,
-    lensSelection,
-    onClick,
-    loader,
-    modelMatrix
-  } = props;
+  const { data, id, loader } = props;
   // Only render in positive coorinate system
   if ([left, bottom, right, top].some(v => v < 0) || !data) {
     return null;
@@ -54,13 +36,7 @@ export function renderSubLayers(props) {
       // Shared props with XRLayer:
       bounds,
       id: `tile-sub-layer-${bounds}-${id}`,
-      tileId: { x, y, z },
-      onHover,
-      pickable,
-      onClick,
-      modelMatrix,
-      opacity,
-      visible
+      tileId: { x, y, z }
     });
   }
   return new XRLayer(props, {
@@ -68,24 +44,9 @@ export function renderSubLayers(props) {
     // Uncomment to help debugging - shades the tile being hovered over.
     // autoHighlight: true,
     // highlightColor: [80, 80, 80, 50],
-    data: null,
-    sliderValues,
-    colorValues,
-    channelIsOn,
-    dtype,
-    colormap,
-    unprojectLensBounds,
-    isLensOn,
-    lensSelection,
     // Shared props with BitmapLayer:
     bounds,
     id: `tile-sub-layer-${bounds}-${id}`,
-    tileId: { x, y, z },
-    onHover,
-    pickable,
-    onClick,
-    modelMatrix,
-    opacity,
-    visible
+    tileId: { x, y, z }
   });
 }
