@@ -137,9 +137,7 @@ const ImageLayer = class extends CompositeLayer {
 
     const bounds = [0, height, width, 0];
     if (isInterleaved(loader.shape)) {
-      const {
-        meta: { photometricInterpretation }
-      } = loader;
+      const { photometricInterpretation = 2 } = loader.meta;
       return new BitmapLayer(this.props, {
         image: this.state,
         photometricInterpretation,
