@@ -10,6 +10,7 @@
 ### Changed
 
 - Fix interleaved RGB image handling.
+- Upgrade geotiff.js to fix https://github.com/geotiffjs/geotiff.js/issues/214
 
 ## 0.9.3
 
