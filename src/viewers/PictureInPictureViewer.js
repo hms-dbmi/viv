@@ -22,7 +22,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {Object} props.overview Allows you to pass settings into the OverviewView: { scale, margin, position, minimumWidth, maximumWidth,
  * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.  See http://viv.gehlenborglab.org/#overviewview for defaults.
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
- * @param {Object} [props.hoverHooks] Object including utility hooks - an object with key handleValue like { handleValue: (valueArray) => {}, handleCoordinate: (coordinate) => {} } where valueArray
+ * @param {import('./VivViewer').HoverHooks} [props.hoverHooks] Object including utility hooks - an object with key handleValue like { handleValue: (valueArray) => {}, handleCoordinate: (coordinate) => {} } where valueArray
  * has the pixel values for the image under the hover location and coordinate is the coordinate in the image from which the values are picked.
  * @param {Array} [props.viewStates] Array of objects like [{ target: [x, y, 0], zoom: -zoom, id: DETAIL_VIEW_ID }] for setting where the viewer looks (optional - this is inferred from height/width/loader
  * internally by default using getDefaultInitialViewState).
@@ -41,7 +41,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
- * @param {Array} [props.transitionFields] A string array indicating which fields require a transition: Default: ['t', 'z'].
+ * @param {Array} [props.transitionFields] A string array indicating which fields require a transition when making a new selection: Default: ['t', 'z'].
  */
 
 const PictureInPictureViewer = props => {
@@ -55,7 +55,7 @@ const PictureInPictureViewer = props => {
     overview,
     overviewOn,
     loaderSelection,
-    hoverHooks = {},
+    hoverHooks = { handleValue: () => {}, handleCoordinate: () => {} },
     height,
     width,
     isLensOn = false,

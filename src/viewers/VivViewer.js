@@ -15,26 +15,56 @@ const areViewStatesEqual = (viewState, otherViewState) => {
 /**
  * @callback ViewStateChange
  * @param {Object} event
+ * @ignore
  */
 
 /**
  * @callback Hover
  * @param {Object} info
  * @param {Object} event
+ * @ignore
  */
 
 /**
- * This component handles rendering the various views within the DeckGL contenxt.
- * @param {Object} props
- * @param {Array} props.layerProps  Props for the layers in each view.
- * @param {Array} props.randomize Whether or not to randomize which view goes first (for dynamic rendering).
- * @param {VivView} props.views Various VivViews to render.
- * @param {Array} props.viewStates List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }]
- * @param {ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
- * @param {Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
- *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
+ * @callback HandleValue
+ * @param {Array.<number>} valueArray pixel values for the image under the hover location
+ * @ignore
  */
+
+/**
+ * @callback HandleCoordinate
+ * @param {Object} coordnate The coordinate in the image from which the values are picked.
+ * @ignore
+ */
+
+/**
+ * @typedef HoverHooks
+ * @type {object}
+ * @property {HandleValue} handleValue
+ * @property {HandleCoordinate} handleCoordinate
+ * @ignore
+ */
+
+/**
+ * @typedef LayerProps
+ * @type {object}
+ * @property {Array} layerProps  Props for the layers in each view.
+ * @property {boolean} [randomize] Whether or not to randomize which view goes first (for dynamic rendering of multiple linked views).
+ * @property {Array.<import('../views').VivView>} views Various `VivView`s to render.
+ * @property {Array.<object>} viewStates List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }]
+ * @property {ViewStateChange} [onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
+ * @property {Hover} [onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
+ *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
+ * @property {HoverHooks} [hoverHooks] Object including utility hooks - an object with key handleValue like { handleValue: (valueArray) => {}, handleCoordinate: (coordinate) => {} } where valueArray
+ * has the pixel values for the image under the hover location and coordinate is the coordinate in the image from which the values are picked.
+ */
+
 export default class VivViewer extends PureComponent {
+  /**
+   * This component handles rendering the various views within the DeckGL contenxt.
+   * @param {LayerProps} props
+   */
+
   constructor(props) {
     super(props);
     this.state = {
@@ -56,8 +86,9 @@ export default class VivViewer extends PureComponent {
    * This prevents only the `draw` call of a layer from firing,
    * but not other layer lifecycle methods.  Nonetheless, it is
    * still useful.
-   * @param {Layer} layer Layer being updated.
-   * @param {Viewport} viewport Viewport being updated.
+   * @param {object} args
+   * @param {object} args.layer Layer being updated.
+   * @param {object} args.viewport Viewport being updated.
    * @returns {boolean} Whether or not this layer should be drawn in this viewport.
    */
   // eslint-disable-next-line class-methods-use-this
