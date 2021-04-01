@@ -59,12 +59,10 @@ const areViewStatesEqual = (viewState, otherViewState) => {
  * has the pixel values for the image under the hover location and coordinate is the coordinate in the image from which the values are picked.
  */
 
-export default class VivViewer extends PureComponent {
-  /**
-   * This component handles rendering the various views within the DeckGL contenxt.
-   * @param {LayerProps} props
-   */
-
+/**
+ * @type {{ new(props: LayerProps): { props: LayerProps, state: any } }}
+ */
+const VivViewer = class extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -310,4 +308,6 @@ export default class VivViewer extends PureComponent {
 
     /* eslint-disable react/destructuring-assignment */
   }
-}
+};
+
+export default VivViewer;
