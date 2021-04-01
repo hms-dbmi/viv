@@ -37,9 +37,9 @@ export default class VivView {
   /**
    * Create a viewState for this class, checking the id to make sure this class and veiwState match.
    * @param {Object} args
-   * @param {object} args.viewState incoming ViewState object from deck.gl update.
-   * @param {object} args.oldViewState old ViewState object from deck.gl.
-   * @param {object} args.currentViewState current ViewState object in react state.
+   * @param {object} [args.viewState] incoming ViewState object from deck.gl update.
+   * @param {object} [args.oldViewState] old ViewState object from deck.gl.
+   * @param {object} [args.currentViewState] current ViewState object in react state.
    * @returns {object} ViewState for this class (or null by default if the ids do not match).
    */
   filterViewState({ viewState }) {
