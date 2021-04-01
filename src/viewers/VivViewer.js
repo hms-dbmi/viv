@@ -44,25 +44,7 @@ const areViewStatesEqual = (viewState, otherViewState) => {
  * @property {HandleCoordinate} handleCoordinate
  * @ignore
  */
-
-/**
- * @typedef LayerProps
- * @type {object}
- * @property {Array} layerProps  Props for the layers in each view.
- * @property {boolean} [randomize] Whether or not to randomize which view goes first (for dynamic rendering of multiple linked views).
- * @property {Array.<import('../views').VivView>} views Various `VivView`s to render.
- * @property {Array.<object>} viewStates List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }]
- * @property {ViewStateChange} [onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
- * @property {Hover} [onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
- *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
- * @property {HoverHooks} [hoverHooks] Object including utility hooks - an object with key handleValue like { handleValue: (valueArray) => {}, handleCoordinate: (coordinate) => {} } where valueArray
- * has the pixel values for the image under the hover location and coordinate is the coordinate in the image from which the values are picked.
- */
-
-/**
- * @type {{ new(props: LayerProps): { props: LayerProps, state: any } }}
- */
-const VivViewer = class extends PureComponent {
+class VivViewerWrapper extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -305,9 +287,22 @@ const VivViewer = class extends PureComponent {
         }}
       />
     );
-
-    /* eslint-disable react/destructuring-assignment */
   }
-};
+}
 
+/**
+ * This component wraps the DeckGL component.
+ * @param {Object} props
+ * @param {Array} props.layerProps  Props for the layers in each view.
+ * @param {boolean} [props.randomize] Whether or not to randomize which view goes first (for dynamic rendering of multiple linked views).
+ * @param {Array.<import('../views').VivView>} props.views Various `VivView`s to render.
+ * @param {Array.<object>} props.viewStates List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }]
+ * @param {ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
+ * @param {Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
+ *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
+ * @param {HoverHooks} [props.hoverHooks] Object including utility hooks - an object with key handleValue like { handleValue: (valueArray) => {}, handleCoordinate: (coordinate) => {} } where valueArray
+ * has the pixel values for the image under the hover location and coordinate is the coordinate in the image from which the values are picked.
+ */
+// eslint-disable-next-line react/jsx-props-no-spreading
+const VivViewer = props => <VivViewerWrapper {...props} />;
 export default VivViewer;
