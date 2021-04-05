@@ -41,7 +41,7 @@ const defaultProps = {
  * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
  * @property {Array.<Array.<boolean>>} channelIsOn List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader PixelSource. Represents an N-dimensional image.
- * @property {Array} loader Selection to be used for fetching data.
+ * @property {Array} loaderSelection Selection to be used for fetching data.
  * @property {number=} opacity Opacity of the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
@@ -59,6 +59,7 @@ const defaultProps = {
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
+ * @property {String=} id Unique identifier for this layer.
  */
 
 /**

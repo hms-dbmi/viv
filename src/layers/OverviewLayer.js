@@ -50,6 +50,7 @@ const defaultProps = {
  * @property {number=} boundingBoxOutlineWidth Width of the bounding box in px (default: 1).
  * @property {Array.<number>=} viewportOutlineColor [r, g, b] color of the outline (default: [255, 190, 0]).
  * @property {number=} viewportOutlineWidth Viewport outline width in px (default: 2).
+ * @property {String=} id Unique identifier for this layer.
  */
 
 /**

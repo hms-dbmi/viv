@@ -10,7 +10,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
  * @param {Array} props.colorValues List of [r, g, b] values for each channel.
  * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
- * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @param {string} [props.colormap] String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.loader This data source for the viewer. PixelSource[]. If loader.length > 1, data is assumed to be multiscale.
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {Boolean} props.zoomLock Whether or not lock the zooms of the two views.
@@ -23,6 +23,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {number} [props.lensSelection] Numeric index of the channel to be focused on by the lens (default 0).
  * @param {Array} [props.lensBorderColor] RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
+ * @param {number} [props.lensRadius] Pixel radius of the lens (default: 100).
  * @param {Array} [props.transparentColor] An RGB (0-255 range) color to be considered "transparent" if provided.
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.

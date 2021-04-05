@@ -9,17 +9,22 @@ import { getImageLayers, getVivId, makeBoundingBox } from './utils';
  * It is linked with its other views as controlled by `linkedIds`, `zoomLock`, and `panLock` parameters.
  * It takes the same arguments for its constructor as its base class VivView plus the following:
  * @param {Object} args
- * @param {Array} args.linkedIds Ids of the other views to which this could be locked via zoom/pan.
+ * @param {Array<String>} args.linkedIds Ids of the other views to which this could be locked via zoom/pan.
  * @param {Boolean} args.panLock Whether or not we lock pan.
  * @param {Boolean} args.zoomLock Whether or not we lock zoom.
- * @param {Array} args.viewportOutlineColor Outline color of the border (default [255, 255, 255])
- * @param {number} args.viewportOutlineWidth Default outline width (default 10)
+ * @param {Array=} args.viewportOutlineColor Outline color of the border (default [255, 255, 255])
+ * @param {number=} args.viewportOutlineWidth Default outline width (default 10)
+ * @param {number=} args.x X (top-left) location on the screen for the current view
+ * @param {number=} args.y Y (top-left) location on the screen for the current view
+ * @param {number} args.height Width of the view.
+ * @param {number} args.width Height of the view.
+ * @param {string} args.id id of the View
  * */
 export default class SideBySideView extends VivView {
   constructor({
     id,
-    x,
-    y,
+    x = 0,
+    y = 0,
     height,
     width,
     linkedIds = [],
