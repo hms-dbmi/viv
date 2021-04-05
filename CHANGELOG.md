@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Fix `VivViewer` and `VivView` types.
+
 ## 0.9.4
 
 ### Added
