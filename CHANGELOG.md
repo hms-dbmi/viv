@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add `VolumeView`, `VolumeViewer`, `VolumeLayer`, and `XR3DLayer` classes for volumetric ray casting.
+
 ### Changed
 
 - Fix `VivViewer` and `VivView` types.
