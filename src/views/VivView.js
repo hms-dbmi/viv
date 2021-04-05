@@ -40,7 +40,7 @@ export default class VivView {
    * @param {object} [args.viewState] incoming ViewState object from deck.gl update.
    * @param {object} [args.oldViewState] old ViewState object from deck.gl.
    * @param {object} [args.currentViewState] current ViewState object in react state.
-   * @returns {object} ViewState for this class (or null by default if the ids do not match).
+   * @returns {?object} ViewState for this class (or null by default if the ids do not match).
    */
   filterViewState({ viewState }) {
     const { id, height, width } = this;
@@ -50,8 +50,8 @@ export default class VivView {
   /**
    * Create a layer for this instance.
    * @param {Object} args
-   * @param {ViewState} args.viewStates ViewStates for all current views.
-   * @param {number} args.props Props for this instance.
+   * @param {Object<string,Object>} args.viewStates ViewStates for all current views.
+   * @param {Object} args.props Props for this instance.
    * @returns {Layer} Instance of a layer.
    */
   // eslint-disable-next-line class-methods-use-this,no-unused-vars

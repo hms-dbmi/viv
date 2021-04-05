@@ -13,8 +13,17 @@ const areViewStatesEqual = (viewState, otherViewState) => {
 };
 
 /**
+ * @typedef viewStateChangeProps
+ * @type {object}
+ * @property {string} args.viewId
+ * @property {object} args.viewState
+ * @property {object} args.oldViewState
+ * @ignore
+ */
+
+/**
  * @callback ViewStateChange
- * @param {Object} event
+ * @param {viewStateChangeProps} args
  * @ignore
  */
 
