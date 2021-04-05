@@ -7,6 +7,7 @@
 ### Changed
 
 - Fix `VivViewer` and `VivView` types.
+- Fix `ImageLayer` `loader` type.
 
 ## 0.9.4
 
