@@ -1,3 +1,4 @@
+import { Matrix4 } from 'math.gl';
 import {
   MAX_COLOR_INTENSITY,
   DEFAULT_COLOR_OFF,
@@ -115,4 +116,34 @@ export function onPointer(layer) {
   } else {
     layer.setState({ unprojectLensBounds: [0, 0, 0, 0] });
   }
+}
+
+/**
+ * Get physical size scaling Matrix4
+ * @param {Object} loader PixelSource
+ */
+export function getPhysicalSizeScalingMatrix(loader) {
+  let physicalSizeScalingMatrix = new Matrix4().identity();
+  if (
+    loader?.meta?.physicalSizes?.x &&
+    loader?.meta?.physicalSizes?.y &&
+    loader?.meta?.physicalSizes?.z
+  ) {
+    const {
+      physicalSizes: {
+        x: { size: physicalSizeX },
+        y: { size: physicalSizeY },
+        z: { size: physicalSizeZ }
+      }
+    } = loader.meta;
+    if (physicalSizeZ && physicalSizeX && physicalSizeY) {
+      const ratio = [
+        physicalSizeX / Math.min(physicalSizeZ, physicalSizeX, physicalSizeY),
+        physicalSizeY / Math.min(physicalSizeZ, physicalSizeX, physicalSizeY),
+        physicalSizeZ / Math.min(physicalSizeZ, physicalSizeX, physicalSizeY)
+      ];
+      physicalSizeScalingMatrix = new Matrix4().scale(ratio);
+    }
+  }
+  return physicalSizeScalingMatrix;
 }
