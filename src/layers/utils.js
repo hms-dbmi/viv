@@ -128,6 +128,6 @@ export function getPhysicalSizeScalingMatrix(loader) {
     const min = Math.min(z.size, x.size, y.size);
     const ratio = [x.size / min, y.size / min, z.size / min];
     return new Matrix4().scale(ratio);
-  } 
+  }
   return new Matrix4().identity();
 }

@@ -133,6 +133,6 @@ export enum RENDERING_MODES {
   MAX_INTENSITY_PROJECTION = 'Maximum Intensity Projection',
   MIN_INTENSITY_PROJECTION = 'Minimum Intensity Projection',
   ADDITIVE = 'Additive'
-};
+}
 
 export const GLOBAL_SLIDER_DIMENSION_FIELDS = ['z', 't'] as const;
