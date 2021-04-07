@@ -28,13 +28,13 @@ vol.flatten()
 #        0., 0., 0., 2., 0., 0., 0., 0., 2., 0., 0., 0., 0., 2.])
 ```
 
-However, if Napari wishes to show the volume with the correct orientation while respecting this in-memory represnetation, it is forced to buck the 3D graphics convention. As in the 2D case, Napari actually continues to treat the y-axis going down as positively oriented (as mentioned, the 3D graphics convention for the y-axis runs contrary to the convention in 2D raster graphics, where the y-axis is positively oriented in the downward direction).
+However, if Napari wishes to show the volume with the correct orientation while respecting this in-memory represnetation, it is forced to buck the 3D graphics convention. As in the 2D case, Napari actually continues to treat the y-axis going down as positively oriented (as mentioned, the 3D graphics convention for the y-axis runs contrary to the convention in 2D raster graphics, where the y-axis is positively oriented in the downward direction). That is, in Napari, the `[0,0,0]` coordinate of your volumetric data array corresponds to the `(0,0,0)` origin in the 3D visualization space. However, because Viv maintains the graphics convention, the `[0,0,0]` data point (and all other data points) must be anti-diagonally transposed in order to maintain the correct orientation of the volume. That is, if you have a `[k,n,m]` shaped data cube in `numpy`, and you wanted to visualize it in Viv via `Zarr`, for example, the `[0,n,m]` data point is actually at the origin `(0,0,0)` and the `[0,0,0]` data point is at `(0,n,m)`. If Viv did not do this anti-diagonal transposition, the volume would look upside down because the `[0,0,0]` data point would be at `(0,0,0)`, which is the "bottom" of the volume.
 
-But, Napari faces another hurdle, which is figuring out what the volumetric axis of the data is. Napari seems to always treat this "first dimension" of the data (i.e the `3` above) as the volumetric dimension. Accordingly, it then visualizes this first dimension on the "volumetric axis," which is the axis going into and out of the screen.
+But, Napari then needs to decide what axis this volumetric axis should be displayed - it would make sense to visualize it on the traditional `z` axis, the one going into and out of the screen. However, this is not what you might expect given the "labels" we semantically assign to the dimensions - traditionally the first axis is `x` but now, we are putting the volumetric `z` axis first.
 
 ### Transformations
 
-Because of this labelless approach, applying transformation matrices in Napari requires care. As mentioned before, the ordering of the dimensions is generally `zyx`. This ordering also applies when you apply transformation matrices. That is the first row/column of the matrix is applied to the first dimension of the data, which is usually by convention the volumetric `z` dimension. So, for example, if you wanted to rotate over the volumetric axis of the data in Napari (i.e the axis going into and out the computer screen), you would want to create a matrix as follows:
+Because of this labelless approach, applying transformation matrices in Napari requires care. As mentioned before, the ordering of the dimensions is generally `zyx`. This ordering also applies when you apply transformation matrices. That is, the first row/column of the matrix is applied to the first dimension of the data, which is usually by convention the volumetric `z` dimension. So, for example, if you wanted to rotate over the volumetric axis of the data in Napari (i.e the axis going into and out the computer screen), you would want to create a matrix as follows:
 
 ```python
 from scipy.spatial.transform import Rotation as R
@@ -46,7 +46,7 @@ rot_napari[:3, :3] = r.as_matrix()
 
 This approach is extremely internally coherent especially with `numpy` but can be tricky because even though the convention for data layout is `zyx`, it is still very common to think about the order for orientations/matrices as `xyz` - hence the need to tell `scipy` to rotate over `x` and `z` above if you want to rotate over the volumetric axis.
 
-By contrast Viv sticks to the graphics convention at the moment. Also, because Viv is meant to interface with the [math.gl](math.gl) ecosystem, Viv requires the input matrix to be both [homogeneous (i.e `4x4`)](https://en.wikipedia.org/wiki/Homogeneous_coordinates#Use_in_computer_graphics_and_computer_vision) and flattened in column-major order. Therefore, if you wanted to rotate over the volumetric axis in Viv you would need to do:
+By contrast Viv sticks to the graphics convention at the moment. Also, because Viv is meant to interface with the [math.gl](http://math.gl) ecosystem, Viv requires the input matrix to be both [homogeneous (i.e `4x4`)](https://en.wikipedia.org/wiki/Homogeneous_coordinates#Use_in_computer_graphics_and_computer_vision) and flattened in column-major order. Therefore, if you wanted to rotate over the volumetric axis in Viv you would need to do:
 
 ```python
 from scipy.spatial.transform import Rotation as R
