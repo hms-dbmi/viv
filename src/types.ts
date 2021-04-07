@@ -70,18 +70,19 @@ interface VivProps<S extends string[]> {
  * stays the same (with less precise types) but code completion / type-checking
  * is much more strict and useful.
  */
-export type Viv<LayerProps, S extends string[] = string[]> = Omit<
-  LayerProps,
-  keyof VivProps<S> | 'loader'
-> &
-  {
-    [K in keyof VivProps<S>]: K extends keyof LayerProps
-      ? VivProps<S>[K]
-      : never;
-  } & {
-    loader: 'loader' extends keyof LayerProps
-      ? LayerProps['loader'] extends any[]
-        ? PixelSource<S>[]
-        : PixelSource<S>
-      : never;
-  };
+export type Viv<LayerProps, S extends string[] = string[]> =
+  // Remove all shared properties from VivProps from LayerProps
+  Omit<LayerProps, keyof VivProps<S> | 'loader'> &
+    // If a property from VivProps exists on LayerProps, replace it
+    {
+      [K in keyof VivProps<S>]: K extends keyof LayerProps
+        ? VivProps<S>[K]
+        : never;
+    } & {
+      // Loader type is special and depends on what is provided (Array or Object)
+      loader: 'loader' extends keyof LayerProps
+        ? LayerProps['loader'] extends Array<unknown>
+          ? PixelSource<S>[]
+          : PixelSource<S>
+        : never;
+    };
