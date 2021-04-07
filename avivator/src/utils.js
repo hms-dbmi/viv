@@ -230,6 +230,12 @@ export function channelsReducer(state, { index, value, type }) {
       sliders[index] = value;
       return { ...state, sliders };
     }
+    case 'CHANGE_DOMAIN': {
+      // Changes slider for individual channel by index
+      const domains = [...state.domains];
+      domains[index] = value;
+      return { ...state, domains };
+    }
     case 'TOGGLE_ON': {
       // Toggles invidiual channel on and off by index
       const isOn = [...state.isOn];
