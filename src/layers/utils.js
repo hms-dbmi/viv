@@ -123,27 +123,11 @@ export function onPointer(layer) {
  * @param {Object} loader PixelSource
  */
 export function getPhysicalSizeScalingMatrix(loader) {
-  let physicalSizeScalingMatrix = new Matrix4().identity();
-  if (
-    loader?.meta?.physicalSizes?.x &&
-    loader?.meta?.physicalSizes?.y &&
-    loader?.meta?.physicalSizes?.z
-  ) {
-    const {
-      physicalSizes: {
-        x: { size: physicalSizeX },
-        y: { size: physicalSizeY },
-        z: { size: physicalSizeZ }
-      }
-    } = loader.meta;
-    if (physicalSizeZ && physicalSizeX && physicalSizeY) {
-      const ratio = [
-        physicalSizeX / Math.min(physicalSizeZ, physicalSizeX, physicalSizeY),
-        physicalSizeY / Math.min(physicalSizeZ, physicalSizeX, physicalSizeY),
-        physicalSizeZ / Math.min(physicalSizeZ, physicalSizeX, physicalSizeY)
-      ];
-      physicalSizeScalingMatrix = new Matrix4().scale(ratio);
-    }
-  }
-  return physicalSizeScalingMatrix;
+  const { x, y, z } = loader?.meta?.physicalSizes ?? {};
+  if (x?.size && y?.size && z?.size) {
+    const min = Math.min(z.size, x.size, y.size);
+    const ratio = [x.size / min, y.size / min, z.size / min];
+    return new Matrix4().scale(ratio);
+  } 
+  return new Matrix4().identity();
 }

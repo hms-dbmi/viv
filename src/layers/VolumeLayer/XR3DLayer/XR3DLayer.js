@@ -67,7 +67,7 @@ const defaultProps = {
   channelData: { type: 'object', value: {}, compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
-  dtype: { type: 'string', value: '<u2', compare: true },
+  dtype: { type: 'string', value: 'Uint8', compare: true },
   colormap: { type: 'string', value: '', compare: true },
   xSlice: { type: 'array', value: [0, 1], compare: true },
   ySlice: { type: 'array', value: [0, 1], compare: true },

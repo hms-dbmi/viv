@@ -33,8 +33,8 @@ test('VolumeLayer', t => {
             width: 2,
             height: 2
           }),
-          shape: [4, 1, 1, 2, 2],
-          labels: ['z', 'c', 't', 'x', 'y'],
+          shape: [1, 1, 4, 2, 2],
+          labels: ['t', 'c', 'z', 'y', 'x'],
           dtype: 'Uint32'
         },
         {
@@ -43,8 +43,8 @@ test('VolumeLayer', t => {
             width: 2,
             height: 2
           }),
-          shape: [4, 1, 1, 2, 2],
-          labels: ['z', 'c', 't', 'x', 'y'],
+          shape: [1, 1, 4, 2, 2],
+          labels: ['t', 'c', 'z', 'y', 'x'],
           dtype: 'Uint32'
         }
       ],
@@ -94,8 +94,8 @@ test('VolumeLayer', t => {
               state.width = 2;
               state.width = 2;
             },
-            shape: [4, 1, 1, 2, 2],
-            labels: ['z', 'c', 't', 'x', 'y'],
+            shape: [1, 1, 4, 2, 2],
+            labels: ['t', 'c', 'z', 'y', 'x'],
             dtype: 'Uint32'
           },
           {
@@ -104,8 +104,8 @@ test('VolumeLayer', t => {
               state.width = 2;
               state.width = 2;
             },
-            shape: [4, 1, 1, 2, 2],
-            labels: ['z', 'c', 't', 'x', 'y'],
+            shape: [1, 1, 4, 2, 2],
+            labels: ['t', 'c', 'z', 'y', 'x'],
             dtype: 'Uint32'
           }
         ],
