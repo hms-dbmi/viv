@@ -78,7 +78,7 @@ const defaultProps = {
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  */
 /**
- * @type {{ new(...props: import('../types').Viv<LayerProps>[]) }}
+ * @type {{ new (...props: import('../../types').Viv<LayerProps>[]) }}
  * @ignore
  */
 const XRLayer = class extends Layer {
