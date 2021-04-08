@@ -52,6 +52,7 @@ export interface PixelSource<S extends string[]> {
   meta?: PixelSourceMeta;
 }
 
+// Not an exported type. Used below with `Viv` utility type.
 interface VivProps<S extends string[]> {
   sliderValues: [begin: number, end: number][];
   colorValues: [r: number, g: number, b: number][];
@@ -83,4 +84,4 @@ export type Viv<LayerProps, S extends string[] = string[]> =
             ? PixelSource<S>[]
             : PixelSource<S>;
         }
-      : {});
+      : never);
