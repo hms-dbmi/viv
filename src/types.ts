@@ -56,8 +56,9 @@ interface VivProps<S extends string[]> {
   sliderValues: [begin: number, end: number][];
   colorValues: [r: number, g: number, b: number][];
   loaderSelection: PixelSourceSelection<S>[];
+  dtype: keyof typeof DTYPE_VALUES;
   domain?: [min: number, max: number][];
-  modelMatrix?: Matrix4;
+  modelMatrix?: Matrix4 | undefined;
 }
 
 /**
@@ -74,15 +75,12 @@ export type Viv<LayerProps, S extends string[] = string[]> =
   // Remove all shared properties from VivProps from LayerProps
   Omit<LayerProps, keyof VivProps<S> | 'loader'> &
     // If a property from VivProps exists on LayerProps, replace it
-    {
-      [K in keyof VivProps<S>]: K extends keyof LayerProps
-        ? VivProps<S>[K]
-        : never;
-    } & {
-      // Loader type is special and depends on what is provided (Array or Object)
-      loader: 'loader' extends keyof LayerProps
-        ? LayerProps['loader'] extends Array<unknown>
-          ? PixelSource<S>[]
-          : PixelSource<S>
-        : never;
-    };
+    Pick<VivProps<S>, keyof LayerProps & keyof VivProps<S>> &
+    // Loader type is special and depends on what is provided (Array or Object)
+    ('loader' extends keyof LayerProps
+      ? {
+          loader: LayerProps['loader'] extends Array<unknown>
+            ? PixelSource<S>[]
+            : PixelSource<S>;
+        }
+      : {});
