@@ -421,12 +421,9 @@ export default function Avivator(props) {
         <ChannelController
           key={`channel-controller-${name}-${id}-${i}`}
           name={name}
+          index={i}
           channelOptions={channelOptions}
-          isOn={isOn[i]}
           dtype={dtype}
-          sliderValue={sliders[i]}
-          colorValue={colors[i]}
-          domain={domains[i]}
           handleChange={(type, value) => handleControllerChange(i, type, value)}
           colormapOn={colormap.length > 0}
           pixelValue={pixelValues[i]}
