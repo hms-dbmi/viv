@@ -9,6 +9,8 @@
 ### Changed
 
 - Fix `VivViewer` and `VivView` types.
+- Fix `ImageLayer` `loader` type.
+- Refine `LayerProps` JSDoc annotations for more precise emitted types.
 
 ## 0.9.4
 

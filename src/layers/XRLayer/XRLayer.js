@@ -58,7 +58,7 @@ const defaultProps = {
  * @type {object}
  * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
- * @property {Array.<Array.<boolean>>} channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @property {Array.<boolean>} channelIsOn List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
  * @property {number=} opacity Opacity of the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
@@ -78,7 +78,8 @@ const defaultProps = {
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  */
 /**
- * @type {{ new(...props: LayerProps[]) }}
+ * @type {{ new (...props: import('../../types').Viv<LayerProps>[]) }}
+ * @ignore
  */
 const XRLayer = class extends Layer {
   /**
