@@ -45,7 +45,7 @@ export function getOmePixelSourceMeta({ Pixels }: OMEXML[0]) {
 
   const dtype = DTYPE_LOOKUP[Pixels.Type as keyof typeof DTYPE_LOOKUP];
 
-  if (Pixels.PhysicalSizeX && Pixels.PhysicalSizeY) {
+  if (Pixels.PhysicalSizeX && Pixels.PhysicalSizeY && Pixels.PhysicalSizeZ) {
     const physicalSizes = {
       x: {
         size: Pixels.PhysicalSizeX,
@@ -54,6 +54,10 @@ export function getOmePixelSourceMeta({ Pixels }: OMEXML[0]) {
       y: {
         size: Pixels.PhysicalSizeY,
         unit: Pixels.PhysicalSizeYUnit
+      },
+      z: {
+        size: Pixels.PhysicalSizeZ,
+        unit: Pixels.PhysicalSizeZUnit
       }
     };
     return { labels, getShape, physicalSizes, dtype };
