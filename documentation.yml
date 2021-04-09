@@ -7,6 +7,8 @@ toc:
   file: docs/API_STRUCTURE.md
 - name: Data preparation
   file: tutorial/README.md
+- name: 3D Rendering
+  file: docs/3D_RENDERING_BRIEF.md
 - name: Viewers (React Components)
 - PictureInPictureViewer
 - SideBySideViewer
