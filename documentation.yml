@@ -25,10 +25,12 @@ toc:
   file: docs/LAYERS_DOCS_NOTE.md
 - MultiscaleImageLayer
 - ImageLayer
-- ScaleBarLayer
 - XRLayer
+- VolumeLayer
+- XR3DLayer
 - BitmapLayer
 - OverviewLayer
+- ScaleBarLayer
 - name: Loaders
 - loadOmeTiff
 - loadOmeZarr
