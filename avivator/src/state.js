@@ -6,6 +6,7 @@ import isFunction from 'lodash/isFunction';
 import shallow from 'zustand/shallow';
 
 import { RENDERING_MODES } from '../../dist';
+import { getSingleSelectionStats } from './utils';
 
 const keysAndValuesToObject = (keys, values) => {
   const merged = keys.map((k, i) => [k, values[i]]);
@@ -33,7 +34,8 @@ const DEFAUlT_CHANNEL_STATE = {
   colors: [],
   domains: [],
   selections: [],
-  ids: []
+  ids: [],
+  loader: []
 };
 
 const DEFAUlT_CHANNEL_VALUES = {
@@ -45,20 +47,43 @@ const DEFAUlT_CHANNEL_VALUES = {
   ids: ''
 };
 
-export const useChannelsStore = create(set => ({
+export const useChannelsStore = create((set, get) => ({
   ...DEFAUlT_CHANNEL_STATE,
   toggleIsOn: channel =>
     set(state => {
-      const newState = { ...state };
-      newState.isOn[channel] = !state.isOn[channel];
-      return newState;
+      const isOn = [...state.isOn];
+      isOn[channel] = !state.isOn[channel];
+      return { ...state, isOn };
     }),
-  setPropertyForChannel: (channel, property, value) =>
-    set(state => {
-      const values = [...state[property]];
-      values[channel] = value;
-      return { ...state, [property]: values };
-    }),
+  setLoader: loader => set(state => ({ ...state, loader })),
+  setPropertyForChannel: async (channel, property, value) => {
+    if (property === 'selections') {
+      const { loader } = get();
+      const { domain, slider } = await getSingleSelectionStats({
+        loader: loader[loader.length - 1],
+        selection: value
+      });
+      set(state => {
+        const newState = {};
+        [
+          [property, value],
+          ['domains', domain],
+          ['sliders', slider]
+        ].forEach(([prop, val]) => {
+          const values = [...state[prop]];
+          values[channel] = val;
+          newState[prop] = values;
+        });
+        return { ...state, ...newState };
+      });
+    } else {
+      set(state => {
+        const values = [...state[property]];
+        values[channel] = value;
+        return { ...state, [property]: values };
+      });
+    }
+  },
   setPropertiesForChannel: (channel, properties, values) =>
     set(state => {
       const oldStateValuesForProperties = properties.map(property => [
@@ -77,14 +102,42 @@ export const useChannelsStore = create(set => ({
       );
       return { ...state, ...zipped };
     }),
-  setPropertyForChannels: (channels, property, values) =>
+  setPropertyForChannels: async (channels, property, values) => {
+    if (property === 'selections') {
+      const stats = await Promise.all(
+        channels.map((_, j) =>
+          getSingleSelectionStats({
+            loader: get().loader,
+            selection: values[j]
+          })
+        )
+      );
+      const domains = stats.map(stat => stat.domain);
+      const sliders = stats.map(stat => stat.slider);
+      set(state => {
+        const newState = {};
+        [
+          [property, values],
+          ['domains', domains],
+          ['sliders', sliders]
+        ].forEach(([prop, vals]) => {
+          const newValues = [...state[prop]];
+          channels.forEach((channelIndex, j) => {
+            newValues[channelIndex] = vals[j];
+          });
+          newState[prop] = newValues;
+        });
+        return { ...state, ...newState };
+      });
+    }
     set(state => {
       const newValues = [...state[property]];
       channels.forEach((channelIndex, j) => {
         newValues[channelIndex] = values[j];
       });
       return { ...state, [property]: newValues };
-    }),
+    });
+  },
   setPropertiesForChannels: (channels, properties, values) =>
     set(state => {
       const newState = { ...state };
@@ -97,14 +150,14 @@ export const useChannelsStore = create(set => ({
     }),
   removeChannel: channel =>
     set(state => {
-      const newState = { ...state };
+      const newState = {};
       const channelKeys = Object.keys(DEFAUlT_CHANNEL_STATE);
       Object.keys(state).forEach(key => {
         if (channelKeys.includes(key)) {
-          newState[key] = newState.filter((_, j) => j !== channel);
+          newState[key] = state[key].filter((_, j) => j !== channel);
         }
       });
-      return newState;
+      return { ...state, ...newState };
     }),
   addChannel: (properties, values) =>
     set(state => {
@@ -166,7 +219,6 @@ export const useImageSettingsStore = create(set => ({
 }));
 
 const DEFAULT_VIEWER_STATE = {
-  loader: {},
   isLoading: true,
   pixelValues: [],
   offsetsSnackbarOn: false,

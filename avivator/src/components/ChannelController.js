@@ -62,7 +62,7 @@ function ChannelController({
   disableOptions = false,
   index
 }) {
-  const { isOn, sliders, colors, domains } = useChannelSettings();
+  const { isOn, sliders, colors, domains, selections } = useChannelSettings();
   const { setPropertyForChannel, toggleIsOn } = useChannelSetters();
   const rgbColor = toRgb(colormapOn, colors[index]);
   const classes = useStyles();
@@ -82,7 +82,12 @@ function ChannelController({
           <Select
             native
             value={name}
-            onChange={e => handleChange('CHANGE_CHANNEL', e.target.value)}
+            onChange={e =>
+              setPropertyForChannel(index, 'selections', {
+                ...selections[index],
+                c: channelOptions.indexOf(e.target.value)
+              })
+            }
           >
             {channelOptions.map(opt => (
               <option disabled={disableOptions} key={opt} value={opt}>
@@ -92,7 +97,7 @@ function ChannelController({
           </Select>
         </Grid>
         <Grid item>
-          <ChannelOptions handleChange={handleChange} />
+          <ChannelOptions handleChange={handleChange} index={index} />
         </Grid>
       </Grid>
       <Grid container direction="row" justify="flex-start" alignItems="center">
@@ -101,7 +106,7 @@ function ChannelController({
         </Grid>
         <Grid item xs={2}>
           <Checkbox
-            onChange={toggleIsOn}
+            onChange={() => toggleIsOn(index)}
             checked={isOn[index]}
             style={{
               color: rgbColor,

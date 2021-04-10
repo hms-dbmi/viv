@@ -114,7 +114,8 @@ export default function Avivator(props) {
     setPropertiesForChannels,
     setPropertiesForChannel,
     addChannels,
-    addChannel
+    addChannel,
+    setLoader: setNewLoader
   } = useChannelSetters();
 
   useEffect(() => {
@@ -189,6 +190,7 @@ export default function Avivator(props) {
           ]
         );
         setLoader(nextLoader);
+        setNewLoader(nextLoader);
         setMetadata(nextMeta);
         setMetadata(nextMeta);
         setIsLoading(false);

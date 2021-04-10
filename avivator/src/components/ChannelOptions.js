@@ -7,6 +7,8 @@ import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 
+import { useChannelSetters } from '../state';
+
 import { makeStyles } from '@material-ui/core/styles';
 
 import ColorPalette from './ColorPalette';
@@ -30,7 +32,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function ChannelOptions({ handleChange }) {
+function ChannelOptions({ handleChange, index }) {
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
 
@@ -44,6 +46,7 @@ function ChannelOptions({ handleChange }) {
   };
 
   const classes = useStyles();
+  const { removeChannel } = useChannelSetters();
   return (
     <>
       <IconButton
@@ -58,7 +61,11 @@ function ChannelOptions({ handleChange }) {
         <Paper className={classes.paper}>
           <ClickAwayListener onClickAway={toggle}>
             <MenuList id="channel-options">
-              <MenuItem dense disableGutters onClick={handleRemove}>
+              <MenuItem
+                dense
+                disableGutters
+                onClick={() => removeChannel(index)}
+              >
                 <span className={classes.span}>Remove</span>
               </MenuItem>
               <MenuItem dense disableGutters className={classes.colors}>
