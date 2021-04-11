@@ -9,6 +9,7 @@
 - Fix `VivViewer` and `VivView` types.
 - Fix `ImageLayer` `loader` type.
 - Refine `LayerProps` JSDoc annotations for more precise emitted types.
+- Fix `Avivator` and `getImageLyaers` utility for `loaderSelection` that is empty array.
 
 ## 0.9.4
 
