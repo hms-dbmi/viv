@@ -38,6 +38,11 @@ import LensSelect from './components/LensSelect';
 import VolumeButton from './components/VolumeButton';
 import RenderingModeSelect from './components/RenderingModeSelect';
 import Slicer from './components/Slicer';
+import AddChannel from './components/AddChannel';
+import PanLock from './components/PanLock';
+import ZoomLock from './components/ZoomLock';
+import SideBySide from './components/SideBySide';
+import PictureInPicture from './components/PictureInPicture';
 import {
   LoaderError,
   OffsetsWarning,
@@ -92,7 +97,10 @@ export default function Avivator(props) {
     ySlice,
     zSlice,
     resolution,
-    isLensOn
+    isLensOn,
+    zoomLock,
+    panLock,
+    isOverviewOn
   } = useImageSettingsStore();
   const {
     isLoading,
@@ -100,18 +108,12 @@ export default function Avivator(props) {
     loaderErrorSnackbar,
     isNoImageUrlSnackbarOn,
     useLinkedView,
-    isOverviewOn,
-    isControllerOn,
-    zoomLock,
-    panLock,
     use3d,
     toggleIsOffsetsSnackbarOn,
     toggleIsNoImageUrlSnackbarOn,
-    toggleIsControllerOn,
     toggleUseLinkedView,
     toggleIsOverviewOn,
     toggleZoomLock,
-    togglePanLock,
     toggleUse3d,
     setViewerState
   } = useViewerStore();
@@ -326,20 +328,6 @@ export default function Avivator(props) {
     }
     setSource(newSource);
   };
-
-  const handleChannelAdd = async () => {
-    const selection = {};
-
-    dimensions.forEach(({ field }) => {
-      // Set new image to default selection for non-global selections (0)
-      // and use current global selection otherwise.
-      selection[field] = GLOBAL_SLIDER_DIMENSION_FIELDS.includes(field)
-        ? selections[0][field]
-        : 0;
-    });
-    addChannel(['selections'], [selection]);
-  };
-  const isPyramid = loader.length > 0;
   const isRgb = metadata && guessRgb(metadata);
   const globalControlDimensions = dimensions?.filter(dimension =>
     GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dimension.field)
@@ -451,65 +439,17 @@ export default function Avivator(props) {
               {!isRgb && <CircularProgress />}
             </Grid>
           )}
-          {!isRgb && (
-            <Button
-              disabled={ids.length === MAX_CHANNELS || isLoading}
-              onClick={handleChannelAdd}
-              fullWidth
-              variant="outlined"
-              style={{ borderStyle: 'dashed' }}
-              startIcon={<AddIcon />}
-              size="small"
-            >
-              Add Channel
-            </Button>
-          )}
+          {!isRgb && <AddChannel />}
           {loader.length > 0 &&
             loader[0].shape[loader[0].labels.indexOf('z')] > 1 && (
               <VolumeButton />
             )}
-          {!use3d && (
-            <Button
-              disabled={!isPyramid || isLoading || useLinkedView}
-              onClick={toggleIsOverviewOn}
-              variant="outlined"
-              size="small"
-              fullWidth
-            >
-              {isOverviewOn ? 'Hide' : 'Show'} Picture-In-Picture
-            </Button>
-          )}
-          {!use3d && (
-            <Button
-              disabled={!isPyramid || isLoading || isOverviewOn}
-              onClick={toggleUseLinkedView}
-              variant="outlined"
-              size="small"
-              fullWidth
-            >
-              {useLinkedView ? 'Hide' : 'Show'} Side-by-Side
-            </Button>
-          )}
+          {!use3d && <PictureInPicture />}
+          {!use3d && <SideBySide />}
           {useLinkedView && (
             <>
-              <Button
-                disabled={!isPyramid || isLoading}
-                onClick={toggleZoomLock}
-                variant="outlined"
-                size="small"
-                fullWidth
-              >
-                {zoomLock ? 'Unlock' : 'Lock'} Zoom
-              </Button>
-              <Button
-                disabled={!isPyramid || isLoading}
-                onClick={togglePanLock}
-                variant="outlined"
-                size="small"
-                fullWidth
-              >
-                {panLock ? 'Unlock' : 'Lock'} Pan
-              </Button>
+              <ZoomLock />
+              <PanLock />
             </>
           )}
           {use3d && <Slicer />}

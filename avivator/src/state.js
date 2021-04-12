@@ -206,7 +206,10 @@ const DEFAULT_IMAGE_STATE = {
   ySlice: [0, 1],
   zSlice: [0, 1],
   resolution: 0,
-  isLensOn: false
+  isLensOn: false,
+  zoomLock: true,
+  panLock: true,
+  isOverviewOn: false
 };
 
 export const useImageSettingsStore = create(set => ({
@@ -229,11 +232,7 @@ const DEFAULT_VIEWER_STATE = {
   },
   isNoImageUrlSnackbarOn: false,
   useLinkedView: false,
-  isOverviewOn: false,
   isControllerOn: true,
-  zoomLock: true,
-  panLock: true,
-  isLensOn: false,
   use3d: false,
   globalSelection: { z: 0, t: 0 }
 };
