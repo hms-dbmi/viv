@@ -6,10 +6,9 @@ import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { useChannelSetters } from '../state';
-
-import { makeStyles } from '@material-ui/core/styles';
 
 import ColorPalette from './ColorPalette';
 
@@ -32,21 +31,17 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function ChannelOptions({ handleChange, index }) {
+function ChannelOptions({ index }) {
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
+  const { removeChannel, setPropertyForChannel } = useChannelSetters();
 
   const handleColorSelect = color => {
-    handleChange('CHANGE_COLOR', color);
+    setPropertyForChannel(index, 'colors', color);
   };
-
-  const handleRemove = () => {
-    toggle();
-    handleChange('REMOVE_CHANNEL');
-  };
+  const handleRemoveChannel = () => removeChannel(index);
 
   const classes = useStyles();
-  const { removeChannel } = useChannelSetters();
   return (
     <>
       <IconButton
@@ -61,11 +56,7 @@ function ChannelOptions({ handleChange, index }) {
         <Paper className={classes.paper}>
           <ClickAwayListener onClickAway={toggle}>
             <MenuList id="channel-options">
-              <MenuItem
-                dense
-                disableGutters
-                onClick={() => removeChannel(index)}
-              >
+              <MenuItem dense disableGutters onClick={handleRemoveChannel}>
                 <span className={classes.span}>Remove</span>
               </MenuItem>
               <MenuItem dense disableGutters className={classes.colors}>

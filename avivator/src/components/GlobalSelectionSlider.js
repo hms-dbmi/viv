@@ -7,7 +7,6 @@ import { useChannelSettings, useChannelSetters } from '../state';
 export default function GlobalSelectionSlider(props) {
   const {
     dimension: { field, values },
-    globalSelections,
     handleGlobalChannelsSelectionChange
   } = props;
   const { setPropertyForChannels } = useChannelSetters();

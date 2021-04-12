@@ -56,7 +56,6 @@ function ChannelController({
   dtype,
   colormapOn,
   channelOptions,
-  handleChange,
   pixelValue,
   shouldShowPixelValue,
   disableOptions = false,
@@ -97,7 +96,7 @@ function ChannelController({
           </Select>
         </Grid>
         <Grid item>
-          <ChannelOptions handleChange={handleChange} index={index} />
+          <ChannelOptions index={index} />
         </Grid>
       </Grid>
       <Grid container direction="row" justify="flex-start" alignItems="center">
