@@ -3,7 +3,7 @@ import Button from '@material-ui/core/Button';
 
 import { useImageSettingsStore, useViewerStore } from '../state';
 
-const SideBySide = () => {
+const SideBySideToggle = () => {
   const { isOverviewOn } = useImageSettingsStore();
   const { isLoading, toggleUseLinkedView, useLinkedView } = useViewerStore();
   return (
@@ -18,4 +18,4 @@ const SideBySide = () => {
     </Button>
   );
 };
-export default SideBySide;
+export default SideBySideToggle;

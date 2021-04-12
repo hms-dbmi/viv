@@ -3,7 +3,7 @@ import Button from '@material-ui/core/Button';
 
 import { useImageSettingsStore, useViewerStore } from '../state';
 
-const PictureInPicture = () => {
+const PictureInPictureToggle = () => {
   const { isOverviewOn, toggleIsOverviewOn } = useImageSettingsStore();
   const { isLoading, useLinkedView } = useViewerStore();
   return (
@@ -18,4 +18,4 @@ const PictureInPicture = () => {
     </Button>
   );
 };
-export default PictureInPicture;
+export default PictureInPictureToggle;

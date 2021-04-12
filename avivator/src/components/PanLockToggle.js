@@ -3,19 +3,19 @@ import Button from '@material-ui/core/Button';
 
 import { useImageSettingsStore, useViewerStore } from '../state';
 
-const ZoomLock = () => {
-  const { toggleZoomLock, zoomLock } = useImageSettingsStore();
+const PanLockToggle = () => {
+  const { togglePanLock, panLock } = useImageSettingsStore();
   const { isLoading } = useViewerStore();
   return (
     <Button
       disabled={isLoading}
-      onClick={toggleZoomLock}
+      onClick={togglePanLock}
       variant="outlined"
       size="small"
       fullWidth
     >
-      {zoomLock ? 'Unlock' : 'Lock'} Zoom
+      {panLock ? 'Unlock' : 'Lock'} Pan
     </Button>
   );
 };
-export default ZoomLock;
+export default PanLockToggle;

@@ -21,10 +21,10 @@ import VolumeButton from './components/VolumeButton';
 import RenderingModeSelect from './components/RenderingModeSelect';
 import Slicer from './components/Slicer';
 import AddChannel from './components/AddChannel';
-import PanLock from './components/PanLock';
-import ZoomLock from './components/ZoomLock';
-import SideBySide from './components/SideBySide';
-import PictureInPicture from './components/PictureInPicture';
+import PanLockToggle from './components/PanLockToggle';
+import ZoomLockToggle from './components/ZoomLockToggle';
+import SideBySideToggle from './components/SideBySideToggle';
+import PictureInPictureToggle from './components/PictureInPictureToggle';
 import Viewer from './components/Viewer';
 import {
   LoaderError,
@@ -164,12 +164,12 @@ export default function Avivator(props) {
             loader[0].shape[loader[0].labels.indexOf('z')] > 1 && (
               <VolumeButton />
             )}
-          {!use3d && <PictureInPicture />}
-          {!use3d && <SideBySide />}
+          {!use3d && <PictureInPictureToggle />}
+          {!use3d && <SideBySideToggle />}
           {useLinkedView && (
             <>
-              <ZoomLock />
-              <PanLock />
+              <ZoomLockToggle />
+              <PanLockToggle />
             </>
           )}
           {use3d && <Slicer />}
