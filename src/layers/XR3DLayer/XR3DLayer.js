@@ -32,12 +32,12 @@ import { Matrix4 } from 'math.gl';
 import vs from './xr-layer-vertex.glsl';
 import fs from './xr-layer-fragment.glsl';
 import channels from './channel-intensity-module';
-import { padColorsAndSliders } from '../../utils';
+import { padColorsAndSliders } from '../utils';
 import {
   DTYPE_VALUES,
   COLORMAPS,
   RENDERING_MODES as RENDERING_NAMES
-} from '../../../constants';
+} from '../../constants';
 import {
   RENDERING_MODES_BLEND,
   RENDERING_MODES_COLORMAP
@@ -108,19 +108,20 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * @type {Object}
  * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
- * @property {Array.<Array.<boolean>>} channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @property {Array.<boolean>} channelIsOn List of boolean values for each channel for whether or not it is visible.
  * @property {number=} opacity Opacity of the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
- * @param {string=} renderingMode One of Maximum Intensity Projection, Minimum Intensity Projection, or Additive
- * @param {Object=} modelMatrix A column major affine transformation to be applied to the volume.
- * @param {Array.<number>=} xSlice 0-1 interval on which to slice the volume.
- * @param {Array.<number>=} ySlice 0-1 interval on which to slice the volume.
- * @param {Array.<number>=} zSlice 0-1 interval on which to slice the volume.
+ * @property {string=} renderingMode One of Maximum Intensity Projection, Minimum Intensity Projection, or Additive
+ * @property {Object=} modelMatrix A column major affine transformation to be applied to the volume.
+ * @property {Array.<number>=} xSlice 0-1 interval on which to slice the volume.
+ * @property {Array.<number>=} ySlice 0-1 interval on which to slice the volume.
+ * @property {Array.<number>=} zSlice 0-1 interval on which to slice the volume.
  */
 
 /**
- * @type {{ new(...props: LayerProps[]) }}
+ * @type {{ new <S extends string[]>(...props: import('../../../types').Viv<LayerProps>[]) }}
+ * @ignore
  */
 const XR3DLayer = class extends Layer {
   initializeState() {

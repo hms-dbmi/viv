@@ -373,7 +373,7 @@ export default function Avivator(props) {
       // Set new image to default selection for non-global selections (0)
       // and use current global selection otherwise.
       selection[field] = GLOBAL_SLIDER_DIMENSION_FIELDS.includes(field)
-        ? selections[0][field]
+        ? globalSelections[field]
         : 0;
     });
     const { domain, slider } = await getSingleSelectionStats({

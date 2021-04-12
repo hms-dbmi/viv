@@ -3,6 +3,7 @@ import {
   ImageLayer,
   ScaleBarLayer,
   XRLayer,
+  XR3DLayer,
   OverviewLayer,
   VolumeLayer,
   BitmapLayer
@@ -38,6 +39,7 @@ export {
   VolumeLayer,
   MultiscaleImageLayer,
   XRLayer,
+  XR3DLayer,
   OverviewLayer,
   BitmapLayer,
   VivViewer,
