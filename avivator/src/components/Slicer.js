@@ -13,7 +13,13 @@ const Slicer = () => {
     [zSlice, v => setImageSetting('zSlice', v), 'z']
   ];
   return sliceValuesAndSetSliceFunctions.map(([slice, setSlice, label]) => (
-    <Grid container direction="row" justify="flex-start" alignItems="center">
+    <Grid
+      container
+      direction="row"
+      justify="flex-start"
+      alignItems="center"
+      key={label}
+    >
       <Grid item xs={1} style={{ marginBottom: 8 }}>
         {label}:
       </Grid>

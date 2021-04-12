@@ -4,12 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 
-import {
-  SideBySideViewer,
-  PictureInPictureViewer,
-  VolumeViewer
-} from '../../dist';
-import { useWindowSize, getNameFromUrl, guessRgb } from './utils';
+import { getNameFromUrl, guessRgb, useWindowSize } from './utils';
 import {
   useChannelSettings,
   useImageSettingsStore,
@@ -30,6 +25,7 @@ import PanLock from './components/PanLock';
 import ZoomLock from './components/ZoomLock';
 import SideBySide from './components/SideBySide';
 import PictureInPicture from './components/PictureInPicture';
+import Viewer from './components/Viewer';
 import {
   LoaderError,
   OffsetsWarning,
@@ -37,7 +33,7 @@ import {
 } from './components/SnackbarAlerts';
 import { DropzoneWrapper } from './components/Dropzone';
 
-import { DEFAULT_OVERVIEW, GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
+import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
 import './index.css';
 
 /**
@@ -49,30 +45,10 @@ import './index.css';
  * */
 export default function Avivator(props) {
   const { history, source: initSource, isDemoImage } = props;
-
   const viewSize = useWindowSize();
 
-  const {
-    colors,
-    sliders,
-    isOn,
-    ids,
-    selections,
-    loader
-  } = useChannelSettings();
-  const {
-    lensSelection,
-    colormap,
-    renderingMode,
-    xSlice,
-    ySlice,
-    zSlice,
-    resolution,
-    isLensOn,
-    zoomLock,
-    panLock,
-    isOverviewOn
-  } = useImageSettingsStore();
+  const { ids, selections, loader } = useChannelSettings();
+  const { colormap } = useImageSettingsStore();
   const {
     isLoading,
     isOffsetsSnackbarOn,
@@ -158,60 +134,7 @@ export default function Avivator(props) {
     <>
       {
         <DropzoneWrapper handleSubmitFile={handleSubmitFile}>
-          {!isLoading &&
-            !use3d &&
-            (useLinkedView ? (
-              <SideBySideViewer
-                loader={loader}
-                sliderValues={sliders}
-                colorValues={colors}
-                channelIsOn={isOn}
-                loaderSelection={selections}
-                height={viewSize.height}
-                width={viewSize.width}
-                colormap={colormap.length > 0 && colormap}
-                zoomLock={zoomLock}
-                panLock={panLock}
-                hoverHooks={{
-                  handleValue: v => setViewerState('pixelValues', v)
-                }}
-                lensSelection={lensSelection}
-                isLensOn={isLensOn}
-              />
-            ) : (
-              <PictureInPictureViewer
-                loader={loader}
-                sliderValues={sliders}
-                colorValues={colors}
-                channelIsOn={isOn}
-                loaderSelection={selections}
-                height={viewSize.height}
-                width={viewSize.width}
-                colormap={colormap.length > 0 && colormap}
-                overview={DEFAULT_OVERVIEW}
-                overviewOn={isOverviewOn}
-                hoverHooks={{
-                  handleValue: v => setViewerState('pixelValues', v)
-                }}
-                lensSelection={lensSelection}
-                isLensOn={isLensOn}
-              />
-            ))}
-          {use3d && !isLoading && (
-            <VolumeViewer
-              loader={loader}
-              sliderValues={sliders}
-              colorValues={colors}
-              channelIsOn={isOn}
-              loaderSelection={selections}
-              colormap={colormap.length > 0 && colormap}
-              xSlice={xSlice}
-              ySlice={ySlice}
-              zSlice={zSlice}
-              resolution={resolution}
-              renderingMode={renderingMode}
-            />
-          )}
+          {!isLoading && <Viewer />}
         </DropzoneWrapper>
       }
       {
