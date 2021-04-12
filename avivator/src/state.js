@@ -186,7 +186,8 @@ export const useChannelsStore = create((set, get) => ({
         }
       });
       return newState;
-    })
+    }),
+  resetChannels: () => set(state => ({ ...state, ...DEFAUlT_CHANNEL_STATE }))
 }));
 
 export const useChannelSettings = () =>

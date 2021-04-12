@@ -15,14 +15,14 @@ export const initImage = (source, history) => {
     setViewerState,
     use3d,
     toggleUse3d,
-    toggleIsOffsetsSnackbarOn,
-    toggleUseLens
+    toggleIsOffsetsSnackbarOn
   } = useViewerStore();
-  const { setLoader, addChannels } = useChannelSetters();
+  const { setLoader, addChannels, resetChannels } = useChannelSetters();
   const { isLensOn, toggleIsLensOn } = useImageSettingsStore();
   useEffect(() => {
     async function changeLoader() {
       setViewerState('isLoading', true);
+      resetChannels();
       const { urlOrFile } = source;
       const {
         data: nextLoader,
