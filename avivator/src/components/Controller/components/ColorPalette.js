@@ -27,7 +27,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const ColorPalette = ({ handleChange }) => {
+const ColorPalette = ({ index }) => {
   const classes = useStyles();
   const { setPropertyForChannel } = useChannelSetters();
 
@@ -41,7 +41,7 @@ const ColorPalette = ({ handleChange }) => {
           <IconButton
             className={classes.button}
             key={color}
-            onClick={() => handleChange(color)}
+            onClick={() => handleColorSelect(color)}
           >
             <LensIcon
               fontSize="small"

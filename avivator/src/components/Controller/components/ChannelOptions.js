@@ -57,7 +57,7 @@ function ChannelOptions({ index }) {
                 <span className={classes.span}>Remove</span>
               </MenuItem>
               <MenuItem dense disableGutters className={classes.colors}>
-                <ColorPalette />
+                <ColorPalette index={index} />
               </MenuItem>
             </MenuList>
           </ClickAwayListener>
