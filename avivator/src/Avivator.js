@@ -89,7 +89,11 @@ export default function Avivator(props) {
     source,
     useLens
   } = useViewerStore();
-  useEffect(() => setViewerState('source', initSource), []);
+
+  useEffect(() => {
+    setViewerState('source', initSource);
+    setViewerState('isNoImageUrlSnackbarOn', isDemoImage);
+  }, []);
 
   initImage(source, history);
   init3DSettings();
@@ -134,7 +138,6 @@ export default function Avivator(props) {
         item
       >
         <ChannelController
-          key={`channel-controller-${name}-${id}-${i}`}
           name={name}
           index={i}
           channelOptions={channelOptions}
@@ -255,10 +258,7 @@ export default function Avivator(props) {
         elevation={6}
         variant="filled"
       >
-        <Alert
-          onClose={() => toggleIsOffsetsSnackbarOn(false)}
-          severity="warning"
-        >
+        <Alert onClose={toggleIsOffsetsSnackbarOn} severity="warning">
           <OffsetsWarning />
         </Alert>
       </Snackbar>
@@ -269,7 +269,9 @@ export default function Avivator(props) {
         variant="filled"
       >
         <Alert
-          onClose={() => setLoaderErrorSnackbar({ on: false, message: null })}
+          onClose={() =>
+            setViewerState('loaderErrorSnackbar', { on: false, message: null })
+          }
           severity="error"
         >
           <LoaderError message={loaderErrorSnackbar.message} />
@@ -282,10 +284,7 @@ export default function Avivator(props) {
         elevation={6}
         variant="filled"
       >
-        <Alert
-          onClose={() => toggleIsNoImageUrlSnackbarOn(false)}
-          severity="info"
-        >
+        <Alert onClose={toggleIsNoImageUrlSnackbarOn} severity="info">
           <NoImageUrlInfo />
         </Alert>
       </Snackbar>
