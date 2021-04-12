@@ -45,13 +45,8 @@ export default function Avivator(props) {
   const { colormap } = useImageSettingsStore();
   const {
     isLoading,
-    isOffsetsSnackbarOn,
-    loaderErrorSnackbar,
-    isNoImageUrlSnackbarOn,
     useLinkedView,
     use3d,
-    toggleIsOffsetsSnackbarOn,
-    toggleIsNoImageUrlSnackbarOn,
     useColormap,
     setViewerState,
     channelOptions,
