@@ -244,7 +244,8 @@ const XR3DLayer = class extends Layer {
       domain,
       dtype,
       normalClippingPlanes,
-      offsetClippingPlanes
+      offsetClippingPlanes,
+      numPlanes
     } = this.props;
     const {
       viewMatrix,
@@ -280,12 +281,12 @@ const XR3DLayer = class extends Layer {
           normalClippingPlanes: padWithDefault(
             [...normalClippingPlanes],
             [1, 0, 0],
-            _NUM_PLANES
+            numPlanes || _NUM_PLANES
           ).flat(),
           offsetClippingPlanes: padWithDefault(
             [...offsetClippingPlanes],
             [0, 0, 0],
-            _NUM_PLANES
+            numPlanes || _NUM_PLANES
           ).flat()
         })
         .draw();
