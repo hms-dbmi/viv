@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
-import Snackbar from '@material-ui/core/Snackbar';
-import Alert from '@material-ui/lab/Alert';
 
 import { getNameFromUrl, guessRgb, useWindowSize } from './utils';
 import {
@@ -25,12 +23,8 @@ import PanLockToggle from './components/PanLockToggle';
 import ZoomLockToggle from './components/ZoomLockToggle';
 import SideBySideToggle from './components/SideBySideToggle';
 import PictureInPictureToggle from './components/PictureInPictureToggle';
+import SnackBars from './components/Snackbars';
 import Viewer from './components/Viewer';
-import {
-  LoaderError,
-  OffsetsWarning,
-  NoImageUrlInfo
-} from './components/SnackbarAlerts';
 import { DropzoneWrapper } from './components/Dropzone';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
@@ -175,42 +169,7 @@ export default function Avivator(props) {
           {use3d && <Slicer />}
         </Menu>
       }
-      <Snackbar
-        open={isOffsetsSnackbarOn}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        elevation={6}
-        variant="filled"
-      >
-        <Alert onClose={toggleIsOffsetsSnackbarOn} severity="warning">
-          <OffsetsWarning />
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={loaderErrorSnackbar.on}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        elevation={6}
-        variant="filled"
-      >
-        <Alert
-          onClose={() =>
-            setViewerState('loaderErrorSnackbar', { on: false, message: null })
-          }
-          severity="error"
-        >
-          <LoaderError message={loaderErrorSnackbar.message} />
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={isNoImageUrlSnackbarOn}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        elevation={6}
-        variant="filled"
-      >
-        <Alert onClose={toggleIsNoImageUrlSnackbarOn} severity="info">
-          <NoImageUrlInfo />
-        </Alert>
-      </Snackbar>
+      <SnackBars />
     </>
   );
 }
