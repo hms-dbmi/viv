@@ -10,7 +10,12 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import ChannelOptions from './ChannelOptions';
 import { FILL_PIXEL_VALUE } from '../constants';
-import { useChannelSettings, useChannelSetters } from '../state';
+import {
+  useChannelSettings,
+  useChannelSetters,
+  useImageSettingsStore,
+  useViewerStore
+} from '../state';
 
 export const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
 
@@ -53,21 +58,28 @@ const getPixelValueDisplay = (isOn, pixelValue, shouldShowPixelValue) => {
 
 function ChannelController({
   name,
-  dtype,
-  colormapOn,
   channelOptions,
-  pixelValue,
   shouldShowPixelValue,
   disableOptions = false,
   index
 }) {
-  const { isOn, sliders, colors, domains, selections } = useChannelSettings();
+  const {
+    isOn,
+    sliders,
+    colors,
+    domains,
+    selections,
+    loader
+  } = useChannelSettings();
   const { setPropertyForChannel, toggleIsOn } = useChannelSetters();
-  const rgbColor = toRgb(colormapOn, colors[index]);
+  const { colormap } = useImageSettingsStore();
+  const { pixelValues } = useViewerStore();
+  const rgbColor = toRgb(colormap, colors[index]);
   const classes = useStyles();
   const [min, max] = domains[index];
   // If the min/max range is and the dtype is float, make the step size smaller so sliders are smoother.
-  const step = max - min < 500 && dtype === 'Float32' ? (max - min) / 500 : 1;
+  const step =
+    max - min < 500 && loader[0]?.dtype === 'Float32' ? (max - min) / 500 : 1;
   return (
     <Grid
       container
@@ -101,7 +113,11 @@ function ChannelController({
       </Grid>
       <Grid container direction="row" justify="flex-start" alignItems="center">
         <Grid item xs={2}>
-          {getPixelValueDisplay(isOn[index], pixelValue, shouldShowPixelValue)}
+          {getPixelValueDisplay(
+            isOn[index],
+            pixelValues[index],
+            shouldShowPixelValue
+          )}
         </Grid>
         <Grid item xs={2}>
           <Checkbox

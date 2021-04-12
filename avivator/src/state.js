@@ -17,12 +17,13 @@ const captialize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
 const generateToggles = (defaults, set) => {
   const toggles = {};
-  Object.entries(defaults).forEach((k, v) => {
+  Object.entries(defaults).forEach(([k, v]) => {
     if (typeof v === 'boolean') {
-      toggles[`toggle${captialize(k)}`] = set(state => ({
-        ...state,
-        [k]: !state[k]
-      }));
+      toggles[`toggle${captialize(k)}`] = () =>
+        set(state => ({
+          ...state,
+          [k]: !state[k]
+        }));
     }
   });
   return toggles;
@@ -221,19 +222,20 @@ export const useImageSettingsStore = create(set => ({
 const DEFAULT_VIEWER_STATE = {
   isLoading: true,
   pixelValues: [],
-  offsetsSnackbarOn: false,
+  isOffsetsSnackbarOn: false,
   loaderErrorSnackbar: {
     on: false,
     message: null
   },
-  noImageUrlSnackbarIsOn: false,
+  isNoImageUrlSnackbarOn: false,
   useLinkedView: false,
-  overviewOn: false,
-  controllerOn: true,
+  isOverviewOn: false,
+  isControllerOn: true,
   zoomLock: true,
   panLock: true,
   isLensOn: false,
-  use3d: false
+  use3d: false,
+  globalSelection: { z: 0, t: 0 }
 };
 
 export const useViewerStore = create(set => ({

@@ -27,7 +27,8 @@ import {
 import {
   useChannelSettings,
   useChannelSetters,
-  useImageSettingsStore
+  useImageSettingsStore,
+  useViewerStore
 } from './state';
 
 import ChannelController from './components/ChannelController';
@@ -74,37 +75,25 @@ export default function Avivator(props) {
 
   const viewSize = useWindowSize();
 
-  const [loader, setLoader] = useState({});
   const [metadata, setMetadata] = useState(null);
   const [source, setSource] = useState(initSource);
-  const [pixelValues, setPixelValues] = useState([]);
   const [dimensions, setDimensions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
-  const [offsetsSnackbarOn, toggleOffsetsSnackbar] = useState(false);
-  const [loaderErrorSnackbar, setLoaderErrorSnackbar] = useState({
-    on: false,
-    message: null
-  });
-  const [noImageUrlSnackbarIsOn, toggleNoImageUrlSnackbar] = useState(
-    isDemoImage
-  );
-
-  const [useLinkedView, toggleLinkedView] = useReducer(v => !v, false);
-  const [overviewOn, setOverviewOn] = useReducer(v => !v, false);
-  const [controllerOn, toggleController] = useReducer(v => !v, true);
-  const [zoomLock, toggleZoomLock] = useReducer(v => !v, true);
-  const [panLock, togglePanLock] = useReducer(v => !v, true);
-  const [use3d, toggleUse3d] = useReducer(v => !v, false);
 
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
-  const { colors, sliders, isOn, ids, selections } = useChannelSettings();
+  const {
+    colors,
+    sliders,
+    isOn,
+    ids,
+    selections,
+    loader
+  } = useChannelSettings();
   const {
     setPropertiesForChannels,
     setPropertiesForChannel,
     addChannels,
     addChannel,
-    setLoader: setNewLoader
+    setLoader
   } = useChannelSetters();
   const {
     lensSelection,
@@ -116,16 +105,40 @@ export default function Avivator(props) {
     resolution,
     isLensOn
   } = useImageSettingsStore();
+  const {
+    globalSelection,
+    isLoading,
+    pixelValues,
+    isOffsetsSnackbarOn,
+    loaderErrorSnackbar,
+    isNoImageUrlSnackbarOn,
+    useLinkedView,
+    isOverviewOn,
+    isControllerOn,
+    zoomLock,
+    panLock,
+    use3d,
+    globalSelections,
+    toggleIsOffsetsSnackbarOn,
+    toggleIsNoImageUrlSnackbarOn,
+    toggleIsControllerOn,
+    toggleLinkedView,
+    toggleOverviewIsOn,
+    toggleZoomLock,
+    togglePanLock,
+    toggleUse3d,
+    setViewerState
+  } = useViewerStore();
 
   useEffect(() => {
     async function changeLoader() {
-      setIsLoading(true);
+      setViewerState('isLoading', true);
       const { urlOrFile } = source;
       const {
         data: nextLoader,
         metadata: nextMeta
-      } = await createLoader(urlOrFile, toggleOffsetsSnackbar, message =>
-        setLoaderErrorSnackbar({ on: true, message })
+      } = await createLoader(urlOrFile, toggleIsOffsetsSnackbarOn, message =>
+        setViewerState('loaderErrorSnackbar', { on: true, message })
       );
 
       if (nextLoader) {
@@ -189,13 +202,14 @@ export default function Avivator(props) {
           ]
         );
         setLoader(nextLoader);
-        setNewLoader(nextLoader);
         setMetadata(nextMeta);
-        setMetadata(nextMeta);
-        setIsLoading(false);
-        setPixelValues(new Array(newSelections.length).fill(FILL_PIXEL_VALUE));
+        setViewerState('isLoading', false);
+        setViewerState(
+          'pixelValues',
+          new Array(newSelections.length).fill(FILL_PIXEL_VALUE)
+        );
         // Set the global selections (needed for the UI). All selections have the same global selection.
-        setGlobalSelections(newSelections[0]);
+        setViewerState('globalSelection', newSelections[0]);
         if (use3d) toggleUse3d();
         // eslint-disable-next-line no-unused-expressions
         history?.push(
@@ -464,7 +478,9 @@ export default function Avivator(props) {
                 colormap={colormap.length > 0 && colormap}
                 zoomLock={zoomLock}
                 panLock={panLock}
-                hoverHooks={{ handleValue: setPixelValues }}
+                hoverHooks={{
+                  handleValue: v => setViewerState('pixelValues', v)
+                }}
                 lensSelection={lensSelection}
                 isLensOn={isLensOn}
               />
@@ -479,8 +495,10 @@ export default function Avivator(props) {
                 width={viewSize.width}
                 colormap={colormap.length > 0 && colormap}
                 overview={DEFAULT_OVERVIEW}
-                overviewOn={overviewOn && isPyramid}
-                hoverHooks={{ handleValue: setPixelValues }}
+                isOverviewOn={isOverviewOn && isPyramid}
+                hoverHooks={{
+                  handleValue: v => setViewerState('pixelValues', v)
+                }}
                 lensSelection={lensSelection}
                 isLensOn={isLensOn}
               />
@@ -507,8 +525,8 @@ export default function Avivator(props) {
           maxHeight={viewSize.height}
           handleSubmitNewUrl={handleSubmitNewUrl}
           urlOrFile={source.urlOrFile}
-          on={controllerOn}
-          toggle={toggleController}
+          on={isControllerOn}
+          toggle={toggleIsControllerOn}
           handleSubmitFile={handleSubmitFile}
         >
           {!isRgb && <ColormapSelect value={colormap} disabled={isLoading} />}
@@ -555,17 +573,17 @@ export default function Avivator(props) {
           {!use3d && (
             <Button
               disabled={!isPyramid || isLoading || useLinkedView}
-              onClick={() => setOverviewOn(prev => !prev)}
+              onClick={() => toggleOverviewIsOn(prev => !prev)}
               variant="outlined"
               size="small"
               fullWidth
             >
-              {overviewOn ? 'Hide' : 'Show'} Picture-In-Picture
+              {isOverviewOn ? 'Hide' : 'Show'} Picture-In-Picture
             </Button>
           )}
           {!use3d && (
             <Button
-              disabled={!isPyramid || isLoading || overviewOn}
+              disabled={!isPyramid || isLoading || isOverviewOn}
               onClick={toggleLinkedView}
               variant="outlined"
               size="small"
@@ -600,12 +618,15 @@ export default function Avivator(props) {
         </Menu>
       }
       <Snackbar
-        open={offsetsSnackbarOn}
+        open={isOffsetsSnackbarOn}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         elevation={6}
         variant="filled"
       >
-        <Alert onClose={() => toggleOffsetsSnackbar(false)} severity="warning">
+        <Alert
+          onClose={() => toggleIsOffsetsSnackbarOn(false)}
+          severity="warning"
+        >
           <OffsetsWarning />
         </Alert>
       </Snackbar>
@@ -624,12 +645,15 @@ export default function Avivator(props) {
       </Snackbar>
 
       <Snackbar
-        open={noImageUrlSnackbarIsOn}
+        open={isNoImageUrlSnackbarOn}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         elevation={6}
         variant="filled"
       >
-        <Alert onClose={() => toggleNoImageUrlSnackbar(false)} severity="info">
+        <Alert
+          onClose={() => toggleIsNoImageUrlSnackbarOn(false)}
+          severity="info"
+        >
           <NoImageUrlInfo />
         </Alert>
       </Snackbar>
