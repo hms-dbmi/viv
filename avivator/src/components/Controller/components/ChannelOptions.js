@@ -34,11 +34,8 @@ const useStyles = makeStyles(() => ({
 function ChannelOptions({ index }) {
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
-  const { removeChannel, setPropertyForChannel } = useChannelSetters();
+  const { removeChannel } = useChannelSetters();
 
-  const handleColorSelect = color => {
-    setPropertyForChannel(index, 'colors', color);
-  };
   const handleRemoveChannel = () => removeChannel(index);
 
   const classes = useStyles();
@@ -60,7 +57,7 @@ function ChannelOptions({ index }) {
                 <span className={classes.span}>Remove</span>
               </MenuItem>
               <MenuItem dense disableGutters className={classes.colors}>
-                <ColorPalette handleChange={handleColorSelect} />
+                <ColorPalette />
               </MenuItem>
             </MenuList>
           </ClickAwayListener>

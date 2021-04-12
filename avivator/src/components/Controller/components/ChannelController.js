@@ -56,13 +56,7 @@ const getPixelValueDisplay = (isOn, pixelValue, shouldShowPixelValue) => {
   return <CircularProgress size="50%" />;
 };
 
-function ChannelController({
-  name,
-  channelOptions,
-  shouldShowPixelValue,
-  disableOptions = false,
-  index
-}) {
+function ChannelController({ name, disableOptions = false, index }) {
   const {
     isOn,
     sliders,
@@ -73,7 +67,8 @@ function ChannelController({
   } = useChannelSettings();
   const { setPropertyForChannel, toggleIsOn } = useChannelSetters();
   const { colormap } = useImageSettingsStore();
-  const { pixelValues } = useViewerStore();
+  const { pixelValues, useLinkedView, channelOptions } = useViewerStore();
+  const shouldShowPixelValue = !useLinkedView;
   const rgbColor = toRgb(colormap, colors[index]);
   const classes = useStyles();
   const [min, max] = domains[index];

@@ -16,7 +16,7 @@ import ZoomLockToggle from './components/ZoomLockToggle';
 import SideBySideToggle from './components/SideBySideToggle';
 import PictureInPictureToggle from './components/PictureInPictureToggle';
 import { useChannelSettings, useViewerStore } from '../../state';
-import { guessRgb, useWindowSize, getNameFromUrl } from '../../utils';
+import { guessRgb, useWindowSize } from '../../utils';
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
 
 const Controller = () => {
@@ -28,7 +28,6 @@ const Controller = () => {
     use3d,
     useColormap,
     useLens,
-    source,
     isLoading
   } = useViewerStore();
   const viewSize = useWindowSize();
@@ -46,12 +45,7 @@ const Controller = () => {
         style={{ width: '100%' }}
         item
       >
-        <ChannelController
-          name={name}
-          index={i}
-          channelOptions={channelOptions}
-          shouldShowPixelValue={!useLinkedView}
-        />
+        <ChannelController name={name} index={i} />
       </Grid>
     );
   });
