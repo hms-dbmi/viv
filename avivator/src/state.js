@@ -234,7 +234,12 @@ const DEFAULT_VIEWER_STATE = {
   useLinkedView: false,
   isControllerOn: true,
   use3d: false,
-  globalSelection: { z: 0, t: 0 }
+  useLens: false,
+  useColormap: false,
+  globalSelection: { z: 0, t: 0 },
+  channelOptions: [],
+  metadata: null,
+  source: ''
 };
 
 export const useViewerStore = create(set => ({

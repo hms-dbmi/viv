@@ -4,15 +4,16 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
 
-import { useImageSettingsStore } from '../state';
+import { useImageSettingsStore, useViewerStore } from '../state';
 
-function LensSelect({ channelOptions }) {
+function LensSelect() {
   const {
     setImageSetting,
     isLensOn,
     toggleIsLensOn,
     lensSelection
   } = useImageSettingsStore();
+  const { channelOptions } = useViewerStore();
 
   const checkboxColor = `rgb(${[255, 255, 255]})`;
   return (
