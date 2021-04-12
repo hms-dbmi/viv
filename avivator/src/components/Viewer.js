@@ -11,7 +11,7 @@ import {
   SideBySideViewer,
   PictureInPictureViewer,
   VolumeViewer
-} from '../../../dist';
+} from '../../../dist'; // eslint-disable-line import/extensions,import/no-unresolved
 
 const Viewer = () => {
   const { useLinkedView, setViewerState, use3d } = useViewerStore();
