@@ -281,12 +281,12 @@ const XR3DLayer = class extends Layer {
             [...normalClippingPlanes],
             [1, 0, 0],
             _NUM_PLANES
-          ).reduce((acc, val) => acc.concat(val), []),
+          ).flat(),
           offsetClippingPlanes: padWithDefault(
             [...offsetClippingPlanes],
             [0, 0, 0],
             _NUM_PLANES
-          ).reduce((acc, val) => acc.concat(val), [])
+          ).flat()
         })
         .draw();
     }
