@@ -4,12 +4,14 @@ import IconButton from '@material-ui/core/IconButton';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import Grid from '@material-ui/core/Grid';
 import CloseIcon from '@material-ui/icons/Close';
+import { useViewerStore } from '../../../state';
 
 const hideButtonStyle = {
   marginRight: '4.5px',
   marginTop: '3px'
 };
-function MenuTitle({ menuToggle }) {
+function MenuTitle() {
+  const { toggleIsControllerOn } = useViewerStore();
   return (
     <Grid container direction="row" justify="flex-end" alignItems="center">
       <Grid style={{ marginRight: 'auto' }} item>
@@ -29,7 +31,7 @@ function MenuTitle({ menuToggle }) {
       <Grid item>
         <IconButton
           size="small"
-          onClick={menuToggle}
+          onClick={toggleIsControllerOn}
           disableRipple
           aria-label="hide-menu"
           style={hideButtonStyle}

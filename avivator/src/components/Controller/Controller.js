@@ -29,34 +29,8 @@ const Controller = () => {
     useColormap,
     useLens,
     source,
-    isLoading,
-    setViewerState
+    isLoading
   } = useViewerStore();
-  const handleSubmitNewUrl = (event, url) => {
-    event.preventDefault();
-    const newSource = {
-      urlOrFile: url,
-      // Use the trailing part of the URL (file name, presumably) as the description.
-      description: getNameFromUrl(url)
-    };
-    setViewerState('source', newSource);
-  };
-  const handleSubmitFile = files => {
-    let newSource;
-    if (files.length === 1) {
-      newSource = {
-        urlOrFile: files[0],
-        // Use the trailing part of the URL (file name, presumably) as the description.
-        description: files[0].name
-      };
-    } else {
-      newSource = {
-        urlOrFile: files,
-        description: 'data.zarr'
-      };
-    }
-    setViewerState('source', newSource);
-  };
   const viewSize = useWindowSize();
   const isRgb = metadata && guessRgb(metadata);
   const globalControlDimensions =
@@ -90,12 +64,7 @@ const Controller = () => {
       ) : null;
     });
   return (
-    <Menu
-      maxHeight={viewSize.height}
-      handleSubmitNewUrl={handleSubmitNewUrl}
-      urlOrFile={source.urlOrFile}
-      handleSubmitFile={handleSubmitFile}
-    >
+    <Menu maxHeight={viewSize.height}>
       {useColormap && <ColormapSelect />}
       {use3d && <RenderingModeSelect />}
       {useLens && !colormap && (

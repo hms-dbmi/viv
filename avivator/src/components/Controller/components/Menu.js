@@ -15,7 +15,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import MenuTitle from './MenuTitle';
 import DropzoneButton from './DropzoneButton';
-import { isMobileOrTablet } from '../../../utils';
+import { isMobileOrTablet, getNameFromUrl } from '../../../utils';
 import { useViewerStore } from '../../../state';
 
 const useStyles = makeStyles(theme => ({
@@ -50,7 +50,17 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Header(props) {
-  const { handleSubmitNewUrl, url, menuToggle } = props;
+  const { setViewerState, source } = useViewerStore();
+  const handleSubmitNewUrl = (event, newUrl) => {
+    event.preventDefault();
+    const newSource = {
+      urlOrFile: newUrl,
+      // Use the trailing part of the URL (file name, presumably) as the description.
+      description: getNameFromUrl(newUrl)
+    };
+    setViewerState('source', newSource);
+  };
+  const url = typeof source.urlOrFile === 'string' ? source.urlOrFile : '';
   const [text, setText] = useState(url);
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
@@ -61,7 +71,7 @@ function Header(props) {
   return (
     <Grid container direction="column">
       <Grid item xs={12}>
-        <MenuTitle menuToggle={menuToggle} />
+        <MenuTitle />
       </Grid>
       <Grid
         container
@@ -127,17 +137,11 @@ function Header(props) {
 
 function Menu({ children, ...props }) {
   const classes = useStyles(props);
-  const { handleSubmitNewUrl, urlOrFile, handleSubmitFile } = props;
   const { isControllerOn, toggleIsControllerOn } = useViewerStore();
   return isControllerOn ? (
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
       <Paper className={classes.paper}>
-        <Header
-          handleSubmitNewUrl={handleSubmitNewUrl}
-          url={typeof urlOrFile === 'string' ? urlOrFile : ''}
-          menuToggle={toggleIsControllerOn}
-          handleSubmitFile={handleSubmitFile}
-        />
+        <Header />
         <Grid
           container
           direction="column"
