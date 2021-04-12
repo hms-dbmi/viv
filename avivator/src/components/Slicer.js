@@ -3,12 +3,14 @@ import Grid from '@material-ui/core/Grid';
 
 import Slider from '@material-ui/core/Slider';
 
-const Slicer = props => {
-  const { xSlice, ySlice, zSlice, setXSlice, setYSlice, setZSlice } = props;
+import { useImageSettingsStore } from '../state';
+
+const Slicer = () => {
+  const { setImageSetting, xSlice, ySlice, zSlice } = useImageSettingsStore();
   const sliceValuesAndSetSliceFunctions = [
-    [xSlice, setXSlice, 'x'],
-    [ySlice, setYSlice, 'y'],
-    [zSlice, setZSlice, 'z']
+    [xSlice, v => setImageSetting('xSlice', v), 'x'],
+    [ySlice, v => setImageSetting('ySlice', v), 'y'],
+    [zSlice, v => setImageSetting('zSlice', v), 'z']
   ];
   return sliceValuesAndSetSliceFunctions.map(([slice, setSlice, label]) => (
     <Grid container direction="row" justify="flex-start" alignItems="center">

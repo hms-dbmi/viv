@@ -24,7 +24,11 @@ import {
   guessRgb,
   range
 } from './utils';
-import { useChannelSettings, useChannelSetters } from './state';
+import {
+  useChannelSettings,
+  useChannelSetters,
+  useImageSettingsStore
+} from './state';
 
 import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
@@ -72,23 +76,16 @@ export default function Avivator(props) {
 
   const [loader, setLoader] = useState({});
   const [metadata, setMetadata] = useState(null);
-  const [lensSelection, setLensSelection] = useState(0);
   const [source, setSource] = useState(initSource);
-  const [colormap, setColormap] = useState('');
-  const [renderingMode, setRenderingMode] = useState(RENDERING_MODES.ADDITIVE);
-  const [isLoading, setIsLoading] = useState(true);
   const [pixelValues, setPixelValues] = useState([]);
   const [dimensions, setDimensions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [globalSelections, setGlobalSelections] = useState({ z: 0, t: 0 });
   const [offsetsSnackbarOn, toggleOffsetsSnackbar] = useState(false);
   const [loaderErrorSnackbar, setLoaderErrorSnackbar] = useState({
     on: false,
     message: null
   });
-  const [xSlice, setXSlice] = useState([0, 1]);
-  const [ySlice, setYSlice] = useState([0, 1]);
-  const [zSlice, setZSlice] = useState([0, 1]);
-  const [resolution, on3DResolutionSelect] = useState(0);
   const [noImageUrlSnackbarIsOn, toggleNoImageUrlSnackbar] = useState(
     isDemoImage
   );
@@ -98,18 +95,10 @@ export default function Avivator(props) {
   const [controllerOn, toggleController] = useReducer(v => !v, true);
   const [zoomLock, toggleZoomLock] = useReducer(v => !v, true);
   const [panLock, togglePanLock] = useReducer(v => !v, true);
-  const [isLensOn, toggleIsLensOn] = useReducer(v => !v, false);
   const [use3d, toggleUse3d] = useReducer(v => !v, false);
 
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
-  const {
-    colors,
-    sliders,
-    isOn,
-    ids,
-    selections,
-    domains
-  } = useChannelSettings();
+  const { colors, sliders, isOn, ids, selections } = useChannelSettings();
   const {
     setPropertiesForChannels,
     setPropertiesForChannel,
@@ -117,6 +106,16 @@ export default function Avivator(props) {
     addChannel,
     setLoader: setNewLoader
   } = useChannelSetters();
+  const {
+    lensSelection,
+    colormap,
+    renderingMode,
+    xSlice,
+    ySlice,
+    zSlice,
+    resolution,
+    isLensOn
+  } = useImageSettingsStore();
 
   useEffect(() => {
     async function changeLoader() {
@@ -512,24 +511,12 @@ export default function Avivator(props) {
           toggle={toggleController}
           handleSubmitFile={handleSubmitFile}
         >
-          {!isRgb && (
-            <ColormapSelect
-              value={colormap}
-              handleChange={setColormap}
-              disabled={isLoading}
-            />
-          )}
+          {!isRgb && <ColormapSelect value={colormap} disabled={isLoading} />}
           {use3d && (
-            <RenderingModeSelect
-              value={renderingMode}
-              handleChange={setRenderingMode}
-              disabled={isLoading}
-            />
+            <RenderingModeSelect value={renderingMode} disabled={isLoading} />
           )}
           {!isRgb && channelOptions?.length > 1 && !colormap && !use3d && (
             <LensSelect
-              handleToggle={toggleIsLensOn}
-              handleSelection={setLensSelection}
               isOn={isLensOn}
               channelOptions={selections.map(sel => channelOptions[sel.c])}
               lensSelection={lensSelection}
@@ -563,7 +550,6 @@ export default function Avivator(props) {
                 fullWidth
                 loader={loader}
                 use3d={use3d}
-                on3DResolutionSelect={on3DResolutionSelect}
               />
             )}
           {!use3d && (
@@ -610,16 +596,7 @@ export default function Avivator(props) {
               </Button>
             </>
           )}
-          {use3d && (
-            <Slicer
-              xSlice={xSlice}
-              setXSlice={setXSlice}
-              ySlice={ySlice}
-              setYSlice={setYSlice}
-              zSlice={zSlice}
-              setZSlice={setZSlice}
-            />
-          )}
+          {use3d && <Slicer />}
         </Menu>
       }
       <Snackbar

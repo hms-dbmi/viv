@@ -5,14 +5,17 @@ import InputLabel from '@material-ui/core/InputLabel';
 
 import { RENDERING_MODES } from '../../../dist'; // eslint-disable-line import/extensions,import/no-unresolved
 
-function RenderingModeSelect({ value, handleChange, disabled }) {
+import { useImageSettingsStore } from '../state';
+
+function RenderingModeSelect({ disabled }) {
+  const { setImageSetting, renderingMode } = useImageSettingsStore();
   return (
     <FormControl fullWidth>
       <InputLabel htmlFor="rendering-mode-select">Rendering Mode</InputLabel>
       <Select
         native
-        onChange={e => handleChange(e.target.value)}
-        value={value}
+        onChange={e => setImageSetting('renderingMode', e.target.value)}
+        value={renderingMode}
         inputProps={{
           name: 'rendering-mode',
           id: 'rendering-mode-select'

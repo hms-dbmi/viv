@@ -190,7 +190,7 @@ export const useChannelsStore = create((set, get) => ({
 
 export const useChannelSettings = () =>
   useChannelsStore(
-    state => pick(state, Object.keys(DEFAUlT_CHANNEL_VALUES)),
+    state => pick(state, Object.keys(DEFAUlT_CHANNEL_STATE)),
     shallow
   );
 

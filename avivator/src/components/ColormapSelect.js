@@ -4,17 +4,19 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 
 import { COLORMAP_OPTIONS } from '../constants';
+import { useImageSettingsStore } from '../state';
 
-function ColormapSelect({ value, handleChange, disabled }) {
+function ColormapSelect({ disabled }) {
+  const { setImageSetting, colormap } = useImageSettingsStore();
   return (
     <FormControl fullWidth>
       <InputLabel htmlFor="colormap-select">
-        Additive {value === '' ? ' Blending' : 'Color Mapping'}
+        Additive {colormap === '' ? ' Blending' : 'Color Mapping'}
       </InputLabel>
       <Select
         native
-        onChange={e => handleChange(e.target.value)}
-        value={value}
+        onChange={e => setImageSetting('colormap', e.target.value)}
+        value={colormap}
         inputProps={{
           name: 'colormap',
           id: 'colormap-select'

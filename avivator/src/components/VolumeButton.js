@@ -9,6 +9,8 @@ import MenuList from '@material-ui/core/MenuList';
 
 import { makeStyles } from '@material-ui/core/styles';
 
+import { useImageSettingsStore, useChannelSettings } from '../state';
+
 function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
 
@@ -41,7 +43,10 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function VolumeButton({ toggleUse3d, loader, use3d, on3DResolutionSelect }) {
+function VolumeButton({ toggleUse3d, use3d }) {
+  const { setImageSetting } = useImageSettingsStore();
+  const { loader } = useChannelSettings();
+
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
   const classes = useStyles();
@@ -88,7 +93,7 @@ function VolumeButton({ toggleUse3d, loader, use3d, on3DResolutionSelect }) {
                           dense
                           disableGutters
                           onClick={() => {
-                            on3DResolutionSelect(resolution);
+                            setImageSetting('resolution', resolution);
                             toggleUse3d();
                             toggle();
                           }}
