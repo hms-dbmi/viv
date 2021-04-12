@@ -16,6 +16,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import MenuTitle from './MenuTitle';
 import { DropzoneButton } from './Dropzone';
 import { isMobileOrTablet } from '../utils';
+import { useViewerStore } from '../state';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -126,14 +127,15 @@ function Header(props) {
 
 function Menu({ children, ...props }) {
   const classes = useStyles(props);
-  const { on, toggle, handleSubmitNewUrl, urlOrFile, handleSubmitFile } = props;
-  return on ? (
+  const { handleSubmitNewUrl, urlOrFile, handleSubmitFile } = props;
+  const { isControllerOn, toggleIsControllerOn } = useViewerStore();
+  return isControllerOn ? (
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
       <Paper className={classes.paper}>
         <Header
           handleSubmitNewUrl={handleSubmitNewUrl}
           url={typeof urlOrFile === 'string' ? urlOrFile : ''}
-          menuToggle={toggle}
+          menuToggle={toggleIsControllerOn}
           handleSubmitFile={handleSubmitFile}
         />
         <Grid
@@ -161,7 +163,7 @@ function Menu({ children, ...props }) {
         color="default"
         size="small"
         endIcon={<SettingsIcon />}
-        onClick={toggle}
+        onClick={toggleIsControllerOn}
         aria-label="show-menu"
       >
         AVIVATOR

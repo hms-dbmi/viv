@@ -5,10 +5,11 @@ import InputLabel from '@material-ui/core/InputLabel';
 
 import { RENDERING_MODES } from '../../../dist'; // eslint-disable-line import/extensions,import/no-unresolved
 
-import { useImageSettingsStore } from '../state';
+import { useImageSettingsStore, useViewerStore } from '../state';
 
-function RenderingModeSelect({ disabled }) {
+function RenderingModeSelect() {
   const { setImageSetting, renderingMode } = useImageSettingsStore();
+  const { isLoading } = useViewerStore();
   return (
     <FormControl fullWidth>
       <InputLabel htmlFor="rendering-mode-select">Rendering Mode</InputLabel>
@@ -20,7 +21,7 @@ function RenderingModeSelect({ disabled }) {
           name: 'rendering-mode',
           id: 'rendering-mode-select'
         }}
-        disabled={disabled}
+        disabled={isLoading}
       >
         {Object.values(RENDERING_MODES).map(name => (
           <option key={name} value={name}>

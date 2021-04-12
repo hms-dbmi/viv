@@ -4,10 +4,11 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 
 import { COLORMAP_OPTIONS } from '../constants';
-import { useImageSettingsStore } from '../state';
+import { useImageSettingsStore, useViewerStore } from '../state';
 
-function ColormapSelect({ disabled }) {
+function ColormapSelect() {
   const { setImageSetting, colormap } = useImageSettingsStore();
+  const { isLoading } = useViewerStore();
   return (
     <FormControl fullWidth>
       <InputLabel htmlFor="colormap-select">
@@ -21,7 +22,7 @@ function ColormapSelect({ disabled }) {
           name: 'colormap',
           id: 'colormap-select'
         }}
-        disabled={disabled}
+        disabled={isLoading}
       >
         <option aria-label="None" value="" />
         {COLORMAP_OPTIONS.map(name => (

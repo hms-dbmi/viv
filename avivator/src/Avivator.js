@@ -11,8 +11,7 @@ import {
   SideBySideViewer,
   PictureInPictureViewer,
   VolumeViewer,
-  getChannelStats,
-  RENDERING_MODES
+  getChannelStats
 } from '../../dist';
 import {
   createLoader,
@@ -55,14 +54,6 @@ import {
 } from './constants';
 import './index.css';
 
-const initialChannels = {
-  sliders: [],
-  colors: [],
-  selections: [],
-  ids: [],
-  isOn: []
-};
-
 /**
  * This component serves as batteries-included visualization for OME-compliant tiff or zarr images.
  * This includes color sliders, selectors, and more.
@@ -78,8 +69,6 @@ export default function Avivator(props) {
   const [metadata, setMetadata] = useState(null);
   const [source, setSource] = useState(initSource);
   const [dimensions, setDimensions] = useState([]);
-
-  const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
   const {
     colors,
     sliders,
@@ -106,9 +95,7 @@ export default function Avivator(props) {
     isLensOn
   } = useImageSettingsStore();
   const {
-    globalSelection,
     isLoading,
-    pixelValues,
     isOffsetsSnackbarOn,
     loaderErrorSnackbar,
     isNoImageUrlSnackbarOn,
@@ -118,12 +105,11 @@ export default function Avivator(props) {
     zoomLock,
     panLock,
     use3d,
-    globalSelections,
     toggleIsOffsetsSnackbarOn,
     toggleIsNoImageUrlSnackbarOn,
     toggleIsControllerOn,
-    toggleLinkedView,
-    toggleOverviewIsOn,
+    toggleUseLinkedView,
+    toggleIsOverviewOn,
     toggleZoomLock,
     togglePanLock,
     toggleUse3d,
@@ -223,7 +209,6 @@ export default function Avivator(props) {
   useEffect(() => {
     async function updateStatsFor3D() {
       if (!use3d) {
-        const { selections } = channels;
         const lowResSource = loader[loader.length - 1];
         const stats = await Promise.all(
           selections.map(async selection => {
@@ -249,7 +234,6 @@ export default function Avivator(props) {
           })
         );
       } else {
-        const { selections } = channels;
         const lowResSource = loader[loader.length - 1];
         const { labels, shape } = lowResSource;
         const sizeZ = shape[labels.indexOf('z')] >> (loader.length - 1);
@@ -326,61 +310,6 @@ export default function Avivator(props) {
     };
     setSource(newSource);
   };
-
-  const handleGlobalChannelsSelectionChange = async ({ selection, event }) => {
-    const loaderSelection = selections.map(pastSelection => ({
-      ...pastSelection,
-      ...selection
-    }));
-    // See https://github.com/hms-dbmi/viv/issues/176 for why
-    // we have to check mouseup.
-    const mouseUp = event.type === 'mouseup';
-    // Only update image on screen on a mouseup event for the same reason as above.
-    if (mouseUp) {
-      const stats = await Promise.all(
-        loaderSelection.map(sel =>
-          getSingleSelectionStats({ loader, selection: sel })
-        )
-      );
-      const newDomains = stats.map(stat => stat.domain);
-      const newSliders = stats.map(stat => stat.slider);
-      setPropertiesForChannels(
-        range(newSliders.length),
-        ['selections', 'domains', 'sliders'],
-        [loaderSelection, newDomains, newSliders]
-      );
-      setGlobalSelections(prev => ({ ...prev, ...selection }));
-    } else {
-      setGlobalSelections(prev => ({ ...prev, ...selection }));
-    }
-  };
-
-  /*
-   * Handles updating state for each channel controller.
-   * Is is too heavy weight to store each channel as an object in state,
-   * so we store the individual viv props (colorValues, sliderValues, etc)
-   * in separate arrays. We use the ordering of the channels in the menu to make
-   * update state very responsive (but dispatching the index of the channel)
-   */
-  const handleControllerChange = async (index, type, value) => {
-    if (type === 'CHANGE_CHANNEL') {
-      const [channelDim] = dimensions.filter(d => d.field === 'c');
-      const { field, values } = channelDim;
-      const dimIndex = values.indexOf(value);
-      const selection = { ...globalSelections, [field]: dimIndex };
-      const { domain, slider } = await getSingleSelectionStats({
-        loader,
-        selection
-      });
-      setPropertiesForChannel(
-        index,
-        ['selections', 'domains', 'sliders'],
-        [selection, domain, slider]
-      );
-    } else {
-      dispatch({ type, index, value });
-    }
-  };
   const handleSubmitFile = files => {
     let newSource;
     if (files.length === 1) {
@@ -408,19 +337,10 @@ export default function Avivator(props) {
         ? selections[0][field]
         : 0;
     });
-    const { domain, slider } = await getSingleSelectionStats({
-      loader,
-      selection
-    });
-    addChannel(
-      ['selections', 'domains', 'sliders'],
-      [selection, domain, slider]
-    );
+    addChannel(['selections'], [selection]);
   };
-
   const isPyramid = loader.length > 0;
   const isRgb = metadata && guessRgb(metadata);
-  const dtype = loader[0];
   const globalControlDimensions = dimensions?.filter(dimension =>
     GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dimension.field)
   );
@@ -438,10 +358,6 @@ export default function Avivator(props) {
           name={name}
           index={i}
           channelOptions={channelOptions}
-          dtype={dtype}
-          handleChange={(type, value) => handleControllerChange(i, type, value)}
-          colormapOn={colormap.length > 0}
-          pixelValue={pixelValues[i]}
           shouldShowPixelValue={!useLinkedView}
         />
       </Grid>
@@ -450,14 +366,7 @@ export default function Avivator(props) {
   const globalControllers = globalControlDimensions.map(dimension => {
     // Only return a slider if there is a "stack."
     return dimension.values.length > 1 && !use3d ? (
-      <GlobalSelectionSlider
-        key={dimension.field}
-        dimension={dimension}
-        globalSelections={globalSelections}
-        handleGlobalChannelsSelectionChange={
-          handleGlobalChannelsSelectionChange
-        }
-      />
+      <GlobalSelectionSlider key={dimension.field} dimension={dimension} />
     ) : null;
   });
   return (
@@ -466,7 +375,7 @@ export default function Avivator(props) {
         <DropzoneWrapper handleSubmitFile={handleSubmitFile}>
           {!isLoading &&
             !use3d &&
-            (useLinkedView && isPyramid ? (
+            (useLinkedView ? (
               <SideBySideViewer
                 loader={loader}
                 sliderValues={sliders}
@@ -495,7 +404,7 @@ export default function Avivator(props) {
                 width={viewSize.width}
                 colormap={colormap.length > 0 && colormap}
                 overview={DEFAULT_OVERVIEW}
-                isOverviewOn={isOverviewOn && isPyramid}
+                overviewOn={isOverviewOn}
                 hoverHooks={{
                   handleValue: v => setViewerState('pixelValues', v)
                 }}
@@ -525,19 +434,13 @@ export default function Avivator(props) {
           maxHeight={viewSize.height}
           handleSubmitNewUrl={handleSubmitNewUrl}
           urlOrFile={source.urlOrFile}
-          on={isControllerOn}
-          toggle={toggleIsControllerOn}
           handleSubmitFile={handleSubmitFile}
         >
-          {!isRgb && <ColormapSelect value={colormap} disabled={isLoading} />}
-          {use3d && (
-            <RenderingModeSelect value={renderingMode} disabled={isLoading} />
-          )}
+          {!isRgb && <ColormapSelect />}
+          {use3d && <RenderingModeSelect />}
           {!isRgb && channelOptions?.length > 1 && !colormap && !use3d && (
             <LensSelect
-              isOn={isLensOn}
               channelOptions={selections.map(sel => channelOptions[sel.c])}
-              lensSelection={lensSelection}
             />
           )}
           {globalControllers}
@@ -563,17 +466,12 @@ export default function Avivator(props) {
           )}
           {loader.length > 0 &&
             loader[0].shape[loader[0].labels.indexOf('z')] > 1 && (
-              <VolumeButton
-                toggleUse3d={toggleUse3d}
-                fullWidth
-                loader={loader}
-                use3d={use3d}
-              />
+              <VolumeButton />
             )}
           {!use3d && (
             <Button
               disabled={!isPyramid || isLoading || useLinkedView}
-              onClick={() => toggleOverviewIsOn(prev => !prev)}
+              onClick={toggleIsOverviewOn}
               variant="outlined"
               size="small"
               fullWidth
@@ -584,7 +482,7 @@ export default function Avivator(props) {
           {!use3d && (
             <Button
               disabled={!isPyramid || isLoading || isOverviewOn}
-              onClick={toggleLinkedView}
+              onClick={toggleUseLinkedView}
               variant="outlined"
               size="small"
               fullWidth
