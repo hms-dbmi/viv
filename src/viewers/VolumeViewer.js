@@ -25,7 +25,7 @@ import { RENDERING_MODES } from '../constants';
  * @param {function} [props.onViewportLoad] Function that gets called when the data in the viewport loads.
  * @param {Array.<Array.<number>>=} normalClippingPlanes List of normal vector for defining the direction of a given clipping plane.
  * Points render in the direction of the normal vector.
- * @param {Array.<Array.<number>>=} offsetClippingPlanes List of "offsets" from the origin (i.e `a` in the equation `n•r + a = 0` defining the plane by normal vector `n`) of the plane.
+ * @param {Array.<Array.<number>>=} offsetClippingPlanes List of "offsets" from the origin (i.e `a` in the equation `n•(r - a) = 0` defining the plane by normal vector `n`) of the plane.
  * @param {number=} numPlanes Number of planes by which to clip.  Only needs to be set if more than 6.
  */
 
