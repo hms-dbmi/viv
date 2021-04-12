@@ -75,7 +75,7 @@ const defaultProps = {
   zSlice: { type: 'array', value: [0, 1], compare: true },
   normalClippingPlanes: { type: 'array', value: [], compare: true },
   offsetClippingPlanes: { type: 'array', value: [], compare: true },
-  numPlanes: { type: 'nuber', value: _NUM_PLANES, compare: true },
+  numPlanes: { type: 'number', value: _NUM_PLANES, compare: true },
   renderingMode: {
     type: 'string',
     value: RENDERING_NAMES.ADDITIVE,

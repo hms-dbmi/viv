@@ -32,7 +32,7 @@ const defaultProps = {
   zSlice: { type: 'array', value: [0, 1], compare: true },
   normalClippingPlanes: { type: 'array', value: [], compare: true },
   offsetClippingPlanes: { type: 'array', value: [], compare: true },
-  numPlanes: { type: 'nuber', value: 6, compare: true },
+  numPlanes: { type: 'number', value: 6, compare: true },
   renderingMode: {
     type: 'string',
     value: RENDERING_MODES.MAX_INTENSITY_PROJECTION,
