@@ -3,7 +3,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 
 import { LoaderError, OffsetsWarning, NoImageUrlInfo } from './SnackbarAlerts';
-import { useViewerStore } from '../state';
+import { useViewerStore } from '../../state';
 
 const SnackBars = () => {
   const {

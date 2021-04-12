@@ -8,6 +8,7 @@ import {
 import { createLoader, buildDefaultSelection, guessRgb, range } from './utils';
 import { COLOR_PALLETE, FILL_PIXEL_VALUE } from './constants';
 import { getChannelStats } from '../../dist';
+import { useDropzone } from 'react-dropzone';
 
 export const initImage = (source, history) => {
   const {
@@ -195,4 +196,27 @@ export const init3DSettings = () => {
     }
     updateStatsFor3D();
   }, [use3d]); // eslint-disable-line react-hooks/exhaustive-deps
+};
+
+export const dropzoneHook = () => {
+  const { setViewerState } = useViewerStore();
+  const handleSubmitFile = files => {
+    let newSource;
+    if (files.length === 1) {
+      newSource = {
+        urlOrFile: files[0],
+        // Use the trailing part of the URL (file name, presumably) as the description.
+        description: files[0].name
+      };
+    } else {
+      newSource = {
+        urlOrFile: files,
+        description: 'data.zarr'
+      };
+    }
+    setViewerState('source', newSource);
+  };
+  return useDropzone({
+    onDrop: handleSubmitFile
+  });
 };

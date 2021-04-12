@@ -2,12 +2,12 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 
-import { MAX_CHANNELS } from '../constants';
+import { MAX_CHANNELS } from '../../../constants';
 import {
   useChannelSettings,
   useChannelSetters,
   useViewerStore
-} from '../state';
+} from '../../../state';
 
 const AddChannel = () => {
   const { globalSelection, isLoading } = useViewerStore();

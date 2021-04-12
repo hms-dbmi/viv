@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
 
-import { useImageSettingsStore, useViewerStore } from '../state';
+import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 const PanLockToggle = () => {
   const { togglePanLock, panLock } = useImageSettingsStore();

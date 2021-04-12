@@ -14,9 +14,9 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import { makeStyles } from '@material-ui/core/styles';
 
 import MenuTitle from './MenuTitle';
-import { DropzoneButton } from './Dropzone';
-import { isMobileOrTablet } from '../utils';
-import { useViewerStore } from '../state';
+import DropzoneButton from './DropzoneButton';
+import { isMobileOrTablet } from '../../../utils';
+import { useViewerStore } from '../../../state';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -50,7 +50,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Header(props) {
-  const { handleSubmitNewUrl, url, menuToggle, handleSubmitFile } = props;
+  const { handleSubmitNewUrl, url, menuToggle } = props;
   const [text, setText] = useState(url);
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
@@ -115,7 +115,7 @@ function Header(props) {
       </Grid>
       {!isMobileOrTablet() && (
         <Grid item xs={12} style={{ paddingTop: 16 }}>
-          <DropzoneButton handleSubmitFile={handleSubmitFile} />
+          <DropzoneButton />
         </Grid>
       )}
       <Grid item xs={12} className={classes.divider}>

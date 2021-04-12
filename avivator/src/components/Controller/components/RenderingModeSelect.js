@@ -3,9 +3,8 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 
-import { RENDERING_MODES } from '../../../dist'; // eslint-disable-line import/extensions,import/no-unresolved
-
-import { useImageSettingsStore, useViewerStore } from '../state';
+import { RENDERING_MODES } from '../../../../../dist';
+import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 function RenderingModeSelect() {
   const { setImageSetting, renderingMode } = useImageSettingsStore();

@@ -4,7 +4,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
 
-import { useImageSettingsStore, useViewerStore } from '../state';
+import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 function LensSelect() {
   const {

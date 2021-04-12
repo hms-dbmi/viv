@@ -3,8 +3,8 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 
-import { COLORMAP_OPTIONS } from '../constants';
-import { useImageSettingsStore, useViewerStore } from '../state';
+import { COLORMAP_OPTIONS } from '../../../constants';
+import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 function ColormapSelect() {
   const { setImageSetting, colormap } = useImageSettingsStore();

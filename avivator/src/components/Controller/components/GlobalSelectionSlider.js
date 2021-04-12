@@ -1,12 +1,12 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
-import { range } from '../utils';
+import { range } from '../../../utils';
 import {
   useChannelSettings,
   useChannelSetters,
   useViewerStore
-} from '../state';
+} from '../../../state';
 
 export default function GlobalSelectionSlider(props) {
   const {

@@ -4,7 +4,7 @@ import LensIcon from '@material-ui/icons/Lens';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import { COLOR_PALLETE } from '../constants';
+import { COLOR_PALLETE } from '../../../constants';
 
 const useStyles = makeStyles(() => ({
   container: {

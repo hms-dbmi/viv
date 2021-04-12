@@ -3,7 +3,7 @@ import Grid from '@material-ui/core/Grid';
 
 import Slider from '@material-ui/core/Slider';
 
-import { useImageSettingsStore } from '../state';
+import { useImageSettingsStore } from '../../../state';
 
 const Slicer = () => {
   const { setImageSetting, xSlice, ySlice, zSlice } = useImageSettingsStore();

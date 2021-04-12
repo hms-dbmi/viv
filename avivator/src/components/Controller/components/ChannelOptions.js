@@ -8,7 +8,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { useChannelSetters } from '../state';
+import { useChannelSetters } from '../../../state';
 
 import ColorPalette from './ColorPalette';
 
