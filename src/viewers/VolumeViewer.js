@@ -23,6 +23,10 @@ import { RENDERING_MODES } from '../constants';
  * @param {Array} [props.ySlice] 0-1 interval on which to slice the volume.
  * @param {Array} [props.zSlice] 0-1 interval on which to slice the volume.
  * @param {function} [props.onViewportLoad] Function that gets called when the data in the viewport loads.
+ * @param {Array.<Array.<number>>=} normalClippingPlanes List of normal vector for defining the direction of a given clipping plane.
+ * Points render in the direction of the normal vector.
+ * @param {Array.<Array.<number>>=} offsetClippingPlanes List of "offsets" from the origin (i.e `a` in the equation `n•r + a = 0` defining the plane by normal vector `n`) of the plane.
+ * @param {number=} numPlanes Number of planes by which to clip.  Only needs to be set if more than 6.
  */
 
 const VolumeViewer = props => {
@@ -40,7 +44,10 @@ const VolumeViewer = props => {
     xSlice = [0, 1],
     ySlice = [0, 1],
     zSlice = [0, 1],
-    onViewportLoad
+    onViewportLoad,
+    normalClippingPlanes = [],
+    offsetClippingPlanes = [],
+    numPlanes = 6
   } = props;
   const initialViewState = useMemo(() => {
     const { shape, labels } = loader[resolution];
@@ -82,7 +89,10 @@ const VolumeViewer = props => {
     resolution,
     renderingMode,
     modelMatrix,
-    onViewportLoad
+    onViewportLoad,
+    normalClippingPlanes,
+    offsetClippingPlanes,
+    numPlanes
   };
   const views = [volumeView];
   const layerProps = [layerConfig];

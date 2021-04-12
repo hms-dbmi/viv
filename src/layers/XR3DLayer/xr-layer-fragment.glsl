@@ -14,6 +14,9 @@ uniform vec3 scaledDimensions;
 
 uniform mat4 scale;
 
+uniform vec3 normalClippingPlanes[_NUM_PLANES];
+uniform vec3 offsetClippingPlanes[_NUM_PLANES];
+
 // range
 uniform vec2 sliderValues[6];
 
@@ -30,8 +33,8 @@ flat in vec3 transformed_eye;
 out vec4 color;
 
 vec2 intersect_box(vec3 orig, vec3 dir) {
-	const vec3 box_min = vec3(0);
-	const vec3 box_max = vec3(1);
+	vec3 box_min = vec3(xSlice[0], ySlice[0], zSlice[0]);
+	vec3 box_max = vec3(xSlice[1], ySlice[1], zSlice[1]);
 	vec3 inv_dir = 1.0 / dir;
 	vec3 tmin_tmp = (box_min - orig) * inv_dir;
 	vec3 tmax_tmp = (box_max - orig) * inv_dir;
@@ -123,16 +126,18 @@ void main(void) {
 	// TODO: Probably want to stop this process at some point to improve performance when marching down the edges.
 	_BEFORE_RENDER
 	for (float t = t_hit.x; t < t_hit.y; t += dt) {
-		float canShowXCoordinate = max(p.x - xSlice[0], 0.0) * max(xSlice[1] - p.x , 0.0);
-		float canShowYCoordinate = max(p.y - ySlice[0], 0.0) * max(ySlice[1] - p.y , 0.0);
-		float canShowZCoordinate = max(p.z - zSlice[0], 0.0) * max(zSlice[1] - p.z , 0.0);
-		float canShowCoordinate = float(ceil(canShowXCoordinate * canShowYCoordinate * canShowZCoordinate));
-    float intensityValue0 = canShowCoordinate * sample_and_apply_sliders(volume0, p, sliderValues[0]);
-    float intensityValue1 = canShowCoordinate * sample_and_apply_sliders(volume1, p, sliderValues[1]);
-		float intensityValue2 = canShowCoordinate * sample_and_apply_sliders(volume2, p, sliderValues[2]);
-		float intensityValue3 = canShowCoordinate * sample_and_apply_sliders(volume3, p, sliderValues[3]);
-    float intensityValue4 = canShowCoordinate * sample_and_apply_sliders(volume4, p, sliderValues[4]);
-		float intensityValue5 = canShowCoordinate * sample_and_apply_sliders(volume5, p, sliderValues[5]);
+		// Check if this point is on the "positive" side or "negative" side of the plane - only show positive.
+		float canShow = 1.;
+		for (int i = 0; i < _NUM_PLANES; i += 1) {
+			canShow *= max(0.0, dot(normalize(normalClippingPlanes[i]), p - offsetClippingPlanes[i]));
+		}
+		canShow = float(ceil(canShow));
+    float intensityValue0 = canShow * sample_and_apply_sliders(volume0, p, sliderValues[0]);
+    float intensityValue1 = canShow * sample_and_apply_sliders(volume1, p, sliderValues[1]);
+		float intensityValue2 = canShow * sample_and_apply_sliders(volume2, p, sliderValues[2]);
+		float intensityValue3 = canShow * sample_and_apply_sliders(volume3, p, sliderValues[3]);
+    float intensityValue4 = canShow * sample_and_apply_sliders(volume4, p, sliderValues[4]);
+		float intensityValue5 = canShow * sample_and_apply_sliders(volume5, p, sliderValues[5]);
 
 		_RENDER
 

@@ -32,7 +32,7 @@ import { Matrix4 } from 'math.gl';
 import vs from './xr-layer-vertex.glsl';
 import fs from './xr-layer-fragment.glsl';
 import channels from './channel-intensity-module';
-import { padColorsAndSliders } from '../utils';
+import { padColorsAndSliders, padWithDefault } from '../utils';
 import {
   DTYPE_VALUES,
   COLORMAPS,
@@ -60,6 +60,7 @@ const CUBE_STRIP = [
 	1, 0, 0,
 	0, 0, 0
 ];
+const _NUM_PLANES = 6;
 
 const defaultProps = {
   pickable: false,
@@ -72,6 +73,9 @@ const defaultProps = {
   xSlice: { type: 'array', value: [0, 1], compare: true },
   ySlice: { type: 'array', value: [0, 1], compare: true },
   zSlice: { type: 'array', value: [0, 1], compare: true },
+  normalClippingPlanes: { type: 'array', value: [], compare: true },
+  offsetClippingPlanes: { type: 'array', value: [], compare: true },
+  numPlanes: { type: 'nuber', value: _NUM_PLANES, compare: true },
   renderingMode: {
     type: 'string',
     value: RENDERING_NAMES.ADDITIVE,
@@ -117,6 +121,10 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * @property {Array.<number>=} xSlice 0-1 interval on which to slice the volume.
  * @property {Array.<number>=} ySlice 0-1 interval on which to slice the volume.
  * @property {Array.<number>=} zSlice 0-1 interval on which to slice the volume.
+ * @property {Array.<Array.<number>>=} normalClippingPlanes List of normal vector for defining the direction of a given clipping plane.
+ * Points render in the direction of the normal vector.
+ * @property {Array.<Array.<number>>=} offsetClippingPlanes List of "offsets" from the origin (i.e `a` in the equation `n•r + a = 0` defining the plane by normal vector `n`) of the plane.
+ * @property {number=} numPlanes Number of planes by which to clip.  Only needs to be set if more than 6.
  */
 
 /**
@@ -146,7 +154,7 @@ const XR3DLayer = class extends Layer {
    * This function compiles the shaders and the projection module.
    */
   getShaders() {
-    const { colormap, renderingMode } = this.props;
+    const { colormap, renderingMode, numPlanes } = this.props;
     const { _BEFORE_RENDER, _RENDER, _AFTER_RENDER } = colormap
       ? RENDERING_MODES_COLORMAP[renderingMode]
       : RENDERING_MODES_BLEND[renderingMode];
@@ -158,7 +166,8 @@ const XR3DLayer = class extends Layer {
         .replace('_RENDER', _RENDER)
         .replace('_AFTER_RENDER', _AFTER_RENDER),
       defines: {
-        _COLORMAP_FUNCTION: colormap || 'viridis'
+        _COLORMAP_FUNCTION: colormap || 'viridis',
+        _NUM_PLANES: String(numPlanes || _NUM_PLANES)
       },
       modules: [channelsModules]
     });
@@ -184,7 +193,8 @@ const XR3DLayer = class extends Layer {
     if (
       changeFlags.extensionsChanged ||
       props.colormap !== oldProps.colormap ||
-      props.renderingMode !== oldProps.renderingMode
+      props.renderingMode !== oldProps.renderingMode ||
+      props.numPlanes !== oldProps.numPlanes
     ) {
       const { gl } = this.context;
       if (this.state.model) {
@@ -232,7 +242,9 @@ const XR3DLayer = class extends Layer {
       modelMatrix,
       channelIsOn,
       domain,
-      dtype
+      dtype,
+      normalClippingPlanes,
+      offsetClippingPlanes
     } = this.props;
     const {
       viewMatrix,
@@ -264,7 +276,17 @@ const XR3DLayer = class extends Layer {
           view: viewMatrix,
           proj: projectionMatrix,
           scale: new Matrix4().scale(volDims),
-          model: modelMatrix || new Matrix4()
+          model: modelMatrix || new Matrix4(),
+          normalClippingPlanes: padWithDefault(
+            [...normalClippingPlanes],
+            [1, 0, 0],
+            _NUM_PLANES
+          ).reduce((acc, val) => acc.concat(val), []),
+          offsetClippingPlanes: padWithDefault(
+            [...offsetClippingPlanes],
+            [0, 0, 0],
+            _NUM_PLANES
+          ).reduce((acc, val) => acc.concat(val), [])
         })
         .draw();
     }
