@@ -15,12 +15,37 @@ import PanLockToggle from './components/PanLockToggle';
 import ZoomLockToggle from './components/ZoomLockToggle';
 import SideBySideToggle from './components/SideBySideToggle';
 import PictureInPictureToggle from './components/PictureInPictureToggle';
-import { useChannelSettings, useViewerStore } from '../../state';
-import { guessRgb, useWindowSize } from '../../utils';
+import {
+  useChannelSettings,
+  useViewerStore,
+  useImageSettingsStore,
+  useChannelSetters
+} from '../../state';
+import {
+  guessRgb,
+  useWindowSize,
+  getSingleSelectionStats,
+  getSingleSelectionStats3D
+} from '../../utils';
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
 
 const Controller = () => {
-  const { loader, selections, ids, colormap } = useChannelSettings();
+  const {
+    isOn,
+    sliders,
+    colors,
+    domains,
+    selections,
+    loader,
+    ids
+  } = useChannelSettings();
+  const {
+    setPropertyForChannel,
+    setPropertiesForChannel,
+    toggleIsOn: toggleIsOnSetter,
+    removeChannel
+  } = useChannelSetters();
+  const { colormap } = useImageSettingsStore();
   const {
     metadata,
     channelOptions,
@@ -28,16 +53,40 @@ const Controller = () => {
     use3d,
     useColormap,
     useLens,
-    isLoading
+    isLoading,
+    pixelValues
   } = useViewerStore();
   const viewSize = useWindowSize();
   const isRgb = metadata && guessRgb(metadata);
-  const globalControlDimensions =
-    loader[0] &&
-    loader[0].labels?.filter(dimension =>
-      GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dimension.field)
-    );
+  const { shape, labels } = loader[0] || {};
+  const globalControlLabels = labels?.filter(label =>
+    GLOBAL_SLIDER_DIMENSION_FIELDS.includes(label)
+  );
   const channelControllers = ids.map((id, i) => {
+    const onSelectionChange = async e => {
+      const selection = {
+        ...selections[i],
+        c: channelOptions.indexOf(e.target.value)
+      };
+      const getStats = use3d
+        ? getSingleSelectionStats3D
+        : getSingleSelectionStats;
+      const { domain, slider } = await getStats({
+        loader,
+        selection
+      });
+      setPropertiesForChannel(
+        i,
+        ['sliders', 'domains', 'selections'],
+        [slider, domain, selection]
+      );
+    };
+    const toggleIsOn = () => toggleIsOnSetter(i);
+    const handleSliderChange = (e, v) => setPropertyForChannel(i, 'sliders', v);
+    const handleRemoveChannel = () => removeChannel(i);
+    const handleColorSelect = color => {
+      setPropertyForChannel(i, 'colors', color);
+    };
     const name = channelOptions[selections[i].c];
     return (
       <Grid
@@ -45,16 +94,29 @@ const Controller = () => {
         style={{ width: '100%' }}
         item
       >
-        <ChannelController name={name} index={i} />
+        <ChannelController
+          name={name}
+          onSelectionChange={onSelectionChange}
+          isOn={isOn[i]}
+          pixelValue={pixelValues[i]}
+          toggleIsOn={toggleIsOn}
+          handleSliderChange={handleSliderChange}
+          domain={domains[i]}
+          slider={sliders[i]}
+          color={colors[i]}
+          handleRemoveChannel={handleRemoveChannel}
+          handleColorSelect={handleColorSelect}
+        />
       </Grid>
     );
   });
   const globalControllers =
-    globalControlDimensions &&
-    globalControlDimensions.map(dimension => {
+    globalControlLabels &&
+    globalControlLabels.map(label => {
+      const size = shape[labels.indexOf(label)];
       // Only return a slider if there is a "stack."
-      return dimension.values.length > 1 && !use3d ? (
-        <GlobalSelectionSlider key={dimension.field} dimension={dimension} />
+      return size > 1 && !use3d ? (
+        <GlobalSelectionSlider key={label} size={size} label={label} />
       ) : null;
     });
   return (

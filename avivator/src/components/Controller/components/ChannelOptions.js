@@ -8,8 +8,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { useChannelSetters } from '../../../state';
-
 import ColorPalette from './ColorPalette';
 
 const useStyles = makeStyles(() => ({
@@ -31,12 +29,9 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function ChannelOptions({ index }) {
+function ChannelOptions({ handleRemoveChannel, handleColorSelect }) {
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
-  const { removeChannel } = useChannelSetters();
-
-  const handleRemoveChannel = () => removeChannel(index);
 
   const classes = useStyles();
   return (
@@ -57,7 +52,7 @@ function ChannelOptions({ index }) {
                 <span className={classes.span}>Remove</span>
               </MenuItem>
               <MenuItem dense disableGutters className={classes.colors}>
-                <ColorPalette index={index} />
+                <ColorPalette handleColorSelect={handleColorSelect} />
               </MenuItem>
             </MenuList>
           </ClickAwayListener>

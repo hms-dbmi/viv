@@ -17,7 +17,6 @@ const Viewer = () => {
   const { useLinkedView, setViewerState, use3d } = useViewerStore();
   const { colors, sliders, isOn, selections, loader } = useChannelSettings();
   const viewSize = useWindowSize();
-
   const {
     lensSelection,
     colormap,

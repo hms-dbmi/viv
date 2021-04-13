@@ -5,7 +5,6 @@ import LensIcon from '@material-ui/icons/Lens';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { COLOR_PALLETE } from '../../../constants';
-import { useChannelSetters } from '../../../state';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -27,13 +26,8 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const ColorPalette = ({ index }) => {
+const ColorPalette = ({ handleColorSelect }) => {
   const classes = useStyles();
-  const { setPropertyForChannel } = useChannelSetters();
-
-  const handleColorSelect = color => {
-    setPropertyForChannel(index, 'colors', color);
-  };
   return (
     <div className={classes.container} aria-label="color-swatch">
       {COLOR_PALLETE.map(color => {

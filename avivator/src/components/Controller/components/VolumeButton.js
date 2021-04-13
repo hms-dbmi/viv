@@ -12,8 +12,15 @@ import { makeStyles } from '@material-ui/core/styles';
 import {
   useImageSettingsStore,
   useChannelSettings,
-  useViewerStore
+  useViewerStore,
+  useChannelSetters
 } from '../../../state';
+import {
+  getSingleSelectionStats,
+  getSingleSelectionStats3D,
+  range,
+  guessRgb
+} from '../../../utils';
 
 function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
@@ -27,6 +34,26 @@ function formatBytes(bytes, decimals = 2) {
   // eslint-disable-next-line no-restricted-properties
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
+
+const getStatsForResolution = (loader, resolution) => {
+  const { shape, labels } = loader[resolution];
+  const height = shape[labels.indexOf('y')];
+  const width = shape[labels.indexOf('x')];
+  const depth = shape[labels.indexOf('z')];
+  const depthDownsampled = Math.floor(depth / 2 ** resolution);
+  // Check memory allocation limits for Float32Array (used in XR3DLayer for rendering)
+  const totalBytes = 4 * height * width * depthDownsampled;
+  return { height, width, depthDownsampled, totalBytes };
+};
+
+const canLoadResolution = (loader, resolution) => {
+  const { totalBytes } = getStatsForResolution(loader, resolution);
+  const maxHeapSize =
+    window.performance?.memory &&
+    window.performance?.memory?.jsHeapSizeLimit / 2;
+  const maxSize = maxHeapSize || 2 ** 31 - 1;
+  return totalBytes < maxSize;
+};
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -49,8 +76,9 @@ const useStyles = makeStyles(() => ({
 
 function VolumeButton() {
   const { setImageSetting } = useImageSettingsStore();
-  const { loader } = useChannelSettings();
-  const { use3d, toggleUse3d } = useViewerStore();
+  const { loader, selections } = useChannelSettings();
+  const { setPropertiesForChannels } = useChannelSetters();
+  const { use3d, toggleUse3d, metadata, setViewerState } = useViewerStore();
 
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
@@ -61,10 +89,28 @@ function VolumeButton() {
         variant="outlined"
         size="small"
         ref={anchorRef}
-        onClick={() => {
+        onClick={async () => {
           toggle();
           // eslint-disable-next-line no-unused-expressions
-          use3d && toggleUse3d();
+          if (use3d) {
+            toggleUse3d();
+            const stats = await Promise.all(
+              selections.map(selection =>
+                getSingleSelectionStats({ loader, selection })
+              )
+            );
+            const domains = stats.map(stat => stat.domain);
+            const sliders = stats.map(stat => stat.slider);
+            setPropertiesForChannels(
+              range(selections.length),
+              ['domains', 'sliders'],
+              [domains, sliders]
+            );
+            const isRgb = metadata && guessRgb(metadata);
+            if (!isRgb && metadata) {
+              setViewerState('useLens', true);
+            }
+          }
         }}
         fullWidth
       >
@@ -79,28 +125,38 @@ function VolumeButton() {
                 // eslint-disable-next-line no-unused-vars
                 .map((_, resolution) => {
                   if (loader) {
-                    const { shape, labels } = loader[resolution];
-                    const height = shape[labels.indexOf('y')];
-                    const width = shape[labels.indexOf('x')];
-                    const depth = shape[labels.indexOf('z')];
-                    const depthDownsampled = Math.floor(
-                      depth / 2 ** resolution
-                    );
-                    // Check memory allocation limits for Float32Array (used in XR3DLayer for rendering)
-                    const totalBytes = 4 * height * width * depthDownsampled;
-                    const maxHeapSize =
-                      window.performance?.memory &&
-                      window.performance?.memory?.jsHeapSizeLimit / 2;
-                    const maxSize = maxHeapSize || 2 ** 31 - 1;
-                    if (totalBytes < maxSize) {
+                    if (canLoadResolution(loader, resolution)) {
+                      const {
+                        height,
+                        width,
+                        depthDownsampled,
+                        totalBytes
+                      } = getStatsForResolution(loader, resolution);
                       return (
                         <MenuItem
                           dense
                           disableGutters
-                          onClick={() => {
+                          onClick={async () => {
                             setImageSetting('resolution', resolution);
                             toggleUse3d();
                             toggle();
+                            const stats = await Promise.all(
+                              selections.map(selection =>
+                                getSingleSelectionStats3D({
+                                  loader,
+                                  selection
+                                })
+                              )
+                            );
+                            const domains = stats.map(stat => stat.domain);
+                            const sliders = stats.map(stat => stat.slider);
+
+                            setPropertiesForChannels(
+                              range(selections.length),
+                              ['domains', 'sliders'],
+                              [domains, sliders]
+                            );
+                            setViewerState('useLens', false);
                           }}
                           key={`(${height}, ${width}, ${depthDownsampled})`}
                         >

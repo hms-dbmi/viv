@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 import { useViewerStore } from './state';
-import { initImage, init3DSettings } from './hooks';
+import { initImage } from './hooks';
 import SnackBars from './components/Snackbars';
 import Viewer from './components/Viewer';
 import Controller from './components/Controller';
@@ -24,9 +24,7 @@ export default function Avivator(props) {
     setViewerState('source', initSource);
     setViewerState('isNoImageUrlSnackbarOn', isDemoImage);
   }, []);
-
   initImage(source, history);
-  init3DSettings();
   return (
     <>
       <DropzoneWrapper>{!isLoading && <Viewer />}</DropzoneWrapper>

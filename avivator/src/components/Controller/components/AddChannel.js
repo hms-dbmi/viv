@@ -8,18 +8,33 @@ import {
   useChannelSetters,
   useViewerStore
 } from '../../../state';
+import {
+  getSingleSelectionStats,
+  getSingleSelectionStats3D
+} from '../../../utils';
 
 const AddChannel = () => {
-  const { globalSelection, isLoading } = useViewerStore();
+  const { globalSelection, isLoading, use3d } = useViewerStore();
   const { loader, selections } = useChannelSettings();
   const { addChannel } = useChannelSetters();
   const handleChannelAdd = async () => {
-    const selection = {};
+    let selection = {};
     const { labels } = loader[0];
     labels.forEach(l => {
       selection[l] = 0;
     });
-    addChannel(['selections'], [{ ...selection, ...globalSelection }]);
+    selection = { ...selection, ...globalSelection };
+    const getStats = use3d
+      ? getSingleSelectionStats3D
+      : getSingleSelectionStats;
+    const { domain, slider } = await getStats({
+      loader,
+      selection
+    });
+    addChannel(
+      ['selections', 'domains', 'sliders'],
+      [selection, domain, slider]
+    );
   };
   return (
     <Button
