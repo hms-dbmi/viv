@@ -3,7 +3,7 @@ import { Matrix4 } from 'math.gl';
 
 import { getPhysicalSizeScalingMatrix } from '../layers/utils';
 import VivViewer from './VivViewer';
-import { VolumeView } from '../views';
+import { VolumeView, getDefaultInitialViewState } from '../views';
 import { RENDERING_MODES } from '../constants';
 
 /**
@@ -23,6 +23,10 @@ import { RENDERING_MODES } from '../constants';
  * @param {Array} [props.ySlice] 0-1 interval on which to slice the volume.
  * @param {Array} [props.zSlice] 0-1 interval on which to slice the volume.
  * @param {function} [props.onViewportLoad] Function that gets called when the data in the viewport loads.
+ * @param {Array} [props.viewStates] List of objects like [{ target: [x, y, z], zoom: -zoom, id: '3d' }] for initializing where the viewer looks (optional - this is inferred from height/width/loader
+ * internally by default using getDefaultInitialViewState).
+ * @param {number} props.height Current height of the component.
+ * @param {number} props.width Current width of the component.
  */
 
 const VolumeViewer = props => {
@@ -40,9 +44,16 @@ const VolumeViewer = props => {
     xSlice = [0, 1],
     ySlice = [0, 1],
     zSlice = [0, 1],
-    onViewportLoad
+    onViewportLoad,
+    height: screenHeight,
+    width: screenWidth,
+    viewStates: viewStatesProp
   } = props;
+  const volumeViewState = viewStatesProp?.find(state => state.id === '3d');
   const initialViewState = useMemo(() => {
+    if (volumeViewState) {
+      return volumeViewState;
+    }
     const { shape, labels } = loader[resolution];
     const height = shape[labels.indexOf('y')];
     const width = shape[labels.indexOf('x')];
@@ -50,6 +61,11 @@ const VolumeViewer = props => {
     const depthDownsampled = Math.floor(depth / 2 ** resolution);
     const physicalSizeScalingMatrix = getPhysicalSizeScalingMatrix(
       loader[resolution]
+    );
+    const { zoom } = getDefaultInitialViewState(
+      loader[resolution],
+      { height: screenHeight, width: screenWidth },
+      1
     );
     return {
       target: (modelMatrix || new Matrix4()).transformPoint(
@@ -59,12 +75,13 @@ const VolumeViewer = props => {
           depthDownsampled / 2
         ])
       ),
-      zoom: -2.0,
+      zoom,
       rotationX: 0,
       rotationOrbit: 0
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loader, resolution, modelMatrix]);
-  const viewStates = [{ ...initialViewState, id: '3d' }];
+  const viewStates = [volumeViewState || { ...initialViewState, id: '3d' }];
   const volumeView = new VolumeView({
     id: '3d',
     target: initialViewState.target

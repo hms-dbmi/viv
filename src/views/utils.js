@@ -31,7 +31,7 @@ export function makeBoundingBox(viewState) {
 
 /**
  * Create an initial view state that centers the image in the viewport at the zoom level that fills the dimensions in `viewSize`.
- * @param {Object} loader PixelSource[]
+ * @param {Object} loader (PixelSource[] | PixelSource)
  * @param {Object} viewSize { height, width } object giving dimensions of the viewport for deducing the right zoom level to center the image.
  * @param {Object} zoomBackOff A positive number which controls how far zoomed out the view state is from filling the entire viewport (default is 0 so the image fully fills the view).
  * SideBySideViewer and PictureInPictureViewer use .5 when setting viewState automatically in their default behavior, so the viewport is slightly zoomed out from the image
@@ -39,7 +39,9 @@ export function makeBoundingBox(viewState) {
  * @returns {ViewState} A default initial view state that centers the image within the view: { target: [x, y, 0], zoom: -zoom }.
  */
 export function getDefaultInitialViewState(loader, viewSize, zoomBackOff = 0) {
-  const { width, height } = getImageSize(loader[0]);
+  const { width, height } = getImageSize(
+    Array.isArray(loader) ? loader[0] : loader
+  );
   const zoom =
     Math.log2(Math.min(viewSize.width / width, viewSize.height / height)) -
     zoomBackOff;

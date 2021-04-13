@@ -43,6 +43,8 @@ const Viewer = () => {
       zSlice={zSlice}
       resolution={resolution}
       renderingMode={renderingMode}
+      height={viewSize.height}
+      width={viewSize.width}
     />
   ) : useLinkedView ? (
     <SideBySideViewer
