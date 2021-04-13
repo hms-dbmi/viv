@@ -50,6 +50,11 @@ const DEFAUlT_CHANNEL_VALUES = {
 export const useChannelsStore = create(set => ({
   ...DEFAUlT_CHANNEL_STATE,
   ...generateToggles(DEFAUlT_CHANNEL_VALUES, set),
+  toggleIsOn: index => set(state => {
+    const isOn = [...state.isOn]
+    isOn[index] = !isOn[index];
+    return { ...state, isOn }
+  }),
   setLoader: loader => set(state => ({ ...state, loader })),
   setPropertyForChannel: (channel, property, value) =>
     set(state => {
