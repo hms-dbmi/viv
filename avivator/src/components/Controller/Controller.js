@@ -68,7 +68,7 @@ const Controller = () => {
         ...selections[i],
         c: channelOptions.indexOf(e.target.value)
       };
-      setPropertyForChannel(i, 'selection', selection);
+      setPropertyForChannel(i, 'selections', selection);
       const getStats = use3d
         ? getSingleSelectionStats3D
         : getSingleSelectionStats;

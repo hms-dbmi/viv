@@ -32,8 +32,8 @@ const AddChannel = () => {
       selection
     });
     addChannel(
-      ['selections', 'domains', 'sliders'],
-      [selection, domain, slider]
+      ['selections', 'domains', 'sliders', 'ids'],
+      [selection, domain, slider, String(Math.random())]
     );
   };
   return (
