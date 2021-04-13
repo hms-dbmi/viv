@@ -10,7 +10,10 @@ import {
 
 export default function GlobalSelectionSlider(props) {
   const { size, label } = props;
-  const { setPropertiesForChannels } = useChannelSetters();
+  const {
+    setPropertiesForChannels,
+    setPropertyForChannels
+  } = useChannelSetters();
   const { selections, loader } = useChannelSettings();
   const { setViewerState, globalSelection } = useViewerStore();
   return (
@@ -29,23 +32,33 @@ export default function GlobalSelectionSlider(props) {
               [label]: newValue
             });
           }}
-          onChangeCommitted={async (event, newValue) => {
+          onChangeCommitted={(event, newValue) => {
             const newSelections = [...selections].map(sel => ({
               ...sel,
               [label]: newValue
             }));
-            const stats = await Promise.all(
+            setPropertyForChannels(
+              range(newSelections.length),
+              'selections',
+              newSelections
+            );
+            Promise.all(
               newSelections.map(selection =>
                 getSingleSelectionStats({ loader, selection })
               )
-            );
-            const domains = stats.map(stat => stat.domain);
-            const sliders = stats.map(stat => stat.slider);
-            setPropertiesForChannels(
-              range(selections.length),
-              ['selections', 'domains', 'sliders'],
-              [newSelections, domains, sliders]
-            );
+            ).then(stats => {
+              const domains = stats.map(stat => stat.domain);
+              const sliders = stats.map(stat => stat.slider);
+              setPropertiesForChannels(
+                range(newSelections.length),
+                ['domains', 'sliders'],
+                [domains, sliders]
+              );
+              setViewerState('globalSelection', {
+                ...globalSelection,
+                [label]: newValue
+              });
+            });
           }}
           valueLabelDisplay="auto"
           getAriaLabel={() => `${label} slider`}

@@ -89,23 +89,24 @@ function VolumeButton() {
         variant="outlined"
         size="small"
         ref={anchorRef}
-        onClick={async () => {
+        onClick={() => {
           toggle();
           // eslint-disable-next-line no-unused-expressions
           if (use3d) {
             toggleUse3d();
-            const stats = await Promise.all(
+            Promise.all(
               selections.map(selection =>
                 getSingleSelectionStats({ loader, selection })
               )
-            );
-            const domains = stats.map(stat => stat.domain);
-            const sliders = stats.map(stat => stat.slider);
-            setPropertiesForChannels(
-              range(selections.length),
-              ['domains', 'sliders'],
-              [domains, sliders]
-            );
+            ).then(stats => {
+              const domains = stats.map(stat => stat.domain);
+              const sliders = stats.map(stat => stat.slider);
+              setPropertiesForChannels(
+                range(selections.length),
+                ['domains', 'sliders'],
+                [domains, sliders]
+              );
+            });
             const isRgb = metadata && guessRgb(metadata);
             if (!isRgb && metadata) {
               setViewerState('useLens', true);
@@ -136,26 +137,27 @@ function VolumeButton() {
                         <MenuItem
                           dense
                           disableGutters
-                          onClick={async () => {
+                          onClick={() => {
                             setImageSetting('resolution', resolution);
                             toggleUse3d();
                             toggle();
-                            const stats = await Promise.all(
+                            Promise.all(
                               selections.map(selection =>
                                 getSingleSelectionStats3D({
                                   loader,
                                   selection
                                 })
                               )
-                            );
-                            const domains = stats.map(stat => stat.domain);
-                            const sliders = stats.map(stat => stat.slider);
+                            ).then(stats => {
+                              const domains = stats.map(stat => stat.domain);
+                              const sliders = stats.map(stat => stat.slider);
 
-                            setPropertiesForChannels(
-                              range(selections.length),
-                              ['domains', 'sliders'],
-                              [domains, sliders]
-                            );
+                              setPropertiesForChannels(
+                                range(selections.length),
+                                ['domains', 'sliders'],
+                                [domains, sliders]
+                              );
+                            });
                             setViewerState('useLens', false);
                           }}
                           key={`(${height}, ${width}, ${depthDownsampled})`}

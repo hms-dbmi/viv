@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'; // eslint-disable-line import/no-unresolved
-import { load } from '../loaders/tiff/ome-tiff';
+import { useState } from 'react'; // eslint-disable-line import/no-unresolved
 
 export default function useGlobalSelection(loaderSelection, transitionFields) {
   // viewportSelection is the last selection that had an onViewportLoad callback.

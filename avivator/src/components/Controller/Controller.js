@@ -63,23 +63,21 @@ const Controller = () => {
     GLOBAL_SLIDER_DIMENSION_FIELDS.includes(label)
   );
   const channelControllers = ids.map((id, i) => {
-    const onSelectionChange = async e => {
+    const onSelectionChange = e => {
       const selection = {
         ...selections[i],
         c: channelOptions.indexOf(e.target.value)
       };
+      setPropertyForChannel(i, 'selection', selection);
       const getStats = use3d
         ? getSingleSelectionStats3D
         : getSingleSelectionStats;
-      const { domain, slider } = await getStats({
+      getStats({
         loader,
         selection
+      }).then(({ domain, slider }) => {
+        setPropertiesForChannel(i, ['sliders', 'domains'], [slider, domain]);
       });
-      setPropertiesForChannel(
-        i,
-        ['sliders', 'domains', 'selections'],
-        [slider, domain, selection]
-      );
     };
     const toggleIsOn = () => toggleIsOnSetter(i);
     const handleSliderChange = (e, v) => setPropertyForChannel(i, 'sliders', v);

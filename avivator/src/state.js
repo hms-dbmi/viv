@@ -51,7 +51,7 @@ export const useChannelsStore = create(set => ({
   ...DEFAUlT_CHANNEL_STATE,
   ...generateToggles(DEFAUlT_CHANNEL_VALUES, set),
   setLoader: loader => set(state => ({ ...state, loader })),
-  setPropertyForChannel: async (channel, property, value) =>
+  setPropertyForChannel: (channel, property, value) =>
     set(state => {
       const values = [...state[property]];
       values[channel] = value;
@@ -75,7 +75,7 @@ export const useChannelsStore = create(set => ({
       );
       return { ...state, ...zipped };
     }),
-  setPropertyForChannels: async (channels, property, values) =>
+  setPropertyForChannels: (channels, property, values) =>
     set(state => {
       const newValues = [...state[property]];
       channels.forEach((channelIndex, j) => {
