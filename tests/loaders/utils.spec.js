@@ -6,6 +6,44 @@ import {
   isInterleaved
 } from '../../src/loaders/utils';
 
+test('getChannelStats: All zeros', t => {
+  t.plan(7);
+  try {
+    const data = [
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0]
+    ];
+    const channelStats = data.map(arr => getChannelStats(arr));
+    const means = channelStats.map(stat => stat.mean);
+    const domains = channelStats.map(stat => stat.domain);
+    const standardDeviations = channelStats.map(stat => stat.sd);
+    const thirdQuartiles = channelStats.map(stat => stat.q3);
+    const firstQuartiles = channelStats.map(stat => stat.q1);
+    const medians = channelStats.map(stat => stat.median);
+    const sliders = channelStats.map(stat => stat.autoSliders);
+
+    t.deepEqual(means, [0, 0, 0]);
+    t.deepEqual(domains, [
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ]);
+    t.deepEqual(sliders, [
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ]);
+    t.deepEqual(standardDeviations, [0, 0, 0]);
+    t.deepEqual(firstQuartiles, [0, 0, 0]);
+    t.deepEqual(thirdQuartiles, [0, 0, 0]);
+    t.deepEqual(medians, [0, 0, 0]);
+    t.end();
+  } catch (e) {
+    t.fail(e);
+  }
+});
+
 test('getChannelStats: Small', t => {
   t.plan(6);
   try {
