@@ -58,7 +58,7 @@ export function getChannelStats(arr: TypedArray) {
   // Used for "auto" settings.  This is the best parameter I've found experimentally.
   // I don't think there is a right answer and this feature is common in Fiji.
   // Also it's best to use a non-zero array for this.
-  const cutoffArr = arr.filter((i: number) => i >= 1);
+  const cutoffArr = arr.filter((i: number) => i >= 0.00000000001);
   const cutoffPercentile = 0.0005;
   const topCutoffLocation = Math.floor(
     cutoffArr.length * (1 - cutoffPercentile)
@@ -67,8 +67,8 @@ export function getChannelStats(arr: TypedArray) {
   quickselect(cutoffArr, topCutoffLocation);
   quickselect(cutoffArr, bottomCutoffLocation, 0, topCutoffLocation);
   const autoSliders = [
-    cutoffArr[bottomCutoffLocation],
-    cutoffArr[topCutoffLocation]
+    cutoffArr[bottomCutoffLocation] || 0,
+    cutoffArr[topCutoffLocation] || 0
   ];
   return {
     mean,

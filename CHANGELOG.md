@@ -6,6 +6,9 @@
 
 ### Changed
 
+- Fix bug in `getChannelStats` where we only considered values over 1 for the sliders
+- Fix bug in `getChannelStats` where array of zeros passed in causes undefined slider settings
+
 ## 0.9.5
 
 ### Added
