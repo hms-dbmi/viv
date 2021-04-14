@@ -8,15 +8,12 @@ import {
   useChannelSetters,
   useViewerStore
 } from '../../../state';
-import {
-  getSingleSelectionStats,
-  getSingleSelectionStats3D
-} from '../../../utils';
+import { getSingleSelectionStats } from '../../../utils';
 
 const AddChannel = () => {
   const { globalSelection, isLoading, use3d } = useViewerStore();
   const { loader, selections } = useChannelSettings();
-  const { addChannel } = useChannelSetters();
+  const { addChannel, setPropertyForChannel } = useChannelSetters();
   const handleChannelAdd = async () => {
     let selection = {};
     const { labels } = loader[0];
@@ -24,16 +21,18 @@ const AddChannel = () => {
       selection[l] = 0;
     });
     selection = { ...selection, ...globalSelection };
-    const getStats = use3d
-      ? getSingleSelectionStats3D
-      : getSingleSelectionStats;
-    const { domain, slider } = await getStats({
+    const numSelectionsBeforeAdd = selections.length;
+    addChannel(['selections', 'ids'], [selection, String(Math.random())]);
+    getSingleSelectionStats({
       loader,
-      selection
-    });
-    addChannel(
-      ['selections', 'domains', 'sliders', 'ids'],
-      [selection, domain, slider, String(Math.random())]
+      selection,
+      use3d
+    }).then(({ domain, slider }) =>
+      setPropertyForChannel(
+        numSelectionsBeforeAdd,
+        ['domains', 'sliders'],
+        [domain, slider]
+      )
     );
   };
   return (

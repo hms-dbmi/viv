@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import {
-  useChannelSettings,
   useChannelSetters,
   useImageSettingsStore,
   useViewerStore
@@ -9,12 +8,9 @@ import {
   createLoader,
   buildDefaultSelection,
   guessRgb,
-  range,
-  getSingleSelectionStats,
-  getSingleSelectionStats3D
+  getMultiSelectionStats
 } from './utils';
 import { COLOR_PALLETE, FILL_PIXEL_VALUE } from './constants';
-import { getChannelStats } from '../../dist';
 import { useDropzone } from 'react-dropzone';
 
 export const initImage = (source, history) => {
@@ -58,21 +54,20 @@ export const initImage = (source, history) => {
           [0, 255, 0],
           [0, 0, 255]
         ];
-        const lowResSource = nextLoader[nextLoader.length - 1];
         const isRgb = guessRgb(nextMeta);
         if (!isRgb) {
-          const stats = await Promise.all(
-            newSelections.map(selection =>
-              getSingleSelectionStats({ loader: lowResSource, selection })
-            )
-          );
-          newDomains = stats.map(stat => stat.domain);
-          newSliders = stats.map(stat => stat.slider);
+          const stats = await getMultiSelectionStats({
+            loader: nextLoader,
+            selections: newSelections,
+            use3d
+          });
+          newDomains = stats.domains;
+          newSliders = stats.sliders;
           // If there is only one channel, use white.
           newColors =
-            stats.length === 1
+            newDomains.length === 1
               ? [[255, 255, 255]]
-              : stats.map((_, i) => COLOR_PALLETE[i]);
+              : newDomains.map((_, i) => COLOR_PALLETE[i]);
           setViewerState('useColormap', true);
           if (channelOptions.length === 1) {
             setViewerState('useLens', false);

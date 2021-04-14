@@ -15,12 +15,7 @@ import {
   useViewerStore,
   useChannelSetters
 } from '../../../state';
-import {
-  getSingleSelectionStats,
-  getSingleSelectionStats3D,
-  range,
-  guessRgb
-} from '../../../utils';
+import { range, guessRgb, getMultiSelectionStats } from '../../../utils';
 
 function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
@@ -94,19 +89,15 @@ function VolumeButton() {
           // eslint-disable-next-line no-unused-expressions
           if (use3d) {
             toggleUse3d();
-            Promise.all(
-              selections.map(selection =>
-                getSingleSelectionStats({ loader, selection })
-              )
-            ).then(stats => {
-              const domains = stats.map(stat => stat.domain);
-              const sliders = stats.map(stat => stat.slider);
-              setPropertiesForChannels(
-                range(selections.length),
-                ['domains', 'sliders'],
-                [domains, sliders]
-              );
-            });
+            getMultiSelectionStats({ loader, selections, use3d: !use3d }).then(
+              ({ domains, sliders }) => {
+                setPropertiesForChannels(
+                  range(selections.length),
+                  ['domains', 'sliders'],
+                  [domains, sliders]
+                );
+              }
+            );
             const isRgb = metadata && guessRgb(metadata);
             if (!isRgb && metadata) {
               setViewerState('useLens', true);
@@ -141,17 +132,11 @@ function VolumeButton() {
                             setImageSetting('resolution', resolution);
                             toggleUse3d();
                             toggle();
-                            Promise.all(
-                              selections.map(selection =>
-                                getSingleSelectionStats3D({
-                                  loader,
-                                  selection
-                                })
-                              )
-                            ).then(stats => {
-                              const domains = stats.map(stat => stat.domain);
-                              const sliders = stats.map(stat => stat.slider);
-
+                            getMultiSelectionStats({
+                              loader,
+                              selections,
+                              use3d: true
+                            }).then(({ domains, sliders }) => {
                               setPropertiesForChannels(
                                 range(selections.length),
                                 ['domains', 'sliders'],

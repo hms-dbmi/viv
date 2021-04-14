@@ -1,7 +1,7 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
-import { range, getSingleSelectionStats } from '../../../utils';
+import { range, getMultiSelectionStats } from '../../../utils';
 import {
   useChannelSettings,
   useChannelSetters,
@@ -42,13 +42,11 @@ export default function GlobalSelectionSlider(props) {
               'selections',
               newSelections
             );
-            Promise.all(
-              newSelections.map(selection =>
-                getSingleSelectionStats({ loader, selection })
-              )
-            ).then(stats => {
-              const domains = stats.map(stat => stat.domain);
-              const sliders = stats.map(stat => stat.slider);
+            getMultiSelectionStats({
+              loader,
+              selections: newSelections,
+              use3d: false
+            }).then(({ domains, sliders }) => {
               setPropertiesForChannels(
                 range(newSelections.length),
                 ['domains', 'sliders'],

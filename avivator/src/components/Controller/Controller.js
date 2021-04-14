@@ -21,12 +21,7 @@ import {
   useImageSettingsStore,
   useChannelSetters
 } from '../../state';
-import {
-  guessRgb,
-  useWindowSize,
-  getSingleSelectionStats,
-  getSingleSelectionStats3D
-} from '../../utils';
+import { guessRgb, useWindowSize, getSingleSelectionStats } from '../../utils';
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
 
 const Controller = () => {
@@ -69,12 +64,10 @@ const Controller = () => {
         c: channelOptions.indexOf(e.target.value)
       };
       setPropertyForChannel(i, 'selections', selection);
-      const getStats = use3d
-        ? getSingleSelectionStats3D
-        : getSingleSelectionStats;
-      getStats({
+      getSingleSelectionStats({
         loader,
-        selection
+        selection,
+        use3d
       }).then(({ domain, slider }) => {
         setPropertiesForChannel(i, ['sliders', 'domains'], [slider, domain]);
       });

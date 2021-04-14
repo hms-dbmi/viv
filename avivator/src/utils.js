@@ -198,7 +198,7 @@ export function useWindowSize(scaleWidth = 1, scaleHeight = 1) {
   return windowSize;
 }
 
-export async function getSingleSelectionStats({ loader, selection }) {
+export async function getSingleSelectionStats2D({ loader, selection }) {
   const data = Array.isArray(loader) ? loader[loader.length - 1] : loader;
   const raster = await data.getRaster({ selection });
   const selectionStats = getChannelStats(raster.data);
@@ -241,6 +241,24 @@ export async function getSingleSelectionStats3D({ loader, selection }) {
     ]
   };
 }
+
+export const getSingleSelectionStats = async ({ loader, selection, use3d }) => {
+  const getStats = use3d
+    ? getSingleSelectionStats3D
+    : getSingleSelectionStats2D;
+  return getStats({ loader, selection });
+};
+
+export const getMultiSelectionStats = async ({ loader, selections, use3d }) => {
+  const stats = await Promise.all(
+    selections.map(selection =>
+      getSingleSelectionStats({ loader, selection, use3d })
+    )
+  );
+  const domains = stats.map(stat => stat.domain);
+  const sliders = stats.map(stat => stat.slider);
+  return { domains, sliders };
+};
 
 /* eslint-disable no-useless-escape */
 // https://stackoverflow.com/a/11381730
