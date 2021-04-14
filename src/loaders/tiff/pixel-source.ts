@@ -39,13 +39,7 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
     const window = [x0, y0, x0 + width, y0 + height];
 
     const image = await this._indexer(selection);
-    const data = await this._readRasters(image, {
-      window,
-      width,
-      height,
-      signal
-    });
-    return data;
+    return this._readRasters(image, { window, width, height, signal });
   }
 
   private async _readRasters(image: GeoTIFFImage, props?: RasterOptions) {
