@@ -61,6 +61,7 @@ const defaultProps = {
 
 /**
  * @type {{ new(...props: LayerProps[]) }}
+ * @ignore
  */
 const ScaleBarLayer = class extends CompositeLayer {
   renderLayers() {

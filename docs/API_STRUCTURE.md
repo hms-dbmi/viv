@@ -2,11 +2,11 @@
 
 #### Viewer
 
-Viv provides three high-level React components called "Viewers": `PictureInPictureViewer`,
-`SideBySideViewer`, and `VivViewer`. A viewer wraps a
-[`DeckGL` component](https://deck.gl/#/documentation/deckgl-api-reference/deck) and handles
-managing complex state (multiple "views" in the same scene). Viewers also handle
-resizing and forwarding rendering `props` down to the underling layers.
+Viv provides four high-level React components called "Viewers": `PictureInPictureViewer`,
+`SideBySideViewer`, `VolumeViewer` and `VivViewer`. The first three wrap the `VivViewer` and use the `View` API for composing different layouts.
+`VivViewer` wraps a [`DeckGL` component](https://deck.gl/#/documentation/deckgl-api-reference/deck) and handles
+managing the complex state (i.e multiple "views" in the same scene) as well as
+resizing and forwarding rendering `props` down to the underling layers via the `View` API.
 
 #### View
 
@@ -29,8 +29,11 @@ the `SideBySideViewer`.
 Viv implements several deck.gl
 [`Layers`](https://deck.gl/#/documentation/developer-guide/using-layers),
 for rending RGB and multi-channel imaging data. These layers can be composed like any other
-layer in the deck.gl ecosystem. The `XRLayer` (eXtended Range Layer) enables multi-channel
-additive blending of `Uint32`, `Uint16`, `Uint8` and `Float32` data on the GPU. 
+layer in the deck.gl ecosystem. The main three layers for use are `MultiscaleImageLayer` (for tiled, pyramidal images),
+`ImageLayer` (for non-pyramidal and non-tiled iamges), and `VolumeLayer` (for volumetric ray casting rendering)
+which accept `PixelSource` arguments for data fetching.  These layers handle the complexity of data fetching
+and setting up the rendering by wrapping the `XRLayer`, `XR3DLayer` and `BitmapLayer`, which are the lower level rendering layers.  
+The `XRLayer` (eXtended Range Layer) and `XR3DLayer` enable multi-channel additive blending of `Uint32`, `Uint16`, `Uint8` and `Float32` data on the GPU. 
 
 #### Loader (Pixel Sources)
 

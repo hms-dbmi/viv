@@ -40,7 +40,7 @@ const defaultProps = {
  * @type {Object}
  * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
- * @property {Array.<Array.<boolean>>} channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @property {Array.<boolean>} channelIsOn List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader PixelSource[]. Assumes multiscale if loader.length > 1.
  * @property {Array} loaderSelection Selection to be used for fetching data.
  * @property {number=} opacity Opacity of the layer.
@@ -54,7 +54,8 @@ const defaultProps = {
  */
 
 /**
- * @type {{ new(...props: LayerProps[]) }}
+ * @type {{ new <S extends string[]>(...props: import('../types').Viv<LayerProps, S>[]) }}
+ * @ignore
  */
 const OverviewLayer = class extends CompositeLayer {
   renderLayers() {
