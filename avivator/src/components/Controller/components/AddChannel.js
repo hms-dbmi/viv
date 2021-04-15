@@ -13,8 +13,8 @@ import { getSingleSelectionStats } from '../../../utils';
 const AddChannel = () => {
   const { globalSelection, isLoading, use3d } = useViewerStore();
   const { loader, selections } = useChannelSettings();
-  const { addChannel, setPropertyForChannel } = useChannelSetters();
-  const handleChannelAdd = async () => {
+  const { addChannel, setPropertiesForChannel } = useChannelSetters();
+  const handleChannelAdd = () => {
     let selection = {};
     const { labels } = loader[0];
     labels.forEach(l => {
@@ -28,7 +28,7 @@ const AddChannel = () => {
       selection,
       use3d
     }).then(({ domain, slider }) =>
-      setPropertyForChannel(
+      setPropertiesForChannel(
         numSelectionsBeforeAdd,
         ['domains', 'sliders'],
         [domain, slider]

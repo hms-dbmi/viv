@@ -132,12 +132,13 @@ const Controller = () => {
         loader[0].shape[loader[0].labels.indexOf('z')] > 1 && <VolumeButton />}
       {!use3d && <PictureInPictureToggle />}
       {!use3d && <SideBySideToggle />}
-      {useLinkedView && (
-        <>
-          <ZoomLockToggle />
-          <PanLockToggle />
-        </>
-      )}
+      {useLinkedView &&
+        !use3d && (
+          <>
+            <ZoomLockToggle />
+            <PanLockToggle />
+          </>
+        )}
       {use3d && <Slicer />}
     </Menu>
   );
