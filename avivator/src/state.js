@@ -51,11 +51,12 @@ const DEFAUlT_CHANNEL_VALUES = {
 export const useChannelsStore = create(set => ({
   ...DEFAUlT_CHANNEL_STATE,
   ...generateToggles(DEFAUlT_CHANNEL_VALUES, set),
-  toggleIsOn: index => set(state => {
-    const isOn = [...state.isOn]
-    isOn[index] = !isOn[index];
-    return { ...state, isOn }
-  }),
+  toggleIsOn: index =>
+    set(state => {
+      const isOn = [...state.isOn];
+      isOn[index] = !isOn[index];
+      return { ...state, isOn };
+    }),
   setLoader: loader => set(state => ({ ...state, loader })),
   setPropertyForChannel: (channel, property, value) =>
     set(state => {
@@ -93,8 +94,10 @@ export const useChannelsStore = create(set => ({
     set(state => {
       const newState = { ...state };
       properties.forEach((property, propertyIndex) => {
+        const newValues = [...state[property]];
         channels.forEach(channel => {
-          newState[property][channel] = values[propertyIndex][channel];
+          newValues[channel] = values[propertyIndex][channel];
+          newState[property] = newValues;
         });
       });
       return { ...state, ...newState };

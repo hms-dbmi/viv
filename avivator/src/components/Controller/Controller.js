@@ -114,11 +114,15 @@ const Controller = () => {
     <Menu maxHeight={viewSize.height}>
       {useColormap && <ColormapSelect />}
       {use3d && <RenderingModeSelect />}
-      {useLens && !colormap && (
-        <LensSelect
-          channelOptions={selections.map(sel => channelOptions[sel.c])}
-        />
-      )}
+      {useLens &&
+        !colormap &&
+        labels &&
+        shape &&
+        shape[labels.indexOf('c')] > 1 && (
+          <LensSelect
+            channelOptions={selections.map(sel => channelOptions[sel.c])}
+          />
+        )}
       {globalControllers}
       {!isLoading && !isRgb ? (
         <Grid container>{channelControllers}</Grid>
@@ -128,17 +132,15 @@ const Controller = () => {
         </Grid>
       )}
       {!isRgb && <AddChannel />}
-      {loader.length > 0 &&
-        loader[0].shape[loader[0].labels.indexOf('z')] > 1 && <VolumeButton />}
+      {labels && shape && shape[labels.indexOf('z')] > 1 && <VolumeButton />}
       {!use3d && <PictureInPictureToggle />}
       {!use3d && <SideBySideToggle />}
-      {useLinkedView &&
-        !use3d && (
-          <>
-            <ZoomLockToggle />
-            <PanLockToggle />
-          </>
-        )}
+      {useLinkedView && !use3d && (
+        <>
+          <ZoomLockToggle />
+          <PanLockToggle />
+        </>
+      )}
       {use3d && <Slicer />}
     </Menu>
   );
