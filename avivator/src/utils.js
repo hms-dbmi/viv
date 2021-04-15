@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { fromBlob, fromFile, fromUrl } from 'geotiff';
 
-import { loadOmeTiff, loadBioformatsZarr, getChannelStats } from '../../dist';
+import {
+  loadOmeTiff,
+  loadBioformatsZarr,
+  getChannelStats,
+} from '@hms-dbmi/viv';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
 
