@@ -18,7 +18,7 @@ import { RENDERING_MODES } from '../constants';
  * @param {Array} [props.resolution] Resolution at which you would like to see the volume and load it into memory (0 highest, loader.length - 1 the lowest with default loader.length - 1)
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * @param {Array} [props.renderingMode] One of Maximum Intensity Projection, Minimum Intensity Projection, or Additive
- * @param {Matrix4} [props.modelMatrix] A column major affine transformation to be applied to the volume.
+ * @param {Object} [props.modelMatrix] A column major affine transformation to be applied to the volume.
  * @param {Array} [props.xSlice] 0-1 interval on which to slice the volume.
  * @param {Array} [props.ySlice] 0-1 interval on which to slice the volume.
  * @param {Array} [props.zSlice] 0-1 interval on which to slice the volume.
@@ -27,6 +27,7 @@ import { RENDERING_MODES } from '../constants';
  * internally by default using getDefaultInitialViewState).
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
+ * @param {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  */
 
 const VolumeViewer = props => {
@@ -47,7 +48,8 @@ const VolumeViewer = props => {
     onViewportLoad,
     height: screenHeight,
     width: screenWidth,
-    viewStates: viewStatesProp
+    viewStates: viewStatesProp,
+    clippingPlanes = []
   } = props;
   const volumeViewState = viewStatesProp?.find(state => state.id === '3d');
   const initialViewState = useMemo(() => {
@@ -99,7 +101,8 @@ const VolumeViewer = props => {
     resolution,
     renderingMode,
     modelMatrix,
-    onViewportLoad
+    onViewportLoad,
+    clippingPlanes
   };
   const views = [volumeView];
   const layerProps = [layerConfig];
