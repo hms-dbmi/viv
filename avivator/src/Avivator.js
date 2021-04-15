@@ -10,8 +10,10 @@ import AddIcon from '@material-ui/icons/Add';
 import {
   SideBySideViewer,
   PictureInPictureViewer,
-  getChannelStats
-} from '../../dist';
+  VolumeViewer,
+  getChannelStats,
+  RENDERING_MODES
+} from '@hms-dbmi/viv';
 import {
   createLoader,
   channelsReducer,
@@ -28,6 +30,9 @@ import Menu from './components/Menu';
 import ColormapSelect from './components/ColormapSelect';
 import GlobalSelectionSlider from './components/GlobalSelectionSlider';
 import LensSelect from './components/LensSelect';
+import VolumeButton from './components/VolumeButton';
+import RenderingModeSelect from './components/RenderingModeSelect';
+import Slicer from './components/Slicer';
 import {
   LoaderError,
   OffsetsWarning,
@@ -69,6 +74,7 @@ export default function Avivator(props) {
   const [lensSelection, setLensSelection] = useState(0);
   const [source, setSource] = useState(initSource);
   const [colormap, setColormap] = useState('');
+  const [renderingMode, setRenderingMode] = useState(RENDERING_MODES.ADDITIVE);
   const [isLoading, setIsLoading] = useState(true);
   const [pixelValues, setPixelValues] = useState([]);
   const [dimensions, setDimensions] = useState([]);
@@ -78,6 +84,10 @@ export default function Avivator(props) {
     on: false,
     message: null
   });
+  const [xSlice, setXSlice] = useState([0, 1]);
+  const [ySlice, setYSlice] = useState([0, 1]);
+  const [zSlice, setZSlice] = useState([0, 1]);
+  const [resolution, on3DResolutionSelect] = useState(0);
   const [noImageUrlSnackbarIsOn, toggleNoImageUrlSnackbar] = useState(
     isDemoImage
   );
@@ -89,17 +99,18 @@ export default function Avivator(props) {
   const [panLock, togglePanLock] = useReducer(v => !v, true);
   const [isLensOn, toggleIsLensOn] = useReducer(v => !v, false);
   const [channels, dispatch] = useReducer(channelsReducer, initialChannels);
-
+  const [use3d, toggleUse3d] = useReducer(v => !v, false);
   useEffect(() => {
     async function changeLoader() {
       setIsLoading(true);
       const { urlOrFile } = source;
-      const { data: nextLoader, metadata: nextMeta } = await createLoader(
-        urlOrFile,
-        toggleOffsetsSnackbar,
-        message => setLoaderErrorSnackbar({ on: true, message })
+      const {
+        data: nextLoader,
+        metadata: nextMeta
+      } = await createLoader(urlOrFile, toggleOffsetsSnackbar, message =>
+        setLoaderErrorSnackbar({ on: true, message })
       );
-      
+
       if (nextLoader) {
         const selections = buildDefaultSelection(nextLoader[0]);
         const { Channels } = nextMeta.Pixels;
@@ -120,15 +131,15 @@ export default function Avivator(props) {
           [0, 255, 0],
           [0, 0, 255]
         ];
-
-        const source = nextLoader[nextLoader.length - 1];
+        const lowResSource = nextLoader[nextLoader.length - 1];
         const isRgb = guessRgb(nextMeta);
         if (!isRgb) {
-          
-          const stats = await Promise.all(selections.map(async selection => {
-            const raster = await source.getRaster({ selection });
-            return getChannelStats(raster.data);
-          }));
+          const stats = await Promise.all(
+            selections.map(async selection => {
+              const raster = await lowResSource.getRaster({ selection });
+              return getChannelStats(raster.data);
+            })
+          );
 
           domains = stats.map(stat => stat.domain);
           sliders = stats.map(stat => stat.autoSliders);
@@ -142,13 +153,13 @@ export default function Avivator(props) {
           isLensOn && toggleIsLensOn(); // eslint-disable-line no-unused-expressions
         }
 
-        const { labels, shape } = source;
+        const { labels, shape } = lowResSource;
         const newDimensions = labels.map((l, i) => {
           return {
-            field: l, 
-            values: l === 'c' ? channelOptions : range(shape[i]),
-          }
-        })
+            field: l,
+            values: l === 'c' ? channelOptions : range(shape[i])
+          };
+        });
         setDimensions(newDimensions);
         dispatch({
           type: 'RESET_CHANNELS',
@@ -165,6 +176,7 @@ export default function Avivator(props) {
         setPixelValues(new Array(selections.length).fill(FILL_PIXEL_VALUE));
         // Set the global selections (needed for the UI). All selections have the same global selection.
         setGlobalSelections(selections[0]);
+        if (use3d) toggleUse3d();
         // eslint-disable-next-line no-unused-expressions
         history?.push(
           typeof urlOrFile === 'string' ? `?image_url=${urlOrFile}` : ''
@@ -173,6 +185,103 @@ export default function Avivator(props) {
     }
     changeLoader();
   }, [source, history]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    async function updateStatsFor3D() {
+      if (!use3d) {
+        const { selections } = channels;
+        const lowResSource = loader[loader.length - 1];
+        const stats = await Promise.all(
+          selections.map(async selection => {
+            const raster = await lowResSource.getRaster({ selection });
+            return getChannelStats(raster.data);
+          })
+        );
+        const domains = stats.map(stat => stat.domain);
+        const sliders = stats.map(stat => stat.autoSliders);
+
+        domains.forEach((domain, index) =>
+          dispatch({
+            type: 'CHANGE_DOMAIN',
+            value: domain,
+            index
+          })
+        );
+        sliders.forEach((slider, index) =>
+          dispatch({
+            type: 'CHANGE_SLIDER',
+            value: slider,
+            index
+          })
+        );
+      } else {
+        const { selections } = channels;
+        const lowResSource = loader[loader.length - 1];
+        const { labels, shape } = lowResSource;
+        const sizeZ = shape[labels.indexOf('z')] >> (loader.length - 1);
+        const stats = await Promise.all(
+          selections.map(async selection => {
+            const raster0 = await lowResSource.getRaster({
+              selection: { ...selection, z: 0 }
+            });
+            const rasterMid = await lowResSource.getRaster({
+              selection: { ...selection, z: Math.floor(sizeZ / 2) }
+            });
+            const rasterTop = await lowResSource.getRaster({
+              selection: { ...selection, z: sizeZ - 1 }
+            });
+            const stats0 = getChannelStats(raster0.data);
+            const statsMid = getChannelStats(rasterMid.data);
+            const statsTop = getChannelStats(rasterTop.data);
+            return {
+              domain: [
+                Math.min(
+                  stats0.domain[0],
+                  statsMid.domain[0],
+                  statsTop.domain[0]
+                ),
+                Math.max(
+                  stats0.domain[1],
+                  statsMid.domain[1],
+                  statsTop.domain[1]
+                )
+              ],
+              autoSliders: [
+                Math.min(
+                  stats0.autoSliders[0],
+                  statsMid.autoSliders[0],
+                  statsTop.autoSliders[0]
+                ),
+                Math.max(
+                  stats0.autoSliders[1],
+                  statsMid.autoSliders[1],
+                  statsTop.autoSliders[1]
+                )
+              ]
+            };
+          })
+        );
+        const domains = stats.map(stat => stat.domain);
+        const sliders = stats.map(stat => stat.autoSliders);
+
+        domains.forEach((domain, index) =>
+          dispatch({
+            type: 'CHANGE_DOMAIN',
+            value: domain,
+            index
+          })
+        );
+        sliders.forEach((slider, index) =>
+          dispatch({
+            type: 'CHANGE_SLIDER',
+            value: slider,
+            index
+          })
+        );
+      }
+    }
+    updateStatsFor3D();
+  }, [use3d, source]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmitNewUrl = (event, url) => {
     event.preventDefault();
@@ -196,7 +305,9 @@ export default function Avivator(props) {
     // Only update image on screen on a mouseup event for the same reason as above.
     if (mouseUp) {
       const stats = await Promise.all(
-        loaderSelection.map(selection => getSingleSelectionStats({ loader, selection }))
+        loaderSelection.map(selection =>
+          getSingleSelectionStats({ loader, selection })
+        )
       );
       const domains = stats.map(stat => stat.domain);
       const sliders = stats.map(stat => stat.slider);
@@ -282,14 +393,11 @@ export default function Avivator(props) {
   const isPyramid = loader.length > 0;
   const isRgb = metadata && guessRgb(metadata);
   const dtype = loader[0];
-
-
   const { colors, sliders, isOn, ids, selections, domains } = channels;
   const globalControlDimensions = dimensions?.filter(dimension =>
     GLOBAL_SLIDER_DIMENSION_FIELDS.includes(dimension.field)
   );
-  const channelOptions = dimensions.filter(j => j.field === 'c')[0]
-    ?.values;
+  const channelOptions = dimensions.filter(j => j.field === 'c')[0]?.values;
   const channelControllers = ids.map((id, i) => {
     const name = channelOptions[selections[i].c];
     return (
@@ -317,7 +425,7 @@ export default function Avivator(props) {
   });
   const globalControllers = globalControlDimensions.map(dimension => {
     // Only return a slider if there is a "stack."
-    return dimension.values.length > 1 ? (
+    return dimension.values.length > 1 && !use3d ? (
       <GlobalSelectionSlider
         key={dimension.field}
         dimension={dimension}
@@ -333,6 +441,7 @@ export default function Avivator(props) {
       {
         <DropzoneWrapper handleSubmitFile={handleSubmitFile}>
           {!isLoading &&
+            !use3d &&
             (useLinkedView && isPyramid ? (
               <SideBySideViewer
                 loader={loader}
@@ -366,6 +475,21 @@ export default function Avivator(props) {
                 isLensOn={isLensOn}
               />
             ))}
+          {use3d && !isLoading && (
+            <VolumeViewer
+              loader={loader}
+              sliderValues={sliders}
+              colorValues={colors}
+              channelIsOn={isOn}
+              loaderSelection={selections}
+              colormap={colormap.length > 0 && colormap}
+              xSlice={xSlice}
+              ySlice={ySlice}
+              zSlice={zSlice}
+              resolution={resolution}
+              renderingMode={renderingMode}
+            />
+          )}
         </DropzoneWrapper>
       }
       {
@@ -384,14 +508,19 @@ export default function Avivator(props) {
               disabled={isLoading}
             />
           )}
-          {!isRgb && channelOptions?.length > 1 && !colormap && (
+          {use3d && (
+            <RenderingModeSelect
+              value={renderingMode}
+              handleChange={setRenderingMode}
+              disabled={isLoading}
+            />
+          )}
+          {!isRgb && channelOptions?.length > 1 && !colormap && !use3d && (
             <LensSelect
               handleToggle={toggleIsLensOn}
               handleSelection={setLensSelection}
               isOn={isLensOn}
-              channelOptions={selections.map(
-                sel => channelOptions[sel.c]
-              )}
+              channelOptions={selections.map(sel => channelOptions[sel.c])}
               lensSelection={lensSelection}
             />
           )}
@@ -416,24 +545,38 @@ export default function Avivator(props) {
               Add Channel
             </Button>
           )}
-          <Button
-            disabled={!isPyramid || isLoading || useLinkedView}
-            onClick={() => setOverviewOn(prev => !prev)}
-            variant="outlined"
-            size="small"
-            fullWidth
-          >
-            {overviewOn ? 'Hide' : 'Show'} Picture-In-Picture
-          </Button>
-          <Button
-            disabled={!isPyramid || isLoading || overviewOn}
-            onClick={toggleLinkedView}
-            variant="outlined"
-            size="small"
-            fullWidth
-          >
-            {useLinkedView ? 'Hide' : 'Show'} Side-by-Side
-          </Button>
+          {loader.length > 0 &&
+            loader[0].shape[loader[0].labels.indexOf('z')] > 1 && (
+              <VolumeButton
+                toggleUse3d={toggleUse3d}
+                fullWidth
+                loader={loader}
+                use3d={use3d}
+                on3DResolutionSelect={on3DResolutionSelect}
+              />
+            )}
+          {!use3d && (
+            <Button
+              disabled={!isPyramid || isLoading || useLinkedView}
+              onClick={() => setOverviewOn(prev => !prev)}
+              variant="outlined"
+              size="small"
+              fullWidth
+            >
+              {overviewOn ? 'Hide' : 'Show'} Picture-In-Picture
+            </Button>
+          )}
+          {!use3d && (
+            <Button
+              disabled={!isPyramid || isLoading || overviewOn}
+              onClick={toggleLinkedView}
+              variant="outlined"
+              size="small"
+              fullWidth
+            >
+              {useLinkedView ? 'Hide' : 'Show'} Side-by-Side
+            </Button>
+          )}
           {useLinkedView && (
             <>
               <Button
@@ -455,6 +598,16 @@ export default function Avivator(props) {
                 {panLock ? 'Unlock' : 'Lock'} Pan
               </Button>
             </>
+          )}
+          {use3d && (
+            <Slicer
+              xSlice={xSlice}
+              setXSlice={setXSlice}
+              ySlice={ySlice}
+              setYSlice={setYSlice}
+              zSlice={zSlice}
+              setZSlice={setZSlice}
+            />
           )}
         </Menu>
       }

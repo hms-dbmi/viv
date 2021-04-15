@@ -5,7 +5,7 @@ import {
   loadOmeTiff,
   loadBioformatsZarr,
   getChannelStats,
-} from '../../dist';
+} from '@hms-dbmi/viv';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
 
@@ -229,6 +229,12 @@ export function channelsReducer(state, { index, value, type }) {
       const sliders = [...state.sliders];
       sliders[index] = value;
       return { ...state, sliders };
+    }
+    case 'CHANGE_DOMAIN': {
+      // Changes slider for individual channel by index
+      const domains = [...state.domains];
+      domains[index] = value;
+      return { ...state, domains };
     }
     case 'TOGGLE_ON': {
       // Toggles invidiual channel on and off by index
