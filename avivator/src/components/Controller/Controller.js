@@ -116,7 +116,8 @@ const Controller = () => {
       {use3d && <RenderingModeSelect />}
       {useLens &&
         !colormap &&
-        loader[0].shape[loader[0].labels.indexOf('c')] > 1 && (
+        loader &&
+        loader[0]?.shape[loader[0].labels.indexOf('c')] > 1 && (
           <LensSelect
             channelOptions={selections.map(sel => channelOptions[sel.c])}
           />

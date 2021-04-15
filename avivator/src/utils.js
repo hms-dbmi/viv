@@ -4,8 +4,8 @@ import { fromBlob, fromFile, fromUrl } from 'geotiff';
 import {
   loadOmeTiff,
   loadBioformatsZarr,
-  getChannelStats,
-// eslint-disable-next-line import/no-unresolved
+  getChannelStats
+  // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
@@ -297,4 +297,11 @@ export function guessRgb({ Pixels }) {
     Pixels.SizeC === 3 && numChannels === 1 && Pixels.Interleaved;
 
   return SamplesPerPixel === 3 || is3Channel8Bit || interleavedRgb;
+}
+export function truncateDecimalNumber(value, maxLength) {
+  if (!value && value !== 0) return '';
+  const stringValue = value.toString();
+  return stringValue.length > maxLength
+    ? stringValue.substring(0, maxLength).replace(/\.$/, '')
+    : stringValue;
 }

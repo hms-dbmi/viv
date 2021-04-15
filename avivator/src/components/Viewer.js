@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
+import { Plane } from '@math.gl/culling';
 import {
   SideBySideViewer,
   PictureInPictureViewer,
@@ -13,7 +14,6 @@ import {
 } from '../state';
 import { useWindowSize } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
-// eslint-disable-line import/extensions,import/no-unresolved
 
 const Viewer = () => {
   const { useLinkedView, setViewerState, use3d } = useViewerStore();
@@ -23,15 +23,22 @@ const Viewer = () => {
     lensSelection,
     colormap,
     renderingMode,
-    xSlice,
-    ySlice,
-    zSlice,
+    clippingPlaneSphericalNormals,
+    clippingPlaneDistances,
+    isNormalPositive,
     resolution,
     isLensOn,
     zoomLock,
     panLock,
     isOverviewOn
   } = useImageSettingsStore();
+  const clippingPlanes = clippingPlaneSphericalNormals.map(
+    (v, i) =>
+      new Plane(
+        v.toVector3().scale(isNormalPositive ? 1 : -1),
+        (isNormalPositive ? 1 : -1) * clippingPlaneDistances[i]
+      )
+  );
   return use3d ? (
     <VolumeViewer
       loader={loader}
@@ -40,9 +47,7 @@ const Viewer = () => {
       channelIsOn={isOn}
       loaderSelection={selections}
       colormap={colormap.length > 0 && colormap}
-      xSlice={xSlice}
-      ySlice={ySlice}
-      zSlice={zSlice}
+      clippingPlanes={clippingPlanes}
       resolution={resolution}
       renderingMode={renderingMode}
       height={viewSize.height}

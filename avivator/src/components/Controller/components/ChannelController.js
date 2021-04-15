@@ -6,8 +6,6 @@ import Slider from '@material-ui/core/Slider';
 import Select from '@material-ui/core/Select';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import { makeStyles } from '@material-ui/core/styles';
-
 import ChannelOptions from './ChannelOptions';
 import { FILL_PIXEL_VALUE } from '../../../constants';
 import {
@@ -15,6 +13,7 @@ import {
   useImageSettingsStore,
   useViewerStore
 } from '../../../state';
+import { truncateDecimalNumber } from '../../../utils';
 
 export const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
 
@@ -22,14 +21,6 @@ const toRgb = (on, arr) => {
   const color = on ? COLORMAP_SLIDER_CHECKBOX_COLOR : arr;
   return `rgb(${color})`;
 };
-
-function truncateDecimalNumber(value, maxLength) {
-  if (!value && value !== 0) return '';
-  const stringValue = value.toString();
-  return stringValue.length > maxLength
-    ? stringValue.substring(0, maxLength).replace(/\.$/, '')
-    : stringValue;
-}
 
 // If the channel is not on, display nothing.
 // If the channel has a not-undefined value, show it.

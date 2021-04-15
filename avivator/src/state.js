@@ -4,7 +4,8 @@ import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import isFunction from 'lodash/isFunction';
 import shallow from 'zustand/shallow';
-
+import { _SphericalCoordinates as SphericalCoordinates } from '@math.gl/core';
+import { Plane } from '@math.gl/culling';
 // eslint-disable-next-line import/no-unresolved
 import { RENDERING_MODES } from '@hms-dbmi/viv';
 
@@ -51,11 +52,12 @@ const DEFAUlT_CHANNEL_VALUES = {
 export const useChannelsStore = create(set => ({
   ...DEFAUlT_CHANNEL_STATE,
   ...generateToggles(DEFAUlT_CHANNEL_VALUES, set),
-  toggleIsOn: index => set(state => {
-    const isOn = [...state.isOn]
-    isOn[index] = !isOn[index];
-    return { ...state, isOn }
-  }),
+  toggleIsOn: index =>
+    set(state => {
+      const isOn = [...state.isOn];
+      isOn[index] = !isOn[index];
+      return { ...state, isOn };
+    }),
   setLoader: loader => set(state => ({ ...state, loader })),
   setPropertyForChannel: (channel, property, value) =>
     set(state => {
@@ -153,14 +155,14 @@ const DEFAULT_IMAGE_STATE = {
   lensSelection: 0,
   colormap: '',
   renderingMode: RENDERING_MODES.MAX_INTENSITY_PROJECTION,
-  xSlice: [0, 1],
-  ySlice: [0, 1],
-  zSlice: [0, 1],
+  clippingPlaneSphericalNormals: [new SphericalCoordinates()],
+  clippingPlaneDistances: [0],
   resolution: 0,
   isLensOn: false,
   zoomLock: true,
   panLock: true,
-  isOverviewOn: false
+  isOverviewOn: false,
+  isNormalPositive: true
 };
 
 export const useImageSettingsStore = create(set => ({
@@ -170,7 +172,28 @@ export const useImageSettingsStore = create(set => ({
     set(state => ({
       ...state,
       [property]: value
-    }))
+    })),
+  setClippingPlaneSettings: (index, prop, val) =>
+    set(state => {
+      if (!['radius', 'theta', 'phi'].includes(prop)) {
+        throw new Error(`prop ${prop} for setting clipping plane not found`);
+      }
+      const newState = {};
+      newState.clippingPlaneSphericalNormals = [
+        ...state.clippingPlaneSphericalNormals
+      ];
+      newState.clippingPlaneDistances = [...state.clippingPlaneDistances];
+      const newSpherical = state.clippingPlaneSphericalNormals[index];
+      let newDistance = state.clippingPlaneDistances[index];
+      if (['theta', 'phi'].includes(prop)) {
+        newSpherical[prop] = val;
+      } else {
+        newDistance = val;
+      }
+      newState.clippingPlaneSphericalNormals[index] = newSpherical;
+      newState.clippingPlaneDistances[index] = newDistance;
+      return { ...state, ...newState };
+    })
 }));
 
 const DEFAULT_VIEWER_STATE = {
