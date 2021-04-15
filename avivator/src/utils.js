@@ -5,7 +5,7 @@ import {
   loadOmeTiff,
   loadBioformatsZarr,
   getChannelStats,
-} from '../../dist';
+} from '@hms-dbmi/viv';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
 

@@ -13,7 +13,7 @@ import {
   VolumeViewer,
   getChannelStats,
   RENDERING_MODES
-} from '../../dist';
+} from '@hms-dbmi/viv';
 import {
   createLoader,
   channelsReducer,
