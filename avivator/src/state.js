@@ -95,8 +95,10 @@ export const useChannelsStore = create(set => ({
     set(state => {
       const newState = { ...state };
       properties.forEach((property, propertyIndex) => {
+        const newValues = [...state[property]];
         channels.forEach(channel => {
-          newState[property][channel] = values[propertyIndex][channel];
+          newValues[channel] = values[propertyIndex][channel];
+          newState[property] = newValues;
         });
       });
       return { ...state, ...newState };

@@ -116,8 +116,9 @@ const Controller = () => {
       {use3d && <RenderingModeSelect />}
       {useLens &&
         !colormap &&
-        loader &&
-        loader[0]?.shape[loader[0].labels.indexOf('c')] > 1 && (
+        labels &&
+        shape &&
+        shape[labels.indexOf('c')] > 1 && (
           <LensSelect
             channelOptions={selections.map(sel => channelOptions[sel.c])}
           />
@@ -131,8 +132,7 @@ const Controller = () => {
         </Grid>
       )}
       {!isRgb && <AddChannel />}
-      {loader.length > 0 &&
-        loader[0].shape[loader[0].labels.indexOf('z')] > 1 && <VolumeButton />}
+      {labels && shape && shape[labels.indexOf('z')] > 1 && <VolumeButton />}
       {!use3d && <PictureInPictureToggle />}
       {!use3d && <SideBySideToggle />}
       {useLinkedView && !use3d && (
