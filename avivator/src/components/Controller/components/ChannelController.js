@@ -23,16 +23,6 @@ const toRgb = (on, arr) => {
   return `rgb(${color})`;
 };
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    paddingTop: theme.spacing(1)
-  },
-  icon: {
-    color: theme.palette.text.primary,
-    marginTop: '4px'
-  }
-}));
-
 function truncateDecimalNumber(value, maxLength) {
   if (!value && value !== 0) return '';
   const stringValue = value.toString();
@@ -74,19 +64,12 @@ function ChannelController({
   const { useLinkedView, channelOptions } = useViewerStore();
   const shouldShowPixelValue = !useLinkedView;
   const rgbColor = toRgb(colormap, color);
-  const classes = useStyles();
   const [min, max] = domain;
   // If the min/max range is and the dtype is float, make the step size smaller so sliders are smoother.
   const step =
     max - min < 500 && loader[0]?.dtype === 'Float32' ? (max - min) / 500 : 1;
   return (
-    <Grid
-      container
-      direction="column"
-      m={2}
-      justify="center"
-      className={classes.root}
-    >
+    <Grid container direction="column" m={2} justify="center">
       <Grid container direction="row" justify="space-between">
         <Grid item xs={11}>
           <Select native value={name} onChange={onSelectionChange}>
