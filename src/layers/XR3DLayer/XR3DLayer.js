@@ -29,10 +29,11 @@ import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer } from '@deck.gl/core';
 import { Model, Geometry, Texture3D, setParameters } from '@luma.gl/core';
 import { Matrix4 } from 'math.gl';
+import { Plane } from '@math.gl/culling';
 import vs from './xr-layer-vertex.glsl';
 import fs from './xr-layer-fragment.glsl';
 import channels from './channel-intensity-module';
-import { padColorsAndSliders } from '../utils';
+import { padColorsAndSliders, padWithDefault } from '../utils';
 import {
   DTYPE_VALUES,
   COLORMAPS,
@@ -60,6 +61,7 @@ const CUBE_STRIP = [
 	1, 0, 0,
 	0, 0, 0
 ];
+const _NUM_PLANES_DEFAULT = 1;
 
 const defaultProps = {
   pickable: false,
@@ -72,6 +74,7 @@ const defaultProps = {
   xSlice: { type: 'array', value: [0, 1], compare: true },
   ySlice: { type: 'array', value: [0, 1], compare: true },
   zSlice: { type: 'array', value: [0, 1], compare: true },
+  clippingPlanes: { type: 'array', value: [], compare: true },
   renderingMode: {
     type: 'string',
     value: RENDERING_NAMES.ADDITIVE,
@@ -117,6 +120,7 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * @property {Array.<number>=} xSlice 0-1 interval on which to slice the volume.
  * @property {Array.<number>=} ySlice 0-1 interval on which to slice the volume.
  * @property {Array.<number>=} zSlice 0-1 interval on which to slice the volume.
+ * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  */
 
 /**
@@ -146,7 +150,7 @@ const XR3DLayer = class extends Layer {
    * This function compiles the shaders and the projection module.
    */
   getShaders() {
-    const { colormap, renderingMode } = this.props;
+    const { colormap, renderingMode, clippingPlanes } = this.props;
     const { _BEFORE_RENDER, _RENDER, _AFTER_RENDER } = colormap
       ? RENDERING_MODES_COLORMAP[renderingMode]
       : RENDERING_MODES_BLEND[renderingMode];
@@ -158,7 +162,8 @@ const XR3DLayer = class extends Layer {
         .replace('_RENDER', _RENDER)
         .replace('_AFTER_RENDER', _AFTER_RENDER),
       defines: {
-        _COLORMAP_FUNCTION: colormap || 'viridis'
+        _COLORMAP_FUNCTION: colormap || 'viridis',
+        _NUM_PLANES: String(clippingPlanes.length || _NUM_PLANES_DEFAULT)
       },
       modules: [channelsModules]
     });
@@ -184,7 +189,8 @@ const XR3DLayer = class extends Layer {
     if (
       changeFlags.extensionsChanged ||
       props.colormap !== oldProps.colormap ||
-      props.renderingMode !== oldProps.renderingMode
+      props.renderingMode !== oldProps.renderingMode ||
+      props.clippingPlanes.length !== oldProps.clippingPlanes.length
     ) {
       const { gl } = this.context;
       if (this.state.model) {
@@ -232,7 +238,8 @@ const XR3DLayer = class extends Layer {
       modelMatrix,
       channelIsOn,
       domain,
-      dtype
+      dtype,
+      clippingPlanes
     } = this.props;
     const {
       viewMatrix,
@@ -247,6 +254,14 @@ const XR3DLayer = class extends Layer {
         domain,
         dtype
       });
+      const paddedClippingPlanes = padWithDefault(
+        [...clippingPlanes],
+        new Plane([1, 0, 0]),
+        clippingPlanes.length || _NUM_PLANES_DEFAULT
+      );
+      // Need to flatten for shaders.
+      const normals = paddedClippingPlanes.map(plane => plane.normal).flat();
+      const distances = paddedClippingPlanes.map(plane => plane.distance);
       model
         .setUniforms({
           ...uniforms,
@@ -264,7 +279,9 @@ const XR3DLayer = class extends Layer {
           view: viewMatrix,
           proj: projectionMatrix,
           scale: new Matrix4().scale(volDims),
-          model: modelMatrix || new Matrix4()
+          model: modelMatrix || new Matrix4(),
+          normals,
+          distances
         })
         .draw();
     }

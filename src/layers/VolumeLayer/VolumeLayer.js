@@ -30,6 +30,7 @@ const defaultProps = {
   xSlice: { type: 'array', value: [0, 1], compare: true },
   ySlice: { type: 'array', value: [0, 1], compare: true },
   zSlice: { type: 'array', value: [0, 1], compare: true },
+  clippingPlanes: { type: 'array', value: [], compare: true },
   renderingMode: {
     type: 'string',
     value: RENDERING_MODES.MAX_INTENSITY_PROJECTION,
@@ -55,6 +56,7 @@ const defaultProps = {
  * @property {Array.<number>=} ySlice 0-1 interval on which to slice the volume.
  * @property {Array.<number>=} zSlice 0-1 interval on which to slice the volume.
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
+ * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  */
 
 /**
