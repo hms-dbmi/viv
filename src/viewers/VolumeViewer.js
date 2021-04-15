@@ -24,7 +24,6 @@ import { RENDERING_MODES } from '../constants';
  * @param {Array} [props.zSlice] 0-1 interval on which to slice the volume.
  * @param {function} [props.onViewportLoad] Function that gets called when the data in the viewport loads.
  * @param {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
- * @param {number=} numPlanes Number of planes by which to clip.  Only needs to be set if more than 6.
  */
 
 const VolumeViewer = props => {
