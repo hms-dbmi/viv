@@ -4,7 +4,7 @@ import {
   SideBySideViewer,
   PictureInPictureViewer,
   VolumeViewer
-// eslint-disable-next-line import/no-unresolved
+  // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 import {
   useImageSettingsStore,
@@ -13,7 +13,7 @@ import {
 } from '../state';
 import { useWindowSize } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
- // eslint-disable-line import/extensions,import/no-unresolved
+// eslint-disable-line import/extensions,import/no-unresolved
 
 const Viewer = () => {
   const { useLinkedView, setViewerState, use3d } = useViewerStore();
