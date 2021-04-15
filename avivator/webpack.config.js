@@ -38,7 +38,8 @@ module.exports = {
     },
     alias: {
       react: path.resolve(__dirname, 'node_modules/react'),
-      'react-dom': path.resolve(__dirname, 'node_modules/react-dom')
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+      '@hms-dbmi/viv': path.resolve(__dirname, '../dist')
     }
   },
   plugins: [
