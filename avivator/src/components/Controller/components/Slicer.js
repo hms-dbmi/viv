@@ -6,12 +6,12 @@ import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import { useImageSettingsStore } from '../../../state';
 import { truncateDecimalNumber } from '../../../utils';
+import { EPSILON } from '../../../constants';
 
 const Slicer = () => {
   const {
     setClippingPlaneSettings,
-    clippingPlaneSphericalNormals: [spherical],
-    clippingPlaneDistances: [distance],
+    sphericals: [spherical],
     isNormalPositive,
     toggleIsNormalPositive
   } = useImageSettingsStore();
@@ -20,15 +20,20 @@ const Slicer = () => {
       spherical.phi,
       v => setClippingPlaneSettings(0, 'phi', v),
       'ϕ',
-      [0, Math.PI * 2]
+      [EPSILON, Math.PI * 2]
     ],
     [
       spherical.theta,
       v => setClippingPlaneSettings(0, 'theta', v),
       'ϴ',
-      [0, Math.PI]
+      [EPSILON, Math.PI]
     ],
-    [distance, v => setClippingPlaneSettings(0, 'radius', v), 'r', [0, 1]]
+    [
+      spherical.radius,
+      v => setClippingPlaneSettings(0, 'radius', v),
+      'r',
+      [EPSILON, 1]
+    ]
   ];
   return sliceValuesAndSetSliceFunctions.map(
     ([val, setVal, label, [min, max]]) => (

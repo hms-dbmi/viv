@@ -23,8 +23,7 @@ const Viewer = () => {
     lensSelection,
     colormap,
     renderingMode,
-    clippingPlaneSphericalNormals,
-    clippingPlaneDistances,
+    sphericals,
     isNormalPositive,
     resolution,
     isLensOn,
@@ -32,11 +31,11 @@ const Viewer = () => {
     panLock,
     isOverviewOn
   } = useImageSettingsStore();
-  const clippingPlanes = clippingPlaneSphericalNormals.map(
+  const clippingPlanes = sphericals.map(
     (v, i) =>
       new Plane(
         v.toVector3().scale(isNormalPositive ? 1 : -1),
-        (isNormalPositive ? 1 : -1) * clippingPlaneDistances[i]
+        (isNormalPositive ? 1 : -1) * sphericals[i].radius
       )
   );
   return use3d ? (

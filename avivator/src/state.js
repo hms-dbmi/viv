@@ -5,9 +5,10 @@ import pickBy from 'lodash/pickBy';
 import isFunction from 'lodash/isFunction';
 import shallow from 'zustand/shallow';
 import { _SphericalCoordinates as SphericalCoordinates } from '@math.gl/core';
-import { Plane } from '@math.gl/culling';
 // eslint-disable-next-line import/no-unresolved
 import { RENDERING_MODES } from '@hms-dbmi/viv';
+
+import { EPSILON } from './constants';
 
 const keysAndValuesToObject = (keys, values) => {
   const merged = keys.map((k, i) => [k, values[i]]);
@@ -157,8 +158,9 @@ const DEFAULT_IMAGE_STATE = {
   lensSelection: 0,
   colormap: '',
   renderingMode: RENDERING_MODES.MAX_INTENSITY_PROJECTION,
-  clippingPlaneSphericalNormals: [new SphericalCoordinates()],
-  clippingPlaneDistances: [0],
+  sphericals: [
+    new SphericalCoordinates({ radius: EPSILON, phi: EPSILON, theta: EPSILON })
+  ],
   resolution: 0,
   isLensOn: false,
   zoomLock: true,
@@ -181,19 +183,8 @@ export const useImageSettingsStore = create(set => ({
         throw new Error(`prop ${prop} for setting clipping plane not found`);
       }
       const newState = {};
-      newState.clippingPlaneSphericalNormals = [
-        ...state.clippingPlaneSphericalNormals
-      ];
-      newState.clippingPlaneDistances = [...state.clippingPlaneDistances];
-      const newSpherical = state.clippingPlaneSphericalNormals[index];
-      let newDistance = state.clippingPlaneDistances[index];
-      if (['theta', 'phi'].includes(prop)) {
-        newSpherical[prop] = val;
-      } else {
-        newDistance = val;
-      }
-      newState.clippingPlaneSphericalNormals[index] = newSpherical;
-      newState.clippingPlaneDistances[index] = newDistance;
+      newState.sphericals = [...state.sphericals];
+      newState.sphericals[index][prop] = val;
       return { ...state, ...newState };
     })
 }));
