@@ -29,6 +29,7 @@ import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer } from '@deck.gl/core';
 import { Model, Geometry, Texture3D, setParameters } from '@luma.gl/core';
 import { Matrix4 } from 'math.gl';
+import { Plane } from '@math.gl/culling';
 import vs from './xr-layer-vertex.glsl';
 import fs from './xr-layer-fragment.glsl';
 import channels from './channel-intensity-module';
@@ -73,8 +74,7 @@ const defaultProps = {
   xSlice: { type: 'array', value: [0, 1], compare: true },
   ySlice: { type: 'array', value: [0, 1], compare: true },
   zSlice: { type: 'array', value: [0, 1], compare: true },
-  normalClippingPlanes: { type: 'array', value: [], compare: true },
-  offsetClippingPlanes: { type: 'array', value: [], compare: true },
+  clippingPlanes: { type: 'array', value: [], compare: true },
   numPlanes: { type: 'number', value: _NUM_PLANES, compare: true },
   renderingMode: {
     type: 'string',
@@ -121,9 +121,7 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * @property {Array.<number>=} xSlice 0-1 interval on which to slice the volume.
  * @property {Array.<number>=} ySlice 0-1 interval on which to slice the volume.
  * @property {Array.<number>=} zSlice 0-1 interval on which to slice the volume.
- * @property {Array.<Array.<number>>=} normalClippingPlanes List of normal vector for defining the direction of a given clipping plane.
- * Points render in the direction of the normal vector.
- * @property {Array.<Array.<number>>=} offsetClippingPlanes List of "offsets" from the origin (i.e `a` in the equation `n•(r - a) = 0` defining the plane by normal vector `n`) of the plane.
+ * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  * @property {number=} numPlanes Number of planes by which to clip.  Only needs to be set if more than 6.
  */
 
@@ -243,8 +241,7 @@ const XR3DLayer = class extends Layer {
       channelIsOn,
       domain,
       dtype,
-      normalClippingPlanes,
-      offsetClippingPlanes,
+      clippingPlanes,
       numPlanes
     } = this.props;
     const {
@@ -260,6 +257,14 @@ const XR3DLayer = class extends Layer {
         domain,
         dtype
       });
+      const paddedClippingPlanes = padWithDefault(
+        [...clippingPlanes],
+        new Plane([1, 0, 0]),
+        numPlanes || _NUM_PLANES
+      );
+      // Need to flatten for shaders.
+      const normals = paddedClippingPlanes.map(plane => plane.normal).flat();
+      const distances = paddedClippingPlanes.map(plane => plane.distance);
       model
         .setUniforms({
           ...uniforms,
@@ -278,16 +283,8 @@ const XR3DLayer = class extends Layer {
           proj: projectionMatrix,
           scale: new Matrix4().scale(volDims),
           model: modelMatrix || new Matrix4(),
-          normalClippingPlanes: padWithDefault(
-            [...normalClippingPlanes],
-            [1, 0, 0],
-            numPlanes || _NUM_PLANES
-          ).flat(),
-          offsetClippingPlanes: padWithDefault(
-            [...offsetClippingPlanes],
-            [0, 0, 0],
-            numPlanes || _NUM_PLANES
-          ).flat()
+          normals,
+          distances
         })
         .draw();
     }

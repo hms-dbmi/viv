@@ -30,8 +30,7 @@ const defaultProps = {
   xSlice: { type: 'array', value: [0, 1], compare: true },
   ySlice: { type: 'array', value: [0, 1], compare: true },
   zSlice: { type: 'array', value: [0, 1], compare: true },
-  normalClippingPlanes: { type: 'array', value: [], compare: true },
-  offsetClippingPlanes: { type: 'array', value: [], compare: true },
+  clippingPlanes: { type: 'array', value: [], compare: true },
   numPlanes: { type: 'number', value: 6, compare: true },
   renderingMode: {
     type: 'string',
@@ -58,9 +57,7 @@ const defaultProps = {
  * @property {Array.<number>=} ySlice 0-1 interval on which to slice the volume.
  * @property {Array.<number>=} zSlice 0-1 interval on which to slice the volume.
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
- * @property {Array.<Array.<number>>=} normalClippingPlanes List of normal vector for defining the direction of a given clipping plane.
- * Points render in the direction of the normal vector.
- * @property {Array.<Array.<number>>=} offsetClippingPlanes List of "offsets" from the origin (i.e `a` in the equation `n•(r - a) = 0` defining the plane by normal vector `n`) of the plane.
+ * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  * @property {number=} numPlanes Number of planes by which to clip.  Only needs to be set if more than 6.
  */
 
