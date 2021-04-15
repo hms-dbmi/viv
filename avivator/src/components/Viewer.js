@@ -1,17 +1,19 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import {
+  SideBySideViewer,
+  PictureInPictureViewer,
+  VolumeViewer
+// eslint-disable-next-line import/no-unresolved
+} from '@hms-dbmi/viv';
+import {
   useImageSettingsStore,
   useViewerStore,
   useChannelSettings
 } from '../state';
 import { useWindowSize } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
-import {
-  SideBySideViewer,
-  PictureInPictureViewer,
-  VolumeViewer
-} from '../../../dist'; // eslint-disable-line import/extensions,import/no-unresolved
+ // eslint-disable-line import/extensions,import/no-unresolved
 
 const Viewer = () => {
   const { useLinkedView, setViewerState, use3d } = useViewerStore();

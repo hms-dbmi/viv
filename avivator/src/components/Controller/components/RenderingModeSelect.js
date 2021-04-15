@@ -3,7 +3,8 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 
-import { RENDERING_MODES } from '../../../../../dist';
+// eslint-disable-next-line import/no-unresolved
+import { RENDERING_MODES } from '@hms-dbmi/viv';
 import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 function RenderingModeSelect() {

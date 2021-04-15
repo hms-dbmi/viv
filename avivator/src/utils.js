@@ -5,6 +5,7 @@ import {
   loadOmeTiff,
   loadBioformatsZarr,
   getChannelStats,
+// eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';

@@ -5,7 +5,8 @@ import pickBy from 'lodash/pickBy';
 import isFunction from 'lodash/isFunction';
 import shallow from 'zustand/shallow';
 
-import { RENDERING_MODES } from '../../dist';
+// eslint-disable-next-line import/no-unresolved
+import { RENDERING_MODES } from '@hms-dbmi/viv';
 
 const keysAndValuesToObject = (keys, values) => {
   const merged = keys.map((k, i) => [k, values[i]]);
