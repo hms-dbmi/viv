@@ -1,6 +1,7 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
+import debounce from 'lodash/debounce';
 import { range, getMultiSelectionStats } from '../../../utils';
 import {
   useChannelSettings,
@@ -18,6 +19,43 @@ export default function GlobalSelectionSlider(props) {
   const { selections, loader } = useChannelSettings();
   const { setViewerState, globalSelection } = useViewerStore();
   const { setImageSetting } = useImageSettingsStore();
+  const changeSelection = debounce(
+    (event, newValue) => {
+      setViewerState(
+        'isChannelLoading',
+        selections.map(i => true)
+      );
+      const newSelections = [...selections].map(sel => ({
+        ...sel,
+        [label]: newValue
+      }));
+      getMultiSelectionStats({
+        loader,
+        selections: newSelections,
+        use3d: false
+      }).then(({ domains, sliders }) => {
+        setImageSetting('onViewportLoad', () => {
+          setPropertiesForChannels(
+            range(newSelections.length),
+            ['domains', 'sliders'],
+            [domains, sliders]
+          );
+          setImageSetting('onViewportLoad', () => {});
+          setViewerState(
+            'isChannelLoading',
+            selections.map(i => false)
+          );
+        });
+        setPropertyForChannels(
+          range(newSelections.length),
+          'selections',
+          newSelections
+        );
+      });
+    },
+    50,
+    { trailing: true }
+  );
   return (
     <Grid container direction="row" justify="space-between" alignItems="center">
       <Grid item xs={1}>
@@ -26,42 +64,12 @@ export default function GlobalSelectionSlider(props) {
       <Grid item xs={11}>
         <Slider
           value={globalSelection[label]}
-          // See https://github.com/hms-dbmi/viv/issues/176 for why
-          // we have the two handlers.
           onChange={(event, newValue) => {
             setViewerState('globalSelection', {
               ...globalSelection,
               [label]: newValue
             });
-          }}
-          onChangeCommitted={(event, newValue) => {
-            const newSelections = [...selections].map(sel => ({
-              ...sel,
-              [label]: newValue
-            }));
-            getMultiSelectionStats({
-              loader,
-              selections: newSelections,
-              use3d: false
-            }).then(({ domains, sliders }) => {
-              setImageSetting('onViewportLoad', () => {
-                setPropertiesForChannels(
-                  range(newSelections.length),
-                  ['domains', 'sliders'],
-                  [domains, sliders]
-                );
-                setImageSetting('onViewportLoad', () => {});
-              });
-              setPropertyForChannels(
-                range(newSelections.length),
-                'selections',
-                newSelections
-              );
-              setViewerState('globalSelection', {
-                ...globalSelection,
-                [label]: newValue
-              });
-            });
+            changeSelection(event, newValue);
           }}
           valueLabelDisplay="auto"
           getAriaLabel={() => `${label} slider`}

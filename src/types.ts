@@ -18,6 +18,7 @@ export type PixelSourceSelection<S extends string[]> = {
 
 export interface RasterSelection<S extends string[]> {
   selection: PixelSourceSelection<S>;
+  signal?: AbortSignal;
 }
 
 export interface TileSelection<S extends string[]> {

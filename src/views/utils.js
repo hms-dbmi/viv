@@ -82,7 +82,13 @@ export function getImageLayers(id, props) {
       const newProps =
         i !== 0
           ? {
-              onViewportLoad: transitionOnViewportLoad
+              onViewportLoad: args => {
+                // Slightly delay to avoid issues with a render in the middle of a deck.gl layer state update.
+                setTimeout(() => {
+                  onViewportLoad(args);
+                  transitionOnViewportLoad(args);
+                }, 0);
+              }
             }
           : { onViewportLoad };
       if (loader.length > 1 && i !== 0) {
