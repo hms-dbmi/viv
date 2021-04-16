@@ -38,14 +38,17 @@ const AddChannel = () => {
       setImageSetting('onViewportLoad', () => {
         setPropertiesForChannel(
           numSelectionsBeforeAdd,
-          ['domains', 'sliders'],
-          [domain, slider]
+          ['domains', 'sliders', 'isOn'],
+          [domain, slider, true]
         );
         setImageSetting('onViewportLoad', () => {});
         setIsChannelLoading(numSelectionsBeforeAdd, false);
       });
-      addChannel(['selections', 'ids'], [selection, String(Math.random())]);
       addIsChannelLoading(true);
+      addChannel(
+        ['selections', 'ids', 'isOn'],
+        [selection, String(Math.random()), false]
+      );
     });
   };
   return (
