@@ -49,7 +49,8 @@ const Controller = () => {
     useColormap,
     useLens,
     isLoading,
-    pixelValues
+    pixelValues,
+    setViewerState
   } = useViewerStore();
   const viewSize = useWindowSize();
   const isRgb = metadata && guessRgb(metadata);
@@ -63,13 +64,16 @@ const Controller = () => {
         ...selections[i],
         c: channelOptions.indexOf(e.target.value)
       };
-      setPropertyForChannel(i, 'selections', selection);
       getSingleSelectionStats({
         loader,
         selection,
         use3d
       }).then(({ domain, slider }) => {
-        setPropertiesForChannel(i, ['sliders', 'domains'], [slider, domain]);
+        setViewerState('onViewportLoad', () => {
+          setPropertiesForChannel(i, ['sliders', 'domains'], [slider, domain]);
+          setViewerState('onViewportLoad', () => {});
+        });
+        setPropertyForChannel(i, 'selections', selection);
       });
     };
     const toggleIsOn = () => toggleIsOnSetter(i);

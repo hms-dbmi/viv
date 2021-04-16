@@ -11,7 +11,12 @@ import {
 import { getSingleSelectionStats } from '../../../utils';
 
 const AddChannel = () => {
-  const { globalSelection, isLoading, use3d } = useViewerStore();
+  const {
+    globalSelection,
+    isLoading,
+    use3d,
+    setViewerState
+  } = useViewerStore();
   const { loader, selections } = useChannelSettings();
   const { addChannel, setPropertiesForChannel } = useChannelSetters();
   const handleChannelAdd = () => {
@@ -22,18 +27,21 @@ const AddChannel = () => {
     });
     selection = { ...selection, ...globalSelection };
     const numSelectionsBeforeAdd = selections.length;
-    addChannel(['selections', 'ids'], [selection, String(Math.random())]);
     getSingleSelectionStats({
       loader,
       selection,
       use3d
-    }).then(({ domain, slider }) =>
-      setPropertiesForChannel(
-        numSelectionsBeforeAdd,
-        ['domains', 'sliders'],
-        [domain, slider]
-      )
-    );
+    }).then(({ domain, slider }) => {
+      setViewerState('onViewportLoad', () => {
+        setPropertiesForChannel(
+          numSelectionsBeforeAdd,
+          ['domains', 'sliders'],
+          [domain, slider]
+        );
+        setViewerState('onViewportLoad', () => {});
+      });
+      addChannel(['selections', 'ids'], [selection, String(Math.random())]);
+    });
   };
   return (
     <Button

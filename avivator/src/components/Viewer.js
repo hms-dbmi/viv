@@ -16,7 +16,12 @@ import { useWindowSize } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
 
 const Viewer = () => {
-  const { useLinkedView, setViewerState, use3d } = useViewerStore();
+  const {
+    useLinkedView,
+    setViewerState,
+    use3d,
+    onViewportLoad
+  } = useViewerStore();
   const { colors, sliders, isOn, selections, loader } = useChannelSettings();
   const viewSize = useWindowSize();
   const {
@@ -50,6 +55,7 @@ const Viewer = () => {
       renderingMode={renderingMode}
       height={viewSize.height}
       width={viewSize.width}
+      onViewportLoad={onViewportLoad}
     />
   ) : useLinkedView ? (
     <SideBySideViewer
@@ -68,6 +74,7 @@ const Viewer = () => {
       }}
       lensSelection={lensSelection}
       isLensOn={isLensOn}
+      onViewportLoad={onViewportLoad}
     />
   ) : (
     <PictureInPictureViewer
@@ -86,6 +93,7 @@ const Viewer = () => {
       }}
       lensSelection={lensSelection}
       isLensOn={isLensOn}
+      onViewportLoad={onViewportLoad}
     />
   );
 };

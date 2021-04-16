@@ -130,18 +130,21 @@ function VolumeButton() {
                           disableGutters
                           onClick={() => {
                             setImageSetting('resolution', resolution);
-                            toggleUse3d();
                             toggle();
                             getMultiSelectionStats({
                               loader,
                               selections,
                               use3d: true
                             }).then(({ domains, sliders }) => {
-                              setPropertiesForChannels(
-                                range(selections.length),
-                                ['domains', 'sliders'],
-                                [domains, sliders]
-                              );
+                              setViewerState('onViewportLoad', () => {
+                                setPropertiesForChannels(
+                                  range(selections.length),
+                                  ['domains', 'sliders'],
+                                  [domains, sliders]
+                                );
+                                setViewerState('onViewportLoad', () => {});
+                              });
+                              toggleUse3d();
                             });
                             setViewerState('useLens', false);
                           }}

@@ -54,12 +54,13 @@ const SideBySideViewer = props => {
     transparentColor,
     onViewStateChange,
     onHover,
-    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS
+    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
+    onViewportLoad
   } = props;
   const {
     newLoaderSelection,
     oldLoaderSelection,
-    onViewportLoad
+    onViewportLoad: transitionOnViewportLoad
   } = useGlobalSelection(loaderSelection, transitionFields);
   const leftViewState = viewStatesProp?.find(v => v.id === 'left');
   const rightViewState = viewStatesProp?.find(v => v.id === 'right');
@@ -104,6 +105,7 @@ const SideBySideViewer = props => {
     loaderSelection: oldLoaderSelection,
     newLoaderSelection,
     onViewportLoad,
+    transitionOnViewportLoad,
     transitionFields,
     colormap,
     isLensOn,

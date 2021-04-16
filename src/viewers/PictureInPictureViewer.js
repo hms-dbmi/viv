@@ -67,12 +67,13 @@ const PictureInPictureViewer = props => {
     transparentColor,
     onViewStateChange,
     onHover,
-    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS
+    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
+    onViewportLoad
   } = props;
   const {
     newLoaderSelection,
     oldLoaderSelection,
-    onViewportLoad
+    onViewportLoad: transitionOnViewportLoad
   } = useGlobalSelection(loaderSelection, transitionFields);
   const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
   const baseViewState = useMemo(() => {
@@ -96,6 +97,7 @@ const PictureInPictureViewer = props => {
     loaderSelection: oldLoaderSelection,
     newLoaderSelection,
     onViewportLoad,
+    transitionOnViewportLoad,
     transitionFields,
     colormap,
     isLensOn,

@@ -43,9 +43,9 @@ const DEFAUlT_CHANNEL_STATE = {
 
 const DEFAUlT_CHANNEL_VALUES = {
   isOn: true,
-  sliders: [0, 255],
+  sliders: [0, 65535],
   colors: [255, 255, 255],
-  domains: [0, 255],
+  domains: [0, 65535],
   selections: { z: 0, c: 0, t: 0 },
   ids: ''
 };
@@ -204,7 +204,8 @@ const DEFAULT_VIEWER_STATE = {
   globalSelection: { z: 0, t: 0 },
   channelOptions: [],
   metadata: null,
-  source: ''
+  source: '',
+  onViewportLoad: () => {}
 };
 
 export const useViewerStore = create(set => ({

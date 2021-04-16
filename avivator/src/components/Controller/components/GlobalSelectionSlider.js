@@ -37,20 +37,23 @@ export default function GlobalSelectionSlider(props) {
               ...sel,
               [label]: newValue
             }));
-            setPropertyForChannels(
-              range(newSelections.length),
-              'selections',
-              newSelections
-            );
             getMultiSelectionStats({
               loader,
               selections: newSelections,
               use3d: false
             }).then(({ domains, sliders }) => {
-              setPropertiesForChannels(
+              setViewerState('onViewportLoad', () => {
+                setPropertiesForChannels(
+                  range(newSelections.length),
+                  ['domains', 'sliders'],
+                  [domains, sliders]
+                );
+                setViewerState('onViewportLoad', () => {});
+              });
+              setPropertyForChannels(
                 range(newSelections.length),
-                ['domains', 'sliders'],
-                [domains, sliders]
+                'selections',
+                newSelections
               );
               setViewerState('globalSelection', {
                 ...globalSelection,
