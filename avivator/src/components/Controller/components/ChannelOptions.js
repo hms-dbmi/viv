@@ -29,7 +29,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function ChannelOptions({ handleRemoveChannel, handleColorSelect }) {
+function ChannelOptions({ handleRemoveChannel, handleColorSelect, disabled }) {
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
 
@@ -41,6 +41,7 @@ function ChannelOptions({ handleRemoveChannel, handleColorSelect }) {
         size="small"
         onClick={toggle}
         ref={anchorRef}
+        disabled={disabled}
       >
         <MoreVertIcon fontSize="small" />
       </IconButton>

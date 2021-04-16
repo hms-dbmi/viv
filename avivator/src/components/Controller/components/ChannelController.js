@@ -78,6 +78,7 @@ function ChannelController({
           <ChannelOptions
             handleRemoveChannel={handleRemoveChannel}
             handleColorSelect={handleColorSelect}
+            disabled={isLoading}
           />
         </Grid>
       </Grid>
