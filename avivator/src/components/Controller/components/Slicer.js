@@ -1,6 +1,7 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
+import Button from '@material-ui/core/Button';
 import { useImageSettingsStore } from '../../../state';
 import { truncateDecimalNumber } from '../../../utils';
 import { EPSILON } from '../../../constants';
@@ -31,7 +32,7 @@ const Slicer = () => {
       [EPSILON, Math.sqrt(2)]
     ]
   ];
-  return sliceValuesAndSetSliceFunctions.map(
+  const slicers = sliceValuesAndSetSliceFunctions.map(
     ([val, setVal, label, [min, max]]) => (
       <Grid
         container
@@ -62,6 +63,37 @@ const Slicer = () => {
         </Grid>
       </Grid>
     )
+  );
+  const presets = [
+    ['X', [EPSILON, 0.5 * Math.PI, 0.5 * Math.PI]],
+    ['Y', [EPSILON, -0.5 * Math.PI, 0]],
+    ['Z', [EPSILON, 0, 0]]
+  ].map(([label, [radius, theta, phi]]) => (
+    <Grid item xs="auto" key={label}>
+      <Button
+        onClick={() => {
+          setClippingPlaneSettings(0, 'radius', radius);
+          setClippingPlaneSettings(0, 'phi', phi);
+          setClippingPlaneSettings(0, 'theta', theta);
+        }}
+        style={{ padding: 0, paddingTop: 4 }}
+      >
+        {label} Slice
+      </Button>
+    </Grid>
+  ));
+  return (
+    <>
+      <Grid
+        container
+        direction="row"
+        justify="space-between"
+        alignItems="center"
+      >
+        {presets}
+      </Grid>
+      {slicers}
+    </>
   );
 };
 

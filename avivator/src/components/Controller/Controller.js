@@ -132,6 +132,7 @@ const Controller = () => {
           />
         )}
       {globalControllers}
+      {use3d && <Slicer />}
       {!isViewerLoading && !isRgb ? (
         <Grid container>{channelControllers}</Grid>
       ) : (
@@ -149,7 +150,6 @@ const Controller = () => {
           <PanLockToggle />
         </>
       )}
-      {use3d && <Slicer />}
     </Menu>
   );
 };
