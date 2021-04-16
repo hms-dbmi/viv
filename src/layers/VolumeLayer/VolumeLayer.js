@@ -64,6 +64,10 @@ const defaultProps = {
  * @ignore
  */
 const VolumeLayer = class extends CompositeLayer {
+  finalizeState() {
+    this.state.abortController.abort();
+  }
+
   updateState({ changeFlags, oldProps, props }) {
     const { propsChanged } = changeFlags;
     const loaderChanged =
@@ -88,12 +92,16 @@ const VolumeLayer = class extends CompositeLayer {
         progress += 0.5 / totalRequests;
         this.setState({ progress });
       };
+      const abortController = new AbortController();
+      this.setState({ abortController });
+      const { signal } = abortController;
       const volumePromises = loaderSelection.map(selection =>
         getVolume({
           selection,
           source,
           onUpdate,
-          downsampleDepth: 2 ** resolution
+          downsampleDepth: 2 ** resolution,
+          signal
         })
       );
 

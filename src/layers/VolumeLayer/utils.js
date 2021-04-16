@@ -20,7 +20,8 @@ export async function getVolume({
   source,
   selection,
   onUpdate = () => {},
-  downsampleDepth = 1
+  downsampleDepth = 1,
+  signal
 }) {
   const { shape, labels, dtype } = source;
   const { height, width } = getImageSize(source);
@@ -37,7 +38,8 @@ export async function getVolume({
         z: z * downsampleDepth
       };
       const { data: rasterData } = await source.getRaster({
-        selection: depthSelection
+        selection: depthSelection,
+        signal
       });
       let r = 0;
       onUpdate();
