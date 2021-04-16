@@ -163,8 +163,7 @@ const DEFAULT_IMAGE_STATE = {
   isLensOn: false,
   zoomLock: true,
   panLock: true,
-  isOverviewOn: false,
-  isNormalPositive: true
+  isOverviewOn: false
 };
 
 export const useImageSettingsStore = create(set => ({

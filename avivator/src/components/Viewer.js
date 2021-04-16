@@ -29,7 +29,6 @@ const Viewer = () => {
     colormap,
     renderingMode,
     sphericals,
-    isNormalPositive,
     resolution,
     isLensOn,
     zoomLock,
@@ -37,10 +36,7 @@ const Viewer = () => {
     isOverviewOn
   } = useImageSettingsStore();
   const clippingPlanes = sphericals.map(v =>
-    new Plane().fromPointNormal(
-      v.toVector3(),
-      v.toVector3().scale(isNormalPositive ? 1 : -1)
-    )
+    new Plane().fromPointNormal(v.toVector3(), v.toVector3())
   );
   return use3d ? (
     <VolumeViewer
