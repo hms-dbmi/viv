@@ -101,7 +101,8 @@ const VolumeViewer = props => {
     resolution,
     renderingMode,
     modelMatrix,
-    onViewportLoad,
+    // Slightly delay to avoid issues with a render in the middle of a deck.gl layer state update.
+    onViewportLoad: () => setTimeout(onViewportLoad, 0),
     clippingPlanes
   };
   const views = [volumeView];
