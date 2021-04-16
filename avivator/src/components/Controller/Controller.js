@@ -40,7 +40,7 @@ const Controller = () => {
     toggleIsOn: toggleIsOnSetter,
     removeChannel
   } = useChannelSetters();
-  const { colormap } = useImageSettingsStore();
+  const { colormap, setImageSetting } = useImageSettingsStore();
   const {
     metadata,
     channelOptions,
@@ -49,8 +49,7 @@ const Controller = () => {
     useColormap,
     useLens,
     isLoading,
-    pixelValues,
-    setViewerState
+    pixelValues
   } = useViewerStore();
   const viewSize = useWindowSize();
   const isRgb = metadata && guessRgb(metadata);
@@ -69,9 +68,9 @@ const Controller = () => {
         selection,
         use3d
       }).then(({ domain, slider }) => {
-        setViewerState('onViewportLoad', () => {
+        setImageSetting('onViewportLoad', () => {
           setPropertiesForChannel(i, ['sliders', 'domains'], [slider, domain]);
-          setViewerState('onViewportLoad', () => {});
+          setImageSetting('onViewportLoad', () => {});
         });
         setPropertyForChannel(i, 'selections', selection);
       });

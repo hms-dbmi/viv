@@ -6,19 +6,16 @@ import { MAX_CHANNELS } from '../../../constants';
 import {
   useChannelSettings,
   useChannelSetters,
-  useViewerStore
+  useViewerStore,
+  useImageSettingsStore
 } from '../../../state';
 import { getSingleSelectionStats } from '../../../utils';
 
 const AddChannel = () => {
-  const {
-    globalSelection,
-    isLoading,
-    use3d,
-    setViewerState
-  } = useViewerStore();
+  const { globalSelection, isLoading, use3d } = useViewerStore();
   const { loader, selections } = useChannelSettings();
   const { addChannel, setPropertiesForChannel } = useChannelSetters();
+  const { setImageSetting } = useImageSettingsStore();
   const handleChannelAdd = () => {
     let selection = {};
     const { labels } = loader[0];
@@ -32,13 +29,13 @@ const AddChannel = () => {
       selection,
       use3d
     }).then(({ domain, slider }) => {
-      setViewerState('onViewportLoad', () => {
+      setImageSetting('onViewportLoad', () => {
         setPropertiesForChannel(
           numSelectionsBeforeAdd,
           ['domains', 'sliders'],
           [domain, slider]
         );
-        setViewerState('onViewportLoad', () => {});
+        setImageSetting('onViewportLoad', () => {});
       });
       addChannel(['selections', 'ids'], [selection, String(Math.random())]);
     });

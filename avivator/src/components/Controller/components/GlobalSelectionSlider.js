@@ -5,7 +5,8 @@ import { range, getMultiSelectionStats } from '../../../utils';
 import {
   useChannelSettings,
   useChannelSetters,
-  useViewerStore
+  useViewerStore,
+  useImageSettingsStore
 } from '../../../state';
 
 export default function GlobalSelectionSlider(props) {
@@ -16,6 +17,7 @@ export default function GlobalSelectionSlider(props) {
   } = useChannelSetters();
   const { selections, loader } = useChannelSettings();
   const { setViewerState, globalSelection } = useViewerStore();
+  const { setImageSetting } = useImageSettingsStore();
   return (
     <Grid container direction="row" justify="space-between" alignItems="center">
       <Grid item xs={1}>
@@ -42,13 +44,13 @@ export default function GlobalSelectionSlider(props) {
               selections: newSelections,
               use3d: false
             }).then(({ domains, sliders }) => {
-              setViewerState('onViewportLoad', () => {
+              setImageSetting('onViewportLoad', () => {
                 setPropertiesForChannels(
                   range(newSelections.length),
                   ['domains', 'sliders'],
                   [domains, sliders]
                 );
-                setViewerState('onViewportLoad', () => {});
+                setImageSetting('onViewportLoad', () => {});
               });
               setPropertyForChannels(
                 range(newSelections.length),

@@ -163,7 +163,8 @@ const DEFAULT_IMAGE_STATE = {
   isLensOn: false,
   zoomLock: true,
   panLock: true,
-  isOverviewOn: false
+  isOverviewOn: false,
+  onViewportLoad: () => {}
 };
 
 export const useImageSettingsStore = create(set => ({
@@ -203,8 +204,7 @@ const DEFAULT_VIEWER_STATE = {
   globalSelection: { z: 0, t: 0 },
   channelOptions: [],
   metadata: null,
-  source: '',
-  onViewportLoad: () => {}
+  source: ''
 };
 
 export const useViewerStore = create(set => ({

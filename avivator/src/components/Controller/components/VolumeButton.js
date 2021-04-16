@@ -136,13 +136,13 @@ function VolumeButton() {
                               selections,
                               use3d: true
                             }).then(({ domains, sliders }) => {
-                              setViewerState('onViewportLoad', () => {
+                              setImageSetting('onViewportLoad', () => {
                                 setPropertiesForChannels(
                                   range(selections.length),
                                   ['domains', 'sliders'],
                                   [domains, sliders]
                                 );
-                                setViewerState('onViewportLoad', () => {});
+                                setImageSetting('onViewportLoad', () => {});
                               });
                               toggleUse3d();
                             });

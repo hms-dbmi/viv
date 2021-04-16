@@ -16,12 +16,7 @@ import { useWindowSize } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
 
 const Viewer = () => {
-  const {
-    useLinkedView,
-    setViewerState,
-    use3d,
-    onViewportLoad
-  } = useViewerStore();
+  const { useLinkedView, setViewerState, use3d } = useViewerStore();
   const { colors, sliders, isOn, selections, loader } = useChannelSettings();
   const viewSize = useWindowSize();
   const {
@@ -33,7 +28,8 @@ const Viewer = () => {
     isLensOn,
     zoomLock,
     panLock,
-    isOverviewOn
+    isOverviewOn,
+    onViewportLoad
   } = useImageSettingsStore();
   const clippingPlanes = sphericals.map(v =>
     new Plane().fromPointNormal(v.toVector3(), v.toVector3())
