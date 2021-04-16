@@ -12,7 +12,13 @@ import {
 import { getSingleSelectionStats } from '../../../utils';
 
 const AddChannel = () => {
-  const { globalSelection, isLoading, use3d } = useViewerStore();
+  const {
+    globalSelection,
+    isViewerLoading,
+    use3d,
+    setIsChannelLoading,
+    addIsChannelLoading
+  } = useViewerStore();
   const { loader, selections } = useChannelSettings();
   const { addChannel, setPropertiesForChannel } = useChannelSetters();
   const { setImageSetting } = useImageSettingsStore();
@@ -36,13 +42,15 @@ const AddChannel = () => {
           [domain, slider]
         );
         setImageSetting('onViewportLoad', () => {});
+        setIsChannelLoading(numSelectionsBeforeAdd, false);
       });
       addChannel(['selections', 'ids'], [selection, String(Math.random())]);
+      addIsChannelLoading(true);
     });
   };
   return (
     <Button
-      disabled={selections.length === MAX_CHANNELS || isLoading}
+      disabled={selections.length === MAX_CHANNELS || isViewerLoading}
       onClick={handleChannelAdd}
       fullWidth
       variant="outlined"

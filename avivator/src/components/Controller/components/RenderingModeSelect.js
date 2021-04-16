@@ -9,7 +9,7 @@ import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 function RenderingModeSelect() {
   const { setImageSetting, renderingMode } = useImageSettingsStore();
-  const { isLoading } = useViewerStore();
+  const { isViewerLoading } = useViewerStore();
   return (
     <FormControl fullWidth>
       <InputLabel htmlFor="rendering-mode-select">Rendering Mode</InputLabel>
@@ -21,7 +21,7 @@ function RenderingModeSelect() {
           name: 'rendering-mode',
           id: 'rendering-mode-select'
         }}
-        disabled={isLoading}
+        disabled={isViewerLoading}
       >
         {Object.values(RENDERING_MODES).map(name => (
           <option key={name} value={name}>

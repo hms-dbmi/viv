@@ -8,7 +8,7 @@ import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 function ColormapSelect() {
   const { setImageSetting, colormap } = useImageSettingsStore();
-  const { isLoading } = useViewerStore();
+  const { isViewerLoading } = useViewerStore();
   return (
     <FormControl fullWidth>
       <InputLabel htmlFor="colormap-select">
@@ -22,7 +22,7 @@ function ColormapSelect() {
           name: 'colormap',
           id: 'colormap-select'
         }}
-        disabled={isLoading}
+        disabled={isViewerLoading}
       >
         <option aria-label="None" value="" />
         {COLORMAP_OPTIONS.map(name => (

@@ -25,15 +25,18 @@ const toRgb = (on, arr) => {
 // If the channel is not on, display nothing.
 // If the channel has a not-undefined value, show it.
 // Otherwise, show a circular progress animation.
-const getPixelValueDisplay = (isOn, pixelValue, shouldShowPixelValue) => {
-  if (!isOn || !shouldShowPixelValue) {
+const getPixelValueDisplay = (pixelValue, isLoading, shouldShowPixelValue) => {
+  if (isLoading) {
+    return <CircularProgress size="50%" />;
+  }
+  if (!shouldShowPixelValue) {
     return FILL_PIXEL_VALUE;
   }
   // Need to check if it's a number becaue 0 is falsy.
   if (pixelValue || typeof pixelValue === 'number') {
     return truncateDecimalNumber(pixelValue, 7);
   }
-  return <CircularProgress size="50%" />;
+  return FILL_PIXEL_VALUE;
 };
 
 function ChannelController({
@@ -48,24 +51,24 @@ function ChannelController({
   color,
   handleRemoveChannel,
   handleColorSelect,
-  disableOptions = false
+  isLoading
 }) {
   const { loader } = useChannelSettings();
   const { colormap } = useImageSettingsStore();
-  const { useLinkedView, channelOptions } = useViewerStore();
-  const shouldShowPixelValue = !useLinkedView;
+  const { channelOptions, useLinkedView, use3d } = useViewerStore();
   const rgbColor = toRgb(colormap, color);
   const [min, max] = domain;
   // If the min/max range is and the dtype is float, make the step size smaller so sliders are smoother.
   const step =
     max - min < 500 && loader[0]?.dtype === 'Float32' ? (max - min) / 500 : 1;
+  const shouldShowPixelValue = !useLinkedView && !use3d;
   return (
     <Grid container direction="column" m={2} justify="center">
       <Grid container direction="row" justify="space-between">
         <Grid item xs={11}>
           <Select native value={name} onChange={onSelectionChange}>
             {channelOptions.map(opt => (
-              <option disabled={disableOptions} key={opt} value={opt}>
+              <option disabled={isLoading} key={opt} value={opt}>
                 {opt}
               </option>
             ))}
@@ -80,11 +83,12 @@ function ChannelController({
       </Grid>
       <Grid container direction="row" justify="flex-start" alignItems="center">
         <Grid item xs={2}>
-          {getPixelValueDisplay(isOn, pixelValue, shouldShowPixelValue)}
+          {getPixelValueDisplay(pixelValue, isLoading, shouldShowPixelValue)}
         </Grid>
         <Grid item xs={2}>
           <Checkbox
             onChange={toggleIsOn}
+            disabled={isLoading}
             checked={isOn}
             style={{
               color: rgbColor,
@@ -96,6 +100,7 @@ function ChannelController({
         </Grid>
         <Grid item xs={7}>
           <Slider
+            disabled={isLoading}
             value={slider}
             onChange={handleSliderChange}
             valueLabelDisplay="auto"

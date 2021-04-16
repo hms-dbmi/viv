@@ -24,7 +24,9 @@ export const initImage = (source, history) => {
   const { isLensOn, toggleIsLensOn } = useImageSettingsStore();
   useEffect(() => {
     async function changeLoader() {
-      setViewerState('isLoading', true);
+      // Placeholder
+      setViewerState('isChannelLoading', [true]);
+      setViewerState('isViewerLoading', true);
       resetChannels();
       const { urlOrFile } = source;
       const {
@@ -93,7 +95,11 @@ export const initImage = (source, history) => {
         );
         setLoader(nextLoader);
         setViewerState('metadata', nextMeta);
-        setViewerState('isLoading', false);
+        setViewerState(
+          'isChannelLoading',
+          newSelections.map(i => !i)
+        );
+        setViewerState('isViewerLoading', false);
         setViewerState(
           'pixelValues',
           new Array(newSelections.length).fill(FILL_PIXEL_VALUE)

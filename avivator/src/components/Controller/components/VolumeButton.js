@@ -89,12 +89,20 @@ function VolumeButton() {
           // eslint-disable-next-line no-unused-expressions
           if (use3d) {
             toggleUse3d();
+            setViewerState(
+              'isChannelLoading',
+              selections.map(_ => true)
+            );
             getMultiSelectionStats({ loader, selections, use3d: !use3d }).then(
               ({ domains, sliders }) => {
                 setPropertiesForChannels(
                   range(selections.length),
                   ['domains', 'sliders'],
                   [domains, sliders]
+                );
+                setViewerState(
+                  'isChannelLoading',
+                  selections.map(_ => false)
                 );
               }
             );
@@ -129,6 +137,10 @@ function VolumeButton() {
                           dense
                           disableGutters
                           onClick={() => {
+                            setViewerState(
+                              'isChannelLoading',
+                              selections.map(_ => true)
+                            );
                             setImageSetting('resolution', resolution);
                             toggle();
                             getMultiSelectionStats({
@@ -143,6 +155,10 @@ function VolumeButton() {
                                   [domains, sliders]
                                 );
                                 setImageSetting('onViewportLoad', () => {});
+                                setViewerState(
+                                  'isChannelLoading',
+                                  selections.map(_ => false)
+                                );
                               });
                               toggleUse3d();
                             });

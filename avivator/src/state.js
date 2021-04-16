@@ -188,7 +188,8 @@ export const useImageSettingsStore = create(set => ({
 }));
 
 const DEFAULT_VIEWER_STATE = {
-  isLoading: true,
+  isChannelLoading: [],
+  isViewerLoading: true,
   pixelValues: [],
   isOffsetsSnackbarOn: false,
   loaderErrorSnackbar: {
@@ -214,5 +215,16 @@ export const useViewerStore = create(set => ({
     set(state => ({
       ...state,
       [property]: value
-    }))
+    })),
+  setIsChannelLoading: (index, val) =>
+    set(state => {
+      const newIsChannelLoading = [...state.isChannelLoading];
+      newIsChannelLoading[index] = val;
+      return { ...state, isChannelLoading: newIsChannelLoading };
+    }),
+  addIsChannelLoading: val =>
+    set(state => {
+      const newIsChannelLoading = [...state.isChannelLoading, val];
+      return { ...state, isChannelLoading: newIsChannelLoading };
+    })
 }));

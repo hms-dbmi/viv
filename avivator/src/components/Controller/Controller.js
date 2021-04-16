@@ -48,8 +48,10 @@ const Controller = () => {
     use3d,
     useColormap,
     useLens,
-    isLoading,
-    pixelValues
+    isChannelLoading,
+    setIsChannelLoading,
+    pixelValues,
+    isViewerLoading
   } = useViewerStore();
   const viewSize = useWindowSize();
   const isRgb = metadata && guessRgb(metadata);
@@ -63,6 +65,7 @@ const Controller = () => {
         ...selections[i],
         c: channelOptions.indexOf(e.target.value)
       };
+      setIsChannelLoading(i, true);
       getSingleSelectionStats({
         loader,
         selection,
@@ -71,6 +74,7 @@ const Controller = () => {
         setImageSetting('onViewportLoad', () => {
           setPropertiesForChannel(i, ['sliders', 'domains'], [slider, domain]);
           setImageSetting('onViewportLoad', () => {});
+          setIsChannelLoading(i, false);
         });
         setPropertyForChannel(i, 'selections', selection);
       });
@@ -100,6 +104,7 @@ const Controller = () => {
           color={colors[i]}
           handleRemoveChannel={handleRemoveChannel}
           handleColorSelect={handleColorSelect}
+          isLoading={isChannelLoading[i]}
         />
       </Grid>
     );
@@ -127,7 +132,7 @@ const Controller = () => {
           />
         )}
       {globalControllers}
-      {!isLoading && !isRgb ? (
+      {!isViewerLoading && !isRgb ? (
         <Grid container>{channelControllers}</Grid>
       ) : (
         <Grid container justify="center">
