@@ -69,8 +69,11 @@ export default function GlobalSelectionSlider(props) {
               ...globalSelection,
               [label]: newValue
             });
-            changeSelection(event, newValue);
+            if (event.type === 'keydown') {
+              changeSelection(event, newValue);
+            }
           }}
+          onChangeCommitted={changeSelection}
           valueLabelDisplay="auto"
           getAriaLabel={() => `${label} slider`}
           marks={range(size).map(val => ({ value: val }))}
