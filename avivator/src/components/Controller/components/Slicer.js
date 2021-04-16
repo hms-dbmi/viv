@@ -20,13 +20,13 @@ const Slicer = () => {
       spherical.phi,
       v => setClippingPlaneSettings(0, 'phi', v),
       'ϕ',
-      [EPSILON, Math.PI * 2]
+      [0, Math.PI * 2]
     ],
     [
       spherical.theta,
       v => setClippingPlaneSettings(0, 'theta', v),
       'ϴ',
-      [EPSILON, Math.PI]
+      [-Math.PI / 2, Math.PI / 2]
     ],
     [
       spherical.radius,
@@ -73,7 +73,11 @@ const Slicer = () => {
             value={val}
             onChange={(e, v) => setVal(v)}
             valueLabelDisplay="auto"
-            valueLabelFormat={v => truncateDecimalNumber(v, 5)}
+            valueLabelFormat={v =>
+              `${truncateDecimalNumber(v / Math.PI, 5)}${
+                label === 'r' ? '' : 'π'
+              }`
+            }
             getAriaLabel={() => `${label} slider`}
             min={min}
             max={max}

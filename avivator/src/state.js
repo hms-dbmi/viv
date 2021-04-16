@@ -158,9 +158,7 @@ const DEFAULT_IMAGE_STATE = {
   lensSelection: 0,
   colormap: '',
   renderingMode: RENDERING_MODES.MAX_INTENSITY_PROJECTION,
-  sphericals: [
-    new SphericalCoordinates({ radius: EPSILON, phi: EPSILON, theta: EPSILON })
-  ],
+  sphericals: [new SphericalCoordinates({ radius: EPSILON, phi: 0, theta: 0 })],
   resolution: 0,
   isLensOn: false,
   zoomLock: true,

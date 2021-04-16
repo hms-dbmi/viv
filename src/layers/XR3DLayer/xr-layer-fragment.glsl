@@ -129,7 +129,7 @@ void main(void) {
 		// Check if this point is on the "positive" side or "negative" side of the plane - only show positive.
 		float canShow = 1.;
 		for (int i = 0; i < _NUM_PLANES; i += 1) {
-			canShow *= max(0., sign(dot(normals[i], p - (distances[i] * normals[i]))));
+			canShow *= max(0., sign(dot(normals[i], p) + distances[i]));
 		}
     float intensityValue0 = canShow * sample_and_apply_sliders(volume0, p, sliderValues[0]);
     float intensityValue1 = canShow * sample_and_apply_sliders(volume1, p, sliderValues[1]);

@@ -31,12 +31,11 @@ const Viewer = () => {
     panLock,
     isOverviewOn
   } = useImageSettingsStore();
-  const clippingPlanes = sphericals.map(
-    (v, i) =>
-      new Plane(
-        v.toVector3().scale(isNormalPositive ? 1 : -1),
-        (isNormalPositive ? 1 : -1) * sphericals[i].radius
-      )
+  const clippingPlanes = sphericals.map(v =>
+    new Plane().fromPointNormal(
+      v.toVector3(),
+      v.toVector3().scale(isNormalPositive ? 1 : -1)
+    )
   );
   return use3d ? (
     <VolumeViewer
