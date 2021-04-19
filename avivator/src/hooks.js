@@ -69,11 +69,7 @@ export const initImage = (source, history) => {
               ? [[255, 255, 255]]
               : newDomains.map((_, i) => COLOR_PALLETE[i]);
           setViewerState({ useColormap: true });
-          if (channelOptions.length === 1) {
-            setViewerState({ useLens: false });
-          } else {
-            setViewerState({ useLens: true });
-          }
+          setViewerState({ useLens: channelOptions.length !== 1 });
         } else {
           if (isLensOn) {
             toggleIsLensOn();
