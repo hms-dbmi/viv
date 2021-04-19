@@ -37,7 +37,7 @@ function LensSelect() {
         <Select
           native
           value={lensSelection}
-          onChange={e => setImageSetting('lensSelection', e.target.value)}
+          onChange={e => setImageSetting({ lensSelection: e.target.value })}
         >
           {channelOptions.map((opt, i) => (
             // eslint-disable-next-line react/no-array-index-key

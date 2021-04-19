@@ -15,7 +15,7 @@ function RenderingModeSelect() {
       <InputLabel htmlFor="rendering-mode-select">Rendering Mode</InputLabel>
       <Select
         native
-        onChange={e => setImageSetting('renderingMode', e.target.value)}
+        onChange={e => setImageSetting({ renderingMode: e.target.value })}
         value={renderingMode}
         inputProps={{
           name: 'rendering-mode',

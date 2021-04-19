@@ -10,10 +10,7 @@ import {
 
 export default function GlobalSelectionSlider(props) {
   const { size, label } = props;
-  const {
-    setPropertiesForChannels,
-    setPropertyForChannels
-  } = useChannelSetters();
+  const { setPropertiesForChannels } = useChannelSetters();
   const { selections, loader } = useChannelSettings();
   const { setViewerState, globalSelection } = useViewerStore();
   return (
@@ -27,9 +24,11 @@ export default function GlobalSelectionSlider(props) {
           // See https://github.com/hms-dbmi/viv/issues/176 for why
           // we have the two handlers.
           onChange={(event, newValue) => {
-            setViewerState('globalSelection', {
-              ...globalSelection,
-              [label]: newValue
+            setViewerState({
+              globalSelection: {
+                ...globalSelection,
+                [label]: newValue
+              }
             });
           }}
           onChangeCommitted={(event, newValue) => {
@@ -37,24 +36,23 @@ export default function GlobalSelectionSlider(props) {
               ...sel,
               [label]: newValue
             }));
-            setPropertyForChannels(
-              range(newSelections.length),
-              'selections',
-              newSelections
-            );
+            setPropertiesForChannels(range(newSelections.length), {
+              selections: newSelections
+            });
             getMultiSelectionStats({
               loader,
               selections: newSelections,
               use3d: false
             }).then(({ domains, sliders }) => {
-              setPropertiesForChannels(
-                range(newSelections.length),
-                ['domains', 'sliders'],
-                [domains, sliders]
-              );
-              setViewerState('globalSelection', {
-                ...globalSelection,
-                [label]: newValue
+              setPropertiesForChannels(range(newSelections.length), {
+                domains,
+                sliders
+              });
+              setViewerState({
+                globalSelection: {
+                  ...globalSelection,
+                  [label]: newValue
+                }
               });
             });
           }}

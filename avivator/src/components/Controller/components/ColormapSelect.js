@@ -16,7 +16,7 @@ function ColormapSelect() {
       </InputLabel>
       <Select
         native
-        onChange={e => setImageSetting('colormap', e.target.value)}
+        onChange={e => setImageSetting({ colormap: e.target.value })}
         value={colormap}
         inputProps={{
           name: 'colormap',

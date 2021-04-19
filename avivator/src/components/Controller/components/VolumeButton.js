@@ -91,16 +91,15 @@ function VolumeButton() {
             toggleUse3d();
             getMultiSelectionStats({ loader, selections, use3d: !use3d }).then(
               ({ domains, sliders }) => {
-                setPropertiesForChannels(
-                  range(selections.length),
-                  ['domains', 'sliders'],
-                  [domains, sliders]
-                );
+                setPropertiesForChannels(range(selections.length), {
+                  domains,
+                  sliders
+                });
               }
             );
             const isRgb = metadata && guessRgb(metadata);
             if (!isRgb && metadata) {
-              setViewerState('useLens', true);
+              setViewerState({ useLens: true });
             }
           }
         }}
@@ -129,7 +128,7 @@ function VolumeButton() {
                           dense
                           disableGutters
                           onClick={() => {
-                            setImageSetting('resolution', resolution);
+                            setImageSetting({ resolution });
                             toggleUse3d();
                             toggle();
                             getMultiSelectionStats({
@@ -139,11 +138,10 @@ function VolumeButton() {
                             }).then(({ domains, sliders }) => {
                               setPropertiesForChannels(
                                 range(selections.length),
-                                ['domains', 'sliders'],
-                                [domains, sliders]
+                                { domains, sliders }
                               );
                             });
-                            setViewerState('useLens', false);
+                            setViewerState({ useLens: false });
                           }}
                           key={`(${height}, ${width}, ${depthDownsampled})`}
                         >

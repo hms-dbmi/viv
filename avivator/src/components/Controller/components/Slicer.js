@@ -8,9 +8,9 @@ import { useImageSettingsStore } from '../../../state';
 const Slicer = () => {
   const { setImageSetting, xSlice, ySlice, zSlice } = useImageSettingsStore();
   const sliceValuesAndSetSliceFunctions = [
-    [xSlice, v => setImageSetting('xSlice', v), 'x'],
-    [ySlice, v => setImageSetting('ySlice', v), 'y'],
-    [zSlice, v => setImageSetting('zSlice', v), 'z']
+    [xSlice, v => setImageSetting({ xSlice: v }), 'x'],
+    [ySlice, v => setImageSetting({ ySlice: v }), 'y'],
+    [zSlice, v => setImageSetting({ zSlice: v }), 'z']
   ];
   return sliceValuesAndSetSliceFunctions.map(([slice, setSlice, label]) => (
     <Grid

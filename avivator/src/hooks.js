@@ -24,14 +24,14 @@ export const initImage = (source, history) => {
   const { isLensOn, toggleIsLensOn } = useImageSettingsStore();
   useEffect(() => {
     async function changeLoader() {
-      setViewerState('isLoading', true);
+      setViewerState({ isLoading: true });
       resetChannels();
       const { urlOrFile } = source;
       const {
         data: nextLoader,
         metadata: nextMeta
       } = await createLoader(urlOrFile, toggleIsOffsetsSnackbarOn, message =>
-        setViewerState('loaderErrorSnackbar', { on: true, message })
+        setViewerState({ loaderErrorSnackbar: { on: true, message } })
       );
 
       if (nextLoader) {
@@ -68,39 +68,35 @@ export const initImage = (source, history) => {
             newDomains.length === 1
               ? [[255, 255, 255]]
               : newDomains.map((_, i) => COLOR_PALLETE[i]);
-          setViewerState('useColormap', true);
+          setViewerState({ useColormap: true });
           if (channelOptions.length === 1) {
-            setViewerState('useLens', false);
+            setViewerState({ useLens: false });
           } else {
-            setViewerState('useLens', true);
+            setViewerState({ useLens: true });
           }
         } else {
           if (isLensOn) {
             toggleIsLensOn();
           }
-          setViewerState('useLens', false);
-          setViewerState('useColormap', false);
+          setViewerState({ useLens: false });
+          setViewerState({ useColormap: false });
         }
-        addChannels(
-          ['ids', 'selections', 'domains', 'sliders', 'colors'],
-          [
-            newDomains.map(() => String(Math.random())),
-            newSelections,
-            newDomains,
-            newSliders,
-            newColors
-          ]
-        );
+        addChannels({
+          ids: newDomains.map(() => String(Math.random())),
+          selections: newSelections,
+          domains: newDomains,
+          sliders: newSliders,
+          colors: newColors
+        });
         setLoader(nextLoader);
-        setViewerState('metadata', nextMeta);
-        setViewerState('isLoading', false);
-        setViewerState(
-          'pixelValues',
-          new Array(newSelections.length).fill(FILL_PIXEL_VALUE)
-        );
+        setViewerState({ metadata: nextMeta });
+        setViewerState({ isLoading: false });
+        setViewerState({
+          pixelValues: new Array(newSelections.length).fill(FILL_PIXEL_VALUE)
+        });
         // Set the global selections (needed for the UI). All selections have the same global selection.
-        setViewerState('globalSelection', newSelections[0]);
-        setViewerState('channelOptions', channelOptions);
+        setViewerState({ globalSelection: newSelections[0] });
+        setViewerState({ channelOptions });
         if (use3d) toggleUse3d();
         // eslint-disable-next-line no-unused-expressions
         history?.push(
@@ -128,7 +124,7 @@ export const dropzoneHook = () => {
         description: 'data.zarr'
       };
     }
-    setViewerState('source', newSource);
+    setViewerState({ source: newSource });
   };
   return useDropzone({
     onDrop: handleSubmitFile

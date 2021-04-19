@@ -35,7 +35,6 @@ const Controller = () => {
     ids
   } = useChannelSettings();
   const {
-    setPropertyForChannel,
     setPropertiesForChannel,
     toggleIsOn: toggleIsOnSetter,
     removeChannel
@@ -63,20 +62,21 @@ const Controller = () => {
         ...selections[i],
         c: channelOptions.indexOf(e.target.value)
       };
-      setPropertyForChannel(i, 'selections', selection);
+      setPropertiesForChannel(i, { selections: selection });
       getSingleSelectionStats({
         loader,
         selection,
         use3d
       }).then(({ domain, slider }) => {
-        setPropertiesForChannel(i, ['sliders', 'domains'], [slider, domain]);
+        setPropertiesForChannel(i, { sliders: slider, domains: domain });
       });
     };
     const toggleIsOn = () => toggleIsOnSetter(i);
-    const handleSliderChange = (e, v) => setPropertyForChannel(i, 'sliders', v);
+    const handleSliderChange = (e, v) =>
+      setPropertiesForChannel(i, { sliders: v });
     const handleRemoveChannel = () => removeChannel(i);
     const handleColorSelect = color => {
-      setPropertyForChannel(i, 'colors', color);
+      setPropertiesForChannel(i, { colors: color });
     };
     const name = channelOptions[selections[i].c];
     return (

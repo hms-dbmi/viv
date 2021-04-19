@@ -58,7 +58,7 @@ function Header(props) {
       // Use the trailing part of the URL (file name, presumably) as the description.
       description: getNameFromUrl(newUrl)
     };
-    setViewerState('source', newSource);
+    setViewerState({ source: newSource });
   };
   const url = typeof source.urlOrFile === 'string' ? source.urlOrFile : '';
   const [text, setText] = useState(url);

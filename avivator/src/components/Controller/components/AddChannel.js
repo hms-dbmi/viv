@@ -19,17 +19,16 @@ const AddChannel = () => {
     let selection = Object.fromEntries(labels.map(l => [l, 0]));
     selection = { ...selection, ...globalSelection };
     const numSelectionsBeforeAdd = selections.length;
-    addChannel(['selections', 'ids'], [selection, String(Math.random())]);
+    addChannel({ selections: selection, ids: String(Math.random()) });
     getSingleSelectionStats({
       loader,
       selection,
       use3d
     }).then(({ domain, slider }) =>
-      setPropertiesForChannel(
-        numSelectionsBeforeAdd,
-        ['domains', 'sliders'],
-        [domain, slider]
-      )
+      setPropertiesForChannel(numSelectionsBeforeAdd, {
+        domains: domain,
+        sliders: slider
+      })
     );
   };
   return (
