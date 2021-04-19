@@ -4,13 +4,17 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
 
-function LensSelect({
-  isOn,
-  handleToggle,
-  handleSelection,
-  channelOptions,
-  lensSelection
-}) {
+import { useImageSettingsStore, useViewerStore } from '../../../state';
+
+function LensSelect() {
+  const {
+    setImageSetting,
+    isLensOn,
+    toggleIsLensOn,
+    lensSelection
+  } = useImageSettingsStore();
+  const { channelOptions } = useViewerStore();
+
   const checkboxColor = `rgb(${[255, 255, 255]})`;
   return (
     <Grid container direction="row" justify="flex-start" alignItems="center">
@@ -19,8 +23,8 @@ function LensSelect({
       </Grid>
       <Grid item xs={2}>
         <Checkbox
-          onChange={handleToggle}
-          checked={isOn}
+          onChange={toggleIsLensOn}
+          checked={isLensOn}
           style={{
             color: checkboxColor,
             '&$checked': {
@@ -33,7 +37,7 @@ function LensSelect({
         <Select
           native
           value={lensSelection}
-          onChange={e => handleSelection(e.target.value)}
+          onChange={e => setImageSetting({ lensSelection: e.target.value })}
         >
           {channelOptions.map((opt, i) => (
             // eslint-disable-next-line react/no-array-index-key

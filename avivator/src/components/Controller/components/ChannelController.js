@@ -9,7 +9,12 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 
 import ChannelOptions from './ChannelOptions';
-import { FILL_PIXEL_VALUE } from '../constants';
+import { FILL_PIXEL_VALUE } from '../../../constants';
+import {
+  useChannelSettings,
+  useImageSettingsStore,
+  useViewerStore
+} from '../../../state';
 
 export const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
 
@@ -52,23 +57,28 @@ const getPixelValueDisplay = (isOn, pixelValue, shouldShowPixelValue) => {
 
 function ChannelController({
   name,
+  onSelectionChange,
   isOn,
-  dtype,
-  sliderValue,
-  colorValue,
-  colormapOn,
-  channelOptions,
-  handleChange,
   pixelValue,
-  shouldShowPixelValue,
-  disableOptions = false,
-  domain
+  toggleIsOn,
+  handleSliderChange,
+  domain,
+  slider,
+  color,
+  handleRemoveChannel,
+  handleColorSelect,
+  disableOptions = false
 }) {
-  const rgbColor = toRgb(colormapOn, colorValue);
+  const { loader } = useChannelSettings();
+  const { colormap } = useImageSettingsStore();
+  const { useLinkedView, channelOptions } = useViewerStore();
+  const shouldShowPixelValue = !useLinkedView;
+  const rgbColor = toRgb(colormap, color);
   const classes = useStyles();
   const [min, max] = domain;
   // If the min/max range is and the dtype is float, make the step size smaller so sliders are smoother.
-  const step = max - min < 500 && dtype === 'Float32' ? (max - min) / 500 : 1;
+  const step =
+    max - min < 500 && loader[0]?.dtype === 'Float32' ? (max - min) / 500 : 1;
   return (
     <Grid
       container
@@ -79,11 +89,7 @@ function ChannelController({
     >
       <Grid container direction="row" justify="space-between">
         <Grid item xs={11}>
-          <Select
-            native
-            value={name}
-            onChange={e => handleChange('CHANGE_CHANNEL', e.target.value)}
-          >
+          <Select native value={name} onChange={onSelectionChange}>
             {channelOptions.map(opt => (
               <option disabled={disableOptions} key={opt} value={opt}>
                 {opt}
@@ -92,7 +98,10 @@ function ChannelController({
           </Select>
         </Grid>
         <Grid item>
-          <ChannelOptions handleChange={handleChange} />
+          <ChannelOptions
+            handleRemoveChannel={handleRemoveChannel}
+            handleColorSelect={handleColorSelect}
+          />
         </Grid>
       </Grid>
       <Grid container direction="row" justify="flex-start" alignItems="center">
@@ -101,7 +110,7 @@ function ChannelController({
         </Grid>
         <Grid item xs={2}>
           <Checkbox
-            onChange={() => handleChange('TOGGLE_ON')}
+            onChange={toggleIsOn}
             checked={isOn}
             style={{
               color: rgbColor,
@@ -113,10 +122,10 @@ function ChannelController({
         </Grid>
         <Grid item xs={7}>
           <Slider
-            value={sliderValue}
-            onChange={(e, v) => handleChange('CHANGE_SLIDER', v)}
+            value={slider}
+            onChange={handleSliderChange}
             valueLabelDisplay="auto"
-            getAriaLabel={() => `${name}-${colorValue}-${sliderValue}`}
+            getAriaLabel={() => `${name}-${color}-${slider}`}
             valueLabelFormat={v => truncateDecimalNumber(v, 5)}
             min={min}
             max={max}

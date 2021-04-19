@@ -6,7 +6,6 @@ import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
-
 import { makeStyles } from '@material-ui/core/styles';
 
 import ColorPalette from './ColorPalette';
@@ -30,18 +29,9 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function ChannelOptions({ handleChange }) {
+function ChannelOptions({ handleRemoveChannel, handleColorSelect }) {
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
-
-  const handleColorSelect = color => {
-    handleChange('CHANGE_COLOR', color);
-  };
-
-  const handleRemove = () => {
-    toggle();
-    handleChange('REMOVE_CHANNEL');
-  };
 
   const classes = useStyles();
   return (
@@ -58,11 +48,11 @@ function ChannelOptions({ handleChange }) {
         <Paper className={classes.paper}>
           <ClickAwayListener onClickAway={toggle}>
             <MenuList id="channel-options">
-              <MenuItem dense disableGutters onClick={handleRemove}>
+              <MenuItem dense disableGutters onClick={handleRemoveChannel}>
                 <span className={classes.span}>Remove</span>
               </MenuItem>
               <MenuItem dense disableGutters className={classes.colors}>
-                <ColorPalette handleChange={handleColorSelect} />
+                <ColorPalette handleColorSelect={handleColorSelect} />
               </MenuItem>
             </MenuList>
           </ClickAwayListener>

@@ -3,21 +3,25 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 
-import { RENDERING_MODES } from '@hms-dbmi/viv'; // eslint-disable-line import/no-unresolved
+// eslint-disable-next-line import/no-unresolved
+import { RENDERING_MODES } from '@hms-dbmi/viv';
+import { useImageSettingsStore, useViewerStore } from '../../../state';
 
-function RenderingModeSelect({ value, handleChange, disabled }) {
+function RenderingModeSelect() {
+  const { setImageSetting, renderingMode } = useImageSettingsStore();
+  const { isLoading } = useViewerStore();
   return (
     <FormControl fullWidth>
       <InputLabel htmlFor="rendering-mode-select">Rendering Mode</InputLabel>
       <Select
         native
-        onChange={e => handleChange(e.target.value)}
-        value={value}
+        onChange={e => setImageSetting({ renderingMode: e.target.value })}
+        value={renderingMode}
         inputProps={{
           name: 'rendering-mode',
           id: 'rendering-mode-select'
         }}
-        disabled={disabled}
+        disabled={isLoading}
       >
         {Object.values(RENDERING_MODES).map(name => (
           <option key={name} value={name}>

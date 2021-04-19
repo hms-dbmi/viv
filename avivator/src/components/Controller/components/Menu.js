@@ -14,8 +14,9 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import { makeStyles } from '@material-ui/core/styles';
 
 import MenuTitle from './MenuTitle';
-import { DropzoneButton } from './Dropzone';
-import { isMobileOrTablet } from '../utils';
+import DropzoneButton from './DropzoneButton';
+import { isMobileOrTablet, getNameFromUrl } from '../../../utils';
+import { useViewerStore } from '../../../state';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -49,7 +50,17 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Header(props) {
-  const { handleSubmitNewUrl, url, menuToggle, handleSubmitFile } = props;
+  const { setViewerState, source } = useViewerStore();
+  const handleSubmitNewUrl = (event, newUrl) => {
+    event.preventDefault();
+    const newSource = {
+      urlOrFile: newUrl,
+      // Use the trailing part of the URL (file name, presumably) as the description.
+      description: getNameFromUrl(newUrl)
+    };
+    setViewerState({ source: newSource });
+  };
+  const url = typeof source.urlOrFile === 'string' ? source.urlOrFile : '';
   const [text, setText] = useState(url);
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
@@ -60,7 +71,7 @@ function Header(props) {
   return (
     <Grid container direction="column">
       <Grid item xs={12}>
-        <MenuTitle menuToggle={menuToggle} />
+        <MenuTitle />
       </Grid>
       <Grid
         container
@@ -114,7 +125,7 @@ function Header(props) {
       </Grid>
       {!isMobileOrTablet() && (
         <Grid item xs={12} style={{ paddingTop: 16 }}>
-          <DropzoneButton handleSubmitFile={handleSubmitFile} />
+          <DropzoneButton />
         </Grid>
       )}
       <Grid item xs={12} className={classes.divider}>
@@ -126,16 +137,11 @@ function Header(props) {
 
 function Menu({ children, ...props }) {
   const classes = useStyles(props);
-  const { on, toggle, handleSubmitNewUrl, urlOrFile, handleSubmitFile } = props;
-  return on ? (
+  const { isControllerOn, toggleIsControllerOn } = useViewerStore();
+  return isControllerOn ? (
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
       <Paper className={classes.paper}>
-        <Header
-          handleSubmitNewUrl={handleSubmitNewUrl}
-          url={typeof urlOrFile === 'string' ? urlOrFile : ''}
-          menuToggle={toggle}
-          handleSubmitFile={handleSubmitFile}
-        />
+        <Header />
         <Grid
           container
           direction="column"
@@ -161,7 +167,7 @@ function Menu({ children, ...props }) {
         color="default"
         size="small"
         endIcon={<SettingsIcon />}
-        onClick={toggle}
+        onClick={toggleIsControllerOn}
         aria-label="show-menu"
       >
         AVIVATOR
