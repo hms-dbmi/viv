@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fromBlob, fromFile, fromUrl } from 'geotiff';
+import { fromBlob, fromUrl } from 'geotiff';
 
 import {
   loadOmeTiff,
@@ -8,7 +8,7 @@ import {
   // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 
-import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
+import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
 
 const MAX_CHANNELS_FOR_SNACKBAR_WARNING = 40;
 

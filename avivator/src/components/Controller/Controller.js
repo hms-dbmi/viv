@@ -35,7 +35,6 @@ const Controller = () => {
     ids
   } = useChannelSettings();
   const {
-    setPropertyForChannel,
     setPropertiesForChannel,
     toggleIsOn: toggleIsOnSetter,
     removeChannel
@@ -55,8 +54,8 @@ const Controller = () => {
   } = useViewerStore();
   const viewSize = useWindowSize();
   const isRgb = metadata && guessRgb(metadata);
-  const { shape, labels } = loader[0] || {};
-  const globalControlLabels = labels?.filter(label =>
+  const { shape, labels } = loader[0];
+  const globalControlLabels = labels.filter(label =>
     GLOBAL_SLIDER_DIMENSION_FIELDS.includes(label)
   );
   const channelControllers = ids.map((id, i) => {
@@ -65,25 +64,26 @@ const Controller = () => {
         ...selections[i],
         c: channelOptions.indexOf(e.target.value)
       };
-      setIsChannelLoading(i, true);
+      setPropertiesForChannel(i, { selections: selection });
       getSingleSelectionStats({
         loader,
         selection,
         use3d
       }).then(({ domain, slider }) => {
         setImageSetting('onViewportLoad', () => {
-          setPropertiesForChannel(i, ['sliders', 'domains'], [slider, domain]);
+          setPropertiesForChannel(i, { sliders: slider, domains: domain });
           setImageSetting('onViewportLoad', () => {});
           setIsChannelLoading(i, false);
         });
-        setPropertyForChannel(i, 'selections', selection);
+        setPropertiesForChannel(i, { selections: selection });
       });
     };
     const toggleIsOn = () => toggleIsOnSetter(i);
-    const handleSliderChange = (e, v) => setPropertyForChannel(i, 'sliders', v);
+    const handleSliderChange = (e, v) =>
+      setPropertiesForChannel(i, { sliders: v });
     const handleRemoveChannel = () => removeChannel(i);
     const handleColorSelect = color => {
-      setPropertyForChannel(i, 'colors', color);
+      setPropertiesForChannel(i, { colors: color });
     };
     const name = channelOptions[selections[i].c];
     return (
@@ -109,28 +109,22 @@ const Controller = () => {
       </Grid>
     );
   });
-  const globalControllers =
-    globalControlLabels &&
-    globalControlLabels.map(label => {
-      const size = shape[labels.indexOf(label)];
-      // Only return a slider if there is a "stack."
-      return size > 1 && !use3d ? (
-        <GlobalSelectionSlider key={label} size={size} label={label} />
-      ) : null;
-    });
+  const globalControllers = globalControlLabels.map(label => {
+    const size = shape[labels.indexOf(label)];
+    // Only return a slider if there is a "stack."
+    return size > 1 && !use3d ? (
+      <GlobalSelectionSlider key={label} size={size} label={label} />
+    ) : null;
+  });
   return (
     <Menu maxHeight={viewSize.height}>
       {useColormap && <ColormapSelect />}
       {use3d && <RenderingModeSelect />}
-      {useLens &&
-        !colormap &&
-        labels &&
-        shape &&
-        shape[labels.indexOf('c')] > 1 && (
-          <LensSelect
-            channelOptions={selections.map(sel => channelOptions[sel.c])}
-          />
-        )}
+      {useLens && !colormap && shape[labels.indexOf('c')] > 1 && (
+        <LensSelect
+          channelOptions={selections.map(sel => channelOptions[sel.c])}
+        />
+      )}
       {globalControllers}
       {use3d && <Slicer />}
       {!isViewerLoading && !isRgb ? (
@@ -141,7 +135,7 @@ const Controller = () => {
         </Grid>
       )}
       {!isRgb && <AddChannel />}
-      {labels && shape && shape[labels.indexOf('z')] > 1 && <VolumeButton />}
+      {shape[labels.indexOf('z')] > 1 && <VolumeButton />}
       {!use3d && <PictureInPictureToggle />}
       {!use3d && <SideBySideToggle />}
       {useLinkedView && !use3d && (

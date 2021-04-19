@@ -21,10 +21,9 @@ export default function GlobalSelectionSlider(props) {
   const { setImageSetting } = useImageSettingsStore();
   const changeSelection = debounce(
     (event, newValue) => {
-      setViewerState(
-        'isChannelLoading',
-        selections.map(i => true)
-      );
+      setViewerState({
+        isChannelLoading: selections.map(i => true)
+      });
       const newSelections = [...selections].map(sel => ({
         ...sel,
         [label]: newValue
@@ -34,23 +33,21 @@ export default function GlobalSelectionSlider(props) {
         selections: newSelections,
         use3d: false
       }).then(({ domains, sliders }) => {
-        setImageSetting('onViewportLoad', () => {
-          setPropertiesForChannels(
-            range(newSelections.length),
-            ['domains', 'sliders'],
-            [domains, sliders]
-          );
-          setImageSetting('onViewportLoad', () => {});
-          setViewerState(
-            'isChannelLoading',
-            selections.map(i => false)
-          );
+        setImageSetting({
+          onViewportLoad: () => {
+            setPropertiesForChannels(range(newSelections.length), {
+              domains,
+              sliders
+            });
+            setImageSetting({ onViewportLoad: () => {} });
+            setViewerState({
+              isChannelLoading: selections.map(i => false)
+            });
+          }
         });
-        setPropertyForChannels(
-          range(newSelections.length),
-          'selections',
-          newSelections
-        );
+        setPropertyForChannels(range(newSelections.length), {
+          selections: newSelections
+        });
       });
     },
     50,
@@ -65,9 +62,11 @@ export default function GlobalSelectionSlider(props) {
         <Slider
           value={globalSelection[label]}
           onChange={(event, newValue) => {
-            setViewerState('globalSelection', {
-              ...globalSelection,
-              [label]: newValue
+            setViewerState({
+              globalSelection: {
+                ...globalSelection,
+                [label]: newValue
+              }
             });
             if (event.type === 'keydown') {
               changeSelection(event, newValue);

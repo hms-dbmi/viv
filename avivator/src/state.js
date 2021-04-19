@@ -10,11 +10,6 @@ import { RENDERING_MODES } from '@hms-dbmi/viv';
 
 import { EPSILON } from './constants';
 
-const keysAndValuesToObject = (keys, values) => {
-  const merged = keys.map((k, i) => [k, values[i]]);
-  return Object.fromEntries(merged);
-};
-
 const captialize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
 const generateToggles = (defaults, set) => {
@@ -38,7 +33,7 @@ const DEFAUlT_CHANNEL_STATE = {
   domains: [],
   selections: [],
   ids: [],
-  loader: []
+  loader: [{ labels: [], shape: [] }]
 };
 
 const DEFAUlT_CHANNEL_VALUES = {
@@ -60,46 +55,24 @@ export const useChannelsStore = create(set => ({
       return { ...state, isOn };
     }),
   setLoader: loader => set(state => ({ ...state, loader })),
-  setPropertyForChannel: (channel, property, value) =>
+  setPropertiesForChannel: (channel, newProperties) =>
     set(state => {
-      const values = [...state[property]];
-      values[channel] = value;
-      return { ...state, [property]: values };
-    }),
-  setPropertiesForChannel: (channel, properties, values) =>
-    set(state => {
-      const oldStateValuesForProperties = properties.map(property => [
-        ...state[property]
-      ]);
-      const newStateValuesForProperties = oldStateValuesForProperties.map(
-        (v, j) => {
-          const oldValues = [...v];
-          oldValues[channel] = values[j];
-          return oldValues;
-        }
-      );
-      const zipped = keysAndValuesToObject(
-        properties,
-        newStateValuesForProperties
-      );
-      return { ...state, ...zipped };
-    }),
-  setPropertyForChannels: (channels, property, values) =>
-    set(state => {
-      const newValues = [...state[property]];
-      channels.forEach((channelIndex, j) => {
-        newValues[channelIndex] = values[j];
+      const entries = Object.entries(newProperties);
+      const newState = {};
+      entries.forEach(([property, value]) => {
+        newState[property] = [...state[property]];
+        newState[property][channel] = value;
       });
-      return { ...state, [property]: newValues };
+      return { ...state, ...newState };
     }),
-  setPropertiesForChannels: (channels, properties, values) =>
+  setPropertiesForChannels: (channels, newProperties) =>
     set(state => {
-      const newState = { ...state };
-      properties.forEach((property, propertyIndex) => {
-        const newValues = [...state[property]];
+      const entries = Object.entries(newProperties);
+      const newState = {};
+      entries.forEach(([property, values]) => {
         channels.forEach(channel => {
-          newValues[channel] = values[propertyIndex][channel];
-          newState[property] = newValues;
+          newState[property] = [...state[property]];
+          newState[property][channel] = values[channel];
         });
       });
       return { ...state, ...newState };
@@ -115,29 +88,34 @@ export const useChannelsStore = create(set => ({
       });
       return { ...state, ...newState };
     }),
-  addChannel: (properties, values) =>
+  addChannel: newProperties =>
     set(state => {
+      const entries = Object.entries(newProperties);
       const newState = { ...state };
-      properties.forEach((property, j) => {
-        newState[property] = [...state[property], values[j]];
+      entries.forEach(([property, value]) => {
+        newState[property] = [...state[property], value];
       });
       Object.entries(DEFAUlT_CHANNEL_VALUES).forEach(([k, v]) => {
-        if (newState[k].length < newState[properties[0]].length) {
+        if (newState[k].length < newState[entries[0][0]].length) {
           newState[k] = [...state[k], v];
         }
       });
       return newState;
     }),
-  addChannels: (properties, values) =>
+  addChannels: newProperties =>
     set(state => {
+      const entries = Object.entries(newProperties);
       const newState = { ...state };
-      properties.forEach((property, j) => {
-        newState[property] = values[j];
+      entries.forEach(([property, values]) => {
+        newState[property] = [...state[property], ...values];
       });
-      const numNewChannels = values[0].length;
+      const numNewChannels = entries[0][1].length;
       Object.entries(DEFAUlT_CHANNEL_VALUES).forEach(([k, v]) => {
         if (!newState[k].length) {
-          newState[k] = Array.from({ length: numNewChannels }).map(() => v);
+          newState[k] = [
+            ...state[k],
+            ...Array.from({ length: numNewChannels }).map(() => v)
+          ];
         }
       });
       return newState;
@@ -170,10 +148,10 @@ const DEFAULT_IMAGE_STATE = {
 export const useImageSettingsStore = create(set => ({
   ...DEFAULT_IMAGE_STATE,
   ...generateToggles(DEFAULT_IMAGE_STATE, set),
-  setImageSetting: (property, value) =>
+  setImageSetting: newState =>
     set(state => ({
       ...state,
-      [property]: value
+      ...newState
     })),
   setClippingPlaneSettings: (index, prop, val) =>
     set(state => {
@@ -211,10 +189,10 @@ const DEFAULT_VIEWER_STATE = {
 export const useViewerStore = create(set => ({
   ...DEFAULT_VIEWER_STATE,
   ...generateToggles(DEFAULT_VIEWER_STATE, set),
-  setViewerState: (property, value) =>
+  setViewerState: newState =>
     set(state => ({
       ...state,
-      [property]: value
+      ...newState
     })),
   setIsChannelLoading: (index, val) =>
     set(state => {

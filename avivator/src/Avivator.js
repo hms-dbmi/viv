@@ -21,8 +21,7 @@ export default function Avivator(props) {
   const { isViewerLoading, setViewerState, source } = useViewerStore();
 
   useEffect(() => {
-    setViewerState('source', initSource);
-    setViewerState('isNoImageUrlSnackbarOn', isDemoImage);
+    setViewerState({ source: initSource, isNoImageUrlSnackbarOn: isDemoImage });
   }, []);
   initImage(source, history);
   return (

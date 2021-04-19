@@ -22,12 +22,9 @@ const AddChannel = () => {
   const { loader, selections } = useChannelSettings();
   const { addChannel, setPropertiesForChannel } = useChannelSetters();
   const { setImageSetting } = useImageSettingsStore();
+  const { labels } = loader[0];
   const handleChannelAdd = () => {
-    let selection = {};
-    const { labels } = loader[0];
-    labels.forEach(l => {
-      selection[l] = 0;
-    });
+    let selection = Object.fromEntries(labels.map(l => [l, 0]));
     selection = { ...selection, ...globalSelection };
     const numSelectionsBeforeAdd = selections.length;
     getSingleSelectionStats({
@@ -36,19 +33,20 @@ const AddChannel = () => {
       use3d
     }).then(({ domain, slider }) => {
       setImageSetting('onViewportLoad', () => {
-        setPropertiesForChannel(
-          numSelectionsBeforeAdd,
-          ['domains', 'sliders', 'isOn'],
-          [domain, slider, true]
-        );
-        setImageSetting('onViewportLoad', () => {});
+        setPropertiesForChannel(numSelectionsBeforeAdd, {
+          domains: domain,
+          sliders: slider,
+          isOn: true
+        });
+        setImageSetting({ onViewportLoad: () => {} });
         setIsChannelLoading(numSelectionsBeforeAdd, false);
       });
       addIsChannelLoading(true);
-      addChannel(
-        ['selections', 'ids', 'isOn'],
-        [selection, String(Math.random()), false]
-      );
+      addChannel({
+        selections: selection,
+        ids: String(Math.random()),
+        isOn: false
+      });
     });
   };
   return (

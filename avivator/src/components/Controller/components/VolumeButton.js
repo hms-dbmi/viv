@@ -95,20 +95,18 @@ function VolumeButton() {
             );
             getMultiSelectionStats({ loader, selections, use3d: !use3d }).then(
               ({ domains, sliders }) => {
-                setPropertiesForChannels(
-                  range(selections.length),
-                  ['domains', 'sliders'],
-                  [domains, sliders]
-                );
-                setViewerState(
-                  'isChannelLoading',
-                  selections.map(_ => false)
-                );
+                setPropertiesForChannels(range(selections.length), {
+                  domains,
+                  sliders
+                });
+                setViewerState({
+                  isChannelLoading: selections.map(_ => false)
+                });
               }
             );
             const isRgb = metadata && guessRgb(metadata);
             if (!isRgb && metadata) {
-              setViewerState('useLens', true);
+              setViewerState({ useLens: true });
             }
           }
         }}
@@ -137,32 +135,31 @@ function VolumeButton() {
                           dense
                           disableGutters
                           onClick={() => {
-                            setViewerState(
-                              'isChannelLoading',
-                              selections.map(_ => true)
-                            );
-                            setImageSetting('resolution', resolution);
+                            setViewerState({
+                              isChannelLoading: selections.map(_ => true)
+                            });
+                            setImageSetting({ resolution });
                             toggle();
                             getMultiSelectionStats({
                               loader,
                               selections,
                               use3d: true
                             }).then(({ domains, sliders }) => {
-                              setImageSetting('onViewportLoad', () => {
-                                setPropertiesForChannels(
-                                  range(selections.length),
-                                  ['domains', 'sliders'],
-                                  [domains, sliders]
-                                );
-                                setImageSetting('onViewportLoad', () => {});
-                                setViewerState(
-                                  'isChannelLoading',
-                                  selections.map(_ => false)
-                                );
+                              setImageSetting({
+                                onViewportLoad: () => {
+                                  setPropertiesForChannels(
+                                    range(selections.length),
+                                    { domains, sliders }
+                                  );
+                                  setImageSetting({ onViewportLoad: () => {} });
+                                  setViewerState({
+                                    isChannelLoading: selections.map(_ => false)
+                                  });
+                                }
                               });
                               toggleUse3d();
                             });
-                            setViewerState('useLens', false);
+                            setViewerState({ useLens: false });
                           }}
                           key={`(${height}, ${width}, ${depthDownsampled})`}
                         >

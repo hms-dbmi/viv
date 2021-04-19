@@ -34,7 +34,9 @@ const SnackBars = () => {
       >
         <Alert
           onClose={() =>
-            setViewerState('loaderErrorSnackbar', { on: false, message: null })
+            setViewerState({
+              loaderErrorSnackbar: { on: false, message: null }
+            })
           }
           severity="error"
         >
