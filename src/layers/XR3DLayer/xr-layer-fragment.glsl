@@ -131,6 +131,14 @@ void main(void) {
 		for (int i = 0; i < _NUM_PLANES; i += 1) {
 			canShow *= max(0., sign(dot(normals[i], p - (distances[i] * normals[i]))));
 		}
+		// Do not show coordinates outside 0-1 box.
+		// Something about the undefined behavior outside the box causes the additive blender to 
+		// render some very odd artifacts.
+		float canShowXCoordinate = max(p.x - 0.0, 0.0) * max(1.0 - p.x , 0.0);
+		float canShowYCoordinate = max(p.y - 0.0, 0.0) * max(1.0 - p.y , 0.0);
+		float canShowZCoordinate = max(p.z - 0.0, 0.0) * max(1.0 - p.z , 0.0);
+		float canShowCoordinate = float(ceil(canShowXCoordinate * canShowYCoordinate * canShowZCoordinate));
+		canShow = canShowCoordinate * canShow;
     float intensityValue0 = canShow * sample_and_apply_sliders(volume0, p, sliderValues[0]);
     float intensityValue1 = canShow * sample_and_apply_sliders(volume1, p, sliderValues[1]);
 		float intensityValue2 = canShow * sample_and_apply_sliders(volume2, p, sliderValues[2]);
