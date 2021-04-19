@@ -15,11 +15,8 @@ const AddChannel = () => {
   const { loader, selections } = useChannelSettings();
   const { addChannel, setPropertiesForChannel } = useChannelSetters();
   const handleChannelAdd = () => {
-    let selection = {};
     const { labels } = loader[0];
-    labels.forEach(l => {
-      selection[l] = 0;
-    });
+    let selection = Object.fromEntries(labels.map(l => [l, 0]));
     selection = { ...selection, ...globalSelection };
     const numSelectionsBeforeAdd = selections.length;
     addChannel(['selections', 'ids'], [selection, String(Math.random())]);

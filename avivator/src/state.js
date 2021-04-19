@@ -36,7 +36,7 @@ const DEFAUlT_CHANNEL_STATE = {
   domains: [],
   selections: [],
   ids: [],
-  loader: []
+  loader: [{ labels: [], shape: [] }]
 };
 
 const DEFAUlT_CHANNEL_VALUES = {
