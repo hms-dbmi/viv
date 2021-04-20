@@ -16,7 +16,13 @@ import { useWindowSize } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
 
 const Viewer = () => {
-  const { useLinkedView, setViewerState, use3d } = useViewerStore();
+  const {
+    useLinkedView,
+    setViewerState,
+    use3d,
+    initialViewState,
+    viewState
+  } = useViewerStore();
   const { colors, sliders, isOn, selections, loader } = useChannelSettings();
   const viewSize = useWindowSize();
   const {
@@ -29,7 +35,8 @@ const Viewer = () => {
     zoomLock,
     panLock,
     isOverviewOn,
-    onViewportLoad
+    onViewportLoad,
+    useFixedAxis
   } = useImageSettingsStore();
   const clippingPlanes = sphericals.map(v =>
     new Plane().fromPointNormal(v.toVector3(), v.toVector3())
@@ -48,6 +55,13 @@ const Viewer = () => {
       height={viewSize.height}
       width={viewSize.width}
       onViewportLoad={onViewportLoad}
+      useFixedAxis={useFixedAxis}
+      viewStates={[viewState]}
+      onViewStateChange={({ viewState: newViewState, viewId }) => {
+        setViewerState({ viewState: { ...newViewState, id: viewId } });
+        if (!initialViewState)
+          setViewerState({ initialViewState: { ...newViewState, id: viewId } });
+      }}
     />
   ) : useLinkedView ? (
     <SideBySideViewer

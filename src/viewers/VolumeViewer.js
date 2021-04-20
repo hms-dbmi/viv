@@ -49,9 +49,10 @@ const VolumeViewer = props => {
     height: screenHeight,
     width: screenWidth,
     viewStates: viewStatesProp,
-    clippingPlanes = []
+    clippingPlanes = [],
+    useFixedAxis = true
   } = props;
-  const volumeViewState = viewStatesProp?.find(state => state.id === '3d');
+  const volumeViewState = viewStatesProp?.find(state => state?.id === '3d');
   const initialViewState = useMemo(() => {
     if (volumeViewState) {
       return volumeViewState;
@@ -86,7 +87,8 @@ const VolumeViewer = props => {
   const viewStates = [volumeViewState || { ...initialViewState, id: '3d' }];
   const volumeView = new VolumeView({
     id: '3d',
-    target: initialViewState.target
+    target: viewStates[0].target,
+    useFixedAxis
   });
   const layerConfig = {
     loader,

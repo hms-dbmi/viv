@@ -15,6 +15,7 @@ import PanLockToggle from './components/PanLockToggle';
 import ZoomLockToggle from './components/ZoomLockToggle';
 import SideBySideToggle from './components/SideBySideToggle';
 import PictureInPictureToggle from './components/PictureInPictureToggle';
+import CameraOptions from './components/CameraOptions';
 import {
   useChannelSettings,
   useViewerStore,
@@ -127,6 +128,7 @@ const Controller = () => {
       )}
       {globalControllers}
       {use3d && <Slicer />}
+      {use3d && <CameraOptions />}
       {!isViewerLoading && !isRgb ? (
         <Grid container>{channelControllers}</Grid>
       ) : (

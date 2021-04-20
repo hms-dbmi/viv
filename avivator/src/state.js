@@ -142,6 +142,7 @@ const DEFAULT_IMAGE_STATE = {
   zoomLock: true,
   panLock: true,
   isOverviewOn: false,
+  useFixedAxis: true,
   onViewportLoad: () => {}
 };
 
@@ -183,6 +184,8 @@ const DEFAULT_VIEWER_STATE = {
   globalSelection: { z: 0, t: 0 },
   channelOptions: [],
   metadata: null,
+  viewState: null,
+  initialViewState: null,
   source: ''
 };
 

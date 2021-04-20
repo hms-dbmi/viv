@@ -7,9 +7,10 @@ import VivView from './VivView';
  * This class generates a VolumeLayer and a view for use in the VivViewer as volumetric rendering.
  * */
 export default class VolumeView extends VivView {
-  constructor({ target, ...args }) {
+  constructor({ target, useFixedAxis, ...args }) {
     super(args);
     this.target = target;
+    this.useFixedAxis = useFixedAxis;
   }
 
   getDeckGlView() {
@@ -26,12 +27,12 @@ export default class VolumeView extends VivView {
   }
 
   filterViewState({ viewState }) {
-    const { id, target } = this;
+    const { id, target, useFixedAxis } = this;
     return viewState.id === id
       ? {
           ...viewState,
-          // fix the center of the camera
-          target
+          // fix the center of the camera if desired
+          target: useFixedAxis ? target : viewState.target
         }
       : null;
   }

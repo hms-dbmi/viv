@@ -2,7 +2,7 @@ import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import Button from '@material-ui/core/Button';
-import { useImageSettingsStore } from '../../../state';
+import { useImageSettingsStore, useViewerStore } from '../../../state';
 import { truncateDecimalNumber } from '../../../utils';
 import { EPSILON } from '../../../constants';
 
@@ -11,6 +11,7 @@ const Slicer = () => {
     setClippingPlaneSettings,
     sphericals: [spherical]
   } = useImageSettingsStore();
+  const { setViewerState, initialViewState } = useViewerStore();
   const sliceValuesAndSetSliceFunctions = [
     [
       spherical.phi,
