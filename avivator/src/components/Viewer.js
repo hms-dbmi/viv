@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import { Plane } from '@math.gl/culling';
+import debounce from 'lodash/debounce';
 import {
   SideBySideViewer,
   PictureInPictureViewer,
@@ -57,11 +58,17 @@ const Viewer = () => {
       onViewportLoad={onViewportLoad}
       useFixedAxis={useFixedAxis}
       viewStates={[viewState]}
-      onViewStateChange={({ viewState: newViewState, viewId }) => {
-        setViewerState({ viewState: { ...newViewState, id: viewId } });
-        if (!initialViewState)
-          setViewerState({ initialViewState: { ...newViewState, id: viewId } });
-      }}
+      onViewStateChange={debounce(
+        ({ viewState: newViewState, viewId }) => {
+          setViewerState({ viewState: { ...newViewState, id: viewId } });
+          if (!initialViewState)
+            setViewerState({
+              initialViewState: { ...newViewState, id: viewId }
+            });
+        },
+        250,
+        { trailing: true }
+      )}
     />
   ) : useLinkedView ? (
     <SideBySideViewer
