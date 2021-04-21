@@ -70,9 +70,9 @@ export const useChannelsStore = create(set => ({
       const entries = Object.entries(newProperties);
       const newState = {};
       entries.forEach(([property, values]) => {
-        channels.forEach(channel => {
-          newState[property] = [...state[property]];
-          newState[property][channel] = values[channel];
+        newState[property] = [...state[property]];
+        channels.forEach((channel, j) => {
+          newState[property].splice(channel, 1, values[j]);
         });
       });
       return { ...state, ...newState };
