@@ -1,5 +1,5 @@
 import { getDims, getLabels } from '../../utils';
-import type { OMEXML } from '../../omexml';
+import type { OMEXML, UnitsLength } from '../../omexml';
 
 const DTYPE_LOOKUP = {
   uint8: 'Uint8',
@@ -45,7 +45,9 @@ export function getOmePixelSourceMeta({ Pixels }: OMEXML[0]) {
 
   const dtype = DTYPE_LOOKUP[Pixels.Type as keyof typeof DTYPE_LOOKUP];
   if (Pixels.PhysicalSizeX && Pixels.PhysicalSizeY) {
-    const physicalSizes = {
+    const physicalSizes: {
+      [k: string]: { size: number; unit: UnitsLength };
+    } = {
       x: {
         size: Pixels.PhysicalSizeX,
         unit: Pixels.PhysicalSizeXUnit
