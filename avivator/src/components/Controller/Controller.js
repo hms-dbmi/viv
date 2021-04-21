@@ -50,6 +50,7 @@ const Controller = () => {
     useLens,
     isChannelLoading,
     setIsChannelLoading,
+    removeIsChannelLoading,
     pixelValues,
     isViewerLoading
   } = useViewerStore();
@@ -85,7 +86,10 @@ const Controller = () => {
     const toggleIsOn = () => toggleIsOnSetter(i);
     const handleSliderChange = (e, v) =>
       setPropertiesForChannel(i, { sliders: v });
-    const handleRemoveChannel = () => removeChannel(i);
+    const handleRemoveChannel = () => {
+      removeChannel(i);
+      removeIsChannelLoading(i);
+    };
     const handleColorSelect = color => {
       setPropertiesForChannel(i, { colors: color });
     };

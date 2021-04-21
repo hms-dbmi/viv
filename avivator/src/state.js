@@ -206,5 +206,11 @@ export const useViewerStore = create(set => ({
     set(state => {
       const newIsChannelLoading = [...state.isChannelLoading, val];
       return { ...state, isChannelLoading: newIsChannelLoading };
+    }),
+  removeIsChannelLoading: index =>
+    set(state => {
+      const newIsChannelLoading = [...state.isChannelLoading];
+      newIsChannelLoading.splice(index, 1);
+      return { ...state, isChannelLoading: newIsChannelLoading };
     })
 }));
