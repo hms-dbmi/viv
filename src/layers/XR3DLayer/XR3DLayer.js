@@ -261,7 +261,10 @@ const XR3DLayer = class extends Layer {
       const invertedResolutionMatrix = resolutionMatrix.clone().invert();
       const paddedClippingPlanes = padWithDefault(
         clippingPlanes.map(p =>
-          p.transform(invertedScaleMatrix).transform(invertedResolutionMatrix)
+          p
+            .clone()
+            .transform(invertedScaleMatrix)
+            .transform(invertedResolutionMatrix)
         ),
         new Plane([1, 0, 0]),
         clippingPlanes.length || _NUM_PLANES_DEFAULT
