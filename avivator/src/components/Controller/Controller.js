@@ -66,7 +66,7 @@ const Controller = () => {
         ...selections[i],
         c: channelOptions.indexOf(e.target.value)
       };
-      setPropertiesForChannel(i, { selections: selection });
+      setIsChannelLoading(i, true);
       getSingleSelectionStats({
         loader,
         selection,
@@ -80,7 +80,6 @@ const Controller = () => {
           }
         });
         setPropertiesForChannel(i, { selections: selection });
-        setIsChannelLoading(i, true);
       });
     };
     const toggleIsOn = () => toggleIsOnSetter(i);
