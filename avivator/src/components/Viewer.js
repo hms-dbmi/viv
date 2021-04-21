@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import { Plane } from '@math.gl/culling';
+import { Matrix4 } from '@math.gl/core';
 import debounce from 'lodash/debounce';
 import {
   SideBySideViewer,
@@ -13,7 +14,7 @@ import {
   useViewerStore,
   useChannelSettings
 } from '../state';
-import { useWindowSize } from '../utils';
+import { useWindowSize, getPhysicalSizeScalingMatrix } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
 
 const Viewer = () => {
@@ -33,8 +34,20 @@ const Viewer = () => {
     onViewportLoad,
     useFixedAxis
   } = useImageSettingsStore();
+  const source = loader[0];
+  const physicalSizeScalingMatrix = getPhysicalSizeScalingMatrix(source);
+  const pixelScalingMatrix = new Matrix4().scale(
+    ['x', 'y', 'z'].map(d => source.shape[source.labels.indexOf(d)])
+  );
   const clippingPlanes = sphericals.map(v =>
-    new Plane().fromPointNormal(v.toVector3(), v.toVector3())
+    new Plane().fromPointNormal(
+      pixelScalingMatrix.transformPoint(
+        physicalSizeScalingMatrix.transformPoint(v.toVector3())
+      ),
+      pixelScalingMatrix.transformPoint(
+        physicalSizeScalingMatrix.transformPoint(v.toVector3())
+      )
+    )
   );
   return use3d ? (
     <VolumeViewer

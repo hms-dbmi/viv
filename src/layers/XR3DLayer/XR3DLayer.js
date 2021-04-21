@@ -230,7 +230,7 @@ const XR3DLayer = class extends Layer {
    * This function runs the shaders and draws to the canvas
    */
   draw({ uniforms }) {
-    const { textures, model, volDims } = this.state;
+    const { textures, model, scaleMatrix } = this.state;
     const {
       sliderValues,
       colorValues,
@@ -249,7 +249,7 @@ const XR3DLayer = class extends Layer {
       viewMatrixInverse,
       projectionMatrix
     } = this.context.viewport;
-    if (textures && model && volDims) {
+    if (textures && model && scaleMatrix) {
       const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
         sliderValues,
         colorValues,
@@ -257,8 +257,12 @@ const XR3DLayer = class extends Layer {
         domain,
         dtype
       });
+      const invertedScaleMatrix = scaleMatrix.clone().invert();
+      const invertedResolutionMatrix = resolutionMatrix.clone().invert();
       const paddedClippingPlanes = padWithDefault(
-        [...clippingPlanes],
+        clippingPlanes.map(p =>
+          p.transform(invertedScaleMatrix).transform(invertedResolutionMatrix)
+        ),
         new Plane([1, 0, 0]),
         clippingPlanes.length || _NUM_PLANES_DEFAULT
       );
@@ -281,7 +285,7 @@ const XR3DLayer = class extends Layer {
           ]),
           view: viewMatrix,
           proj: projectionMatrix,
-          scale: new Matrix4().scale(volDims),
+          scale: scaleMatrix,
           resolution: resolutionMatrix,
           model: modelMatrix || new Matrix4(),
           normals,
@@ -317,11 +321,13 @@ const XR3DLayer = class extends Layer {
       }, this);
       this.setState({
         textures,
-        volDims: this.props.physicalSizeScalingMatrix.transformPoint([
-          width,
-          height,
-          depth
-        ])
+        scaleMatrix: new Matrix4().scale(
+          this.props.physicalSizeScalingMatrix.transformPoint([
+            width,
+            height,
+            depth
+          ])
+        )
       });
     }
   }
