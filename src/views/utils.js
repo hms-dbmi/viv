@@ -35,10 +35,12 @@ export function makeBoundingBox(viewState) {
  * Create an initial view state that centers the image in the viewport at the zoom level that fills the dimensions in `viewSize`.
  * @param {Object} loader (PixelSource[] | PixelSource)
  * @param {Object} viewSize { height, width } object giving dimensions of the viewport for deducing the right zoom level to center the image.
- * @param {Object} zoomBackOff A positive number which controls how far zoomed out the view state is from filling the entire viewport (default is 0 so the image fully fills the view).
+ * @param {Object=} zoomBackOff A positive number which controls how far zoomed out the view state is from filling the entire viewport (default is 0 so the image fully fills the view).
  * SideBySideViewer and PictureInPictureViewer use .5 when setting viewState automatically in their default behavior, so the viewport is slightly zoomed out from the image
  * filling the whole screen.  1 unit of zoomBackOff (so a passed-in value of 1) corresponds to a 2x zooming out.
- * @returns {ViewState} A default initial view state that centers the image within the view: { target: [x, y, 0], zoom: -zoom }.
+ * @param {Boolean=} use3d Whether or not to return a view state that can be used with the 3d viewer
+ * @param {Boolean=} modelMatrix If using a transformation matrix, passing it in here will allow this function to properly center the volume.
+ * @returns {Object} A default initial view state that centers the image within the view: { target: [x, y, 0], zoom: -zoom }.
  */
 export function getDefaultInitialViewState(
   loader,

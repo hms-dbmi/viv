@@ -26,6 +26,7 @@ import { RENDERING_MODES } from '../constants';
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
  * @param {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
+ * @param {Array.<Object>=} [useFixedAxis] Whether or not to fix the axis of the camera (default is true).
  */
 
 const VolumeViewer = props => {

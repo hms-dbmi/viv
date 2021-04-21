@@ -89,10 +89,9 @@ function VolumeButton() {
           // eslint-disable-next-line no-unused-expressions
           if (use3d) {
             toggleUse3d();
-            setViewerState(
-              'isChannelLoading',
-              selections.map(_ => true)
-            );
+            setViewerState({
+              isChannelLoading: selections.map(_ => true)
+            });
             getMultiSelectionStats({ loader, selections, use3d: !use3d }).then(
               ({ domains, sliders }) => {
                 setPropertiesForChannels(range(selections.length), {

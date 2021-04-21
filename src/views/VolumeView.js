@@ -5,6 +5,9 @@ import VivView from './VivView';
 
 /**
  * This class generates a VolumeLayer and a view for use in the VivViewer as volumetric rendering.
+ * @param {Object} args
+ * @param {Array<number>} args.target Centered target for the camera (used if useFixedAxis is true)
+ * @param {Boolean} args.useFixedAxis Whether or not to fix the axis of the camera.
  * */
 export default class VolumeView extends VivView {
   constructor({ target, useFixedAxis, ...args }) {
