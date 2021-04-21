@@ -79,6 +79,7 @@ const Controller = () => {
           }
         });
         setPropertiesForChannel(i, { selections: selection });
+        setIsChannelLoading(i, true);
       });
     };
     const toggleIsOn = () => toggleIsOnSetter(i);
