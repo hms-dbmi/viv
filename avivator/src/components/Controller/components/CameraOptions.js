@@ -14,7 +14,7 @@ import { useWindowSize } from '../../../utils';
 const CameraOptions = () => {
   const { loader } = useChannelSettings();
   const { useFixedAxis, toggleUseFixedAxis } = useImageSettingsStore();
-  const { setViewerState } = useViewerStore();
+  const { setViewerState, viewState } = useViewerStore();
   const { height, width } = useWindowSize();
   const toggleFixedAxisButton = (
     <Grid item xs="auto" key="toggle-fixed-axis">
@@ -33,12 +33,12 @@ const CameraOptions = () => {
       <Button
         onClick={() =>
           setViewerState({
-            viewState: getDefaultInitialViewState(
-              loader,
-              { height, width },
-              1,
-              true
-            )
+            viewState: {
+              ...viewState,
+              ...getDefaultInitialViewState(loader, { height, width }, 1, true),
+              rotationX: 0,
+              rotationOrbit: 0
+            }
           })
         }
         style={{ padding: 0 }}
