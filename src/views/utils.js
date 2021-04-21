@@ -58,7 +58,7 @@ export function getDefaultInitialViewState(
   const physicalSizeScalingMatrix = getPhysicalSizeScalingMatrix(source);
   const loaderInitialViewState = {
     target: (modelMatrix || new Matrix4()).transformPoint(
-      physicalSizeScalingMatrix.transformPoint([
+      (use3d ? physicalSizeScalingMatrix : new Matrix4()).transformPoint([
         width / 2,
         height / 2,
         use3d ? depth / 2 : 0
