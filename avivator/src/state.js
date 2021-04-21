@@ -185,7 +185,6 @@ const DEFAULT_VIEWER_STATE = {
   channelOptions: [],
   metadata: null,
   viewState: null,
-  initialViewState: null,
   source: ''
 };
 

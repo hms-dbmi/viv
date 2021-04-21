@@ -11,7 +11,6 @@ const Slicer = () => {
     setClippingPlaneSettings,
     sphericals: [spherical]
   } = useImageSettingsStore();
-  const { setViewerState, initialViewState } = useViewerStore();
   const sliceValuesAndSetSliceFunctions = [
     [
       spherical.phi,

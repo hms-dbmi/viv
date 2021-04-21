@@ -1,7 +1,5 @@
 import React, { useMemo } from 'react'; // eslint-disable-line import/no-unresolved
-import { Matrix4 } from 'math.gl';
 
-import { getPhysicalSizeScalingMatrix } from '../layers/utils';
 import VivViewer from './VivViewer';
 import { VolumeView, getDefaultInitialViewState } from '../views';
 import { RENDERING_MODES } from '../constants';
