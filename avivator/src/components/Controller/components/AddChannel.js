@@ -32,14 +32,16 @@ const AddChannel = () => {
       selection,
       use3d
     }).then(({ domain, slider }) => {
-      setImageSetting('onViewportLoad', () => {
-        setPropertiesForChannel(numSelectionsBeforeAdd, {
-          domains: domain,
-          sliders: slider,
-          isOn: true
-        });
-        setImageSetting({ onViewportLoad: () => {} });
-        setIsChannelLoading(numSelectionsBeforeAdd, false);
+      setImageSetting({
+        onViewportLoad: () => {
+          setPropertiesForChannel(numSelectionsBeforeAdd, {
+            domains: domain,
+            sliders: slider,
+            isOn: true
+          });
+          setImageSetting({ onViewportLoad: () => {} });
+          setIsChannelLoading(numSelectionsBeforeAdd, false);
+        }
       });
       addIsChannelLoading(true);
       addChannel({

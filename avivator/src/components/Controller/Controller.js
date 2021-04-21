@@ -71,10 +71,12 @@ const Controller = () => {
         selection,
         use3d
       }).then(({ domain, slider }) => {
-        setImageSetting('onViewportLoad', () => {
-          setPropertiesForChannel(i, { sliders: slider, domains: domain });
-          setImageSetting('onViewportLoad', () => {});
-          setIsChannelLoading(i, false);
+        setImageSetting({
+          onViewportLoad: () => {
+            setPropertiesForChannel(i, { sliders: slider, domains: domain });
+            setImageSetting({ onViewportLoad: () => {} });
+            setIsChannelLoading(i, false);
+          }
         });
         setPropertiesForChannel(i, { selections: selection });
       });

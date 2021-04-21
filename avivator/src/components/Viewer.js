@@ -85,7 +85,7 @@ const Viewer = () => {
       zoomLock={zoomLock}
       panLock={panLock}
       hoverHooks={{
-        handleValue: v => setViewerState('pixelValues', v)
+        handleValue: v => setViewerState({ pixelValues: v })
       }}
       lensSelection={lensSelection}
       isLensOn={isLensOn}
@@ -104,7 +104,7 @@ const Viewer = () => {
       overview={DEFAULT_OVERVIEW}
       overviewOn={isOverviewOn}
       hoverHooks={{
-        handleValue: v => setViewerState('pixelValues', v)
+        handleValue: v => setViewerState({ pixelValues: v })
       }}
       lensSelection={lensSelection}
       isLensOn={isLensOn}
