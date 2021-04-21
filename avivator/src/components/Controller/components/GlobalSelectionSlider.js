@@ -12,10 +12,7 @@ import {
 
 export default function GlobalSelectionSlider(props) {
   const { size, label } = props;
-  const {
-    setPropertiesForChannels,
-    setPropertyForChannels
-  } = useChannelSetters();
+  const { setPropertiesForChannels } = useChannelSetters();
   const { selections, loader } = useChannelSettings();
   const { setViewerState, globalSelection } = useViewerStore();
   const { setImageSetting } = useImageSettingsStore();
@@ -45,7 +42,7 @@ export default function GlobalSelectionSlider(props) {
             });
           }
         });
-        setPropertyForChannels(range(newSelections.length), {
+        setPropertiesForChannels(range(newSelections.length), {
           selections: newSelections
         });
       });
