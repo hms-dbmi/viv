@@ -71,9 +71,9 @@ const defaultProps = {
   sliderValues: { type: 'array', value: [], compare: true },
   dtype: { type: 'string', value: 'Uint8', compare: true },
   colormap: { type: 'string', value: '', compare: true },
-  xSlice: { type: 'array', value: [0, 1], compare: true },
-  ySlice: { type: 'array', value: [0, 1], compare: true },
-  zSlice: { type: 'array', value: [0, 1], compare: true },
+  xSlice: { type: 'array', value: null, compare: true },
+  ySlice: { type: 'array', value: null, compare: true },
+  zSlice: { type: 'array', value: null, compare: true },
   clippingPlanes: { type: 'array', value: [], compare: true },
   renderingMode: {
     type: 'string',
@@ -118,9 +118,9 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @property {string=} renderingMode One of Maximum Intensity Projection, Minimum Intensity Projection, or Additive
  * @property {Object=} modelMatrix A column major affine transformation to be applied to the volume.
- * @property {Array.<number>=} xSlice 0-1 interval on which to slice the volume.
- * @property {Array.<number>=} ySlice 0-1 interval on which to slice the volume.
- * @property {Array.<number>=} zSlice 0-1 interval on which to slice the volume.
+ * @property {Array.<number>=} xSlice 0-width (physical coordinates) interval on which to slice the volume.
+ * @property {Array.<number>=} ySlice 0-height (physical coordinates) interval on which to slice the volume.
+ * @property {Array.<number>=} zSlice 0-depth (physical coordinates) interval on which to slice the volume.
  * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  * @property {Object=} resolutionMatrix Matrix for scaling the volume based on the (downsampled) resolution being displayed.
  */
@@ -275,9 +275,21 @@ const XR3DLayer = class extends Layer {
           ...textures,
           sliderValues: paddedSliderValues,
           colorValues: paddedColorValues,
-          xSlice: new Float32Array(xSlice),
-          ySlice: new Float32Array(ySlice),
-          zSlice: new Float32Array(zSlice),
+          xSlice: new Float32Array(
+            xSlice
+              ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])
+              : [0, 1]
+          ),
+          ySlice: new Float32Array(
+            ySlice
+              ? ySlice.map(i => i / scaleMatrix[5] / resolutionMatrix[5])
+              : [0, 1]
+          ),
+          zSlice: new Float32Array(
+            zSlice
+              ? zSlice.map(i => i / scaleMatrix[10] / resolutionMatrix[10])
+              : [0, 1]
+          ),
           eye_pos: new Float32Array([
             viewMatrixInverse[12],
             viewMatrixInverse[13],

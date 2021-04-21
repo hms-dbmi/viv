@@ -28,9 +28,9 @@ const defaultProps = {
     ],
     compare: true
   },
-  xSlice: { type: 'array', value: [0, 1], compare: true },
-  ySlice: { type: 'array', value: [0, 1], compare: true },
-  zSlice: { type: 'array', value: [0, 1], compare: true },
+  xSlice: { type: 'array', value: null, compare: true },
+  ySlice: { type: 'array', value: null, compare: true },
+  zSlice: { type: 'array', value: null, compare: true },
   clippingPlanes: { type: 'array', value: [], compare: true },
   renderingMode: {
     type: 'string',
@@ -53,9 +53,9 @@ const defaultProps = {
  * @property {number=} resolution Resolution at which you would like to see the volume and load it into memory (0 highest, loader.length -1 the lowest default 0)
  * @property {string=} renderingMode One of Maximum Intensity Projection, Minimum Intensity Projection, or Additive
  * @property {Object=} modelMatrix A column major affine transformation to be applied to the volume.
- * @property {Array.<number>=} xSlice 0-1 interval on which to slice the volume.
- * @property {Array.<number>=} ySlice 0-1 interval on which to slice the volume.
- * @property {Array.<number>=} zSlice 0-1 interval on which to slice the volume.
+ * @property {Array.<number>=} xSlice 0-width (physical coordinates) interval on which to slice the volume.
+ * @property {Array.<number>=} ySlice 0-height (physical coordinates) interval on which to slice the volume.
+ * @property {Array.<number>=} zSlice 0-depth (physical coordinates) interval on which to slice the volume.
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
  * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  */
