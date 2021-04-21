@@ -1,5 +1,6 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { TextLayer } from '@deck.gl/layers';
+import { Matrix4 } from 'math.gl';
 import XR3DLayer from '../XR3DLayer';
 import { getPhysicalSizeScalingMatrix } from '../utils';
 import { RENDERING_MODES } from '../../constants';
@@ -72,10 +73,13 @@ const VolumeLayer = class extends CompositeLayer {
     const { propsChanged } = changeFlags;
     const loaderChanged =
       typeof propsChanged === 'string' && propsChanged.includes('props.loader');
+    const resolutionChanged =
+      typeof propsChanged === 'string' &&
+      propsChanged.includes('props.resolution');
     const loaderSelectionChanged =
       props.loaderSelection !== oldProps.loaderSelection;
     // Only fetch new data to render if loader has changed
-    if (loaderChanged || loaderSelectionChanged) {
+    if (loaderChanged || loaderSelectionChanged || resolutionChanged) {
       const {
         loader,
         loaderSelection = [],
@@ -104,6 +108,9 @@ const VolumeLayer = class extends CompositeLayer {
           signal
         })
       );
+      const physicalSizeScalingMatrix = getPhysicalSizeScalingMatrix(
+        loader[resolution]
+      );
 
       Promise.all(volumePromises).then(volumes => {
         if (onViewportLoad) {
@@ -116,7 +123,11 @@ const VolumeLayer = class extends CompositeLayer {
           depth: volumes[0].depth
         };
 
-        this.setState({ ...volume });
+        this.setState({
+          ...volume,
+          physicalSizeScalingMatrix,
+          resolutionMatrix: new Matrix4().scale(2 ** resolution)
+        });
       });
     }
   }
@@ -124,7 +135,15 @@ const VolumeLayer = class extends CompositeLayer {
   renderLayers() {
     const { loader, id, resolution } = this.props;
     const { dtype } = loader[resolution];
-    const { data, width, height, depth, progress } = this.state;
+    const {
+      data,
+      width,
+      height,
+      depth,
+      progress,
+      physicalSizeScalingMatrix,
+      resolutionMatrix
+    } = this.state;
     if (!(width && height)) {
       const { viewport } = this.context;
       return new TextLayer({
@@ -145,13 +164,11 @@ const VolumeLayer = class extends CompositeLayer {
         sizeScale: 2 ** -viewport.zoom
       });
     }
-    const physicalSizeScalingMatrix = getPhysicalSizeScalingMatrix(
-      loader[resolution]
-    );
     return new XR3DLayer(this.props, {
       channelData: { data, width, height, depth },
       id: `XR3DLayer-${0}-${height}-${width}-${0}-${resolution}-${id}`,
       physicalSizeScalingMatrix,
+      resolutionMatrix,
       dtype
     });
   }

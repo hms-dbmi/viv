@@ -2,17 +2,27 @@ import React from 'react';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import { useImageSettingsStore, useViewerStore } from '../../../state';
+// eslint-disable-next-line import/no-unresolved
+import { getDefaultInitialViewState } from '@hms-dbmi/viv';
+import {
+  useImageSettingsStore,
+  useViewerStore,
+  useChannelSettings
+} from '../../../state';
+import { useWindowSize } from '../../../utils';
 
 const CameraOptions = () => {
+  const { loader } = useChannelSettings();
   const { useFixedAxis, toggleUseFixedAxis } = useImageSettingsStore();
-  const { initialViewState, setViewerState } = useViewerStore();
+  const { setViewerState } = useViewerStore();
+  const { height, width } = useWindowSize();
   const toggleFixedAxisButton = (
     <Grid item xs="auto" key="toggle-fixed-axis">
       <ToggleButton
         selected={useFixedAxis}
         onClick={toggleUseFixedAxis}
         style={{ padding: 0 }}
+        value={useFixedAxis}
       >
         Fix Camera Axis
       </ToggleButton>
@@ -21,7 +31,16 @@ const CameraOptions = () => {
   const reCenterButton = (
     <Grid item xs="auto" key="recenter">
       <Button
-        onClick={() => setViewerState({ viewState: initialViewState })}
+        onClick={() =>
+          setViewerState({
+            viewState: getDefaultInitialViewState(
+              loader,
+              { height, width },
+              1,
+              true
+            )
+          })
+        }
         style={{ padding: 0 }}
       >
         Re-Center

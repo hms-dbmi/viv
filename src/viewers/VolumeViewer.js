@@ -57,28 +57,15 @@ const VolumeViewer = props => {
     if (volumeViewState) {
       return volumeViewState;
     }
-    const { shape, labels } = loader[resolution];
-    const height = shape[labels.indexOf('y')];
-    const width = shape[labels.indexOf('x')];
-    const depth = shape[labels.indexOf('z')];
-    const depthDownsampled = Math.floor(depth / 2 ** resolution);
-    const physicalSizeScalingMatrix = getPhysicalSizeScalingMatrix(
-      loader[resolution]
-    );
-    const { zoom } = getDefaultInitialViewState(
-      loader[resolution],
+    const viewState = getDefaultInitialViewState(
+      loader,
       { height: screenHeight, width: screenWidth },
-      1
+      1,
+      true,
+      modelMatrix
     );
     return {
-      target: (modelMatrix || new Matrix4()).transformPoint(
-        physicalSizeScalingMatrix.transformPoint([
-          width / 2,
-          height / 2,
-          depthDownsampled / 2
-        ])
-      ),
-      zoom,
+      ...viewState,
       rotationX: 0,
       rotationOrbit: 0
     };

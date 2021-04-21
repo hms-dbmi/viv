@@ -17,13 +17,7 @@ import { useWindowSize } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
 
 const Viewer = () => {
-  const {
-    useLinkedView,
-    setViewerState,
-    use3d,
-    initialViewState,
-    viewState
-  } = useViewerStore();
+  const { useLinkedView, setViewerState, use3d, viewState } = useViewerStore();
   const { colors, sliders, isOn, selections, loader } = useChannelSettings();
   const viewSize = useWindowSize();
   const {
@@ -59,13 +53,8 @@ const Viewer = () => {
       useFixedAxis={useFixedAxis}
       viewStates={[viewState]}
       onViewStateChange={debounce(
-        ({ viewState: newViewState, viewId }) => {
-          setViewerState({ viewState: { ...newViewState, id: viewId } });
-          if (!initialViewState)
-            setViewerState({
-              initialViewState: { ...newViewState, id: viewId }
-            });
-        },
+        ({ viewState: newViewState, viewId }) =>
+          setViewerState({ viewState: { ...newViewState, id: viewId } }),
         250,
         { trailing: true }
       )}

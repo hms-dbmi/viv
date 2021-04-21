@@ -1,9 +1,11 @@
 import { OrthographicView } from '@deck.gl/core';
+import { Matrix4 } from 'math.gl';
 import { getImageSize } from '../loaders/utils';
 
 // Do not import from '../layers' because that causes a circular dependency.
 import MultiscaleImageLayer from '../layers/MultiscaleImageLayer';
 import ImageLayer from '../layers/ImageLayer';
+import { getPhysicalSizeScalingMatrix } from '../layers/utils';
 
 export function getVivId(id) {
   return `-#${id}#`;
@@ -38,15 +40,28 @@ export function makeBoundingBox(viewState) {
  * filling the whole screen.  1 unit of zoomBackOff (so a passed-in value of 1) corresponds to a 2x zooming out.
  * @returns {ViewState} A default initial view state that centers the image within the view: { target: [x, y, 0], zoom: -zoom }.
  */
-export function getDefaultInitialViewState(loader, viewSize, zoomBackOff = 0) {
-  const { width, height } = getImageSize(
-    Array.isArray(loader) ? loader[0] : loader
-  );
+export function getDefaultInitialViewState(
+  loader,
+  viewSize,
+  zoomBackOff = 0,
+  use3d = false,
+  modelMatrix
+) {
+  const source = Array.isArray(loader) ? loader[0] : loader;
+  const { width, height } = getImageSize(source);
+  const depth = source.shape[source.labels.indexOf('z')];
   const zoom =
     Math.log2(Math.min(viewSize.width / width, viewSize.height / height)) -
     zoomBackOff;
+  const physicalSizeScalingMatrix = getPhysicalSizeScalingMatrix(source);
   const loaderInitialViewState = {
-    target: [width / 2, height / 2, 0],
+    target: (modelMatrix || new Matrix4()).transformPoint(
+      physicalSizeScalingMatrix.transformPoint([
+        width / 2,
+        height / 2,
+        use3d ? depth / 2 : 0
+      ])
+    ),
     zoom
   };
   return loaderInitialViewState;

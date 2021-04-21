@@ -79,7 +79,8 @@ const defaultProps = {
     type: 'string',
     value: RENDERING_NAMES.ADDITIVE,
     compare: true
-  }
+  },
+  resolutionMatrix: { type: 'object', value: new Matrix4(), compare: true }
 };
 
 function removeExtraColormapFunctionsFromShader(colormap) {
@@ -121,6 +122,7 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * @property {Array.<number>=} ySlice 0-1 interval on which to slice the volume.
  * @property {Array.<number>=} zSlice 0-1 interval on which to slice the volume.
  * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
+ * @property {Object=} resolutionMatrix Matrix for scaling the volume based on the (downsampled) resolution being displayed.
  */
 
 /**
@@ -239,7 +241,8 @@ const XR3DLayer = class extends Layer {
       channelIsOn,
       domain,
       dtype,
-      clippingPlanes
+      clippingPlanes,
+      resolutionMatrix
     } = this.props;
     const {
       viewMatrix,
@@ -279,6 +282,7 @@ const XR3DLayer = class extends Layer {
           view: viewMatrix,
           proj: projectionMatrix,
           scale: new Matrix4().scale(volDims),
+          resolution: resolutionMatrix,
           model: modelMatrix || new Matrix4(),
           normals,
           distances
