@@ -8,6 +8,8 @@ const areViewStatesEqual = (viewState, otherViewState) => {
   return (
     otherViewState === viewState ||
     (viewState?.zoom === otherViewState?.zoom &&
+      viewState?.rotationX === otherViewState?.rotationX &&
+      viewState?.rotationOrbit === otherViewState?.rotationOrbit &&
       equal(viewState?.target, otherViewState?.target))
   );
 };

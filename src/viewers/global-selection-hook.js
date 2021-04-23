@@ -15,12 +15,7 @@ export default function useGlobalSelection(loaderSelection, transitionFields) {
   ) {
     // onViewportLoad is a property of TileLayer that is passed through:
     // https://deck.gl/docs/api-reference/geo-layers/tile-layer#onviewportload
-    onViewportLoad = () => {
-      // Slightly delay to avoid issues with a render in the middle of a deck.gl layer state update.
-      setTimeout(() => {
-        setViewportSelection(loaderSelection);
-      }, 0);
-    };
+    onViewportLoad = () => setViewportSelection(loaderSelection);
     // Set newLoaderSelection to cause the creation of an extra tile layer.
     newLoaderSelection = loaderSelection;
     oldLoaderSelection = viewportSelection;

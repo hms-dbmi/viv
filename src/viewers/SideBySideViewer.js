@@ -32,6 +32,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {Array} [props.transitionFields] A string array indicating which fields require a transition: Default: ['t', 'z'].
+ * @param {function} [props.onViewportLoad] Function that gets called when the data in the viewport loads.
  */
 const SideBySideViewer = props => {
   const {
@@ -54,12 +55,13 @@ const SideBySideViewer = props => {
     transparentColor,
     onViewStateChange,
     onHover,
-    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS
+    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
+    onViewportLoad
   } = props;
   const {
     newLoaderSelection,
     oldLoaderSelection,
-    onViewportLoad
+    onViewportLoad: transitionOnViewportLoad
   } = useGlobalSelection(loaderSelection, transitionFields);
   const leftViewState = viewStatesProp?.find(v => v.id === 'left');
   const rightViewState = viewStatesProp?.find(v => v.id === 'right');
@@ -104,6 +106,7 @@ const SideBySideViewer = props => {
     loaderSelection: oldLoaderSelection,
     newLoaderSelection,
     onViewportLoad,
+    transitionOnViewportLoad,
     transitionFields,
     colormap,
     isLensOn,
