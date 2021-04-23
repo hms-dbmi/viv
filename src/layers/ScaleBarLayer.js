@@ -4,29 +4,28 @@ import { range } from './utils';
 import { makeBoundingBox } from '../views/utils';
 import { DEFAULT_FONT_FAMILY } from '../constants';
 
-function getPosition(boundingBox, position, length) {
+function getPosition(boundingBox, position, offset) {
   const viewLength = boundingBox[2][0] - boundingBox[0][0];
+  const viewHeight = boundingBox[2][1] - boundingBox[0][1];
   switch (position) {
     case 'bottom-right': {
-      const yCoord =
-        boundingBox[2][1] - (boundingBox[2][1] - boundingBox[0][1]) * length;
-      const xLeftCoord = boundingBox[2][0] - viewLength * length;
+      const yCoord = boundingBox[2][1] - viewHeight * offset;
+      const xLeftCoord = boundingBox[2][0] - viewLength * offset;
       return [yCoord, xLeftCoord];
     }
     case 'top-right': {
-      const yCoord = (boundingBox[2][1] - boundingBox[0][1]) * length;
-      const xLeftCoord = boundingBox[2][0] - viewLength * length;
+      const yCoord = viewHeight * offset;
+      const xLeftCoord = boundingBox[2][0] - viewLength * offset;
       return [yCoord, xLeftCoord];
     }
     case 'top-left': {
-      const yCoord = (boundingBox[2][1] - boundingBox[0][1]) * length;
-      const xLeftCoord = viewLength * length;
+      const yCoord = viewHeight * offset;
+      const xLeftCoord = viewLength * offset;
       return [yCoord, xLeftCoord];
     }
     case 'bottom-left': {
-      const yCoord =
-        boundingBox[2][1] - (boundingBox[2][1] - boundingBox[0][1]) * length;
-      const xLeftCoord = viewLength * length;
+      const yCoord = boundingBox[2][1] - viewHeight * offset;
+      const xLeftCoord = viewLength * offset;
       return [yCoord, xLeftCoord];
     }
     default: {
@@ -45,7 +44,8 @@ const defaultProps = {
   unit: { type: 'string', value: '', compare: true },
   size: { type: 'number', value: 1, compare: true },
   position: { type: 'string', value: 'bottom-right', compare: true },
-  length: { type: 'number', value: 0.085, compare: true }
+  length: { type: 'number', value: 0.05, compare: true },
+  offset: { type: 'number', value: 0.085, compare: true }
 };
 /**
  * @typedef LayerProps
@@ -56,6 +56,7 @@ const defaultProps = {
  * https://github.com/visgl/deck.gl/issues/4504
  * @property {Array=} boundingBox Boudning box of the view in which this should render.
  * @property {string=} id Id from the parent layer.
+ * @property {string=} position In which corner to situate the scale bar (one of bottom-right, top-right, top-left, or bottom-left).
  * @property {number=} length Value from 0 to 1 representing the portion of the view to be used for the length part of the scale bar.
  */
 
@@ -65,11 +66,11 @@ const defaultProps = {
  */
 const ScaleBarLayer = class extends CompositeLayer {
   renderLayers() {
-    const { id, unit, size, position, viewState, length } = this.props;
+    const { id, unit, size, position, viewState, length, offset } = this.props;
     const boundingBox = makeBoundingBox(viewState);
     const { zoom } = viewState;
     const viewLength = boundingBox[2][0] - boundingBox[0][0];
-    const barLength = viewLength * 0.05;
+    const barLength = viewLength * length;
     // This is a good heuristic for stopping the bar tick marks from getting too small
     // and/or the text squishing up into the bar.
     const barHeight = Math.max(
@@ -77,7 +78,7 @@ const ScaleBarLayer = class extends CompositeLayer {
       (boundingBox[2][1] - boundingBox[0][1]) * 0.007
     );
     const numUnits = barLength * size;
-    const [yCoord, xLeftCoord] = getPosition(boundingBox, position, length);
+    const [yCoord, xLeftCoord] = getPosition(boundingBox, position, offset);
     const lengthBar = new LineLayer({
       id: `scale-bar-length-${id}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,

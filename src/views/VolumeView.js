@@ -1,5 +1,5 @@
 import { OrbitView } from '@deck.gl/core';
-import { VolumeLayer } from '../layers';
+import { VolumeLayer, AxesLayer3D } from '../layers';
 import { getVivId } from './utils';
 import VivView from './VivView';
 
@@ -40,15 +40,42 @@ export default class VolumeView extends VivView {
       : null;
   }
 
-  getLayers({ props }) {
+  getLayers({ props, viewStates }) {
     const { loader } = props;
-    const { id } = this;
-
+    const { shape } = loader[0];
+    const { id, height, width } = this;
+    const layerViewState = viewStates[id];
     const layers = [
       new VolumeLayer(props, {
         id: `${loader.type}${getVivId(id)}`
       })
     ];
+    // Inspect the first pixel source for physical sizes
+    if (
+      loader[0]?.meta?.physicalSizes?.x &&
+      loader[0]?.meta?.physicalSizes?.y &&
+      loader[0]?.meta?.physicalSizes?.z
+    ) {
+      const axes = ['x', 'y', 'z'];
+      // Volumes, if this information is present, have been scaled so that the minimum size is the per-pixel size.
+      const sizes = axes.map(axis => loader[0].meta.physicalSizes[axis].size);
+      const minSize = Math.min(...sizes);
+      const minAxis = axes.find(
+        axis => loader[0].meta.physicalSizes[axis].size === minSize
+      );
+      const minSizes = axes.map(_ => minSize);
+      const units = axes.map(_ => loader[0].meta.physicalSizes[minAxis].unit);
+      layers.push(
+        new AxesLayer3D({
+          id: getVivId(id),
+          loader,
+          units,
+          sizes: minSizes,
+          shape,
+          viewState: { ...layerViewState, height, width }
+        })
+      );
+    }
 
     return layers;
   }
