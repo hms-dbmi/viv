@@ -15,8 +15,7 @@ const defaultProps = {
   size: { type: 'number', value: 1, compare: true },
   position: { type: 'string', value: 'bottom-right', compare: true },
   length: { type: 'number', value: 0.2, compare: true },
-  labels: { type: 'array', value: ['x', 'y', 'z'], compare: true },
-  modelMatrix: { type: 'object', value: new Matrix4(), compare: true }
+  labels: { type: 'array', value: ['x', 'y', 'z'], compare: true }
 };
 /**
  * @typedef LayerProps
@@ -36,18 +35,8 @@ const defaultProps = {
  */
 const AxesLayer3D = class extends CompositeLayer {
   renderLayers() {
-    const {
-      id,
-      units,
-      sizes,
-      labels,
-      viewState,
-      shape,
-      length,
-      modelMatrix
-    } = this.props;
+    const { id, units, sizes, labels, viewState, shape } = this.props;
     const { zoom } = viewState;
-    const barLength = Math.max(...shape) * length;
     const axisLineLayers = labels.map(
       (axis, index) =>
         new LineLayer({
@@ -56,8 +45,8 @@ const AxesLayer3D = class extends CompositeLayer {
           data: [
             [
               [0, 0, 0],
-              [0, 0, 0].map((i, j) => (j === index ? barLength : i))
-            ].map(point => modelMatrix.transformPoint(point))
+              [0, 0, 0].map((i, j) => (j === index ? shape[index] : i))
+            ]
           ],
           getSourcePosition: d => d[0],
           getTargetPosition: d => d[1],
@@ -73,21 +62,17 @@ const AxesLayer3D = class extends CompositeLayer {
           data: [
             {
               text: `${
-                String(sizes[index] * barLength)
+                String(sizes[index] * shape[index])
                   .slice(0, 5)
                   .replace(/\.$/, '') + units[index]
               } (${axis})`,
-              position: modelMatrix.transformPoint(
-                [0, 0, 0]
-                  .map((i, j) => (j === index ? barLength * 0.95 : i))
-                  .map((i, j) =>
-                    j % 3 === (index + 1) % 3 ? barLength * 0.105 : i
-                  )
+              position: [0, 0, 0].map((i, j) =>
+                j === index ? shape[index] * 1.05 : i
               )
             }
           ],
           getColor: [0, 0, 0, 255].map((i, j) => (j === index ? 255 : i)),
-          getSize: barLength * 0.2,
+          getSize: shape[index] * 0.05,
           fontFamily: DEFAULT_FONT_FAMILY,
           sizeUnits: 'meters',
           sizeScale: Math.min(1, 2 ** -(zoom + 2)),
@@ -102,7 +87,7 @@ const AxesLayer3D = class extends CompositeLayer {
           ]
         })
     );
-    return [...axisLineLayers, ...textLayers];
+    return [...textLayers, ...axisLineLayers];
   }
 };
 

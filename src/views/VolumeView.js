@@ -42,7 +42,6 @@ export default class VolumeView extends VivView {
 
   getLayers({ props, viewStates }) {
     const { loader } = props;
-    const { shape } = loader[0];
     const { id, height, width } = this;
     const layerViewState = viewStates[id];
     const layers = [
@@ -50,28 +49,35 @@ export default class VolumeView extends VivView {
         id: `${loader.type}${getVivId(id)}`
       })
     ];
+    const source = loader[0];
+    const { labels, shape } = source;
     // Inspect the first pixel source for physical sizes
     if (
-      loader[0]?.meta?.physicalSizes?.x &&
-      loader[0]?.meta?.physicalSizes?.y &&
-      loader[0]?.meta?.physicalSizes?.z
+      source?.meta?.physicalSizes?.x &&
+      source?.meta?.physicalSizes?.y &&
+      source?.meta?.physicalSizes?.z
     ) {
       const axes = ['x', 'y', 'z'];
       // Volumes, if this information is present, have been scaled so that the minimum size is the per-pixel size.
-      const sizes = axes.map(axis => loader[0].meta.physicalSizes[axis].size);
+      const sizes = axes.map(axis => source.meta.physicalSizes[axis].size);
       const minSize = Math.min(...sizes);
       const minAxis = axes.find(
-        axis => loader[0].meta.physicalSizes[axis].size === minSize
+        axis => source.meta.physicalSizes[axis].size === minSize
       );
+      const ratios = sizes.map(size => size / minSize);
       const minSizes = axes.map(_ => minSize);
-      const units = axes.map(_ => loader[0].meta.physicalSizes[minAxis].unit);
+      const units = axes.map(_ => source.meta.physicalSizes[minAxis].unit);
       layers.push(
         new AxesLayer3D({
           id: getVivId(id),
           loader,
           units,
           sizes: minSizes,
-          shape,
+          shape: [
+            ratios[0] * shape[labels.indexOf('x')],
+            ratios[1] * shape[labels.indexOf('y')],
+            ratios[2] * shape[labels.indexOf('z')]
+          ],
           viewState: { ...layerViewState, height, width }
         })
       );
