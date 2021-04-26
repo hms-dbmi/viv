@@ -1,6 +1,6 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
+import { GL } from '@luma.gl/constants';
 import { LineLayer, TextLayer } from '@deck.gl/layers';
-import { Matrix4 } from 'math.gl';
 import { range } from './utils';
 import { DEFAULT_FONT_FAMILY } from '../constants';
 
