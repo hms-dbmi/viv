@@ -12,6 +12,7 @@ export const RENDERING_MODES_BLEND = {
       for(int i = 0; i < 6; i++) {
         if(intensityArray[i] > maxVals[i]) {
           maxVals[i] = intensityArray[i];
+          renderDepthCoord = p;
         }
       }
     `,
@@ -36,6 +37,7 @@ export const RENDERING_MODES_BLEND = {
       for(int i = 0; i < 6; i++) {
         if(intensityArray[i] < minVals[i]) {
           minVals[i] = intensityArray[i];
+          renderDepthCoord = p;
         }
       }
     `,
@@ -70,6 +72,7 @@ export const RENDERING_MODES_BLEND = {
       val_color.a = 1.0 - pow(1.0 - val_color.a, 1.0);
       color.rgb += (1.0 - color.a) * val_color.a * val_color.rgb;
       color.a += (1.0 - color.a) * val_color.a;
+      renderDepthCoord = p;
       if (color.a >= 0.95) {
         break;
       }
@@ -90,6 +93,7 @@ export const RENDERING_MODES_COLORMAP = {
       for(int i = 0; i < 6; i++) {
         if(intensityArray[i] > maxVals[i]) {
           maxVals[i] = intensityArray[i];
+          renderDepthCoord = p;
         }
       }
     `,
@@ -114,6 +118,7 @@ export const RENDERING_MODES_COLORMAP = {
       for(int i = 0; i < 6; i++) {
         if(intensityArray[i] < minVals[i]) {
           minVals[i] = intensityArray[i];
+          renderDepthCoord = p;
         }
       }
     `,
@@ -144,11 +149,11 @@ export const RENDERING_MODES_COLORMAP = {
 		// Opacity correction
 		val_color.a = 1.0 - pow(1.0 - val_color.a, 1.0);
 		color.rgb += (1.0 - color.a) * val_color.a * val_color.rgb;
-		color.a += (1.0 - color.a) * val_color.a;
+    color.a += (1.0 - color.a) * val_color.a;
+    renderDepthCoord = p;
 		if (color.a >= 0.95) {
 			break;
 		}
-    p += ray_dir * dt;
     `,
     _AFTER_RENDER: ``
   }

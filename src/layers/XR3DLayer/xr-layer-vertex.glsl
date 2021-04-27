@@ -19,12 +19,15 @@ uniform mat4 resolution;
 
 
 out vec3 vray_dir;
+flat out mat4 mvp;
 flat out vec3 transformed_eye;
 
 void main() {
 
+  mvp = proj * view * model * scale * resolution;
+
   // Step 1: Standard MVP transformation (+ the scale matrix) to place the positions on your 2D screen ready for rasterization + fragment processing.
-  gl_Position = proj * view * model * scale * resolution * vec4(positions, 1.0);
+  gl_Position = mvp * vec4(positions, 1.0);
 
   // Step 2: Invert the eye back from world space to the normalized 0-1 cube world space because ray casting on the fragment shader runs in 0-1 space.
   // Geometrically, the transformed_eye is a position relative to the 0-1 normalized vertices, which themselves are the inverse of the model + scale trasnformation.

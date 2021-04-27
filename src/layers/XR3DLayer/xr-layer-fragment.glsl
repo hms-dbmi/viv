@@ -30,6 +30,8 @@ uniform vec2 zSlice;
 
 in vec3 vray_dir;
 flat in vec3 transformed_eye;
+flat in mat4 mvp;
+
 out vec4 color;
 
 vec2 intersect_box(vec3 orig, vec3 dir) {
@@ -122,7 +124,9 @@ void main(void) {
 	// Step 4: Starting from the entry point, march the ray through the volume
 	// and sample it
 	vec3 p = transformed_eye + (t_hit.x + offset * dt) * ray_dir;
-
+	// Set render coordinate to basically inifnite distance.
+	vec3 backFaceCoord = transformed_eye + t_hit.y * 10. * ray_dir;
+	vec3 renderDepthCoord = backFaceCoord;
 	// TODO: Probably want to stop this process at some point to improve performance when marching down the edges.
 	_BEFORE_RENDER
 	for (float t = t_hit.x; t < t_hit.y; t += dt) {
@@ -151,6 +155,7 @@ void main(void) {
 		p += ray_dir * dt;
 	}
 	_AFTER_RENDER
+	gl_FragDepth = (mvp * vec4(renderDepthCoord, 1.)).z;
   color.r = linear_to_srgb(color.r);
   color.g = linear_to_srgb(color.g);
   color.b = linear_to_srgb(color.b);
