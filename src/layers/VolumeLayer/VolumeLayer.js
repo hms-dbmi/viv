@@ -1,5 +1,6 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { TextLayer } from '@deck.gl/layers';
+import GL from '@luma.gl/constants';
 import { Matrix4 } from 'math.gl';
 import XR3DLayer from '../XR3DLayer';
 import { getPhysicalSizeScalingMatrix } from '../utils';
@@ -167,6 +168,10 @@ const VolumeLayer = class extends CompositeLayer {
     return new XR3DLayer(this.props, {
       channelData: { data, width, height, depth },
       id: `XR3DLayer-${0}-${height}-${width}-${0}-${resolution}-${id}`,
+      parameters: {
+        [GL.CULL_FACE]: true,
+        [GL.CULL_FACE_MODE]: GL.FRONT
+      },
       physicalSizeScalingMatrix,
       resolutionMatrix,
       dtype
