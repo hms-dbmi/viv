@@ -127,7 +127,11 @@ const ImageLayer = class extends CompositeLayer {
           }
           this.setState({ ...raster });
         })
-        .catch(e => (e === SIGNAL_ABORTED ? null : e));
+        .catch(e => {
+          if (e !== SIGNAL_ABORTED)  {
+            throw e; // re-throws error if not our signal
+          }
+         });
     }
   }
 
