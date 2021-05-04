@@ -65,18 +65,6 @@ export const useChannelsStore = create(set => ({
       });
       return { ...state, ...newState };
     }),
-  setPropertiesForChannels: (channels, newProperties) =>
-    set(state => {
-      const entries = Object.entries(newProperties);
-      const newState = {};
-      entries.forEach(([property, values]) => {
-        newState[property] = [...state[property]];
-        channels.forEach((channel, j) => {
-          newState[property].splice(channel, 1, values[j]);
-        });
-      });
-      return { ...state, ...newState };
-    }),
   removeChannel: channel =>
     set(state => {
       const newState = {};
@@ -154,14 +142,13 @@ export const useImageSettingsStore = create(set => ({
       ...state,
       ...newState
     })),
-  setClippingPlaneSettings: (index, prop, val) =>
+  setClippingPlaneSettings: (index, props) =>
     set(state => {
-      if (!['radius', 'theta', 'phi'].includes(prop)) {
-        throw new Error(`prop ${prop} for setting clipping plane not found`);
-      }
       const newState = {};
       newState.sphericals = [...state.sphericals];
-      newState.sphericals[index][prop] = val;
+      Object.entries(props).forEach(([prop, val]) => {
+        newState.sphericals[index][prop] = val;
+      });
       return { ...state, ...newState };
     })
 }));

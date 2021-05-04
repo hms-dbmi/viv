@@ -119,7 +119,7 @@ const Controller = () => {
   const globalControllers = globalControlLabels.map(label => {
     const size = shape[labels.indexOf(label)];
     // Only return a slider if there is a "stack."
-    return size > 1 && !use3d ? (
+    return size > 1 ? (
       <GlobalSelectionSlider key={label} size={size} label={label} />
     ) : null;
   });
@@ -132,7 +132,7 @@ const Controller = () => {
           channelOptions={selections.map(sel => channelOptions[sel.c])}
         />
       )}
-      {globalControllers}
+      {!use3d && globalControllers}
       {use3d && <Slicer />}
       {use3d && <CameraOptions />}
       {!isViewerLoading && !isRgb ? (

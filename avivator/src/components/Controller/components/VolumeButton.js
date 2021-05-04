@@ -72,7 +72,7 @@ const useStyles = makeStyles(() => ({
 function VolumeButton() {
   const { setImageSetting } = useImageSettingsStore();
   const { loader, selections } = useChannelSettings();
-  const { setPropertiesForChannels } = useChannelSetters();
+  const { setPropertiesForChannel } = useChannelSetters();
   const { use3d, toggleUse3d, metadata, setViewerState } = useViewerStore();
 
   const [open, toggle] = useReducer(v => !v, false);
@@ -94,10 +94,12 @@ function VolumeButton() {
             });
             getMultiSelectionStats({ loader, selections, use3d: !use3d }).then(
               ({ domains, sliders }) => {
-                setPropertiesForChannels(range(selections.length), {
-                  domains,
-                  sliders
-                });
+                range(selections.length).forEach((channel, j) =>
+                  setPropertiesForChannel(channel, {
+                    domains: domains[j],
+                    sliders: sliders[j]
+                  })
+                );
                 setViewerState({
                   isChannelLoading: selections.map(_ => false)
                 });
@@ -146,9 +148,12 @@ function VolumeButton() {
                             }).then(({ domains, sliders }) => {
                               setImageSetting({
                                 onViewportLoad: () => {
-                                  setPropertiesForChannels(
-                                    range(selections.length),
-                                    { domains, sliders }
+                                  range(selections.length).forEach(
+                                    (channel, j) =>
+                                      setPropertiesForChannel(channel, {
+                                        domains: domains[j],
+                                        sliders: sliders[j]
+                                      })
                                   );
                                   setImageSetting({ onViewportLoad: () => {} });
                                   setViewerState({

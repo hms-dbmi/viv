@@ -2,9 +2,18 @@ import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import Button from '@material-ui/core/Button';
-import { useImageSettingsStore, useViewerStore } from '../../../state';
+import { useImageSettingsStore } from '../../../state';
 import { truncateDecimalNumber } from '../../../utils';
 import { EPSILON } from '../../../constants';
+
+function formatter(label) {
+  const isRadius = label === 'r'; // useful variable name
+  return v => {
+    const val = truncateDecimalNumber(isRadius ? v : v / Math.PI, 4);
+    const radians = label === 'r' ? '' : 'π';
+    return `${val}${radians}`;
+  };
+}
 
 const Slicer = () => {
   const {
@@ -14,19 +23,19 @@ const Slicer = () => {
   const sliceValuesAndSetSliceFunctions = [
     [
       spherical.phi,
-      v => setClippingPlaneSettings(0, 'phi', v),
+      phi => setClippingPlaneSettings(0, { phi }),
       'ϕ',
       [0, Math.PI * 2]
     ],
     [
       spherical.theta,
-      v => setClippingPlaneSettings(0, 'theta', v),
+      theta => setClippingPlaneSettings(0, { theta }),
       'ϴ',
       [-Math.PI / 2, Math.PI / 2]
     ],
     [
       spherical.radius,
-      v => setClippingPlaneSettings(0, 'radius', v),
+      radius => setClippingPlaneSettings(0, { radius }),
       'r',
       // Since the box has diagonal length (1 + 1)^{\frac{1}{2}}
       [EPSILON, Math.sqrt(2)]
@@ -49,11 +58,7 @@ const Slicer = () => {
             value={val}
             onChange={(e, v) => setVal(v)}
             valueLabelDisplay="auto"
-            valueLabelFormat={v =>
-              `${truncateDecimalNumber(label === 'r' ? v : v / Math.PI, 4)}${
-                label === 'r' ? '' : 'π'
-              }`
-            }
+            valueLabelFormat={formatter(label)}
             getAriaLabel={() => `${label} slider`}
             min={min}
             max={max}
@@ -72,9 +77,7 @@ const Slicer = () => {
     <Grid item xs="auto" key={label}>
       <Button
         onClick={() => {
-          setClippingPlaneSettings(0, 'radius', radius);
-          setClippingPlaneSettings(0, 'phi', phi);
-          setClippingPlaneSettings(0, 'theta', theta);
+          setClippingPlaneSettings(0, { radius, phi, theta });
         }}
         style={{ padding: 0, paddingTop: 4 }}
       >

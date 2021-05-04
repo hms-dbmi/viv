@@ -12,14 +12,14 @@ import {
 
 export default function GlobalSelectionSlider(props) {
   const { size, label } = props;
-  const { setPropertiesForChannels } = useChannelSetters();
+  const { setPropertiesForChannel } = useChannelSetters();
   const { selections, loader } = useChannelSettings();
   const { setViewerState, globalSelection } = useViewerStore();
   const { setImageSetting } = useImageSettingsStore();
   const changeSelection = debounce(
     (event, newValue) => {
       setViewerState({
-        isChannelLoading: selections.map(i => true)
+        isChannelLoading: selections.map(() => true)
       });
       const newSelections = [...selections].map(sel => ({
         ...sel,
@@ -32,19 +32,23 @@ export default function GlobalSelectionSlider(props) {
       }).then(({ domains, sliders }) => {
         setImageSetting({
           onViewportLoad: () => {
-            setPropertiesForChannels(range(newSelections.length), {
-              domains,
-              sliders
-            });
+            range(newSelections.length).forEach((channel, j) =>
+              setPropertiesForChannel(channel, {
+                domains: domains[j],
+                sliders: sliders[j]
+              })
+            );
             setImageSetting({ onViewportLoad: () => {} });
             setViewerState({
-              isChannelLoading: selections.map(i => false)
+              isChannelLoading: selections.map(() => false)
             });
           }
         });
-        setPropertiesForChannels(range(newSelections.length), {
-          selections: newSelections
-        });
+        range(newSelections.length).forEach((channel, j) =>
+          setPropertiesForChannel(channel, {
+            selections: newSelections[j]
+          })
+        );
       });
     },
     50,
