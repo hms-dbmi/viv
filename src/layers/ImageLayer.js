@@ -4,7 +4,7 @@ import GL from '@luma.gl/constants';
 import XRLayer from './XRLayer';
 import BitmapLayer from './BitmapLayer';
 import { onPointer } from './utils';
-import { isInterleaved } from '../loaders/utils';
+import { isInterleaved, SIGNAL_ABORTED } from '../loaders/utils';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -83,6 +83,10 @@ const ImageLayer = class extends CompositeLayer {
     }
   }
 
+  finalizeState() {
+    this.state.abortController.abort();
+  }
+
   updateState({ changeFlags, props, oldProps }) {
     const { propsChanged } = changeFlags;
     const loaderChanged =
@@ -93,32 +97,41 @@ const ImageLayer = class extends CompositeLayer {
     if (loaderChanged || loaderSelectionChanged) {
       // Only fetch new data to render if loader has changed
       const { loader, loaderSelection = [], onViewportLoad } = this.props;
-      const getRaster = selection => loader.getRaster({ selection });
+      const abortController = new AbortController();
+      this.setState({ abortController });
+      const { signal } = abortController;
+      const getRaster = selection => loader.getRaster({ selection, signal });
       const dataPromises = loaderSelection.map(getRaster);
 
-      Promise.all(dataPromises).then(rasters => {
-        const raster = {
-          data: rasters.map(d => d.data),
-          width: rasters[0].width,
-          height: rasters[0].height
-        };
+      Promise.all(dataPromises)
+        .then(rasters => {
+          const raster = {
+            data: rasters.map(d => d.data),
+            width: rasters[0].width,
+            height: rasters[0].height
+          };
 
-        if (isInterleaved(loader.shape)) {
-          // data is for BitmapLayer and needs to be of form { data: Uint8Array, width, height };
-          // eslint-disable-next-line prefer-destructuring
-          raster.data = raster.data[0];
-          if (raster.data.length === raster.width * raster.height * 3) {
-            // data is RGB (not RGBA) and need to update texture formats
-            raster.format = GL.RGB;
-            raster.dataFormat = GL.RGB;
+          if (isInterleaved(loader.shape)) {
+            // data is for BitmapLayer and needs to be of form { data: Uint8Array, width, height };
+            // eslint-disable-next-line prefer-destructuring
+            raster.data = raster.data[0];
+            if (raster.data.length === raster.width * raster.height * 3) {
+              // data is RGB (not RGBA) and need to update texture formats
+              raster.format = GL.RGB;
+              raster.dataFormat = GL.RGB;
+            }
           }
-        }
 
-        if (onViewportLoad) {
-          onViewportLoad(raster);
-        }
-        this.setState({ ...raster });
-      });
+          if (onViewportLoad) {
+            onViewportLoad(raster);
+          }
+          this.setState({ ...raster });
+        })
+        .catch(e => {
+          if (e !== SIGNAL_ABORTED) {
+            throw e; // re-throws error if not our signal
+          }
+        });
     }
   }
 

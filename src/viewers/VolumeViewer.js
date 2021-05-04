@@ -1,7 +1,5 @@
 import React, { useMemo } from 'react'; // eslint-disable-line import/no-unresolved
-import { Matrix4 } from 'math.gl';
 
-import { getPhysicalSizeScalingMatrix } from '../layers/utils';
 import VivViewer from './VivViewer';
 import { VolumeView, getDefaultInitialViewState } from '../views';
 import { RENDERING_MODES } from '../constants';
@@ -28,6 +26,7 @@ import { RENDERING_MODES } from '../constants';
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
  * @param {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
+ * @param {Array.<Object>=} [useFixedAxis] Whether or not to fix the axis of the camera (default is true).
  */
 
 const VolumeViewer = props => {
@@ -42,42 +41,30 @@ const VolumeViewer = props => {
     modelMatrix,
     onViewStateChange,
     renderingMode = RENDERING_MODES.ADDITIVE,
-    xSlice = [0, 1],
-    ySlice = [0, 1],
-    zSlice = [0, 1],
+    xSlice = null,
+    ySlice = null,
+    zSlice = null,
     onViewportLoad,
     height: screenHeight,
     width: screenWidth,
     viewStates: viewStatesProp,
-    clippingPlanes = []
+    clippingPlanes = [],
+    useFixedAxis = true
   } = props;
-  const volumeViewState = viewStatesProp?.find(state => state.id === '3d');
+  const volumeViewState = viewStatesProp?.find(state => state?.id === '3d');
   const initialViewState = useMemo(() => {
     if (volumeViewState) {
       return volumeViewState;
     }
-    const { shape, labels } = loader[resolution];
-    const height = shape[labels.indexOf('y')];
-    const width = shape[labels.indexOf('x')];
-    const depth = shape[labels.indexOf('z')];
-    const depthDownsampled = Math.floor(depth / 2 ** resolution);
-    const physicalSizeScalingMatrix = getPhysicalSizeScalingMatrix(
-      loader[resolution]
-    );
-    const { zoom } = getDefaultInitialViewState(
-      loader[resolution],
+    const viewState = getDefaultInitialViewState(
+      loader,
       { height: screenHeight, width: screenWidth },
-      1
+      1,
+      true,
+      modelMatrix
     );
     return {
-      target: (modelMatrix || new Matrix4()).transformPoint(
-        physicalSizeScalingMatrix.transformPoint([
-          width / 2,
-          height / 2,
-          depthDownsampled / 2
-        ])
-      ),
-      zoom,
+      ...viewState,
       rotationX: 0,
       rotationOrbit: 0
     };
@@ -86,7 +73,8 @@ const VolumeViewer = props => {
   const viewStates = [volumeViewState || { ...initialViewState, id: '3d' }];
   const volumeView = new VolumeView({
     id: '3d',
-    target: initialViewState.target
+    target: viewStates[0].target,
+    useFixedAxis
   });
   const layerConfig = {
     loader,
@@ -101,7 +89,8 @@ const VolumeViewer = props => {
     resolution,
     renderingMode,
     modelMatrix,
-    onViewportLoad,
+    // Slightly delay to avoid issues with a render in the middle of a deck.gl layer state update.
+    onViewportLoad: () => setTimeout(onViewportLoad, 0),
     clippingPlanes
   };
   const views = [volumeView];

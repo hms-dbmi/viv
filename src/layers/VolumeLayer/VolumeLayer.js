@@ -1,5 +1,6 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { TextLayer } from '@deck.gl/layers';
+import { Matrix4 } from 'math.gl';
 import XR3DLayer from '../XR3DLayer';
 import { getPhysicalSizeScalingMatrix } from '../utils';
 import { RENDERING_MODES } from '../../constants';
@@ -27,9 +28,9 @@ const defaultProps = {
     ],
     compare: true
   },
-  xSlice: { type: 'array', value: [0, 1], compare: true },
-  ySlice: { type: 'array', value: [0, 1], compare: true },
-  zSlice: { type: 'array', value: [0, 1], compare: true },
+  xSlice: { type: 'array', value: null, compare: true },
+  ySlice: { type: 'array', value: null, compare: true },
+  zSlice: { type: 'array', value: null, compare: true },
   clippingPlanes: { type: 'array', value: [], compare: true },
   renderingMode: {
     type: 'string',
@@ -52,9 +53,9 @@ const defaultProps = {
  * @property {number=} resolution Resolution at which you would like to see the volume and load it into memory (0 highest, loader.length -1 the lowest default 0)
  * @property {string=} renderingMode One of Maximum Intensity Projection, Minimum Intensity Projection, or Additive
  * @property {Object=} modelMatrix A column major affine transformation to be applied to the volume.
- * @property {Array.<number>=} xSlice 0-1 interval on which to slice the volume.
- * @property {Array.<number>=} ySlice 0-1 interval on which to slice the volume.
- * @property {Array.<number>=} zSlice 0-1 interval on which to slice the volume.
+ * @property {Array.<number>=} xSlice 0-width (physical coordinates) interval on which to slice the volume.
+ * @property {Array.<number>=} ySlice 0-height (physical coordinates) interval on which to slice the volume.
+ * @property {Array.<number>=} zSlice 0-depth (physical coordinates) interval on which to slice the volume.
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
  * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  */
@@ -64,14 +65,21 @@ const defaultProps = {
  * @ignore
  */
 const VolumeLayer = class extends CompositeLayer {
+  finalizeState() {
+    this.state.abortController.abort();
+  }
+
   updateState({ changeFlags, oldProps, props }) {
     const { propsChanged } = changeFlags;
     const loaderChanged =
       typeof propsChanged === 'string' && propsChanged.includes('props.loader');
+    const resolutionChanged =
+      typeof propsChanged === 'string' &&
+      propsChanged.includes('props.resolution');
     const loaderSelectionChanged =
       props.loaderSelection !== oldProps.loaderSelection;
     // Only fetch new data to render if loader has changed
-    if (loaderChanged || loaderSelectionChanged) {
+    if (loaderChanged || loaderSelectionChanged || resolutionChanged) {
       const {
         loader,
         loaderSelection = [],
@@ -88,13 +96,20 @@ const VolumeLayer = class extends CompositeLayer {
         progress += 0.5 / totalRequests;
         this.setState({ progress });
       };
+      const abortController = new AbortController();
+      this.setState({ abortController });
+      const { signal } = abortController;
       const volumePromises = loaderSelection.map(selection =>
         getVolume({
           selection,
           source,
           onUpdate,
-          downsampleDepth: 2 ** resolution
+          downsampleDepth: 2 ** resolution,
+          signal
         })
+      );
+      const physicalSizeScalingMatrix = getPhysicalSizeScalingMatrix(
+        loader[resolution]
       );
 
       Promise.all(volumePromises).then(volumes => {
@@ -108,7 +123,11 @@ const VolumeLayer = class extends CompositeLayer {
           depth: volumes[0].depth
         };
 
-        this.setState({ ...volume });
+        this.setState({
+          ...volume,
+          physicalSizeScalingMatrix,
+          resolutionMatrix: new Matrix4().scale(2 ** resolution)
+        });
       });
     }
   }
@@ -116,7 +135,15 @@ const VolumeLayer = class extends CompositeLayer {
   renderLayers() {
     const { loader, id, resolution } = this.props;
     const { dtype } = loader[resolution];
-    const { data, width, height, depth, progress } = this.state;
+    const {
+      data,
+      width,
+      height,
+      depth,
+      progress,
+      physicalSizeScalingMatrix,
+      resolutionMatrix
+    } = this.state;
     if (!(width && height)) {
       const { viewport } = this.context;
       return new TextLayer({
@@ -137,13 +164,11 @@ const VolumeLayer = class extends CompositeLayer {
         sizeScale: 2 ** -viewport.zoom
       });
     }
-    const physicalSizeScalingMatrix = getPhysicalSizeScalingMatrix(
-      loader[resolution]
-    );
     return new XR3DLayer(this.props, {
       channelData: { data, width, height, depth },
       id: `XR3DLayer-${0}-${height}-${width}-${0}-${resolution}-${id}`,
       physicalSizeScalingMatrix,
+      resolutionMatrix,
       dtype
     });
   }
