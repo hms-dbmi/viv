@@ -198,14 +198,11 @@ class VivViewerWrapper extends PureComponent {
     if (onHover) {
       onHover(info, event);
     }
-    if (!hoverHooks) {
-      return null;
-    }
-    if (!coordinate) {
+    if (!hoverHooks || !coordinate || !sourceLayer || !layer) {
       return null;
     }
     const { channelData, bounds } = sourceLayer.props;
-    if (!channelData) {
+    if (!channelData || !bounds) {
       return null;
     }
     const { data, width } = channelData;
