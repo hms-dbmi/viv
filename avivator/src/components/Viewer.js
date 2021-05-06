@@ -1,5 +1,8 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
+import { Plane } from '@math.gl/culling';
+import { Matrix4 } from '@math.gl/core';
+import debounce from 'lodash/debounce';
 import {
   SideBySideViewer,
   PictureInPictureViewer,
@@ -11,27 +14,41 @@ import {
   useViewerStore,
   useChannelSettings
 } from '../state';
-import { useWindowSize } from '../utils';
+import { useWindowSize, getPhysicalSizeScalingMatrix } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
-// eslint-disable-line import/extensions,import/no-unresolved
 
 const Viewer = () => {
-  const { useLinkedView, setViewerState, use3d } = useViewerStore();
+  const { useLinkedView, setViewerState, use3d, viewState } = useViewerStore();
   const { colors, sliders, isOn, selections, loader } = useChannelSettings();
   const viewSize = useWindowSize();
   const {
     lensSelection,
     colormap,
     renderingMode,
-    xSlice,
-    ySlice,
-    zSlice,
+    sphericals,
     resolution,
     isLensOn,
     zoomLock,
     panLock,
-    isOverviewOn
+    isOverviewOn,
+    onViewportLoad,
+    useFixedAxis
   } = useImageSettingsStore();
+  const source = loader[0];
+  const physicalSizeScalingMatrix = getPhysicalSizeScalingMatrix(source);
+  const pixelScalingMatrix = new Matrix4().scale(
+    ['x', 'y', 'z'].map(d => source.shape[source.labels.indexOf(d)])
+  );
+  const clippingPlanes = sphericals.map(v =>
+    new Plane().fromPointNormal(
+      pixelScalingMatrix.transformPoint(
+        physicalSizeScalingMatrix.transformPoint(v.toVector3())
+      ),
+      pixelScalingMatrix.transformPoint(
+        physicalSizeScalingMatrix.transformPoint(v.toVector3())
+      )
+    )
+  );
   return use3d ? (
     <VolumeViewer
       loader={loader}
@@ -40,13 +57,20 @@ const Viewer = () => {
       channelIsOn={isOn}
       loaderSelection={selections}
       colormap={colormap.length > 0 && colormap}
-      xSlice={xSlice}
-      ySlice={ySlice}
-      zSlice={zSlice}
+      clippingPlanes={clippingPlanes}
       resolution={resolution}
       renderingMode={renderingMode}
       height={viewSize.height}
       width={viewSize.width}
+      onViewportLoad={onViewportLoad}
+      useFixedAxis={useFixedAxis}
+      viewStates={[viewState]}
+      onViewStateChange={debounce(
+        ({ viewState: newViewState, viewId }) =>
+          setViewerState({ viewState: { ...newViewState, id: viewId } }),
+        250,
+        { trailing: true }
+      )}
     />
   ) : useLinkedView ? (
     <SideBySideViewer
@@ -65,6 +89,7 @@ const Viewer = () => {
       }}
       lensSelection={lensSelection}
       isLensOn={isLensOn}
+      onViewportLoad={onViewportLoad}
     />
   ) : (
     <PictureInPictureViewer
@@ -83,6 +108,7 @@ const Viewer = () => {
       }}
       lensSelection={lensSelection}
       isLensOn={isLensOn}
+      onViewportLoad={onViewportLoad}
     />
   );
 };

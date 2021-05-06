@@ -24,7 +24,9 @@ export const initImage = (source, history) => {
   const { isLensOn, toggleIsLensOn } = useImageSettingsStore();
   useEffect(() => {
     async function changeLoader() {
-      setViewerState({ isLoading: true });
+      // Placeholder
+      setViewerState({ isChannelLoading: [true] });
+      setViewerState({ isViewerLoading: true });
       resetChannels();
       const { urlOrFile } = source;
       const {
@@ -68,14 +70,15 @@ export const initImage = (source, history) => {
             newDomains.length === 1
               ? [[255, 255, 255]]
               : newDomains.map((_, i) => COLOR_PALLETE[i]);
-          setViewerState({ useColormap: true });
-          setViewerState({ useLens: channelOptions.length !== 1 });
+          setViewerState({
+            useLens: channelOptions.length !== 1,
+            useColormap: true
+          });
         } else {
           if (isLensOn) {
             toggleIsLensOn();
           }
-          setViewerState({ useLens: false });
-          setViewerState({ useColormap: false });
+          setViewerState({ useColormap: false, useLens: false });
         }
         addChannels({
           ids: newDomains.map(() => String(Math.random())),
@@ -85,14 +88,15 @@ export const initImage = (source, history) => {
           colors: newColors
         });
         setLoader(nextLoader);
-        setViewerState({ metadata: nextMeta });
-        setViewerState({ isLoading: false });
         setViewerState({
-          pixelValues: new Array(newSelections.length).fill(FILL_PIXEL_VALUE)
+          isChannelLoading: newSelections.map(i => !i),
+          isViewerLoading: false,
+          metadata: nextMeta,
+          pixelValues: new Array(newSelections.length).fill(FILL_PIXEL_VALUE),
+          // Set the global selections (needed for the UI). All selections have the same global selection.
+          globalSelection: newSelections[0],
+          channelOptions
         });
-        // Set the global selections (needed for the UI). All selections have the same global selection.
-        setViewerState({ globalSelection: newSelections[0] });
-        setViewerState({ channelOptions });
         if (use3d) toggleUse3d();
         // eslint-disable-next-line no-unused-expressions
         history?.push(

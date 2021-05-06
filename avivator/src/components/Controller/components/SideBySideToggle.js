@@ -5,10 +5,14 @@ import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 const SideBySideToggle = () => {
   const { isOverviewOn } = useImageSettingsStore();
-  const { isLoading, toggleUseLinkedView, useLinkedView } = useViewerStore();
+  const {
+    isViewerLoading,
+    toggleUseLinkedView,
+    useLinkedView
+  } = useViewerStore();
   return (
     <Button
-      disabled={isLoading || isOverviewOn}
+      disabled={isViewerLoading || isOverviewOn}
       onClick={toggleUseLinkedView}
       variant="outlined"
       size="small"

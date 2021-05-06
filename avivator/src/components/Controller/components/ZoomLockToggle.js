@@ -5,10 +5,10 @@ import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 const ZoomLockToggle = () => {
   const { toggleZoomLock, zoomLock } = useImageSettingsStore();
-  const { isLoading } = useViewerStore();
+  const { isViewerLoading } = useViewerStore();
   return (
     <Button
-      disabled={isLoading}
+      disabled={isViewerLoading}
       onClick={toggleZoomLock}
       variant="outlined"
       size="small"

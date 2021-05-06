@@ -4,14 +4,11 @@ import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import isFunction from 'lodash/isFunction';
 import shallow from 'zustand/shallow';
-
+import { _SphericalCoordinates as SphericalCoordinates } from '@math.gl/core';
 // eslint-disable-next-line import/no-unresolved
 import { RENDERING_MODES } from '@hms-dbmi/viv';
 
-const keysAndValuesToObject = (keys, values) => {
-  const merged = keys.map((k, i) => [k, values[i]]);
-  return Object.fromEntries(merged);
-};
+import { EPSILON } from './constants';
 
 const captialize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -41,9 +38,9 @@ const DEFAUlT_CHANNEL_STATE = {
 
 const DEFAUlT_CHANNEL_VALUES = {
   isOn: true,
-  sliders: [0, 255],
+  sliders: [0, 65535],
   colors: [255, 255, 255],
-  domains: [0, 255],
+  domains: [0, 65535],
   selections: { z: 0, c: 0, t: 0 },
   ids: ''
 };
@@ -65,18 +62,6 @@ export const useChannelsStore = create(set => ({
       entries.forEach(([property, value]) => {
         newState[property] = [...state[property]];
         newState[property][channel] = value;
-      });
-      return { ...state, ...newState };
-    }),
-  setPropertiesForChannels: (channels, newProperties) =>
-    set(state => {
-      const entries = Object.entries(newProperties);
-      const newState = {};
-      entries.forEach(([property, values]) => {
-        channels.forEach(channel => {
-          newState[property] = [...state[property]];
-          newState[property][channel] = values[channel];
-        });
       });
       return { ...state, ...newState };
     }),
@@ -139,14 +124,14 @@ const DEFAULT_IMAGE_STATE = {
   lensSelection: 0,
   colormap: '',
   renderingMode: RENDERING_MODES.MAX_INTENSITY_PROJECTION,
-  xSlice: [0, 1],
-  ySlice: [0, 1],
-  zSlice: [0, 1],
+  sphericals: [new SphericalCoordinates({ radius: EPSILON, phi: 0, theta: 0 })],
   resolution: 0,
   isLensOn: false,
   zoomLock: true,
   panLock: true,
-  isOverviewOn: false
+  isOverviewOn: false,
+  useFixedAxis: true,
+  onViewportLoad: () => {}
 };
 
 export const useImageSettingsStore = create(set => ({
@@ -156,11 +141,21 @@ export const useImageSettingsStore = create(set => ({
     set(state => ({
       ...state,
       ...newState
-    }))
+    })),
+  setClippingPlaneSettings: (index, props) =>
+    set(state => {
+      const newState = {};
+      newState.sphericals = [...state.sphericals];
+      Object.entries(props).forEach(([prop, val]) => {
+        newState.sphericals[index][prop] = val;
+      });
+      return { ...state, ...newState };
+    })
 }));
 
 const DEFAULT_VIEWER_STATE = {
-  isLoading: true,
+  isChannelLoading: [],
+  isViewerLoading: true,
   pixelValues: [],
   isOffsetsSnackbarOn: false,
   loaderErrorSnackbar: {
@@ -176,6 +171,7 @@ const DEFAULT_VIEWER_STATE = {
   globalSelection: { z: 0, t: 0 },
   channelOptions: [],
   metadata: null,
+  viewState: null,
   source: ''
 };
 
@@ -186,5 +182,22 @@ export const useViewerStore = create(set => ({
     set(state => ({
       ...state,
       ...newState
-    }))
+    })),
+  setIsChannelLoading: (index, val) =>
+    set(state => {
+      const newIsChannelLoading = [...state.isChannelLoading];
+      newIsChannelLoading[index] = val;
+      return { ...state, isChannelLoading: newIsChannelLoading };
+    }),
+  addIsChannelLoading: val =>
+    set(state => {
+      const newIsChannelLoading = [...state.isChannelLoading, val];
+      return { ...state, isChannelLoading: newIsChannelLoading };
+    }),
+  removeIsChannelLoading: index =>
+    set(state => {
+      const newIsChannelLoading = [...state.isChannelLoading];
+      newIsChannelLoading.splice(index, 1);
+      return { ...state, isChannelLoading: newIsChannelLoading };
+    })
 }));

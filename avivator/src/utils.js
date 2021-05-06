@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
-import { fromBlob, fromFile, fromUrl } from 'geotiff';
+import { fromBlob, fromUrl } from 'geotiff';
+import { Matrix4 } from '@math.gl/core';
 
 import {
   loadOmeTiff,
   loadBioformatsZarr,
-  getChannelStats,
-// eslint-disable-next-line import/no-unresolved
+  getChannelStats
+  // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 
-import { GLOBAL_SLIDER_DIMENSION_FIELDS, COLOR_PALLETE } from './constants';
+import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
 
 const MAX_CHANNELS_FOR_SNACKBAR_WARNING = 40;
 
@@ -297,4 +298,25 @@ export function guessRgb({ Pixels }) {
     Pixels.SizeC === 3 && numChannels === 1 && Pixels.Interleaved;
 
   return SamplesPerPixel === 3 || is3Channel8Bit || interleavedRgb;
+}
+export function truncateDecimalNumber(value, maxLength) {
+  if (!value && value !== 0) return '';
+  const stringValue = value.toString();
+  return stringValue.length > maxLength
+    ? stringValue.substring(0, maxLength).replace(/\.$/, '')
+    : stringValue;
+}
+
+/**
+ * Get physical size scaling Matrix4
+ * @param {Object} loader PixelSource
+ */
+export function getPhysicalSizeScalingMatrix(loader) {
+  const { x, y, z } = loader?.meta?.physicalSizes ?? {};
+  if (x?.size && y?.size && z?.size) {
+    const min = Math.min(z.size, x.size, y.size);
+    const ratio = [x.size / min, y.size / min, z.size / min];
+    return new Matrix4().scale(ratio);
+  }
+  return new Matrix4().identity();
 }

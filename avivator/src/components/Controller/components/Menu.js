@@ -69,7 +69,7 @@ function Header(props) {
   useEffect(() => setText(url), [url]);
 
   return (
-    <Grid container direction="column">
+    <Grid container direction="column" spacing={0}>
       <Grid item xs={12}>
         <MenuTitle />
       </Grid>
@@ -142,13 +142,7 @@ function Menu({ children, ...props }) {
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
       <Paper className={classes.paper}>
         <Header />
-        <Grid
-          container
-          direction="column"
-          spacing={1}
-          justify="center"
-          alignItems="center"
-        >
+        <Grid container direction="column" justify="center" alignItems="center">
           {children.map((child, i) => {
             return (
               // eslint-disable-next-line react/no-array-index-key

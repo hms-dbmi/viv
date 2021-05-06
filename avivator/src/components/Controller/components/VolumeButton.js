@@ -72,7 +72,7 @@ const useStyles = makeStyles(() => ({
 function VolumeButton() {
   const { setImageSetting } = useImageSettingsStore();
   const { loader, selections } = useChannelSettings();
-  const { setPropertiesForChannels } = useChannelSetters();
+  const { setPropertiesForChannel } = useChannelSetters();
   const { use3d, toggleUse3d, metadata, setViewerState } = useViewerStore();
 
   const [open, toggle] = useReducer(v => !v, false);
@@ -89,11 +89,19 @@ function VolumeButton() {
           // eslint-disable-next-line no-unused-expressions
           if (use3d) {
             toggleUse3d();
+            setViewerState({
+              isChannelLoading: selections.map(_ => true)
+            });
             getMultiSelectionStats({ loader, selections, use3d: !use3d }).then(
               ({ domains, sliders }) => {
-                setPropertiesForChannels(range(selections.length), {
-                  domains,
-                  sliders
+                range(selections.length).forEach((channel, j) =>
+                  setPropertiesForChannel(channel, {
+                    domains: domains[j],
+                    sliders: sliders[j]
+                  })
+                );
+                setViewerState({
+                  isChannelLoading: selections.map(_ => false)
                 });
               }
             );
@@ -128,18 +136,32 @@ function VolumeButton() {
                           dense
                           disableGutters
                           onClick={() => {
+                            setViewerState({
+                              isChannelLoading: selections.map(_ => true)
+                            });
                             setImageSetting({ resolution });
-                            toggleUse3d();
                             toggle();
                             getMultiSelectionStats({
                               loader,
                               selections,
                               use3d: true
                             }).then(({ domains, sliders }) => {
-                              setPropertiesForChannels(
-                                range(selections.length),
-                                { domains, sliders }
-                              );
+                              setImageSetting({
+                                onViewportLoad: () => {
+                                  range(selections.length).forEach(
+                                    (channel, j) =>
+                                      setPropertiesForChannel(channel, {
+                                        domains: domains[j],
+                                        sliders: sliders[j]
+                                      })
+                                  );
+                                  setImageSetting({ onViewportLoad: () => {} });
+                                  setViewerState({
+                                    isChannelLoading: selections.map(_ => false)
+                                  });
+                                }
+                              });
+                              toggleUse3d();
                             });
                             setViewerState({ useLens: false });
                           }}

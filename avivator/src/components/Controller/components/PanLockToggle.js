@@ -5,10 +5,10 @@ import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 const PanLockToggle = () => {
   const { togglePanLock, panLock } = useImageSettingsStore();
-  const { isLoading } = useViewerStore();
+  const { isViewerLoading } = useViewerStore();
   return (
     <Button
-      disabled={isLoading}
+      disabled={isViewerLoading}
       onClick={togglePanLock}
       variant="outlined"
       size="small"

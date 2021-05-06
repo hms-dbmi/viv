@@ -15,6 +15,7 @@ import PanLockToggle from './components/PanLockToggle';
 import ZoomLockToggle from './components/ZoomLockToggle';
 import SideBySideToggle from './components/SideBySideToggle';
 import PictureInPictureToggle from './components/PictureInPictureToggle';
+import CameraOptions from './components/CameraOptions';
 import {
   useChannelSettings,
   useViewerStore,
@@ -39,7 +40,7 @@ const Controller = () => {
     toggleIsOn: toggleIsOnSetter,
     removeChannel
   } = useChannelSetters();
-  const { colormap } = useImageSettingsStore();
+  const { colormap, setImageSetting } = useImageSettingsStore();
   const {
     metadata,
     channelOptions,
@@ -47,8 +48,11 @@ const Controller = () => {
     use3d,
     useColormap,
     useLens,
-    isLoading,
-    pixelValues
+    isChannelLoading,
+    setIsChannelLoading,
+    removeIsChannelLoading,
+    pixelValues,
+    isViewerLoading
   } = useViewerStore();
   const viewSize = useWindowSize();
   const isRgb = metadata && guessRgb(metadata);
@@ -62,19 +66,29 @@ const Controller = () => {
         ...selections[i],
         c: channelOptions.indexOf(e.target.value)
       };
-      setPropertiesForChannel(i, { selections: selection });
+      setIsChannelLoading(i, true);
       getSingleSelectionStats({
         loader,
         selection,
         use3d
       }).then(({ domain, slider }) => {
-        setPropertiesForChannel(i, { sliders: slider, domains: domain });
+        setImageSetting({
+          onViewportLoad: () => {
+            setPropertiesForChannel(i, { sliders: slider, domains: domain });
+            setImageSetting({ onViewportLoad: () => {} });
+            setIsChannelLoading(i, false);
+          }
+        });
+        setPropertiesForChannel(i, { selections: selection });
       });
     };
     const toggleIsOn = () => toggleIsOnSetter(i);
     const handleSliderChange = (e, v) =>
       setPropertiesForChannel(i, { sliders: v });
-    const handleRemoveChannel = () => removeChannel(i);
+    const handleRemoveChannel = () => {
+      removeChannel(i);
+      removeIsChannelLoading(i);
+    };
     const handleColorSelect = color => {
       setPropertiesForChannel(i, { colors: color });
     };
@@ -97,6 +111,7 @@ const Controller = () => {
           color={colors[i]}
           handleRemoveChannel={handleRemoveChannel}
           handleColorSelect={handleColorSelect}
+          isLoading={isChannelLoading[i]}
         />
       </Grid>
     );
@@ -104,7 +119,7 @@ const Controller = () => {
   const globalControllers = globalControlLabels.map(label => {
     const size = shape[labels.indexOf(label)];
     // Only return a slider if there is a "stack."
-    return size > 1 && !use3d ? (
+    return size > 1 ? (
       <GlobalSelectionSlider key={label} size={size} label={label} />
     ) : null;
   });
@@ -117,8 +132,10 @@ const Controller = () => {
           channelOptions={selections.map(sel => channelOptions[sel.c])}
         />
       )}
-      {globalControllers}
-      {!isLoading && !isRgb ? (
+      {!use3d && globalControllers}
+      {use3d && <Slicer />}
+      {use3d && <CameraOptions />}
+      {!isViewerLoading && !isRgb ? (
         <Grid container>{channelControllers}</Grid>
       ) : (
         <Grid container justify="center">
@@ -135,7 +152,6 @@ const Controller = () => {
           <PanLockToggle />
         </>
       )}
-      {use3d && <Slicer />}
     </Menu>
   );
 };
