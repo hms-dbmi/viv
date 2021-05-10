@@ -15,7 +15,12 @@ import {
   useViewerStore,
   useChannelSetters
 } from '../../../state';
-import { range, guessRgb, getMultiSelectionStats } from '../../../utils';
+import {
+  range,
+  guessRgb,
+  getMultiSelectionStats,
+  getBoundingCube
+} from '../../../utils';
 
 function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
@@ -139,7 +144,15 @@ function VolumeButton() {
                             setViewerState({
                               isChannelLoading: selections.map(_ => true)
                             });
-                            setImageSetting({ resolution });
+                            const [xSlice, ySlice, zSlice] = getBoundingCube(
+                              loader
+                            );
+                            setImageSetting({
+                              resolution,
+                              xSlice,
+                              ySlice,
+                              zSlice
+                            });
                             toggle();
                             getMultiSelectionStats({
                               loader,
