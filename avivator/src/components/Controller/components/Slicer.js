@@ -37,7 +37,7 @@ const Slicer = () => {
         alignItems="center"
         key={label}
       >
-        <Grid item xs={1}>
+        <Grid item xs={1} style={{ marginBottom: 8 }}>
           {label}:
         </Grid>
         <Grid item xs={11}>
