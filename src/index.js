@@ -19,6 +19,7 @@ import {
   OverviewView,
   DetailView,
   SideBySideView,
+  VolumeView,
   getDefaultInitialViewState,
   DETAIL_VIEW_ID,
   OVERVIEW_VIEW_ID
@@ -48,6 +49,7 @@ export {
   PictureInPictureViewer,
   getDefaultInitialViewState,
   SideBySideView,
+  VolumeView,
   DETAIL_VIEW_ID,
   OVERVIEW_VIEW_ID,
   SideBySideViewer,

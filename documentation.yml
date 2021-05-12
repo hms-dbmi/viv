@@ -12,11 +12,13 @@ toc:
 - name: Viewers (React Components)
 - PictureInPictureViewer
 - SideBySideViewer
+- VolumeViewer
 - VivViewer
 - name: Views
 - VivView
 - OverviewView
 - DetailView
+- VolumeView
 - SideBySideView
 - name: Utility Methods
 - getChannelStats
