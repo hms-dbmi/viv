@@ -8,8 +8,6 @@ import { _SphericalCoordinates as SphericalCoordinates } from '@math.gl/core';
 // eslint-disable-next-line import/no-unresolved
 import { RENDERING_MODES } from '@hms-dbmi/viv';
 
-import { EPSILON } from './constants';
-
 const captialize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
 const generateToggles = (defaults, set) => {
@@ -124,13 +122,15 @@ const DEFAULT_IMAGE_STATE = {
   lensSelection: 0,
   colormap: '',
   renderingMode: RENDERING_MODES.MAX_INTENSITY_PROJECTION,
-  sphericals: [new SphericalCoordinates({ radius: EPSILON, phi: 0, theta: 0 })],
   resolution: 0,
   isLensOn: false,
   zoomLock: true,
   panLock: true,
   isOverviewOn: false,
   useFixedAxis: true,
+  xSlice: null,
+  ySlice: null,
+  zSlice: null,
   onViewportLoad: () => {}
 };
 
@@ -141,16 +141,7 @@ export const useImageSettingsStore = create(set => ({
     set(state => ({
       ...state,
       ...newState
-    })),
-  setClippingPlaneSettings: (index, props) =>
-    set(state => {
-      const newState = {};
-      newState.sphericals = [...state.sphericals];
-      Object.entries(props).forEach(([prop, val]) => {
-        newState.sphericals[index][prop] = val;
-      });
-      return { ...state, ...newState };
-    })
+    }))
 }));
 
 const DEFAULT_VIEWER_STATE = {

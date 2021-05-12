@@ -320,3 +320,16 @@ export function getPhysicalSizeScalingMatrix(loader) {
   }
   return new Matrix4().identity();
 }
+
+export function getBoundingCube(loader) {
+  const source = Array.isArray(loader) ? loader[0] : loader;
+  const { shape, labels } = source;
+  const physicalSizeScalingMatrix = getPhysicalSizeScalingMatrix(source);
+  const xSlice = [0, physicalSizeScalingMatrix[0] * shape[labels.indexOf('x')]];
+  const ySlice = [0, physicalSizeScalingMatrix[5] * shape[labels.indexOf('y')]];
+  const zSlice = [
+    0,
+    physicalSizeScalingMatrix[10] * shape[labels.indexOf('z')]
+  ];
+  return [xSlice, ySlice, zSlice];
+}
