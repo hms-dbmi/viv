@@ -1,12 +1,18 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
-import { useImageSettingsStore, useChannelSettings } from '../../../state';
+import {
+  useImageSettingsStore,
+  useChannelSettings,
+  useViewerStore
+} from '../../../state';
 import { getBoundingCube, truncateDecimalNumber } from '../../../utils';
+import { Typography } from '@material-ui/core';
 
 const Slicer = () => {
   const { setImageSetting, xSlice, ySlice, zSlice } = useImageSettingsStore();
   const { loader } = useChannelSettings();
+  const { use3d } = useViewerStore();
   const [xSliceInit, ySliceInit, zSliceInit] = getBoundingCube(loader);
   const sliceValuesAndSetSliceFunctions = [
     [
@@ -28,7 +34,7 @@ const Slicer = () => {
       zSliceInit
     ]
   ];
-  return sliceValuesAndSetSliceFunctions.map(
+  const Slicers = sliceValuesAndSetSliceFunctions.map(
     ([val, setVal, label, [min, max]]) => (
       <Grid
         container
@@ -42,6 +48,7 @@ const Slicer = () => {
         </Grid>
         <Grid item xs={11}>
           <Slider
+            disabled={!use3d}
             value={val}
             onChange={(e, v) => setVal(v)}
             valueLabelDisplay="auto"
@@ -55,6 +62,12 @@ const Slicer = () => {
         </Grid>
       </Grid>
     )
+  );
+  return (
+    <>
+      <Typography style={{ marginTop: 4 }}>Clipping Planes: </Typography>{' '}
+      {Slicers}
+    </>
   );
 };
 

@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Divider from '@material-ui/core/Divider';
 
 import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
@@ -24,6 +27,22 @@ import {
 } from '../../state';
 import { guessRgb, useWindowSize, getSingleSelectionStats } from '../../utils';
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && children}
+    </div>
+  );
+}
 
 const Controller = () => {
   const {
@@ -123,27 +142,46 @@ const Controller = () => {
       <GlobalSelectionSlider key={label} size={size} label={label} />
     ) : null;
   });
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
   return (
     <Menu maxHeight={viewSize.height}>
-      {useColormap && <ColormapSelect />}
-      {use3d && <RenderingModeSelect />}
-      {useLens && !colormap && shape[labels.indexOf('c')] > 1 && (
-        <LensSelect
-          channelOptions={selections.map(sel => channelOptions[sel.c])}
-        />
-      )}
-      {!use3d && globalControllers}
-      {use3d && <Slicer />}
-      {use3d && <CameraOptions />}
-      {!isViewerLoading && !isRgb ? (
-        <Grid container>{channelControllers}</Grid>
-      ) : (
-        <Grid container justify="center">
-          {!isRgb && <CircularProgress />}
-        </Grid>
-      )}
-      {!isRgb && <AddChannel />}
-      {shape[labels.indexOf('z')] > 1 && <VolumeButton />}
+      <Tabs
+        value={value}
+        onChange={handleChange}
+        aria-label="simple tabs example"
+        style={{ height: '24px', minHeight: '24px' }}
+      >
+        <Tab label="Channels" style={{ fontSize: '.75rem', bottom: 12 }} />
+        <Tab label="Volume" style={{ fontSize: '.75rem', bottom: 12 }} />
+      </Tabs>
+      <Divider />
+      <TabPanel value={value} index={0}>
+        {useColormap && <ColormapSelect />}
+        {useLens && !colormap && shape[labels.indexOf('c')] > 1 && (
+          <LensSelect
+            channelOptions={selections.map(sel => channelOptions[sel.c])}
+          />
+        )}
+        {!use3d && globalControllers}
+        {!isViewerLoading && !isRgb ? (
+          <Grid container>{channelControllers}</Grid>
+        ) : (
+          <Grid container justify="center">
+            {!isRgb && <CircularProgress />}
+          </Grid>
+        )}
+        {!isRgb && <AddChannel />}
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        {<RenderingModeSelect />}
+        {<Slicer />}
+        {<CameraOptions />}
+      </TabPanel>
+      {<VolumeButton />}
       {!use3d && <PictureInPictureToggle />}
       {!use3d && <SideBySideToggle />}
       {useLinkedView && !use3d && (

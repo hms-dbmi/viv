@@ -14,7 +14,7 @@ import { useWindowSize } from '../../../utils';
 const CameraOptions = () => {
   const { loader } = useChannelSettings();
   const { useFixedAxis, toggleUseFixedAxis } = useImageSettingsStore();
-  const { setViewerState, viewState } = useViewerStore();
+  const { setViewerState, viewState, use3d } = useViewerStore();
   const { height, width } = useWindowSize();
   const toggleFixedAxisButton = (
     <Grid item xs="auto" key="toggle-fixed-axis">
@@ -22,6 +22,7 @@ const CameraOptions = () => {
         selected={useFixedAxis}
         onClick={toggleUseFixedAxis}
         style={{ padding: 0 }}
+        disabled={!use3d}
         value={useFixedAxis}
       >
         Fix Camera Axis
@@ -41,6 +42,7 @@ const CameraOptions = () => {
             }
           })
         }
+        disabled={!use3d}
         style={{ padding: 0 }}
       >
         Re-Center
