@@ -96,7 +96,7 @@ function VolumeButton() {
         variant="outlined"
         size="small"
         ref={anchorRef}
-        disabled={!shape[labels.indexOf('z')] > 1 || isViewerLoading}
+        disabled={!(shape[labels.indexOf('z')] > 1) || isViewerLoading}
         onClick={() => {
           toggle();
           // eslint-disable-next-line no-unused-expressions
