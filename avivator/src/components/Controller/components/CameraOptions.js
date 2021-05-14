@@ -1,7 +1,9 @@
 import React from 'react';
-import ToggleButton from '@material-ui/lab/ToggleButton';
+import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
 // eslint-disable-next-line import/no-unresolved
 import { getDefaultInitialViewState } from '@hms-dbmi/viv';
 import {
@@ -11,22 +13,37 @@ import {
 } from '../../../state';
 import { useWindowSize } from '../../../utils';
 
+const useStyles = makeStyles(theme =>
+  createStyles({
+    enabled: {
+      marginLeft: '4px'
+    },
+    disabled: {
+      color: theme.palette.text.disabled,
+      marginLeft: '4px'
+    }
+  })
+);
+
 const CameraOptions = () => {
   const { loader } = useChannelSettings();
   const { useFixedAxis, toggleUseFixedAxis } = useImageSettingsStore();
   const { setViewerState, viewState, use3d } = useViewerStore();
   const { height, width } = useWindowSize();
+  const classes = useStyles();
   const toggleFixedAxisButton = (
     <Grid item xs="auto" key="toggle-fixed-axis">
-      <ToggleButton
-        selected={useFixedAxis}
-        onClick={toggleUseFixedAxis}
-        style={{ padding: 0 }}
-        disabled={!use3d}
-        value={useFixedAxis}
-      >
-        Fix Camera Axis
-      </ToggleButton>
+      <Grid container direction="row">
+        <Checkbox
+          onClick={toggleUseFixedAxis}
+          style={{ padding: 0 }}
+          disabled={!use3d}
+          checked={useFixedAxis}
+        />
+        <Typography className={!use3d ? classes.disabled : classes.enabled}>
+          Fix Camera Axis
+        </Typography>
+      </Grid>
     </Grid>
   );
   const reCenterButton = (

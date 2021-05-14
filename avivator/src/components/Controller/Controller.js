@@ -188,8 +188,8 @@ const Controller = () => {
         }}
       />
       {<VolumeButton />}
-      {!use3d && <PictureInPictureToggle />}
-      {!use3d && <SideBySideToggle />}
+      {<PictureInPictureToggle />}
+      {<SideBySideToggle />}
       {useLinkedView && !use3d && (
         <>
           <ZoomLockToggle />

@@ -8,11 +8,12 @@ const SideBySideToggle = () => {
   const {
     isViewerLoading,
     toggleUseLinkedView,
-    useLinkedView
+    useLinkedView,
+    use3d
   } = useViewerStore();
   return (
     <Button
-      disabled={isViewerLoading || isOverviewOn}
+      disabled={isViewerLoading || isOverviewOn || use3d}
       onClick={toggleUseLinkedView}
       variant="outlined"
       size="small"
