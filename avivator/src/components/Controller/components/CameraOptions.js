@@ -67,7 +67,13 @@ const CameraOptions = () => {
     </Grid>
   );
   return (
-    <Grid container direction="row" justify="space-between" alignItems="center">
+    <Grid
+      container
+      direction="row"
+      justify="space-between"
+      alignItems="center"
+      style={{ marginTop: 16 }}
+    >
       {[toggleFixedAxisButton, reCenterButton]}
     </Grid>
   );

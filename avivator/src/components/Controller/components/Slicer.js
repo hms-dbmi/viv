@@ -85,7 +85,7 @@ const Slicer = () => {
     <>
       <Typography
         className={!use3d ? classes.disabled : classes.enabled}
-        style={{ marginTop: 4 }}
+        style={{ marginTop: 16 }}
       >
         Clipping Planes:{' '}
       </Typography>{' '}
