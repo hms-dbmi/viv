@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add screenshots to README.md
+
 ### Changed
 
 - Fix bug in `getChannelStats` where we only considered values over 1 for the sliders
