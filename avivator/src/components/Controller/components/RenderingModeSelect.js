@@ -7,6 +7,8 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { RENDERING_MODES } from '@hms-dbmi/viv';
 import { useImageSettingsStore, useViewerStore } from '../../../state';
 
+const options = [...Object.values(RENDERING_MODES), ''];
+
 function RenderingModeSelect() {
   const { setImageSetting, renderingMode } = useImageSettingsStore();
   const { isViewerLoading, use3d } = useViewerStore();
@@ -16,14 +18,14 @@ function RenderingModeSelect() {
       <Select
         native
         onChange={e => setImageSetting({ renderingMode: e.target.value })}
-        value={renderingMode}
+        value={use3d ? renderingMode : ''}
         inputProps={{
           name: 'rendering-mode',
           id: 'rendering-mode-select'
         }}
         disabled={isViewerLoading || !use3d}
       >
-        {Object.values(RENDERING_MODES).map(name => (
+        {options.map(name => (
           <option key={name} value={name}>
             {name}
           </option>
