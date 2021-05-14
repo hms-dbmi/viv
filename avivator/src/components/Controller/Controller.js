@@ -181,6 +181,12 @@ const Controller = () => {
         {<Slicer />}
         {<CameraOptions />}
       </TabPanel>
+      <Divider
+        style={{
+          marginTop: '8px',
+          marginBottom: '8px'
+        }}
+      />
       {<VolumeButton />}
       {!use3d && <PictureInPictureToggle />}
       {!use3d && <SideBySideToggle />}

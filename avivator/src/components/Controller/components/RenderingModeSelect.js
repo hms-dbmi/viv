@@ -7,11 +7,12 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { RENDERING_MODES } from '@hms-dbmi/viv';
 import { useImageSettingsStore, useViewerStore } from '../../../state';
 
-const options = [...Object.values(RENDERING_MODES), ''];
+const renderingOptions = Object.values(RENDERING_MODES);
 
 function RenderingModeSelect() {
   const { setImageSetting, renderingMode } = useImageSettingsStore();
   const { isViewerLoading, use3d } = useViewerStore();
+  const options = !use3d ? [...renderingOptions, ''] : renderingOptions;
   return (
     <FormControl fullWidth>
       <InputLabel htmlFor="rendering-mode-select">Rendering Mode</InputLabel>
