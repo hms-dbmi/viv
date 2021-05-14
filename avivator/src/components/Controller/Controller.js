@@ -142,16 +142,16 @@ const Controller = () => {
       <GlobalSelectionSlider key={label} size={size} label={label} />
     ) : null;
   });
-  const [value, setValue] = useState(0);
+  const [tab, setTab] = useState(0);
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const handleTabChange = (event, newTab) => {
+    setTab(newTab);
   };
   return (
     <Menu maxHeight={viewSize.height}>
       <Tabs
-        value={value}
-        onChange={handleChange}
+        value={tab}
+        onChange={handleTabChange}
         aria-label="simple tabs example"
         style={{ height: '24px', minHeight: '24px' }}
       >
@@ -159,7 +159,7 @@ const Controller = () => {
         <Tab label="Volume" style={{ fontSize: '.75rem', bottom: 12 }} />
       </Tabs>
       <Divider />
-      <TabPanel value={value} index={0}>
+      <TabPanel value={tab} index={0}>
         {useColormap && <ColormapSelect />}
         {useLens && !colormap && shape[labels.indexOf('c')] > 1 && (
           <LensSelect
@@ -176,7 +176,7 @@ const Controller = () => {
         )}
         {!isRgb && <AddChannel />}
       </TabPanel>
-      <TabPanel value={value} index={1}>
+      <TabPanel value={tab} index={1}>
         {<RenderingModeSelect />}
         {<Slicer />}
         {<CameraOptions />}
