@@ -3,6 +3,8 @@
 A library for multiscale visualization of high-resolution multiplexed bioimaging data on the web. Directly renders Bio-Formats-compatible Zarr and OME-TIFF.
 Written in JavaScript and built on Deck.gl with modern web technologies.
 
+![](docs/glomerular-lens.png)![](docs/3d-slicing.gif)
+
 ## About
 
 Viv is a JavaScript library providing utilities for rendering primary imaging data. Viv supports WebGL-based multi-channel rendering of both pyramidal and non-pyramidal images. The rendering components of Viv are provided as Deck.gl layers, making it easy to compose images with existing layers and efficiently update rendering properties within a reactive paradigm.
@@ -20,21 +22,25 @@ More details can be found in our preprint describing the Viv library and related
 ### Tools Built with Viv
 
 #### Vitessce
+
 - http://vitessce.io
 
 #### OME-NGFF:
+
 - https://blog.openmicroscopy.org/file-formats/community/2020/11/04/zarr-data/
-- https://blog.openmicroscopy.org/file-formats/community/2020/12/01/zarr-hcs/ 
+- https://blog.openmicroscopy.org/file-formats/community/2020/12/01/zarr-hcs/
 
 #### ImJoy:
-- https://imjoy.io/docs/#/i2k_tutorial?id=open-integration-with-imjoy  
+
+- https://imjoy.io/docs/#/i2k_tutorial?id=open-integration-with-imjoy
 
 #### Galaxy:
+
 - The Avivator image viewer will be included as the default visualization for OME-TIFF files: https://github.com/galaxyproject/galaxy/pull/10534
 
 #### HuBMAP CCF EUI:
-- https://github.com/hubmapconsortium/ccf-ui
 
+- https://github.com/hubmapconsortium/ccf-ui
 
 ## Supported Data Formats
 
