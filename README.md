@@ -3,7 +3,7 @@
 A library for multiscale visualization of high-resolution multiplexed bioimaging data on the web. Directly renders Bio-Formats-compatible Zarr and OME-TIFF.
 Written in JavaScript and built on Deck.gl with modern web technologies.
 
-![](docs/glomerular-lens.png)![](docs/3d-slicing.gif)
+<img src="docs/3d-slicing.gif" alt="drawing" width="400"/> <img src="docs/glomerular-lens.png" alt="drawing" width="400"/>
 
 ## About
 
