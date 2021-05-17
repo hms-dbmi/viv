@@ -15,7 +15,16 @@ const useStyles = makeStyles(theme =>
   createStyles({
     enabled: {},
     disabled: {
-      color: theme.palette.text.disabled
+      color: theme.palette.text.disabled,
+      // Because of the .5 opacity of the disabled color in the theme, and the fact
+      // that there are multiple overlaid parts to the slider,
+      // this needs to be set manually for the desired effect.
+      '& .MuiSlider-thumb': {
+        color: 'rgb(100, 100, 100, 1.0)'
+      },
+      '&  .MuiSlider-track': {
+        color: 'rgb(100, 100, 100, 1.0)'
+      }
     }
   })
 );
