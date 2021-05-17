@@ -1,4 +1,6 @@
 import { useEffect } from 'react';
+import { useDropzone } from 'react-dropzone';
+
 import {
   useChannelSetters,
   useImageSettingsStore,
@@ -8,10 +10,10 @@ import {
   createLoader,
   buildDefaultSelection,
   guessRgb,
-  getMultiSelectionStats
+  getMultiSelectionStats,
+  getBoundingCube
 } from './utils';
 import { COLOR_PALLETE, FILL_PIXEL_VALUE } from './constants';
-import { useDropzone } from 'react-dropzone';
 
 export const initImage = (source, history) => {
   const {
@@ -21,7 +23,7 @@ export const initImage = (source, history) => {
     toggleIsOffsetsSnackbarOn
   } = useViewerStore();
   const { setLoader, addChannels, resetChannels } = useChannelSetters();
-  const { isLensOn, toggleIsLensOn } = useImageSettingsStore();
+  const { isLensOn, toggleIsLensOn, setImageSetting } = useImageSettingsStore();
   useEffect(() => {
     async function changeLoader() {
       // Placeholder
@@ -96,6 +98,12 @@ export const initImage = (source, history) => {
           // Set the global selections (needed for the UI). All selections have the same global selection.
           globalSelection: newSelections[0],
           channelOptions
+        });
+        const [xSlice, ySlice, zSlice] = getBoundingCube(nextLoader);
+        setImageSetting({
+          xSlice,
+          ySlice,
+          zSlice
         });
         if (use3d) toggleUse3d();
         // eslint-disable-next-line no-unused-expressions
