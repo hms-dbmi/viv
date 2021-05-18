@@ -67,7 +67,7 @@ const SnackBars = () => {
         elevation={6}
         variant="filled"
       >
-        <Alert onClose={toggleIsVolumeRenderingWarningOn} severity="info">
+        <Alert onClose={toggleIsVolumeRenderingWarningOn} severity="warning">
           <VolumeRenderingWarning />
         </Alert>
       </Snackbar>
