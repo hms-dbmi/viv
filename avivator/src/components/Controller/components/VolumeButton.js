@@ -82,6 +82,7 @@ function VolumeButton() {
     use3d,
     toggleUse3d,
     metadata,
+    toggleIsVolumeRenderingWarningOn,
     setViewerState,
     isViewerLoading
   } = useViewerStore();
@@ -183,6 +184,12 @@ function VolumeButton() {
                                 }
                               });
                               toggleUse3d();
+                              const isWebGL2Supported = !!document
+                                .createElement('canvas')
+                                .getContext('webgl2');
+                              if (!isWebGL2Supported) {
+                                toggleIsVolumeRenderingWarningOn();
+                              }
                             });
                             setViewerState({ useLens: false });
                           }}

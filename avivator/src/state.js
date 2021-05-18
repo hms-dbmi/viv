@@ -154,6 +154,7 @@ const DEFAULT_VIEWER_STATE = {
     message: null
   },
   isNoImageUrlSnackbarOn: false,
+  isVolumeRenderingWarningOn: false,
   useLinkedView: false,
   isControllerOn: true,
   use3d: false,

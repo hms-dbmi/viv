@@ -154,7 +154,7 @@ const VolumeLayer = class extends CompositeLayer {
             text: `Loading Volume ${String((progress || 0) * 100).slice(
               0,
               5
-            )}% (Firefox/Chrome Only)...`,
+            )}%...`,
             position: viewport.position
           }
         ],

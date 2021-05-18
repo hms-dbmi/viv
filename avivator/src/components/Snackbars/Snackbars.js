@@ -2,7 +2,12 @@ import React from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 
-import { LoaderError, OffsetsWarning, NoImageUrlInfo } from './SnackbarAlerts';
+import {
+  LoaderError,
+  OffsetsWarning,
+  NoImageUrlInfo,
+  VolumeRenderingWarning
+} from './SnackbarAlerts';
 import { useViewerStore } from '../../state';
 
 const SnackBars = () => {
@@ -12,6 +17,8 @@ const SnackBars = () => {
     isNoImageUrlSnackbarOn,
     toggleIsOffsetsSnackbarOn,
     toggleIsNoImageUrlSnackbarOn,
+    isVolumeRenderingWarningOn,
+    toggleIsVolumeRenderingWarningOn,
     setViewerState
   } = useViewerStore();
   return (
@@ -52,6 +59,16 @@ const SnackBars = () => {
       >
         <Alert onClose={toggleIsNoImageUrlSnackbarOn} severity="info">
           <NoImageUrlInfo />
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={isVolumeRenderingWarningOn}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        elevation={6}
+        variant="filled"
+      >
+        <Alert onClose={toggleIsVolumeRenderingWarningOn} severity="info">
+          <VolumeRenderingWarning />
         </Alert>
       </Snackbar>
     </>
