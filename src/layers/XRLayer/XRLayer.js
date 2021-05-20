@@ -21,7 +21,7 @@ const SHADER_MODULES = [
 
 function getRenderingAttrs(dtype, gl, interpolation) {
   const isLinear = interpolation === INTERPOLATION_MODES.LINEAR;
-  const interpolationSetting = isLinear ? GL.LINEAR : GL.NEAREST;
+  const filterSetting = isLinear ? GL.LINEAR : GL.NEAREST;
   if (!isWebGL2(gl)) {
     // WebGL1
     return {
@@ -30,7 +30,7 @@ function getRenderingAttrs(dtype, gl, interpolation) {
       type: GL.FLOAT,
       sampler: 'sampler2D',
       shaderModule: SHADER_MODULES[0],
-      filter: interpolationSetting,
+      filter: filterSetting,
       cast: data => new Float32Array(data)
     };
   }
@@ -39,7 +39,7 @@ function getRenderingAttrs(dtype, gl, interpolation) {
   return {
     ...values,
     shaderModule: SHADER_MODULES[1],
-    filter: interpolationSetting,
+    filter: filterSetting,
     cast: isLinear ? data => new Float32Array(data) : data => data
   };
 }
