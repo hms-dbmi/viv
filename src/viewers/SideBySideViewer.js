@@ -2,7 +2,10 @@ import React, { useMemo } from 'react'; // eslint-disable-line import/no-unresol
 import VivViewer from './VivViewer';
 import { SideBySideView, getDefaultInitialViewState } from '../views';
 import useGlobalSelection from './global-selection-hook';
-import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
+import {
+  GLOBAL_SLIDER_DIMENSION_FIELDS,
+  INTERPOLATION_MODES
+} from '../constants';
 
 /**
  * This component provides a side-by-side VivViewer with linked zoom/pan.
@@ -32,6 +35,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {Array} [props.transitionFields] A string array indicating which fields require a transition: Default: ['t', 'z'].
+ * @param {String=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is NEAREST
  */
 const SideBySideViewer = props => {
   const {
@@ -54,7 +58,8 @@ const SideBySideViewer = props => {
     transparentColor,
     onViewStateChange,
     onHover,
-    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS
+    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
+    interpolation = INTERPOLATION_MODES.NEAREST
   } = props;
   const {
     newLoaderSelection,
@@ -111,7 +116,8 @@ const SideBySideViewer = props => {
     lensRadius,
     lensBorderColor,
     lensBorderRadius,
-    transparentColor
+    transparentColor,
+    interpolation
   };
   const views = [detailViewRight, detailViewLeft];
   const layerProps = [layerConfig, layerConfig];
