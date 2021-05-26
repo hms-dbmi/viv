@@ -12,6 +12,7 @@ const renderingOptions = Object.values(RENDERING_MODES);
 function RenderingModeSelect() {
   const { setImageSetting, renderingMode } = useImageSettingsStore();
   const { isViewerLoading, use3d } = useViewerStore();
+  // Empty option allows for displaying the title of the dropdown fully in the UI.
   const options = !use3d ? [...renderingOptions, ''] : renderingOptions;
   return (
     <FormControl fullWidth>
