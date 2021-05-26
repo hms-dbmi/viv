@@ -21,7 +21,6 @@ const SHADER_MODULES = [
 
 function getRenderingAttrs(dtype, gl, interpolation) {
   const isLinear = interpolation === INTERPOLATION_MODES.LINEAR;
-  const filterSetting = isLinear ? GL.LINEAR : GL.NEAREST;
   if (!isWebGL2(gl)) {
     // WebGL1
     return {
@@ -30,7 +29,7 @@ function getRenderingAttrs(dtype, gl, interpolation) {
       type: GL.FLOAT,
       sampler: 'sampler2D',
       shaderModule: SHADER_MODULES[0],
-      filter: filterSetting,
+      filter: interpolation,
       cast: data => new Float32Array(data)
     };
   }
@@ -39,7 +38,7 @@ function getRenderingAttrs(dtype, gl, interpolation) {
   return {
     ...values,
     shaderModule: SHADER_MODULES[1],
-    filter: filterSetting,
+    filter: interpolation,
     cast: isLinear ? data => new Float32Array(data) : data => data
   };
 }
@@ -91,7 +90,7 @@ const defaultProps = {
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
- * @property {String=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is NEAREST
+ * @property {String=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
  */
 /**
  * @type {{ new (...props: import('../../types').Viv<LayerProps>[]) }}
