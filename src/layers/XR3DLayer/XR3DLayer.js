@@ -213,7 +213,8 @@ const XR3DLayer = class extends Layer {
       changeFlags.extensionsChanged ||
       props.colormap !== oldProps.colormap ||
       props.renderingMode !== oldProps.renderingMode ||
-      props.clippingPlanes.length !== oldProps.clippingPlanes.length
+      props.clippingPlanes.length !== oldProps.clippingPlanes.length ||
+      props.interpolation !== oldProps.interpolation
     ) {
       const { gl } = this.context;
       if (this.state.model) {
