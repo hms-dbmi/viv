@@ -88,7 +88,6 @@ const defaultProps = {
   }
 };
 
-
 function getRenderingAttrs(dtype, interpolation) {
   const isLinear = interpolation === INTERPOLATION_MODES.LINEAR;
   // Linear filtering only works when the data type is cast to Float32.
@@ -166,8 +165,14 @@ const XR3DLayer = class extends Layer {
    * This function compiles the shaders and the projection module.
    */
   getShaders() {
-    const { colormap, renderingMode, clippingPlanes, dtype, interpolation } = this.props;
-    const { sampler } = getRenderingAttrs(dtype, interpolation)
+    const {
+      colormap,
+      renderingMode,
+      clippingPlanes,
+      dtype,
+      interpolation
+    } = this.props;
+    const { sampler } = getRenderingAttrs(dtype, interpolation);
     const { _BEFORE_RENDER, _RENDER, _AFTER_RENDER } = colormap
       ? RENDERING_MODES_COLORMAP[renderingMode]
       : RENDERING_MODES_BLEND[renderingMode];
