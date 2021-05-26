@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'; // eslint-disable-line import/no-unresol
 
 import VivViewer from './VivViewer';
 import { VolumeView, getDefaultInitialViewState } from '../views';
-import { RENDERING_MODES } from '../constants';
+import { RENDERING_MODES, INTERPOLATION_MODES } from '../constants';
 
 /**
  * This component provides a volumetric viewer that provides provides volume-ray-casting.
@@ -27,6 +27,7 @@ import { RENDERING_MODES } from '../constants';
  * @param {number} props.width Current width of the component.
  * @param {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  * @param {Boolean} [useFixedAxis] Whether or not to fix the axis of the camera (default is true).
+ * @param {Number} [props.interpolation] The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.LINEAR
  */
 
 const VolumeViewer = props => {
@@ -49,7 +50,8 @@ const VolumeViewer = props => {
     width: screenWidth,
     viewStates: viewStatesProp,
     clippingPlanes = [],
-    useFixedAxis = true
+    useFixedAxis = true,
+    interpolation = INTERPOLATION_MODES.LINEAR
   } = props;
   const volumeViewState = viewStatesProp?.find(state => state?.id === '3d');
   const initialViewState = useMemo(() => {
@@ -91,7 +93,8 @@ const VolumeViewer = props => {
     modelMatrix,
     // Slightly delay to avoid issues with a render in the middle of a deck.gl layer state update.
     onViewportLoad: () => setTimeout(onViewportLoad, 0),
-    clippingPlanes
+    clippingPlanes,
+    interpolation
   };
   const views = [volumeView];
   const layerProps = [layerConfig];

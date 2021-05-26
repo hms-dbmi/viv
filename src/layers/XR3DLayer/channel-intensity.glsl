@@ -75,12 +75,12 @@ vec3 rgb_to_hsv(vec3 rgb) {
   return hsv;
 }
 
-float sample_and_apply_sliders(sampler3D channel, vec3 vTexCoord, vec2 sliderValues) {
+float sample_and_apply_sliders(SAMPLER_TYPE channel, vec3 vTexCoord, vec2 sliderValues) {
   float fragIntensity = float(texture(channel, vTexCoord).r);
   float slidersAppliedToIntensity = (fragIntensity - sliderValues[0]) / max(0.0005, (sliderValues[1] - sliderValues[0]));
   return max(0.0, slidersAppliedToIntensity);
 }
 
 vec4 colormap(float intensity, float opacity) {
-  return vec4(_COLORMAP_FUNCTION(min(1.0,intensity)).xyz, opacity);
+  return vec4(COLORMAP_FUNCTION(min(1.0,intensity)).xyz, opacity);
 }
