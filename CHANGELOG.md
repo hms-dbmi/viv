@@ -4,11 +4,38 @@
 
 ### Added
 
+- Add screenshots to README.md
+- Allow users to choose `LINEAR` or `NEAREST` interpolation filtering for `XRLayer`.
+
+### Changed
+
+- Fix bug in `getChannelStats` where we only considered values over 1 for the sliders
+- Fix bug in `getChannelStats` where array of zeros passed in causes undefined slider settings
+- Check all properties in `onHover` to avoid crashes
+- Check for dependabot before running CHANGELOG checks
+
+## 0.9.5
+
+### Added
+
+### Changed
+
+- Fix `VivViewer` and `VivView` types.
+- Fix `ImageLayer` `loader` type.
+- Refine `LayerProps` JSDoc annotations for more precise emitted types.
+- Fix `Avivator` and `getImageLyaers` utility for `loaderSelection` that is empty array.
+
+## 0.9.4
+
+### Added
+
 - Refactor JSDoc comments to properly annotate Layer classes with constructor signatures.
 - `getChannelStats` in snippet to show how to use it.
 
 ### Changed
 
+- Fix interleaved RGB image handling.
+- Add test for interleaved RGB images.
 - Upgrade geotiff.js to fix https://github.com/geotiffjs/geotiff.js/issues/214
 
 ## 0.9.3

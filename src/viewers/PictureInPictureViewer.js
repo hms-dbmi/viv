@@ -8,7 +8,10 @@ import {
   OVERVIEW_VIEW_ID
 } from '../views';
 import useGlobalSelection from './global-selection-hook';
-import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
+import {
+  GLOBAL_SLIDER_DIMENSION_FIELDS,
+  INTERPOLATION_MODES
+} from '../constants';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -16,13 +19,13 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
  * @param {Array} props.colorValues List of [r, g, b] values for each channel.
  * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
- * @param {string} props.colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @param {string} [props.colormap] String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.loader The data source for the viewer, PixelSource[]. If loader.length > 1, data is assumed to be multiscale.
  * @param {Array} props.loaderSelection Selection to be used for fetching data.
  * @param {Object} props.overview Allows you to pass settings into the OverviewView: { scale, margin, position, minimumWidth, maximumWidth,
  * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.  See http://viv.gehlenborglab.org/#overviewview for defaults.
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
- * @param {Object} [props.hoverHooks] Object including utility hooks - an object with key handleValue like { handleValue: (valueArray) => {}, handleCoordinate: (coordinate) => {} } where valueArray
+ * @param {import('./VivViewer').HoverHooks} [props.hoverHooks] Object including utility hooks - an object with key handleValue like { handleValue: (valueArray) => {}, handleCoordinate: (coordinate) => {} } where valueArray
  * has the pixel values for the image under the hover location and coordinate is the coordinate in the image from which the values are picked.
  * @param {Array} [props.viewStates] Array of objects like [{ target: [x, y, 0], zoom: -zoom, id: DETAIL_VIEW_ID }] for setting where the viewer looks (optional - this is inferred from height/width/loader
  * internally by default using getDefaultInitialViewState).
@@ -41,7 +44,8 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
- * @param {Array} [props.transitionFields] A string array indicating which fields require a transition: Default: ['t', 'z'].
+ * @param {Array} [props.transitionFields] A string array indicating which fields require a transition when making a new selection: Default: ['t', 'z'].
+ * @param {String=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
  */
 
 const PictureInPictureViewer = props => {
@@ -55,7 +59,7 @@ const PictureInPictureViewer = props => {
     overview,
     overviewOn,
     loaderSelection,
-    hoverHooks = {},
+    hoverHooks = { handleValue: () => {}, handleCoordinate: () => {} },
     height,
     width,
     isLensOn = false,
@@ -67,7 +71,8 @@ const PictureInPictureViewer = props => {
     transparentColor,
     onViewStateChange,
     onHover,
-    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS
+    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
+    interpolation = INTERPOLATION_MODES.NEAREST
   } = props;
   const {
     newLoaderSelection,
@@ -103,7 +108,8 @@ const PictureInPictureViewer = props => {
     lensRadius,
     lensBorderColor,
     lensBorderRadius,
-    transparentColor
+    transparentColor,
+    interpolation
   };
   const views = [detailView];
   const layerProps = [layerConfig];

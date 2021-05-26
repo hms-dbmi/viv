@@ -137,6 +137,14 @@ function getDefaultGlobalSelection({ labels, shape }) {
   return selection;
 }
 
+/**
+ * @param {Array.<number>} shape loader shape
+ */
+export function isInterleaved(shape) {
+  const lastDimSize = shape[shape.length - 1];
+  return lastDimSize === 3 || lastDimSize === 4;
+}
+
 // Create a default selection using the midpoint of the available global dimensions,
 // and then the first four available selections from the first selectable channel.
 /**
@@ -144,7 +152,7 @@ function getDefaultGlobalSelection({ labels, shape }) {
  * @param { import('../../src/types').PixelSource<['t', 'z', 'c']> } pixelSource 
  */
 export function buildDefaultSelection(pixelSource) {
-  const selection = [];
+  let selection = [];
   const globalSelection = getDefaultGlobalSelection(pixelSource);
   // First non-global dimension with some sort of selectable values.
 
@@ -163,6 +171,7 @@ export function buildDefaultSelection(pixelSource) {
     });
   }
 
+  selection = isInterleaved(pixelSource.shape) ? [{ ...selection[0], c: 0 }] : selection;
   return selection;
 }
 

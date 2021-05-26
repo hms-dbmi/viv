@@ -10,6 +10,7 @@ import {
   isInterleaved,
   SIGNAL_ABORTED
 } from '../../loaders/utils';
+import { INTERPOLATION_MODES } from '../../constants';
 
 // From https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
 const DECK_GL_TILE_SIZE = 512;
@@ -33,7 +34,12 @@ const defaultProps = {
   onClick: { type: 'function', value: null, compare: true },
   transparentColor: { type: 'array', value: null, compare: true },
   refinementStrategy: { type: 'string', value: null, compare: true },
-  excludeBackground: { type: 'boolean', value: false, compare: true }
+  excludeBackground: { type: 'boolean', value: false, compare: true },
+  interpolation: {
+    type: 'string',
+    value: INTERPOLATION_MODES.LINEAR,
+    compare: true
+  }
 };
 
 /**
@@ -41,7 +47,7 @@ const defaultProps = {
  * @type {object}
  * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
- * @property {Array.<Array.<boolean>>} channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @property {Array.<boolean>} channelIsOn List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader Image pyramid. PixelSource[], where each PixelSource is decreasing in shape.
  * @property {Array} loaderSelection Selection to be used for fetching data.
  * @property {number=} opacity Opacity of the layer.
@@ -65,10 +71,12 @@ const defaultProps = {
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {string=} refinementStrategy 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
  * @property {boolean=} excludeBackground Whether to exclude the background image. The background image is also excluded for opacity!=1.
+ * @property {String=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
  */
 
 /**
- * @type {{ new(...props: LayerProps[]) }}
+ * @type {{ new <S extends string[]>(...props: import('../../types').Viv<LayerProps, S>[]) }}
+ * @ignore
  */
 const MultiscaleImageLayer = class extends CompositeLayer {
   initializeState() {
@@ -87,28 +95,16 @@ const MultiscaleImageLayer = class extends CompositeLayer {
   renderLayers() {
     const {
       loader,
-      sliderValues,
-      colorValues,
-      channelIsOn,
       loaderSelection,
-      domain,
       opacity,
-      colormap,
       viewportId,
       onTileError,
       onHover,
-      pickable,
       id,
-      isLensOn,
-      lensSelection,
-      lensBorderColor,
-      lensBorderRadius,
-      maxRequests,
       onClick,
       modelMatrix,
       transparentColor,
       excludeBackground,
-      onViewportLoad,
       refinementStrategy
     } = this.props;
 
@@ -156,7 +152,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
           height: tiles[0].height
         };
 
-        if (isInterleaved(loader)) {
+        if (isInterleaved(loader[resolution].shape)) {
           // eslint-disable-next-line prefer-destructuring
           tile.data = tile.data[0];
           if (tile.data.length === tile.width * tile.height * 3) {
@@ -197,16 +193,10 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       tileSize: modelMatrix
         ? tileSize * (1 / modelMatrix.getScale()[0])
         : tileSize,
-      onClick,
       extent: [0, 0, width, height],
       // See the above note within for why the use of zoomOffset and the rounding necessary.
       minZoom: Math.round(-(loader.length - 1) + zoomOffset),
       maxZoom: Math.round(zoomOffset),
-      colorValues,
-      sliderValues,
-      channelIsOn,
-      maxRequests,
-      domain,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
       // multiple rendered sublayers (some of which have been cached) from overlapping
       refinementStrategy:
@@ -218,19 +208,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         getTileData: [loader, loaderSelection]
       },
       onTileError: onTileError || loader[0].onTileError,
-      opacity,
-      colormap,
-      viewportId,
-      onHover,
-      pickable,
-      unprojectLensBounds,
-      isLensOn,
-      lensSelection,
-      lensBorderColor,
-      lensBorderRadius,
-      modelMatrix,
-      transparentColor,
-      onViewportLoad
+      unprojectLensBounds
     });
 
     // This gives us a background image and also solves the current
