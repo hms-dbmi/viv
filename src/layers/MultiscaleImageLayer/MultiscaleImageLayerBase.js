@@ -1,6 +1,7 @@
 import { TileLayer } from '@deck.gl/geo-layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import { renderSubLayers } from './utils';
+import { INTERPOLATION_MODES } from '../../constants';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -8,10 +9,7 @@ const defaultProps = {
   sliderValues: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
   channelIsOn: { type: 'array', value: [], compare: true },
-  minZoom: { type: 'number', value: 0, compare: true },
-  maxZoom: { type: 'number', value: 0, compare: true },
   renderSubLayers: { type: 'function', value: renderSubLayers, compare: false },
-  opacity: { type: 'number', value: 1, compare: true },
   colormap: { type: 'string', value: '', compare: true },
   dtype: { type: 'string', value: 'Uint16', compare: true },
   domain: { type: 'array', value: [], compare: true },
@@ -22,7 +20,12 @@ const defaultProps = {
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
-  transparentColor: { type: 'array', value: null, compare: true }
+  transparentColor: { type: 'array', value: null, compare: true },
+  interpolation: {
+    type: 'string',
+    value: INTERPOLATION_MODES.NEAREST,
+    compare: true
+  }
 };
 
 /**

@@ -1,12 +1,12 @@
-import { FileStore } from './lib/storage';
 import { HTTPStore } from 'zarr';
+import { FileStore } from './lib/storage';
 import { getRootPrefix } from './lib/utils';
 
 import { load as loadBioformats } from './bioformats-zarr';
 import { load as loadOme } from './ome-zarr';
 
 interface ZarrOptions {
-  fetchOptions?: RequestInit;
+  fetchOptions: RequestInit;
 }
 
 /**
@@ -19,7 +19,7 @@ interface ZarrOptions {
  */
 export async function loadBioformatsZarr(
   source: string | (File & { path: string })[],
-  options: ZarrOptions = {}
+  options: Partial<ZarrOptions> = {}
 ) {
   const METADATA = 'METADATA.ome.xml';
   const ZARR_DIR = 'data.zarr';
@@ -67,7 +67,7 @@ export async function loadBioformatsZarr(
  */
 export async function loadOmeZarr(
   source: string,
-  options: ZarrOptions & { type?: 'multiscales' }
+  options: Partial<ZarrOptions & { type: 'multiscales' }> = {}
 ) {
   const store = new HTTPStore(source, options);
 

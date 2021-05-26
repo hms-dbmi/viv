@@ -5,6 +5,7 @@ import XRLayer from './XRLayer';
 import BitmapLayer from './BitmapLayer';
 import { onPointer } from './utils';
 import { isInterleaved } from '../loaders/utils';
+import { INTERPOLATION_MODES } from '../constants';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -31,7 +32,12 @@ const defaultProps = {
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   onClick: { type: 'function', value: null, compare: true },
   transparentColor: { type: 'array', value: null, compare: true },
-  onViewportLoad: { type: 'function', value: null, compare: true }
+  onViewportLoad: { type: 'function', value: null, compare: true },
+  interpolation: {
+    type: 'string',
+    value: INTERPOLATION_MODES.NEAREST,
+    compare: true
+  }
 };
 
 /**
@@ -39,9 +45,9 @@ const defaultProps = {
  * @type {Object}
  * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
- * @property {Array.<Array.<boolean>>} channelIsOn List of boolean values for each channel for whether or not it is visible.
- * @property {Array} loader PixelSource. Represents an N-dimensional image.
- * @property {Array} loader Selection to be used for fetching data.
+ * @property {Array.<boolean>} channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @property {Object} loader PixelSource. Represents an N-dimensional image.
+ * @property {Array} loaderSelection Selection to be used for fetching data.
  * @property {number=} opacity Opacity of the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
@@ -59,10 +65,13 @@ const defaultProps = {
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
+ * @property {String=} id Unique identifier for this layer.
+ * @property {String=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
  */
 
 /**
- * @type {{ new(...props: LayerProps[]) }}
+ * @type {{ new <S extends string[]>(...props: import('../types').Viv<LayerProps, S>[]) }}
+ * @ignore
  */
 const ImageLayer = class extends CompositeLayer {
   initializeState() {
@@ -101,7 +110,7 @@ const ImageLayer = class extends CompositeLayer {
           height: rasters[0].height
         };
 
-        if (isInterleaved(loader)) {
+        if (isInterleaved(loader.shape)) {
           // data is for BitmapLayer and needs to be of form { data: Uint8Array, width, height };
           // eslint-disable-next-line prefer-destructuring
           raster.data = raster.data[0];
@@ -130,69 +139,28 @@ const ImageLayer = class extends CompositeLayer {
   }
 
   renderLayers() {
-    const {
-      loader,
-      visible,
-      opacity,
-      colormap,
-      sliderValues,
-      colorValues,
-      channelIsOn,
-      domain,
-      pickable,
-      isLensOn,
-      lensSelection,
-      lensBorderColor,
-      lensRadius,
-      id,
-      onClick,
-      onHover,
-      modelMatrix,
-      transparentColor
-    } = this.props;
-    const { dtype, photometricInterpretation } = loader;
-    const { width, height, data, unprojectLensBounds } = this.state;
+    const { loader, id } = this.props;
+    const { dtype } = loader;
+    const { width, height, data } = this.state;
     if (!(width && height)) return null;
 
     const bounds = [0, height, width, 0];
-    if (isInterleaved(loader)) {
+    if (isInterleaved(loader.shape)) {
+      const { photometricInterpretation = 2 } = loader.meta;
       return new BitmapLayer(this.props, {
         image: this.state,
         photometricInterpretation,
         // Shared props with XRLayer:
         bounds,
-        id: `image-sub-layer-${bounds}-${id}`,
-        onHover,
-        pickable,
-        onClick,
-        modelMatrix,
-        opacity,
-        visible
+        id: `image-sub-layer-${bounds}-${id}`
       });
     }
     return new XRLayer(this.props, {
       channelData: { data, height, width },
-      sliderValues,
-      colorValues,
-      channelIsOn,
-      domain,
-      dtype,
-      colormap,
-      unprojectLensBounds,
-      isLensOn,
-      lensSelection,
-      lensBorderColor,
-      lensRadius,
       // Shared props with BitmapLayer:
       bounds,
       id: `image-sub-layer-${bounds}-${id}`,
-      onHover,
-      pickable,
-      onClick,
-      modelMatrix,
-      opacity,
-      visible,
-      transparentColor
+      dtype
     });
   }
 };

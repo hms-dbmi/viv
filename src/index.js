@@ -16,11 +16,16 @@ import {
   DETAIL_VIEW_ID,
   OVERVIEW_VIEW_ID
 } from './views';
-import { DTYPE_VALUES, MAX_SLIDERS_AND_CHANNELS } from './constants';
+import {
+  DTYPE_VALUES,
+  MAX_SLIDERS_AND_CHANNELS,
+  INTERPOLATION_MODES
+} from './constants';
 
 export {
   DTYPE_VALUES,
   MAX_SLIDERS_AND_CHANNELS,
+  INTERPOLATION_MODES,
   ScaleBarLayer,
   MultiscaleImageLayer,
   XRLayer,

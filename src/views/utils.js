@@ -52,7 +52,7 @@ export function getDefaultInitialViewState(loader, viewSize, zoomBackOff = 0) {
 
 /**
  * Creates the layers for viewing an image in detail.
- * @param {string} id The identifier of the view.
+ * @param {String} id The identifier of the view.
  * @param {Object} props The layer properties.
  * @returns {Array} An array of layers.
  */
@@ -74,9 +74,8 @@ export function getImageLayers(id, props) {
   return [loaderSelection, newLoaderSelection]
     .filter((s, i) => i === 0 || s)
     .map((s, i) => {
-      const suffix = s
-        ? `-${transitionFields.map(f => s[0][f]).join('-')}`
-        : '';
+      const suffix =
+        s && s[0] ? `-${transitionFields.map(f => s[0][f]).join('-')}` : '';
       const newProps =
         i !== 0
           ? {
