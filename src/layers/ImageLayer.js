@@ -5,6 +5,7 @@ import XRLayer from './XRLayer';
 import BitmapLayer from './BitmapLayer';
 import { onPointer } from './utils';
 import { isInterleaved, SIGNAL_ABORTED } from '../loaders/utils';
+import { INTERPOLATION_MODES } from '../constants';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -31,7 +32,12 @@ const defaultProps = {
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   onClick: { type: 'function', value: null, compare: true },
   transparentColor: { type: 'array', value: null, compare: true },
-  onViewportLoad: { type: 'function', value: null, compare: true }
+  onViewportLoad: { type: 'function', value: null, compare: true },
+  interpolation: {
+    type: 'string',
+    value: INTERPOLATION_MODES.NEAREST,
+    compare: true
+  }
 };
 
 /**
@@ -60,6 +66,7 @@ const defaultProps = {
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
  * @property {String=} id Unique identifier for this layer.
+ * @property {String=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
  */
 
 /**
