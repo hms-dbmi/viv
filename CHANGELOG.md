@@ -5,12 +5,15 @@
 ### Added
 
 - Add `VolumeView`, `VolumeViewer`, `VolumeLayer`, and `XR3DLayer` classes for volumetric ray casting.
+- Add screenshots to README.md
+- Allow users to choose `LINEAR` or `NEAREST` interpolation filtering for `XRLayer`.
 
 ### Changed
 
 - Fix bug in `getChannelStats` where we only considered values over 1 for the sliders
 - Fix bug in `getChannelStats` where array of zeros passed in causes undefined slider settings
 - Check all properties in `onHover` to avoid crashes
+- Check for dependabot before running CHANGELOG checks
 
 ## 0.9.5
 

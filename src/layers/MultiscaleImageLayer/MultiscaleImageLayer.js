@@ -10,6 +10,7 @@ import {
   isInterleaved,
   SIGNAL_ABORTED
 } from '../../loaders/utils';
+import { INTERPOLATION_MODES } from '../../constants';
 
 // From https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
 const DECK_GL_TILE_SIZE = 512;
@@ -33,7 +34,12 @@ const defaultProps = {
   onClick: { type: 'function', value: null, compare: true },
   transparentColor: { type: 'array', value: null, compare: true },
   refinementStrategy: { type: 'string', value: null, compare: true },
-  excludeBackground: { type: 'boolean', value: false, compare: true }
+  excludeBackground: { type: 'boolean', value: false, compare: true },
+  interpolation: {
+    type: 'number',
+    value: INTERPOLATION_MODES.LINEAR,
+    compare: true
+  }
 };
 
 /**
@@ -65,6 +71,7 @@ const defaultProps = {
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {string=} refinementStrategy 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
  * @property {boolean=} excludeBackground Whether to exclude the background image. The background image is also excluded for opacity!=1.
+ * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
  */
 
 /**

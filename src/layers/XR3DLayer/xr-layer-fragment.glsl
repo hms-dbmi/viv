@@ -1,21 +1,21 @@
 #version 300 es
 precision highp int;
 precision highp float;
-precision highp sampler3D;
+precision highp SAMPLER_TYPE;
 
-uniform highp sampler3D volume0;
-uniform highp sampler3D volume1;
-uniform highp sampler3D volume2;
-uniform highp sampler3D volume3;
-uniform highp sampler3D volume4;
-uniform highp sampler3D volume5;
+uniform highp SAMPLER_TYPE volume0;
+uniform highp SAMPLER_TYPE volume1;
+uniform highp SAMPLER_TYPE volume2;
+uniform highp SAMPLER_TYPE volume3;
+uniform highp SAMPLER_TYPE volume4;
+uniform highp SAMPLER_TYPE volume5;
 
 uniform vec3 scaledDimensions;
 
 uniform mat4 scale;
 
-uniform vec3 normals[_NUM_PLANES];
-uniform float distances[_NUM_PLANES];
+uniform vec3 normals[NUM_PLANES];
+uniform float distances[NUM_PLANES];
 
 // range
 uniform vec2 sliderValues[6];
@@ -128,7 +128,7 @@ void main(void) {
 	for (float t = t_hit.x; t < t_hit.y; t += dt) {
 		// Check if this point is on the "positive" side or "negative" side of the plane - only show positive.
 		float canShow = 1.;
-		for (int i = 0; i < _NUM_PLANES; i += 1) {
+		for (int i = 0; i < NUM_PLANES; i += 1) {
 			canShow *= max(0., sign(dot(normals[i], p) + distances[i]));
 		}
 		// Do not show coordinates outside 0-1 box.

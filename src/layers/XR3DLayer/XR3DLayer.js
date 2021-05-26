@@ -33,11 +33,11 @@ import { Plane } from '@math.gl/culling';
 import vs from './xr-layer-vertex.glsl';
 import fs from './xr-layer-fragment.glsl';
 import channels from './channel-intensity-module';
-import { padColorsAndSliders, padWithDefault } from '../utils';
+import { padColorsAndSliders, padWithDefault, getDtypeValues } from '../utils';
 import {
-  DTYPE_VALUES,
   COLORMAPS,
-  RENDERING_MODES as RENDERING_NAMES
+  RENDERING_MODES as RENDERING_NAMES,
+  INTERPOLATION_MODES
 } from '../../constants';
 import {
   RENDERING_MODES_BLEND,
@@ -61,7 +61,7 @@ const CUBE_STRIP = [
 	1, 0, 0,
 	0, 0, 0
 ];
-const _NUM_PLANES_DEFAULT = 1;
+const NUM_PLANES_DEFAULT = 1;
 
 const defaultProps = {
   pickable: false,
@@ -80,8 +80,26 @@ const defaultProps = {
     value: RENDERING_NAMES.ADDITIVE,
     compare: true
   },
-  resolutionMatrix: { type: 'object', value: new Matrix4(), compare: true }
+  resolutionMatrix: { type: 'object', value: new Matrix4(), compare: true },
+  interpolation: {
+    type: 'number',
+    value: INTERPOLATION_MODES.LINEAR,
+    compare: true
+  }
 };
+
+
+function getRenderingAttrs(dtype, interpolation) {
+  const isLinear = interpolation === INTERPOLATION_MODES.LINEAR;
+  // Linear filtering only works when the data type is cast to Float32.
+  const values = getDtypeValues(isLinear ? 'Float32' : dtype);
+  return {
+    ...values,
+    sampler: values.sampler.replace('2D', '3D'),
+    filter: interpolation,
+    cast: isLinear ? data => new Float32Array(data) : data => data
+  };
+}
 
 function removeExtraColormapFunctionsFromShader(colormap) {
   // Always include viridis so shaders compile,
@@ -101,7 +119,7 @@ function removeExtraColormapFunctionsFromShader(colormap) {
     ...channels,
     fs: channels.fs.replace(discardRegex, ''),
     defines: {
-      _COLORMAP_FUNCTION: colormap || 'viridis'
+      COLORMAP_FUNCTION: colormap || 'viridis'
     }
   };
   return channelsModules;
@@ -113,7 +131,7 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} channelIsOn List of boolean values for each channel for whether or not it is visible.
- * @property {number=} opacity Opacity of the layer.
+ * @property {string} dtype Dtype for the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @property {string=} renderingMode One of Maximum Intensity Projection, Minimum Intensity Projection, or Additive
@@ -123,6 +141,7 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * @property {Array.<number>=} zSlice 0-depth (physical coordinates) interval on which to slice the volume.
  * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  * @property {Object=} resolutionMatrix Matrix for scaling the volume based on the (downsampled) resolution being displayed.
+ * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.LINEAR
  */
 
 /**
@@ -152,7 +171,8 @@ const XR3DLayer = class extends Layer {
    * This function compiles the shaders and the projection module.
    */
   getShaders() {
-    const { colormap, renderingMode, clippingPlanes } = this.props;
+    const { colormap, renderingMode, clippingPlanes, dtype, interpolation } = this.props;
+    const { sampler } = getRenderingAttrs(dtype, interpolation)
     const { _BEFORE_RENDER, _RENDER, _AFTER_RENDER } = colormap
       ? RENDERING_MODES_COLORMAP[renderingMode]
       : RENDERING_MODES_BLEND[renderingMode];
@@ -164,8 +184,9 @@ const XR3DLayer = class extends Layer {
         .replace('_RENDER', _RENDER)
         .replace('_AFTER_RENDER', _AFTER_RENDER),
       defines: {
-        _COLORMAP_FUNCTION: colormap || 'viridis',
-        _NUM_PLANES: String(clippingPlanes.length || _NUM_PLANES_DEFAULT)
+        SAMPLER_TYPE: sampler,
+        COLORMAP_FUNCTION: colormap || 'viridis',
+        NUM_PLANES: String(clippingPlanes.length || NUM_PLANES_DEFAULT)
       },
       modules: [channelsModules]
     });
@@ -267,7 +288,7 @@ const XR3DLayer = class extends Layer {
             .transform(invertedResolutionMatrix)
         ),
         new Plane([1, 0, 0]),
-        clippingPlanes.length || _NUM_PLANES_DEFAULT
+        clippingPlanes.length || NUM_PLANES_DEFAULT
       );
       // Need to flatten for shaders.
       const normals = paddedClippingPlanes.map(plane => plane.normal).flat();
@@ -351,22 +372,23 @@ const XR3DLayer = class extends Layer {
    * This function creates textures from the data
    */
   dataToTexture(data, width, height, depth) {
-    const { format, dataFormat, type } = DTYPE_VALUES.Float32;
+    const { dtype, interpolation } = this.props;
+    const attrs = getRenderingAttrs(dtype, interpolation);
     const texture = new Texture3D(this.context.gl, {
       width,
       height,
       depth,
-      data: new Float32Array(data),
+      data: attrs.cast?.(data) ?? data,
       // ? Seems to be a luma.gl bug.  Looks like Texture2D is wrong or this is but these are flipped somewhere.
-      format: dataFormat,
-      dataFormat: format,
-      type,
+      format: attrs.dataFormat,
+      dataFormat: attrs.format,
+      type: attrs.type,
       mipmaps: false,
       parameters: {
         // LINEAR results in the best results visually - otherwise everything looks pixelated.
         // The above cast to Float32Array is needed forthis setting to work (it does not work with integer data).
-        [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
-        [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
+        [GL.TEXTURE_MIN_FILTER]: attrs.filter,
+        [GL.TEXTURE_MAG_FILTER]: attrs.filter,
         [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
         [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
         [GL.TEXTURE_WRAP_R]: GL.CLAMP_TO_EDGE

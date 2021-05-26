@@ -3,7 +3,7 @@ import { TextLayer } from '@deck.gl/layers';
 import { Matrix4 } from 'math.gl';
 import XR3DLayer from '../XR3DLayer';
 import { getPhysicalSizeScalingMatrix } from '../utils';
-import { RENDERING_MODES } from '../../constants';
+import { RENDERING_MODES, INTERPOLATION_MODES } from '../../constants';
 import { getVolume } from './utils';
 
 const defaultProps = {
@@ -36,6 +36,11 @@ const defaultProps = {
     type: 'string',
     value: RENDERING_MODES.MAX_INTENSITY_PROJECTION,
     compare: true
+  },
+  interpolation: {
+    type: 'number',
+    value: INTERPOLATION_MODES.LINEAR,
+    compare: true
   }
 };
 
@@ -47,7 +52,6 @@ const defaultProps = {
  * @property {Array.<boolean>} channelIsOn List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader PixelSource[]. Represents an N-dimensional image.
  * @property {Array} loaderSelection Selection to be used for fetching data.
- * @property {number=} opacity Opacity of the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @property {number=} resolution Resolution at which you would like to see the volume and load it into memory (0 highest, loader.length -1 the lowest default 0)
@@ -58,6 +62,7 @@ const defaultProps = {
  * @property {Array.<number>=} zSlice 0-depth (physical coordinates) interval on which to slice the volume.
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
  * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
+ * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.LINEAR
  */
 
 /**
