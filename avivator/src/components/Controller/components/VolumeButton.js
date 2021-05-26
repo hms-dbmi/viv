@@ -78,17 +78,26 @@ function VolumeButton() {
   const { setImageSetting } = useImageSettingsStore();
   const { loader, selections } = useChannelSettings();
   const { setPropertiesForChannel } = useChannelSetters();
-  const { use3d, toggleUse3d, metadata, setViewerState } = useViewerStore();
+  const {
+    use3d,
+    toggleUse3d,
+    metadata,
+    toggleIsVolumeRenderingWarningOn,
+    setViewerState,
+    isViewerLoading
+  } = useViewerStore();
 
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
   const classes = useStyles();
+  const { shape, labels } = Array.isArray(loader) ? loader[0] : loader;
   return (
     <>
       <Button
         variant="outlined"
         size="small"
         ref={anchorRef}
+        disabled={!(shape[labels.indexOf('z')] > 1) || isViewerLoading}
         onClick={() => {
           toggle();
           // eslint-disable-next-line no-unused-expressions
@@ -175,6 +184,12 @@ function VolumeButton() {
                                 }
                               });
                               toggleUse3d();
+                              const isWebGL2Supported = !!document
+                                .createElement('canvas')
+                                .getContext('webgl2');
+                              if (!isWebGL2Supported) {
+                                toggleIsVolumeRenderingWarningOn();
+                              }
                             });
                             setViewerState({ useLens: false });
                           }}

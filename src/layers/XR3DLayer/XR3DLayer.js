@@ -153,11 +153,6 @@ const XR3DLayer = class extends Layer {
     this.setState({
       model: this._getModel(gl)
     });
-    // Needed to only render the back polygons.
-    setParameters(gl, {
-      [GL.CULL_FACE]: true,
-      [GL.CULL_FACE_MODE]: GL.FRONT
-    });
     // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
     // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
     // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).

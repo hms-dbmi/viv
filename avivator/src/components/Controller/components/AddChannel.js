@@ -57,7 +57,7 @@ const AddChannel = () => {
       onClick={handleChannelAdd}
       fullWidth
       variant="outlined"
-      style={{ borderStyle: 'dashed', marginBottom: 8 }}
+      style={{ borderStyle: 'dashed' }}
       startIcon={<AddIcon />}
       size="small"
     >

@@ -5,10 +5,10 @@ import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 const PictureInPictureToggle = () => {
   const { isOverviewOn, toggleIsOverviewOn } = useImageSettingsStore();
-  const { isViewerLoading, useLinkedView } = useViewerStore();
+  const { isViewerLoading, useLinkedView, use3d } = useViewerStore();
   return (
     <Button
-      disabled={isViewerLoading || useLinkedView}
+      disabled={isViewerLoading || useLinkedView || use3d}
       onClick={toggleIsOverviewOn}
       variant="outlined"
       size="small"
