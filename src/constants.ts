@@ -83,3 +83,8 @@ export const DTYPE_VALUES = {
 } as const;
 
 export const GLOBAL_SLIDER_DIMENSION_FIELDS = ['z', 't'];
+
+export enum INTERPOLATION_MODES {
+  LINEAR = GL.LINEAR,
+  NEAREST = GL.NEAREST
+}

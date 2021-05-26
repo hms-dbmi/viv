@@ -5,6 +5,7 @@
 ### Added
 
 - Add screenshots to README.md
+- Allow users to choose `LINEAR` or `NEAREST` interpolation filtering for `XRLayer`.
 
 ### Changed
 

@@ -8,7 +8,10 @@ import {
   OVERVIEW_VIEW_ID
 } from '../views';
 import useGlobalSelection from './global-selection-hook';
-import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
+import {
+  GLOBAL_SLIDER_DIMENSION_FIELDS,
+  INTERPOLATION_MODES
+} from '../constants';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -42,6 +45,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {Array} [props.transitionFields] A string array indicating which fields require a transition when making a new selection: Default: ['t', 'z'].
+ * @param {String=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
  */
 
 const PictureInPictureViewer = props => {
@@ -67,7 +71,8 @@ const PictureInPictureViewer = props => {
     transparentColor,
     onViewStateChange,
     onHover,
-    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS
+    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
+    interpolation = INTERPOLATION_MODES.NEAREST
   } = props;
   const {
     newLoaderSelection,
@@ -103,7 +108,8 @@ const PictureInPictureViewer = props => {
     lensRadius,
     lensBorderColor,
     lensBorderRadius,
-    transparentColor
+    transparentColor,
+    interpolation
   };
   const views = [detailView];
   const layerProps = [layerConfig];

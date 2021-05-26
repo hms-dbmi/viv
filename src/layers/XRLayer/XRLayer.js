@@ -12,13 +12,15 @@ import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
 import { lens, channels } from './shader-modules';
 import { padColorsAndSliders, getDtypeValues } from '../utils';
+import { INTERPOLATION_MODES } from '../../constants';
 
 const SHADER_MODULES = [
   { fs: fs1, fscmap: fsColormap1, vs: vs1 },
   { fs: fs2, fscmap: fsColormap2, vs: vs2 }
 ];
 
-function getRenderingAttrs(dtype, gl) {
+function getRenderingAttrs(dtype, gl, interpolation) {
+  const isLinear = interpolation === INTERPOLATION_MODES.LINEAR;
   if (!isWebGL2(gl)) {
     // WebGL1
     return {
@@ -27,11 +29,18 @@ function getRenderingAttrs(dtype, gl) {
       type: GL.FLOAT,
       sampler: 'sampler2D',
       shaderModule: SHADER_MODULES[0],
+      filter: interpolation,
       cast: data => new Float32Array(data)
     };
   }
-  const values = getDtypeValues(dtype);
-  return { ...values, shaderModule: SHADER_MODULES[1] };
+  // Linear filtering only works when the data type is cast to Float32.
+  const values = getDtypeValues(isLinear ? 'Float32' : dtype);
+  return {
+    ...values,
+    shaderModule: SHADER_MODULES[1],
+    filter: interpolation,
+    cast: isLinear ? data => new Float32Array(data) : data => data
+  };
 }
 
 const defaultProps = {
@@ -50,7 +59,12 @@ const defaultProps = {
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   unprojectLensBounds: { type: 'array', value: [0, 0, 0, 0], compare: true },
-  transparentColor: { type: 'array', value: null, compare: true }
+  transparentColor: { type: 'array', value: null, compare: true },
+  interpolation: {
+    type: 'string',
+    value: INTERPOLATION_MODES.NEAREST,
+    compare: true
+  }
 };
 
 /**
@@ -76,6 +90,7 @@ const defaultProps = {
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
+ * @property {String=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
  */
 /**
  * @type {{ new (...props: import('../../types').Viv<LayerProps>[]) }}
@@ -87,8 +102,12 @@ const XRLayer = class extends Layer {
    * replaces `usampler` with `sampler` if the data is not an unsigned integer
    */
   getShaders() {
-    const { colormap, dtype } = this.props;
-    const { shaderModule, sampler } = getRenderingAttrs(dtype, this.context.gl);
+    const { colormap, dtype, interpolation } = this.props;
+    const { shaderModule, sampler } = getRenderingAttrs(
+      dtype,
+      this.context.gl,
+      interpolation
+    );
     return super.getShaders({
       fs: colormap ? shaderModule.fscmap : shaderModule.fs,
       vs: shaderModule.vs,
@@ -144,7 +163,11 @@ const XRLayer = class extends Layer {
    */
   updateState({ props, oldProps, changeFlags }) {
     // setup model first
-    if (changeFlags.extensionsChanged || props.colormap !== oldProps.colormap) {
+    if (
+      changeFlags.extensionsChanged ||
+      props.colormap !== oldProps.colormap ||
+      props.interpolation !== oldProps.interpolation
+    ) {
       const { gl } = this.context;
       if (this.state.model) {
         this.state.model.delete();
@@ -154,8 +177,9 @@ const XRLayer = class extends Layer {
       this.getAttributeManager().invalidateAll();
     }
     if (
-      props.channelData !== oldProps.channelData &&
-      props.channelData?.data !== oldProps.channelData?.data
+      (props.channelData !== oldProps.channelData &&
+        props.channelData?.data !== oldProps.channelData?.data) ||
+      props.interpolation !== oldProps.interpolation
     ) {
       this.loadChannelTextures(props.channelData);
     }
@@ -331,18 +355,22 @@ const XRLayer = class extends Layer {
    * This function creates textures from the data
    */
   dataToTexture(data, width, height) {
-    const attrs = getRenderingAttrs(this.props.dtype, this.context.gl);
+    const { interpolation } = this.props;
+    const attrs = getRenderingAttrs(
+      this.props.dtype,
+      this.context.gl,
+      interpolation
+    );
     return new Texture2D(this.context.gl, {
       width,
       height,
-      // data is cast in WebGL1 environment
       data: attrs.cast?.(data) ?? data,
       // we don't want or need mimaps
       mipmaps: false,
       parameters: {
         // NEAREST for integer data
-        [GL.TEXTURE_MIN_FILTER]: GL.NEAREST,
-        [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
+        [GL.TEXTURE_MIN_FILTER]: attrs.filter,
+        [GL.TEXTURE_MAG_FILTER]: attrs.filter,
         // CLAMP_TO_EDGE to remove tile artifacts
         [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
         [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
