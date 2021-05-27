@@ -42,7 +42,9 @@ const defaultProps = {
     type: 'number',
     value: INTERPOLATION_MODES.LINEAR,
     compare: true
-  }
+  },
+  onUpdate: { type: 'function', value: () => {}, compare: true },
+  useProgressIndicator: { type: 'boolean', value: true, compare: true }
 };
 
 /**
@@ -64,6 +66,8 @@ const defaultProps = {
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
  * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.LINEAR
+ * @property {boolean=} useProgressIndicator Whether or not to use the default progress text + indicator (default is true)
+ * @property {function=} onUpdate A callback to be used for getting updates of the progress, ({ progress }) => {}
  */
 
 /**
@@ -100,6 +104,9 @@ const VolumeLayer = class extends CompositeLayer {
         loaderSelection.length;
       const onUpdate = () => {
         progress += 0.5 / totalRequests;
+        if (this.props.onUpdate) {
+          this.props.onUpdate({ progress });
+        }
         this.setState({ progress });
       };
       const abortController = new AbortController();
@@ -139,7 +146,7 @@ const VolumeLayer = class extends CompositeLayer {
   }
 
   renderLayers() {
-    const { loader, id, resolution } = this.props;
+    const { loader, id, resolution, useProgressIndicator } = this.props;
     const { dtype } = loader[resolution];
     const {
       data,
@@ -150,7 +157,7 @@ const VolumeLayer = class extends CompositeLayer {
       physicalSizeScalingMatrix,
       resolutionMatrix
     } = this.state;
-    if (!(width && height)) {
+    if (!(width && height) && useProgressIndicator) {
       const { viewport } = this.context;
       return new TextLayer({
         id: `loading-text-layer-${id}`,
@@ -167,7 +174,8 @@ const VolumeLayer = class extends CompositeLayer {
         getColor: [220, 220, 220, 255],
         getSize: 25,
         sizeUnits: 'meters',
-        sizeScale: 2 ** -viewport.zoom
+        sizeScale: 2 ** -viewport.zoom,
+        fontFamily: 'Helvetica'
       });
     }
     return new XR3DLayer(this.props, {
