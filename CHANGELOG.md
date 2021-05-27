@@ -13,6 +13,7 @@
 - Fix bug in `getChannelStats` where array of zeros passed in causes undefined slider settings
 - Check all properties in `onHover` to avoid crashes
 - Check for dependabot before running CHANGELOG checks
+- Make default setting for `MutliscaleImageLayer` for interpolation to be `NEAREST` at highest resolution, `LINEAR` otherwise.
 
 ## 0.9.5
 
