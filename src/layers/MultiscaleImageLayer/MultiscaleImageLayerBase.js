@@ -1,7 +1,6 @@
 import { TileLayer } from '@deck.gl/geo-layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import { renderSubLayers } from './utils';
-import { INTERPOLATION_MODES } from '../../constants';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -21,11 +20,7 @@ const defaultProps = {
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   transparentColor: { type: 'array', value: null, compare: true },
-  interpolation: {
-    type: 'string',
-    value: INTERPOLATION_MODES.NEAREST,
-    compare: true
-  }
+  interpolation: { type: 'string', value: null, compare: true }
 };
 
 /**

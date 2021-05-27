@@ -72,7 +72,7 @@ const PictureInPictureViewer = props => {
     onViewStateChange,
     onHover,
     transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
-    interpolation = INTERPOLATION_MODES.NEAREST
+    interpolation
   } = props;
   const {
     newLoaderSelection,
