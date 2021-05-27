@@ -108,7 +108,7 @@ type PixelType =
   | 'complex'
   | 'double-complex';
 
-type UnitsLength =
+export type UnitsLength =
   | 'Ym'
   | 'Zm'
   | 'Em'

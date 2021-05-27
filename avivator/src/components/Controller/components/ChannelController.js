@@ -6,10 +6,14 @@ import Slider from '@material-ui/core/Slider';
 import Select from '@material-ui/core/Select';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import { makeStyles } from '@material-ui/core/styles';
-
 import ChannelOptions from './ChannelOptions';
-import { FILL_PIXEL_VALUE } from '../constants';
+import { FILL_PIXEL_VALUE } from '../../../constants';
+import {
+  useChannelSettings,
+  useImageSettingsStore,
+  useViewerStore
+} from '../../../state';
+import { truncateDecimalNumber } from '../../../utils';
 
 export const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
 
@@ -18,90 +22,74 @@ const toRgb = (on, arr) => {
   return `rgb(${color})`;
 };
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    paddingTop: theme.spacing(1)
-  },
-  icon: {
-    color: theme.palette.text.primary,
-    marginTop: '4px'
-  }
-}));
-
-function truncateDecimalNumber(value, maxLength) {
-  if (!value && value !== 0) return '';
-  const stringValue = value.toString();
-  return stringValue.length > maxLength
-    ? stringValue.substring(0, maxLength).replace(/\.$/, '')
-    : stringValue;
-}
-
 // If the channel is not on, display nothing.
 // If the channel has a not-undefined value, show it.
 // Otherwise, show a circular progress animation.
-const getPixelValueDisplay = (isOn, pixelValue, shouldShowPixelValue) => {
-  if (!isOn || !shouldShowPixelValue) {
+const getPixelValueDisplay = (pixelValue, isLoading, shouldShowPixelValue) => {
+  if (isLoading) {
+    return <CircularProgress size="50%" />;
+  }
+  if (!shouldShowPixelValue) {
     return FILL_PIXEL_VALUE;
   }
   // Need to check if it's a number becaue 0 is falsy.
   if (pixelValue || typeof pixelValue === 'number') {
     return truncateDecimalNumber(pixelValue, 7);
   }
-  return <CircularProgress size="50%" />;
+  return FILL_PIXEL_VALUE;
 };
 
 function ChannelController({
   name,
+  onSelectionChange,
   isOn,
-  dtype,
-  sliderValue,
-  colorValue,
-  colormapOn,
-  channelOptions,
-  handleChange,
   pixelValue,
-  shouldShowPixelValue,
-  disableOptions = false,
-  domain
+  toggleIsOn,
+  handleSliderChange,
+  domain,
+  slider,
+  color,
+  handleRemoveChannel,
+  handleColorSelect,
+  isLoading
 }) {
-  const rgbColor = toRgb(colormapOn, colorValue);
-  const classes = useStyles();
+  const { loader } = useChannelSettings();
+  const { colormap } = useImageSettingsStore();
+  const { channelOptions, useLinkedView, use3d } = useViewerStore();
+  const rgbColor = toRgb(colormap, color);
   const [min, max] = domain;
   // If the min/max range is and the dtype is float, make the step size smaller so sliders are smoother.
-  const step = max - min < 500 && dtype === 'Float32' ? (max - min) / 500 : 1;
+  const step =
+    max - min < 500 && loader[0]?.dtype === 'Float32' ? (max - min) / 500 : 1;
+  const shouldShowPixelValue = !useLinkedView && !use3d;
   return (
-    <Grid
-      container
-      direction="column"
-      m={2}
-      justify="center"
-      className={classes.root}
-    >
+    <Grid container direction="column" m={2} justify="center">
       <Grid container direction="row" justify="space-between">
         <Grid item xs={11}>
-          <Select
-            native
-            value={name}
-            onChange={e => handleChange('CHANGE_CHANNEL', e.target.value)}
-          >
+          <Select native value={name} onChange={onSelectionChange}>
             {channelOptions.map(opt => (
-              <option disabled={disableOptions} key={opt} value={opt}>
+              <option disabled={isLoading} key={opt} value={opt}>
                 {opt}
               </option>
             ))}
           </Select>
         </Grid>
         <Grid item>
-          <ChannelOptions handleChange={handleChange} />
+          <ChannelOptions
+            handleRemoveChannel={handleRemoveChannel}
+            handleColorSelect={handleColorSelect}
+            disabled={isLoading}
+          />
         </Grid>
       </Grid>
       <Grid container direction="row" justify="flex-start" alignItems="center">
         <Grid item xs={2}>
-          {getPixelValueDisplay(isOn, pixelValue, shouldShowPixelValue)}
+          {getPixelValueDisplay(pixelValue, isLoading, shouldShowPixelValue)}
         </Grid>
         <Grid item xs={2}>
           <Checkbox
-            onChange={() => handleChange('TOGGLE_ON')}
+            onChange={toggleIsOn}
+            disabled={isLoading}
             checked={isOn}
             style={{
               color: rgbColor,
@@ -113,10 +101,11 @@ function ChannelController({
         </Grid>
         <Grid item xs={7}>
           <Slider
-            value={sliderValue}
-            onChange={(e, v) => handleChange('CHANGE_SLIDER', v)}
+            disabled={isLoading}
+            value={slider}
+            onChange={handleSliderChange}
             valueLabelDisplay="auto"
-            getAriaLabel={() => `${name}-${colorValue}-${sliderValue}`}
+            getAriaLabel={() => `${name}-${color}-${slider}`}
             valueLabelFormat={v => truncateDecimalNumber(v, 5)}
             min={min}
             max={max}
