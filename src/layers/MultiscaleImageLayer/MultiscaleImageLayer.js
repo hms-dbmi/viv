@@ -234,6 +234,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         pickable: { type: 'boolean', value: true, compare: true },
         onHover,
         onClick,
+        // Background image is nicest when LINEAR in my opinion.
         interpolation: interpolation || INTERPOLATION_MODES.LINEAR
       });
     const layers = [baseLayer, tiledLayer];

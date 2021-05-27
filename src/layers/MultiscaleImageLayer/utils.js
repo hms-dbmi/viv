@@ -49,6 +49,7 @@ export function renderSubLayers(props) {
     bounds,
     id: `tile-sub-layer-${bounds}-${id}`,
     tileId: { x, y, z },
+    // If no option is passed in, the auto setting is NEAREST at the highest resolution but LINEAR otherwise.
     interpolation:
       props.interpolation || z === maxZoom
         ? INTERPOLATION_MODES.NEAREST
