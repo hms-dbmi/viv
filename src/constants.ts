@@ -82,7 +82,60 @@ export const DTYPE_VALUES = {
   }
 } as const;
 
-export const GLOBAL_SLIDER_DIMENSION_FIELDS = ['z', 't'];
+export const COLORMAPS = [
+  'jet',
+  'hsv',
+  'hot',
+  'cool',
+  'spring',
+  'summer',
+  'autumn',
+  'winter',
+  'bone',
+  'copper',
+  'greys',
+  'yignbu',
+  'greens',
+  'yiorrd',
+  'bluered',
+  'rdbu',
+  'picnic',
+  'rainbow',
+  'portland',
+  'blackbody',
+  'earth',
+  'electric',
+  'alpha',
+  'viridis',
+  'inferno',
+  'magma',
+  'plasma',
+  'warm',
+  'rainbow-soft',
+  'bathymetry',
+  'cdom',
+  'chlorophyll',
+  'density',
+  'freesurface-blue',
+  'freesurface-red',
+  'oxygen',
+  'par',
+  'phase',
+  'salinity',
+  'temperature',
+  'turbidity',
+  'velocity-blue',
+  'velocity-green',
+  'cubehelix'
+] as const;
+
+export enum RENDERING_MODES {
+  MAX_INTENSITY_PROJECTION = 'Maximum Intensity Projection',
+  MIN_INTENSITY_PROJECTION = 'Minimum Intensity Projection',
+  ADDITIVE = 'Additive'
+}
+
+export const GLOBAL_SLIDER_DIMENSION_FIELDS = ['z', 't'] as const;
 
 export enum INTERPOLATION_MODES {
   LINEAR = GL.LINEAR,

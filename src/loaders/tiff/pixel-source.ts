@@ -27,9 +27,9 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
     this._indexer = indexer;
   }
 
-  async getRaster({ selection }: RasterSelection<S>) {
+  async getRaster({ selection, signal }: RasterSelection<S>) {
     const image = await this._indexer(selection);
-    return this._readRasters(image);
+    return this._readRasters(image, { signal });
   }
 
   async getTile({ x, y, selection, signal }: TileSelection<S>) {

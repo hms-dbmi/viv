@@ -22,8 +22,18 @@ const sources = [
   },
   {
     // Generated using bioformats2raw and raw2ometiff.
-    path: 'HandEuncompressed_Scan1.ome.tif',
-    description: 'Perkin Elmer H&E Stain HandEuncompressed_Scan1.qptiff'
+    path: '2018-12-18_ASY_H2B_bud_05_3D_8_angles.ome.tif',
+    description: 'idr0077'
+  },
+  {
+    // Generated using bioformats2raw and raw2ometiff.
+    path: 'brain.pyramid.ome.tif',
+    description: 'idr0085'
+  },
+  {
+    // Generated using bioformats2raw and raw2ometiff.
+    path: 'idr0106.pyramid.ome.tif',
+    description: 'idr0106'
   }
 ];
 

@@ -35,7 +35,7 @@ import {
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {Array} [props.transitionFields] A string array indicating which fields require a transition: Default: ['t', 'z'].
- * @param {String=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter).
+ * @param {Number} [props.interpolation] The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter).
  * Default is null which indicates an "auto" setting where the highest reoslution is NEREAST and all else is LINEAR.  Otherwise, for non-multiscale, the setting is NEAREST.
  */
 const SideBySideViewer = props => {
@@ -61,12 +61,13 @@ const SideBySideViewer = props => {
     onHover,
     transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
     // For ImageLayer, we want NEAREST
-    interpolation = loader?.length > 1 ? null : INTERPOLATION_MODES.NEAREST
+    interpolation = loader?.length > 1 ? null : INTERPOLATION_MODES.NEAREST,
+    onViewportLoad
   } = props;
   const {
     newLoaderSelection,
     oldLoaderSelection,
-    onViewportLoad
+    onViewportLoad: transitionOnViewportLoad
   } = useGlobalSelection(loaderSelection, transitionFields);
   const leftViewState = viewStatesProp?.find(v => v.id === 'left');
   const rightViewState = viewStatesProp?.find(v => v.id === 'right');
@@ -111,6 +112,7 @@ const SideBySideViewer = props => {
     loaderSelection: oldLoaderSelection,
     newLoaderSelection,
     onViewportLoad,
+    transitionOnViewportLoad,
     transitionFields,
     colormap,
     isLensOn,

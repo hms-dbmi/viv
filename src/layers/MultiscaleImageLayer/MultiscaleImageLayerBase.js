@@ -20,7 +20,7 @@ const defaultProps = {
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   transparentColor: { type: 'array', value: null, compare: true },
-  interpolation: { type: 'string', value: null, compare: true }
+  interpolation: { type: 'number', value: null, compare: true }
 };
 
 /**

@@ -61,7 +61,7 @@ const defaultProps = {
   unprojectLensBounds: { type: 'array', value: [0, 0, 0, 0], compare: true },
   transparentColor: { type: 'array', value: null, compare: true },
   interpolation: {
-    type: 'string',
+    type: 'number',
     value: INTERPOLATION_MODES.NEAREST,
     compare: true
   }
@@ -90,7 +90,7 @@ const defaultProps = {
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
- * @property {String=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
+ * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
  */
 /**
  * @type {{ new (...props: import('../../types').Viv<LayerProps>[]) }}

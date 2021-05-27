@@ -45,8 +45,9 @@ import {
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {Array} [props.transitionFields] A string array indicating which fields require a transition when making a new selection: Default: ['t', 'z'].
- * @param {String=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter).
+ * @param {Number} [props.interpolation] The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter).
  * Default is null which indicates an "auto" setting where the highest reoslution is NEREAST and all else is LINEAR.  Otherwise, for non-multiscale, the setting is NEAREST.
+ * @param {function} [props.onViewportLoad] Function that gets called when the data in the viewport loads.
  */
 
 const PictureInPictureViewer = props => {
@@ -74,12 +75,13 @@ const PictureInPictureViewer = props => {
     onHover,
     transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
     // For ImageLayer, we want NEAREST
-    interpolation = loader?.length > 1 ? null : INTERPOLATION_MODES.NEAREST
+    interpolation = loader?.length > 1 ? null : INTERPOLATION_MODES.NEAREST,
+    onViewportLoad
   } = props;
   const {
     newLoaderSelection,
     oldLoaderSelection,
-    onViewportLoad
+    onViewportLoad: transitionOnViewportLoad
   } = useGlobalSelection(loaderSelection, transitionFields);
   const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
   const baseViewState = useMemo(() => {
@@ -103,6 +105,7 @@ const PictureInPictureViewer = props => {
     loaderSelection: oldLoaderSelection,
     newLoaderSelection,
     onViewportLoad,
+    transitionOnViewportLoad,
     transitionFields,
     colormap,
     isLensOn,
