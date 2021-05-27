@@ -10,7 +10,7 @@ import {
   isInterleaved,
   SIGNAL_ABORTED
 } from '../../loaders/utils';
-import { INTERPOLATION_MODES } from '../..';
+import { INTERPOLATION_MODES } from '../../constants';
 
 // From https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
 const DECK_GL_TILE_SIZE = 512;
