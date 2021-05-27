@@ -36,7 +36,7 @@ import {
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {Array} [props.transitionFields] A string array indicating which fields require a transition: Default: ['t', 'z'].
  * @param {String=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter).
- * Default is null which indicates an "auto" setting where the highest reoslution is NEREAST and all else is LINEAR.
+ * Default is null which indicates an "auto" setting where the highest reoslution is NEREAST and all else is LINEAR.  Otherwise, for non-multiscale, the setting is NEAREST.
  */
 const SideBySideViewer = props => {
   const {
@@ -60,7 +60,8 @@ const SideBySideViewer = props => {
     onViewStateChange,
     onHover,
     transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
-    interpolation
+    // For ImageLayer, we want NEAREST
+    interpolation = loader?.length > 1 ? null : INTERPOLATION_MODES.NEAREST
   } = props;
   const {
     newLoaderSelection,
