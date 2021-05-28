@@ -152,7 +152,7 @@ const ImageLayer = class extends CompositeLayer {
   }
 
   renderLayers() {
-    const { loader, id } = this.props;
+    const { loader, id, interpolation } = this.props;
     const { dtype } = loader;
     const { width, height, data } = this.state;
     if (!(width && height)) return null;
@@ -173,7 +173,11 @@ const ImageLayer = class extends CompositeLayer {
       // Shared props with BitmapLayer:
       bounds,
       id: `image-sub-layer-${bounds}-${id}`,
-      dtype
+      dtype,
+      interpolation:
+        interpolation === INTERPOLATION_MODES.AUTO
+          ? defaultProps.interpolation.value
+          : interpolation
     });
   }
 };

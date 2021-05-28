@@ -35,7 +35,11 @@ const defaultProps = {
   transparentColor: { type: 'array', value: null, compare: true },
   refinementStrategy: { type: 'string', value: null, compare: true },
   excludeBackground: { type: 'boolean', value: false, compare: true },
-  interpolation: { type: 'number', value: null, compare: true }
+  interpolation: {
+    type: 'number',
+    value: INTERPOLATION_MODES.AUTO,
+    compare: true
+  }
 };
 
 /**
@@ -235,7 +239,10 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         onHover,
         onClick,
         // Background image is nicest when LINEAR in my opinion.
-        interpolation: interpolation || INTERPOLATION_MODES.LINEAR
+        interpolation:
+          interpolation === INTERPOLATION_MODES.AUTO
+            ? INTERPOLATION_MODES.LINEAR
+            : interpolation
       });
     const layers = [baseLayer, tiledLayer];
     return layers;

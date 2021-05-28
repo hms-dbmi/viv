@@ -139,5 +139,6 @@ export const GLOBAL_SLIDER_DIMENSION_FIELDS = ['z', 't'] as const;
 
 export enum INTERPOLATION_MODES {
   LINEAR = GL.LINEAR,
-  NEAREST = GL.NEAREST
+  NEAREST = GL.NEAREST,
+  AUTO = 'Auto'
 }

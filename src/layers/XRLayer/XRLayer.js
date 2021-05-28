@@ -20,6 +20,9 @@ const SHADER_MODULES = [
 ];
 
 function getRenderingAttrs(dtype, gl, interpolation) {
+  if (interpolation === INTERPOLATION_MODES.AUTO) {
+    throw new Error('AUTO interpolation mode not allowed in XRLayer');
+  }
   const isLinear = interpolation === INTERPOLATION_MODES.LINEAR;
   if (!isWebGL2(gl)) {
     // WebGL1

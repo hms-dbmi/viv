@@ -75,7 +75,9 @@ const PictureInPictureViewer = props => {
     onHover,
     transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
     // For ImageLayer, we want NEAREST
-    interpolation = loader?.length > 1 ? null : INTERPOLATION_MODES.NEAREST,
+    interpolation = loader?.length > 1
+      ? INTERPOLATION_MODES.AUTO
+      : INTERPOLATION_MODES.NEAREST,
     onViewportLoad
   } = props;
   const {

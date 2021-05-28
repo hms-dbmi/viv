@@ -89,6 +89,9 @@ const defaultProps = {
 };
 
 function getRenderingAttrs(dtype, interpolation) {
+  if (interpolation === INTERPOLATION_MODES.AUTO) {
+    throw new Error('AUTO interpolation mode not allowed in XR3DLayer');
+  }
   const isLinear = interpolation === INTERPOLATION_MODES.LINEAR;
   // Linear filtering only works when the data type is cast to Float32.
   const values = getDtypeValues(isLinear ? 'Float32' : dtype);

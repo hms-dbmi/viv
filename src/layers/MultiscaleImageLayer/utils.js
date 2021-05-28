@@ -51,8 +51,11 @@ export function renderSubLayers(props) {
     tileId: { x, y, z },
     // If no option is passed in, the auto setting is NEAREST at the highest resolution but LINEAR otherwise.
     interpolation:
-      props.interpolation || z === maxZoom
-        ? INTERPOLATION_MODES.NEAREST
-        : INTERPOLATION_MODES.LINEAR
+      // eslint-disable-next-line no-nested-ternary
+      props.interpolation === INTERPOLATION_MODES.AUTO
+        ? z === maxZoom
+          ? INTERPOLATION_MODES.NEAREST
+          : INTERPOLATION_MODES.LINEAR
+        : props.interpolation
   });
 }

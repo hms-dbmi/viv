@@ -146,7 +146,13 @@ const VolumeLayer = class extends CompositeLayer {
   }
 
   renderLayers() {
-    const { loader, id, resolution, useProgressIndicator } = this.props;
+    const {
+      loader,
+      id,
+      resolution,
+      useProgressIndicator,
+      interpolation
+    } = this.props;
     const { dtype } = loader[resolution];
     const {
       data,
@@ -190,6 +196,10 @@ const VolumeLayer = class extends CompositeLayer {
         blend: true
       },
       resolutionMatrix,
+      interpolation:
+        interpolation === INTERPOLATION_MODES.AUTO
+          ? defaultProps.interpolation.value
+          : interpolation,
       dtype
     });
   }
