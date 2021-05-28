@@ -14,38 +14,6 @@ import { lens, channels } from './shader-modules';
 import { padColorsAndSliders, getDtypeValues } from '../utils';
 import { INTERPOLATION_MODES } from '../../constants';
 
-const SHADER_MODULES = [
-  { fs: fs1, fscmap: fsColormap1, vs: vs1 },
-  { fs: fs2, fscmap: fsColormap2, vs: vs2 }
-];
-
-function getRenderingAttrs(dtype, gl, interpolation) {
-  if (interpolation === INTERPOLATION_MODES.AUTO) {
-    throw new Error('AUTO interpolation mode not allowed in XRLayer');
-  }
-  const isLinear = interpolation === INTERPOLATION_MODES.LINEAR;
-  if (!isWebGL2(gl)) {
-    // WebGL1
-    return {
-      format: GL.LUMINANCE,
-      dataFormat: GL.LUMINANCE,
-      type: GL.FLOAT,
-      sampler: 'sampler2D',
-      shaderModule: SHADER_MODULES[0],
-      filter: interpolation,
-      cast: data => new Float32Array(data)
-    };
-  }
-  // Linear filtering only works when the data type is cast to Float32.
-  const values = getDtypeValues(isLinear ? 'Float32' : dtype);
-  return {
-    ...values,
-    shaderModule: SHADER_MODULES[1],
-    filter: interpolation,
-    cast: isLinear ? data => new Float32Array(data) : data => data
-  };
-}
-
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
@@ -69,6 +37,38 @@ const defaultProps = {
     compare: true
   }
 };
+
+const SHADER_MODULES = [
+  { fs: fs1, fscmap: fsColormap1, vs: vs1 },
+  { fs: fs2, fscmap: fsColormap2, vs: vs2 }
+];
+
+function getRenderingAttrs(dtype, gl, interpolation) {
+  const isLinear = interpolation === INTERPOLATION_MODES.LINEAR;
+  if (!isWebGL2(gl)) {
+    // WebGL1
+    return {
+      format: GL.LUMINANCE,
+      dataFormat: GL.LUMINANCE,
+      type: GL.FLOAT,
+      sampler: 'sampler2D',
+      shaderModule: SHADER_MODULES[0],
+      filter: interpolation,
+      cast: data => new Float32Array(data)
+    };
+  }
+  // Linear filtering only works when the data type is cast to Float32.
+  const values = getDtypeValues(isLinear ? 'Float32' : dtype);
+  return {
+    ...values,
+    shaderModule: SHADER_MODULES[1],
+    filter:
+      interpolation === INTERPOLATION_MODES.AUTO
+        ? defaultProps.interpolation.value
+        : interpolation,
+    cast: isLinear ? data => new Float32Array(data) : data => data
+  };
+}
 
 /**
  * @typedef LayerProps

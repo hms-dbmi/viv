@@ -27,7 +27,7 @@ More information about that is detailed in the comments there.
 */
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer } from '@deck.gl/core';
-import { Model, Geometry, Texture3D, setParameters } from '@luma.gl/core';
+import { Model, Geometry, Texture3D } from '@luma.gl/core';
 import { Matrix4 } from 'math.gl';
 import { Plane } from '@math.gl/culling';
 import vs from './xr-layer-vertex.glsl';
@@ -89,16 +89,16 @@ const defaultProps = {
 };
 
 function getRenderingAttrs(dtype, interpolation) {
-  if (interpolation === INTERPOLATION_MODES.AUTO) {
-    throw new Error('AUTO interpolation mode not allowed in XR3DLayer');
-  }
   const isLinear = interpolation === INTERPOLATION_MODES.LINEAR;
   // Linear filtering only works when the data type is cast to Float32.
   const values = getDtypeValues(isLinear ? 'Float32' : dtype);
   return {
     ...values,
     sampler: values.sampler.replace('2D', '3D'),
-    filter: interpolation,
+    filter:
+      interpolation === INTERPOLATION_MODES.AUTO
+        ? defaultProps.interpolation.value
+        : interpolation,
     cast: isLinear ? data => new Float32Array(data) : data => data
   };
 }
