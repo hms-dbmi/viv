@@ -27,18 +27,14 @@ More information about that is detailed in the comments there.
 */
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer } from '@deck.gl/core';
-import { Model, Geometry, Texture3D, setParameters } from '@luma.gl/core';
+import { Model, Geometry, Texture3D } from '@luma.gl/core';
 import { Matrix4 } from 'math.gl';
 import { Plane } from '@math.gl/culling';
 import vs from './xr-layer-vertex.glsl';
 import fs from './xr-layer-fragment.glsl';
 import channels from './channel-intensity-module';
 import { padColorsAndSliders, padWithDefault, getDtypeValues } from '../utils';
-import {
-  COLORMAPS,
-  RENDERING_MODES as RENDERING_NAMES,
-  INTERPOLATION_MODES
-} from '../../constants';
+import { COLORMAPS, RENDERING_MODES as RENDERING_NAMES } from '../../constants';
 import {
   RENDERING_MODES_BLEND,
   RENDERING_MODES_COLORMAP
@@ -80,23 +76,15 @@ const defaultProps = {
     value: RENDERING_NAMES.ADDITIVE,
     compare: true
   },
-  resolutionMatrix: { type: 'object', value: new Matrix4(), compare: true },
-  interpolation: {
-    type: 'number',
-    value: INTERPOLATION_MODES.LINEAR,
-    compare: true
-  }
+  resolutionMatrix: { type: 'object', value: new Matrix4(), compare: true }
 };
 
-function getRenderingAttrs(dtype, interpolation) {
-  const isLinear = interpolation === INTERPOLATION_MODES.LINEAR;
-  // Linear filtering only works when the data type is cast to Float32.
-  const values = getDtypeValues(isLinear ? 'Float32' : dtype);
+function getRenderingAttrs() {
+  const values = getDtypeValues('Float32');
   return {
     ...values,
     sampler: values.sampler.replace('2D', '3D'),
-    filter: interpolation,
-    cast: isLinear ? data => new Float32Array(data) : data => data
+    cast: data => new Float32Array(data)
   };
 }
 
@@ -140,7 +128,6 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * @property {Array.<number>=} zSlice 0-depth (physical coordinates) interval on which to slice the volume.
  * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  * @property {Object=} resolutionMatrix Matrix for scaling the volume based on the (downsampled) resolution being displayed.
- * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.LINEAR
  */
 
 /**
@@ -165,14 +152,8 @@ const XR3DLayer = class extends Layer {
    * This function compiles the shaders and the projection module.
    */
   getShaders() {
-    const {
-      colormap,
-      renderingMode,
-      clippingPlanes,
-      dtype,
-      interpolation
-    } = this.props;
-    const { sampler } = getRenderingAttrs(dtype, interpolation);
+    const { colormap, renderingMode, clippingPlanes } = this.props;
+    const { sampler } = getRenderingAttrs();
     const { _BEFORE_RENDER, _RENDER, _AFTER_RENDER } = colormap
       ? RENDERING_MODES_COLORMAP[renderingMode]
       : RENDERING_MODES_BLEND[renderingMode];
@@ -213,8 +194,7 @@ const XR3DLayer = class extends Layer {
       changeFlags.extensionsChanged ||
       props.colormap !== oldProps.colormap ||
       props.renderingMode !== oldProps.renderingMode ||
-      props.clippingPlanes.length !== oldProps.clippingPlanes.length ||
-      props.interpolation !== oldProps.interpolation
+      props.clippingPlanes.length !== oldProps.clippingPlanes.length
     ) {
       const { gl } = this.context;
       if (this.state.model) {
@@ -373,8 +353,7 @@ const XR3DLayer = class extends Layer {
    * This function creates textures from the data
    */
   dataToTexture(data, width, height, depth) {
-    const { dtype, interpolation } = this.props;
-    const attrs = getRenderingAttrs(dtype, interpolation);
+    const attrs = getRenderingAttrs();
     const texture = new Texture3D(this.context.gl, {
       width,
       height,
@@ -386,10 +365,8 @@ const XR3DLayer = class extends Layer {
       type: attrs.type,
       mipmaps: false,
       parameters: {
-        // LINEAR results in the best results visually - otherwise everything looks pixelated.
-        // The above cast to Float32Array is needed forthis setting to work (it does not work with integer data).
-        [GL.TEXTURE_MIN_FILTER]: attrs.filter,
-        [GL.TEXTURE_MAG_FILTER]: attrs.filter,
+        [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
+        [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
         [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
         [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
         [GL.TEXTURE_WRAP_R]: GL.CLAMP_TO_EDGE

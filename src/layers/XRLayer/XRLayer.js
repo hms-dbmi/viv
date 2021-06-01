@@ -12,7 +12,6 @@ import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
 import { lens, channels } from './shader-modules';
 import { padColorsAndSliders, getDtypeValues } from '../utils';
-import { INTERPOLATION_MODES } from '../../constants';
 
 const SHADER_MODULES = [
   { fs: fs1, fscmap: fsColormap1, vs: vs1 },
@@ -20,7 +19,7 @@ const SHADER_MODULES = [
 ];
 
 function getRenderingAttrs(dtype, gl, interpolation) {
-  const isLinear = interpolation === INTERPOLATION_MODES.LINEAR;
+  const isLinear = interpolation === GL.LINEAR;
   if (!isWebGL2(gl)) {
     // WebGL1
     return {
@@ -62,7 +61,7 @@ const defaultProps = {
   transparentColor: { type: 'array', value: null, compare: true },
   interpolation: {
     type: 'number',
-    value: INTERPOLATION_MODES.NEAREST,
+    value: GL.NEAREST,
     compare: true
   }
 };

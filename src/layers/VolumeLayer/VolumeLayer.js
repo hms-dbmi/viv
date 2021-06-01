@@ -4,7 +4,7 @@ import { TextLayer } from '@deck.gl/layers';
 import { Matrix4 } from 'math.gl';
 import XR3DLayer from '../XR3DLayer';
 import { getPhysicalSizeScalingMatrix } from '../utils';
-import { RENDERING_MODES, INTERPOLATION_MODES } from '../../constants';
+import { RENDERING_MODES } from '../../constants';
 import { getVolume } from './utils';
 
 const defaultProps = {
@@ -38,11 +38,6 @@ const defaultProps = {
     value: RENDERING_MODES.MAX_INTENSITY_PROJECTION,
     compare: true
   },
-  interpolation: {
-    type: 'number',
-    value: INTERPOLATION_MODES.LINEAR,
-    compare: true
-  },
   onUpdate: { type: 'function', value: () => {}, compare: true },
   useProgressIndicator: { type: 'boolean', value: true, compare: true }
 };
@@ -65,7 +60,6 @@ const defaultProps = {
  * @property {Array.<number>=} zSlice 0-depth (physical coordinates) interval on which to slice the volume.
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
  * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
- * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.LINEAR
  * @property {boolean=} useProgressIndicator Whether or not to use the default progress text + indicator (default is true)
  * @property {function=} onUpdate A callback to be used for getting updates of the progress, ({ progress }) => {}
  */
