@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Fix viewer props docs.
+
 ## 0.10.0
 
 ### Added
