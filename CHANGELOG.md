@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.10.0
+
+### Added
+
 - Add `VolumeView`, `VolumeViewer`, `VolumeLayer`, and `XR3DLayer` classes for volumetric ray casting.
 - Add screenshots to README.md
 - Allow users to choose `LINEAR` or `NEAREST` interpolation filtering for `XRLayer`.
