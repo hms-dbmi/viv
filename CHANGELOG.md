@@ -4,6 +4,8 @@
 
 ### Added
 
+- Log metadata for current file in Avivator.
+
 ### Changed
 
 ## 0.10.0

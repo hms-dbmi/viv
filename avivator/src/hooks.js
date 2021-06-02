@@ -37,6 +37,10 @@ export const initImage = (source, history) => {
       } = await createLoader(urlOrFile, toggleIsOffsetsSnackbarOn, message =>
         setViewerState({ loaderErrorSnackbar: { on: true, message } })
       );
+      console.info(
+        'Metadata (in JSON-like form) for current file being viewed: ',
+        nextMeta
+      );
 
       if (nextLoader) {
         const newSelections = buildDefaultSelection(nextLoader[0]);
