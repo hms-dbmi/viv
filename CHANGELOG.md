@@ -4,6 +4,8 @@
 
 ### Added
 
+- Log metadata for current file in Avivator.
+
 ### Changed
 
 - Fix viewer props docs.
