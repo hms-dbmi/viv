@@ -1,3 +1,4 @@
+import GL from '@luma.gl/constants';
 import XRLayer from '../XRLayer';
 import BitmapLayer from '../BitmapLayer';
 import { getImageSize, isInterleaved } from '../../loaders/utils';
@@ -13,7 +14,7 @@ export function renderSubLayers(props) {
     y,
     z
   } = props.tile;
-  const { data, id, loader } = props;
+  const { data, id, loader, maxZoom } = props;
   // Only render in positive coorinate system
   if ([left, bottom, right, top].some(v => v < 0) || !data) {
     return null;
@@ -47,6 +48,8 @@ export function renderSubLayers(props) {
     // Shared props with BitmapLayer:
     bounds,
     id: `tile-sub-layer-${bounds}-${id}`,
-    tileId: { x, y, z }
+    tileId: { x, y, z },
+    // The auto setting is NEAREST at the highest resolution but LINEAR otherwise.
+    interpolation: z === maxZoom ? GL.NEAREST : GL.LINEAR
   });
 }
