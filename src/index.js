@@ -28,8 +28,7 @@ import {
   DTYPE_VALUES,
   MAX_SLIDERS_AND_CHANNELS,
   COLORMAPS,
-  RENDERING_MODES,
-  INTERPOLATION_MODES
+  RENDERING_MODES
 } from './constants';
 
 export {
@@ -37,7 +36,6 @@ export {
   COLORMAPS,
   MAX_SLIDERS_AND_CHANNELS,
   RENDERING_MODES,
-  INTERPOLATION_MODES,
   ScaleBarLayer,
   VolumeLayer,
   MultiscaleImageLayer,

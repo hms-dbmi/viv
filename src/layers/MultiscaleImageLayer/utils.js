@@ -1,7 +1,7 @@
+import GL from '@luma.gl/constants';
 import XRLayer from '../XRLayer';
 import BitmapLayer from '../BitmapLayer';
 import { getImageSize, isInterleaved } from '../../loaders/utils';
-import { INTERPOLATION_MODES } from '../../constants';
 
 export function range(len) {
   return [...Array(len).keys()];
@@ -49,10 +49,7 @@ export function renderSubLayers(props) {
     bounds,
     id: `tile-sub-layer-${bounds}-${id}`,
     tileId: { x, y, z },
-    // If no option is passed in, the auto setting is NEAREST at the highest resolution but LINEAR otherwise.
-    interpolation:
-      props.interpolation || z === maxZoom
-        ? INTERPOLATION_MODES.NEAREST
-        : INTERPOLATION_MODES.LINEAR
+    // The auto setting is NEAREST at the highest resolution but LINEAR otherwise.
+    interpolation: z === maxZoom ? GL.NEAREST : GL.LINEAR
   });
 }

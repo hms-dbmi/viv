@@ -8,10 +8,7 @@ import {
   OVERVIEW_VIEW_ID
 } from '../views';
 import useGlobalSelection from './global-selection-hook';
-import {
-  GLOBAL_SLIDER_DIMENSION_FIELDS,
-  INTERPOLATION_MODES
-} from '../constants';
+import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -45,8 +42,6 @@ import {
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {Array} [props.transitionFields] A string array indicating which fields require a transition when making a new selection: Default: ['t', 'z'].
- * @param {Number} [props.interpolation] The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter).
- * Default is null which indicates an "auto" setting where the highest reoslution is NEREAST and all else is LINEAR.  Otherwise, for non-multiscale, the setting is NEAREST.
  * @param {function} [props.onViewportLoad] Function that gets called when the data in the viewport loads.
  */
 
@@ -74,8 +69,6 @@ const PictureInPictureViewer = props => {
     onViewStateChange,
     onHover,
     transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
-    // For ImageLayer, we want NEAREST
-    interpolation = loader?.length > 1 ? null : INTERPOLATION_MODES.NEAREST,
     onViewportLoad
   } = props;
   const {
@@ -113,8 +106,7 @@ const PictureInPictureViewer = props => {
     lensRadius,
     lensBorderColor,
     lensBorderRadius,
-    transparentColor,
-    interpolation
+    transparentColor
   };
   const views = [detailView];
   const layerProps = [layerConfig];
