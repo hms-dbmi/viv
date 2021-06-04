@@ -4,9 +4,14 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
 
-import { useImageSettingsStore, useViewerStore } from '../../../state';
+import {
+  useChannelSettings,
+  useImageSettingsStore,
+  useViewerStore
+} from '../../../state';
 
 function LensSelect() {
+  const { selections } = useChannelSettings();
   const {
     setImageSetting,
     isLensOn,
@@ -14,6 +19,7 @@ function LensSelect() {
     lensSelection
   } = useImageSettingsStore();
   const { channelOptions } = useViewerStore();
+  const currChannelIndices = selections.map(sel => sel.c);
 
   const checkboxColor = `rgb(${[255, 255, 255]})`;
   return (
@@ -39,10 +45,13 @@ function LensSelect() {
           value={lensSelection}
           onChange={e => setImageSetting({ lensSelection: e.target.value })}
         >
-          {channelOptions.map((opt, i) => (
+          {currChannelIndices.map((channelIndex, relativeIndex) => (
             // eslint-disable-next-line react/no-array-index-key
-            <option key={opt + i} value={i}>
-              {opt}
+            <option
+              key={channelOptions[channelIndex] + String(relativeIndex)}
+              value={relativeIndex}
+            >
+              {channelOptions[channelIndex]}
             </option>
           ))}
         </Select>
