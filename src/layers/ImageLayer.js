@@ -152,7 +152,7 @@ const ImageLayer = class extends CompositeLayer {
   renderLayers() {
     const { loader, id } = this.props;
     const { dtype } = loader;
-    const { width, height, data } = this.state;
+    const { width, height, data, unprojectLensBounds } = this.state;
     if (!(width && height)) return null;
 
     const bounds = [0, height, width, 0];
@@ -171,7 +171,8 @@ const ImageLayer = class extends CompositeLayer {
       // Shared props with BitmapLayer:
       bounds,
       id: `image-sub-layer-${bounds}-${id}`,
-      dtype
+      dtype,
+      unprojectLensBounds
     });
   }
 };

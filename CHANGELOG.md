@@ -9,6 +9,7 @@
 ### Changed
 
 - Fix viewer props docs.
+- Fix lens in Avivator + `ImageLayer`.
 
 ## 0.10.0
 
