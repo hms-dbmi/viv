@@ -4,6 +4,7 @@
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer, project32, picking } from '@deck.gl/core';
 import { Model, Geometry, Texture2D, isWebGL2 } from '@luma.gl/core';
+import { hasFeature, FEATURES } from '@luma.gl/webgl';
 import fsColormap1 from './xr-layer-fragment-colormap.webgl1.glsl';
 import fsColormap2 from './xr-layer-fragment-colormap.webgl2.glsl';
 import fs1 from './xr-layer-fragment.webgl1.glsl';
@@ -18,17 +19,36 @@ const SHADER_MODULES = [
   { fs: fs2, fscmap: fsColormap2, vs: vs2 }
 ];
 
+function validateWebGL2Filter(gl, interpolation) {
+  const canShowFloat = hasFeature(gl, FEATURES.TEXTURE_FLOAT);
+  const canShowLinear = hasFeature(gl, FEATURES.TEXTURE_FILTER_LINEAR_FLOAT);
+
+  if (!canShowFloat) {
+    throw new Error(
+      'WebGL1 context does not support floating point textures.  Unable to display raster data.'
+    );
+  }
+
+  if (!canShowLinear && interpolation === GL.LINEAR) {
+    console.warn(
+      'LINEAR filtering not supported in WebGL1 context.  Falling back to NEAREST.'
+    );
+    return GL.NEAREST;
+  }
+
+  return interpolation;
+}
+
 function getRenderingAttrs(dtype, gl, interpolation) {
   const isLinear = interpolation === GL.LINEAR;
   if (!isWebGL2(gl)) {
-    // WebGL1
     return {
       format: GL.LUMINANCE,
       dataFormat: GL.LUMINANCE,
       type: GL.FLOAT,
       sampler: 'sampler2D',
       shaderModule: SHADER_MODULES[0],
-      filter: interpolation,
+      filter: validateWebGL2Filter(gl, interpolation),
       cast: data => new Float32Array(data)
     };
   }
