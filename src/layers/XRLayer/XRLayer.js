@@ -26,7 +26,7 @@ function getRenderingAttrs(dtype, gl, interpolation) {
     const canShowFloat = hasFeature(gl, FEATURES.TEXTURE_FLOAT);
     if (!canShowFloat) {
       throw new Error(
-        'WebGL1 context does no support floating point textures.  Unable to display raster data'
+        'WebGL1 context does not support floating point textures.  Unable to display raster data.'
       );
     }
     const canShowLinear = hasFeature(gl, FEATURES.TEXTURE_FILTER_LINEAR_FLOAT);
