@@ -4,6 +4,7 @@
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer, project32, picking } from '@deck.gl/core';
 import { Model, Geometry, Texture2D, isWebGL2 } from '@luma.gl/core';
+import {hasFeature, FEATURES} from '@luma.gl/webgl';
 import fsColormap1 from './xr-layer-fragment-colormap.webgl1.glsl';
 import fsColormap2 from './xr-layer-fragment-colormap.webgl2.glsl';
 import fs1 from './xr-layer-fragment.webgl1.glsl';
@@ -22,13 +23,14 @@ function getRenderingAttrs(dtype, gl, interpolation) {
   const isLinear = interpolation === GL.LINEAR;
   if (!isWebGL2(gl)) {
     // WebGL1
+    const canShowLinear = hasFeature(gl, FEATURES.TEXTURE_FILTER_LINEAR_FLOAT);
     return {
       format: GL.LUMINANCE,
       dataFormat: GL.LUMINANCE,
       type: GL.FLOAT,
       sampler: 'sampler2D',
       shaderModule: SHADER_MODULES[0],
-      filter: interpolation,
+      filter: canShowLinear ? interpolation : GL.NEAREST,
       cast: data => new Float32Array(data)
     };
   }

@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Fix WebGL1 Float + LINEAR combination in `XRLayer`
+
 ## 0.10.1
 
 ### Added
