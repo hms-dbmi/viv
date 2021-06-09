@@ -4,7 +4,7 @@
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer, project32, picking } from '@deck.gl/core';
 import { Model, Geometry, Texture2D, isWebGL2 } from '@luma.gl/core';
-import {hasFeature, FEATURES} from '@luma.gl/webgl';
+import { hasFeature, FEATURES } from '@luma.gl/webgl';
 import fsColormap1 from './xr-layer-fragment-colormap.webgl1.glsl';
 import fsColormap2 from './xr-layer-fragment-colormap.webgl2.glsl';
 import fs1 from './xr-layer-fragment.webgl1.glsl';
@@ -25,7 +25,9 @@ function getRenderingAttrs(dtype, gl, interpolation) {
     // WebGL1
     const canShowFloat = hasFeature(gl, FEATURES.TEXTURE_FLOAT);
     if (!canShowFloat) {
-      throw new Error('WebGL1 context does no support floating point textures.  Unable to display raster data')
+      throw new Error(
+        'WebGL1 context does no support floating point textures.  Unable to display raster data'
+      );
     }
     const canShowLinear = hasFeature(gl, FEATURES.TEXTURE_FILTER_LINEAR_FLOAT);
     return {
