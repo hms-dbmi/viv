@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Make sure loading message reappears if the resolution changes.
+
 ## 0.10.2
 
 ### Added
