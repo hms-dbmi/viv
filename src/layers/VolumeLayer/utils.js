@@ -1,3 +1,5 @@
+import { COORDINATE_SYSTEM } from '@deck.gl/core';
+import { TextLayer } from '@deck.gl/layers';
 import { getImageSize } from '../../loaders/utils';
 
 /**
@@ -62,3 +64,21 @@ export async function getVolume({
     depth: depthDownsampled
   };
 }
+
+export const getTextLayer = (text, viewport, id) => {
+  return new TextLayer({
+    id: `webgl1-warning-layer-${id}`,
+    coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+    data: [
+      {
+        text,
+        position: viewport.position
+      }
+    ],
+    getColor: [220, 220, 220, 255],
+    getSize: 25,
+    sizeUnits: 'meters',
+    sizeScale: 2 ** -viewport.zoom,
+    fontFamily: 'Helvetica'
+  });
+};

@@ -1,12 +1,11 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import GL from '@luma.gl/constants';
 import { isWebGL2 } from '@luma.gl/core';
-import { TextLayer } from '@deck.gl/layers';
 import { Matrix4 } from 'math.gl';
 import XR3DLayer from '../XR3DLayer';
 import { getPhysicalSizeScalingMatrix } from '../utils';
 import { RENDERING_MODES } from '../../constants';
-import { getVolume } from './utils';
+import { getVolume, getTextLayer } from './utils';
 
 const defaultProps = {
   pickable: false,
@@ -163,47 +162,24 @@ const VolumeLayer = class extends CompositeLayer {
     const { gl } = this.context;
     if (!isWebGL2(gl) && useWebGL1Warning) {
       const { viewport } = this.context;
-      return new TextLayer({
-        id: `loading-text-layer-${id}`,
-        coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-        data: [
-          {
-            text: [
-              'Volume rendering is only available on browsers that support WebGL2. If you',
-              'are using Safari, you can turn on WebGL2 by navigating in the top menubar',
-              'to check Develop > Experimental Features > WebGL 2.0 and then refreshing',
-              'the page.'
-            ].join('\n'),
-            position: viewport.position
-          }
-        ],
-        getColor: [220, 220, 220, 255],
-        getSize: 25,
-        sizeUnits: 'meters',
-        sizeScale: 2 ** -viewport.zoom,
-        fontFamily: 'Helvetica'
-      });
+      return getTextLayer(
+        [
+          'Volume rendering is only available on browsers that support WebGL2. If you',
+          'are using Safari, you can turn on WebGL2 by navigating in the top menubar',
+          'to check Develop > Experimental Features > WebGL 2.0 and then refreshing',
+          'the page.'
+        ].join('\n'),
+        viewport,
+        id
+      );
     }
     if (!(width && height) && useProgressIndicator) {
       const { viewport } = this.context;
-      return new TextLayer({
-        id: `loading-text-layer-${id}`,
-        coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-        data: [
-          {
-            text: `Loading Volume ${String((progress || 0) * 100).slice(
-              0,
-              5
-            )}%...`,
-            position: viewport.position
-          }
-        ],
-        getColor: [220, 220, 220, 255],
-        getSize: 25,
-        sizeUnits: 'meters',
-        sizeScale: 2 ** -viewport.zoom,
-        fontFamily: 'Helvetica'
-      });
+      return getTextLayer(
+        `Loading Volume ${String((progress || 0) * 100).slice(0, 5)}%...`,
+        viewport,
+        id
+      );
     }
     return new XR3DLayer(this.props, {
       channelData: { data, width, height, depth },
