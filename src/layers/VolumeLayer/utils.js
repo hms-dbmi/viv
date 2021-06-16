@@ -67,7 +67,7 @@ export async function getVolume({
 
 export const getTextLayer = (text, viewport, id) => {
   return new TextLayer({
-    id: `webgl1-warning-layer-${id}`,
+    id: `text-${id}`,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     data: [
       {
