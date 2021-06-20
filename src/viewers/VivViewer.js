@@ -262,7 +262,7 @@ class VivViewerWrapper extends PureComponent {
 
   render() {
     /* eslint-disable react/destructuring-assignment */
-    const { views, randomize, useDevicePixels = true } = this.props;
+    const { views, randomize, useDevicePixels = true, glOptions } = this.props;
     const { viewStates } = this.state;
     const deckGLViews = views.map(view => view.getDeckGlView());
     // DeckGL seems to use the first view more than the second for updates
@@ -284,7 +284,7 @@ class VivViewerWrapper extends PureComponent {
     }
     return (
       <DeckGL
-        glOptions={{ webgl2: true }}
+        glOptions={glOptions ?? {}}
         layerFilter={this.layerFilter}
         layers={this._renderLayers()}
         onViewStateChange={this._onViewStateChange}
@@ -311,6 +311,7 @@ class VivViewerWrapper extends PureComponent {
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {HoverHooks} [props.hoverHooks] Object including utility hooks - an object with key handleValue like { handleValue: (valueArray) => {}, handleCoordinate: (coordinate) => {} } where valueArray
  * has the pixel values for the image under the hover location and coordinate is the coordinate in the image from which the values are picked.
+ * @param {Object} [props.glOptions] Additional options used when creating the WebGLContext.
  */
 // eslint-disable-next-line react/jsx-props-no-spreading
 const VivViewer = props => <VivViewerWrapper {...props} />;
