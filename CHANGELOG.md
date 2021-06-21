@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add in-layer warning about WebGL1 to `VolumeLayer`.
+
 ### Changed
 
 ## 0.10.2
