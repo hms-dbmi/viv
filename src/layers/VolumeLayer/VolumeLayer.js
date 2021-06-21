@@ -71,6 +71,19 @@ const defaultProps = {
  * @ignore
  */
 const VolumeLayer = class extends CompositeLayer {
+  clearState() {
+    this.setState({
+      height: null,
+      width: null,
+      depth: null,
+      data: null,
+      physicalSizeScalingMatrix: null,
+      resolutionMatrix: null,
+      progress: 0,
+      abortController: null
+    });
+  }
+
   finalizeState() {
     this.state.abortController.abort();
   }
@@ -85,6 +98,10 @@ const VolumeLayer = class extends CompositeLayer {
     const loaderSelectionChanged =
       props.loaderSelection !== oldProps.loaderSelection;
     // Only fetch new data to render if loader has changed
+    if (resolutionChanged) {
+      // Clear last volume.
+      this.clearState();
+    }
     if (loaderChanged || loaderSelectionChanged || resolutionChanged) {
       const {
         loader,
