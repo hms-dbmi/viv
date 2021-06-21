@@ -8,6 +8,7 @@
 
 ### Changed
 
+- Make sure loading message reappears if the resolution changes.
 - Pass `glOptions` from the viewers to `DeckGL`
 
 ## 0.10.2
