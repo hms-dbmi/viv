@@ -8,6 +8,8 @@
 
 ### Changed
 
+- Pass `glOptions` from the viewers to `DeckGL`
+
 ## 0.10.2
 
 ### Added
