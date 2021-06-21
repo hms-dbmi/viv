@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Remove unneeeded `VolumeButton.js` file.
+
 ## 0.10.2
 
 ### Added
