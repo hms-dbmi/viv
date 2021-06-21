@@ -4,9 +4,12 @@
 
 ### Added
 
+- Add in-layer warning about WebGL1 to `VolumeLayer`.
+
 ### Changed
 
 - Remove unneeeded `VolumeButton.js` file.
+- Pass `glOptions` from the viewers to `DeckGL`
 
 ## 0.10.2
 
