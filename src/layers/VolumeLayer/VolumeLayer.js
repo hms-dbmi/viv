@@ -88,13 +88,9 @@ const VolumeLayer = class extends CompositeLayer {
     this.state.abortController.abort();
   }
 
-  updateState({ changeFlags, oldProps, props }) {
-    const { propsChanged } = changeFlags;
-    const loaderChanged =
-      typeof propsChanged === 'string' && propsChanged.includes('props.loader');
-    const resolutionChanged =
-      typeof propsChanged === 'string' &&
-      propsChanged.includes('props.resolution');
+  updateState({ oldProps, props }) {
+    const loaderChanged = props.loader !== oldProps.loader;
+    const resolutionChanged = props.resolution !== oldProps.resolution;
     const loaderSelectionChanged =
       props.loaderSelection !== oldProps.loaderSelection;
     // Only fetch new data to render if loader has changed

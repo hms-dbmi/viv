@@ -7,6 +7,7 @@
 ### Changed
 
 - Make OME-TIFF loader use a `guessTileSize` function just like the zarr loaders in order to handle pyramids that are not tiled, just downsampled.
+- Don't use `changeFlags` for `updateState` prop diffing.
 
 ## 0.10.3
 

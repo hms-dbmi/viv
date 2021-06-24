@@ -92,10 +92,8 @@ const ImageLayer = class extends CompositeLayer {
     this.state.abortController.abort();
   }
 
-  updateState({ changeFlags, props, oldProps }) {
-    const { propsChanged } = changeFlags;
-    const loaderChanged =
-      typeof propsChanged === 'string' && propsChanged.includes('props.loader');
+  updateState({ props, oldProps }) {
+    const loaderChanged = props.loader !== oldProps.loader;
     const loaderSelectionChanged =
       props.loaderSelection !== oldProps.loaderSelection;
 
