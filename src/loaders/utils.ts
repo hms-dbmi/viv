@@ -162,4 +162,8 @@ export function getImageSize<T extends string[]>(source: PixelSource<T>) {
   return { height, width };
 }
 
+export function prevPowerOf2(x: number) {
+  return 2 ** Math.floor(Math.log2(x));
+}
+
 export const SIGNAL_ABORTED = '__vivSignalAborted';

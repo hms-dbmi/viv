@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Make OME-TIFF loader use a `guessTileSize` function just like the zarr loaders in order to handle pyramids that are not tiled, just downsampled.
+
 ## 0.10.3
 
 ### Added

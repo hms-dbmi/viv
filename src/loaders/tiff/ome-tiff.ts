@@ -7,7 +7,7 @@ import {
   getOmeSubIFDIndexer,
   OmeTiffIndexer
 } from './lib/indexers';
-import { getOmePixelSourceMeta } from './lib/utils';
+import { getOmePixelSourceMeta, guessTileSize } from './lib/utils';
 
 export interface OmeTiffSelection {
   t: number;
@@ -47,7 +47,7 @@ export async function load(tiff: GeoTIFF) {
   const { labels, getShape, physicalSizes, dtype } = getOmePixelSourceMeta(
     imgMeta
   );
-  const tileSize = firstImage.getTileWidth();
+  const tileSize = guessTileSize(firstImage);
   const meta = { photometricInterpretation, physicalSizes };
 
   const data = Array.from({ length: levels }).map((_, resolution) => {

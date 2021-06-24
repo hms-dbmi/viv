@@ -1,7 +1,7 @@
 import { openGroup } from 'zarr';
 import type { ZarrArray } from 'zarr';
 import type { OMEXML } from '../../omexml';
-import { getLabels, isInterleaved } from '../../utils';
+import { getLabels, isInterleaved, prevPowerOf2 } from '../../utils';
 
 import type { RootAttrs } from '../ome-zarr';
 
@@ -84,10 +84,6 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
     data: (await Promise.all(data)) as ZarrArray[],
     rootAttrs
   };
-}
-
-function prevPowerOf2(x: number) {
-  return 2 ** Math.floor(Math.log2(x));
 }
 
 export function guessTileSize(arr: ZarrArray) {
