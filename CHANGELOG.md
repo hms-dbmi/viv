@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Don't use `changeFlags` for `updateState` prop diffing.
+
 ## 0.10.3
 
 ### Added
