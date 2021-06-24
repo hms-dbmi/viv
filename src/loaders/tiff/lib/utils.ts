@@ -1,6 +1,6 @@
+import type { GeoTIFFImage } from 'geotiff';
 import { getDims, getLabels, prevPowerOf2 } from '../../utils';
 import type { OMEXML, UnitsLength } from '../../omexml';
-import { GeoTIFFImage } from 'geotiff';
 
 const DTYPE_LOOKUP = {
   uint8: 'Uint8',
