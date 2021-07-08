@@ -5,6 +5,7 @@ import {
   SideBySideViewer,
   PictureInPictureViewer,
   VolumeViewer
+  // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 import {
   useImageSettingsStore,
