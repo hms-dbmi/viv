@@ -2,9 +2,10 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import pkg from './package.json';
 
+import reactRefresh from '@vitejs/plugin-react-refresh';
 import glslify from 'rollup-plugin-glslify';
 
-const plugins = [ glslify() ];
+const plugins = [reactRefresh(), glslify()];
 
 const configAvivator = defineConfig({
   plugins,
