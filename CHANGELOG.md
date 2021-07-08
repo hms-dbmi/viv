@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Fix Galaxy note in the README.md.
 
 ## 0.10.4
 
