@@ -104,8 +104,8 @@ declare module 'quickselect' {
  */
 declare module '*?worker&inline' {
   const workerConstructor: {
-    new (): Worker
-  }
+    new (): Worker;
+  };
   export default workerConstructor;
 }
 

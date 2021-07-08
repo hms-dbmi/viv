@@ -10,10 +10,10 @@
   ],
   "description": "High bit depth, high resolution, many channels, low overhead",
   "scripts": {
-    "build": "vite build --mode lib && tsc --emitDeclarationOnly",
-    "install:avivator": "cd avivator && npm install",
     "start": "vite",
+    "build": "vite build --mode lib && tsc --emitDeclarationOnly",
     "build:avivator": "vite build",
+    "postinstall": "cd avivator && npm install",
     "test": "npm run test:layers_views && npm run test:loaders",
     "test:layers_views": "rollup -c --environment TEST:layers_views | browserify - | tape-run | tap-spec",
     "test:loaders": "rollup -c --environment TEST:loaders | node - | tap-spec",
