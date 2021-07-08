@@ -36,7 +36,7 @@ More details can be found in our preprint describing the Viv library and related
 
 #### Galaxy:
 
-- The Avivator image viewer will be included as the default visualization for OME-TIFF files: https://github.com/galaxyproject/galaxy/pull/10534
+- The Avivator image viewer is included as the [default visualization for OME-TIFF files](https://docs.galaxyproject.org/en/release_21.05/releases/21.05_announce_user.html#new-datatypes)
 
 #### HuBMAP CCF EUI:
 
