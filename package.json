@@ -10,11 +10,10 @@
   ],
   "description": "High bit depth, high resolution, many channels, low overhead",
   "scripts": {
-    "build": "rollup -c && tsc --emitDeclarationOnly",
-    "build:w": "rollup -c --watch",
-    "start": "concurrently \"npm run build:w\" \"cd avivator && npm start\"",
+    "build": "vite build --mode lib && tsc --emitDeclarationOnly",
     "install:avivator": "cd avivator && npm install",
-    "build:avivator": "cd avivator && npm run build",
+    "start": "vite",
+    "build:avivator": "vite build",
     "test": "npm run test:layers_views && npm run test:loaders",
     "test:layers_views": "rollup -c --environment TEST:layers_views | browserify - | tape-run | tap-spec",
     "test:loaders": "rollup -c --environment TEST:loaders | node - | tap-spec",
@@ -80,7 +79,8 @@
     "tape": "^5.0.1",
     "tape-catch": "^1.0.6",
     "tape-run": "^8.0.0",
-    "typescript": "^4.1.3"
+    "typescript": "^4.1.3",
+    "vite": "^2.4.1"
   },
   "dependencies": {
     "@math.gl/culling": "^3.4.2",
