@@ -13,9 +13,9 @@ const configAvivator = defineConfig({
   publicDir: 'avivator/public',
   resolve: {
     alias: {
+      '@hms-dbmi/viv': resolve(__dirname, 'src'),
       'react': resolve(__dirname, 'avivator/node_modules/react'),
       'react-dom': resolve(__dirname, 'avivator/node_modules/react-dom'),
-      '@hms-dbmi/viv': resolve(__dirname, 'src'),
       /**
        * Geottif.js uses node-builtins in its source. We don't use these 
        * module exports in our code. Rather than polyfilling these modules, 
