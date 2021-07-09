@@ -2,7 +2,6 @@ import { fromUrl, fromBlob } from 'geotiff';
 import type { GeoTIFF } from 'geotiff';
 
 import {
-  createPoolProxy,
   createOffsetsProxy,
   checkProxies
 } from './lib/proxies';
@@ -41,14 +40,6 @@ export async function loadOmeTiff(
     tiff = await fromBlob(source);
   }
 
-  if (pool) {
-    /*
-     * Creates a worker pool to decode tiff tiles. Wraps tiff
-     * in a Proxy that injects 'pool' into `tiff.readRasters`.
-     */
-    tiff = createPoolProxy(tiff, new Pool());
-  }
-
   if (offsets) {
     /*
      * Performance enhancement. If offsets are provided, we
@@ -64,5 +55,5 @@ export async function loadOmeTiff(
    */
   checkProxies(tiff);
 
-  return load(tiff);
+  return pool ? load(tiff, new Pool()) : load(tiff);
 }

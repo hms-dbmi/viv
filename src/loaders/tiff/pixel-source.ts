@@ -2,6 +2,7 @@ import type { GeoTIFFImage, RasterOptions } from 'geotiff';
 import type { TypedArray } from 'zarr';
 import { getImageSize, isInterleaved, SIGNAL_ABORTED } from '../utils';
 
+import type Pool from './lib/Pool';
 import type {
   PixelSource,
   PixelSourceSelection,
@@ -22,7 +23,8 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
     public tileSize: number,
     public shape: number[],
     public labels: Labels<S>,
-    public meta?: PixelSourceMeta
+    public meta?: PixelSourceMeta,
+    public pool?: Pool,
   ) {
     this._indexer = indexer;
   }
@@ -44,7 +46,7 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
 
   private async _readRasters(image: GeoTIFFImage, props?: RasterOptions) {
     const interleave = isInterleaved(this.shape);
-    const raster = await image.readRasters({ interleave, ...props });
+    const raster = await image.readRasters({ interleave, ...props, pool: this.pool });
 
     if (props?.signal?.aborted) {
       throw SIGNAL_ABORTED;

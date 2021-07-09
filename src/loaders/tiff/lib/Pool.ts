@@ -48,7 +48,7 @@ export default class Pool {
       currentWorker.onmessage = event => {
         // this.workers.push(currentWorker);
         this.finishTask(currentWorker);
-        resolve(event.data[0]);
+        resolve(event.data);
       };
       currentWorker.onerror = error => {
         // this.workers.push(currentWorker);
