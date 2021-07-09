@@ -4,8 +4,29 @@ import pkg from './package.json';
 
 import reactRefresh from '@vitejs/plugin-react-refresh';
 import glslify from 'rollup-plugin-glslify';
+import esbuild from 'esbuild';
 
-const plugins = [reactRefresh(), glslify()];
+const plugins = [
+  reactRefresh(),
+  glslify(),
+  {
+    name: 'bundle-web-worker',
+    apply: 'serve', // plugin only applied with dev-server
+    async transform(_, id) {
+      if (id.includes(`decoder.worker.ts?worker_file`)) {
+        // just use esbuild to bundle the worker dependencies
+        const { outputFiles } = await esbuild.build({
+          entryPoints: [id],
+          format: 'esm',
+          bundle: true,
+          write: false,
+        });
+        return outputFiles[0].text;
+      }
+    }
+  }
+];
+
 
 const configAvivator = defineConfig({
   plugins,
@@ -23,9 +44,6 @@ const configAvivator = defineConfig({
        * we use resolve to empty exports.
        */
       'fs': resolve(__dirname, 'avivator/empty-fs.js'),
-      'http': resolve(__dirname, 'avivator/empty-default.js'),
-      'https': resolve(__dirname, 'avivator/empty-default.js'),
-      'through2': resolve(__dirname, 'avivator/empty-default.js'),
     }
   },
 });;

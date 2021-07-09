@@ -13,6 +13,7 @@
     "start": "vite",
     "build": "vite build --mode lib && tsc --emitDeclarationOnly",
     "build:avivator": "vite build",
+    "preview": "vite preview",
     "postinstall": "cd avivator && npm install",
     "test": "npm run test:layers_views && npm run test:loaders",
     "test:layers_views": "rollup -c rollup.config.test.js tests/layers_views/index.spec.js | browserify - | tape-run | tap-spec",
