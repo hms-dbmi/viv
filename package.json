@@ -61,6 +61,7 @@
     "abortcontroller-polyfill": "^1.5.0",
     "deck.gl": "^8.4.0",
     "documentation": "^13.1.0",
+    "esbuild": "^0.12.15",
     "esbuild-plugin-glslify": "^1.0.1",
     "eslint": "^7.12.1",
     "eslint-config-airbnb": "^18.2.0",
