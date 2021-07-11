@@ -6,6 +6,7 @@
 
 ### Changed
 - Fix Galaxy note in the README.md.
+- Test
 
 ## 0.10.4
 
