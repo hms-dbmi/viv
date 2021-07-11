@@ -1,10 +1,7 @@
 import { fromUrl, fromBlob } from 'geotiff';
 import type { GeoTIFF } from 'geotiff';
 
-import {
-  createOffsetsProxy,
-  checkProxies
-} from './lib/proxies';
+import { createOffsetsProxy, checkProxies } from './lib/proxies';
 import Pool from './lib/Pool';
 
 import { load } from './ome-tiff';

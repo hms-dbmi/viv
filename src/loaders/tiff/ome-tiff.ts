@@ -61,7 +61,7 @@ export async function load(tiff: GeoTIFF, pool?: Pool) {
       shape,
       labels,
       meta,
-      pool,
+      pool
     );
     return source;
   });
