@@ -1,4 +1,6 @@
 import { test } from 'tape';
+import { fromFile } from 'geotiff';
+
 import { createOffsetsProxy } from '../../src/loaders/tiff/lib/proxies';
 
 test('Inspect tiff proxies.', async t => {
