@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fromBlob, fromUrl } from 'geotiff';
+import { fromBlob, fromUrl } from 'geotiff'; // eslint-disable-line import/no-extraneous-dependencies 
 import { Matrix4 } from '@math.gl/core';
 
 import {
@@ -215,6 +215,7 @@ export async function getSingleSelectionStats2D({ loader, selection }) {
 export async function getSingleSelectionStats3D({ loader, selection }) {
   const lowResSource = loader[loader.length - 1];
   const { shape, labels } = lowResSource;
+  // eslint-disable-next-line no-bitwise
   const sizeZ = shape[labels.indexOf('z')] >> (loader.length - 1);
   const raster0 = await lowResSource.getRaster({
     selection: { ...selection, z: 0 }

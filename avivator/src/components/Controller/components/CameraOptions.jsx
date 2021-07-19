@@ -57,8 +57,7 @@ const CameraOptions = () => {
               rotationX: 0,
               rotationOrbit: 0
             }
-          })
-        }
+          })}
         disabled={!use3d}
         style={{ padding: 0 }}
       >

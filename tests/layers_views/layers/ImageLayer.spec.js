@@ -60,7 +60,7 @@ test('ImageLayer', t => {
     target: [2, 2, 0],
     zoom: 0
   });
-  let state = { data: [], width: 0, height: 0 };
+  const state = { data: [], width: 0, height: 0 };
   const testCases = [
     {
       props: {

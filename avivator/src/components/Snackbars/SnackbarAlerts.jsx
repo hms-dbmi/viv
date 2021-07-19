@@ -62,7 +62,7 @@ export function VolumeRenderingWarning() {
     <>
       Volume rendering is only available on browsers that support WebGL2. If you
       are using Safari, you can turn on WebGL2 by navigating in the top menubar
-      to check Develop > Experimental Features > WebGL 2.0 and then refreshing
+      to check Develop &gt; Experimental Features &gt; WebGL 2.0 and then refreshing
       the page.
     </>
   );

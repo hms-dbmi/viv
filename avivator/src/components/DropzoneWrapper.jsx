@@ -1,8 +1,8 @@
 import React from 'react';
-import { dropzoneHook } from '../hooks';
+import { useDropzone } from '../hooks';
 
 export default function DropzoneWrapper({ children }) {
-  const { getRootProps, getInputProps } = dropzoneHook();
+  const { getRootProps, getInputProps } = useDropzone();
 
   return (
     <div
