@@ -43,7 +43,8 @@ const SnackBars = () => {
           onClose={() =>
             setViewerState({
               loaderErrorSnackbar: { on: false, message: null }
-            })}
+            })
+          }
           severity="error"
         >
           <LoaderError message={loaderErrorSnackbar.message} />

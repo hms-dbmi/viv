@@ -104,7 +104,7 @@ function VolumeButton() {
           if (use3d) {
             toggleUse3d();
             setViewerState({
-              isChannelLoading: Array(selections.length).fill(true),
+              isChannelLoading: Array(selections.length).fill(true)
             });
             getMultiSelectionStats({ loader, selections, use3d: !use3d }).then(
               ({ domains, sliders }) => {
@@ -115,7 +115,7 @@ function VolumeButton() {
                   })
                 );
                 setViewerState({
-                  isChannelLoading: Array(selections.length).fill(false),
+                  isChannelLoading: Array(selections.length).fill(false)
                 });
               }
             );
@@ -151,7 +151,9 @@ function VolumeButton() {
                           disableGutters
                           onClick={() => {
                             setViewerState({
-                              isChannelLoading: Array(selections.length).fill(true),
+                              isChannelLoading: Array(selections.length).fill(
+                                true
+                              )
                             });
                             const [xSlice, ySlice, zSlice] = getBoundingCube(
                               loader
@@ -179,7 +181,9 @@ function VolumeButton() {
                                   );
                                   setImageSetting({ onViewportLoad: () => {} });
                                   setViewerState({
-                                    isChannelLoading: Array(selections.length).fill(false),
+                                    isChannelLoading: Array(
+                                      selections.length
+                                    ).fill(false)
                                   });
                                 }
                               });

@@ -75,7 +75,7 @@ test('ImageLayer', t => {
         channelIsOn: [true, false],
         loader: {
           getRaster: async () => {
-            state.data.push(new Uint32Array([0, 2, 1, 2]))
+            state.data.push(new Uint32Array([0, 2, 1, 2]));
             state.width = 2;
             state.width = 2;
           },
