@@ -58,7 +58,7 @@ const CameraOptions = () => {
               rotationOrbit: 0
             }
           })
-        }
+        } // eslint-disable-line react/jsx-curly-newline
         disabled={!use3d}
         style={{ padding: 0 }}
       >
