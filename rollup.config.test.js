@@ -5,17 +5,17 @@ import pkg from './package.json';
 
 export default {
   output: {
-    format: 'cjs',
+    format: 'cjs'
   },
   external: [
     ...['fs/promises', 'path'],
     ...Object.keys(pkg.peerDependencies),
     ...Object.keys(pkg.dependencies),
-    ...Object.keys(pkg.devDependencies),
+    ...Object.keys(pkg.devDependencies)
   ],
   plugins: [
     resolve(),
     glslify(),
-    sucrase({ transforms: ['jsx', 'typescript'] }),
+    sucrase({ transforms: ['jsx', 'typescript'] })
   ]
 };

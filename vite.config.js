@@ -13,20 +13,22 @@ const plugins = [
     name: 'bundle-web-worker',
     apply: 'serve', // plugin only applied with dev-server
     async transform(_, id) {
-      if (id.includes(`decoder.worker.ts?worker_file`)) {
+      if (id.includes('decoder.worker.ts?worker_file')) {
         // just use esbuild to bundle the worker dependencies
-        const { outputFiles } = await esbuild.build({
+        const bundle = await esbuild.build({
           entryPoints: [id],
           format: 'esm',
           bundle: true,
-          write: false,
+          write: false
         });
-        return outputFiles[0].text;
+        if (bundle.outputFiles.length !== 1) {
+          throw new Error('Worker must be a single module.');
+        }
+        return bundle.outputFiles[0].text;
       }
     }
   }
 ];
-
 
 const configAvivator = defineConfig({
   plugins,
@@ -39,14 +41,14 @@ const configAvivator = defineConfig({
       'react': resolve(__dirname, 'avivator/node_modules/react'),
       'react-dom': resolve(__dirname, 'avivator/node_modules/react-dom'),
       /**
-       * Geottif.js uses node-builtins in its source. We don't use these 
-       * module exports in our code. Rather than polyfilling these modules, 
+       * Geottif.js uses node-builtins in its source. We don't use these
+       * module exports in our code. Rather than polyfilling these modules,
        * we use resolve to empty exports.
        */
-      'fs': resolve(__dirname, 'avivator/empty-fs.js'),
+      'fs': resolve(__dirname, 'avivator/empty-fs.js')
     }
-  },
-});;
+  }
+});
 
 const configViv = defineConfig({
   plugins,
@@ -55,20 +57,20 @@ const configViv = defineConfig({
     minify: false,
     lib: {
       entry: resolve(__dirname, 'src/index.js'),
-      formats: ['es'],
+      formats: ['es']
     },
     rollupOptions: {
       external: [
         ...Object.keys(pkg.peerDependencies),
-        ...Object.keys(pkg.dependencies),
-      ],
-    } 
-  },
+        ...Object.keys(pkg.dependencies)
+      ]
+    }
+  }
 });
 
 export default ({ command, mode }) => {
   if (command === 'build' && mode === 'lib') {
     return configViv;
-  } 
+  }
   return configAvivator;
-}
+};
