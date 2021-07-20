@@ -24,7 +24,7 @@
     "format:write": "npm run format -- --write",
     "version": "./version.sh",
     "postversion": "git push && git push --tags",
-    "docs": "mkdir -p dist_docs || rm -r dist_docs && mkdir -p dist_docs && documentation build dist/index.js -f html --document-exported --config documentation.yml --shallow -o dist_docs"
+    "docs": "mkdir -p dist_docs || rm -r dist_docs && mkdir -p dist_docs && documentation build dist/viv.es.js -f html --document-exported --config documentation.yml --shallow -o dist_docs"
   },
   "repository": {
     "type": "git",
