@@ -16,38 +16,32 @@ Avivator has been tested with the following dependency versions:
     - Google Chrome 87.0.4280.88
 
 
-## Development installation guide
+## Development guide
 
-To install Avivator, run the following commands in a `zsh` or `bash` shell in the `avivator/` directory.
-
-First, install the NPM dependencies for Viv (typical time: 29.63 seconds):
-
-```sh
-cd .. && npm install && cd -
-```
-
-Install the NPM dependencies for Avivator (typical time: 22.78 seconds):
+Avivator is developed alongside the Viv codebase. To develop Avivator, clone
+the Viv repository and run the following commands in a `zsh` or `bash` shell:
 
 ```sh
-npm install
+git clone https://github.com/hms-dbmi/viv.git && cd viv
+npm install # installs dependencies for both viv and avivator
+npm start
 ```
 
-Build the Viv dependency (typical time: 2.84 seconds):
+
+This command starts a live development server. Navigate to `http://localhost:3000`
+in your web browser to view the site. You may edit the contents of `src/` (Viv codebase) 
+or `avivator/`, and the changes should be applied automatically.
+
+## Production build
+
+You may build a static production build of Avivator with the following:
 
 ```sh
-npm run prebuild
+npm run build:avivator
 ```
 
-## Demo
-
-To start the demo, run the development server (typical time: 3.53 seconds):
-
-```sh
-npm run start
-```
-
-To view the demo, navigate to `http://localhost:8080` in your web browser.
-If the demo has been built successfully, the demo site will contain a visualization of a microscopy image and a controller for manipulating channel settings of the image.
+which outputs the final build in `avivator/dist`. This directory can be deployed as
+static site in production.
 
 ## Instructions for use
 
