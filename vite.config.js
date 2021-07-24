@@ -10,6 +10,13 @@ const plugins = [
   reactRefresh(),
   glslify(),
   {
+    /**
+     * Bundles code in `src/loaders/tiff/lib/decoder.worker.ts` into a single file
+     * during _development only_. WebWorker modules are only stable in chromium
+     * browsers, so this is a work-around to allow us to develop in other browsers.
+     * 
+     * see: https://github.com/hms-dbmi/viv/pull/469#issuecomment-877276110
+     */
     name: 'bundle-web-worker',
     apply: 'serve', // plugin only applied with dev-server
     async transform(_, id) {
@@ -41,7 +48,7 @@ const configAvivator = defineConfig({
       'react': resolve(__dirname, 'avivator/node_modules/react'),
       'react-dom': resolve(__dirname, 'avivator/node_modules/react-dom'),
       /**
-       * Geottif.js uses node-builtins in its source. We don't use these
+       * Geotiff.js uses node-builtins in its source. We don't use these
        * module exports in our code. Rather than polyfilling these modules,
        * we use resolve to empty exports.
        */
