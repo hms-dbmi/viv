@@ -1,9 +1,9 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
-import { dropzoneHook } from '../../../hooks';
+import { useDropzone } from '../../../hooks';
 
 export default function DropzoneButton() {
-  const { getRootProps, getInputProps } = dropzoneHook();
+  const { getRootProps, getInputProps } = useDropzone();
 
   return (
     <Button

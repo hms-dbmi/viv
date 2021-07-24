@@ -75,9 +75,8 @@ $ npm install deck.gl @luma.gl/core
 
 ```bash
 $ git clone https://github.com/hms-dbmi/viv.git
-$ cd viv && npm install # install deps for viv library
-$ npm run install:avivator # install deps for avivator app
-$ npm start # Starts rollup build (for Viv) & dev server for Avivator
+$ cd viv && npm install
+$ npm start
 ```
 
 Please install the [Prettier plug-in](https://prettier.io/docs/en/editors.html) for your preferred editor. Badly formatted code will fail on Travis.

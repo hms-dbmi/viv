@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useDropzone } from 'react-dropzone';
+import { useDropzone as useReactDropzone } from 'react-dropzone';
 
 import {
   useChannelSetters,
@@ -15,7 +15,7 @@ import {
 } from './utils';
 import { COLOR_PALLETE, FILL_PIXEL_VALUE } from './constants';
 
-export const initImage = (source, history) => {
+export const useImage = (source, history) => {
   const {
     setViewerState,
     use3d,
@@ -45,7 +45,7 @@ export const initImage = (source, history) => {
       if (nextLoader) {
         const newSelections = buildDefaultSelection(nextLoader[0]);
         const { Channels } = nextMeta.Pixels;
-        const channelOptions = Channels.map((c, i) => c.Name ?? 'Channel ' + i);
+        const channelOptions = Channels.map((c, i) => c.Name ?? `Channel ${i}`);
         // Default RGB.
         let newSliders = [
           [0, 255],
@@ -120,7 +120,7 @@ export const initImage = (source, history) => {
   }, [source, history]); // eslint-disable-line react-hooks/exhaustive-deps
 };
 
-export const dropzoneHook = () => {
+export const useDropzone = () => {
   const { setViewerState } = useViewerStore();
   const handleSubmitFile = files => {
     let newSource;
@@ -138,7 +138,7 @@ export const dropzoneHook = () => {
     }
     setViewerState({ source: newSource });
   };
-  return useDropzone({
+  return useReactDropzone({
     onDrop: handleSubmitFile
   });
 };

@@ -1,3 +1,4 @@
+/* global globalThis */
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import { TextLayer } from '@deck.gl/layers';
 import { getImageSize } from '../../loaders/utils';
