@@ -43,8 +43,8 @@ export const initImage = (source, history) => {
       );
 
       if (nextLoader) {
-        const newSelections = buildDefaultSelection(nextLoader[0]);
-        const { Channels } = nextMeta.Pixels;
+        const newSelections = [{ z: 1 }];
+        const { Channels = [0] } = nextMeta.Pixels || {};
         const channelOptions = Channels.map((c, i) => c.Name ?? 'Channel ' + i);
         // Default RGB.
         let newSliders = [
@@ -62,15 +62,15 @@ export const initImage = (source, history) => {
           [0, 255, 0],
           [0, 0, 255]
         ];
-        const isRgb = guessRgb(nextMeta);
+        const isRgb = false;
         if (!isRgb) {
-          const stats = await getMultiSelectionStats({
-            loader: nextLoader,
-            selections: newSelections,
-            use3d
-          });
-          newDomains = stats.domains;
-          newSliders = stats.sliders;
+          // const stats = await getMultiSelectionStats({
+          //   loader: nextLoader,
+          //   selections: newSelections,
+          //   use3d
+          // });
+          newDomains = [[0, 1000]];
+          newSliders = [[0, 250]];
           // If there is only one channel, use white.
           newColors =
             newDomains.length === 1

@@ -112,6 +112,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
   }
 
   async getTile(props: TileSelection<S> | ZarrTileSelection) {
+    // console.log(props);
     const { x, y, selection, signal } = props;
 
     let res;

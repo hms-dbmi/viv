@@ -37,7 +37,7 @@ export interface RootAttrs {
 
 export async function load(store: ZarrArray['store']) {
   const { data, rootAttrs } = await loadMultiscales(store);
-  const labels = ['t', 'c', 'z', 'y', 'x'] as Labels<['t', 'c', 'z']>;
+  const labels = ['z', 'y', 'x'] as Labels<['t', 'c', 'z']>;
   const tileSize = guessTileSize(data[0]);
   const pyramid = data.map(arr => new ZarrPixelSource(arr, labels, tileSize));
   return {

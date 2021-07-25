@@ -4,7 +4,7 @@ import { Matrix4 } from '@math.gl/core';
 
 import {
   loadOmeTiff,
-  loadBioformatsZarr,
+  loadOmeZarr,
   getChannelStats
   // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
@@ -99,12 +99,13 @@ export async function createLoader(
       );
     }
 
-    const source = await loadBioformatsZarr(urlOrFile);
+    const source = await loadOmeZarr(urlOrFile);
     return source;
   } catch (e) {
     if (e instanceof UnsupportedBrowserError) {
       handleLoaderError(e.message);
     } else {
+      console.log(e);
       handleLoaderError(null);
     }
     return { data: null };
@@ -289,7 +290,8 @@ export function isMobileOrTablet() {
 /**
  * @param { import('../../src/loaders/omexml').OMEXML[0] } imgMeta
  */
-export function guessRgb({ Pixels }) {
+export function guessRgb() {
+  return false;
   const numChannels = Pixels.Channels.length;
   const { SamplesPerPixel } = Pixels.Channels[0];
 

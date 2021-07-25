@@ -89,7 +89,7 @@
     "geotiff": "ilan-gold/geotiff.js#ilan-gold/viv_094",
     "math.gl": "^3.3.0",
     "quickselect": "^2.0.0",
-    "zarr": "^0.4.0"
+    "zarr": "^0.5.0"
   },
   "prettier": {
     "singleQuote": true,
