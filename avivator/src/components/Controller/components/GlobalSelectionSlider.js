@@ -21,18 +21,23 @@ export default function GlobalSelectionSlider(props) {
       setViewerState({
         isChannelLoading: selections.map(() => true)
       });
+      const newSelectionsForStats = [...selections].map(sel => ({
+        ...sel,
+        [label]: newValue >> loader.length
+      }));
       const newSelections = [...selections].map(sel => ({
         ...sel,
         [label]: newValue
       }));
+      console.log(newSelections);
       getMultiSelectionStats({
         loader,
-        selections: newSelections,
+        selections: newSelectionsForStats,
         use3d: false
       }).then(({ domains, sliders }) => {
         setImageSetting({
           onViewportLoad: () => {
-            range(newSelections.length).forEach((channel, j) =>
+            range(newSelectionsForStats.length).forEach((channel, j) =>
               setPropertiesForChannel(channel, {
                 domains: domains[j],
                 sliders: sliders[j]

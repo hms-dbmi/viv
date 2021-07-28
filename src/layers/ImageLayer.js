@@ -103,7 +103,7 @@ const ImageLayer = class extends CompositeLayer {
       const abortController = new AbortController();
       this.setState({ abortController });
       const { signal } = abortController;
-      const getRaster = selection => loader.getRaster({ selection, signal });
+      const getRaster = selection => loader.getRaster({ selection: { z: selection.z >> loader.length }, signal });
       const dataPromises = loaderSelection.map(getRaster);
 
       Promise.all(dataPromises)
