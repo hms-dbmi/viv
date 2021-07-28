@@ -5,7 +5,9 @@
 ### Added
 
 ### Changed
+
 - Fix Galaxy note in the README.md.
+- Fix interleaved RGB issue in Avivator when setting up viewer initially.
 
 ## 0.10.4
 
