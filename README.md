@@ -90,9 +90,10 @@ use `npm run test:prod`.
 - `Avivator` viewer: `npm run build:avivator`
 
 ## Publish
-
+First checkout a new branch like `release/version`.
 To bump the version number, clean up/update the CHANGELOG.md, and push the tag to Github,
 please run `npm version [major | minor | patch]` depending on which you want. Then run `./publish.sh` to publish the package/demo.
+After that, make a PR for `release/version` and squash + merge it.
 
 ## Browser Support
 
