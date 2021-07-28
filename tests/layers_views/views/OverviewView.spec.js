@@ -19,7 +19,7 @@ const loader = [
   { shape: [12500, 5000] },
   { shape: [6250, 2500] },
   { shape: [3125, 1250] },
-  { shape: [1562, 625] },
+  { shape: [1562, 625] }
 ];
 
 const overviewViewArguments = {
@@ -74,9 +74,9 @@ test(`OverviewView respects maximumHeight and minimumHeight when height > width.
 test(`OverviewView respects maximumWidth and minimumWidth when width > height.`, t => {
   const minimumWidth = 350;
   const loaderWidth = [
-    { type: 'loads', shape: [10000, 20000], },
-    { type: 'loads', shape: [5000, 10000], },
-    { type: 'loads', shape: [2500, 5000], }
+    { type: 'loads', shape: [10000, 20000] },
+    { type: 'loads', shape: [5000, 10000] },
+    { type: 'loads', shape: [2500, 5000] }
   ];
   let view = new OverviewView({
     ...overviewViewArguments,

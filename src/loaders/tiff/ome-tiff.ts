@@ -8,6 +8,7 @@ import {
   OmeTiffIndexer
 } from './lib/indexers';
 import { getOmePixelSourceMeta, guessTileSize } from './lib/utils';
+import type Pool from './lib/Pool';
 
 export interface OmeTiffSelection {
   t: number;
@@ -15,7 +16,7 @@ export interface OmeTiffSelection {
   z: number;
 }
 
-export async function load(tiff: GeoTIFF) {
+export async function load(tiff: GeoTIFF, pool?: Pool) {
   // Get first image from tiff and inspect OME-XML metadata
   const firstImage = await tiff.getImage(0);
   const {
@@ -59,7 +60,8 @@ export async function load(tiff: GeoTIFF) {
       tileSize,
       shape,
       labels,
-      meta
+      meta,
+      pool
     );
     return source;
   });

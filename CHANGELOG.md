@@ -15,6 +15,8 @@
 
 - Make OME-TIFF loader use a `guessTileSize` function just like the zarr loaders in order to handle pyramids that are not tiled, just downsampled.
 - Don't use `changeFlags` for `updateState` prop diffing.
+- Fix broken decoder Pool. Remove pool proxy.
+- Replace Webpack & Rollup with Vite for development & build.
 
 ## 0.10.3
 

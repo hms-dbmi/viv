@@ -21,8 +21,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies for Viv
         run: npm install
-      - name: Install dependencies for Avivator
-        run: npm run install:avivator
       - name: Build Avivator and Viv
         run: npm run build && npm run build:avivator
   test-linux:
@@ -43,8 +41,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies for Viv
         run: npm install
-      - name: Install dependencies for Avivator
-        run: npm run install:avivator
       - name: Install dependencies needed for testing with tape
         run: sudo apt-get install xvfb # needed for tape-run
       - name: Test library
