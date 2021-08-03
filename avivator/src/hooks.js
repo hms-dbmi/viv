@@ -11,7 +11,8 @@ import {
   buildDefaultSelection,
   guessRgb,
   getMultiSelectionStats,
-  getBoundingCube
+  getBoundingCube,
+  isInterleaved
 } from './utils';
 import { COLOR_PALLETE, FILL_PIXEL_VALUE } from './constants';
 
@@ -80,11 +81,6 @@ export const useImage = (source, history) => {
             useLens: channelOptions.length !== 1,
             useColormap: true
           });
-        } else {
-          if (isLensOn) {
-            toggleIsLensOn();
-          }
-          setViewerState({ useColormap: false, useLens: false });
         }
         addChannels({
           ids: newDomains.map(() => String(Math.random())),
