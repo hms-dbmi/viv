@@ -55,6 +55,8 @@ const configAvivator = defineConfig({
        * Geotiff.js uses node-builtins in its source. We don't use these
        * module exports in our code. Rather than polyfilling these modules,
        * we use resolve to empty exports.
+       * 
+       * loaders.gl does the same for child_process.
        */
       'fs': resolve(__dirname, 'avivator/empty-fs.js'),
       'child_process': resolve(__dirname, 'avivator/empty-child_process.js')
