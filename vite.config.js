@@ -42,6 +42,10 @@ const configAvivator = defineConfig({
   base: './',
   root: 'avivator',
   publicDir: 'avivator/public',
+  define: {
+    'process.env': {},
+    'global': {}
+  },
   resolve: {
     alias: {
       '@hms-dbmi/viv': resolve(__dirname, 'src'),
@@ -52,7 +56,8 @@ const configAvivator = defineConfig({
        * module exports in our code. Rather than polyfilling these modules,
        * we use resolve to empty exports.
        */
-      'fs': resolve(__dirname, 'avivator/empty-fs.js')
+      'fs': resolve(__dirname, 'avivator/empty-fs.js'),
+      'child_process': resolve(__dirname, 'avivator/empty-child_process.js')
     }
   }
 });
