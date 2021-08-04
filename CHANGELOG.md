@@ -4,6 +4,8 @@
 
 ### Added
 
+- Expansion button for non-interleaved RGB datasets that might be fluorescence.
+
 ### Changed
 
 ## 0.10.5

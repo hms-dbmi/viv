@@ -4,6 +4,8 @@ import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Divider from '@material-ui/core/Divider';
+import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore';
+import Button from '@material-ui/core/Button';
 
 import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
@@ -25,7 +27,12 @@ import {
   useImageSettingsStore,
   useChannelSetters
 } from '../../state';
-import { guessRgb, useWindowSize, getSingleSelectionStats } from '../../utils';
+import {
+  guessRgb,
+  useWindowSize,
+  getSingleSelectionStats,
+  isInterleaved
+} from '../../utils';
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
 
 function TabPanel(props) {
@@ -75,6 +82,7 @@ const Controller = () => {
     isViewerLoading
   } = useViewerStore();
   const viewSize = useWindowSize();
+  const [areChannelsUnfolded, handleUnfoldChannels] = useState(false);
   const isRgb = metadata && guessRgb(metadata);
   const { shape, labels } = loader[0];
   const globalControlLabels = labels.filter(label =>
@@ -168,11 +176,22 @@ const Controller = () => {
           />
         )}
         {!use3d && globalControllers}
-        {!isViewerLoading && !isRgb ? (
+        {!isViewerLoading && (!isRgb || areChannelsUnfolded) ? (
           <Grid container>{channelControllers}</Grid>
         ) : (
           <Grid container justify="center">
-            {!isRgb && <CircularProgress />}
+            {!isRgb ? (
+              <CircularProgress />
+            ) : (
+              !isInterleaved(loader[0].shape) && (
+                <Button
+                  onClick={() => handleUnfoldChannels(true)}
+                  fullWidth
+                  startIcon={<UnfoldMoreIcon />}
+                  size="small"
+                />
+              )
+            )}
           </Grid>
         )}
         {!isRgb && <AddChannel />}
