@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useDropzone } from 'react-dropzone';
+import { useDropzone as useReactDropzone } from 'react-dropzone';
 
 import {
   useChannelSetters,
@@ -11,11 +11,12 @@ import {
   buildDefaultSelection,
   guessRgb,
   getMultiSelectionStats,
-  getBoundingCube
+  getBoundingCube,
+  isInterleaved
 } from './utils';
 import { COLOR_PALLETE, FILL_PIXEL_VALUE } from './constants';
 
-export const initImage = (source, history) => {
+export const useImage = (source, history) => {
   const {
     setViewerState,
     use3d,
@@ -45,25 +46,40 @@ export const initImage = (source, history) => {
       if (nextLoader) {
         const newSelections = buildDefaultSelection(nextLoader[0]);
         const { Channels } = nextMeta.Pixels;
-        const channelOptions = Channels.map((c, i) => c.Name ?? 'Channel ' + i);
+        const channelOptions = Channels.map((c, i) => c.Name ?? `Channel ${i}`);
         // Default RGB.
-        let newSliders = [
-          [0, 255],
-          [0, 255],
-          [0, 255]
-        ];
-        let newDomains = [
-          [0, 255],
-          [0, 255],
-          [0, 255]
-        ];
-        let newColors = [
-          [255, 0, 0],
-          [0, 255, 0],
-          [0, 0, 255]
-        ];
+        let newSliders = [];
+        let newDomains = [];
+        let newColors = [];
         const isRgb = guessRgb(nextMeta);
-        if (!isRgb) {
+        if (isRgb) {
+          if (isInterleaved(nextLoader[0].shape)) {
+            // These don't matter because the data is interleaved.
+            newSliders = [[0, 255]];
+            newDomains = [[0, 255]];
+            newColors = [[255, 0, 0]];
+          } else {
+            newSliders = [
+              [0, 255],
+              [0, 255],
+              [0, 255]
+            ];
+            newDomains = [
+              [0, 255],
+              [0, 255],
+              [0, 255]
+            ];
+            newColors = [
+              [255, 0, 0],
+              [0, 255, 0],
+              [0, 0, 255]
+            ];
+          }
+          if (isLensOn) {
+            toggleIsLensOn();
+          }
+          setViewerState({ useColormap: false, useLens: false });
+        } else {
           const stats = await getMultiSelectionStats({
             loader: nextLoader,
             selections: newSelections,
@@ -80,11 +96,6 @@ export const initImage = (source, history) => {
             useLens: channelOptions.length !== 1,
             useColormap: true
           });
-        } else {
-          if (isLensOn) {
-            toggleIsLensOn();
-          }
-          setViewerState({ useColormap: false, useLens: false });
         }
         addChannels({
           ids: newDomains.map(() => String(Math.random())),
@@ -120,7 +131,7 @@ export const initImage = (source, history) => {
   }, [source, history]); // eslint-disable-line react-hooks/exhaustive-deps
 };
 
-export const dropzoneHook = () => {
+export const useDropzone = () => {
   const { setViewerState } = useViewerStore();
   const handleSubmitFile = files => {
     let newSource;
@@ -138,7 +149,7 @@ export const dropzoneHook = () => {
     }
     setViewerState({ source: newSource });
   };
-  return useDropzone({
+  return useReactDropzone({
     onDrop: handleSubmitFile
   });
 };

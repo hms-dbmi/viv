@@ -1,5 +1,5 @@
 import type { FileDirectory } from 'geotiff';
-import Worker from 'web-worker:./decoder.worker.ts';
+import Worker from './decoder.worker.ts?worker&inline';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/NavigatorConcurrentHardware/hardwareConcurrency
 // We need to give a different way of getting this for safari, so 4 is probably a safe bet
@@ -48,7 +48,7 @@ export default class Pool {
       currentWorker.onmessage = event => {
         // this.workers.push(currentWorker);
         this.finishTask(currentWorker);
-        resolve(event.data[0]);
+        resolve(event.data);
       };
       currentWorker.onerror = error => {
         // this.workers.push(currentWorker);

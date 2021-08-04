@@ -36,7 +36,7 @@ More details can be found in our preprint describing the Viv library and related
 
 #### Galaxy:
 
-- The Avivator image viewer will be included as the default visualization for OME-TIFF files: https://github.com/galaxyproject/galaxy/pull/10534
+- The Avivator image viewer is included as the [default visualization for OME-TIFF files](https://docs.galaxyproject.org/en/release_21.05/releases/21.05_announce_user.html#new-datatypes)
 
 #### HuBMAP CCF EUI:
 
@@ -75,9 +75,8 @@ $ npm install deck.gl @luma.gl/core
 
 ```bash
 $ git clone https://github.com/hms-dbmi/viv.git
-$ cd viv && npm install # install deps for viv library
-$ npm run install:avivator # install deps for avivator app
-$ npm start # Starts rollup build (for Viv) & dev server for Avivator
+$ cd viv && npm install
+$ npm start
 ```
 
 Please install the [Prettier plug-in](https://prettier.io/docs/en/editors.html) for your preferred editor. Badly formatted code will fail on Travis.
@@ -91,9 +90,10 @@ use `npm run test:prod`.
 - `Avivator` viewer: `npm run build:avivator`
 
 ## Publish
-
+First checkout a new branch like `release/version`.
 To bump the version number, clean up/update the CHANGELOG.md, and push the tag to Github,
 please run `npm version [major | minor | patch]` depending on which you want. Then run `./publish.sh` to publish the package/demo.
+After that, make a PR for `release/version` and squash + merge it.
 
 ## Browser Support
 

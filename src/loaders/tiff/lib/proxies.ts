@@ -1,9 +1,7 @@
 import type { GeoTIFF } from 'geotiff';
-import type Pool from './Pool';
 
 const VIV_PROXY_KEY = '__viv';
 const OFFSETS_PROXY_KEY = `${VIV_PROXY_KEY}-offsets` as const;
-const POOL_PROXY_KEY = `${VIV_PROXY_KEY}-decoder-pool` as const;
 
 /*
  * Inspect if the GeoTIFF source is wrapped in our proxies,
@@ -12,10 +10,6 @@ const POOL_PROXY_KEY = `${VIV_PROXY_KEY}-decoder-pool` as const;
 export function checkProxies(tiff: GeoTIFF) {
   if (!isProxy(tiff, OFFSETS_PROXY_KEY)) {
     console.warn('GeoTIFF source is missing offsets proxy.');
-  }
-
-  if (!isProxy(tiff, POOL_PROXY_KEY)) {
-    console.warn('GeoTIFF source is missing decoder-pool proxy.');
   }
 }
 
@@ -54,34 +48,6 @@ export function createOffsetsProxy(tiff: GeoTIFF, offsets: number[]) {
 
     // tiff['__viv-offsets'] === true
     if (key === OFFSETS_PROXY_KEY) {
-      return true;
-    }
-
-    return Reflect.get(target, key);
-  };
-  return new Proxy(tiff, { get });
-}
-
-/*
- * Creates an ES6 Proxy that wraps a GeoTIFF object. The proxy
- * handler intercepts calls to `tiff.readRasters` and injects
- * a pool argument to every call. This means our TiffPixelSource
- * doesn't need to be aware of whether a decoder pool is in use.
- *
- * > tiff.readRasters({ window }) -> tiff.readRasters({ window, pool });
- */
-export function createPoolProxy(tiff: GeoTIFF, pool: Pool) {
-  const get = (target: GeoTIFF, key: any) => {
-    // Intercept calls to `image.readRasters`
-    if (key === 'readRasters') {
-      return (options: Parameters<typeof target.readRasters>) => {
-        // Inject `pool` argument with other raster options.
-        return target.readRasters({ ...options, pool });
-      };
-    }
-
-    // tiff['__viv-decoder-pool'] === true
-    if (key === POOL_PROXY_KEY) {
       return true;
     }
 

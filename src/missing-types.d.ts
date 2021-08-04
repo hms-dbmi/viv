@@ -97,16 +97,16 @@ declare module 'quickselect' {
 }
 
 /*
- * Adds types for imports from `rollup-plugin-web-worker-loader`
+ * Adds types for imports for vite
  *
- * import Worker from 'web-worker:./some-url'
+ * import Worker from './my-worker.ts?worker&inline'
  * const worker = new Worker();
  */
-declare module 'web-worker:*' {
-  class WorkerLoader extends Worker {
-    constructor() {}
-  }
-  export default WorkerLoader;
+declare module '*?worker&inline' {
+  const workerConstructor: {
+    new (): Worker;
+  };
+  export default workerConstructor;
 }
 
 /*

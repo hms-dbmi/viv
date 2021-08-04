@@ -4,7 +4,6 @@ import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import isFunction from 'lodash/isFunction';
 import shallow from 'zustand/shallow';
-import { _SphericalCoordinates as SphericalCoordinates } from '@math.gl/core';
 // eslint-disable-next-line import/no-unresolved
 import { RENDERING_MODES } from '@hms-dbmi/viv';
 
