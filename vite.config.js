@@ -43,8 +43,8 @@ const configAvivator = defineConfig({
   root: 'avivator',
   publicDir: 'avivator/public',
   define: {
-    'process.env': {},
-    'global': {}
+    'process.env': JSON.stringify(process.env),
+    'global': 'gobalThis',
   },
   resolve: {
     alias: {
