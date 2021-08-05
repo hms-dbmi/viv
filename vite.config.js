@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
-import pkg from './package.json';
 
 import reactRefresh from '@vitejs/plugin-react-refresh';
 import glslify from 'rollup-plugin-glslify';
@@ -44,7 +43,7 @@ const configAvivator = defineConfig({
   publicDir: 'avivator/public',
   define: {
     'process.env.NODE_DEBUG': 'false',
-    'global.Symbol': 'globalThis.Symbol',
+    'global.Symbol': 'Symbol',
   },
   resolve: {
     alias: {
@@ -74,10 +73,8 @@ const configViv = defineConfig({
       formats: ['es']
     },
     rollupOptions: {
-      external: [
-        ...Object.keys(pkg.peerDependencies),
-        ...Object.keys(pkg.dependencies)
-      ]
+      // All non-relative paths are external
+      external: [/^[^.\/]|^\.[^.\/]|^\.\.[^\/]/],
     }
   }
 });
