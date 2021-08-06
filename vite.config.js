@@ -52,6 +52,7 @@ const configAvivator = defineConfig({
        * we use resolve to empty exports.
        */
       'fs': resolve(__dirname, 'avivator/empty-fs.js'),
+      './make-node-stream': resolve(__dirname, 'avivator/empty-loaders.gl-iterators-make-node-stream.js'),
     }
   }
 });
