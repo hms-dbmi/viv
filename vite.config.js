@@ -6,17 +6,15 @@ import reactRefresh from '@vitejs/plugin-react-refresh';
 import glslify from 'rollup-plugin-glslify';
 import esbuild from 'esbuild';
 
-const plugins = [
-  reactRefresh(),
-  glslify(),
-  {
-    /**
-     * Bundles code in `src/loaders/tiff/lib/decoder.worker.ts` into a single file
-     * during _development only_. WebWorker modules are only stable in chromium
-     * browsers, so this is a work-around to allow us to develop in other browsers.
-     * 
-     * see: https://github.com/hms-dbmi/viv/pull/469#issuecomment-877276110
-     */
+/**
+  * Bundles code in `src/loaders/tiff/lib/decoder.worker.ts` into a single file
+  * during _development only_. WebWorker modules are only stable in chromium
+  * browsers, so this is a work-around to allow us to develop in other browsers.
+  *
+  * see: https://github.com/hms-dbmi/viv/pull/469#issuecomment-877276110
+  */
+const bundleWebWorker = () => {
+  return {
     name: 'bundle-web-worker',
     apply: 'serve', // plugin only applied with dev-server
     async transform(_, id) {
@@ -26,7 +24,7 @@ const plugins = [
           entryPoints: [id],
           format: 'esm',
           bundle: true,
-          write: false
+          write: false,
         });
         if (bundle.outputFiles.length !== 1) {
           throw new Error('Worker must be a single module.');
@@ -35,6 +33,12 @@ const plugins = [
       }
     }
   }
+}
+
+const plugins = [
+  reactRefresh(),
+  glslify(),
+  bundleWebWorker(),
 ];
 
 const configAvivator = defineConfig({
