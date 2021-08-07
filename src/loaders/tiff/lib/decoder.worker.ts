@@ -1,5 +1,5 @@
 import type { FileDirectory } from 'geotiff';
-import { getDecoder } from 'geotiff/src/compression';
+import { getDecoder } from 'geotiff';
 
 async function decode(fileDirectory: FileDirectory, buffer: ArrayBuffer) {
   const decoder = getDecoder(fileDirectory);
