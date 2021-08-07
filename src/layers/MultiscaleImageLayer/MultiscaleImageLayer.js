@@ -162,7 +162,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
          * Signal is aborted. We handle the custom value thrown
          * by our pixel sources here and return falsy to deck.gl.
          */
-        if (err === SIGNAL_ABORTED) {
+        if (err?.name === 'AbortError') {
           return null;
         }
 

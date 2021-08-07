@@ -1,6 +1,6 @@
 import type { GeoTIFFImage, RasterOptions } from 'geotiff';
 import type { TypedArray } from 'zarr';
-import { getImageSize, isInterleaved, SIGNAL_ABORTED } from '../utils';
+import { getImageSize, isInterleaved } from '../utils';
 
 import type Pool from './lib/Pool';
 import type {
@@ -51,10 +51,6 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
       ...props,
       pool: this.pool
     });
-
-    if (props?.signal?.aborted) {
-      throw SIGNAL_ABORTED;
-    }
 
     /*
      * geotiff.js returns objects with different structure
