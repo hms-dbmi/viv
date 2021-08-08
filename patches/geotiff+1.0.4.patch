@@ -161,6 +161,37 @@ index 7179948..8b27399 100644
 +    return decoded.buffer;
    }
  }
+diff --git a/node_modules/geotiff/src/source/blockedsource.js b/node_modules/geotiff/src/source/blockedsource.js
+index 92569a5..bef45c7 100644
+--- a/node_modules/geotiff/src/source/blockedsource.js
++++ b/node_modules/geotiff/src/source/blockedsource.js
+@@ -1,6 +1,6 @@
+ import LRUCache from 'lru-cache';
+ import { BaseSource } from './basesource';
+-import { AbortError, AggregateError, wait, zip } from '../utils';
++import { AbortError, AggregateError, zip } from '../utils';
+ 
+ class Block {
+   /**
+@@ -101,8 +101,7 @@ export class BlockedSource extends BaseSource {
+     }
+ 
+     // allow additional block requests to accumulate
+-    await wait();
+-    this.fetchBlocks(signal);
++    await this.fetchBlocks(signal);
+ 
+     for (const blockId of missingBlockIds) {
+       const block = this.blockRequests.get(blockId);
+@@ -177,7 +176,7 @@ export class BlockedSource extends BaseSource {
+    *
+    * @param {AbortSignal} signal
+    */
+-  fetchBlocks(signal) {
++  async fetchBlocks(signal) {
+     // check if we still need to
+     if (this.blockIdsToFetch.size > 0) {
+       const groups = this.groupBlocks(this.blockIdsToFetch);
 diff --git a/node_modules/geotiff/src/source/file.js b/node_modules/geotiff/src/source/file.js
 index cc6964c..d95b104 100644
 --- a/node_modules/geotiff/src/source/file.js
