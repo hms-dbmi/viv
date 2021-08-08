@@ -35,14 +35,12 @@ const bundleWebWorker = () => {
   }
 }
 
-const plugins = [
-  reactRefresh(),
-  glslify(),
-  bundleWebWorker(),
-];
-
 const configAvivator = defineConfig({
-  plugins,
+  plugins: [
+    reactRefresh(),
+    glslify(),
+    bundleWebWorker(),
+  ],
   base: './',
   root: 'avivator',
   publicDir: 'avivator/public',
@@ -52,11 +50,13 @@ const configAvivator = defineConfig({
       'react': resolve(__dirname, 'avivator/node_modules/react'),
       'react-dom': resolve(__dirname, 'avivator/node_modules/react-dom'),
     }
-  }
+  },
 });
 
 const configViv = defineConfig({
-  plugins,
+  plugins: [
+    glslify(),
+  ],
   build: {
     target: 'esnext',
     minify: false,
