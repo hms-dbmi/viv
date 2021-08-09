@@ -5,10 +5,7 @@ import GL from '@luma.gl/constants';
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
 import { onPointer } from '../utils';
-import {
-  getImageSize,
-  isInterleaved,
-} from '../../loaders/utils';
+import { getImageSize, isInterleaved } from '../../loaders/utils';
 
 // From https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
 const DECK_GL_TILE_SIZE = 512;
@@ -129,8 +126,8 @@ const MultiscaleImageLayer = class extends CompositeLayer {
 
       try {
         /*
-         * Try to request the tile data. Our pixels sources _always_ 
-         * have the same return type, and optional throw an 
+         * Try to request the tile data. Our pixels sources _always_
+         * have the same return type, and optional throw an
          * 'AbortError' for performance.
          */
         const tiles = await Promise.all(loaderSelection.map(getTile));
