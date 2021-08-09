@@ -8,7 +8,6 @@ import { onPointer } from '../utils';
 import {
   getImageSize,
   isInterleaved,
-  SIGNAL_ABORTED
 } from '../../loaders/utils';
 
 // From https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
@@ -130,12 +129,9 @@ const MultiscaleImageLayer = class extends CompositeLayer {
 
       try {
         /*
-         * Try to request the tile data. The pixels sources can throw
-         * special SIGNAL_ABORTED string that we pick up in the catch
-         * block to return null to deck.gl.
-         *
-         * This means that our pixels sources _always_ have the same
-         * return type, and optional throw for performance.
+         * Try to request the tile data. Our pixels sources _always_ 
+         * have the same return type, and optional throw an 
+         * 'AbortError' for performance.
          */
         const tiles = await Promise.all(loaderSelection.map(getTile));
 

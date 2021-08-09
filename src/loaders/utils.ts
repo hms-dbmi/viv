@@ -166,4 +166,3 @@ export function prevPowerOf2(x: number) {
   return 2 ** Math.floor(Math.log2(x));
 }
 
-export const SIGNAL_ABORTED = '__vivSignalAborted';

@@ -4,7 +4,7 @@ import GL from '@luma.gl/constants';
 import XRLayer from './XRLayer';
 import BitmapLayer from './BitmapLayer';
 import { onPointer } from './utils';
-import { isInterleaved, SIGNAL_ABORTED } from '../loaders/utils';
+import { isInterleaved } from '../loaders/utils';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -131,8 +131,8 @@ const ImageLayer = class extends CompositeLayer {
           this.setState({ ...raster });
         })
         .catch(e => {
-          if (e !== SIGNAL_ABORTED) {
-            throw e; // re-throws error if not our signal
+          if (e.name !== 'AbortError') {
+            throw e; // re-throws any non AbortError
           }
         });
     }
