@@ -1,26 +1,26 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
-import pkg from './package.json';
 
 import reactRefresh from '@vitejs/plugin-react-refresh';
 import glslify from 'rollup-plugin-glslify';
 import esbuild from 'esbuild';
 
-const plugins = [
-  reactRefresh(),
-  glslify(),
-  {
-    /**
-     * Bundles code in `src/loaders/tiff/lib/decoder.worker.ts` into a single file
-     * during _development only_. WebWorker modules are only stable in chromium
-     * browsers, so this is a work-around to allow us to develop in other browsers.
-     * 
-     * see: https://github.com/hms-dbmi/viv/pull/469#issuecomment-877276110
-     */
+/**
+ * Vite plugin. Bundles code in `src/loaders/tiff/lib/decoder.worker.ts`
+ * into a single file during _development only_. WebWorker modules are only
+ * stable in chromium browsers, so this is a work-around to allow us to
+ * develop in other browsers.
+ *
+ * see: https://github.com/hms-dbmi/viv/pull/469#issuecomment-877276110
+ *
+ * @returns {import('vite').Plugin}
+ */
+const bundleWebWorker = () => {
+  return {
     name: 'bundle-web-worker',
     apply: 'serve', // plugin only applied with dev-server
     async transform(_, id) {
-      if (id.includes('decoder.worker.ts?worker_file')) {
+      if (/\?worker_file$/.test(id)) {
         // just use esbuild to bundle the worker dependencies
         const bundle = await esbuild.build({
           entryPoints: [id],
@@ -35,6 +35,12 @@ const plugins = [
       }
     }
   }
+};
+
+const plugins = [
+  reactRefresh(),
+  glslify(),
+  bundleWebWorker(),
 ];
 
 const configAvivator = defineConfig({
@@ -52,7 +58,7 @@ const configAvivator = defineConfig({
        * module exports in our code. Rather than polyfilling these modules,
        * we use resolve to empty exports.
        */
-      'fs': resolve(__dirname, 'avivator/empty-fs.js')
+      'fs': resolve(__dirname, 'avivator/empty-fs.js'),
     }
   }
 });
@@ -67,10 +73,8 @@ const configViv = defineConfig({
       formats: ['es']
     },
     rollupOptions: {
-      external: [
-        ...Object.keys(pkg.peerDependencies),
-        ...Object.keys(pkg.dependencies)
-      ]
+      // All non-relative paths are external
+      external: [/^[^.\/]|^\.[^.\/]|^\.\.[^\/]/],
     }
   }
 });

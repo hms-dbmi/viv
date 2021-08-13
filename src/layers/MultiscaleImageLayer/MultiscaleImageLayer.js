@@ -11,9 +11,6 @@ import {
   SIGNAL_ABORTED
 } from '../../loaders/utils';
 
-// From https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
-const DECK_GL_TILE_SIZE = 512;
-
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   onHover: { type: 'function', value: null, compare: false },
@@ -109,7 +106,6 @@ const MultiscaleImageLayer = class extends CompositeLayer {
     // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
     // The z level can be wrong for showing the correct scales because of the calculation deck.gl does
     // so we need to invert it for fetching tiles and minZoom/maxZoom.
-    const zoomOffset = Math.log2(DECK_GL_TILE_SIZE / tileSize);
     const getTileData = async ({ x, y, z, signal }) => {
       // Early return if no loaderSelection
       if (!loaderSelection || loaderSelection.length === 0) {
@@ -122,7 +118,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       // which felt odd to me to beign with.
       // The image-tile example works without, this but I have a feeling there is something
       // going on with our pyramids and/or rendering that is different.
-      const resolution = Math.round(-z + zoomOffset);
+      const resolution = Math.round(-z);
       const getTile = selection => {
         const config = { x, y, selection, signal };
         return loader[resolution].getTile(config);
@@ -176,20 +172,18 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       id: `Tiled-Image-${id}`,
       getTileData,
       dtype,
-      // If you scale a matrix up or down, that is like zooming in or out.  After
-      // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128,
-      // tileSize controls the zoom level that the tile indexer thinks you are at for fetching tiles.
-      // Because the indexing offsets `z` by math.log2(TILE_SIZE / tileSize), passing in
-      // tileSize * (1 / modelMatrix.getScale()[0]) from this layer as below to TileLayer gives an offset of
-      // math.log2(TILE_SIZE / (tileSize * (1 / modelMatrix.getScale()[0]))) = math.log2(TILE_SIZE / tileSize) + Math.log2(modelMatrix.getScale()[0])
-      // as desired so that the z level used for indexing the tiles is larger (i.e more zoomed in) if the image is scaled larger, and vice-versa if scaled smaller.
-      tileSize: modelMatrix
-        ? tileSize * (1 / modelMatrix.getScale()[0])
-        : tileSize,
+      tileSize,
+      // If you scale a matrix up or down, that is like zooming in or out.  zoomOffset controls
+      // how the zoom level you fetch tiles at is offset, allowing us to fetch higher resolution tiles
+      // while at a lower "absolute" zoom level.  If you didn't use this prop, an image that is scaled
+      // up would always look "low resolution" no matter the level of the image pyramid you are looking at.
+      zoomOffset: Math.round(
+        Math.log2(modelMatrix ? modelMatrix.getScale()[0] : 1)
+      ),
       extent: [0, 0, width, height],
       // See the above note within for why the use of zoomOffset and the rounding necessary.
-      minZoom: Math.round(-(loader.length - 1) + zoomOffset),
-      maxZoom: Math.round(zoomOffset),
+      minZoom: Math.round(-(loader.length - 1)),
+      maxZoom: 0,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
       // multiple rendered sublayers (some of which have been cached) from overlapping
       refinementStrategy:
