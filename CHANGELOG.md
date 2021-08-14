@@ -7,6 +7,7 @@
 ### Changed
 
 - Upgrade deck.gl to 8.5
+- Update fork of geotiff.js
 
 ## 0.10.5
 
