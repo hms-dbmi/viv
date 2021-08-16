@@ -1,5 +1,5 @@
 import test from 'tape';
-import { fromFile } from 'geotiff'; // eslint-disable-line import/no-unresolved
+import { fromFile } from 'geotiff';
 
 import { load } from '../../src/loaders/tiff/ome-tiff';
 
