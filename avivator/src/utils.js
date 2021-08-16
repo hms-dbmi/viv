@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fromBlob, fromUrl } from 'geotiff'; // eslint-disable-line import/no-extraneous-dependencies
+import { fromBlob, fromUrl } from 'geotiff'; // eslint-disable-line import/no-unresolved
 import { Matrix4 } from '@math.gl/core';
 
 import {
