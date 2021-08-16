@@ -7,6 +7,7 @@
 ### Changed
 
 - Upgrade deck.gl to 8.5
+- Fix changelog check in `bash`.
 
 ## 0.10.5
 
