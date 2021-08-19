@@ -8,6 +8,7 @@
 
 - Upgrade deck.gl to 8.5
 - Fix changelog check in `bash`.
+- Fix documentation for React Components.
 
 ## 0.10.5
 
