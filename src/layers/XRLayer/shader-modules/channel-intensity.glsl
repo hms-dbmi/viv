@@ -85,8 +85,8 @@ vec3 process_channel_intensity(float intensity, vec3 colorValues, int channelInd
   float useColorValue = float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));
   // Use arithmetic instead of if-then for useColorValue.
   vec3 hsvCombo = rgb_to_hsv(max(vec3(colorValues), (1.0 - useColorValue) * vec3(255, 255, 255)));
-  // Sum up the intesitiies in additive blending.
-  hsvCombo = vec3(hsvCombo.xy, max(0.0, intensity));
+  // Sum up the intensities in additive blending.
+  hsvCombo = vec3(hsvCombo.xy, hsvCombo.z * max(0.0, min(1.0, intensity)));
   return hsv_to_rgb(hsvCombo);
 }
 
