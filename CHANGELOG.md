@@ -8,7 +8,7 @@
 
 - Upgrade deck.gl to 8.5
 - Fix changelog check in `bash`.
-
+- Update README to note Node version restrictions.
 ## 0.10.5
 
 ### Added
