@@ -8,6 +8,8 @@
 
 - Upgrade deck.gl to 8.5
 - Fix changelog check in `bash`.
+- Update README to note Node version restrictions.
+- Maintain the value of the channel color in HSV when applying intensity.
 - Fix documentation for React Components.
 
 ## 0.10.5
