@@ -49,32 +49,6 @@ vec3 hsv_to_rgb(vec3 c) {
   return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-vec3 rgb_to_hsv(vec3 rgb) {
-  float Cmax = max(rgb.r, max(rgb.g, rgb.b));
-  float Cmin = min(rgb.r, min(rgb.g, rgb.b));
-  float delta = Cmax - Cmin;
-
-  vec3 hsv = vec3(0., 0., Cmax);
-
-  if (Cmax > Cmin) {
-    hsv.y = delta / Cmax;
-
-    if (rgb.r == Cmax) {
-      hsv.x = (rgb.g - rgb.b) / delta;
-    }
-    else {
-      if (rgb.g == Cmax){
-        hsv.x = 2. + (rgb.b - rgb.r) / delta;
-      }
-      else {
-        hsv.x = 4. + (rgb.r - rgb.g) / delta;
-      }
-    }
-    hsv.x = fract(hsv.x / 6.);
-  }
-  return hsv;
-}
-
 float sample_and_apply_sliders(SAMPLER_TYPE channel, vec3 vTexCoord, vec2 sliderValues) {
   float fragIntensity = float(texture(channel, vTexCoord).r);
   float slidersAppliedToIntensity = (fragIntensity - sliderValues[0]) / max(0.0005, (sliderValues[1] - sliderValues[0]));

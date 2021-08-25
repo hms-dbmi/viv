@@ -18,7 +18,7 @@ export const COLORMAP_OPTIONS = [
 ];
 export const COLOR_PALLETE = [
   [0, 0, 255],
-  [0, 255, 0],
+  [0, 128, 0],
   [255, 0, 255],
   [255, 255, 0],
   [255, 128, 0],
