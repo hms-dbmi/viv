@@ -19,7 +19,7 @@ export const RENDERING_MODES_BLEND = {
       vec3 rgbCombo = vec3(0.0);
       for(int i = 0; i < 6; i++) {
         vec3 hsvCombo = rgb2hsv(vec3(colorValues[i]));
-        hsvCombo = vec3(hsvCombo.xy, maxVals[i]);
+        hsvCombo = vec3(hsvCombo.xy, hsvCombo.z * max(0.0, min(1.0, maxVals[i])));
         rgbCombo += hsv2rgb(hsvCombo);
       }
       color = vec4(rgbCombo, 1.0);
@@ -43,7 +43,7 @@ export const RENDERING_MODES_BLEND = {
       vec3 rgbCombo = vec3(0.0);
       for(int i = 0; i < 6; i++) {
         vec3 hsvCombo = rgb2hsv(vec3(colorValues[i]));
-        hsvCombo = vec3(hsvCombo.xy, minVals[i]);
+        hsvCombo = vec3(hsvCombo.xy, hsvCombo.z * max(0.0, min(1.0, minVals[i])));
         rgbCombo += hsv2rgb(hsvCombo);
       }
       color = vec4(rgbCombo, 1.0);
@@ -59,7 +59,7 @@ export const RENDERING_MODES_BLEND = {
       for(int i = 0; i < 6; i++) {
         float intensityValue = intensityArray[i];
         hsvCombo = rgb2hsv(vec3(colorValues[i]));
-        hsvCombo = vec3(hsvCombo.xy, intensityValue);
+        hsvCombo = vec3(hsvCombo.xy, hsvCombo.z * max(0.0, min(1.0, intensityValue)));
         rgbCombo += hsv2rgb(hsvCombo);
         total += intensityValue;
       }
