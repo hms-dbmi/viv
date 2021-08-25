@@ -52,7 +52,7 @@ float sample_and_apply_sliders(SAMPLER_TYPE channel, vec2 vTexCoord, vec2 slider
 vec3 process_channel_intensity(float intensity, vec3 colorValues, int channelIndex, bool inLensAndUseLens, int lensSelection) {
   float useColorValue = float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));
   // Use arithmetic instead of if-then for useColorValue.
-  vec3 rgb = max(0.0, min(1.0, intensity)) * max(vec3(colorValues), (1.0 - useColorValue) * vec3(255, 255, 255));
+  vec3 rgb = max(0.0, min(1.0, intensity)) * max(vec3(colorValues), (1.0 - useColorValue) * vec3(1., 1., 1.));
   return rgb;
 }
 
