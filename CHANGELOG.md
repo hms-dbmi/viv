@@ -12,6 +12,7 @@
 - Maintain the value of the channel color in HSV when applying intensity (3D + 2D)
 - Fix documentation for React Components.
 - Fix channel stats for thin 3D volumes in Avivator.
+- Better checking for viewable volumes at certain resolutions.
 
 ## 0.10.5
 
