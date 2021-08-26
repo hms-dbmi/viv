@@ -57,7 +57,7 @@ void main() {
 
   // Declare variables.
   bool inLensAndUseLens = isLensOn && isFragInLensBounds;
-  vec3 rgbCombo = vec3(0.0);
+  vec3 rgbCombo = vec3(0.);
 
   for(int i = 0; i < 6; i++) {
     rgbCombo += process_channel_intensity(intensityArray[i], colorValues[i], i, inLensAndUseLens, lensSelection);

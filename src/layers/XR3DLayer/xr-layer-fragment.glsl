@@ -35,7 +35,7 @@ out vec4 color;
 vec2 intersect_box(vec3 orig, vec3 dir) {
 	vec3 box_min = vec3(xSlice[0], ySlice[0], zSlice[0]);
 	vec3 box_max = vec3(xSlice[1], ySlice[1], zSlice[1]);
-	vec3 inv_dir = 1.0 / dir;
+	vec3 inv_dir = 1. / dir;
 	vec3 tmin_tmp = (box_min - orig) * inv_dir;
 	vec3 tmax_tmp = (box_max - orig) * inv_dir;
 	vec3 tmin = min(tmin_tmp, tmax_tmp);
@@ -79,13 +79,13 @@ void main(void) {
 	// We don't want to sample voxels behind the eye if it's
 	// inside the volume, so keep the starting point at or in front
 	// of the eye
-	t_hit.x = max(t_hit.x, 0.0);
+	t_hit.x = max(t_hit.x, 0.);
 
 	// Step 3: Compute the step size to march through the volume grid
-	vec3 dt_vec = 1.0 / (scale * vec4(abs(ray_dir), 1.0)).xyz;
-	float dt = 1.0 * min(dt_vec.x, min(dt_vec.y, dt_vec.z));
+	vec3 dt_vec = 1. / (scale * vec4(abs(ray_dir), 1.)).xyz;
+	float dt = 1. * min(dt_vec.x, min(dt_vec.y, dt_vec.z));
 
-	float offset = wang_hash(int(gl_FragCoord.x + 640.0 * gl_FragCoord.y));
+	float offset = wang_hash(int(gl_FragCoord.x + 640. * gl_FragCoord.y));
 
 	// Step 4: Starting from the entry point, march the ray through the volume
 	// and sample it
@@ -102,9 +102,9 @@ void main(void) {
 		// Do not show coordinates outside 0-1 box.
 		// Something about the undefined behavior outside the box causes the additive blender to 
 		// render some very odd artifacts.
-		float canShowXCoordinate = max(p.x - 0.0, 0.0) * max(1.0 - p.x , 0.0);
-		float canShowYCoordinate = max(p.y - 0.0, 0.0) * max(1.0 - p.y , 0.0);
-		float canShowZCoordinate = max(p.z - 0.0, 0.0) * max(1.0 - p.z , 0.0);
+		float canShowXCoordinate = max(p.x - 0., 0.) * max(1. - p.x , 0.);
+		float canShowYCoordinate = max(p.y - 0., 0.) * max(1. - p.y , 0.);
+		float canShowZCoordinate = max(p.z - 0., 0.) * max(1. - p.z , 0.);
 		float canShowCoordinate = float(ceil(canShowXCoordinate * canShowYCoordinate * canShowZCoordinate));
 		canShow = canShowCoordinate * canShow;
     float intensityValue0 = canShow * sample_and_apply_sliders(volume0, p, sliderValues[0]);

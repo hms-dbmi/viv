@@ -12,7 +12,7 @@
 - Maintain the value of the channel color in HSV when applying intensity (3D + 2D)
 - Fix documentation for React Components.
 - Don't do RGB-HSV conversion on shaders.  Instead, scale RGB linearly.
-
+- Consistent shader floats `n.0` -> `n.`
 ## 0.10.5
 
 ### Added
