@@ -31,14 +31,14 @@ void main() {
   float intensityValue4 = sample_and_apply_sliders(channel4, vTexCoord, sliderValues[4]);
   float intensityValue5 = sample_and_apply_sliders(channel5, vTexCoord, sliderValues[5]);
 
-  float intensityCombo = 0.0;
+  float intensityCombo = 0.;
   
-  intensityCombo += max(0.0,intensityValue0);
-  intensityCombo += max(0.0,intensityValue1);
-  intensityCombo += max(0.0,intensityValue2);
-  intensityCombo += max(0.0,intensityValue3);
-  intensityCombo += max(0.0,intensityValue4);
-  intensityCombo += max(0.0,intensityValue5);
+  intensityCombo += max(0.,intensityValue0);
+  intensityCombo += max(0.,intensityValue1);
+  intensityCombo += max(0.,intensityValue2);
+  intensityCombo += max(0.,intensityValue3);
+  intensityCombo += max(0.,intensityValue4);
+  intensityCombo += max(0.,intensityValue5);
 
   gl_FragColor = colormap(intensityCombo, opacity, useTransparentColor);
   geometry.uv = vTexCoord;

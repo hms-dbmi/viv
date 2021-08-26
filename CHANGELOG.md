@@ -13,6 +13,8 @@
 - Fix documentation for React Components.
 - Fix channel stats for thin 3D volumes in Avivator.
 - Better checking for viewable volumes at certain resolutions.
+- Don't do RGB-HSV conversion on shaders.  Instead, scale RGB linearly.
+- Consistent shader floats `n.0` -> `n.`
 
 ## 0.10.5
 
