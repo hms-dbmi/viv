@@ -46,20 +46,20 @@
 float sample_and_apply_sliders(SAMPLER_TYPE channel, vec2 vTexCoord, vec2 sliderValues) {
   float fragIntensity = float(texture(channel, vTexCoord).r);
   float slidersAppliedToIntensity = (fragIntensity - sliderValues[0]) / max(0.0005, (sliderValues[1] - sliderValues[0]));
-  return max(0.0, slidersAppliedToIntensity);
+  return max(0., slidersAppliedToIntensity);
 }
 
 vec3 process_channel_intensity(float intensity, vec3 colorValues, int channelIndex, bool inLensAndUseLens, int lensSelection) {
   float useColorValue = float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));
   // Use arithmetic instead of if-then for useColorValue.
-  vec3 rgb = max(0.0, min(1.0, intensity)) * max(vec3(colorValues), (1.0 - useColorValue) * vec3(1., 1., 1.));
+  vec3 rgb = max(0., min(1., intensity)) * max(vec3(colorValues), (1. - useColorValue) * vec3(1., 1., 1.));
   return rgb;
 }
 
 vec4 apply_opacity(vec3 color, bool useTransparentColor, vec3 transparentColor, float opacity){
-  return vec4(color, (color == transparentColor && useTransparentColor) ? 0.0 : opacity);
+  return vec4(color, (color == transparentColor && useTransparentColor) ? 0. : opacity);
 }
 
 vec4 colormap(float intensity, float opacity, bool useTransparentColor) {
-  return apply_opacity(COLORMAP_FUNCTION(min(1.0,intensity)).xyz, useTransparentColor, COLORMAP_FUNCTION(0.0).xyz, opacity);
+  return apply_opacity(COLORMAP_FUNCTION(min(1.,intensity)).xyz, useTransparentColor, COLORMAP_FUNCTION(0.).xyz, opacity);
 }
