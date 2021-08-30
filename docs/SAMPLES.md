@@ -87,7 +87,7 @@ function App() {
       sliderValues={autoProps.sliders}
       colors={autoProps.colors}
       active={autoProps.active}
-      loaderSelection={autoProps.selections}
+      selections={autoProps.selections}
       height={1080}
       width={1920}
     />

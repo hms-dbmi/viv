@@ -48,7 +48,7 @@ test('VolumeLayer', t => {
           dtype: 'Uint32'
         }
       ],
-      loaderSelection: [{}, {}]
+      selections: [{}, {}]
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
   });
@@ -109,7 +109,7 @@ test('VolumeLayer', t => {
             dtype: 'Uint32'
           }
         ],
-        loaderSelection: []
+        selections: []
       },
       onAfterUpdate: () => {
         t.ok(
@@ -120,7 +120,7 @@ test('VolumeLayer', t => {
     },
     {
       updateProps: {
-        loaderSelection: [1, 2]
+        selections: [1, 2]
       },
       onAfterUpdate: () =>
         t.ok(state.data.length === 8, 'Updated loader selection requests data.')

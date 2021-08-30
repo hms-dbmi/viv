@@ -40,7 +40,7 @@ const Viewer = () => {
       sliderValues={sliders}
       colors={colors}
       active={active}
-      loaderSelection={selections}
+      selections={selections}
       colormap={colormap.length > 0 && colormap}
       xSlice={xSlice}
       ySlice={ySlice}
@@ -65,7 +65,7 @@ const Viewer = () => {
       sliderValues={sliders}
       colors={colors}
       active={active}
-      loaderSelection={selections}
+      selections={selections}
       height={viewSize.height}
       width={viewSize.width}
       colormap={colormap.length > 0 && colormap}
@@ -84,7 +84,7 @@ const Viewer = () => {
       sliderValues={sliders}
       colors={colors}
       active={active}
-      loaderSelection={selections}
+      selections={selections}
       height={viewSize.height}
       width={viewSize.width}
       colormap={colormap.length > 0 && colormap}

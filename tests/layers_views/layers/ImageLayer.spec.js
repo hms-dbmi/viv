@@ -34,7 +34,7 @@ test('ImageLayer', t => {
         }),
         dtype: 'Uint32'
       },
-      loaderSelection: [{}, {}]
+      selections: [{}, {}]
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
   });
@@ -81,7 +81,7 @@ test('ImageLayer', t => {
           },
           dtype: 'Uint32'
         },
-        loaderSelection: []
+        selections: []
       },
       onAfterUpdate: () => {
         t.ok(
@@ -92,7 +92,7 @@ test('ImageLayer', t => {
     },
     {
       updateProps: {
-        loaderSelection: [1, 2]
+        selections: [1, 2]
       },
       onAfterUpdate: () =>
         t.ok(state.data.length === 2, 'Updated loader selection requests data.')

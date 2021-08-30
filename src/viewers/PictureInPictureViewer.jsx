@@ -18,7 +18,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {Array} props.active List of boolean values for each channel for whether or not it is visible.
  * @param {string} [props.colormap] String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.loader The data source for the viewer, PixelSource[]. If loader.length > 1, data is assumed to be multiscale.
- * @param {Array} props.loaderSelection Selection to be used for fetching data.
+ * @param {Array} props.selections Selection to be used for fetching data.
  * @param {Object} props.overview Allows you to pass settings into the OverviewView: { scale, margin, position, minimumWidth, maximumWidth,
  * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.  See http://viv.gehlenborglab.org/#overviewview for defaults.
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
@@ -56,7 +56,7 @@ const PictureInPictureViewer = props => {
     colormap,
     overview,
     overviewOn,
-    loaderSelection,
+    selections,
     hoverHooks = { handleValue: () => {}, handleCoordinate: () => {} },
     height,
     width,
@@ -74,10 +74,10 @@ const PictureInPictureViewer = props => {
     glOptions
   } = props;
   const {
-    newLoaderSelection,
-    oldLoaderSelection,
+    newselections,
+    oldselections,
     onViewportLoad: transitionOnViewportLoad
-  } = useGlobalSelection(loaderSelection, transitionFields);
+  } = useGlobalSelection(selections, transitionFields);
   const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
   const baseViewState = useMemo(() => {
     return (
@@ -97,8 +97,8 @@ const PictureInPictureViewer = props => {
     sliderValues,
     colors,
     active,
-    loaderSelection: oldLoaderSelection,
-    newLoaderSelection,
+    selections: oldselections,
+    newselections,
     onViewportLoad,
     transitionOnViewportLoad,
     transitionFields,

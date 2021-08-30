@@ -66,7 +66,7 @@ export function generateViewTests(ViewType, args, linkedViewIds = []) {
     const layers = view.getLayers({
       props: {
         loader: [{ type: 'loads' }],
-        loaderSelection: [{ foo: 'bar' }],
+        selections: [{ foo: 'bar' }],
         transitionFields: ['foo']
       },
       viewStates

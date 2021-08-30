@@ -14,7 +14,7 @@ const defaultProps = {
   active: { type: 'array', value: [], compare: true },
   colors: { type: 'array', value: [], compare: true },
   colormap: { type: 'string', value: '', compare: true },
-  loaderSelection: { type: 'array', value: [], compare: true },
+  selections: { type: 'array', value: [], compare: true },
   resolution: { type: 'number', value: 0, compare: true },
   domain: { type: 'array', value: [], compare: true },
   loader: {
@@ -50,7 +50,7 @@ const defaultProps = {
  * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader PixelSource[]. Represents an N-dimensional image.
- * @property {Array} loaderSelection Selection to be used for fetching data.
+ * @property {Array} selections Selection to be used for fetching data.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @property {number=} resolution Resolution at which you would like to see the volume and load it into memory (0 highest, loader.length -1 the lowest default 0)
@@ -91,17 +91,17 @@ const VolumeLayer = class extends CompositeLayer {
   updateState({ oldProps, props }) {
     const loaderChanged = props.loader !== oldProps.loader;
     const resolutionChanged = props.resolution !== oldProps.resolution;
-    const loaderSelectionChanged =
-      props.loaderSelection !== oldProps.loaderSelection;
+    const selectionsChanged =
+      props.selections !== oldProps.selections;
     // Only fetch new data to render if loader has changed
     if (resolutionChanged) {
       // Clear last volume.
       this.clearState();
     }
-    if (loaderChanged || loaderSelectionChanged || resolutionChanged) {
+    if (loaderChanged || selectionsChanged || resolutionChanged) {
       const {
         loader,
-        loaderSelection = [],
+        selections = [],
         resolution,
         onViewportLoad
       } = this.props;
@@ -110,7 +110,7 @@ const VolumeLayer = class extends CompositeLayer {
       const totalRequests =
         // eslint-disable-next-line no-bitwise
         (source.shape[source.labels.indexOf('z')] >> resolution) *
-        loaderSelection.length;
+        selections.length;
       const onUpdate = () => {
         progress += 0.5 / totalRequests;
         if (this.props.onUpdate) {
@@ -121,7 +121,7 @@ const VolumeLayer = class extends CompositeLayer {
       const abortController = new AbortController();
       this.setState({ abortController });
       const { signal } = abortController;
-      const volumePromises = loaderSelection.map(selection =>
+      const volumePromises = selections.map(selection =>
         getVolume({
           selection,
           source,

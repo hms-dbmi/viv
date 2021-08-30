@@ -12,7 +12,7 @@ const defaultProps = {
   sliderValues: { type: 'array', value: [], compare: true },
   active: { type: 'array', value: [], compare: true },
   colors: { type: 'array', value: [], compare: true },
-  loaderSelection: { type: 'array', value: [], compare: true },
+  selections: { type: 'array', value: [], compare: true },
   colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
   viewportId: { type: 'string', value: '', compare: true },
@@ -46,7 +46,7 @@ const defaultProps = {
  * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
  * @property {Object} loader PixelSource. Represents an N-dimensional image.
- * @property {Array} loaderSelection Selection to be used for fetching data.
+ * @property {Array} selections Selection to be used for fetching data.
  * @property {number=} opacity Opacity of the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
@@ -94,17 +94,17 @@ const ImageLayer = class extends CompositeLayer {
 
   updateState({ props, oldProps }) {
     const loaderChanged = props.loader !== oldProps.loader;
-    const loaderSelectionChanged =
-      props.loaderSelection !== oldProps.loaderSelection;
+    const selectionsChanged =
+      props.selections !== oldProps.selections;
 
-    if (loaderChanged || loaderSelectionChanged) {
+    if (loaderChanged || selectionsChanged) {
       // Only fetch new data to render if loader has changed
-      const { loader, loaderSelection = [], onViewportLoad } = this.props;
+      const { loader, selections = [], onViewportLoad } = this.props;
       const abortController = new AbortController();
       this.setState({ abortController });
       const { signal } = abortController;
       const getRaster = selection => loader.getRaster({ selection, signal });
-      const dataPromises = loaderSelection.map(getRaster);
+      const dataPromises = selections.map(getRaster);
 
       Promise.all(dataPromises)
         .then(rasters => {
