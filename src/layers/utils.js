@@ -30,7 +30,7 @@ export function getDtypeValues(dtype) {
   return values;
 }
 
-export function padColorsAndSliders({
+export function padColorsAndWindows({
   windows,
   colors,
   active,
@@ -55,28 +55,28 @@ export function padColorsAndSliders({
     throw Error(`${lengths} channels passed in, but only 6 are allowed.`);
   }
 
-  const paddedColorValues = padWithDefault(
+  const paddedColors = padWithDefault(
     newColors,
     DEFAULT_COLOR_OFF,
     padSize
   );
-  const paddedSliderValues = padWithDefault(
+  const paddedWindows = padWithDefault(
     newWindows,
     [maxSliderValue, maxSliderValue],
     padSize
   );
-  const paddedColorsAndSliders = {
-    paddedSliderValues: paddedSliderValues.reduce(
+  const paddedColorsAndWindows = {
+    paddedWindows: paddedWindows.reduce(
       (acc, val) => acc.concat(val),
       []
     ), // flatten for use on shaders
-    paddedColorValues: paddedColorValues.reduce(
+    paddedColors: paddedColors.reduce(
       (acc, val) => acc.concat(val),
       []
     )
   };
 
-  return paddedColorsAndSliders;
+  return paddedColorsAndWindows;
 }
 
 export function onPointer(layer) {

@@ -33,7 +33,7 @@ import { Plane } from '@math.gl/culling';
 import vs from './xr-layer-vertex.glsl';
 import fs from './xr-layer-fragment.glsl';
 import channels from './channel-intensity-module';
-import { padColorsAndSliders, padWithDefault, getDtypeValues } from '../utils';
+import { padColorsAndWindows, padWithDefault, getDtypeValues } from '../utils';
 import { COLORMAPS, RENDERING_MODES as RENDERING_NAMES } from '../../constants';
 import {
   RENDERING_MODES_BLEND,
@@ -252,7 +252,7 @@ const XR3DLayer = class extends Layer {
       projectionMatrix
     } = this.context.viewport;
     if (textures && model && scaleMatrix) {
-      const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
+      const { paddedWindows, paddedColors } = padColorsAndWindows({
         windows,
         colors,
         active,
@@ -278,8 +278,8 @@ const XR3DLayer = class extends Layer {
         .setUniforms({
           ...uniforms,
           ...textures,
-          windows: paddedSliderValues,
-          colors: paddedColorValues,
+          windows: paddedWindows,
+          colors: paddedColors,
           xSlice: new Float32Array(
             xSlice
               ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])

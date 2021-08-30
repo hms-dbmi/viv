@@ -48,18 +48,18 @@ export const useImage = (source, history) => {
         const { Channels } = nextMeta.Pixels;
         const channelOptions = Channels.map((c, i) => c.Name ?? `Channel ${i}`);
         // Default RGB.
-        let newSliders = [];
+        let newWindows = [];
         let newDomains = [];
         let newColors = [];
         const isRgb = guessRgb(nextMeta);
         if (isRgb) {
           if (isInterleaved(nextLoader[0].shape)) {
             // These don't matter because the data is interleaved.
-            newSliders = [[0, 255]];
+            newWindows = [[0, 255]];
             newDomains = [[0, 255]];
             newColors = [[255, 0, 0]];
           } else {
-            newSliders = [
+            newWindows = [
               [0, 255],
               [0, 255],
               [0, 255]
@@ -86,7 +86,7 @@ export const useImage = (source, history) => {
             use3d
           });
           newDomains = stats.domains;
-          newSliders = stats.windows;
+          newWindows = stats.windows;
           // If there is only one channel, use white.
           newColors =
             newDomains.length === 1
@@ -101,7 +101,7 @@ export const useImage = (source, history) => {
           ids: newDomains.map(() => String(Math.random())),
           selections: newSelections,
           domains: newDomains,
-          windows: newSliders,
+          windows: newWindows,
           colors: newColors
         });
         setLoader(nextLoader);

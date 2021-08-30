@@ -76,7 +76,7 @@ function App() {
 
     // These are precalculated settings for the windows that
     // should render a good, "in focus" image initially.
-    windows = stats.map(stat => stat.autoSliders);
+    windows = stats.map(stat => stat.autoWindows);
     const newProps = { ...props, windows };
   }, [loader])
 

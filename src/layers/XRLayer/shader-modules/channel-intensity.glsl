@@ -43,10 +43,10 @@
 #pragma glslify: velocity-green = require("glsl-colormap/velocity-green")
 #pragma glslify: cubehelix = require("glsl-colormap/cubehelix")
 
-float sample_and_apply_sliders(SAMPLER_TYPE channel, vec2 vTexCoord, vec2 windows) {
+float sample_and_apply_windows(SAMPLER_TYPE channel, vec2 vTexCoord, vec2 windows) {
   float fragIntensity = float(texture(channel, vTexCoord).r);
-  float slidersAppliedToIntensity = (fragIntensity - windows[0]) / max(0.0005, (windows[1] - windows[0]));
-  return max(0., slidersAppliedToIntensity);
+  float windowsAppliedToIntensity = (fragIntensity - windows[0]) / max(0.0005, (windows[1] - windows[0]));
+  return max(0., windowsAppliedToIntensity);
 }
 
 vec3 process_channel_intensity(float intensity, vec3 colors, int channelIndex, bool inLensAndUseLens, int lensSelection) {

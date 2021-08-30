@@ -208,7 +208,7 @@ export async function getSingleSelectionStats2D({ loader, selection }) {
   const data = Array.isArray(loader) ? loader[loader.length - 1] : loader;
   const raster = await data.getRaster({ selection });
   const selectionStats = getChannelStats(raster.data);
-  const { domain, autoSliders: slider } = selectionStats;
+  const { domain, autoWindows: slider } = selectionStats;
   return { domain, slider };
 }
 
@@ -236,14 +236,14 @@ export async function getSingleSelectionStats3D({ loader, selection }) {
     ],
     slider: [
       Math.min(
-        stats0.autoSliders[0],
-        statsMid.autoSliders[0],
-        statsTop.autoSliders[0]
+        stats0.autoWindows[0],
+        statsMid.autoWindows[0],
+        statsTop.autoWindows[0]
       ),
       Math.max(
-        stats0.autoSliders[1],
-        statsMid.autoSliders[1],
-        statsTop.autoSliders[1]
+        stats0.autoWindows[1],
+        statsMid.autoWindows[1],
+        statsTop.autoWindows[1]
       )
     ]
   };

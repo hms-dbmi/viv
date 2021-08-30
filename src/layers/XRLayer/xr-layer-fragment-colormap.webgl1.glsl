@@ -24,12 +24,12 @@ varying vec2 vTexCoord;
 
 
 void main() {
-  float intensityValue0 = sample_and_apply_sliders(channel0, vTexCoord, windows[0]);
-  float intensityValue1 = sample_and_apply_sliders(channel1, vTexCoord, windows[1]);
-  float intensityValue2 = sample_and_apply_sliders(channel2, vTexCoord, windows[2]);
-  float intensityValue3 = sample_and_apply_sliders(channel3, vTexCoord, windows[3]);
-  float intensityValue4 = sample_and_apply_sliders(channel4, vTexCoord, windows[4]);
-  float intensityValue5 = sample_and_apply_sliders(channel5, vTexCoord, windows[5]);
+  float intensityValue0 = sample_and_apply_windows(channel0, vTexCoord, windows[0]);
+  float intensityValue1 = sample_and_apply_windows(channel1, vTexCoord, windows[1]);
+  float intensityValue2 = sample_and_apply_windows(channel2, vTexCoord, windows[2]);
+  float intensityValue3 = sample_and_apply_windows(channel3, vTexCoord, windows[3]);
+  float intensityValue4 = sample_and_apply_windows(channel4, vTexCoord, windows[4]);
+  float intensityValue5 = sample_and_apply_windows(channel5, vTexCoord, windows[5]);
 
   float intensityCombo = 0.;
   

@@ -12,7 +12,7 @@ import fs2 from './xr-layer-fragment.webgl2.glsl';
 import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
 import { lens, channels } from './shader-modules';
-import { padColorsAndSliders, getDtypeValues } from '../utils';
+import { padColorsAndWindows, getDtypeValues } from '../utils';
 
 const SHADER_MODULES = [
   { fs: fs1, fscmap: fsColormap1, vs: vs1 },
@@ -294,7 +294,7 @@ const XRLayer = class extends Layer {
       const numTextures = Object.values(textures).filter(t => t).length;
       // Slider values and color values can come in before textures since their data is async.
       // Thus we pad based on the number of textures bound.
-      const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
+      const { paddedWindows, paddedColors } = padColorsAndWindows({
         windows: windows.slice(0, numTextures),
         colors: colors.slice(0, numTextures),
         active: active.slice(0, numTextures),
@@ -318,8 +318,8 @@ const XRLayer = class extends Layer {
       model
         .setUniforms({
           ...uniforms,
-          colors: paddedColorValues,
-          windows: paddedSliderValues,
+          colors: paddedColors,
+          windows: paddedWindows,
           opacity,
           majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
           minorLensAxis: (bottomMouseBoundScaled - topMouseBoundScaled) / 2,

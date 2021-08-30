@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
 import { range } from '../../../src/layers/MultiscaleImageLayer/utils';
-import { padWithDefault, padColorsAndSliders } from '../../../src/layers/utils';
+import { padWithDefault, padColorsAndWindows } from '../../../src/layers/utils';
 
 test('range test', t => {
   const expected = [0, 1, 2];
@@ -20,13 +20,13 @@ test('padWithDefault test', t => {
   t.end();
 });
 
-test('padColorsAndSliders test', t => {
+test('padColorsAndWindows test', t => {
   const expectedNoDomain = {
-    paddedSliderValues: [0, 5, 0, 5, 255, 255, 255, 255, 255, 255, 255, 255],
-    paddedColorValues: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    paddedWindows: [0, 5, 0, 5, 255, 255, 255, 255, 255, 255, 255, 255],
+    paddedColors: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   };
   const expectedChannelOff = {
-    paddedSliderValues: [
+    paddedWindows: [
       0,
       5,
       255,
@@ -40,10 +40,10 @@ test('padColorsAndSliders test', t => {
       255,
       255
     ],
-    paddedColorValues: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    paddedColors: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   };
   const expectedDomain = {
-    paddedSliderValues: [
+    paddedWindows: [
       0,
       5,
       0,
@@ -57,10 +57,10 @@ test('padColorsAndSliders test', t => {
       1000,
       1000
     ],
-    paddedColorValues: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    paddedColors: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   };
   const expected16Bit = {
-    paddedSliderValues: [
+    paddedWindows: [
       0,
       5,
       0,
@@ -74,11 +74,11 @@ test('padColorsAndSliders test', t => {
       2 ** 16 - 1,
       2 ** 16 - 1
     ],
-    paddedColorValues: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    paddedColors: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   };
 
   t.deepEqual(
-    padColorsAndSliders({
+    padColorsAndWindows({
       windows: [
         [0, 5],
         [0, 5]
@@ -94,7 +94,7 @@ test('padColorsAndSliders test', t => {
     'Pads with no domain provided'
   );
   t.deepEqual(
-    padColorsAndSliders({
+    padColorsAndWindows({
       windows: [
         [0, 5],
         [0, 5]
@@ -110,7 +110,7 @@ test('padColorsAndSliders test', t => {
     'Pads with one channel turned off'
   );
   t.deepEqual(
-    padColorsAndSliders({
+    padColorsAndWindows({
       windows: [
         [0, 5],
         [0, 5]
@@ -127,7 +127,7 @@ test('padColorsAndSliders test', t => {
     'Pads with provided domain value'
   );
   t.deepEqual(
-    padColorsAndSliders({
+    padColorsAndWindows({
       windows: [
         [0, 5],
         [0, 5]
