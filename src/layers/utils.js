@@ -2,7 +2,7 @@ import { Matrix4 } from 'math.gl';
 import {
   MAX_COLOR_INTENSITY,
   DEFAULT_COLOR_OFF,
-  MAX_SLIDERS_AND_CHANNELS,
+  MAX_CHANNELS,
   DTYPE_VALUES
 } from '../constants';
 
@@ -50,7 +50,7 @@ export function padColorsAndSliders({
     active[i] ? slider : [maxSliderValue, maxSliderValue]
   );
   // Need to pad windows and colors with default values (required by shader)
-  const padSize = MAX_SLIDERS_AND_CHANNELS - newColors.length;
+  const padSize = MAX_CHANNELS - newColors.length;
   if (padSize < 0) {
     throw Error(`${lengths} channels passed in, but only 6 are allowed.`);
   }
