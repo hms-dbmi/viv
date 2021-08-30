@@ -67,7 +67,7 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'object', value: {}, compare: true },
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
-  colorValues: { type: 'array', value: [], compare: true },
+  colors: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
   active: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
@@ -90,7 +90,7 @@ const defaultProps = {
  * @typedef LayerProps
  * @type {object}
  * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
+ * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
  * @property {number=} opacity Opacity of the layer.
@@ -277,7 +277,7 @@ const XRLayer = class extends Layer {
     if (textures && model) {
       const {
         sliderValues,
-        colorValues,
+        colors,
         opacity,
         domain,
         dtype,
@@ -296,7 +296,7 @@ const XRLayer = class extends Layer {
       // Thus we pad based on the number of textures bound.
       const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
         sliderValues: sliderValues.slice(0, numTextures),
-        colorValues: colorValues.slice(0, numTextures),
+        colors: colors.slice(0, numTextures),
         active: active.slice(0, numTextures),
         domain,
         dtype
@@ -318,7 +318,7 @@ const XRLayer = class extends Layer {
       model
         .setUniforms({
           ...uniforms,
-          colorValues: paddedColorValues,
+          colors: paddedColorValues,
           sliderValues: paddedSliderValues,
           opacity,
           majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,

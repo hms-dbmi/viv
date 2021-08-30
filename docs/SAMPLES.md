@@ -85,7 +85,7 @@ function App() {
     <PictureInPictureViewer
       loader={loader.data}
       sliderValues={autoProps.sliders}
-      colorValues={autoProps.colors}
+      colors={autoProps.colors}
       active={autoProps.active}
       loaderSelection={autoProps.selections}
       height={1080}

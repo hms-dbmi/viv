@@ -32,17 +32,17 @@ export function getDtypeValues(dtype) {
 
 export function padColorsAndSliders({
   sliderValues,
-  colorValues,
+  colors,
   active,
   domain,
   dtype
 }) {
-  const lengths = [sliderValues.length, colorValues.length];
+  const lengths = [sliderValues.length, colors.length];
   if (lengths.every(l => l !== lengths[0])) {
     throw Error('Inconsistent number of slider values and colors provided');
   }
 
-  const colors = colorValues.map((color, i) =>
+  const colors = colors.map((color, i) =>
     active[i] ? color.map(c => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
   );
   const maxSliderValue = (domain && domain[1]) || getDtypeValues(dtype).max;

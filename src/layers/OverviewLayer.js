@@ -39,7 +39,7 @@ const defaultProps = {
  * @typedef LayerProps
  * @type {Object}
  * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
+ * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader PixelSource[]. Assumes multiscale if loader.length > 1.
  * @property {Array} loaderSelection Selection to be used for fetching data.

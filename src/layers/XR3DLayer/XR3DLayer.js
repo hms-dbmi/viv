@@ -63,7 +63,7 @@ const defaultProps = {
   pickable: false,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'object', value: {}, compare: true },
-  colorValues: { type: 'array', value: [], compare: true },
+  colors: { type: 'array', value: [], compare: true },
   sliderValues: { type: 'array', value: [], compare: true },
   dtype: { type: 'string', value: 'Uint8', compare: true },
   colormap: { type: 'string', value: '', compare: true },
@@ -116,7 +116,7 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * @typedef LayerProps
  * @type {Object}
  * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
+ * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
@@ -235,7 +235,7 @@ const XR3DLayer = class extends Layer {
     const { textures, model, scaleMatrix } = this.state;
     const {
       sliderValues,
-      colorValues,
+      colors,
       xSlice,
       ySlice,
       zSlice,
@@ -254,7 +254,7 @@ const XR3DLayer = class extends Layer {
     if (textures && model && scaleMatrix) {
       const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
         sliderValues,
-        colorValues,
+        colors,
         active,
         domain,
         dtype
@@ -279,7 +279,7 @@ const XR3DLayer = class extends Layer {
           ...uniforms,
           ...textures,
           sliderValues: paddedSliderValues,
-          colorValues: paddedColorValues,
+          colors: paddedColorValues,
           xSlice: new Float32Array(
             xSlice
               ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])

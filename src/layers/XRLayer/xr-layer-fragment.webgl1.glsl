@@ -13,7 +13,7 @@ uniform sampler2D channel5;
 uniform vec2 sliderValues[6];
 
 // color
-uniform vec3 colorValues[6];
+uniform vec3 colors[6];
 uniform float intensityArray[6];
 
 // opacity
@@ -52,12 +52,12 @@ void main() {
   // Declare variables.
   bool inLensAndUseLens = isLensOn && isFragInLensBounds;
 
-  vec3 rgbCombo = process_channel_intensity(intensityValue0, colorValues[0], 0, inLensAndUseLens, lensSelection);
-  rgbCombo += process_channel_intensity(intensityValue1, colorValues[1], 1, inLensAndUseLens, lensSelection);
-  rgbCombo += process_channel_intensity(intensityValue2, colorValues[2], 2, inLensAndUseLens, lensSelection);
-  rgbCombo += process_channel_intensity(intensityValue3, colorValues[3], 3, inLensAndUseLens, lensSelection);
-  rgbCombo += process_channel_intensity(intensityValue4, colorValues[4], 4, inLensAndUseLens, lensSelection);
-  rgbCombo += process_channel_intensity(intensityValue5, colorValues[5], 5, inLensAndUseLens, lensSelection);
+  vec3 rgbCombo = process_channel_intensity(intensityValue0, colors[0], 0, inLensAndUseLens, lensSelection);
+  rgbCombo += process_channel_intensity(intensityValue1, colors[1], 1, inLensAndUseLens, lensSelection);
+  rgbCombo += process_channel_intensity(intensityValue2, colors[2], 2, inLensAndUseLens, lensSelection);
+  rgbCombo += process_channel_intensity(intensityValue3, colors[3], 3, inLensAndUseLens, lensSelection);
+  rgbCombo += process_channel_intensity(intensityValue4, colors[4], 4, inLensAndUseLens, lensSelection);
+  rgbCombo += process_channel_intensity(intensityValue5, colors[5], 5, inLensAndUseLens, lensSelection);
 
   // Ternaries are faster than checking this first and then returning/breaking out of shader.
   rgbCombo = (isLensOn && isFragOnLensBounds) ? lensBorderColor : rgbCombo;

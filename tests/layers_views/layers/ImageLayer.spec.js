@@ -21,7 +21,7 @@ test('ImageLayer', t => {
         [0, 10],
         [0, 10]
       ],
-      colorValues: [
+      colors: [
         [0, 1, 1],
         [0, 1, 1]
       ],
@@ -68,7 +68,7 @@ test('ImageLayer', t => {
           [0, 10],
           [0, 10]
         ],
-        colorValues: [
+        colors: [
           [0, 1, 1],
           [0, 1, 1]
         ],

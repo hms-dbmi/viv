@@ -56,7 +56,7 @@ export interface PixelSource<S extends string[]> {
 // Not an exported type. Used below with `Viv` utility type.
 interface VivProps<S extends string[]> {
   sliderValues: [begin: number, end: number][];
-  colorValues: [r: number, g: number, b: number][];
+  colors: [r: number, g: number, b: number][];
   loaderSelection: PixelSourceSelection<S>[];
   dtype: keyof typeof DTYPE_VALUES;
   domain?: [min: number, max: number][];

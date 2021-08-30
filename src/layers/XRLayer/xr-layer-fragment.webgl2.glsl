@@ -16,7 +16,7 @@ uniform SAMPLER_TYPE channel5;
 uniform vec2 sliderValues[6];
 
 // color
-uniform vec3 colorValues[6];
+uniform vec3 colors[6];
 
 // opacity
 uniform float opacity;
@@ -60,7 +60,7 @@ void main() {
   vec3 rgbCombo = vec3(0.);
 
   for(int i = 0; i < 6; i++) {
-    rgbCombo += process_channel_intensity(intensityArray[i], colorValues[i], i, inLensAndUseLens, lensSelection);
+    rgbCombo += process_channel_intensity(intensityArray[i], colors[i], i, inLensAndUseLens, lensSelection);
   }
 
 

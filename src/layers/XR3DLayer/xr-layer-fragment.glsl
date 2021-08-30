@@ -21,7 +21,7 @@ uniform float distances[NUM_PLANES];
 uniform vec2 sliderValues[6];
 
 // color
-uniform vec3 colorValues[6];
+uniform vec3 colors[6];
 
 // slices
 uniform vec2 xSlice;

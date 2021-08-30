@@ -83,7 +83,7 @@ test('padColorsAndSliders test', t => {
         [0, 5],
         [0, 5]
       ],
-      colorValues: [
+      colors: [
         [255, 0, 0],
         [255, 255, 0]
       ],
@@ -99,7 +99,7 @@ test('padColorsAndSliders test', t => {
         [0, 5],
         [0, 5]
       ],
-      colorValues: [
+      colors: [
         [255, 0, 0],
         [255, 255, 0]
       ],
@@ -115,7 +115,7 @@ test('padColorsAndSliders test', t => {
         [0, 5],
         [0, 5]
       ],
-      colorValues: [
+      colors: [
         [255, 0, 0],
         [255, 255, 0]
       ],
@@ -132,7 +132,7 @@ test('padColorsAndSliders test', t => {
         [0, 5],
         [0, 5]
       ],
-      colorValues: [
+      colors: [
         [255, 0, 0],
         [255, 255, 0]
       ],

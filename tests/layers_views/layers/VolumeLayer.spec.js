@@ -21,7 +21,7 @@ test('VolumeLayer', t => {
         [0, 10],
         [0, 10]
       ],
-      colorValues: [
+      colors: [
         [0, 1, 1],
         [0, 1, 1]
       ],
@@ -82,7 +82,7 @@ test('VolumeLayer', t => {
           [0, 10],
           [0, 10]
         ],
-        colorValues: [
+        colors: [
           [0, 1, 1],
           [0, 1, 1]
         ],

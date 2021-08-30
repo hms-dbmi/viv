@@ -38,7 +38,7 @@ const Viewer = () => {
     <VolumeViewer
       loader={loader}
       sliderValues={sliders}
-      colorValues={colors}
+      colors={colors}
       active={active}
       loaderSelection={selections}
       colormap={colormap.length > 0 && colormap}
@@ -63,7 +63,7 @@ const Viewer = () => {
     <SideBySideViewer
       loader={loader}
       sliderValues={sliders}
-      colorValues={colors}
+      colors={colors}
       active={active}
       loaderSelection={selections}
       height={viewSize.height}
@@ -82,7 +82,7 @@ const Viewer = () => {
     <PictureInPictureViewer
       loader={loader}
       sliderValues={sliders}
-      colorValues={colors}
+      colors={colors}
       active={active}
       loaderSelection={selections}
       height={viewSize.height}

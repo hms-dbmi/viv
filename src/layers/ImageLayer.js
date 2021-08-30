@@ -11,7 +11,7 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   sliderValues: { type: 'array', value: [], compare: true },
   active: { type: 'array', value: [], compare: true },
-  colorValues: { type: 'array', value: [], compare: true },
+  colors: { type: 'array', value: [], compare: true },
   loaderSelection: { type: 'array', value: [], compare: true },
   colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
@@ -43,7 +43,7 @@ const defaultProps = {
  * @typedef LayerProps
  * @type {Object}
  * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
+ * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
  * @property {Object} loader PixelSource. Represents an N-dimensional image.
  * @property {Array} loaderSelection Selection to be used for fetching data.
