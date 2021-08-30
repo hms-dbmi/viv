@@ -91,8 +91,7 @@ const VolumeLayer = class extends CompositeLayer {
   updateState({ oldProps, props }) {
     const loaderChanged = props.loader !== oldProps.loader;
     const resolutionChanged = props.resolution !== oldProps.resolution;
-    const selectionsChanged =
-      props.selections !== oldProps.selections;
+    const selectionsChanged = props.selections !== oldProps.selections;
     // Only fetch new data to render if loader has changed
     if (resolutionChanged) {
       // Clear last volume.

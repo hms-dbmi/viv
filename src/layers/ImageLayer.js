@@ -94,8 +94,7 @@ const ImageLayer = class extends CompositeLayer {
 
   updateState({ props, oldProps }) {
     const loaderChanged = props.loader !== oldProps.loader;
-    const selectionsChanged =
-      props.selections !== oldProps.selections;
+    const selectionsChanged = props.selections !== oldProps.selections;
 
     if (loaderChanged || selectionsChanged) {
       // Only fetch new data to render if loader has changed

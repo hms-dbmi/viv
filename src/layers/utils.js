@@ -55,7 +55,11 @@ export function padColorsAndSliders({
     throw Error(`${lengths} channels passed in, but only 6 are allowed.`);
   }
 
-  const paddedColorValues = padWithDefault(newColors, DEFAULT_COLOR_OFF, padSize);
+  const paddedColorValues = padWithDefault(
+    newColors,
+    DEFAULT_COLOR_OFF,
+    padSize
+  );
   const paddedSliderValues = padWithDefault(
     newWindows,
     [maxSliderValue, maxSliderValue],

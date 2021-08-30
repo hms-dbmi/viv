@@ -9,9 +9,7 @@ export default function useGlobalSelection(selections, transitionFields) {
   if (
     selections?.length &&
     viewportSelection?.length &&
-    transitionFields.some(
-      f => selections[0][f] !== viewportSelection[0][f]
-    )
+    transitionFields.some(f => selections[0][f] !== viewportSelection[0][f])
   ) {
     // onViewportLoad is a property of TileLayer that is passed through:
     // https://deck.gl/docs/api-reference/geo-layers/tile-layer#onviewportload
