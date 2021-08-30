@@ -13,6 +13,12 @@
 - Fix documentation for React Components.
 - Don't do RGB-HSV conversion on shaders.  Instead, scale RGB linearly.
 - Consistent shader floats `n.0` -> `n.`
+- Change API for all public props
+  - `sliderValues` -> `windows`
+  - `colorValues` -> `colors`
+  - `channelIsOn` -> `active`
+  - `loaderSelection` -> `selections`
+  - `MAX_SLIDERS_AND_CHANNELS` -> `MAX_CHANNELS`
 ## 0.10.5
 
 ### Added
