@@ -37,7 +37,7 @@ const AddChannel = () => {
           setPropertiesForChannel(numSelectionsBeforeAdd, {
             domains: domain,
             sliders: slider,
-            isOn: true
+            active: true
           });
           setImageSetting({ onViewportLoad: () => {} });
           setIsChannelLoading(numSelectionsBeforeAdd, false);
@@ -47,7 +47,7 @@ const AddChannel = () => {
       addChannel({
         selections: selection,
         ids: String(Math.random()),
-        isOn: false
+        active: false
       });
     });
   };

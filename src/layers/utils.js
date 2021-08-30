@@ -33,7 +33,7 @@ export function getDtypeValues(dtype) {
 export function padColorsAndSliders({
   sliderValues,
   colorValues,
-  channelIsOn,
+  active,
   domain,
   dtype
 }) {
@@ -43,11 +43,11 @@ export function padColorsAndSliders({
   }
 
   const colors = colorValues.map((color, i) =>
-    channelIsOn[i] ? color.map(c => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
+    active[i] ? color.map(c => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
   );
   const maxSliderValue = (domain && domain[1]) || getDtypeValues(dtype).max;
   const sliders = sliderValues.map((slider, i) =>
-    channelIsOn[i] ? slider : [maxSliderValue, maxSliderValue]
+    active[i] ? slider : [maxSliderValue, maxSliderValue]
   );
   // Need to pad sliders and colors with default values (required by shader)
   const padSize = MAX_SLIDERS_AND_CHANNELS - colors.length;

@@ -47,7 +47,7 @@ function TabPanel(props) {
 
 const Controller = () => {
   const {
-    isOn,
+    active,
     sliders,
     colors,
     domains,
@@ -122,7 +122,7 @@ const Controller = () => {
         <ChannelController
           name={name}
           onSelectionChange={onSelectionChange}
-          isOn={isOn[i]}
+          active={active[i]}
           pixelValue={pixelValues[i]}
           toggleIsOn={toggleIsOn}
           handleSliderChange={handleSliderChange}

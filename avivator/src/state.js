@@ -24,7 +24,7 @@ const generateToggles = (defaults, set) => {
 };
 
 const DEFAUlT_CHANNEL_STATE = {
-  isOn: [],
+  active: [],
   sliders: [],
   colors: [],
   domains: [],
@@ -34,7 +34,7 @@ const DEFAUlT_CHANNEL_STATE = {
 };
 
 const DEFAUlT_CHANNEL_VALUES = {
-  isOn: true,
+  active: true,
   sliders: [0, 65535],
   colors: [255, 255, 255],
   domains: [0, 65535],
@@ -47,9 +47,9 @@ export const useChannelsStore = create(set => ({
   ...generateToggles(DEFAUlT_CHANNEL_VALUES, set),
   toggleIsOn: index =>
     set(state => {
-      const isOn = [...state.isOn];
-      isOn[index] = !isOn[index];
-      return { ...state, isOn };
+      const active = [...state.active];
+      active[index] = !active[index];
+      return { ...state, active };
     }),
   setLoader: loader => set(state => ({ ...state, loader })),
   setPropertiesForChannel: (channel, newProperties) =>

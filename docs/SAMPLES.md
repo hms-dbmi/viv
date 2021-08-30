@@ -40,7 +40,7 @@ const props = {
     [0, 255],
     [0, 255],
   ],
-  isOn: [true, true, true],
+  active: [true, true, true],
 }
 
 // Simple url handler.
@@ -86,7 +86,7 @@ function App() {
       loader={loader.data}
       sliderValues={autoProps.sliders}
       colorValues={autoProps.colors}
-      channelIsOn={autoProps.isOn}
+      active={autoProps.active}
       loaderSelection={autoProps.selections}
       height={1080}
       width={1920}

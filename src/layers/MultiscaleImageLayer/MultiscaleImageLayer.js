@@ -16,7 +16,7 @@ const defaultProps = {
   onHover: { type: 'function', value: null, compare: false },
   sliderValues: { type: 'array', value: [], compare: true },
   colorValues: { type: 'array', value: [], compare: true },
-  channelIsOn: { type: 'array', value: [], compare: true },
+  active: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
@@ -38,7 +38,7 @@ const defaultProps = {
  * @type {object}
  * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
- * @property {Array.<boolean>} channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader Image pyramid. PixelSource[], where each PixelSource is decreasing in shape.
  * @property {Array} loaderSelection Selection to be used for fetching data.
  * @property {number=} opacity Opacity of the layer.

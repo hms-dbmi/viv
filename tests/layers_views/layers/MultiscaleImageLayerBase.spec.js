@@ -30,7 +30,7 @@ test('MultiscaleImageLayerBase', async t => {
     sampleProps: {
       sliderValues: [[0, 10]],
       colorValues: [[0, 1, 1]],
-      channelIsOn: [true],
+      active: [true],
       tileSize: 2,
       loader: [
         {

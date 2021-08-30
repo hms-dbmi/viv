@@ -17,7 +17,7 @@ import { DEFAULT_OVERVIEW } from '../constants';
 
 const Viewer = () => {
   const { useLinkedView, setViewerState, use3d, viewState } = useViewerStore();
-  const { colors, sliders, isOn, selections, loader } = useChannelSettings();
+  const { colors, sliders, active, selections, loader } = useChannelSettings();
   const viewSize = useWindowSize();
   const {
     lensSelection,
@@ -39,7 +39,7 @@ const Viewer = () => {
       loader={loader}
       sliderValues={sliders}
       colorValues={colors}
-      channelIsOn={isOn}
+      active={active}
       loaderSelection={selections}
       colormap={colormap.length > 0 && colormap}
       xSlice={xSlice}
@@ -64,7 +64,7 @@ const Viewer = () => {
       loader={loader}
       sliderValues={sliders}
       colorValues={colors}
-      channelIsOn={isOn}
+      active={active}
       loaderSelection={selections}
       height={viewSize.height}
       width={viewSize.width}
@@ -83,7 +83,7 @@ const Viewer = () => {
       loader={loader}
       sliderValues={sliders}
       colorValues={colors}
-      channelIsOn={isOn}
+      active={active}
       loaderSelection={selections}
       height={viewSize.height}
       width={viewSize.width}

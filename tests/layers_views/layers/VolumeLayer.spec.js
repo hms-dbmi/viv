@@ -25,7 +25,7 @@ test('VolumeLayer', t => {
         [0, 1, 1],
         [0, 1, 1]
       ],
-      channelIsOn: [true, false],
+      active: [true, false],
       loader: [
         {
           getRaster: async () => ({
@@ -86,7 +86,7 @@ test('VolumeLayer', t => {
           [0, 1, 1],
           [0, 1, 1]
         ],
-        channelIsOn: [true, false],
+        active: [true, false],
         loader: [
           {
             getRaster: async () => {

@@ -42,7 +42,7 @@ const getPixelValueDisplay = (pixelValue, isLoading, shouldShowPixelValue) => {
 function ChannelController({
   name,
   onSelectionChange,
-  isOn,
+  active,
   pixelValue,
   toggleIsOn,
   handleSliderChange,
@@ -90,7 +90,7 @@ function ChannelController({
           <Checkbox
             onChange={toggleIsOn}
             disabled={isLoading}
-            checked={isOn}
+            checked={active}
             style={{
               color: rgbColor,
               '&$checked': {
