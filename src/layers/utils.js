@@ -42,22 +42,22 @@ export function padColorsAndSliders({
     throw Error('Inconsistent number of slider values and colors provided');
   }
 
-  const colors = colors.map((color, i) =>
+  const newColors = colors.map((color, i) =>
     active[i] ? color.map(c => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
   );
   const maxSliderValue = (domain && domain[1]) || getDtypeValues(dtype).max;
-  const windows = windows.map((slider, i) =>
+  const newWindows = windows.map((slider, i) =>
     active[i] ? slider : [maxSliderValue, maxSliderValue]
   );
   // Need to pad windows and colors with default values (required by shader)
-  const padSize = MAX_SLIDERS_AND_CHANNELS - colors.length;
+  const padSize = MAX_SLIDERS_AND_CHANNELS - newColors.length;
   if (padSize < 0) {
     throw Error(`${lengths} channels passed in, but only 6 are allowed.`);
   }
 
-  const paddedColorValues = padWithDefault(colors, DEFAULT_COLOR_OFF, padSize);
+  const paddedColorValues = padWithDefault(newColors, DEFAULT_COLOR_OFF, padSize);
   const paddedSliderValues = padWithDefault(
-    windows,
+    newWindows,
     [maxSliderValue, maxSliderValue],
     padSize
   );
