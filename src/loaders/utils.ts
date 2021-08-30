@@ -7,7 +7,7 @@ import type { Labels, PixelSource } from '../types';
  * Computes statics from pixel data.
  *
  * This is helpful for generating histograms
- * or scaling sliders to reasonable range. Also provided are
+ * or scaling windows to reasonable range. Also provided are
  * "autoSliders" which are slider bounds that should give a
  * good initial image.
  * @param {TypedArray} arr

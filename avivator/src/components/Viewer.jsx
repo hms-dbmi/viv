@@ -17,7 +17,7 @@ import { DEFAULT_OVERVIEW } from '../constants';
 
 const Viewer = () => {
   const { useLinkedView, setViewerState, use3d, viewState } = useViewerStore();
-  const { colors, sliders, active, selections, loader } = useChannelSettings();
+  const { colors, windows, active, selections, loader } = useChannelSettings();
   const viewSize = useWindowSize();
   const {
     lensSelection,
@@ -37,7 +37,7 @@ const Viewer = () => {
   return use3d ? (
     <VolumeViewer
       loader={loader}
-      sliderValues={sliders}
+      windows={windows}
       colors={colors}
       active={active}
       selections={selections}
@@ -62,7 +62,7 @@ const Viewer = () => {
   ) : useLinkedView ? (
     <SideBySideViewer
       loader={loader}
-      sliderValues={sliders}
+      windows={windows}
       colors={colors}
       active={active}
       selections={selections}
@@ -81,7 +81,7 @@ const Viewer = () => {
   ) : (
     <PictureInPictureViewer
       loader={loader}
-      sliderValues={sliders}
+      windows={windows}
       colors={colors}
       active={active}
       selections={selections}

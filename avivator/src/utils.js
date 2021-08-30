@@ -263,8 +263,8 @@ export const getMultiSelectionStats = async ({ loader, selections, use3d }) => {
     )
   );
   const domains = stats.map(stat => stat.domain);
-  const sliders = stats.map(stat => stat.slider);
-  return { domains, sliders };
+  const windows = stats.map(stat => stat.slider);
+  return { domains, windows };
 };
 
 /* eslint-disable no-useless-escape */

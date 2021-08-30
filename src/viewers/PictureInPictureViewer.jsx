@@ -13,7 +13,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
  * @param {Object} props
- * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
+ * @param {Array} props.windows List of [begin, end] values to control each channel's ramp function.
  * @param {Array} props.colors List of [r, g, b] values for each channel.
  * @param {Array} props.active List of boolean values for each channel for whether or not it is visible.
  * @param {string} [props.colormap] String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
@@ -49,7 +49,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 const PictureInPictureViewer = props => {
   const {
     loader,
-    sliderValues,
+    windows,
     colors,
     active,
     viewStates: viewStatesProp,
@@ -94,7 +94,7 @@ const PictureInPictureViewer = props => {
   });
   const layerConfig = {
     loader,
-    sliderValues,
+    windows,
     colors,
     active,
     selections: oldselections,

@@ -18,7 +18,7 @@ test('XRLayer', t => {
     assert: t.ok,
     sampleProps: {
       bounds: [0, 0, 2, 2],
-      sliderValues: [[0, 10]],
+      windows: [[0, 10]],
       colors: [[0, 1, 1]],
       active: [true],
       tileSize: 2,

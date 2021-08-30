@@ -10,7 +10,7 @@ uniform sampler2D channel4;
 uniform sampler2D channel5;
 
 // range
-uniform vec2 sliderValues[6];
+uniform vec2 windows[6];
 
 // color
 uniform vec3 colors[6];
@@ -38,12 +38,12 @@ varying vec2 vTexCoord;
 
 void main() {
 
-  float intensityValue0 = sample_and_apply_sliders(channel0, vTexCoord, sliderValues[0]);
-  float intensityValue1 = sample_and_apply_sliders(channel1, vTexCoord, sliderValues[1]);
-  float intensityValue2 = sample_and_apply_sliders(channel2, vTexCoord, sliderValues[2]);
-  float intensityValue3 = sample_and_apply_sliders(channel3, vTexCoord, sliderValues[3]);
-  float intensityValue4 = sample_and_apply_sliders(channel4, vTexCoord, sliderValues[4]);
-  float intensityValue5 = sample_and_apply_sliders(channel5, vTexCoord, sliderValues[5]);
+  float intensityValue0 = sample_and_apply_sliders(channel0, vTexCoord, windows[0]);
+  float intensityValue1 = sample_and_apply_sliders(channel1, vTexCoord, windows[1]);
+  float intensityValue2 = sample_and_apply_sliders(channel2, vTexCoord, windows[2]);
+  float intensityValue3 = sample_and_apply_sliders(channel3, vTexCoord, windows[3]);
+  float intensityValue4 = sample_and_apply_sliders(channel4, vTexCoord, windows[4]);
+  float intensityValue5 = sample_and_apply_sliders(channel5, vTexCoord, windows[5]);
 
   // Find out if the frag is in bounds of the lens.
   bool isFragInLensBounds = frag_in_lens_bounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);

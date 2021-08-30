@@ -48,7 +48,7 @@ function TabPanel(props) {
 const Controller = () => {
   const {
     active,
-    sliders,
+    windows,
     colors,
     domains,
     selections,
@@ -94,7 +94,7 @@ const Controller = () => {
       }).then(({ domain, slider }) => {
         setImageSetting({
           onViewportLoad: () => {
-            setPropertiesForChannel(i, { sliders: slider, domains: domain });
+            setPropertiesForChannel(i, { windows: slider, domains: domain });
             setImageSetting({ onViewportLoad: () => {} });
             setIsChannelLoading(i, false);
           }
@@ -104,7 +104,7 @@ const Controller = () => {
     };
     const toggleIsOn = () => toggleIsOnSetter(i);
     const handleSliderChange = (e, v) =>
-      setPropertiesForChannel(i, { sliders: v });
+      setPropertiesForChannel(i, { windows: v });
     const handleRemoveChannel = () => {
       removeChannel(i);
       removeIsChannelLoading(i);
@@ -127,7 +127,7 @@ const Controller = () => {
           toggleIsOn={toggleIsOn}
           handleSliderChange={handleSliderChange}
           domain={domains[i]}
-          slider={sliders[i]}
+          slider={windows[i]}
           color={colors[i]}
           handleRemoveChannel={handleRemoveChannel}
           handleColorSelect={handleColorSelect}

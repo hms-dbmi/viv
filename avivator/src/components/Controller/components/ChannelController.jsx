@@ -58,7 +58,7 @@ function ChannelController({
   const { channelOptions, useLinkedView, use3d } = useViewerStore();
   const rgbColor = toRgb(colormap, color);
   const [min, max] = domain;
-  // If the min/max range is and the dtype is float, make the step size smaller so sliders are smoother.
+  // If the min/max range is and the dtype is float, make the step size smaller so windows are smoother.
   const step =
     max - min < 500 && loader[0]?.dtype === 'Float32' ? (max - min) / 500 : 1;
   const shouldShowPixelValue = !useLinkedView && !use3d;

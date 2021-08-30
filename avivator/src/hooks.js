@@ -86,7 +86,7 @@ export const useImage = (source, history) => {
             use3d
           });
           newDomains = stats.domains;
-          newSliders = stats.sliders;
+          newSliders = stats.windows;
           // If there is only one channel, use white.
           newColors =
             newDomains.length === 1
@@ -101,7 +101,7 @@ export const useImage = (source, history) => {
           ids: newDomains.map(() => String(Math.random())),
           selections: newSelections,
           domains: newDomains,
-          sliders: newSliders,
+          windows: newSliders,
           colors: newColors
         });
         setLoader(nextLoader);

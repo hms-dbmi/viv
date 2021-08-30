@@ -35,7 +35,7 @@ const props = {
     [0, 255, 0],
     [255, 0, 0],
   ],
-  sliders: [
+  windows: [
     [0, 255],
     [0, 255],
     [0, 255],
@@ -70,21 +70,21 @@ function App() {
       const raster = await source.getRaster({ selection });
       return getChannelStats(raster.data);
     }));
-    // These are calculated bounds for the sliders
+    // These are calculated bounds for the windows
     // that could be used for display purposes.
     // domains = stats.map(stat => stat.domain);
 
-    // These are precalculated settings for the sliders that
+    // These are precalculated settings for the windows that
     // should render a good, "in focus" image initially.
-    sliders = stats.map(stat => stat.autoSliders);
-    const newProps = { ...props, sliders };
+    windows = stats.map(stat => stat.autoSliders);
+    const newProps = { ...props, windows };
   }, [loader])
 
   if (!loader) return null;
   return (
     <PictureInPictureViewer
       loader={loader.data}
-      sliderValues={autoProps.sliders}
+      windows={autoProps.windows}
       colors={autoProps.colors}
       active={autoProps.active}
       selections={autoProps.selections}

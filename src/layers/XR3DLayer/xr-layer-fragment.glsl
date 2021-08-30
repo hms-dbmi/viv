@@ -18,7 +18,7 @@ uniform vec3 normals[NUM_PLANES];
 uniform float distances[NUM_PLANES];
 
 // range
-uniform vec2 sliderValues[6];
+uniform vec2 windows[6];
 
 // color
 uniform vec3 colors[6];
@@ -107,12 +107,12 @@ void main(void) {
 		float canShowZCoordinate = max(p.z - 0., 0.) * max(1. - p.z , 0.);
 		float canShowCoordinate = float(ceil(canShowXCoordinate * canShowYCoordinate * canShowZCoordinate));
 		canShow = canShowCoordinate * canShow;
-    float intensityValue0 = canShow * sample_and_apply_sliders(volume0, p, sliderValues[0]);
-    float intensityValue1 = canShow * sample_and_apply_sliders(volume1, p, sliderValues[1]);
-		float intensityValue2 = canShow * sample_and_apply_sliders(volume2, p, sliderValues[2]);
-		float intensityValue3 = canShow * sample_and_apply_sliders(volume3, p, sliderValues[3]);
-    float intensityValue4 = canShow * sample_and_apply_sliders(volume4, p, sliderValues[4]);
-		float intensityValue5 = canShow * sample_and_apply_sliders(volume5, p, sliderValues[5]);
+    float intensityValue0 = canShow * sample_and_apply_sliders(volume0, p, windows[0]);
+    float intensityValue1 = canShow * sample_and_apply_sliders(volume1, p, windows[1]);
+		float intensityValue2 = canShow * sample_and_apply_sliders(volume2, p, windows[2]);
+		float intensityValue3 = canShow * sample_and_apply_sliders(volume3, p, windows[3]);
+    float intensityValue4 = canShow * sample_and_apply_sliders(volume4, p, windows[4]);
+		float intensityValue5 = canShow * sample_and_apply_sliders(volume5, p, windows[5]);
 
 		_RENDER
 

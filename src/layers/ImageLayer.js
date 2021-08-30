@@ -9,7 +9,7 @@ import { isInterleaved, SIGNAL_ABORTED } from '../loaders/utils';
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-  sliderValues: { type: 'array', value: [], compare: true },
+  windows: { type: 'array', value: [], compare: true },
   active: { type: 'array', value: [], compare: true },
   colors: { type: 'array', value: [], compare: true },
   selections: { type: 'array', value: [], compare: true },
@@ -42,7 +42,7 @@ const defaultProps = {
 /**
  * @typedef LayerProps
  * @type {Object}
- * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
+ * @property {Array.<Array.<number>>} windows List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
  * @property {Object} loader PixelSource. Represents an N-dimensional image.

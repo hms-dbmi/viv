@@ -7,7 +7,7 @@ import { RENDERING_MODES } from '../constants';
 /**
  * This component provides a volumetric viewer that provides provides volume-ray-casting.
  * @param {Object} props
- * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
+ * @param {Array} props.windows List of [begin, end] values to control each channel's ramp function.
  * @param {Array} props.colors List of [r, g, b] values for each channel.
  * @param {Array} props.active List of boolean values for each channel for whether or not it is visible.
  * @param {string} [props.colormap] String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
@@ -32,7 +32,7 @@ import { RENDERING_MODES } from '../constants';
 const VolumeViewer = props => {
   const {
     loader,
-    sliderValues,
+    windows,
     colors,
     active,
     selections,
@@ -78,7 +78,7 @@ const VolumeViewer = props => {
   });
   const layerConfig = {
     loader,
-    sliderValues,
+    windows,
     colors,
     active,
     selections,

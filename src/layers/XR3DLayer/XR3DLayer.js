@@ -64,7 +64,7 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'object', value: {}, compare: true },
   colors: { type: 'array', value: [], compare: true },
-  sliderValues: { type: 'array', value: [], compare: true },
+  windows: { type: 'array', value: [], compare: true },
   dtype: { type: 'string', value: 'Uint8', compare: true },
   colormap: { type: 'string', value: '', compare: true },
   xSlice: { type: 'array', value: null, compare: true },
@@ -115,7 +115,7 @@ function removeExtraColormapFunctionsFromShader(colormap) {
 /**
  * @typedef LayerProps
  * @type {Object}
- * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
+ * @property {Array.<Array.<number>>} windows List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
@@ -234,7 +234,7 @@ const XR3DLayer = class extends Layer {
   draw({ uniforms }) {
     const { textures, model, scaleMatrix } = this.state;
     const {
-      sliderValues,
+      windows,
       colors,
       xSlice,
       ySlice,
@@ -253,7 +253,7 @@ const XR3DLayer = class extends Layer {
     } = this.context.viewport;
     if (textures && model && scaleMatrix) {
       const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
-        sliderValues,
+        windows,
         colors,
         active,
         domain,
@@ -278,7 +278,7 @@ const XR3DLayer = class extends Layer {
         .setUniforms({
           ...uniforms,
           ...textures,
-          sliderValues: paddedSliderValues,
+          windows: paddedSliderValues,
           colors: paddedColorValues,
           xSlice: new Float32Array(
             xSlice

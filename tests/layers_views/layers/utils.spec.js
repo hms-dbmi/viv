@@ -79,7 +79,7 @@ test('padColorsAndSliders test', t => {
 
   t.deepEqual(
     padColorsAndSliders({
-      sliderValues: [
+      windows: [
         [0, 5],
         [0, 5]
       ],
@@ -95,7 +95,7 @@ test('padColorsAndSliders test', t => {
   );
   t.deepEqual(
     padColorsAndSliders({
-      sliderValues: [
+      windows: [
         [0, 5],
         [0, 5]
       ],
@@ -111,7 +111,7 @@ test('padColorsAndSliders test', t => {
   );
   t.deepEqual(
     padColorsAndSliders({
-      sliderValues: [
+      windows: [
         [0, 5],
         [0, 5]
       ],
@@ -128,7 +128,7 @@ test('padColorsAndSliders test', t => {
   );
   t.deepEqual(
     padColorsAndSliders({
-      sliderValues: [
+      windows: [
         [0, 5],
         [0, 5]
       ],

@@ -36,7 +36,7 @@ const AddChannel = () => {
         onViewportLoad: () => {
           setPropertiesForChannel(numSelectionsBeforeAdd, {
             domains: domain,
-            sliders: slider,
+            windows: slider,
             active: true
           });
           setImageSetting({ onViewportLoad: () => {} });

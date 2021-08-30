@@ -17,7 +17,7 @@ test('ImageLayer', t => {
     Layer: ImageLayer,
     assert: t.ok,
     sampleProps: {
-      sliderValues: [
+      windows: [
         [0, 10],
         [0, 10]
       ],
@@ -64,7 +64,7 @@ test('ImageLayer', t => {
   const testCases = [
     {
       props: {
-        sliderValues: [
+        windows: [
           [0, 10],
           [0, 10]
         ],

@@ -21,7 +21,7 @@ test('getChannelStats: All zeros', t => {
     const thirdQuartiles = channelStats.map(stat => stat.q3);
     const firstQuartiles = channelStats.map(stat => stat.q1);
     const medians = channelStats.map(stat => stat.median);
-    const sliders = channelStats.map(stat => stat.autoSliders);
+    const windows = channelStats.map(stat => stat.autoSliders);
 
     t.deepEqual(means, [0, 0, 0]);
     t.deepEqual(domains, [
@@ -29,7 +29,7 @@ test('getChannelStats: All zeros', t => {
       [0, 0],
       [0, 0]
     ]);
-    t.deepEqual(sliders, [
+    t.deepEqual(windows, [
       [0, 0],
       [0, 0],
       [0, 0]
