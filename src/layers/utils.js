@@ -55,25 +55,15 @@ export function padColorsAndWindows({
     throw Error(`${lengths} channels passed in, but only 6 are allowed.`);
   }
 
-  const paddedColors = padWithDefault(
-    newColors,
-    DEFAULT_COLOR_OFF,
-    padSize
-  );
+  const paddedColors = padWithDefault(newColors, DEFAULT_COLOR_OFF, padSize);
   const paddedWindows = padWithDefault(
     newWindows,
     [maxSliderValue, maxSliderValue],
     padSize
   );
   const paddedColorsAndWindows = {
-    paddedWindows: paddedWindows.reduce(
-      (acc, val) => acc.concat(val),
-      []
-    ), // flatten for use on shaders
-    paddedColors: paddedColors.reduce(
-      (acc, val) => acc.concat(val),
-      []
-    )
+    paddedWindows: paddedWindows.reduce((acc, val) => acc.concat(val), []), // flatten for use on shaders
+    paddedColors: paddedColors.reduce((acc, val) => acc.concat(val), [])
   };
 
   return paddedColorsAndWindows;
