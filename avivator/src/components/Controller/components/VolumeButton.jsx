@@ -40,19 +40,30 @@ const getStatsForResolution = (loader, resolution) => {
   const height = shape[labels.indexOf('y')];
   const width = shape[labels.indexOf('x')];
   const depth = shape[labels.indexOf('z')];
-  const depthDownsampled = Math.floor(depth / 2 ** resolution);
+  // eslint-disable-next-line no-bitwise
+  const depthDownsampled = Math.max(1, depth >> resolution);
   // Check memory allocation limits for Float32Array (used in XR3DLayer for rendering)
   const totalBytes = 4 * height * width * depthDownsampled;
   return { height, width, depthDownsampled, totalBytes };
 };
 
 const canLoadResolution = (loader, resolution) => {
-  const { totalBytes } = getStatsForResolution(loader, resolution);
+  const { totalBytes, height, width, depthDownsampled } = getStatsForResolution(
+    loader,
+    resolution
+  );
   const maxHeapSize =
     window.performance?.memory &&
     window.performance?.memory?.jsHeapSizeLimit / 2;
   const maxSize = maxHeapSize || 2 ** 31 - 1;
-  return totalBytes < maxSize;
+  // 2048 is a normal texture size limit although some browsers go larger.
+  return (
+    totalBytes < maxSize &&
+    height < 2048 &&
+    depthDownsampled < 2048 &&
+    width < 2048 &&
+    depthDownsampled > 1
+  );
 };
 
 const useStyles = makeStyles(() => ({
@@ -91,13 +102,21 @@ function VolumeButton() {
   const anchorRef = useRef(null);
   const classes = useStyles();
   const { shape, labels } = Array.isArray(loader) ? loader[0] : loader;
+  // Only show volume button if we can actually view resolutions.
+  const hasViewableResolutions = Array.from({
+    length: loader.length
+  }).filter((_, resolution) => canLoadResolution(loader, resolution)).length;
   return (
     <>
       <Button
         variant="outlined"
         size="small"
         ref={anchorRef}
-        disabled={!(shape[labels.indexOf('z')] > 1) || isViewerLoading}
+        disabled={
+          !(shape[labels.indexOf('z')] > 1) ||
+          isViewerLoading ||
+          !hasViewableResolutions
+        }
         onClick={() => {
           toggle();
           // eslint-disable-next-line no-unused-expressions
