@@ -224,7 +224,7 @@ export async function getSingleSelectionStats3D({ loader, selection }) {
     selection: { ...selection, z: Math.floor(sizeZ / 2) }
   });
   const rasterTop = await lowResSource.getRaster({
-    selection: { ...selection, z: sizeZ - 1 }
+    selection: { ...selection, z: Math.max(0, sizeZ - 1) }
   });
   const stats0 = getChannelStats(raster0.data);
   const statsMid = getChannelStats(rasterMid.data);

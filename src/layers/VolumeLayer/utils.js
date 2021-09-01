@@ -29,7 +29,7 @@ export async function getVolume({
   const { shape, labels, dtype } = source;
   const { height, width } = getImageSize(source);
   const depth = shape[labels.indexOf('z')];
-  const depthDownsampled = Math.floor(depth / downsampleDepth);
+  const depthDownsampled = Math.max(1, Math.floor(depth / downsampleDepth));
   const rasterSize = height * width;
   const name = `${dtype}Array`;
   const TypedArray = globalThis[name];
