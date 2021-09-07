@@ -15,6 +15,7 @@
 - Better checking for viewable volumes at certain resolutions.
 - Don't do RGB-HSV conversion on shaders.  Instead, scale RGB linearly.
 - Consistent shader floats `n.0` -> `n.`
+- Pin deck.gl to minor versions
 
 ## 0.10.5
 
