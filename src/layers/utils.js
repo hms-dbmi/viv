@@ -62,7 +62,10 @@ export function padColorsAndWindows({
     padSize
   );
   const paddedColorsAndWindows = {
-    paddedContrastLimits: paddedContrastLimits.reduce((acc, val) => acc.concat(val), []), // flatten for use on shaders
+    paddedContrastLimits: paddedContrastLimits.reduce(
+      (acc, val) => acc.concat(val),
+      []
+    ), // flatten for use on shaders
     paddedColors: paddedColors.reduce((acc, val) => acc.concat(val), [])
   };
 
