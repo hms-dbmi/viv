@@ -32,7 +32,10 @@ export async function loadOmeTiff(
 
   // Create tiff source
   if (typeof source === 'string') {
-    tiff = await fromUrl(source, headers);
+    // https://github.com/ilan-gold/geotiff.js/tree/viv#abortcontroller-support
+    // https://www.npmjs.com/package/lru-cache#options
+    // Cache size needs to be infinite due to consistency issues.
+    tiff = await fromUrl(source, { ...headers, cacheSize: Infinity });
   } else {
     tiff = await fromBlob(source);
   }
