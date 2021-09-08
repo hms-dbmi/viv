@@ -18,7 +18,7 @@ uniform vec3 normals[NUM_PLANES];
 uniform float distances[NUM_PLANES];
 
 // range
-uniform vec2 windows[6];
+uniform vec2 contrastLimits[6];
 
 // color
 uniform vec3 colors[6];
@@ -107,12 +107,12 @@ void main(void) {
 		float canShowZCoordinate = max(p.z - 0., 0.) * max(1. - p.z , 0.);
 		float canShowCoordinate = float(ceil(canShowXCoordinate * canShowYCoordinate * canShowZCoordinate));
 		canShow = canShowCoordinate * canShow;
-    float intensityValue0 = canShow * sample_and_apply_windows(volume0, p, windows[0]);
-    float intensityValue1 = canShow * sample_and_apply_windows(volume1, p, windows[1]);
-		float intensityValue2 = canShow * sample_and_apply_windows(volume2, p, windows[2]);
-		float intensityValue3 = canShow * sample_and_apply_windows(volume3, p, windows[3]);
-    float intensityValue4 = canShow * sample_and_apply_windows(volume4, p, windows[4]);
-		float intensityValue5 = canShow * sample_and_apply_windows(volume5, p, windows[5]);
+    float intensityValue0 = canShow * sample_and_apply_contrast_limits(volume0, p, contrastLimits[0]);
+    float intensityValue1 = canShow * sample_and_apply_contrast_limits(volume1, p, contrastLimits[1]);
+		float intensityValue2 = canShow * sample_and_apply_contrast_limits(volume2, p, contrastLimits[2]);
+		float intensityValue3 = canShow * sample_and_apply_contrast_limits(volume3, p, contrastLimits[3]);
+    float intensityValue4 = canShow * sample_and_apply_contrast_limits(volume4, p, contrastLimits[4]);
+		float intensityValue5 = canShow * sample_and_apply_contrast_limits(volume5, p, contrastLimits[5]);
 
 		_RENDER
 

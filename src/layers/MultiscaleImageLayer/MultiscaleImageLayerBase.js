@@ -5,7 +5,7 @@ import { renderSubLayers } from './utils';
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-  windows: { type: 'array', value: [], compare: true },
+  contrastLimits: { type: 'array', value: [], compare: true },
   colors: { type: 'array', value: [], compare: true },
   active: { type: 'array', value: [], compare: true },
   renderSubLayers: { type: 'function', value: renderSubLayers, compare: false },

@@ -14,7 +14,7 @@ import {
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   onHover: { type: 'function', value: null, compare: false },
-  windows: { type: 'array', value: [], compare: true },
+  contrastLimits: { type: 'array', value: [], compare: true },
   colors: { type: 'array', value: [], compare: true },
   active: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
@@ -36,7 +36,7 @@ const defaultProps = {
 /**
  * @typedef LayerProps
  * @type {object}
- * @property {Array.<Array.<number>>} windows List of [begin, end] values to control each channel's ramp function.
+ * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader Image pyramid. PixelSource[], where each PixelSource is decreasing in shape.

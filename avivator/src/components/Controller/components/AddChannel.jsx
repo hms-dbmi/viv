@@ -31,12 +31,12 @@ const AddChannel = () => {
       loader,
       selection,
       use3d
-    }).then(({ domain, slider }) => {
+    }).then(({ domain, contrastLimits }) => {
       setImageSetting({
         onViewportLoad: () => {
           setPropertiesForChannel(numSelectionsBeforeAdd, {
             domains: domain,
-            windows: slider,
+            contrastLimits,
             active: true
           });
           setImageSetting({ onViewportLoad: () => {} });

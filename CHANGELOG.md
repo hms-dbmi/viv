@@ -16,7 +16,7 @@
 - Don't do RGB-HSV conversion on shaders.  Instead, scale RGB linearly.
 - Consistent shader floats `n.0` -> `n.`
 - Change API for all public props
-  - `sliderValues` -> `windows`
+  - `sliderValues` -> `contrastLimits`
   - `colorValues` -> `colors`
   - `channelIsOn` -> `active`
   - `loaderSelection` -> `selections`

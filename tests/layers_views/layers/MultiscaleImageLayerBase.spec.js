@@ -28,7 +28,7 @@ test('MultiscaleImageLayerBase', async t => {
     Layer: MultiscaleImageLayerBase,
     assert: t.ok,
     sampleProps: {
-      windows: [[0, 10]],
+      contrastLimits: [[0, 10]],
       colors: [[0, 1, 1]],
       active: [true],
       tileSize: 2,

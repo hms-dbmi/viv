@@ -25,7 +25,7 @@ const generateToggles = (defaults, set) => {
 
 const DEFAUlT_CHANNEL_STATE = {
   active: [],
-  windows: [],
+  contrastLimits: [],
   colors: [],
   domains: [],
   selections: [],
@@ -35,7 +35,7 @@ const DEFAUlT_CHANNEL_STATE = {
 
 const DEFAUlT_CHANNEL_VALUES = {
   active: true,
-  windows: [0, 65535],
+  contrastLimits: [0, 65535],
   colors: [255, 255, 255],
   domains: [0, 65535],
   selections: { z: 0, c: 0, t: 0 },

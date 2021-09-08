@@ -126,11 +126,11 @@ function VolumeButton() {
               isChannelLoading: Array(selections.length).fill(true)
             });
             getMultiSelectionStats({ loader, selections, use3d: !use3d }).then(
-              ({ domains, windows }) => {
+              ({ domains, contrastLimits }) => {
                 range(selections.length).forEach((channel, j) =>
                   setPropertiesForChannel(channel, {
                     domains: domains[j],
-                    windows: windows[j]
+                    contrastLimits: contrastLimits[j]
                   })
                 );
                 setViewerState({
@@ -188,14 +188,14 @@ function VolumeButton() {
                               loader,
                               selections,
                               use3d: true
-                            }).then(({ domains, windows }) => {
+                            }).then(({ domains, contrastLimits }) => {
                               setImageSetting({
                                 onViewportLoad: () => {
                                   range(selections.length).forEach(
                                     (channel, j) =>
                                       setPropertiesForChannel(channel, {
                                         domains: domains[j],
-                                        windows: windows[j]
+                                        contrastLimits: contrastLimits[j]
                                       })
                                   );
                                   setImageSetting({ onViewportLoad: () => {} });

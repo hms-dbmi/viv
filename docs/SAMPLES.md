@@ -35,7 +35,7 @@ const props = {
     [0, 255, 0],
     [255, 0, 0],
   ],
-  windows: [
+  contrastLimits: [
     [0, 255],
     [0, 255],
     [0, 255],
@@ -70,21 +70,21 @@ function App() {
       const raster = await source.getRaster({ selection });
       return getChannelStats(raster.data);
     }));
-    // These are calculated bounds for the windows
+    // These are calculated bounds for the contrastLimits
     // that could be used for display purposes.
     // domains = stats.map(stat => stat.domain);
 
-    // These are precalculated settings for the windows that
+    // These are precalculated settings for the contrastLimits that
     // should render a good, "in focus" image initially.
-    windows = stats.map(stat => stat.autoWindows);
-    const newProps = { ...props, windows };
+    contrastLimits = stats.map(stat => stat.contrastLimits);
+    const newProps = { ...props, contrastLimits };
   }, [loader])
 
   if (!loader) return null;
   return (
     <PictureInPictureViewer
       loader={loader.data}
-      windows={autoProps.windows}
+      contrastLimits={autoProps.contrastLimits}
       colors={autoProps.colors}
       active={autoProps.active}
       selections={autoProps.selections}

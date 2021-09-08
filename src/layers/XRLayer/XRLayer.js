@@ -68,7 +68,7 @@ const defaultProps = {
   channelData: { type: 'object', value: {}, compare: true },
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
   colors: { type: 'array', value: [], compare: true },
-  windows: { type: 'array', value: [], compare: true },
+  contrastLimits: { type: 'array', value: [], compare: true },
   active: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: 'Uint16', compare: true },
@@ -89,7 +89,7 @@ const defaultProps = {
 /**
  * @typedef LayerProps
  * @type {object}
- * @property {Array.<Array.<number>>} windows List of [begin, end] values to control each channel's ramp function.
+ * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
@@ -276,7 +276,7 @@ const XRLayer = class extends Layer {
     const { textures, model } = this.state;
     if (textures && model) {
       const {
-        windows,
+        contrastLimits,
         colors,
         opacity,
         domain,
@@ -294,8 +294,8 @@ const XRLayer = class extends Layer {
       const numTextures = Object.values(textures).filter(t => t).length;
       // Slider values and color values can come in before textures since their data is async.
       // Thus we pad based on the number of textures bound.
-      const { paddedWindows, paddedColors } = padColorsAndWindows({
-        windows: windows.slice(0, numTextures),
+      const { paddedContrastLimits, paddedColors } = padColorsAndWindows({
+        contrastLimits: contrastLimits.slice(0, numTextures),
         colors: colors.slice(0, numTextures),
         active: active.slice(0, numTextures),
         domain,
@@ -319,7 +319,7 @@ const XRLayer = class extends Layer {
         .setUniforms({
           ...uniforms,
           colors: paddedColors,
-          windows: paddedWindows,
+          contrastLimits: paddedContrastLimits,
           opacity,
           majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
           minorLensAxis: (bottomMouseBoundScaled - topMouseBoundScaled) / 2,

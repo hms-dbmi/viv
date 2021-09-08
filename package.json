@@ -10,7 +10,7 @@
   ],
   "description": "High bit depth, high resolution, many channels, low overhead",
   "scripts": {
-    "start": "vite",
+    "start": "vite --force",
     "build": "vite build --mode lib && tsc --emitDeclarationOnly",
     "build:avivator": "vite build",
     "preview": "vite preview",

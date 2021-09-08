@@ -17,7 +17,7 @@ test('ImageLayer', t => {
     Layer: ImageLayer,
     assert: t.ok,
     sampleProps: {
-      windows: [
+      contrastLimits: [
         [0, 10],
         [0, 10]
       ],
@@ -64,7 +64,7 @@ test('ImageLayer', t => {
   const testCases = [
     {
       props: {
-        windows: [
+        contrastLimits: [
           [0, 10],
           [0, 10]
         ],

@@ -17,7 +17,7 @@ test('VolumeLayer', t => {
     Layer: VolumeLayer,
     assert: t.ok,
     sampleProps: {
-      windows: [
+      contrastLimits: [
         [0, 10],
         [0, 10]
       ],
@@ -78,7 +78,7 @@ test('VolumeLayer', t => {
   const testCases = [
     {
       props: {
-        windows: [
+        contrastLimits: [
           [0, 10],
           [0, 10]
         ],

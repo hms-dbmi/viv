@@ -10,7 +10,7 @@ import { getVolume, getTextLayer } from './utils';
 const defaultProps = {
   pickable: false,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-  windows: { type: 'array', value: [], compare: true },
+  contrastLimits: { type: 'array', value: [], compare: true },
   active: { type: 'array', value: [], compare: true },
   colors: { type: 'array', value: [], compare: true },
   colormap: { type: 'string', value: '', compare: true },
@@ -46,7 +46,7 @@ const defaultProps = {
 /**
  * @typedef LayerProps
  * @type {Object}
- * @property {Array.<Array.<number>>} windows List of [begin, end] values to control each channel's ramp function.
+ * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader PixelSource[]. Represents an N-dimensional image.

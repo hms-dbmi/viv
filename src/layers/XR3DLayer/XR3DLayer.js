@@ -64,7 +64,7 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'object', value: {}, compare: true },
   colors: { type: 'array', value: [], compare: true },
-  windows: { type: 'array', value: [], compare: true },
+  contrastLimits: { type: 'array', value: [], compare: true },
   dtype: { type: 'string', value: 'Uint8', compare: true },
   colormap: { type: 'string', value: '', compare: true },
   xSlice: { type: 'array', value: null, compare: true },
@@ -115,7 +115,7 @@ function removeExtraColormapFunctionsFromShader(colormap) {
 /**
  * @typedef LayerProps
  * @type {Object}
- * @property {Array.<Array.<number>>} windows List of [begin, end] values to control each channel's ramp function.
+ * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
@@ -234,7 +234,7 @@ const XR3DLayer = class extends Layer {
   draw({ uniforms }) {
     const { textures, model, scaleMatrix } = this.state;
     const {
-      windows,
+      contrastLimits,
       colors,
       xSlice,
       ySlice,
@@ -252,8 +252,8 @@ const XR3DLayer = class extends Layer {
       projectionMatrix
     } = this.context.viewport;
     if (textures && model && scaleMatrix) {
-      const { paddedWindows, paddedColors } = padColorsAndWindows({
-        windows,
+      const { paddedContrastLimits, paddedColors } = padColorsAndWindows({
+        contrastLimits,
         colors,
         active,
         domain,
@@ -278,7 +278,7 @@ const XR3DLayer = class extends Layer {
         .setUniforms({
           ...uniforms,
           ...textures,
-          windows: paddedWindows,
+          contrastLimits: paddedContrastLimits,
           colors: paddedColors,
           xSlice: new Float32Array(
             xSlice

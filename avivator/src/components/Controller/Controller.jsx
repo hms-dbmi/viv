@@ -48,7 +48,7 @@ function TabPanel(props) {
 const Controller = () => {
   const {
     active,
-    windows,
+    contrastLimits,
     colors,
     domains,
     selections,
@@ -91,10 +91,10 @@ const Controller = () => {
         loader,
         selection,
         use3d
-      }).then(({ domain, slider }) => {
+      }).then(({ domain, contrastLimits: newContrastLimit }) => {
         setImageSetting({
           onViewportLoad: () => {
-            setPropertiesForChannel(i, { windows: slider, domains: domain });
+            setPropertiesForChannel(i, { contrastLimits: newContrastLimit, domains: domain });
             setImageSetting({ onViewportLoad: () => {} });
             setIsChannelLoading(i, false);
           }
@@ -104,7 +104,7 @@ const Controller = () => {
     };
     const toggleIsOn = () => toggleIsOnSetter(i);
     const handleSliderChange = (e, v) =>
-      setPropertiesForChannel(i, { windows: v });
+      setPropertiesForChannel(i, { contrastLimits: v });
     const handleRemoveChannel = () => {
       removeChannel(i);
       removeIsChannelLoading(i);
@@ -127,7 +127,7 @@ const Controller = () => {
           toggleIsOn={toggleIsOn}
           handleSliderChange={handleSliderChange}
           domain={domains[i]}
-          slider={windows[i]}
+          slider={contrastLimits[i]}
           color={colors[i]}
           handleRemoveChannel={handleRemoveChannel}
           handleColorSelect={handleColorSelect}

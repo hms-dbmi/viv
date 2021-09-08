@@ -22,11 +22,11 @@ test('padWithDefault test', t => {
 
 test('padColorsAndWindows test', t => {
   const expectedNoDomain = {
-    paddedWindows: [0, 5, 0, 5, 255, 255, 255, 255, 255, 255, 255, 255],
+    paddedContrastLimits: [0, 5, 0, 5, 255, 255, 255, 255, 255, 255, 255, 255],
     paddedColors: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   };
   const expectedChannelOff = {
-    paddedWindows: [
+    paddedContrastLimits: [
       0,
       5,
       255,
@@ -43,7 +43,7 @@ test('padColorsAndWindows test', t => {
     paddedColors: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   };
   const expectedDomain = {
-    paddedWindows: [
+    paddedContrastLimits: [
       0,
       5,
       0,
@@ -60,7 +60,7 @@ test('padColorsAndWindows test', t => {
     paddedColors: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   };
   const expected16Bit = {
-    paddedWindows: [
+    paddedContrastLimits: [
       0,
       5,
       0,
@@ -79,7 +79,7 @@ test('padColorsAndWindows test', t => {
 
   t.deepEqual(
     padColorsAndWindows({
-      windows: [
+      contrastLimits: [
         [0, 5],
         [0, 5]
       ],
@@ -95,7 +95,7 @@ test('padColorsAndWindows test', t => {
   );
   t.deepEqual(
     padColorsAndWindows({
-      windows: [
+      contrastLimits: [
         [0, 5],
         [0, 5]
       ],
@@ -111,7 +111,7 @@ test('padColorsAndWindows test', t => {
   );
   t.deepEqual(
     padColorsAndWindows({
-      windows: [
+      contrastLimits: [
         [0, 5],
         [0, 5]
       ],
@@ -128,7 +128,7 @@ test('padColorsAndWindows test', t => {
   );
   t.deepEqual(
     padColorsAndWindows({
-      windows: [
+      contrastLimits: [
         [0, 5],
         [0, 5]
       ],
