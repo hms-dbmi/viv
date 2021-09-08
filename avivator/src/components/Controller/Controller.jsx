@@ -94,7 +94,10 @@ const Controller = () => {
       }).then(({ domain, contrastLimits: newContrastLimit }) => {
         setImageSetting({
           onViewportLoad: () => {
-            setPropertiesForChannel(i, { contrastLimits: newContrastLimit, domains: domain });
+            setPropertiesForChannel(i, {
+              contrastLimits: newContrastLimit,
+              domains: domain
+            });
             setImageSetting({ onViewportLoad: () => {} });
             setIsChannelLoading(i, false);
           }
