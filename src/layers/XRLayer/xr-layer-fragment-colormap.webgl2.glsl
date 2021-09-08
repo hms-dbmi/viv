@@ -36,9 +36,9 @@ void main() {
   float intensityValue5 = sample_and_apply_sliders(channel5, vTexCoord, sliderValues[5]);
 
   float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
-  float intensityCombo = 0.0;
+  float intensityCombo = 0.;
   for(int i = 0; i < 6; i++) {
-    intensityCombo += max(0.0,intensityArray[i]);
+    intensityCombo += max(0.,intensityArray[i]);
   }
   color = colormap(intensityCombo, opacity, useTransparentColor);
   geometry.uv = vTexCoord;

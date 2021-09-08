@@ -84,6 +84,8 @@ Please install the [Prettier plug-in](https://prettier.io/docs/en/editors.html) 
 To run unit and integration tests locally, use `npm test`. For full prodcution test (including linting and formatting checks),
 use `npm run test:prod`.
 
+To our knowledge, Viv can be developed with Node version greater than 10.  To be certain of having a version that will work, you can check what is running on our CI by going to our [Github Workflow](https://github.com/hms-dbmi/viv/blob/master/.github/workflows/test.yml#L31).
+
 ## Build
 
 - `@hms-dbmi/viv` library: `npm run build`
