@@ -12,9 +12,10 @@
 - Update README to note Node version restrictions.
 - Maintain the value of the channel color in HSV when applying intensity (3D + 2D)
 - Fix documentation for React Components.
+- Fix documentation for TypeScript exports.
 - Fix channel stats for thin 3D volumes in Avivator.
 - Better checking for viewable volumes at certain resolutions.
-- Don't do RGB-HSV conversion on shaders.  Instead, scale RGB linearly.
+- Don't do RGB-HSV conversion on shaders. Instead, scale RGB linearly.
 - Consistent shader floats `n.0` -> `n.`
 - Pin deck.gl to minor versions
 
