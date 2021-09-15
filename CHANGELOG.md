@@ -6,6 +6,12 @@
 
 ### Changed
 
+## 0.10.6
+
+### Added
+
+### Changed
+
 - Upgrade deck.gl to 8.5
 - Update fork of geotiff.js
 - Fix changelog check in `bash`.
