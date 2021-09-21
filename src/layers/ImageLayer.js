@@ -73,7 +73,7 @@ const defaultProps = {
  */
 const ImageLayer = class extends CompositeLayer {
   initializeState() {
-    const internalState = this.internalState;
+    const { internalState } = this;
     const handler = () => onPointer(internalState.layer);
     this.state = {
       onPointer: handler,
