@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Do not retain layer in pointer-event handler
+
 ## 0.10.6
 
 ### Added

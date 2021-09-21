@@ -70,16 +70,30 @@ const defaultProps = {
  */
 const MultiscaleImageLayer = class extends CompositeLayer {
   initializeState() {
+    const internalState = this.internalState;
+    const handler = () => onPointer(internalState.layer);
     this.state = {
+      onPointer: handler,
       unprojectLensBounds: [0, 0, 0, 0]
     };
     if (this.context.deck) {
       this.context.deck.eventManager.on({
-        pointermove: () => onPointer(this),
-        pointerleave: () => onPointer(this),
-        wheel: () => onPointer(this)
+        pointermove: handler,
+        pointerleave: handler,
+        wheel: handler
       });
     }
+  }
+
+  finalizeState() {
+    if (this.context.deck) {
+      this.context.deck.eventManager.off({
+        pointermove: this.state.onPointer,
+        pointerleave: this.state.onPointer,
+        wheel: this.state.onPointer
+      });
+    }
+    super.finalizeState();
   }
 
   renderLayers() {
