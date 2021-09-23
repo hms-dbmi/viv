@@ -180,7 +180,8 @@ const XRLayer = class extends Layer {
    * This function updates state by retriggering model creation (shader compilation and attribute binding)
    * and loading any textures that need be loading.
    */
-  updateState({ props, oldProps, changeFlags }) {
+  updateState({ props, oldProps, changeFlags, ...rest }) {
+    super.updateState({ props, oldProps, changeFlags, ...rest });
     // setup model first
     if (
       changeFlags.extensionsChanged ||
