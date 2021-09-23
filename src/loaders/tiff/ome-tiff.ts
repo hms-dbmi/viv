@@ -2,10 +2,7 @@ import type { GeoTIFF } from 'geotiff';
 import { fromString } from '../omexml';
 
 import TiffPixelSource from './pixel-source';
-import {
-  getOmeLegacyIndexer,
-  getOmeSubIFDIndexer,
-} from './lib/indexers';
+import { getOmeLegacyIndexer, getOmeSubIFDIndexer } from './lib/indexers';
 import { getOmePixelSourceMeta, guessTileSize } from './lib/utils';
 import type Pool from './lib/Pool';
 import type { OmeTiffIndexer } from './lib/indexers';
