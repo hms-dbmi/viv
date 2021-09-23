@@ -31,13 +31,13 @@ const AddChannel = () => {
       loader,
       selection,
       use3d
-    }).then(({ domain, slider }) => {
+    }).then(({ domain, contrastLimits }) => {
       setImageSetting({
         onViewportLoad: () => {
           setPropertiesForChannel(numSelectionsBeforeAdd, {
             domains: domain,
-            sliders: slider,
-            isOn: true
+            contrastLimits,
+            channelsVisible: true
           });
           setImageSetting({ onViewportLoad: () => {} });
           setIsChannelLoading(numSelectionsBeforeAdd, false);
@@ -47,7 +47,7 @@ const AddChannel = () => {
       addChannel({
         selections: selection,
         ids: String(Math.random()),
-        isOn: false
+        channelsVisible: false
       });
     });
   };

@@ -208,8 +208,8 @@ export async function getSingleSelectionStats2D({ loader, selection }) {
   const data = Array.isArray(loader) ? loader[loader.length - 1] : loader;
   const raster = await data.getRaster({ selection });
   const selectionStats = getChannelStats(raster.data);
-  const { domain, autoSliders: slider } = selectionStats;
-  return { domain, slider };
+  const { domain, contrastLimits } = selectionStats;
+  return { domain, contrastLimits };
 }
 
 export async function getSingleSelectionStats3D({ loader, selection }) {
@@ -234,16 +234,16 @@ export async function getSingleSelectionStats3D({ loader, selection }) {
       Math.min(stats0.domain[0], statsMid.domain[0], statsTop.domain[0]),
       Math.max(stats0.domain[1], statsMid.domain[1], statsTop.domain[1])
     ],
-    slider: [
+    contrastLimits: [
       Math.min(
-        stats0.autoSliders[0],
-        statsMid.autoSliders[0],
-        statsTop.autoSliders[0]
+        stats0.contrastLimits[0],
+        statsMid.contrastLimits[0],
+        statsTop.contrastLimits[0]
       ),
       Math.max(
-        stats0.autoSliders[1],
-        statsMid.autoSliders[1],
-        statsTop.autoSliders[1]
+        stats0.contrastLimits[1],
+        statsMid.contrastLimits[1],
+        statsTop.contrastLimits[1]
       )
     ]
   };
@@ -263,8 +263,8 @@ export const getMultiSelectionStats = async ({ loader, selections, use3d }) => {
     )
   );
   const domains = stats.map(stat => stat.domain);
-  const sliders = stats.map(stat => stat.slider);
-  return { domains, sliders };
+  const contrastLimits = stats.map(stat => stat.contrastLimits);
+  return { domains, contrastLimits };
 };
 
 /* eslint-disable no-useless-escape */

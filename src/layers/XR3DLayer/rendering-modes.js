@@ -18,7 +18,7 @@ export const RENDERING_MODES_BLEND = {
     _AFTER_RENDER: `\
       vec3 rgbCombo = vec3(0.0);
       for(int i = 0; i < 6; i++) {
-        rgbCombo += max(0.0, min(1.0, maxVals[i])) * vec3(colorValues[i]);
+        rgbCombo += max(0.0, min(1.0, maxVals[i])) * vec3(colors[i]);
       }
       color = vec4(rgbCombo, 1.0);
     `
@@ -40,7 +40,7 @@ export const RENDERING_MODES_BLEND = {
     _AFTER_RENDER: `\
       vec3 rgbCombo = vec3(0.0);
       for(int i = 0; i < 6; i++) {
-        rgbCombo += max(0.0, min(1.0, minVals[i])) * vec3(colorValues[i]);
+        rgbCombo += max(0.0, min(1.0, minVals[i])) * vec3(colors[i]);
       }
       color = vec4(rgbCombo, 1.0);
     `
@@ -54,7 +54,7 @@ export const RENDERING_MODES_BLEND = {
       float total = 0.0;
       for(int i = 0; i < 6; i++) {
         float intensityValue = intensityArray[i];
-        rgbCombo += max(0.0, min(1.0, intensityValue)) * colorValues[i];
+        rgbCombo += max(0.0, min(1.0, intensityValue)) * colors[i];
         total += intensityValue;
       }
       // Do not go past 1 in opacity.

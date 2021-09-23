@@ -33,7 +33,7 @@ import { Plane } from '@math.gl/culling';
 import vs from './xr-layer-vertex.glsl';
 import fs from './xr-layer-fragment.glsl';
 import channels from './channel-intensity-module';
-import { padColorsAndSliders, padWithDefault, getDtypeValues } from '../utils';
+import { padColorsAndWindows, padWithDefault, getDtypeValues } from '../utils';
 import { COLORMAPS, RENDERING_MODES as RENDERING_NAMES } from '../../constants';
 import {
   RENDERING_MODES_BLEND,
@@ -63,8 +63,8 @@ const defaultProps = {
   pickable: false,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'object', value: {}, compare: true },
-  colorValues: { type: 'array', value: [], compare: true },
-  sliderValues: { type: 'array', value: [], compare: true },
+  colors: { type: 'array', value: [], compare: true },
+  contrastLimits: { type: 'array', value: [], compare: true },
   dtype: { type: 'string', value: 'Uint8', compare: true },
   colormap: { type: 'string', value: '', compare: true },
   xSlice: { type: 'array', value: null, compare: true },
@@ -115,9 +115,9 @@ function removeExtraColormapFunctionsFromShader(colormap) {
 /**
  * @typedef LayerProps
  * @type {Object}
- * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
- * @property {Array.<boolean>} channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
+ * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
+ * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
@@ -234,13 +234,13 @@ const XR3DLayer = class extends Layer {
   draw({ uniforms }) {
     const { textures, model, scaleMatrix } = this.state;
     const {
-      sliderValues,
-      colorValues,
+      contrastLimits,
+      colors,
       xSlice,
       ySlice,
       zSlice,
       modelMatrix,
-      channelIsOn,
+      channelsVisible,
       domain,
       dtype,
       clippingPlanes,
@@ -252,10 +252,10 @@ const XR3DLayer = class extends Layer {
       projectionMatrix
     } = this.context.viewport;
     if (textures && model && scaleMatrix) {
-      const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
-        sliderValues,
-        colorValues,
-        channelIsOn,
+      const { paddedContrastLimits, paddedColors } = padColorsAndWindows({
+        contrastLimits,
+        colors,
+        channelsVisible,
         domain,
         dtype
       });
@@ -278,8 +278,8 @@ const XR3DLayer = class extends Layer {
         .setUniforms({
           ...uniforms,
           ...textures,
-          sliderValues: paddedSliderValues,
-          colorValues: paddedColorValues,
+          contrastLimits: paddedContrastLimits,
+          colors: paddedColors,
           xSlice: new Float32Array(
             xSlice
               ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])

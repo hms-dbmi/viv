@@ -7,12 +7,12 @@ import { RENDERING_MODES } from '../constants';
 /**
  * This component provides a volumetric viewer that provides provides volume-ray-casting.
  * @param {Object} props
- * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
- * @param {Array} props.colorValues List of [r, g, b] values for each channel.
- * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @param {Array} props.contrastLimits List of [begin, end] values to control each channel's ramp function.
+ * @param {Array} props.colors List of [r, g, b] values for each channel.
+ * @param {Array} props.channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @param {string} [props.colormap] String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.loader This data source for the viewer. PixelSource[]. If loader.length > 1, data is assumed to be multiscale.
- * @param {Array} props.loaderSelection Selection to be used for fetching data
+ * @param {Array} props.selections Selection to be used for fetching data
  * @param {Array} [props.resolution] Resolution at which you would like to see the volume and load it into memory (0 highest, loader.length - 1 the lowest with default loader.length - 1)
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * @param {Array} [props.renderingMode] One of Maximum Intensity Projection, Minimum Intensity Projection, or Additive
@@ -32,10 +32,10 @@ import { RENDERING_MODES } from '../constants';
 const VolumeViewer = props => {
   const {
     loader,
-    sliderValues,
-    colorValues,
-    channelIsOn,
-    loaderSelection,
+    contrastLimits,
+    colors,
+    channelsVisible,
+    selections,
     colormap,
     resolution = Math.max(0, loader.length - 1),
     modelMatrix,
@@ -78,10 +78,10 @@ const VolumeViewer = props => {
   });
   const layerConfig = {
     loader,
-    sliderValues,
-    colorValues,
-    channelIsOn,
-    loaderSelection,
+    contrastLimits,
+    colors,
+    channelsVisible,
+    selections,
     colormap,
     xSlice,
     ySlice,

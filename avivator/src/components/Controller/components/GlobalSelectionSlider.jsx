@@ -29,13 +29,13 @@ export default function GlobalSelectionSlider(props) {
         loader,
         selections: newSelections,
         use3d: false
-      }).then(({ domains, sliders }) => {
+      }).then(({ domains, contrastLimits }) => {
         setImageSetting({
           onViewportLoad: () => {
             range(newSelections.length).forEach((channel, j) =>
               setPropertiesForChannel(channel, {
                 domains: domains[j],
-                sliders: sliders[j]
+                contrastLimits: contrastLimits[j]
               })
             );
             setImageSetting({ onViewportLoad: () => {} });

@@ -5,9 +5,9 @@ import { renderSubLayers } from './utils';
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-  sliderValues: { type: 'array', value: [], compare: true },
-  colorValues: { type: 'array', value: [], compare: true },
-  channelIsOn: { type: 'array', value: [], compare: true },
+  contrastLimits: { type: 'array', value: [], compare: true },
+  colors: { type: 'array', value: [], compare: true },
+  channelsVisible: { type: 'array', value: [], compare: true },
   renderSubLayers: { type: 'function', value: renderSubLayers, compare: false },
   colormap: { type: 'string', value: '', compare: true },
   dtype: { type: 'string', value: 'Uint16', compare: true },

@@ -7,11 +7,11 @@ import type { Labels, PixelSource } from '../types';
  * Computes statics from pixel data.
  *
  * This is helpful for generating histograms
- * or scaling sliders to reasonable range. Also provided are
- * "autoSliders" which are slider bounds that should give a
+ * or scaling contrastLimits to reasonable range. Also provided are
+ * "contrastLimits" which are slider bounds that should give a
  * good initial image.
  * @param {TypedArray} arr
- * @return {{ mean: number, sd: number, q1: number, q3: number, median: number, domain: number[], autoSliders: number[] }}
+ * @return {{ mean: number, sd: number, q1: number, q3: number, median: number, domain: number[], contrastLimits: number[] }}
  */
 export function getChannelStats(arr: TypedArray) {
   let len = arr.length;
@@ -66,7 +66,7 @@ export function getChannelStats(arr: TypedArray) {
   const bottomCutoffLocation = Math.floor(cutoffArr.length * cutoffPercentile);
   quickselect(cutoffArr, topCutoffLocation);
   quickselect(cutoffArr, bottomCutoffLocation, 0, topCutoffLocation);
-  const autoSliders = [
+  const contrastLimits = [
     cutoffArr[bottomCutoffLocation] || 0,
     cutoffArr[topCutoffLocation] || 0
   ];
@@ -77,7 +77,7 @@ export function getChannelStats(arr: TypedArray) {
     q3,
     median,
     domain: [min, max],
-    autoSliders
+    contrastLimits
   };
 }
 

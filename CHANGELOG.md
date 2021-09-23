@@ -6,6 +6,13 @@
 
 ### Changed
 
+- Change API for all public props
+  - `sliderValues` -> `contrastLimits`
+  - `colorValues` -> `colors`
+  - `channelIsOn` -> `channelsVisible`
+  - `loaderSelection` -> `selections`
+  - `MAX_SLIDERS_AND_CHANNELS` -> `MAX_CHANNELS`
+
 ## 0.10.6
 
 ### Added

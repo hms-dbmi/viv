@@ -77,8 +77,8 @@ export function getDefaultInitialViewState(
  */
 export function getImageLayers(id, props) {
   const {
-    loaderSelection,
-    newLoaderSelection,
+    selections,
+    newselections,
     transitionFields,
     transitionOnViewportLoad,
     onViewportLoad,
@@ -88,10 +88,10 @@ export function getImageLayers(id, props) {
   // Grab name of PixelSource if a class instance (works for Tiff & Zarr).
   const sourceName = loader[0]?.constructor?.name;
 
-  // Create at least one layer even without loaderSelection so that the tests pass.
+  // Create at least one layer even without selections so that the tests pass.
   const Layer = loader.length > 1 ? MultiscaleImageLayer : ImageLayer;
   const layerLoader = loader.length > 1 ? loader : loader[0];
-  const layers = [loaderSelection, newLoaderSelection]
+  const layers = [selections, newselections]
     .filter((s, i) => i === 0 || s)
     .map((s, i) => {
       const suffix =
@@ -115,7 +115,7 @@ export function getImageLayers(id, props) {
       return new Layer({
         ...layerProps,
         ...newProps,
-        loaderSelection: s,
+        selections: s,
         id: `${sourceName}${getVivId(id)}${suffix}`,
         viewportId: id,
         loader: layerLoader

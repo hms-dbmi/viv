@@ -26,7 +26,7 @@ import {
 } from './views';
 import {
   DTYPE_VALUES,
-  MAX_SLIDERS_AND_CHANNELS,
+  MAX_CHANNELS,
   COLORMAPS,
   RENDERING_MODES
 } from './constants';
@@ -34,7 +34,7 @@ import {
 export {
   DTYPE_VALUES,
   COLORMAPS,
-  MAX_SLIDERS_AND_CHANNELS,
+  MAX_CHANNELS,
   RENDERING_MODES,
   ScaleBarLayer,
   VolumeLayer,
