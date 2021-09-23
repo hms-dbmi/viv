@@ -33,7 +33,7 @@ export function getDtypeValues(dtype) {
 export function padColorsAndWindows({
   contrastLimits,
   colors,
-  active,
+  channelsVisible,
   domain,
   dtype
 }) {
@@ -43,11 +43,11 @@ export function padColorsAndWindows({
   }
 
   const newColors = colors.map((color, i) =>
-    active[i] ? color.map(c => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
+    channelsVisible[i] ? color.map(c => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
   );
   const maxSliderValue = (domain && domain[1]) || getDtypeValues(dtype).max;
   const newContrastLimits = contrastLimits.map((slider, i) =>
-    active[i] ? slider : [maxSliderValue, maxSliderValue]
+    channelsVisible[i] ? slider : [maxSliderValue, maxSliderValue]
   );
   // Need to pad contrastLimits and colors with default values (required by shader)
   const padSize = MAX_CHANNELS - newColors.length;

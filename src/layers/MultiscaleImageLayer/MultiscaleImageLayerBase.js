@@ -7,7 +7,7 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   contrastLimits: { type: 'array', value: [], compare: true },
   colors: { type: 'array', value: [], compare: true },
-  active: { type: 'array', value: [], compare: true },
+  channelsVisible: { type: 'array', value: [], compare: true },
   renderSubLayers: { type: 'function', value: renderSubLayers, compare: false },
   colormap: { type: 'string', value: '', compare: true },
   dtype: { type: 'string', value: 'Uint16', compare: true },

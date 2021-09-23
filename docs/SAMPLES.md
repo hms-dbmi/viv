@@ -40,7 +40,7 @@ const props = {
     [0, 255],
     [0, 255],
   ],
-  active: [true, true, true],
+  channelsVisible: [true, true, true],
 }
 
 // Simple url handler.
@@ -86,7 +86,7 @@ function App() {
       loader={loader.data}
       contrastLimits={autoProps.contrastLimits}
       colors={autoProps.colors}
-      active={autoProps.active}
+      channelsVisible={autoProps.channelsVisible}
       selections={autoProps.selections}
       height={1080}
       width={1920}

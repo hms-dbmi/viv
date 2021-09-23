@@ -25,7 +25,7 @@ test('ImageLayer', t => {
         [0, 1, 1],
         [0, 1, 1]
       ],
-      active: [true, false],
+      channelsVisible: [true, false],
       loader: {
         getRaster: async () => ({
           data: new Uint32Array([0, 2, 1, 2]),
@@ -72,7 +72,7 @@ test('ImageLayer', t => {
           [0, 1, 1],
           [0, 1, 1]
         ],
-        active: [true, false],
+        channelsVisible: [true, false],
         loader: {
           getRaster: async () => {
             state.data.push(new Uint32Array([0, 2, 1, 2]));

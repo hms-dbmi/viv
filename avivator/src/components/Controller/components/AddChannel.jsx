@@ -37,7 +37,7 @@ const AddChannel = () => {
           setPropertiesForChannel(numSelectionsBeforeAdd, {
             domains: domain,
             contrastLimits,
-            active: true
+            channelsVisible: true
           });
           setImageSetting({ onViewportLoad: () => {} });
           setIsChannelLoading(numSelectionsBeforeAdd, false);
@@ -47,7 +47,7 @@ const AddChannel = () => {
       addChannel({
         selections: selection,
         ids: String(Math.random()),
-        active: false
+        channelsVisible: false
       });
     });
   };

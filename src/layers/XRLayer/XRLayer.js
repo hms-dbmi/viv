@@ -69,7 +69,7 @@ const defaultProps = {
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
   colors: { type: 'array', value: [], compare: true },
   contrastLimits: { type: 'array', value: [], compare: true },
-  active: { type: 'array', value: [], compare: true },
+  channelsVisible: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: 'Uint16', compare: true },
   colormap: { type: 'string', value: '', compare: true },
@@ -91,7 +91,7 @@ const defaultProps = {
  * @type {object}
  * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
- * @property {Array.<boolean>} active List of boolean values for each channel for whether or not it is visible.
+ * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
  * @property {number=} opacity Opacity of the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
@@ -281,7 +281,7 @@ const XRLayer = class extends Layer {
         opacity,
         domain,
         dtype,
-        active,
+        channelsVisible,
         unprojectLensBounds,
         bounds,
         isLensOn,
@@ -297,7 +297,7 @@ const XRLayer = class extends Layer {
       const { paddedContrastLimits, paddedColors } = padColorsAndWindows({
         contrastLimits: contrastLimits.slice(0, numTextures),
         colors: colors.slice(0, numTextures),
-        active: active.slice(0, numTextures),
+        channelsVisible: channelsVisible.slice(0, numTextures),
         domain,
         dtype
       });

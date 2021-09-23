@@ -20,7 +20,7 @@ test('XRLayer', t => {
       bounds: [0, 0, 2, 2],
       contrastLimits: [[0, 10]],
       colors: [[0, 1, 1]],
-      active: [true],
+      channelsVisible: [true],
       tileSize: 2,
       channelData: {
         data: [new Uint32Array([0, 2, 1, 2])],

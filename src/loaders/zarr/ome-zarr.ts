@@ -4,7 +4,7 @@ import ZarrPixelSource from './pixel-source';
 import type { Labels } from '../../types';
 
 interface Channel {
-  active: boolean;
+  channelsVisible: boolean;
   color: string;
   label: string;
   window: {

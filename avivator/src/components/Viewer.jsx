@@ -20,7 +20,7 @@ const Viewer = () => {
   const {
     colors,
     contrastLimits,
-    active,
+    channelsVisible,
     selections,
     loader
   } = useChannelSettings();
@@ -45,7 +45,7 @@ const Viewer = () => {
       loader={loader}
       contrastLimits={contrastLimits}
       colors={colors}
-      active={active}
+      channelsVisible={channelsVisible}
       selections={selections}
       colormap={colormap.length > 0 && colormap}
       xSlice={xSlice}
@@ -70,7 +70,7 @@ const Viewer = () => {
       loader={loader}
       contrastLimits={contrastLimits}
       colors={colors}
-      active={active}
+      channelsVisible={channelsVisible}
       selections={selections}
       height={viewSize.height}
       width={viewSize.width}
@@ -89,7 +89,7 @@ const Viewer = () => {
       loader={loader}
       contrastLimits={contrastLimits}
       colors={colors}
-      active={active}
+      channelsVisible={channelsVisible}
       selections={selections}
       height={viewSize.height}
       width={viewSize.width}

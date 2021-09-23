@@ -87,7 +87,7 @@ test('padColorsAndWindows test', t => {
         [255, 0, 0],
         [255, 255, 0]
       ],
-      active: [true, true],
+      channelsVisible: [true, true],
       dtype: 'Uint8'
     }),
     expectedNoDomain,
@@ -103,7 +103,7 @@ test('padColorsAndWindows test', t => {
         [255, 0, 0],
         [255, 255, 0]
       ],
-      active: [true, false],
+      channelsVisible: [true, false],
       dtype: 'Uint8'
     }),
     expectedChannelOff,
@@ -119,7 +119,7 @@ test('padColorsAndWindows test', t => {
         [255, 0, 0],
         [255, 255, 0]
       ],
-      active: [true, true],
+      channelsVisible: [true, true],
       domain: [0, 1000],
       dtype: 'Uint8'
     }),
@@ -136,7 +136,7 @@ test('padColorsAndWindows test', t => {
         [255, 0, 0],
         [255, 255, 0]
       ],
-      active: [true, true],
+      channelsVisible: [true, true],
       dtype: 'Uint16'
     }),
     expected16Bit,
