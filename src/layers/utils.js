@@ -43,7 +43,9 @@ export function padColorsAndWindows({
   }
 
   const newColors = colors.map((color, i) =>
-    channelsVisible[i] ? color.map(c => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
+    channelsVisible[i]
+      ? color.map(c => c / MAX_COLOR_INTENSITY)
+      : DEFAULT_COLOR_OFF
   );
   const maxSliderValue = (domain && domain[1]) || getDtypeValues(dtype).max;
   const newContrastLimits = contrastLimits.map((slider, i) =>
