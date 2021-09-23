@@ -5,10 +5,10 @@ import TiffPixelSource from './pixel-source';
 import {
   getOmeLegacyIndexer,
   getOmeSubIFDIndexer,
-  OmeTiffIndexer
 } from './lib/indexers';
 import { getOmePixelSourceMeta, guessTileSize } from './lib/utils';
 import type Pool from './lib/Pool';
+import type { OmeTiffIndexer } from './lib/indexers';
 
 export interface OmeTiffSelection {
   t: number;
