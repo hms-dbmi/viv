@@ -6,10 +6,8 @@ export default {
   output: {
     format: 'cjs'
   },
-  // All non-relative paths are external
-  external: [/^[^.\/]|^\.[^.\/]|^\.\.[^\/]/],
   plugins: [
-    resolve(),
+    resolve({ resolveOnly: ['geotiff'] }),
     glslify(),
     sucrase({ transforms: ['jsx', 'typescript'] })
   ]

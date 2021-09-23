@@ -6,21 +6,31 @@
 
 ### Changed
 
-- Upgrade deck.gl to 8.5
-- Fix changelog check in `bash`.
-- Update README to note Node version restrictions.
-- Maintain the value of the channel color in HSV when applying intensity (3D + 2D)
-- Fix documentation for React Components.
-- Fix channel stats for thin 3D volumes in Avivator.
-- Better checking for viewable volumes at certain resolutions.
-- Don't do RGB-HSV conversion on shaders.  Instead, scale RGB linearly.
-- Consistent shader floats `n.0` -> `n.`
 - Change API for all public props
   - `sliderValues` -> `contrastLimits`
   - `colorValues` -> `colors`
   - `channelIsOn` -> `channelsVisible`
   - `loaderSelection` -> `selections`
   - `MAX_SLIDERS_AND_CHANNELS` -> `MAX_CHANNELS`
+
+## 0.10.6
+
+### Added
+
+### Changed
+
+- Upgrade deck.gl to 8.5
+- Update fork of geotiff.js
+- Fix changelog check in `bash`.
+- Update README to note Node version restrictions.
+- Maintain the value of the channel color in HSV when applying intensity (3D + 2D)
+- Fix documentation for React Components.
+- Fix documentation for TypeScript exports.
+- Fix channel stats for thin 3D volumes in Avivator.
+- Better checking for viewable volumes at certain resolutions.
+- Don't do RGB-HSV conversion on shaders. Instead, scale RGB linearly.
+- Consistent shader floats `n.0` -> `n.`
+- Pin deck.gl to minor versions
 
 ## 0.10.5
 

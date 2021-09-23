@@ -53,12 +53,6 @@ const configAvivator = defineConfig({
       '@hms-dbmi/viv': resolve(__dirname, 'src'),
       'react': resolve(__dirname, 'avivator/node_modules/react'),
       'react-dom': resolve(__dirname, 'avivator/node_modules/react-dom'),
-      /**
-       * Geotiff.js uses node-builtins in its source. We don't use these
-       * module exports in our code. Rather than polyfilling these modules,
-       * we use resolve to empty exports.
-       */
-      'fs': resolve(__dirname, 'avivator/empty-fs.js'),
     }
   }
 });
