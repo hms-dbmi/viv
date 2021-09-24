@@ -27,8 +27,6 @@ uniform bool useTransparentColor;
 
 in vec2 vTexCoord;
 
-out vec4 color;
-
 void main() {
 
   float intensityValue0 = sample_and_apply_sliders(channel0, vTexCoord, sliderValues[0]);
@@ -47,7 +45,7 @@ void main() {
   }
 
 
-  color = apply_opacity(rgbCombo, useTransparentColor, transparentColor, opacity);
+  gl_FragColor = apply_opacity(rgbCombo, useTransparentColor, transparentColor, opacity);
   geometry.uv = vTexCoord;
-  DECKGL_FILTER_COLOR(color, geometry);
+  DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }

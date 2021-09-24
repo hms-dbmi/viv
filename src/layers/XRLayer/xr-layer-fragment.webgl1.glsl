@@ -19,17 +19,6 @@ uniform float intensityArray[6];
 // opacity
 uniform float opacity;
 
-// lens bounds
-uniform float majorLensAxis;
-uniform float minorLensAxis;
-uniform vec2 lensCenter;
-
-// lens uniforms
-uniform bool isLensOn;
-uniform int lensSelection;
-uniform vec3 lensBorderColor;
-uniform float lensBorderRadius;
-
 // uniform for making a transparent color.
 uniform vec3 transparentColor;
 uniform bool useTransparentColor;
@@ -45,22 +34,14 @@ void main() {
   float intensityValue4 = sample_and_apply_sliders(channel4, vTexCoord, sliderValues[4]);
   float intensityValue5 = sample_and_apply_sliders(channel5, vTexCoord, sliderValues[5]);
 
-  // Find out if the frag is in bounds of the lens.
-  bool isFragInLensBounds = frag_in_lens_bounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);
-  bool isFragOnLensBounds = frag_on_lens_bounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);
+  vec3 rgbCombo = vec3(0.);
+  DECKGL_PROCESS_INTENSITY(rgbCombo, intensityValue0, colorValues[0], vTexCoord, 0);
+  DECKGL_PROCESS_INTENSITY(rgbCombo, intensityValue1, colorValues[1], vTexCoord, 1);
+  DECKGL_PROCESS_INTENSITY(rgbCombo, intensityValue2, colorValues[2], vTexCoord, 2);
+  DECKGL_PROCESS_INTENSITY(rgbCombo, intensityValue3, colorValues[3], vTexCoord, 3);
+  DECKGL_PROCESS_INTENSITY(rgbCombo, intensityValue4, colorValues[4], vTexCoord, 4);
+  DECKGL_PROCESS_INTENSITY(rgbCombo, intensityValue5, colorValues[5], vTexCoord, 5);
 
-  // Declare variables.
-  bool inLensAndUseLens = isLensOn && isFragInLensBounds;
-
-  vec3 rgbCombo = process_channel_intensity(intensityValue0, colorValues[0], 0, inLensAndUseLens, lensSelection);
-  rgbCombo += process_channel_intensity(intensityValue1, colorValues[1], 1, inLensAndUseLens, lensSelection);
-  rgbCombo += process_channel_intensity(intensityValue2, colorValues[2], 2, inLensAndUseLens, lensSelection);
-  rgbCombo += process_channel_intensity(intensityValue3, colorValues[3], 3, inLensAndUseLens, lensSelection);
-  rgbCombo += process_channel_intensity(intensityValue4, colorValues[4], 4, inLensAndUseLens, lensSelection);
-  rgbCombo += process_channel_intensity(intensityValue5, colorValues[5], 5, inLensAndUseLens, lensSelection);
-
-  // Ternaries are faster than checking this first and then returning/breaking out of shader.
-  rgbCombo = (isLensOn && isFragOnLensBounds) ? lensBorderColor : rgbCombo;
   gl_FragColor = apply_opacity(rgbCombo, useTransparentColor, transparentColor, opacity);
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
