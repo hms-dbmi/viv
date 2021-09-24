@@ -14,7 +14,7 @@ import fs2 from './xr-layer-fragment.webgl2.glsl';
 import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
 import { channels } from './shader-modules';
-import { padColorsAndSliders, getDtypeValues } from '../utils';
+import { padColorsAndWindows, getDtypeValues } from '../utils';
 
 const SHADER_MODULES = [
   { fs: fs1, fscmap: fsColormap1, vs: vs1 },
@@ -69,9 +69,9 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'object', value: {}, compare: true },
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
-  colorValues: { type: 'array', value: [], compare: true },
-  sliderValues: { type: 'array', value: [], compare: true },
-  channelIsOn: { type: 'array', value: [], compare: true },
+  colors: { type: 'array', value: [], compare: true },
+  contrastLimits: { type: 'array', value: [], compare: true },
+  channelsVisible: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: 'Uint16', compare: true },
   colormap: { type: 'string', value: '', compare: true },
@@ -86,9 +86,9 @@ const defaultProps = {
 /**
  * @typedef LayerProps
  * @type {object}
- * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
- * @property {Array.<boolean>} channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
+ * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
+ * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
  * @property {number=} opacity Opacity of the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
@@ -286,22 +286,22 @@ const XRLayer = class extends Layer {
     const { textures, model } = this.state;
     if (textures && model) {
       const {
-        sliderValues,
-        colorValues,
+        contrastLimits,
+        colors,
         opacity,
         domain,
         dtype,
-        channelIsOn,
+        channelsVisible,
         transparentColor
       } = this.props;
       // Check number of textures not null.
       const numTextures = Object.values(textures).filter(t => t).length;
       // Slider values and color values can come in before textures since their data is async.
       // Thus we pad based on the number of textures bound.
-      const { paddedSliderValues, paddedColorValues } = padColorsAndSliders({
-        sliderValues: sliderValues.slice(0, numTextures),
-        colorValues: colorValues.slice(0, numTextures),
-        channelIsOn: channelIsOn.slice(0, numTextures),
+      const { paddedContrastLimits, paddedColors } = padColorsAndWindows({
+        contrastLimits: contrastLimits.slice(0, numTextures),
+        colors: colors.slice(0, numTextures),
+        channelsVisible: channelsVisible.slice(0, numTextures),
         domain,
         dtype
       });
@@ -309,8 +309,8 @@ const XRLayer = class extends Layer {
       model
         .setUniforms({
           ...uniforms,
-          colorValues: paddedColorValues,
-          sliderValues: paddedSliderValues,
+          colors: paddedColors,
+          contrastLimits: paddedContrastLimits,
           opacity,
           transparentColor: (transparentColor || [0, 0, 0]).map(i => i / 255),
           useTransparentColor: Boolean(transparentColor),

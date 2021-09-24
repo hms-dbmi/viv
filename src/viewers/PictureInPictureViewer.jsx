@@ -13,12 +13,12 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
  * @param {Object} props
- * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
- * @param {Array} props.colorValues List of [r, g, b] values for each channel.
- * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @param {Array} props.contrastLimits List of [begin, end] values to control each channel's ramp function.
+ * @param {Array} props.colors List of [r, g, b] values for each channel.
+ * @param {Array} props.channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @param {string} [props.colormap] String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.loader The data source for the viewer, PixelSource[]. If loader.length > 1, data is assumed to be multiscale.
- * @param {Array} props.loaderSelection Selection to be used for fetching data.
+ * @param {Array} props.selections Selection to be used for fetching data.
  * @param {Object} props.overview Allows you to pass settings into the OverviewView: { scale, margin, position, minimumWidth, maximumWidth,
  * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.  See http://viv.gehlenborglab.org/#overviewview for defaults.
  * @param {Boolean} props.overviewOn Whether or not to show the OverviewView.
@@ -49,14 +49,14 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 const PictureInPictureViewer = props => {
   const {
     loader,
-    sliderValues,
-    colorValues,
-    channelIsOn,
+    contrastLimits,
+    colors,
+    channelsVisible,
     viewStates: viewStatesProp,
     colormap,
     overview,
     overviewOn,
-    loaderSelection,
+    selections,
     hoverHooks = { handleValue: () => {}, handleCoordinate: () => {} },
     height,
     width,
@@ -74,10 +74,10 @@ const PictureInPictureViewer = props => {
     glOptions
   } = props;
   const {
-    newLoaderSelection,
-    oldLoaderSelection,
+    newselections,
+    oldselections,
     onViewportLoad: transitionOnViewportLoad
-  } = useGlobalSelection(loaderSelection, transitionFields);
+  } = useGlobalSelection(selections, transitionFields);
   const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
   const baseViewState = useMemo(() => {
     return (
@@ -94,11 +94,11 @@ const PictureInPictureViewer = props => {
   });
   const layerConfig = {
     loader,
-    sliderValues,
-    colorValues,
-    channelIsOn,
-    loaderSelection: oldLoaderSelection,
-    newLoaderSelection,
+    contrastLimits,
+    colors,
+    channelsVisible,
+    selections: oldselections,
+    newselections,
     onViewportLoad,
     transitionOnViewportLoad,
     transitionFields,

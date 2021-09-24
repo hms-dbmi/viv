@@ -17,15 +17,15 @@ test('ImageLayer', t => {
     Layer: ImageLayer,
     assert: t.ok,
     sampleProps: {
-      sliderValues: [
+      contrastLimits: [
         [0, 10],
         [0, 10]
       ],
-      colorValues: [
+      colors: [
         [0, 1, 1],
         [0, 1, 1]
       ],
-      channelIsOn: [true, false],
+      channelsVisible: [true, false],
       loader: {
         getRaster: async () => ({
           data: new Uint32Array([0, 2, 1, 2]),
@@ -34,7 +34,7 @@ test('ImageLayer', t => {
         }),
         dtype: 'Uint32'
       },
-      loaderSelection: [{}, {}]
+      selections: [{}, {}]
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
   });
@@ -64,15 +64,15 @@ test('ImageLayer', t => {
   const testCases = [
     {
       props: {
-        sliderValues: [
+        contrastLimits: [
           [0, 10],
           [0, 10]
         ],
-        colorValues: [
+        colors: [
           [0, 1, 1],
           [0, 1, 1]
         ],
-        channelIsOn: [true, false],
+        channelsVisible: [true, false],
         loader: {
           getRaster: async () => {
             state.data.push(new Uint32Array([0, 2, 1, 2]));
@@ -81,7 +81,7 @@ test('ImageLayer', t => {
           },
           dtype: 'Uint32'
         },
-        loaderSelection: []
+        selections: []
       },
       onAfterUpdate: () => {
         t.ok(
@@ -92,7 +92,7 @@ test('ImageLayer', t => {
     },
     {
       updateProps: {
-        loaderSelection: [1, 2]
+        selections: [1, 2]
       },
       onAfterUpdate: () =>
         t.ok(state.data.length === 2, 'Updated loader selection requests data.')

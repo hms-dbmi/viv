@@ -14,9 +14,9 @@ import {
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   onHover: { type: 'function', value: null, compare: false },
-  sliderValues: { type: 'array', value: [], compare: true },
-  colorValues: { type: 'array', value: [], compare: true },
-  channelIsOn: { type: 'array', value: [], compare: true },
+  contrastLimits: { type: 'array', value: [], compare: true },
+  colors: { type: 'array', value: [], compare: true },
+  channelsVisible: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
@@ -31,11 +31,11 @@ const defaultProps = {
 /**
  * @typedef LayerProps
  * @type {object}
- * @property {Array.<Array.<number>>} sliderValues List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colorValues List of [r, g, b] values for each channel.
- * @property {Array.<boolean>} channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
+ * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
+ * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader Image pyramid. PixelSource[], where each PixelSource is decreasing in shape.
- * @property {Array} loaderSelection Selection to be used for fetching data.
+ * @property {Array} selections Selection to be used for fetching data.
  * @property {number=} opacity Opacity of the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
@@ -80,7 +80,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
   renderLayers() {
     const {
       loader,
-      loaderSelection,
+      selections,
       opacity,
       viewportId,
       onTileError,
@@ -102,8 +102,8 @@ const MultiscaleImageLayer = class extends CompositeLayer {
     // The z level can be wrong for showing the correct scales because of the calculation deck.gl does
     // so we need to invert it for fetching tiles and minZoom/maxZoom.
     const getTileData = async ({ x, y, z, signal }) => {
-      // Early return if no loaderSelection
-      if (!loaderSelection || loaderSelection.length === 0) {
+      // Early return if no selections
+      if (!selections || selections.length === 0) {
         return null;
       }
 
@@ -128,7 +128,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
          * This means that our pixels sources _always_ have the same
          * return type, and optional throw for performance.
          */
-        const tiles = await Promise.all(loaderSelection.map(getTile));
+        const tiles = await Promise.all(selections.map(getTile));
 
         const tile = {
           data: tiles.map(d => d.data),
@@ -187,7 +187,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       // needs to be re-created. We want to trigger this behavior if the loader changes.
       // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
       updateTriggers: {
-        getTileData: [loader, loaderSelection]
+        getTileData: [loader, selections]
       },
       onTileError: onTileError || loader[0].onTileError,
       unprojectLensBounds

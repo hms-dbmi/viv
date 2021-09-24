@@ -17,7 +17,13 @@ import { DEFAULT_OVERVIEW } from '../constants';
 
 const Viewer = () => {
   const { useLinkedView, setViewerState, use3d, viewState } = useViewerStore();
-  const { colors, sliders, isOn, selections, loader } = useChannelSettings();
+  const {
+    colors,
+    contrastLimits,
+    channelsVisible,
+    selections,
+    loader
+  } = useChannelSettings();
   const viewSize = useWindowSize();
   const {
     lensSelection,
@@ -37,10 +43,10 @@ const Viewer = () => {
   return use3d ? (
     <VolumeViewer
       loader={loader}
-      sliderValues={sliders}
-      colorValues={colors}
-      channelIsOn={isOn}
-      loaderSelection={selections}
+      contrastLimits={contrastLimits}
+      colors={colors}
+      channelsVisible={channelsVisible}
+      selections={selections}
       colormap={colormap.length > 0 && colormap}
       xSlice={xSlice}
       ySlice={ySlice}
@@ -62,10 +68,10 @@ const Viewer = () => {
   ) : useLinkedView ? (
     <SideBySideViewer
       loader={loader}
-      sliderValues={sliders}
-      colorValues={colors}
-      channelIsOn={isOn}
-      loaderSelection={selections}
+      contrastLimits={contrastLimits}
+      colors={colors}
+      channelsVisible={channelsVisible}
+      selections={selections}
       height={viewSize.height}
       width={viewSize.width}
       colormap={colormap.length > 0 && colormap}
@@ -81,10 +87,10 @@ const Viewer = () => {
   ) : (
     <PictureInPictureViewer
       loader={loader}
-      sliderValues={sliders}
-      colorValues={colors}
-      channelIsOn={isOn}
-      loaderSelection={selections}
+      contrastLimits={contrastLimits}
+      colors={colors}
+      channelsVisible={channelsVisible}
+      selections={selections}
       height={viewSize.height}
       width={viewSize.width}
       colormap={colormap.length > 0 && colormap}

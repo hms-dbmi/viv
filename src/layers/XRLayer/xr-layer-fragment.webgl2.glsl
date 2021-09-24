@@ -13,10 +13,10 @@ uniform SAMPLER_TYPE channel4;
 uniform SAMPLER_TYPE channel5;
 
 // range
-uniform vec2 sliderValues[6];
+uniform vec2 contrastLimits[6];
 
 // color
-uniform vec3 colorValues[6];
+uniform vec3 colors[6];
 
 // opacity
 uniform float opacity;
@@ -29,19 +29,19 @@ in vec2 vTexCoord;
 
 void main() {
 
-  float intensityValue0 = sample_and_apply_sliders(channel0, vTexCoord, sliderValues[0]);
-  float intensityValue1 = sample_and_apply_sliders(channel1, vTexCoord, sliderValues[1]);
-  float intensityValue2 = sample_and_apply_sliders(channel2, vTexCoord, sliderValues[2]);
-  float intensityValue3 = sample_and_apply_sliders(channel3, vTexCoord, sliderValues[3]);
-  float intensityValue4 = sample_and_apply_sliders(channel4, vTexCoord, sliderValues[4]);
-  float intensityValue5 = sample_and_apply_sliders(channel5, vTexCoord, sliderValues[5]);
+  float intensityValue0 = sample_and_apply_contrast_limits(channel0, vTexCoord, contrastLimits[0]);
+  float intensityValue1 = sample_and_apply_contrast_limits(channel1, vTexCoord, contrastLimits[1]);
+  float intensityValue2 = sample_and_apply_contrast_limits(channel2, vTexCoord, contrastLimits[2]);
+  float intensityValue3 = sample_and_apply_contrast_limits(channel3, vTexCoord, contrastLimits[3]);
+  float intensityValue4 = sample_and_apply_contrast_limits(channel4, vTexCoord, contrastLimits[4]);
+  float intensityValue5 = sample_and_apply_contrast_limits(channel5, vTexCoord, contrastLimits[5]);
 
   float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
 
   vec3 rgbCombo = vec3(0.);
 
   for(int i = 0; i < 6; i++) {
-    DECKGL_PROCESS_INTENSITY(rgbCombo, intensityArray[i], colorValues[i], vTexCoord, i);
+    DECKGL_PROCESS_INTENSITY(rgbCombo, intensityArray[i], colors[i], vTexCoord, i);
   }
 
 

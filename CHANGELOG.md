@@ -6,6 +6,14 @@
 
 ### Changed
 
+- Change API for all public props
+  - `sliderValues` -> `contrastLimits`
+  - `colorValues` -> `colors`
+  - `channelIsOn` -> `channelsVisible`
+  - `loaderSelection` -> `selections`
+  - `MAX_SLIDERS_AND_CHANNELS` -> `MAX_CHANNELS`
+- Upgrade `Vite` to `~2.5.4`
+
 ## 0.10.6
 
 ### Added

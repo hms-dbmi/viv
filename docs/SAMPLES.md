@@ -35,12 +35,12 @@ const props = {
     [0, 255, 0],
     [255, 0, 0],
   ],
-  sliders: [
+  contrastLimits: [
     [0, 255],
     [0, 255],
     [0, 255],
   ],
-  isOn: [true, true, true],
+  channelsVisible: [true, true, true],
 }
 
 // Simple url handler.
@@ -70,24 +70,24 @@ function App() {
       const raster = await source.getRaster({ selection });
       return getChannelStats(raster.data);
     }));
-    // These are calculated bounds for the sliders
+    // These are calculated bounds for the contrastLimits
     // that could be used for display purposes.
     // domains = stats.map(stat => stat.domain);
 
-    // These are precalculated settings for the sliders that
+    // These are precalculated settings for the contrastLimits that
     // should render a good, "in focus" image initially.
-    sliders = stats.map(stat => stat.autoSliders);
-    const newProps = { ...props, sliders };
+    contrastLimits = stats.map(stat => stat.contrastLimits);
+    const newProps = { ...props, contrastLimits };
   }, [loader])
 
   if (!loader) return null;
   return (
     <PictureInPictureViewer
       loader={loader.data}
-      sliderValues={autoProps.sliders}
-      colorValues={autoProps.colors}
-      channelIsOn={autoProps.isOn}
-      loaderSelection={autoProps.selections}
+      contrastLimits={autoProps.contrastLimits}
+      colors={autoProps.colors}
+      channelsVisible={autoProps.channelsVisible}
+      selections={autoProps.selections}
       height={1080}
       width={1920}
     />

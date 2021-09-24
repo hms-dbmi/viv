@@ -18,10 +18,10 @@ uniform vec3 normals[NUM_PLANES];
 uniform float distances[NUM_PLANES];
 
 // range
-uniform vec2 sliderValues[6];
+uniform vec2 contrastLimits[6];
 
 // color
-uniform vec3 colorValues[6];
+uniform vec3 colors[6];
 
 // slices
 uniform vec2 xSlice;
@@ -107,12 +107,12 @@ void main(void) {
 		float canShowZCoordinate = max(p.z - 0., 0.) * max(1. - p.z , 0.);
 		float canShowCoordinate = float(ceil(canShowXCoordinate * canShowYCoordinate * canShowZCoordinate));
 		canShow = canShowCoordinate * canShow;
-    float intensityValue0 = canShow * sample_and_apply_sliders(volume0, p, sliderValues[0]);
-    float intensityValue1 = canShow * sample_and_apply_sliders(volume1, p, sliderValues[1]);
-		float intensityValue2 = canShow * sample_and_apply_sliders(volume2, p, sliderValues[2]);
-		float intensityValue3 = canShow * sample_and_apply_sliders(volume3, p, sliderValues[3]);
-    float intensityValue4 = canShow * sample_and_apply_sliders(volume4, p, sliderValues[4]);
-		float intensityValue5 = canShow * sample_and_apply_sliders(volume5, p, sliderValues[5]);
+    float intensityValue0 = canShow * sample_and_apply_contrast_limits(volume0, p, contrastLimits[0]);
+    float intensityValue1 = canShow * sample_and_apply_contrast_limits(volume1, p, contrastLimits[1]);
+		float intensityValue2 = canShow * sample_and_apply_contrast_limits(volume2, p, contrastLimits[2]);
+		float intensityValue3 = canShow * sample_and_apply_contrast_limits(volume3, p, contrastLimits[3]);
+    float intensityValue4 = canShow * sample_and_apply_contrast_limits(volume4, p, contrastLimits[4]);
+		float intensityValue5 = canShow * sample_and_apply_contrast_limits(volume5, p, contrastLimits[5]);
 
 		_RENDER
 

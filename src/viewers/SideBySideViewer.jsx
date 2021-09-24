@@ -7,12 +7,12 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 /**
  * This component provides a side-by-side VivViewer with linked zoom/pan.
  * @param {Object} props
- * @param {Array} props.sliderValues List of [begin, end] values to control each channel's ramp function.
- * @param {Array} props.colorValues List of [r, g, b] values for each channel.
- * @param {Array} props.channelIsOn List of boolean values for each channel for whether or not it is visible.
+ * @param {Array} props.contrastLimits List of [begin, end] values to control each channel's ramp function.
+ * @param {Array} props.colors List of [r, g, b] values for each channel.
+ * @param {Array} props.channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @param {string} [props.colormap] String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.loader This data source for the viewer. PixelSource[]. If loader.length > 1, data is assumed to be multiscale.
- * @param {Array} props.loaderSelection Selection to be used for fetching data.
+ * @param {Array} props.selections Selection to be used for fetching data.
  * @param {Boolean} props.zoomLock Whether or not lock the zooms of the two views.
  * @param {Boolean} props.panLock Whether or not lock the pans of the two views.
  * @param {Array} [props.viewStates] List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }] for initializing where the viewer looks (optional - this is inferred from height/width/loader
@@ -37,13 +37,13 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 const SideBySideViewer = props => {
   const {
     loader,
-    sliderValues,
-    colorValues,
-    channelIsOn,
+    contrastLimits,
+    colors,
+    channelsVisible,
     viewStates: viewStatesProp,
     colormap,
     panLock,
-    loaderSelection,
+    selections,
     zoomLock,
     height,
     width,
@@ -60,10 +60,10 @@ const SideBySideViewer = props => {
     glOptions
   } = props;
   const {
-    newLoaderSelection,
-    oldLoaderSelection,
+    newselections,
+    oldselections,
     onViewportLoad: transitionOnViewportLoad
-  } = useGlobalSelection(loaderSelection, transitionFields);
+  } = useGlobalSelection(selections, transitionFields);
   const leftViewState = viewStatesProp?.find(v => v.id === 'left');
   const rightViewState = viewStatesProp?.find(v => v.id === 'right');
   const viewStates = useMemo(() => {
@@ -101,11 +101,11 @@ const SideBySideViewer = props => {
   });
   const layerConfig = {
     loader,
-    sliderValues,
-    colorValues,
-    channelIsOn,
-    loaderSelection: oldLoaderSelection,
-    newLoaderSelection,
+    contrastLimits,
+    colors,
+    channelsVisible,
+    selections: oldselections,
+    newselections,
     onViewportLoad,
     transitionOnViewportLoad,
     transitionFields,
