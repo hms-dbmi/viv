@@ -24,11 +24,6 @@ const defaultProps = {
     },
     compare: true
   },
-  isLensOn: { type: 'boolean', value: false, compare: true },
-  lensSelection: { type: 'number', value: 0, compare: true },
-  lensRadius: { type: 'number', value: 100, compare: true },
-  lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
-  lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   onClick: { type: 'function', value: null, compare: true },
   transparentColor: { type: 'array', value: null, compare: true },
   onViewportLoad: { type: 'function', value: null, compare: true },

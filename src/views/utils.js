@@ -82,6 +82,10 @@ export function getImageLayers(id, props) {
     transitionFields,
     transitionOnViewportLoad,
     onViewportLoad,
+    isLensOn,
+    lensSelection,
+    lensBorderColor,
+    lensBorderRadius,
     ...layerProps
   } = props;
   const { loader } = layerProps;
@@ -119,7 +123,14 @@ export function getImageLayers(id, props) {
         id: `${sourceName}${getVivId(id)}${suffix}`,
         viewportId: id,
         loader: layerLoader,
-        extensions: [new LensExtension()]
+        extensions: [
+          new LensExtension({
+            isLensOn,
+            lensSelection,
+            lensBorderColor,
+            lensBorderRadius
+          })
+        ]
       });
     });
   return layers;

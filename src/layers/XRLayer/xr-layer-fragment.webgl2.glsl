@@ -21,17 +21,6 @@ uniform vec3 colorValues[6];
 // opacity
 uniform float opacity;
 
-// lens bounds for ellipse
-uniform float majorLensAxis;
-uniform float minorLensAxis;
-uniform vec2 lensCenter;
-
-// lens uniforms
-uniform bool isLensOn;
-uniform int lensSelection;
-uniform vec3 lensBorderColor;
-uniform float lensBorderRadius;
-
 // uniform for making a transparent color.
 uniform vec3 transparentColor;
 uniform bool useTransparentColor;
@@ -51,21 +40,13 @@ void main() {
 
   float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
 
-  // Find out if the frag is in bounds of the lens.
-  bool isFragInLensBounds = frag_in_lens_bounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);
-  bool isFragOnLensBounds = frag_on_lens_bounds(lensCenter, vTexCoord, majorLensAxis, minorLensAxis, lensBorderRadius);
-
-  // Declare variables.
-  bool inLensAndUseLens = isLensOn && isFragInLensBounds;
   vec3 rgbCombo = vec3(0.);
 
   for(int i = 0; i < 6; i++) {
-    rgbCombo += process_channel_intensity(intensityArray[i], colorValues[i], i, inLensAndUseLens, lensSelection);
+    DECKGL_PROCESS_INTENSITY(rgbCombo, intensityArray[i], colorValues[i], vTexCoord, i);
   }
 
 
-  // Ternaries are faster than checking this first and then returning/breaking out of shader.
-  rgbCombo = (isLensOn && isFragOnLensBounds) ? lensBorderColor : rgbCombo;
   color = apply_opacity(rgbCombo, useTransparentColor, transparentColor, opacity);
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(color, geometry);

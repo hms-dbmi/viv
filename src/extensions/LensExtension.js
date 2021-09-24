@@ -1,13 +1,18 @@
 import { LayerExtension } from '@deck.gl/core';
+import lens from './lens-module';
 
 export default class LensExtension extends LayerExtension {
-  initializeState(context, extension) {
-    this.setState({
-      unprojectLensBounds: [0, 0, 0, 0]
-    });
+  getShaders() {
+    return {
+      ...super.getShaders(),
+      modules: [lens]
+    };
+  }
+
+  initializeState() {
+    const layer = this.getCurrentLayer();
     // eslint-disable-next-line no-param-reassign
-    extension.onMouseMove = () => {
-      const layer = this.getCurrentLayer();
+    const onMouseMove = () => {
       const { viewportId, lensRadius } = layer.props;
       // If there is no viewportId, don't try to do anything.
       if (!viewportId) {
@@ -51,20 +56,61 @@ export default class LensExtension extends LayerExtension {
     };
     if (this.context.deck) {
       this.context.deck.eventManager.on({
-        pointermove: extension.onMouseMove,
-        pointerleave: extension.onMouseMove,
-        wheel: extension.onMouseMove
+        pointermove: onMouseMove,
+        pointerleave: onMouseMove,
+        wheel: onMouseMove
       });
     }
+    this.setState({ onMouseMove, unprojectLensBounds: [0, 0, 0, 0] });
   }
 
-  finalizeState(extension) {
+  draw(params, extension) {
+    const { bounds } = this.props;
+    const { model, unprojectLensBounds } = this.state;
+    const {
+      isLensOn,
+      lensSelection,
+      lensBorderColor,
+      lensBorderRadius
+    } = extension.opts;
+    // Creating a unit-square scaled intersection box for rendering the lens.
+    // It is ok if these coordinates are outside the unit square since
+    // we check membership in or out of the lens on the fragment shader.
+    const [
+      leftMouseBound,
+      bottomMouseBound,
+      rightMouseBound,
+      topMouseBound
+    ] = unprojectLensBounds;
+    const [left, bottom, right, top] = bounds;
+    const leftMouseBoundScaled = (leftMouseBound - left) / (right - left);
+    const bottomMouseBoundScaled = (bottomMouseBound - top) / (bottom - top);
+    const rightMouseBoundScaled = (rightMouseBound - left) / (right - left);
+    const topMouseBoundScaled = (topMouseBound - top) / (bottom - top);
+    const uniforms = {
+      majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
+      minorLensAxis: (bottomMouseBoundScaled - topMouseBoundScaled) / 2,
+      lensCenter: [
+        (rightMouseBoundScaled + leftMouseBoundScaled) / 2,
+        (bottomMouseBoundScaled + topMouseBoundScaled) / 2
+      ],
+      isLensOn,
+      lensSelection,
+      lensBorderColor,
+      lensBorderRadius
+    };
+    // ScatterplotLayer model
+    // eslint-disable-next-line no-unused-expressions
+    model?.setUniforms(uniforms);
+  }
+
+  finalizeState() {
     // Remove event listeners
     if (this.context.deck) {
       this.context.deck.eventManager.off({
-        pointermove: extension.onMouseMove,
-        pointerleave: extension.onMouseMove,
-        wheel: extension.onMouseMove
+        pointermove: this.state?.onMouseMove,
+        pointerleave: this.state?.onMouseMove,
+        wheel: this.state?.onMouseMove
       });
     }
   }
