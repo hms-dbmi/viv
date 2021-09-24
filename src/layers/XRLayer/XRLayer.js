@@ -168,7 +168,8 @@ const XRLayer = class extends Layer {
     // Only initialize shader hook functions _once globally_
     // Since the program manager is shared across all layers, but many layers
     // might be created, this solves the performance issue of always adding new
-    // hook functions. See #22
+    // hook functions.
+    // See https://github.com/kylebarron/deck.gl-raster/blob/2eb91626f0836558f0be4cd201ea18980d7f7f2d/src/deckgl/raster-layer/raster-layer.js#L21-L40
     if (!programManager._hookFunctions.includes(processStr)) {
       programManager.addShaderHook(processStr);
     }
