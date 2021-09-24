@@ -1,10 +1,17 @@
 import { defineConfig } from 'vite';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import serveStatic from 'serve-static';
 
 import react from '@vitejs/plugin-react';
 import glslify from 'rollup-plugin-glslify';
 import esbuild from 'esbuild';
+
+const resolveDataDir = (fp) => {
+  if (fp[0] === '~') {
+    return join(process.env.HOME, fp.slice(1));
+  }
+  return resolve(__dirname, fp);
+};
 
 /**
  * Vite plugins. Serves contents of `avivator/data` during
@@ -13,6 +20,7 @@ import esbuild from 'esbuild';
  * @returns {import('vite').Plugin}
  */
 const serveData = (dir) => {
+  dir = resolveDataDir(dir);
   const serve = serveStatic(dir);
   return {
     name: 'serve-data-dir',
@@ -66,7 +74,7 @@ const plugins = [
   react(),
   glslify(),
   bundleWebWorker(),
-  serveData('avivator/data'),
+  serveData(process.env.VIV_DATA_DIR || 'avivator/data'),
 ];
 
 const configAvivator = defineConfig({
