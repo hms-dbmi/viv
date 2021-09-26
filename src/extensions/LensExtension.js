@@ -2,7 +2,7 @@ import { LayerExtension } from '@deck.gl/core';
 import lens from './lens-module';
 
 /**
- * This deck.gl extension allows for a lens that selectively shows one channel in its chose color and then the others in white.
+ * This deck.gl extension allows for a lens that selectively shows one channel in its chosen color and then the others in white.
  * @param {Object} opts
  * @param {boolean=} opts.isLensOn Whether or not to use the lens.
  * @param {number=} opts.lensSelection Numeric index of the channel to be focused on by the lens.
