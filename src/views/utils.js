@@ -122,15 +122,7 @@ export function getImageLayers(id, props) {
         selections: s,
         id: `${sourceName}${getVivId(id)}${suffix}`,
         viewportId: id,
-        loader: layerLoader,
-        extensions: [
-          new LensExtension({
-            isLensOn,
-            lensSelection,
-            lensBorderColor,
-            lensBorderRadius
-          })
-        ]
+        loader: layerLoader
       });
     });
   return layers;

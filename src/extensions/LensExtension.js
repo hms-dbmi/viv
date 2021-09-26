@@ -1,6 +1,16 @@
 import { LayerExtension } from '@deck.gl/core';
 import lens from './lens-module';
 
+/**
+ * This deck.gl extension allows for a lens that selectively shows one channel in its chose color and then the others in white.
+ * @param {Object} opts
+ * @param {boolean=} opts.isLensOn Whether or not to use the lens.
+ * @param {number=} opts.lensSelection Numeric index of the channel to be focused on by the lens.
+ * @param {number=} opts.lensRadius Pixel radius of the lens (default: 100).
+ * @param {Array.<number>=} opts.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
+ * @param {number=} opts.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * */
+
 export default class LensExtension extends LayerExtension {
   getShaders() {
     return {
@@ -9,11 +19,12 @@ export default class LensExtension extends LayerExtension {
     };
   }
 
-  initializeState() {
+  initializeState(context, extension) {
     const layer = this.getCurrentLayer();
     // eslint-disable-next-line no-param-reassign
     const onMouseMove = () => {
-      const { viewportId, lensRadius } = layer.props;
+      const { viewportId } = layer.props;
+      const { lensRadius = 100 } = extension.opts;
       // If there is no viewportId, don't try to do anything.
       if (!viewportId) {
         layer.setState({ unprojectLensBounds: [0, 0, 0, 0] });
@@ -70,8 +81,8 @@ export default class LensExtension extends LayerExtension {
     const {
       isLensOn,
       lensSelection,
-      lensBorderColor,
-      lensBorderRadius
+      lensBorderColor = [255, 255, 255],
+      lensBorderRadius = 0.02
     } = extension.opts;
     // Creating a unit-square scaled intersection box for rendering the lens.
     // It is ok if these coordinates are outside the unit square since

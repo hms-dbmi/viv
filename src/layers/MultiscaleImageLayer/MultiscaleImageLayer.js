@@ -4,7 +4,6 @@ import GL from '@luma.gl/constants';
 
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
-import { onPointer } from '../utils';
 import {
   getImageSize,
   isInterleaved,
@@ -43,11 +42,6 @@ const defaultProps = {
  * @property {String=} id Unique identifier for this layer.
  * @property {function=} onTileError Custom override for handle tile fetching errors.
  * @property {function=} onHover Hook function from deck.gl to handle hover objects.
- * @property {boolean=} isLensOn Whether or not to use the lens.
- * @property {number=} lensSelection Numeric index of the channel to be focused on by the lens.
- * @property {number=} lensRadius Pixel radius of the lens (default: 100).
- * @property {Array.<number>=} lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
- * @property {number=} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  * @property {number=} maxRequests Maximum parallel ongoing requests allowed before aborting.
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
@@ -57,6 +51,7 @@ const defaultProps = {
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {string=} refinementStrategy 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
  * @property {boolean=} excludeBackground Whether to exclude the background image. The background image is also excluded for opacity!=1.
+ * @property {Array=} extensions [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers.
  */
 
 /**
@@ -64,19 +59,6 @@ const defaultProps = {
  * @ignore
  */
 const MultiscaleImageLayer = class extends CompositeLayer {
-  initializeState() {
-    this.state = {
-      unprojectLensBounds: [0, 0, 0, 0]
-    };
-    if (this.context.deck) {
-      this.context.deck.eventManager.on({
-        pointermove: () => onPointer(this),
-        pointerleave: () => onPointer(this),
-        wheel: () => onPointer(this)
-      });
-    }
-  }
-
   renderLayers() {
     const {
       loader,

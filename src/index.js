@@ -30,6 +30,7 @@ import {
   COLORMAPS,
   RENDERING_MODES
 } from './constants';
+import { LensExtension } from './extensions';
 
 export {
   DTYPE_VALUES,
@@ -55,7 +56,8 @@ export {
   SideBySideViewer,
   VolumeViewer,
   DetailView,
-  ImageLayer
+  ImageLayer,
+  LensExtension
 };
 
 export * from './loaders';

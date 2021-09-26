@@ -4,7 +4,8 @@ import debounce from 'lodash/debounce';
 import {
   SideBySideViewer,
   PictureInPictureViewer,
-  VolumeViewer
+  VolumeViewer,
+  LensExtension
   // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 import {
@@ -102,6 +103,12 @@ const Viewer = () => {
       lensSelection={lensSelection}
       isLensOn={isLensOn}
       onViewportLoad={onViewportLoad}
+      extensions={[
+        new LensExtension({
+          isLensOn,
+          lensSelection
+        })
+      ]}
     />
   );
 };
