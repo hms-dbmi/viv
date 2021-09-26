@@ -1,7 +1,6 @@
 import { OrthographicView } from '@deck.gl/core';
 import { Matrix4 } from 'math.gl';
 import { getImageSize } from '../loaders/utils';
-import { LensExtension } from '../extensions';
 // Do not import from '../layers' because that causes a circular dependency.
 import MultiscaleImageLayer from '../layers/MultiscaleImageLayer';
 import ImageLayer from '../layers/ImageLayer';
