@@ -7,6 +7,7 @@
 - New `LensExtension` for controlling lensing on layers as a deck.gl extension
   - props like `lensBorderRadius` no longer used in favor of using the `extensions` prop with new `LensExtension`
     - These props are now `opts` on the extension itself
+    - See https://deck.gl/docs/developer-guide/custom-layers/layer-extensions for more information on how to use `extensions` and what they are
 
 ### Changed
 
