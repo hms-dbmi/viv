@@ -118,12 +118,26 @@ const XRLayer = class extends Layer {
    * replaces `usampler` with `sampler` if the data is not an unsigned integer
    */
   getShaders() {
-    const { colormap, dtype, interpolation } = this.props;
+    const { colormap, dtype, interpolation, extensions } = this.props;
     const { shaderModule, sampler } = getRenderingAttrs(
       dtype,
       this.context.gl,
       interpolation
     );
+    const extensionDefinesDeckglProcessIntensity = extensions?.some(e => {
+      const shaders = e.getShaders();
+      const { inject = {}, modules = [] } = shaders;
+      const definesInjection = inject['fs:DECKGL_PROCESS_INTENSITY'];
+      const moduleDefinesInjection = modules.some(
+        m => m?.inject['fs:DECKGL_PROCESS_INTENSITY']
+      );
+      return definesInjection || moduleDefinesInjection;
+    });
+    const inject = !extensionDefinesDeckglProcessIntensity && {
+      'fs:DECKGL_PROCESS_INTENSITY': `
+        rgbOut += max(0., min(1., intensity)) * vec3(color);
+      `
+    };
     return super.getShaders({
       fs: colormap ? shaderModule.fscmap : shaderModule.fs,
       vs: shaderModule.vs,
@@ -131,6 +145,7 @@ const XRLayer = class extends Layer {
         SAMPLER_TYPE: sampler,
         COLORMAP_FUNCTION: colormap || 'viridis'
       },
+      inject,
       modules: [project32, picking, channels]
     });
   }

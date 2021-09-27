@@ -77,7 +77,7 @@ export default class LensExtension extends LayerExtension {
 
   draw(params, extension) {
     const { bounds } = this.props;
-    const { model, unprojectLensBounds } = this.state;
+    const { unprojectLensBounds } = this.state;
     const {
       isLensOn,
       lensSelection,
@@ -112,7 +112,7 @@ export default class LensExtension extends LayerExtension {
     };
     // ScatterplotLayer model
     // eslint-disable-next-line no-unused-expressions
-    model?.setUniforms(uniforms);
+    this.state.model?.setUniforms(uniforms);
   }
 
   finalizeState() {
