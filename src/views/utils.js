@@ -81,10 +81,6 @@ export function getImageLayers(id, props) {
     transitionFields,
     transitionOnViewportLoad,
     onViewportLoad,
-    isLensOn,
-    lensSelection,
-    lensBorderColor,
-    lensBorderRadius,
     ...layerProps
   } = props;
   const { loader } = layerProps;
