@@ -110,7 +110,6 @@ export default class LensExtension extends LayerExtension {
       lensBorderColor,
       lensBorderRadius
     };
-    // ScatterplotLayer model
     // eslint-disable-next-line no-unused-expressions
     this.state.model?.setUniforms(uniforms);
   }
