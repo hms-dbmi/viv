@@ -33,6 +33,8 @@ toc:
 - BitmapLayer
 - OverviewLayer
 - ScaleBarLayer
+- name: Extensions
+- LensExtension
 - name: Loaders
 - loadOmeTiff
 - loadOmeZarr
