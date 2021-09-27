@@ -118,21 +118,15 @@ const XRLayer = class extends Layer {
    * replaces `usampler` with `sampler` if the data is not an unsigned integer
    */
   getShaders() {
-    const { colormap, dtype, interpolation, extensions } = this.props;
+    const { colormap, dtype, interpolation } = this.props;
     const { shaderModule, sampler } = getRenderingAttrs(
       dtype,
       this.context.gl,
       interpolation
     );
-    const extensionDefinesDeckglProcessIntensity = extensions?.some(e => {
-      const shaders = e.getShaders();
-      const { inject = {}, modules = [] } = shaders;
-      const definesInjection = inject['fs:DECKGL_PROCESS_INTENSITY'];
-      const moduleDefinesInjection = modules.some(
-        m => m?.inject['fs:DECKGL_PROCESS_INTENSITY']
-      );
-      return definesInjection || moduleDefinesInjection;
-    });
+    const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
+      'fs:DECKGL_PROCESS_INTENSITY'
+    );
     const inject = !extensionDefinesDeckglProcessIntensity && {
       'fs:DECKGL_PROCESS_INTENSITY': `
         rgbOut += max(0., min(1., intensity)) * vec3(color);
@@ -147,6 +141,17 @@ const XRLayer = class extends Layer {
       },
       inject,
       modules: [project32, picking, channels]
+    });
+  }
+
+  _isHookDefinedByExtensions(hookName) {
+    const { extensions } = this.props;
+    return extensions?.some(e => {
+      const shaders = e.getShaders();
+      const { inject = {}, modules = [] } = shaders;
+      const definesInjection = inject[hookName];
+      const moduleDefinesInjection = modules.some(m => m?.inject[hookName]);
+      return definesInjection || moduleDefinesInjection;
     });
   }
 
