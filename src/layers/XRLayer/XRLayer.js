@@ -170,7 +170,6 @@ const XRLayer = class extends Layer {
    * This function initializes the internal state.
    */
   initializeState() {
-    console.log('here!!');
     const { gl } = this.context;
     // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
     // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
