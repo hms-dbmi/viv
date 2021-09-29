@@ -43,17 +43,19 @@
 #pragma glslify: velocity-green = require("glsl-colormap/velocity-green")
 #pragma glslify: cubehelix = require("glsl-colormap/cubehelix")
 
-float sample_and_apply_contrast_limits(SAMPLER_TYPE channel, vec2 vTexCoord, vec2 contrastLimits) {
-  float fragIntensity = float(texture(channel, vTexCoord).r);
-  float contrastLimitsAppliedToIntensity = (fragIntensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0]));
-  return max(0., contrastLimitsAppliedToIntensity);
-}
 
-vec3 process_channel_intensity(float intensity, vec3 colors, int channelIndex, bool inLensAndUseLens, int lensSelection) {
-  float useColorValue = float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));
-  // Use arithmetic instead of if-then for useColorValue.
-  vec3 rgb = max(0., min(1., intensity)) * max(vec3(colors), (1. - useColorValue) * vec3(1., 1., 1.));
-  return rgb;
+// range
+uniform vec2 contrastLimits[6];
+
+float apply_contrast_limits(float intensity, int channelIndex) {
+  // Because WebGL1 cannot index the contrastLimits array dynamically, we need to use this assignment trick to apply the contrast funtion.
+  intensity =  float(channelIndex != 0) * intensity + float(channelIndex == 0) * max(0., (intensity - contrastLimits[0][0]) / max(0.0005, (contrastLimits[0][1] - contrastLimits[0][0])));
+  intensity =  float(channelIndex != 1) * intensity + float(channelIndex == 1) * max(0., (intensity - contrastLimits[1][0]) / max(0.0005, (contrastLimits[1][1] - contrastLimits[1][0])));
+  intensity =  float(channelIndex != 2) * intensity + float(channelIndex == 2) * max(0., (intensity - contrastLimits[2][0]) / max(0.0005, (contrastLimits[2][1] - contrastLimits[2][0])));
+  intensity =  float(channelIndex != 3) * intensity + float(channelIndex == 3) * max(0., (intensity - contrastLimits[3][0]) / max(0.0005, (contrastLimits[3][1] - contrastLimits[3][0])));
+  intensity =  float(channelIndex != 4) * intensity + float(channelIndex == 4) * max(0., (intensity - contrastLimits[4][0]) / max(0.0005, (contrastLimits[4][1] - contrastLimits[4][0])));
+  intensity =  float(channelIndex != 5) * intensity + float(channelIndex == 5) * max(0., (intensity - contrastLimits[5][0]) / max(0.0005, (contrastLimits[5][1] - contrastLimits[5][0])));
+  return intensity;
 }
 
 vec4 apply_opacity(vec3 color, bool useTransparentColor, vec3 transparentColor, float opacity){

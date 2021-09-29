@@ -10,9 +10,6 @@ uniform sampler2D channel3;
 uniform sampler2D channel4;
 uniform sampler2D channel5;
 
-// range
-uniform vec2 contrastLimits[6];
-
 // opacity
 uniform float opacity;
 uniform float divisor;
@@ -24,12 +21,18 @@ varying vec2 vTexCoord;
 
 
 void main() {
-  float intensityValue0 = sample_and_apply_contrast_limits(channel0, vTexCoord, contrastLimits[0]);
-  float intensityValue1 = sample_and_apply_contrast_limits(channel1, vTexCoord, contrastLimits[1]);
-  float intensityValue2 = sample_and_apply_contrast_limits(channel2, vTexCoord, contrastLimits[2]);
-  float intensityValue3 = sample_and_apply_contrast_limits(channel3, vTexCoord, contrastLimits[3]);
-  float intensityValue4 = sample_and_apply_contrast_limits(channel4, vTexCoord, contrastLimits[4]);
-  float intensityValue5 = sample_and_apply_contrast_limits(channel5, vTexCoord, contrastLimits[5]);
+  float intensityValue0 = float(texture(channel0, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensityValue0, 0);
+  float intensityValue1 = float(texture(channel1, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensityValue1, 1);
+  float intensityValue2 = float(texture(channel2, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensityValue2, 2);
+  float intensityValue3 = float(texture(channel3, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensityValue3, 3);
+  float intensityValue4 = float(texture(channel4, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensityValue4, 4);
+  float intensityValue5 = float(texture(channel5, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensityValue5, 5);
 
   float intensityCombo = 0.;
   

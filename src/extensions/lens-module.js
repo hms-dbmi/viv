@@ -4,7 +4,7 @@ export default {
   name: 'lens-module',
   fs,
   inject: {
-    'fs:DECKGL_PROCESS_INTENSITY': `
+    'fs:DECKGL_MUTATE_COLOR': `
     process_channel_intensity_with_lens(rgbOut, intensity, color, vTexCoord, channelIndex);
   `,
     'fs:#main-end': `

@@ -9,9 +9,6 @@ uniform sampler2D channel3;
 uniform sampler2D channel4;
 uniform sampler2D channel5;
 
-// range
-uniform vec2 contrastLimits[6];
-
 // color
 uniform vec3 colors[6];
 uniform float intensityArray[6];
@@ -27,20 +24,26 @@ varying vec2 vTexCoord;
 
 void main() {
 
-  float intensityValue0 = sample_and_apply_contrast_limits(channel0, vTexCoord, contrastLimits[0]);
-  float intensityValue1 = sample_and_apply_contrast_limits(channel1, vTexCoord, contrastLimits[1]);
-  float intensityValue2 = sample_and_apply_contrast_limits(channel2, vTexCoord, contrastLimits[2]);
-  float intensityValue3 = sample_and_apply_contrast_limits(channel3, vTexCoord, contrastLimits[3]);
-  float intensityValue4 = sample_and_apply_contrast_limits(channel4, vTexCoord, contrastLimits[4]);
-  float intensityValue5 = sample_and_apply_contrast_limits(channel5, vTexCoord, contrastLimits[5]);
+  float intensityValue0 = float(texture(channel0, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensityValue0, 0);
+  float intensityValue1 = float(texture(channel1, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensityValue1, 1);
+  float intensityValue2 = float(texture(channel2, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensityValue2, 2);
+  float intensityValue3 = float(texture(channel3, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensityValue3, 3);
+  float intensityValue4 = float(texture(channel4, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensityValue4, 4);
+  float intensityValue5 = float(texture(channel5, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensityValue5, 5);
 
   vec3 rgbCombo = vec3(0.);
-  DECKGL_PROCESS_INTENSITY(rgbCombo, intensityValue0, colors[0], vTexCoord, 0);
-  DECKGL_PROCESS_INTENSITY(rgbCombo, intensityValue1, colors[1], vTexCoord, 1);
-  DECKGL_PROCESS_INTENSITY(rgbCombo, intensityValue2, colors[2], vTexCoord, 2);
-  DECKGL_PROCESS_INTENSITY(rgbCombo, intensityValue3, colors[3], vTexCoord, 3);
-  DECKGL_PROCESS_INTENSITY(rgbCombo, intensityValue4, colors[4], vTexCoord, 4);
-  DECKGL_PROCESS_INTENSITY(rgbCombo, intensityValue5, colors[5], vTexCoord, 5);
+  DECKGL_MUTATE_COLOR(rgbCombo, intensityValue0, colors[0], vTexCoord, 0);
+  DECKGL_MUTATE_COLOR(rgbCombo, intensityValue1, colors[1], vTexCoord, 1);
+  DECKGL_MUTATE_COLOR(rgbCombo, intensityValue2, colors[2], vTexCoord, 2);
+  DECKGL_MUTATE_COLOR(rgbCombo, intensityValue3, colors[3], vTexCoord, 3);
+  DECKGL_MUTATE_COLOR(rgbCombo, intensityValue4, colors[4], vTexCoord, 4);
+  DECKGL_MUTATE_COLOR(rgbCombo, intensityValue5, colors[5], vTexCoord, 5);
 
   gl_FragColor = apply_opacity(rgbCombo, useTransparentColor, transparentColor, opacity);
   geometry.uv = vTexCoord;
