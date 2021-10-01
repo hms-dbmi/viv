@@ -43,19 +43,8 @@
 #pragma glslify: velocity-green = require("glsl-colormap/velocity-green")
 #pragma glslify: cubehelix = require("glsl-colormap/cubehelix")
 
-
-// range
-uniform vec2 contrastLimits[6];
-
-float apply_contrast_limits(float intensity, int channelIndex) {
-  // Because WebGL1 cannot index the contrastLimits array dynamically, we need to use this assignment trick to apply the contrast funtion.
-  intensity =  float(channelIndex != 0) * intensity + float(channelIndex == 0) * max(0., (intensity - contrastLimits[0][0]) / max(0.0005, (contrastLimits[0][1] - contrastLimits[0][0])));
-  intensity =  float(channelIndex != 1) * intensity + float(channelIndex == 1) * max(0., (intensity - contrastLimits[1][0]) / max(0.0005, (contrastLimits[1][1] - contrastLimits[1][0])));
-  intensity =  float(channelIndex != 2) * intensity + float(channelIndex == 2) * max(0., (intensity - contrastLimits[2][0]) / max(0.0005, (contrastLimits[2][1] - contrastLimits[2][0])));
-  intensity =  float(channelIndex != 3) * intensity + float(channelIndex == 3) * max(0., (intensity - contrastLimits[3][0]) / max(0.0005, (contrastLimits[3][1] - contrastLimits[3][0])));
-  intensity =  float(channelIndex != 4) * intensity + float(channelIndex == 4) * max(0., (intensity - contrastLimits[4][0]) / max(0.0005, (contrastLimits[4][1] - contrastLimits[4][0])));
-  intensity =  float(channelIndex != 5) * intensity + float(channelIndex == 5) * max(0., (intensity - contrastLimits[5][0]) / max(0.0005, (contrastLimits[5][1] - contrastLimits[5][0])));
-  return intensity;
+float apply_contrast_limits(float intensity, vec2 contrastLimits) {
+    return  max(0., (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0])));
 }
 
 vec4 apply_opacity(vec3 color, bool useTransparentColor, vec3 transparentColor, float opacity){

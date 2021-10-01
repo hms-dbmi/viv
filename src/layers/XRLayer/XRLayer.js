@@ -140,7 +140,7 @@ const XRLayer = class extends Layer {
     const newChannelsModule = { ...channels, inject: {} };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
-        intensity = apply_contrast_limits(intensity, channelIndex);
+        intensity = apply_contrast_limits(intensity, contrastLimits);
       `;
     }
     return super.getShaders({
@@ -195,7 +195,7 @@ const XRLayer = class extends Layer {
 
     const mutateStr =
       'fs:DECKGL_MUTATE_COLOR(inout vec3 rgbOut, float intensity, vec3 color, vec2 vTexCoord, int channelIndex)';
-    const processStr = `fs:DECKGL_PROCESS_INTENSITY(inout float intensity, int channelIndex)`;
+    const processStr = `fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)`;
 
     // Only initialize shader hook functions _once globally_
     // Since the program manager is shared across all layers, but many layers

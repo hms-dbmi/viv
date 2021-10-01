@@ -43,11 +43,8 @@
 #pragma glslify: velocity-green = require("glsl-colormap/velocity-green")
 #pragma glslify: cubehelix = require("glsl-colormap/cubehelix")
 
-// range
-uniform vec2 contrastLimits[6];
-
-float apply_contrast_limits(float intensity, int channelIndex) {
-  float contrastLimitsAppliedToIntensity = (intensity - contrastLimits[channelIndex][0]) / max(0.0005, (contrastLimits[channelIndex][1] - contrastLimits[channelIndex][0]));
+float apply_contrast_limits(float intensity, vec2 contrastLimits) {
+  float contrastLimitsAppliedToIntensity = (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0]));
   return max(0., contrastLimitsAppliedToIntensity);
 }
 

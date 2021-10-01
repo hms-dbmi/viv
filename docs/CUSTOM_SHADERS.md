@@ -1,6 +1,6 @@
 Viv's layer allow for custom shader hooks to be defined via [deck.gl hook functions](https://deck.gl/docs/developer-guide/custom-layers/writing-shaders#standard-shader-hooks). To take advantage of these, please pass in a deck.gl [layer extension](https://deck.gl/docs/api-reference/extensions/overview) whose `getShaders` function has a definition in `inject` for one of these hooks. Viv supports 3 hooks on the fragment shader:
 
-### `DECKGL_PROCESS_INTENSITY(inout float intensity, int channelIndex)`
+### `DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)`
 
 This hook allows for custom processing of the raw intensities of the pixels. You may for example want to apply a nonlinear or otherwise different function instead of the standard ramp function with 2 contrast limit endpoints we apply. This hook is available on all layers in all modes
 
