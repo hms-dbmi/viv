@@ -21,6 +21,10 @@ export default class LensExtension extends LayerExtension {
 
   initializeState(context, extension) {
     const layer = this.getCurrentLayer();
+    // No need to run this on layers that don't have a `draw` call.
+    if (layer.isComposite) {
+      return;
+    }
     // eslint-disable-next-line no-param-reassign
     const onMouseMove = () => {
       const { viewportId } = layer.props;
