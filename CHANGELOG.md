@@ -13,6 +13,7 @@
   - `loaderSelection` -> `selections`
   - `MAX_SLIDERS_AND_CHANNELS` -> `MAX_CHANNELS`
 - Upgrade `Vite` to `~2.5.4`
+- Fix value-picking for `VivViewer`.
 
 ## 0.10.6
 
