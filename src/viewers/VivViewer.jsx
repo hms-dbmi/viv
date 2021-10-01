@@ -226,7 +226,6 @@ class VivViewerWrapper extends PureComponent {
         return null;
       }
       // The zoomed out layer needs to use the fixed zoom at which it is rendered.
-      // See: https://github.com/visgl/deck.gl/blob/2b15bc459c6534ea38ce1153f254ce0901f51d6f/modules/geo-layers/src/tile-layer/utils.js#L130.
       const layerZoomScale = Math.max(1, 2 ** Math.round(-z));
       const dataCoords = [
         Math.floor((coordinate[0] - bounds[0]) / layerZoomScale),
