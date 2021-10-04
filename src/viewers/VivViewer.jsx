@@ -327,7 +327,7 @@ class VivViewerWrapper extends PureComponent {
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {HoverHooks} [props.hoverHooks] Object including utility hooks - an object with key handleValue like { handleValue: (valueArray) => {}, handleCoordinate: (coordinate) => {} } where valueArray
  * has the pixel values for the image under the hover location and coordinate is the coordinate in the image from which the values are picked.
- * @param {Object} [props.deckProps] Additional options used when creating the DeckGL component.
+ * @param {Object} [props.deckProps] Additional options used when creating the DeckGL component.  See [the deck.gl docs.](https://deck.gl/docs/api-reference/core/deck#initialization-settings).  `layerFilter`, `layers`, `onViewStateChange`, `views`, `viewState`, `useDevicePixels`, and `getCursor` are already set.
  */
 // eslint-disable-next-line react/jsx-props-no-spreading
 const VivViewer = props => <VivViewerWrapper {...props} />;

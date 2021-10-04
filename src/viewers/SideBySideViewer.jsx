@@ -32,7 +32,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {Array} [props.transitionFields] A string array indicating which fields require a transition: Default: ['t', 'z'].
- * @param {Object} [props.deckProps] Additional options used when creating the DeckGL component.
+ * @param {Object} [props.deckProps] Additional options used when creating the DeckGL component.  See [the deck.gl docs.](https://deck.gl/docs/api-reference/core/deck#initialization-settings).  `layerFilter`, `layers`, `onViewStateChange`, `views`, `viewState`, `useDevicePixels`, and `getCursor` are already set.
  */
 const SideBySideViewer = props => {
   const {
