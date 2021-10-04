@@ -6,6 +6,12 @@
 
 ### Changed
 
+## 0.11.0
+
+### Added
+
+### Changed
+
 - Change API for all public props
   - `sliderValues` -> `contrastLimits`
   - `colorValues` -> `colors`
