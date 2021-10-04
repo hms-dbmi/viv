@@ -14,6 +14,7 @@
   - `MAX_SLIDERS_AND_CHANNELS` -> `MAX_CHANNELS`
 - Upgrade `Vite` to `~2.5.4`
 - Fix value-picking for `VivViewer`.
+- `glOptions` is removed in favor of a general `deckProps` for Viewer components for all props that can be passed to the `DeckGL` component.
 
 ## 0.10.6
 
