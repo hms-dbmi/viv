@@ -71,6 +71,8 @@ This is in order to prevent users from installing multiple versions of deck.gl.
 $ npm install deck.gl @luma.gl/core
 ```
 
+Breaking changes may happen on the minor version update.  Please see the [changelog](https://github.com/hms-dbmi/viv/blob/master/CHANGELOG.md) for information.
+
 ## Development
 
 ```bash

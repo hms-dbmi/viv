@@ -39,7 +39,7 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {Array} [props.transitionFields] A string array indicating which fields require a transition when making a new selection: Default: ['t', 'z'].
  * @param {function} [props.onViewportLoad] Function that gets called when the data in the viewport loads.
- * @param {Object} [props.glOptions] Additional options used when creating the WebGLContext.
+ * @param {Object} [props.deckProps] Additional options used when creating the DeckGL component.  See [the deck.gl docs.](https://deck.gl/docs/api-reference/core/deck#initialization-settings).  `layerFilter`, `layers`, `onViewStateChange`, `views`, `viewState`, `useDevicePixels`, and `getCursor` are already set.
  */
 
 const PictureInPictureViewer = props => {
@@ -62,8 +62,8 @@ const PictureInPictureViewer = props => {
     onHover,
     transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
     onViewportLoad,
-    glOptions,
     extensions = []
+    deckProps,
   } = props;
   const {
     newselections,
@@ -127,7 +127,7 @@ const PictureInPictureViewer = props => {
       hoverHooks={hoverHooks}
       onViewStateChange={onViewStateChange}
       onHover={onHover}
-      glOptions={glOptions}
+      deckProps={deckProps}
     />
   );
 };

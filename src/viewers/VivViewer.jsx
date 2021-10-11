@@ -195,49 +195,64 @@ class VivViewerWrapper extends PureComponent {
 
   // eslint-disable-next-line consistent-return
   onHover(info, event) {
-    const { sourceLayer, coordinate, layer } = info;
+    const { tile, coordinate, sourceLayer: layer } = info;
     const { onHover, hoverHooks } = this.props;
     if (onHover) {
       onHover(info, event);
     }
-    if (!hoverHooks || !coordinate || !sourceLayer || !layer) {
-      return null;
-    }
-    const { channelData, bounds } = sourceLayer.props;
-    if (!channelData || !bounds) {
-      return null;
-    }
-    const { data, width } = channelData;
-    if (!data) {
+    if (!hoverHooks || !coordinate || !layer) {
       return null;
     }
     const { handleValue = () => {}, handleCoordnate = () => {} } = hoverHooks;
-    let dataCoords;
+    let hoverData;
     // Tiled layer needs a custom layerZoomScale.
-    if (sourceLayer.id.includes('Tiled')) {
-      const { tileSize } = layer.props.loader[0];
-      const { z } = sourceLayer.props.tileId;
+    if (layer.id.includes('Tiled')) {
+      if (!tile?.content) {
+        return null;
+      }
+      const { content, bbox, z } = tile;
+      if (!content.data || !bbox) {
+        return null;
+      }
+      const { data, width, height } = content;
+      const { left, right, top, bottom } = bbox;
+      const bounds = [
+        left,
+        data.height < layer.tileSize ? height : bottom,
+        data.width < layer.tileSize ? width : right,
+        top
+      ];
+      if (!data) {
+        return null;
+      }
       // The zoomed out layer needs to use the fixed zoom at which it is rendered.
-      // See: https://github.com/visgl/deck.gl/blob/2b15bc459c6534ea38ce1153f254ce0901f51d6f/modules/geo-layers/src/tile-layer/utils.js#L130.
-      const layerZoomScale = Math.max(
-        1,
-        2 ** Math.round(-z + Math.log2(512 / tileSize))
-      );
-      dataCoords = [
+      const layerZoomScale = Math.max(1, 2 ** Math.round(-z));
+      const dataCoords = [
         Math.floor((coordinate[0] - bounds[0]) / layerZoomScale),
         Math.floor((coordinate[1] - bounds[3]) / layerZoomScale)
       ];
+      const coords = dataCoords[1] * width + dataCoords[0];
+      hoverData = data.map(d => d[coords]);
     } else {
+      const { channelData } = layer.props;
+      if (!channelData) {
+        return null;
+      }
+      const { data, width, height } = channelData;
+      if (!data || !width || !height) {
+        return null;
+      }
+      const bounds = [0, height, width, 0];
       // Using floor means that as we zoom out, we are scaling by the zoom just passed, not the one coming.
       const { zoom } = layer.context.viewport;
       const layerZoomScale = Math.max(1, 2 ** Math.floor(-zoom));
-      dataCoords = [
+      const dataCoords = [
         Math.floor((coordinate[0] - bounds[0]) / layerZoomScale),
         Math.floor((coordinate[1] - bounds[3]) / layerZoomScale)
       ];
+      const coords = dataCoords[1] * width + dataCoords[0];
+      hoverData = data.map(d => d[coords]);
     }
-    const coords = dataCoords[1] * width + dataCoords[0];
-    const hoverData = data.map(d => d[coords]);
     handleValue(hoverData);
     handleCoordnate(coordinate);
   }
@@ -262,7 +277,7 @@ class VivViewerWrapper extends PureComponent {
 
   render() {
     /* eslint-disable react/destructuring-assignment */
-    const { views, randomize, useDevicePixels = true, glOptions } = this.props;
+    const { views, randomize, useDevicePixels = true, deckProps } = this.props;
     const { viewStates } = this.state;
     const deckGLViews = views.map(view => view.getDeckGlView());
     // DeckGL seems to use the first view more than the second for updates
@@ -284,7 +299,8 @@ class VivViewerWrapper extends PureComponent {
     }
     return (
       <DeckGL
-        glOptions={glOptions ?? {}}
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        {...(deckProps ?? {})}
         layerFilter={this.layerFilter}
         layers={this._renderLayers()}
         onViewStateChange={this._onViewStateChange}
@@ -311,7 +327,7 @@ class VivViewerWrapper extends PureComponent {
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {HoverHooks} [props.hoverHooks] Object including utility hooks - an object with key handleValue like { handleValue: (valueArray) => {}, handleCoordinate: (coordinate) => {} } where valueArray
  * has the pixel values for the image under the hover location and coordinate is the coordinate in the image from which the values are picked.
- * @param {Object} [props.glOptions] Additional options used when creating the WebGLContext.
+ * @param {Object} [props.deckProps] Additional options used when creating the DeckGL component.  See [the deck.gl docs.](https://deck.gl/docs/api-reference/core/deck#initialization-settings).  `layerFilter`, `layers`, `onViewStateChange`, `views`, `viewState`, `useDevicePixels`, and `getCursor` are already set.
  */
 // eslint-disable-next-line react/jsx-props-no-spreading
 const VivViewer = props => <VivViewerWrapper {...props} />;
