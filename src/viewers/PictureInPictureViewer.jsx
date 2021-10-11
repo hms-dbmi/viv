@@ -74,7 +74,6 @@ const PictureInPictureViewer = props => {
     onViewportLoad,
     deckProps,
     extensions = [],
-    deckProps
   } = props;
   const {
     newselections,
