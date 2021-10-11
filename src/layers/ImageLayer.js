@@ -3,7 +3,6 @@ import GL from '@luma.gl/constants';
 
 import XRLayer from './XRLayer';
 import BitmapLayer from './BitmapLayer';
-import { onPointer } from './utils';
 import { isInterleaved, SIGNAL_ABORTED } from '../loaders/utils';
 
 const defaultProps = {
@@ -24,11 +23,6 @@ const defaultProps = {
     },
     compare: true
   },
-  isLensOn: { type: 'boolean', value: false, compare: true },
-  lensSelection: { type: 'number', value: 0, compare: true },
-  lensRadius: { type: 'number', value: 100, compare: true },
-  lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
-  lensBorderRadius: { type: 'number', value: 0.02, compare: true },
   onClick: { type: 'function', value: null, compare: true },
   transparentColor: { type: 'array', value: null, compare: true },
   onViewportLoad: { type: 'function', value: null, compare: true },
@@ -52,11 +46,6 @@ const defaultProps = {
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @property {string=} viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
  * @property {function=} onHover Hook function from deck.gl to handle hover objects.
- * @property {boolean=} isLensOn Whether or not to use the lens.
- * @property {number=} lensSelection Numeric index of the channel to be focused on by the lens.
- * @property {number=} lensRadius Pixel radius of the lens (default: 100).
- * @property {Array.<number>=} lensBorderColor RGB color of the border of the lens.
- * @property {number=} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
  * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
@@ -65,6 +54,7 @@ const defaultProps = {
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
  * @property {String=} id Unique identifier for this layer.
+ * @property {Array=} extensions [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers.
  */
 
 /**
@@ -72,22 +62,6 @@ const defaultProps = {
  * @ignore
  */
 const ImageLayer = class extends CompositeLayer {
-  initializeState() {
-    this.state = {
-      unprojectLensBounds: [0, 0, 0, 0],
-      width: 0,
-      height: 0,
-      data: []
-    };
-    if (this.context.deck) {
-      this.context.deck.eventManager.on({
-        pointermove: () => onPointer(this),
-        pointerleave: () => onPointer(this),
-        wheel: () => onPointer(this)
-      });
-    }
-  }
-
   finalizeState() {
     this.state.abortController.abort();
   }

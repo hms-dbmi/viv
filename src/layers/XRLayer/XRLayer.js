@@ -4,6 +4,8 @@
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer, project32, picking } from '@deck.gl/core';
 import { Model, Geometry, Texture2D, isWebGL2 } from '@luma.gl/core';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { ProgramManager } from '@luma.gl/engine';
 import { hasFeature, FEATURES } from '@luma.gl/webgl';
 import fsColormap1 from './xr-layer-fragment-colormap.webgl1.glsl';
 import fsColormap2 from './xr-layer-fragment-colormap.webgl2.glsl';
@@ -11,7 +13,7 @@ import fs1 from './xr-layer-fragment.webgl1.glsl';
 import fs2 from './xr-layer-fragment.webgl2.glsl';
 import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
-import { lens, channels } from './shader-modules';
+import { channels } from './shader-modules';
 import { padColorsAndWindows, getDtypeValues } from '../utils';
 
 const SHADER_MODULES = [
@@ -73,11 +75,6 @@ const defaultProps = {
   opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: 'Uint16', compare: true },
   colormap: { type: 'string', value: '', compare: true },
-  isLensOn: { type: 'boolean', value: false, compare: true },
-  lensSelection: { type: 'number', value: 0, compare: true },
-  lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
-  lensBorderRadius: { type: 'number', value: 0.02, compare: true },
-  unprojectLensBounds: { type: 'array', value: [0, 0, 0, 0], compare: true },
   transparentColor: { type: 'array', value: null, compare: true },
   interpolation: {
     type: 'number',
@@ -127,6 +124,14 @@ const XRLayer = class extends Layer {
       this.context.gl,
       interpolation
     );
+    const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
+      'fs:DECKGL_PROCESS_INTENSITY'
+    );
+    const inject = !extensionDefinesDeckglProcessIntensity && {
+      'fs:DECKGL_PROCESS_INTENSITY': `
+        rgbOut += max(0., min(1., intensity)) * vec3(color);
+      `
+    };
     return super.getShaders({
       fs: colormap ? shaderModule.fscmap : shaderModule.fs,
       vs: shaderModule.vs,
@@ -134,7 +139,19 @@ const XRLayer = class extends Layer {
         SAMPLER_TYPE: sampler,
         COLORMAP_FUNCTION: colormap || 'viridis'
       },
-      modules: [project32, picking, channels, lens]
+      inject,
+      modules: [project32, picking, channels]
+    });
+  }
+
+  _isHookDefinedByExtensions(hookName) {
+    const { extensions } = this.props;
+    return extensions?.some(e => {
+      const shaders = e.getShaders();
+      const { inject = {}, modules = [] } = shaders;
+      const definesInjection = inject[hookName];
+      const moduleDefinesInjection = modules.some(m => m?.inject[hookName]);
+      return definesInjection || moduleDefinesInjection;
     });
   }
 
@@ -163,6 +180,19 @@ const XRLayer = class extends Layer {
       numInstances: 1,
       positions: new Float64Array(12)
     });
+    const programManager = ProgramManager.getDefaultProgramManager(gl);
+
+    const processStr =
+      'fs:DECKGL_PROCESS_INTENSITY(inout vec3 rgbOut, float intensity, vec3 color, vec2 vTexCoord, int channelIndex)';
+
+    // Only initialize shader hook functions _once globally_
+    // Since the program manager is shared across all layers, but many layers
+    // might be created, this solves the performance issue of always adding new
+    // hook functions.
+    // See https://github.com/kylebarron/deck.gl-raster/blob/2eb91626f0836558f0be4cd201ea18980d7f7f2d/src/deckgl/raster-layer/raster-layer.js#L21-L40
+    if (!programManager._hookFunctions.includes(processStr)) {
+      programManager.addShaderHook(processStr);
+    }
   }
 
   /**
@@ -180,7 +210,8 @@ const XRLayer = class extends Layer {
    * This function updates state by retriggering model creation (shader compilation and attribute binding)
    * and loading any textures that need be loading.
    */
-  updateState({ props, oldProps, changeFlags }) {
+  updateState({ props, oldProps, changeFlags, ...rest }) {
+    super.updateState({ props, oldProps, changeFlags, ...rest });
     // setup model first
     if (
       changeFlags.extensionsChanged ||
@@ -282,12 +313,6 @@ const XRLayer = class extends Layer {
         domain,
         dtype,
         channelsVisible,
-        unprojectLensBounds,
-        bounds,
-        isLensOn,
-        lensSelection,
-        lensBorderColor,
-        lensBorderRadius,
         transparentColor
       } = this.props;
       // Check number of textures not null.
@@ -301,36 +326,13 @@ const XRLayer = class extends Layer {
         domain,
         dtype
       });
-      // Creating a unit-square scaled intersection box for rendering the lens.
-      // It is ok if these coordinates are outside the unit square since
-      // we check membership in or out of the lens on the fragment shader.
-      const [
-        leftMouseBound,
-        bottomMouseBound,
-        rightMouseBound,
-        topMouseBound
-      ] = unprojectLensBounds;
-      const [left, bottom, right, top] = bounds;
-      const leftMouseBoundScaled = (leftMouseBound - left) / (right - left);
-      const bottomMouseBoundScaled = (bottomMouseBound - top) / (bottom - top);
-      const rightMouseBoundScaled = (rightMouseBound - left) / (right - left);
-      const topMouseBoundScaled = (topMouseBound - top) / (bottom - top);
+
       model
         .setUniforms({
           ...uniforms,
           colors: paddedColors,
           contrastLimits: paddedContrastLimits,
           opacity,
-          majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
-          minorLensAxis: (bottomMouseBoundScaled - topMouseBoundScaled) / 2,
-          lensCenter: [
-            (rightMouseBoundScaled + leftMouseBoundScaled) / 2,
-            (bottomMouseBoundScaled + topMouseBoundScaled) / 2
-          ],
-          isLensOn,
-          lensSelection,
-          lensBorderColor,
-          lensBorderRadius,
           transparentColor: (transparentColor || [0, 0, 0]).map(i => i / 255),
           useTransparentColor: Boolean(transparentColor),
           ...textures
