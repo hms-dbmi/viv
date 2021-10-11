@@ -7,7 +7,7 @@
 - New `LensExtension` for controlling lensing on layers as a deck.gl extension
   - props like `lensBorderRadius` no longer used directly by the layer in favor of using the `extensions` prop with new `LensExtension` in connjunction with these props.  So, to be able to use the lens feature, you must pass in the old props as well as the `LensExtension` to `extensions`.
     - See https://deck.gl/docs/developer-guide/custom-layers/layer-extensions for more information on how to use `extensions` and what they are
-  - Expose `DECKGL_FILTER_COLOR`, `DECKGL_PROCESS_INTENSITY`, AND `DECKGL_MUTATE_COLOR` hooks and document them.
+- Expose `DECKGL_FILTER_COLOR`, `DECKGL_PROCESS_INTENSITY`, AND `DECKGL_MUTATE_COLOR` hooks and document them.
 
 ### Changed
 

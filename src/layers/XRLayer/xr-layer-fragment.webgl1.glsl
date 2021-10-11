@@ -27,7 +27,7 @@ uniform vec2 contrastLimits[6];
 
 void main() {
 
-float intensityValue0 = float(texture(channel0, vTexCoord).r);
+  float intensityValue0 = float(texture(channel0, vTexCoord).r);
   DECKGL_PROCESS_INTENSITY(intensityValue0, contrastLimits[0], 0);
   float intensityValue1 = float(texture(channel1, vTexCoord).r);
   DECKGL_PROCESS_INTENSITY(intensityValue1, contrastLimits[1], 1);
@@ -48,7 +48,7 @@ float intensityValue0 = float(texture(channel0, vTexCoord).r);
   DECKGL_MUTATE_COLOR(rgbCombo, intensityValue3, colors[3], vTexCoord, 3);
   DECKGL_MUTATE_COLOR(rgbCombo, intensityValue4, colors[4], vTexCoord, 4);
   DECKGL_MUTATE_COLOR(rgbCombo, intensityValue5, colors[5], vTexCoord, 5);
-
+  
   gl_FragColor = apply_opacity(rgbCombo, useTransparentColor, transparentColor, opacity);
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(gl_FragColor, geometry);

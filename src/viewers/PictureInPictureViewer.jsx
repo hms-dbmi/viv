@@ -72,8 +72,8 @@ const PictureInPictureViewer = props => {
     onHover,
     transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
     onViewportLoad,
-    deckProps,
-    extensions = []
+    extensions = [],
+    deckProps
   } = props;
   const {
     newselections,

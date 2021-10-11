@@ -143,7 +143,7 @@ const XRLayer = class extends Layer {
         intensity = apply_contrast_limits(intensity, contrastLimits);
       `;
     }
-    return super.getShaders({
+   return super.getShaders({
       fs,
       vs: shaderModule.vs,
       defines: {
@@ -152,7 +152,7 @@ const XRLayer = class extends Layer {
       },
       inject,
       modules: [project32, picking, newChannelsModule]
-    });
+   });
   }
 
   _isHookDefinedByExtensions(hookName) {
@@ -196,7 +196,6 @@ const XRLayer = class extends Layer {
     const mutateStr =
       'fs:DECKGL_MUTATE_COLOR(inout vec3 rgbOut, float intensity, vec3 color, vec2 vTexCoord, int channelIndex)';
     const processStr = `fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)`;
-
     // Only initialize shader hook functions _once globally_
     // Since the program manager is shared across all layers, but many layers
     // might be created, this solves the performance issue of always adding new
@@ -205,7 +204,7 @@ const XRLayer = class extends Layer {
     if (!programManager._hookFunctions.includes(mutateStr)) {
       programManager.addShaderHook(mutateStr);
     }
-    if (!programManager._hookFunctions.includes(processStr)) {
+   if (!programManager._hookFunctions.includes(processStr)) {
       programManager.addShaderHook(processStr);
     }
   }
