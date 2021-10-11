@@ -143,7 +143,7 @@ const XRLayer = class extends Layer {
         intensity = apply_contrast_limits(intensity, contrastLimits);
       `;
     }
-   return super.getShaders({
+    return super.getShaders({
       fs,
       vs: shaderModule.vs,
       defines: {
@@ -152,7 +152,7 @@ const XRLayer = class extends Layer {
       },
       inject,
       modules: [project32, picking, newChannelsModule]
-   });
+    });
   }
 
   _isHookDefinedByExtensions(hookName) {
@@ -204,7 +204,7 @@ const XRLayer = class extends Layer {
     if (!programManager._hookFunctions.includes(mutateStr)) {
       programManager.addShaderHook(mutateStr);
     }
-   if (!programManager._hookFunctions.includes(processStr)) {
+    if (!programManager._hookFunctions.includes(processStr)) {
       programManager.addShaderHook(processStr);
     }
   }
