@@ -25,7 +25,6 @@ export default class LensExtension extends LayerExtension {
     if (layer.isComposite) {
       return;
     }
-    // eslint-disable-next-line no-param-reassign
     const onMouseMove = () => {
       const { viewportId } = layer.props;
       const { lensRadius = 100 } = extension.opts;
