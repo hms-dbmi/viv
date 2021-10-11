@@ -84,6 +84,7 @@ const Viewer = () => {
       lensSelection={lensSelection}
       isLensOn={isLensOn}
       onViewportLoad={onViewportLoad}
+      extensions={[new LensExtension()]}
     />
   ) : (
     <PictureInPictureViewer
@@ -103,12 +104,7 @@ const Viewer = () => {
       lensSelection={lensSelection}
       isLensOn={isLensOn}
       onViewportLoad={onViewportLoad}
-      extensions={[
-        new LensExtension({
-          isLensOn,
-          lensSelection
-        })
-      ]}
+      extensions={[new LensExtension()]}
     />
   );
 };
