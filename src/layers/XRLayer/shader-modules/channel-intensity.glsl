@@ -43,17 +43,8 @@
 #pragma glslify: velocity-green = require("glsl-colormap/velocity-green")
 #pragma glslify: cubehelix = require("glsl-colormap/cubehelix")
 
-float sample_and_apply_contrast_limits(SAMPLER_TYPE channel, vec2 vTexCoord, vec2 contrastLimits) {
-  float fragIntensity = float(texture(channel, vTexCoord).r);
-  float contrastLimitsAppliedToIntensity = (fragIntensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0]));
-  return max(0., contrastLimitsAppliedToIntensity);
-}
-
-vec3 process_channel_intensity(float intensity, vec3 colors, int channelIndex, bool inLensAndUseLens, int lensSelection) {
-  float useColorValue = float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));
-  // Use arithmetic instead of if-then for useColorValue.
-  vec3 rgb = max(0., min(1., intensity)) * max(vec3(colors), (1. - useColorValue) * vec3(1., 1., 1.));
-  return rgb;
+float apply_contrast_limits(float intensity, vec2 contrastLimits) {
+    return  max(0., (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0])));
 }
 
 vec4 apply_opacity(vec3 color, bool useTransparentColor, vec3 transparentColor, float opacity){
