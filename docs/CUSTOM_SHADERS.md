@@ -4,7 +4,7 @@ Viv's shaders can be modified via [deck.gl hook functions](https://deck.gl/docs/
 
 This hook allows for custom processing of raw pixel intensities. For example, an non-linear (or alternative) transformation function may be provided to override the default linear ramp function with 2 contrast limit endpoints. This hook is available on all layers in all modes.
 
-### `DECKGL_MUTATE_COLOR(inout float intensity, int channelIndex)`
+### `DECKGL_MUTATE_COLOR(inout vec3 rgb, float intensity, vec3 color, vec2 texCoord, int channelIndex)`
 
 This hook allows for users to mutate conversion of a processed intensity (from `DECKGL_PROCESS_INTENSITY`) into a color when not using a colormap like `viridis` or `jet` via the `colormap` prop. This is only available in 2D layers.
 
