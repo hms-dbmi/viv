@@ -1,4 +1,4 @@
-Viv's shaders can be modified via [deck.gl hook functions](https://deck.gl/docs/developer-guide/custom-layers/writing-shaders#standard-shader-hooks). To take advantage of this feature, pass in a deck.gl [layer extension](https://deck.gl/docs/api-reference/extensions/overview) where the `getShaders` function returns an `inject` method for one of the following supported hooks:
+Viv's shaders can be modified via [deck.gl hook functions](https://deck.gl/docs/developer-guide/custom-layers/writing-shaders#standard-shader-hooks).  The `LensExtension` in Viv is implemented using this feature - look [here]() for an example.   To take advantage of this feature, pass in a deck.gl [layer extension](https://deck.gl/docs/api-reference/extensions/overview) where the `getShaders` function returns an `inject` method for one of the following supported hooks:
 
 ### `DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)`
 
