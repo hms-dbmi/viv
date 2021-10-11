@@ -30,6 +30,11 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {number} props.width Current width of the component.
  * @param {Array} [props.extensions] [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers.
  * @param {Boolean} [props.clickCenter] Click to center the default view. Default is true.
+ * @param {boolean} [props.isLensOn] Whether or not to use the lens (deafult false). Must be used with the `LensExtension` in the `extensions` prop.
+ * @param {number} [props.lensSelection] Numeric index of the channel to be focused on by the lens (default 0). Must be used with the `LensExtension` in the `extensions` prop.
+ * @param {number} [props.lensRadius] Pixel radius of the lens (default: 100). Must be used with the `LensExtension` in the `extensions` prop.
+ * @param {Array} [props.lensBorderColor] RGB color of the border of the lens (default [255, 255, 255]). Must be used with the `LensExtension` in the `extensions` prop.
+ * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02). Must be used with the `LensExtension` in the `extensions` prop.
  * @param {Array} [props.transparentColor] An RGB (0-255 range) color to be considered "transparent" if provided.
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
@@ -56,14 +61,20 @@ const PictureInPictureViewer = props => {
     hoverHooks = { handleValue: () => {}, handleCoordinate: () => {} },
     height,
     width,
+    isLensOn = false,
+    lensSelection = 0,
+    lensRadius = 100,
+    lensBorderColor = [255, 255, 255],
+    lensBorderRadius = 0.02,
     clickCenter = true,
     transparentColor,
     onViewStateChange,
     onHover,
     transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
     onViewportLoad,
-    extensions = []
     deckProps,
+    extensions = [],
+    deckProps
   } = props;
   const {
     newselections,
@@ -95,6 +106,11 @@ const PictureInPictureViewer = props => {
     transitionOnViewportLoad,
     transitionFields,
     colormap,
+    isLensOn,
+    lensSelection,
+    lensRadius,
+    lensBorderColor,
+    lensBorderRadius,
     extensions,
     transparentColor
   };

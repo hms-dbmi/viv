@@ -3,15 +3,21 @@ import lens from './lens-module';
 
 /**
  * This deck.gl extension allows for a lens that selectively shows one channel in its chosen color and then the others in white.
- * @param {Object} opts
- * @param {boolean=} opts.isLensOn Whether or not to use the lens.
- * @param {number=} opts.lensSelection Numeric index of the channel to be focused on by the lens.
- * @param {number=} opts.lensRadius Pixel radius of the lens (default: 100).
- * @param {Array.<number>=} opts.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
- * @param {number=} opts.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * @param {Object} props
+ * @param {boolean=} props.isLensOn Whether or not to use the lens.
+ * @param {number=} props.lensSelection Numeric index of the channel to be focused on by the lens.
+ * @param {number=} props.lensRadius Pixel radius of the lens (default: 100).
+ * @param {Array.<number>=} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
+ * @param {number=} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  * */
-
-export default class LensExtension extends LayerExtension {
+const defaultProps = {
+  isLensOn: { type: 'boolean', value: false, compare: true },
+  lensSelection: { type: 'number', value: 0, compare: true },
+  lensRadius: { type: 'number', value: 100, compare: true },
+  lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
+  lensBorderRadius: { type: 'number', value: 0.02, compare: true }
+};
+const LensExtension = class extends LayerExtension {
   getShaders() {
     return {
       ...super.getShaders(),
@@ -19,16 +25,15 @@ export default class LensExtension extends LayerExtension {
     };
   }
 
-  initializeState(context, extension) {
+  initializeState() {
     const layer = this.getCurrentLayer();
     // No need to run this on layers that don't have a `draw` call.
     if (layer.isComposite) {
       return;
     }
-    // eslint-disable-next-line no-param-reassign
     const onMouseMove = () => {
       const { viewportId } = layer.props;
-      const { lensRadius = 100 } = extension.opts;
+      const { lensRadius = 100 } = this.props;
       // If there is no viewportId, don't try to do anything.
       if (!viewportId) {
         layer.setState({ unprojectLensBounds: [0, 0, 0, 0] });
@@ -79,15 +84,15 @@ export default class LensExtension extends LayerExtension {
     this.setState({ onMouseMove, unprojectLensBounds: [0, 0, 0, 0] });
   }
 
-  draw(params, extension) {
-    const { bounds } = this.props;
+  draw() {
     const { unprojectLensBounds } = this.state;
     const {
+      bounds,
       isLensOn,
       lensSelection,
       lensBorderColor = [255, 255, 255],
       lensBorderRadius = 0.02
-    } = extension.opts;
+    } = this.props;
     // Creating a unit-square scaled intersection box for rendering the lens.
     // It is ok if these coordinates are outside the unit square since
     // we check membership in or out of the lens on the fragment shader.
@@ -128,6 +133,9 @@ export default class LensExtension extends LayerExtension {
       });
     }
   }
-}
+};
 
 LensExtension.extensionName = 'LensExtension';
+LensExtension.defaultProps = defaultProps;
+
+export default LensExtension;
