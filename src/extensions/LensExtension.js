@@ -84,7 +84,7 @@ const LensExtension = class extends LayerExtension {
     this.setState({ onMouseMove, unprojectLensBounds: [0, 0, 0, 0] });
   }
 
-  draw(params) {
+  draw() {
     const { unprojectLensBounds } = this.state;
     const {
       bounds,
