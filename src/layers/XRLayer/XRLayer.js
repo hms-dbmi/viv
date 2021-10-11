@@ -124,23 +124,34 @@ const XRLayer = class extends Layer {
       this.context.gl,
       interpolation
     );
+    const fs = colormap ? shaderModule.fscmap : shaderModule.fs;
+    const extensionDefinesDeckglMutateColor = this._isHookDefinedByExtensions(
+      'fs:DECKGL_MUTATE_COLOR'
+    );
     const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
       'fs:DECKGL_PROCESS_INTENSITY'
     );
-    const inject = !extensionDefinesDeckglProcessIntensity && {
-      'fs:DECKGL_PROCESS_INTENSITY': `
+    const inject = {};
+    if (!extensionDefinesDeckglMutateColor) {
+      inject['fs:DECKGL_MUTATE_COLOR'] = `
         rgbOut += max(0., min(1., intensity)) * vec3(color);
-      `
-    };
+      `;
+    }
+    const newChannelsModule = { ...channels, inject: {} };
+    if (!extensionDefinesDeckglProcessIntensity) {
+      newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
+        intensity = apply_contrast_limits(intensity, contrastLimits);
+      `;
+    }
     return super.getShaders({
-      fs: colormap ? shaderModule.fscmap : shaderModule.fs,
+      fs,
       vs: shaderModule.vs,
       defines: {
         SAMPLER_TYPE: sampler,
         COLORMAP_FUNCTION: colormap || 'viridis'
       },
       inject,
-      modules: [project32, picking, channels]
+      modules: [project32, picking, newChannelsModule]
     });
   }
 
@@ -182,14 +193,17 @@ const XRLayer = class extends Layer {
     });
     const programManager = ProgramManager.getDefaultProgramManager(gl);
 
-    const processStr =
-      'fs:DECKGL_PROCESS_INTENSITY(inout vec3 rgbOut, float intensity, vec3 color, vec2 vTexCoord, int channelIndex)';
-
+    const mutateStr =
+      'fs:DECKGL_MUTATE_COLOR(inout vec3 rgbOut, float intensity, vec3 color, vec2 vTexCoord, int channelIndex)';
+    const processStr = `fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)`;
     // Only initialize shader hook functions _once globally_
     // Since the program manager is shared across all layers, but many layers
     // might be created, this solves the performance issue of always adding new
     // hook functions.
     // See https://github.com/kylebarron/deck.gl-raster/blob/2eb91626f0836558f0be4cd201ea18980d7f7f2d/src/deckgl/raster-layer/raster-layer.js#L21-L40
+    if (!programManager._hookFunctions.includes(mutateStr)) {
+      programManager.addShaderHook(mutateStr);
+    }
     if (!programManager._hookFunctions.includes(processStr)) {
       programManager.addShaderHook(processStr);
     }

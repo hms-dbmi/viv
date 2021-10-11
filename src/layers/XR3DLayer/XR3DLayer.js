@@ -28,6 +28,8 @@ More information about that is detailed in the comments there.
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer } from '@deck.gl/core';
 import { Model, Geometry, Texture3D } from '@luma.gl/core';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { ProgramManager } from '@luma.gl/engine';
 import { Matrix4 } from 'math.gl';
 import { Plane } from '@math.gl/culling';
 import vs from './xr-layer-vertex.glsl';
@@ -137,15 +139,28 @@ function removeExtraColormapFunctionsFromShader(colormap) {
 const XR3DLayer = class extends Layer {
   initializeState() {
     const { gl } = this.context;
-    this.setState({
-      model: this._getModel(gl)
-    });
     // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
     // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
     // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
     gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
     gl.pixelStorei(GL.PACK_ALIGNMENT, 1);
+    const programManager = ProgramManager.getDefaultProgramManager(gl);
+    const processStr = `fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)`;
+    if (!programManager._hookFunctions.includes(processStr)) {
+      programManager.addShaderHook(processStr);
+    }
+  }
+
+  _isHookDefinedByExtensions(hookName) {
+    const { extensions } = this.props;
+    return extensions?.some(e => {
+      const shaders = e.getShaders();
+      const { inject = {}, modules = [] } = shaders;
+      const definesInjection = inject[hookName];
+      const moduleDefinesInjection = modules.some(m => m?.inject[hookName]);
+      return definesInjection || moduleDefinesInjection;
+    });
   }
 
   /**
@@ -158,6 +173,15 @@ const XR3DLayer = class extends Layer {
       ? RENDERING_MODES_COLORMAP[renderingMode]
       : RENDERING_MODES_BLEND[renderingMode];
     const channelsModules = removeExtraColormapFunctionsFromShader(colormap);
+    const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
+      'fs:DECKGL_PROCESS_INTENSITY'
+    );
+    const newChannelsModule = { ...channelsModules, inject: {} };
+    if (!extensionDefinesDeckglProcessIntensity) {
+      newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
+        intensity = apply_contrast_limits(intensity, contrastLimits);
+      `;
+    }
     return super.getShaders({
       vs,
       fs: fs
@@ -169,7 +193,7 @@ const XR3DLayer = class extends Layer {
         COLORMAP_FUNCTION: colormap || 'viridis',
         NUM_PLANES: String(clippingPlanes.length || NUM_PLANES_DEFAULT)
       },
-      modules: [channelsModules]
+      modules: [newChannelsModule]
     });
   }
 
