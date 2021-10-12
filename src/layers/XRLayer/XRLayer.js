@@ -125,18 +125,9 @@ const XRLayer = class extends Layer {
       interpolation
     );
     const fs = colormap ? shaderModule.fscmap : shaderModule.fs;
-    const extensionDefinesDeckglMutateColor = this._isHookDefinedByExtensions(
-      'fs:DECKGL_MUTATE_COLOR'
-    );
     const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
       'fs:DECKGL_PROCESS_INTENSITY'
     );
-    const inject = {};
-    if (!extensionDefinesDeckglMutateColor) {
-      inject['fs:DECKGL_MUTATE_COLOR'] = `
-        rgbOut += max(0., min(1., intensity)) * vec3(color);
-      `;
-    }
     const newChannelsModule = { ...channels, inject: {} };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
@@ -150,7 +141,6 @@ const XRLayer = class extends Layer {
         SAMPLER_TYPE: sampler,
         COLORMAP_FUNCTION: colormap || 'viridis'
       },
-      inject,
       modules: [project32, picking, newChannelsModule]
     });
   }
@@ -194,7 +184,7 @@ const XRLayer = class extends Layer {
     const programManager = ProgramManager.getDefaultProgramManager(gl);
 
     const mutateStr =
-      'fs:DECKGL_MUTATE_COLOR(inout vec3 rgbOut, float intensity, vec3 color, vec2 vTexCoord, int channelIndex)';
+      'fs:DECKGL_MUTATE_COLOR(inout vec3 rgb, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)';
     const processStr = `fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)`;
     // Only initialize shader hook functions _once globally_
     // Since the program manager is shared across all layers, but many layers
