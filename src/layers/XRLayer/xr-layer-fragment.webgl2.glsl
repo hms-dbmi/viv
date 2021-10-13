@@ -12,13 +12,6 @@ uniform SAMPLER_TYPE channel3;
 uniform SAMPLER_TYPE channel4;
 uniform SAMPLER_TYPE channel5;
 
-// opacity
-uniform float opacity;
-
-// uniform for making a transparent color.
-uniform vec3 transparentColor;
-uniform bool useTransparentColor;
-
 in vec2 vTexCoord;
 
 // range
@@ -39,12 +32,9 @@ void main() {
   float intensity5 = float(texture(channel5, vTexCoord).r);
   DECKGL_PROCESS_INTENSITY(intensity5, contrastLimits[5], 5);
 
-  vec3 rgb = vec3(0.);
-
-  DECKGL_MUTATE_COLOR(rgb, intensity0, intensity1, intensity2, intensity3, intensity4, intensity5, vTexCoord);
+  DECKGL_MUTATE_COLOR(gl_FragColor, intensity0, intensity1, intensity2, intensity3, intensity4, intensity5, vTexCoord);
 
 
-  gl_FragColor = apply_opacity(rgb, useTransparentColor, transparentColor, opacity);
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }

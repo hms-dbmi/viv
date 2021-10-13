@@ -1,3 +1,5 @@
+#pragma glslify: apply_opacity = require(../utils.glsl)
+
 uniform vec3 colors[6];
 
 void mutate_color(inout vec3 rgb, float intensity, int channelIndex){

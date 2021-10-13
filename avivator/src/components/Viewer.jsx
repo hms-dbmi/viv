@@ -104,7 +104,6 @@ const Viewer = () => {
       lensSelection={lensSelection}
       isLensOn={isLensOn}
       onViewportLoad={onViewportLoad}
-      extensions={[new LensExtension()]}
     />
   );
 };

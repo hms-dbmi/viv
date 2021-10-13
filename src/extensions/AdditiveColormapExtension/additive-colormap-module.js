@@ -1,0 +1,18 @@
+import fs from './color-palette.glsl';
+
+export default {
+  name: 'color-palette-module',
+  fs,
+  inject: {
+    'fs:DECKGL_MUTATE_COLOR': `
+  float intensityCombo = 0.;
+  intensityCombo += max(0.,intensity0);
+  intensityCombo += max(0.,intensity1);
+  intensityCombo += max(0.,intensity2);
+  intensityCombo += max(0.,intensity3);
+  intensityCombo += max(0.,intensity4);
+  intensityCombo += max(0.,intensity5);
+  color = colormap(intensityCombo, opacity, useTransparentColor);
+`,
+  }
+};

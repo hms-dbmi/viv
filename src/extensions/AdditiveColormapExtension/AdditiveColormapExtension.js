@@ -23,15 +23,14 @@ const ColorPaletteExtension = class extends LayerExtension {
       colors,
       channelsVisible,
       opacity,
-      transparentColor,
+      useTransparentColor
     } = this.props;
     const paddedColors = padColors({
       channelsVisible,
       colors
     });
     const uniforms = { colors: paddedColors,  opacity,
-          transparentColor: (transparentColor || [0, 0, 0]).map(i => i / 255),
-          useTransparentColor: Boolean(transparentColor),
+          useTransparentColor,
   };
     // eslint-disable-next-line no-unused-expressions
     this.state.model?.setUniforms(uniforms);

@@ -74,7 +74,6 @@ const defaultProps = {
   opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: 'Uint16', compare: true },
   colormap: { type: 'string', value: '', compare: true },
-  transparentColor: { type: 'array', value: null, compare: true },
   interpolation: {
     type: 'number',
     value: GL.NEAREST,
@@ -86,19 +85,14 @@ const defaultProps = {
  * @typedef LayerProps
  * @type {object}
  * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
- * @property {number=} opacity Opacity of the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<number>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @property {String=} id Unique identifier for this layer.
  * @property {function=} onHover Hook function from deck.gl to handle hover objects.
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
- * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
- * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
- * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
  */
@@ -178,7 +172,7 @@ const XRLayer = class extends Layer {
     const programManager = ProgramManager.getDefaultProgramManager(gl);
 
     const mutateStr =
-      'fs:DECKGL_MUTATE_COLOR(inout vec3 rgb, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)';
+      'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)';
     const processStr = `fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)`;
     // Only initialize shader hook functions _once globally_
     // Since the program manager is shared across all layers, but many layers
@@ -306,11 +300,9 @@ const XRLayer = class extends Layer {
     if (textures && model) {
       const {
         contrastLimits,
-        opacity,
         domain,
         dtype,
         channelsVisible,
-        transparentColor
       } = this.props;
       // Check number of textures not null.
       const numTextures = Object.values(textures).filter(t => t).length;
@@ -327,9 +319,6 @@ const XRLayer = class extends Layer {
         .setUniforms({
           ...uniforms,
           contrastLimits: paddedContrastLimits,
-          opacity,
-          transparentColor: (transparentColor || [0, 0, 0]).map(i => i / 255),
-          useTransparentColor: Boolean(transparentColor),
           ...textures
         })
         .draw();
