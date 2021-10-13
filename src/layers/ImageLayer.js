@@ -4,6 +4,7 @@ import GL from '@luma.gl/constants';
 import XRLayer from './XRLayer';
 import BitmapLayer from './BitmapLayer';
 import { isInterleaved, SIGNAL_ABORTED } from '../loaders/utils';
+import { ColorPaletteExtension } from '../extensions'; 
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -29,7 +30,8 @@ const defaultProps = {
     type: 'number',
     value: GL.NEAREST,
     compare: true
-  }
+  },
+  extensions: { type: 'array', value: [ new ColorPaletteExtension() ], compare: true },
 };
 
 /**

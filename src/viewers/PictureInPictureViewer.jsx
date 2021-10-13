@@ -9,6 +9,7 @@ import {
 } from '../views';
 import useGlobalSelection from './global-selection-hook';
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
+import { ColorPaletteExtension } from '../extensions';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -72,7 +73,7 @@ const PictureInPictureViewer = props => {
     onHover,
     transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
     onViewportLoad,
-    extensions = [],
+    extensions = [ new ColorPaletteExtension() ],
     deckProps
   } = props;
   const {

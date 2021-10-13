@@ -3,6 +3,7 @@ import VivViewer from './VivViewer';
 import { SideBySideView, getDefaultInitialViewState } from '../views';
 import useGlobalSelection from './global-selection-hook';
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
+import { ColorPaletteExtension } from '../extensions';
 
 /**
  * This component provides a side-by-side VivViewer with linked zoom/pan.
@@ -58,7 +59,7 @@ const SideBySideViewer = props => {
     onHover,
     transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
     onViewportLoad,
-    extensions = [],
+    extensions = [ new ColorPaletteExtension() ],
     deckProps
   } = props;
   const {

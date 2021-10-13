@@ -9,6 +9,7 @@ import {
   isInterleaved,
   SIGNAL_ABORTED
 } from '../../loaders/utils';
+import { ColorPaletteExtension } from '../../extensions';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -23,7 +24,8 @@ const defaultProps = {
   onClick: { type: 'function', value: null, compare: true },
   transparentColor: { type: 'array', value: null, compare: true },
   refinementStrategy: { type: 'string', value: null, compare: true },
-  excludeBackground: { type: 'boolean', value: false, compare: true }
+  excludeBackground: { type: 'boolean', value: false, compare: true },
+  extensions: { type: 'array', value: [new ColorPaletteExtension()], compare: true }
 };
 
 /**
@@ -72,7 +74,6 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       excludeBackground,
       refinementStrategy
     } = this.props;
-
     // Get properties from highest resolution
     const { tileSize, dtype } = loader[0];
 

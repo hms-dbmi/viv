@@ -5,7 +5,7 @@ import {
   SideBySideViewer,
   PictureInPictureViewer,
   VolumeViewer,
-  ColorPaletteExtension
+  LensExtension,
   // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 import {
@@ -84,7 +84,7 @@ const Viewer = () => {
       lensSelection={lensSelection}
       isLensOn={isLensOn}
       onViewportLoad={onViewportLoad}
-      extensions={[new ColorPaletteExtension()]}
+      extensions={[new LensExtension()]}
     />
   ) : (
     <PictureInPictureViewer
@@ -104,7 +104,7 @@ const Viewer = () => {
       lensSelection={lensSelection}
       isLensOn={isLensOn}
       onViewportLoad={onViewportLoad}
-      extensions={[new ColorPaletteExtension()]}
+      extensions={[new LensExtension()]}
     />
   );
 };
