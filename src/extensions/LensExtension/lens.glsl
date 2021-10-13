@@ -30,7 +30,7 @@ bool frag_on_lens_bounds(vec2 vTexCoord) {
   return ellipseDistance <= 1. && ellipseDistance >= (1. - lensBorderRadius);
 }
 
-void process_channel_intensity_with_lens(inout vec3 rgbOut, float intensity, vec2 vTexCoord, int channelIndex){
+void mutate_color(inout vec3 rgbOut, float intensity, vec2 vTexCoord, int channelIndex){
   bool isFragInLensBounds = frag_in_lens_bounds(vTexCoord);
   bool inLensAndUseLens = isLensOn && isFragInLensBounds;
   float useColorValue = float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));

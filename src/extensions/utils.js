@@ -4,7 +4,6 @@ import { DEFAULT_COLOR_OFF, MAX_CHANNELS, MAX_COLOR_INTENSITY } from '../constan
 export function padColors({
   colors,
   channelsVisible,
-  dtype
 }) {
   const newColors = colors.map((color, i) =>
     channelsVisible[i]

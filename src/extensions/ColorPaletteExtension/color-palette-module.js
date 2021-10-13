@@ -1,15 +1,16 @@
-import fs from './lens.glsl';
+import fs from './color-palette.glsl';
 
 export default {
-  name: 'lens-module',
+  name: 'color-palette-module',
   fs,
   inject: {
     'fs:DECKGL_MUTATE_COLOR': `
-   process_channel_intensity_with_lens(rgbOut, intensity, color, vTexCoord, channelIndex);
+   mutate_color(rgb, intensity0, 0);
+   mutate_color(rgb, intensity1, 1);
+   mutate_color(rgb, intensity2, 2);
+   mutate_color(rgb, intensity3, 3);
+   mutate_color(rgb, intensity4, 4);
+   mutate_color(rgb, intensity5, 5);
   `,
-    'fs:#main-end': `
-      bool isFragOnLensBounds = frag_on_lens_bounds(vTexCoord);
-     gl_FragColor = (isLensOn && isFragOnLensBounds) ? vec4(lensBorderColor, 1.) : gl_FragColor;
-  `
   }
 };

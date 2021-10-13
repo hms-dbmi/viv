@@ -1,5 +1,6 @@
 import { LayerExtension } from '@deck.gl/core';
 import colorPalette from './color-palette-module';
+import { padColors } from '../utils';
 
 /**
  * This deck.gl extension allows for a color palette to be used for pseudo-coloring channels.
@@ -7,7 +8,7 @@ import colorPalette from './color-palette-module';
  * @param {Array<Array<number>>=} props.colors Array of colors to map channels to (RGB).
 * */
 const defaultProps = {
-  color: { type: 'array', value: [], compare: true },
+  colors: { type: 'array', value: [], compare: true },
 };
 const ColorPaletteExtension = class extends LayerExtension {
   getShaders() {
@@ -20,8 +21,13 @@ const ColorPaletteExtension = class extends LayerExtension {
   draw() {
     const {
       colors,
+      channelsVisible
     } = this.props;
-    const uniforms = { colors };
+    const paddedColors = padColors({
+      channelsVisible,
+      colors
+    });
+    const uniforms = { colors: paddedColors };
     // eslint-disable-next-line no-unused-expressions
     this.state.model?.setUniforms(uniforms);
   }
