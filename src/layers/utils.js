@@ -30,48 +30,29 @@ export function getDtypeValues(dtype) {
   return values;
 }
 
-export function padColorsAndWindows({
-  contrastLimits,
-  colors,
+export function padContrastLimits({
+  contrastLimits = [],
   channelsVisible,
   domain,
   dtype
 }) {
-  const lengths = [contrastLimits.length, colors.length];
-  if (lengths.every(l => l !== lengths[0])) {
-    throw Error('Inconsistent number of slider values and colors provided');
-  }
-
-  const newColors = colors.map((color, i) =>
-    channelsVisible[i]
-      ? color.map(c => c / MAX_COLOR_INTENSITY)
-      : DEFAULT_COLOR_OFF
-  );
   const maxSliderValue = (domain && domain[1]) || getDtypeValues(dtype).max;
   const newContrastLimits = contrastLimits.map((slider, i) =>
     channelsVisible[i] ? slider : [maxSliderValue, maxSliderValue]
   );
   // Need to pad contrastLimits and colors with default values (required by shader)
-  const padSize = MAX_CHANNELS - newColors.length;
+  const padSize = MAX_CHANNELS - newContrastLimits.length;
   if (padSize < 0) {
     throw Error(`${lengths} channels passed in, but only 6 are allowed.`);
   }
 
-  const paddedColors = padWithDefault(newColors, DEFAULT_COLOR_OFF, padSize);
   const paddedContrastLimits = padWithDefault(
     newContrastLimits,
     [maxSliderValue, maxSliderValue],
     padSize
-  );
-  const paddedColorsAndWindows = {
-    paddedContrastLimits: paddedContrastLimits.reduce(
-      (acc, val) => acc.concat(val),
-      []
-    ), // flatten for use on shaders
-    paddedColors: paddedColors.reduce((acc, val) => acc.concat(val), [])
-  };
+  ).reduce((acc, val) => acc.concat(val), []);
 
-  return paddedColorsAndWindows;
+  return paddedContrastLimits;
 }
 
 export function onPointer(layer) {

@@ -35,7 +35,7 @@ import { Plane } from '@math.gl/culling';
 import vs from './xr-layer-vertex.glsl';
 import fs from './xr-layer-fragment.glsl';
 import channels from './channel-intensity-module';
-import { padColorsAndWindows, padWithDefault, getDtypeValues } from '../utils';
+import { padContrastLimits, padWithDefault, getDtypeValues } from '../utils';
 import { COLORMAPS, RENDERING_MODES as RENDERING_NAMES } from '../../constants';
 import {
   RENDERING_MODES_BLEND,
@@ -276,7 +276,7 @@ const XR3DLayer = class extends Layer {
       projectionMatrix
     } = this.context.viewport;
     if (textures && model && scaleMatrix) {
-      const { paddedContrastLimits, paddedColors } = padColorsAndWindows({
+      const { paddedContrastLimits, paddedColors } = padContrastLimits({
         contrastLimits,
         colors,
         channelsVisible,

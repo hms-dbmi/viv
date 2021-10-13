@@ -14,7 +14,7 @@ import fs2 from './xr-layer-fragment.webgl2.glsl';
 import vs1 from './xr-layer-vertex.webgl1.glsl';
 import vs2 from './xr-layer-vertex.webgl2.glsl';
 import { channels } from './shader-modules';
-import { padColorsAndWindows, getDtypeValues } from '../utils';
+import { padContrastLimits, getDtypeValues } from '../utils';
 
 const SHADER_MODULES = [
   { fs: fs1, fscmap: fsColormap1, vs: vs1 },
@@ -69,7 +69,6 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'object', value: {}, compare: true },
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
-  colors: { type: 'array', value: [], compare: true },
   contrastLimits: { type: 'array', value: [], compare: true },
   channelsVisible: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
@@ -95,11 +94,6 @@ const defaultProps = {
  * @property {Array.<number>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @property {String=} id Unique identifier for this layer.
  * @property {function=} onHover Hook function from deck.gl to handle hover objects.
- * @property {boolean=} isLensOn Whether or not to use the lens.
- * @property {number=} lensSelection Numeric index of the channel to be focused on by the lens.
- * @property {number=} lensRadius Pixel radius of the lens (default: 100).
- * @property {Array.<number>=} lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
- * @property {number=} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
  * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
@@ -312,7 +306,6 @@ const XRLayer = class extends Layer {
     if (textures && model) {
       const {
         contrastLimits,
-        colors,
         opacity,
         domain,
         dtype,
@@ -323,9 +316,8 @@ const XRLayer = class extends Layer {
       const numTextures = Object.values(textures).filter(t => t).length;
       // Slider values and color values can come in before textures since their data is async.
       // Thus we pad based on the number of textures bound.
-      const { paddedContrastLimits, paddedColors } = padColorsAndWindows({
+      const paddedContrastLimits = padContrastLimits({
         contrastLimits: contrastLimits.slice(0, numTextures),
-        colors: colors.slice(0, numTextures),
         channelsVisible: channelsVisible.slice(0, numTextures),
         domain,
         dtype
@@ -334,7 +326,6 @@ const XRLayer = class extends Layer {
       model
         .setUniforms({
           ...uniforms,
-          colors: paddedColors,
           contrastLimits: paddedContrastLimits,
           opacity,
           transparentColor: (transparentColor || [0, 0, 0]).map(i => i / 255),

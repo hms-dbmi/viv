@@ -10,7 +10,6 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   contrastLimits: { type: 'array', value: [], compare: true },
   channelsVisible: { type: 'array', value: [], compare: true },
-  colors: { type: 'array', value: [], compare: true },
   selections: { type: 'array', value: [], compare: true },
   colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
@@ -37,7 +36,6 @@ const defaultProps = {
  * @typedef LayerProps
  * @type {Object}
  * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {Object} loader PixelSource. Represents an N-dimensional image.
  * @property {Array} selections Selection to be used for fetching data.
@@ -123,7 +121,7 @@ const ImageLayer = class extends CompositeLayer {
   renderLayers() {
     const { loader, id } = this.props;
     const { dtype } = loader;
-    const { width, height, data, unprojectLensBounds } = this.state;
+    const { width, height, data } = this.state;
     if (!(width && height)) return null;
 
     const bounds = [0, height, width, 0];
@@ -143,7 +141,6 @@ const ImageLayer = class extends CompositeLayer {
       bounds,
       id: `image-sub-layer-${bounds}-${id}`,
       dtype,
-      unprojectLensBounds
     });
   }
 };

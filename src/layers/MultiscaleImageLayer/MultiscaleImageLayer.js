@@ -14,7 +14,6 @@ const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   onHover: { type: 'function', value: null, compare: false },
   contrastLimits: { type: 'array', value: [], compare: true },
-  colors: { type: 'array', value: [], compare: true },
   channelsVisible: { type: 'array', value: [], compare: true },
   opacity: { type: 'number', value: 1, compare: true },
   colormap: { type: 'string', value: '', compare: true },
@@ -31,7 +30,6 @@ const defaultProps = {
  * @typedef LayerProps
  * @type {object}
  * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader Image pyramid. PixelSource[], where each PixelSource is decreasing in shape.
  * @property {Array} selections Selection to be used for fetching data.
@@ -78,7 +76,6 @@ const MultiscaleImageLayer = class extends CompositeLayer {
     // Get properties from highest resolution
     const { tileSize, dtype } = loader[0];
 
-    const { unprojectLensBounds } = this.state;
     // This is basically to invert:
     // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
     // The z level can be wrong for showing the correct scales because of the calculation deck.gl does
@@ -172,7 +169,6 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         getTileData: [loader, selections]
       },
       onTileError: onTileError || loader[0].onTileError,
-      unprojectLensBounds
     });
 
     // This gives us a background image and also solves the current

@@ -1,6 +1,6 @@
 import { LayerExtension } from '@deck.gl/core';
 import lens from './lens-module';
-
+import { padColors } from '../utils';
 /**
  * This deck.gl extension allows for a lens that selectively shows one channel in its chosen color and then the others in white.
  * @param {Object} props
@@ -9,14 +9,17 @@ import lens from './lens-module';
  * @param {number=} props.lensRadius Pixel radius of the lens (default: 100).
  * @param {Array.<number>=} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number=} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
- * */
+ * @param {Array<Array.<number>>=} props.colors Color palette to pseudo-color channels as.  
+* */
 const defaultProps = {
   isLensOn: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true },
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
-  lensBorderRadius: { type: 'number', value: 0.02, compare: true }
+  lensBorderRadius: { type: 'number', value: 0.02, compare: true },
+  colors: { type: 'array', value: [], compare: true }
 };
+
 const LensExtension = class extends LayerExtension {
   getShaders() {
     return {
@@ -90,8 +93,11 @@ const LensExtension = class extends LayerExtension {
       bounds,
       isLensOn,
       lensSelection,
-      lensBorderColor = [255, 255, 255],
-      lensBorderRadius = 0.02
+      lensBorderColor,
+      lensBorderRadius,
+      colors,
+      dtype,
+      channelsVisible,
     } = this.props;
     // Creating a unit-square scaled intersection box for rendering the lens.
     // It is ok if these coordinates are outside the unit square since
@@ -107,6 +113,11 @@ const LensExtension = class extends LayerExtension {
     const bottomMouseBoundScaled = (bottomMouseBound - top) / (bottom - top);
     const rightMouseBoundScaled = (rightMouseBound - left) / (right - left);
     const topMouseBoundScaled = (topMouseBound - top) / (bottom - top);
+    const paddedColors = padColors({
+      channelsVisible,
+      colors,
+      dtype,
+    });
     const uniforms = {
       majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
       minorLensAxis: (bottomMouseBoundScaled - topMouseBoundScaled) / 2,
@@ -117,7 +128,8 @@ const LensExtension = class extends LayerExtension {
       isLensOn,
       lensSelection,
       lensBorderColor,
-      lensBorderRadius
+      lensBorderRadius,
+      colors: paddedColors,
     };
     // eslint-disable-next-line no-unused-expressions
     this.state.model?.setUniforms(uniforms);
