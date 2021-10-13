@@ -5,7 +5,7 @@ import {
   SideBySideViewer,
   PictureInPictureViewer,
   VolumeViewer,
-  LensExtension,
+  AdditiveColormapExtension,
   // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 import {
@@ -84,7 +84,7 @@ const Viewer = () => {
       lensSelection={lensSelection}
       isLensOn={isLensOn}
       onViewportLoad={onViewportLoad}
-      extensions={[new LensExtension()]}
+      extensions={[new AdditiveColormapExtension()]}
     />
   ) : (
     <PictureInPictureViewer
@@ -95,7 +95,7 @@ const Viewer = () => {
       selections={selections}
       height={viewSize.height}
       width={viewSize.width}
-      colormap={colormap.length > 0 && colormap}
+      colormap="viridis"
       overview={DEFAULT_OVERVIEW}
       overviewOn={isOverviewOn}
       hoverHooks={{
@@ -104,6 +104,7 @@ const Viewer = () => {
       lensSelection={lensSelection}
       isLensOn={isLensOn}
       onViewportLoad={onViewportLoad}
+      extensions={[new AdditiveColormapExtension()]}
     />
   );
 };

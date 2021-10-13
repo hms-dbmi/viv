@@ -12,7 +12,7 @@ export default {
    mutate_color(rgb, intensity3, 3);
    mutate_color(rgb, intensity4, 4);
    mutate_color(rgb, intensity5, 5);
-   rgba = ${fs.match(/apply\_opacity\_[0-9]*/)[0]}(rgb, useTransparentColor, transparentColor, opacity);
+   rgba = apply_opacity(rgb);
   `,
   }
 };

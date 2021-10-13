@@ -1,4 +1,4 @@
-import fs from './color-palette.glsl';
+import fs from './additive-colormap.glsl';
 
 export default {
   name: 'color-palette-module',
@@ -12,7 +12,7 @@ export default {
   intensityCombo += max(0.,intensity3);
   intensityCombo += max(0.,intensity4);
   intensityCombo += max(0.,intensity5);
-  color = colormap(intensityCombo, opacity, useTransparentColor);
+  rgba = colormap(intensityCombo);
 `,
   }
 };

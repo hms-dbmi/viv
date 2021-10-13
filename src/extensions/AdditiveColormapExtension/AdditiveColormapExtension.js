@@ -1,5 +1,5 @@
 import { LayerExtension } from '@deck.gl/core';
-import colorPalette from './color-palette-module';
+import additiveColormap from './additive-colormap-module';
 import { padColors } from '../utils';
 
 /**
@@ -10,11 +10,12 @@ import { padColors } from '../utils';
 const defaultProps = {
   colors: { type: 'array', value: [], compare: true },
 };
-const ColorPaletteExtension = class extends LayerExtension {
+const AdditiveColormapExtension = class extends LayerExtension {
   getShaders() {
+    const newColormapExtension = { ...additiveColormap, fs: additiveColormap.fs.replaceAll('COLORMAP_FUNCTION', 'viridis') } 
     return {
       ...super.getShaders(),
-      modules: [colorPalette]
+      modules: [newColormapExtension]
     };
   }
 
@@ -23,21 +24,21 @@ const ColorPaletteExtension = class extends LayerExtension {
       colors,
       channelsVisible,
       opacity,
-      useTransparentColor
     } = this.props;
     const paddedColors = padColors({
       channelsVisible,
       colors
     });
+
     const uniforms = { colors: paddedColors,  opacity,
-          useTransparentColor,
+      useTransparentColor: true,
   };
     // eslint-disable-next-line no-unused-expressions
     this.state.model?.setUniforms(uniforms);
   }
 }
 
-ColorPaletteExtension.extensionName = 'ColorPaletteExtension';
-ColorPaletteExtension.defaultProps = defaultProps;
+AdditiveColormapExtension.extensionName = 'AdditiveColormapExtension';
+AdditiveColormapExtension.defaultProps = defaultProps;
 
-export default ColorPaletteExtension;
+export default AdditiveColormapExtension;

@@ -1,3 +1,3 @@
-import ColorPaletteExtension from './ColorPaletteExtension';
+import AdditiveColormapExtension from './AdditiveColormapExtension';
 
-export default ColorPaletteExtension;
+export default AdditiveColormapExtension;

@@ -42,12 +42,12 @@
 #pragma glslify: velocity-blue = require("glsl-colormap/velocity-blue")
 #pragma glslify: velocity-green = require("glsl-colormap/velocity-green")
 #pragma glslify: cubehelix = require("glsl-colormap/cubehelix")
-#pragma glslify: apply_opacity = require("../utils.glsl")
+#pragma glslify: apply_transparent_color = require("../utils.glsl")
 
 uniform float opacity;
 uniform bool useTransparentColor;
 
 vec4 colormap(float intensity) {
-  return apply_opacity(COLORMAP_FUNCTION(min(1.,intensity)).xyz, useTransparentColor, COLORMAP_FUNCTION(0.).xyz, opacity);
+  return vec4(apply_transparent_color(COLORMAP_FUNCTION(min(1.,intensity)).xyz, COLORMAP_FUNCTION(0.).xyz, useTransparentColor, opacity));
 }
  

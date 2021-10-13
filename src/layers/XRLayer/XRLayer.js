@@ -7,8 +7,6 @@ import { Model, Geometry, Texture2D, isWebGL2 } from '@luma.gl/core';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { ProgramManager } from '@luma.gl/engine';
 import { hasFeature, FEATURES } from '@luma.gl/webgl';
-import fsColormap1 from './xr-layer-fragment-colormap.webgl1.glsl';
-import fsColormap2 from './xr-layer-fragment-colormap.webgl2.glsl';
 import fs1 from './xr-layer-fragment.webgl1.glsl';
 import fs2 from './xr-layer-fragment.webgl2.glsl';
 import vs1 from './xr-layer-vertex.webgl1.glsl';
@@ -17,8 +15,8 @@ import { channels } from './shader-modules';
 import { padContrastLimits, getDtypeValues } from '../utils';
 
 const SHADER_MODULES = [
-  { fs: fs1, fscmap: fsColormap1, vs: vs1 },
-  { fs: fs2, fscmap: fsColormap2, vs: vs2 }
+  { fs: fs1, vs: vs1 },
+  { fs: fs2, vs: vs2 }
 ];
 
 function validateWebGL2Filter(gl, interpolation) {
@@ -112,7 +110,7 @@ const XRLayer = class extends Layer {
       this.context.gl,
       interpolation
     );
-    const fs = colormap ? shaderModule.fscmap : shaderModule.fs;
+    const fs = shaderModule.fs;
     const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
       'fs:DECKGL_PROCESS_INTENSITY'
     );
@@ -127,7 +125,6 @@ const XRLayer = class extends Layer {
       vs: shaderModule.vs,
       defines: {
         SAMPLER_TYPE: sampler,
-        COLORMAP_FUNCTION: colormap || 'viridis'
       },
       modules: [project32, picking, newChannelsModule]
     });
@@ -314,7 +311,7 @@ const XRLayer = class extends Layer {
         domain,
         dtype
       });
-
+      console.log(uniforms, paddedContrastLimits, textures)
       model
         .setUniforms({
           ...uniforms,

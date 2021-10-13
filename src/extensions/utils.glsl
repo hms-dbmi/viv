@@ -1,6 +1,5 @@
-
-vec4 apply_opacity(vec3 color, bool useTransparentColor, vec3 transparentColor, float opacity){
+vec4 apply_transparent_color(vec3 color, vec3 transparentColor, bool useTransparentColor, float opacity){
   return vec4(color, (color == transparentColor && useTransparentColor) ? 0. : opacity);
 }
 
-#pragma glslify: export(apply_opacity)
+#pragma glslify: export(apply_transparent_color)
