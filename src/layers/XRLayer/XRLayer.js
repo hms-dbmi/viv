@@ -7,17 +7,12 @@ import { Model, Geometry, Texture2D, isWebGL2 } from '@luma.gl/core';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { ProgramManager } from '@luma.gl/engine';
 import { hasFeature, FEATURES } from '@luma.gl/webgl';
-import fs1 from './xr-layer-fragment.webgl1.glsl';
-import fs2 from './xr-layer-fragment.webgl2.glsl';
-import vs1 from './xr-layer-vertex.webgl1.glsl';
-import vs2 from './xr-layer-vertex.webgl2.glsl';
+import fs from './xr-layer-fragment.webgl.glsl';
+import vs from './xr-layer-vertex.webgl.glsl';
 import { channels } from './shader-modules';
 import { padContrastLimits, getDtypeValues } from '../utils';
 
-const SHADER_MODULES = [
-  { fs: fs1, vs: vs1 },
-  { fs: fs2, vs: vs2 }
-];
+const shaderModule = { fs, vs };
 
 function validateWebGL2Filter(gl, interpolation) {
   const canShowFloat = hasFeature(gl, FEATURES.TEXTURE_FLOAT);
@@ -47,7 +42,7 @@ function getRenderingAttrs(dtype, gl, interpolation) {
       dataFormat: GL.LUMINANCE,
       type: GL.FLOAT,
       sampler: 'sampler2D',
-      shaderModule: SHADER_MODULES[0],
+      shaderModule,
       filter: validateWebGL2Filter(gl, interpolation),
       cast: data => new Float32Array(data)
     };
@@ -56,7 +51,7 @@ function getRenderingAttrs(dtype, gl, interpolation) {
   const values = getDtypeValues(isLinear ? 'Float32' : dtype);
   return {
     ...values,
-    shaderModule: SHADER_MODULES[1],
+    shaderModule,
     filter: interpolation,
     cast: isLinear ? data => new Float32Array(data) : data => data
   };
@@ -311,7 +306,6 @@ const XRLayer = class extends Layer {
         domain,
         dtype
       });
-      console.log(uniforms, paddedContrastLimits, textures)
       model
         .setUniforms({
           ...uniforms,
