@@ -78,7 +78,6 @@ const defaultProps = {
  * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
  * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
- * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<number>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @property {String=} id Unique identifier for this layer.
  * @property {function=} onHover Hook function from deck.gl to handle hover objects.
@@ -93,11 +92,11 @@ const defaultProps = {
  */
 const XRLayer = class extends Layer {
   /**
-   * This function chooses a shader (colormapping or not) and
-   * replaces `usampler` with `sampler` if the data is not an unsigned integer
+   * This function replaces `usampler` with `sampler` if the data is not an unsigned integer
+   * and adds a standard ramp function default for DECKGL_PROCESS_INTENSITY.
    */
   getShaders() {
-    const { colormap, dtype, interpolation } = this.props;
+    const { dtype, interpolation } = this.props;
     const { shaderModule, sampler } = getRenderingAttrs(
       dtype,
       this.context.gl,
@@ -195,19 +194,6 @@ const XRLayer = class extends Layer {
   updateState({ props, oldProps, changeFlags, ...rest }) {
     super.updateState({ props, oldProps, changeFlags, ...rest });
     // setup model first
-    if (
-      changeFlags.extensionsChanged ||
-      props.colormap !== oldProps.colormap ||
-      props.interpolation !== oldProps.interpolation
-    ) {
-      const { gl } = this.context;
-      if (this.state.model) {
-        this.state.model.delete();
-      }
-      this.setState({ model: this._getModel(gl) });
-
-      this.getAttributeManager().invalidateAll();
-    }
     if (
       (props.channelData !== oldProps.channelData &&
         props.channelData?.data !== oldProps.channelData?.data) ||
