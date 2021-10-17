@@ -16,13 +16,10 @@ const defaultProps = {
   onHover: { type: 'function', value: null, compare: false },
   contrastLimits: { type: 'array', value: [], compare: true },
   channelsVisible: { type: 'array', value: [], compare: true },
-  opacity: { type: 'number', value: 1, compare: true },
-  colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
   viewportId: { type: 'string', value: '', compare: true },
   maxRequests: { type: 'number', value: 10, compare: true },
   onClick: { type: 'function', value: null, compare: true },
-  transparentColor: { type: 'array', value: null, compare: true },
   refinementStrategy: { type: 'string', value: null, compare: true },
   excludeBackground: { type: 'boolean', value: false, compare: true },
   extensions: {
@@ -68,7 +65,6 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       id,
       onClick,
       modelMatrix,
-      transparentColor,
       excludeBackground,
       refinementStrategy
     } = this.props;
@@ -186,13 +182,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         loader: lowestResolution,
         modelMatrix: layerModelMatrix.scale(2 ** (loader.length - 1)),
         visible:
-          opacity === 1 &&
-          (!viewportId || this.context.viewport.id === viewportId) &&
-          // If we are using a transparent color, we shouldn't show the background image
-          // since the background image might not have the same color output from the fragment shader
-          // as the tiled layer at a higher resolution level.
-          !transparentColor,
-        pickable: { type: 'boolean', value: true, compare: true },
+          (!viewportId || this.context.viewport.id === viewportId),
         onHover,
         onClick,
         // Background image is nicest when LINEAR in my opinion.

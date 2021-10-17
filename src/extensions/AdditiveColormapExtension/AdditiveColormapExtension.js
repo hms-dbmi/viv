@@ -7,13 +7,12 @@ import { padColors } from '../utils';
  * @type {object}
  * @property {number=} opacity Opacity of the layer.
  * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
- * @property {booleab} useTransparentColor Indicates whether the shader should make the output of colormap_function(0) color transparent
+ * @property {boolean} useTransparentColor Indicates whether the shader should make the output of colormap_function(0) color transparent
  * */
 const defaultProps = {
-  colors: { type: 'array', value: [], compare: true },
   colormap: { type: 'string', value: 'viridis', compare: true },
   opacity: { type: 'number', value: 1.0, compare: true },
-  useTransparentColor: { type: 'boolean', value: false, compare: true },
+  useTransparentColor:{ type: 'boolean', value: false, compare: true }, 
 };
 
 const AdditiveColormapExtension = class extends LayerExtension {
@@ -47,7 +46,7 @@ const AdditiveColormapExtension = class extends LayerExtension {
       channelsVisible,
       colors
     });
-
+    console.log(this.props)
     const uniforms = {
       colors: paddedColors,
       opacity,
