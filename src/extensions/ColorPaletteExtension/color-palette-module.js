@@ -6,12 +6,7 @@ export default {
   inject: {
     'fs:DECKGL_MUTATE_COLOR': `
    vec3 rgb = rgba.rgb;
-   mutate_color(rgb, intensity0, 0);
-   mutate_color(rgb, intensity1, 1);
-   mutate_color(rgb, intensity2, 2);
-   mutate_color(rgb, intensity3, 3);
-   mutate_color(rgb, intensity4, 4);
-   mutate_color(rgb, intensity5, 5);
+   mutate_color(rgb, intensity0, intensity1, intensity2, intensity3, intensity4, intensity5);
    rgba = apply_opacity(rgb);
   `,
   }
