@@ -29,11 +29,31 @@ bool frag_on_lens_bounds(vec2 vTexCoord) {
   // Check membership on "bourndary" of ellipse.
   return ellipseDistance <= 1. && ellipseDistance >= (1. - lensBorderRadius);
 }
-
-void mutate_color(inout vec3 rgbOut, float intensity, vec2 vTexCoord, int channelIndex){
+// Return a float for boolean arithmetic calculation.
+float get_use_color_float(vec2 vTexCoord, int channelIndex) {
   bool isFragInLensBounds = frag_in_lens_bounds(vTexCoord);
   bool inLensAndUseLens = isLensOn && isFragInLensBounds;
-  float useColorValue = float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));
-  // Use arithmetic instead of if-then for useColorValue.
-  rgbOut += max(0., min(1., intensity)) * max(vec3(colors[channelIndex]), (1. - useColorValue) * vec3(1., 1., 1.));
+  return float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));
+ 
+}
+void mutate_color(inout vec3 rgb, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord){
+  float useColorValue = 0.;
+
+  useColorValue = get_use_color_float(vTexCoord, 0);
+  rgb += max(0., min(1., intensity0)) * max(vec3(colors[0]), (1. - useColorValue) * vec3(1., 1., 1.));
+  
+  useColorValue = get_use_color_float(vTexCoord, 1);
+  rgb += max(0., min(1., intensity1)) * max(vec3(colors[1]), (1. - useColorValue) * vec3(1., 1., 1.));
+
+  useColorValue = get_use_color_float(vTexCoord, 2);
+  rgb += max(0., min(1., intensity2)) * max(vec3(colors[2]), (1. - useColorValue) * vec3(1., 1., 1.));
+
+  useColorValue = get_use_color_float(vTexCoord, 3);
+  rgb += max(0., min(1., intensity3)) * max(vec3(colors[3]), (1. - useColorValue) * vec3(1., 1., 1.));
+
+  useColorValue = get_use_color_float(vTexCoord, 4);
+  rgb += max(0., min(1., intensity4)) * max(vec3(colors[4]), (1. - useColorValue) * vec3(1., 1., 1.));
+
+  useColorValue = get_use_color_float(vTexCoord, 5);
+  rgb += max(0., min(1., intensity5)) * max(vec3(colors[5]), (1. - useColorValue) * vec3(1., 1., 1.));
 }
