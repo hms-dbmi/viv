@@ -6,6 +6,7 @@ import {
   PictureInPictureViewer,
   VolumeViewer,
   AdditiveColormapExtension,
+  LensExtension
   // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 import {
@@ -48,7 +49,7 @@ const Viewer = () => {
       colors={colors}
       channelsVisible={channelsVisible}
       selections={selections}
-      colormap={colormap.length > 0 && colormap}
+      colormap={colormap || "viridis"}
       xSlice={xSlice}
       ySlice={ySlice}
       zSlice={zSlice}
@@ -75,7 +76,6 @@ const Viewer = () => {
       selections={selections}
       height={viewSize.height}
       width={viewSize.width}
-      colormap={colormap.length > 0 && colormap}
       zoomLock={zoomLock}
       panLock={panLock}
       hoverHooks={{
@@ -84,7 +84,10 @@ const Viewer = () => {
       lensSelection={lensSelection}
       isLensOn={isLensOn}
       onViewportLoad={onViewportLoad}
-      extensions={[new AdditiveColormapExtension()]}
+      extensions={[colormap ? new AdditiveColormapExtension() : new LensExtension()]}
+      colormap={colormap || "viridis"}
+      lensSelection={lensSelection}
+      isLensOn={isLensOn}
     />
   ) : (
     <PictureInPictureViewer
@@ -95,7 +98,6 @@ const Viewer = () => {
       selections={selections}
       height={viewSize.height}
       width={viewSize.width}
-      colormap="viridis"
       overview={DEFAULT_OVERVIEW}
       overviewOn={isOverviewOn}
       hoverHooks={{
@@ -104,7 +106,10 @@ const Viewer = () => {
       lensSelection={lensSelection}
       isLensOn={isLensOn}
       onViewportLoad={onViewportLoad}
-      extensions={[new AdditiveColormapExtension()]}
+      extensions={[colormap ? new AdditiveColormapExtension() : new LensExtension()]}
+      colormap={colormap || "viridis"}
+      lensSelection={lensSelection}
+      isLensOn={isLensOn}
     />
   );
 };

@@ -3,13 +3,13 @@ import lens from './lens-module';
 import { padColors } from '../utils';
 /**
  * This deck.gl extension allows for a lens that selectively shows one channel in its chosen color and then the others in white.
- * @param {Object} props
- * @param {boolean=} props.isLensOn Whether or not to use the lens.
- * @param {number=} props.lensSelection Numeric index of the channel to be focused on by the lens.
- * @param {number=} props.lensRadius Pixel radius of the lens (default: 100).
- * @param {Array.<number>=} props.lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
- * @param {number=} props.lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
- * @param {Array<Array.<number>>=} props.colors Color palette to pseudo-color channels as.  
+ * @type {Object}
+ * @property {boolean=} isLensOn Whether or not to use the lens.
+ * @property {number=} lensSelection Numeric index of the channel to be focused on by the lens.
+ * @property {number=} lensRadius Pixel radius of the lens (default: 100).
+ * @property {Array.<number>=} lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
+ * @property {number=} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * @property {Array<Array.<number>>=} colors Color palette to pseudo-color channels as.  
 * */
 const defaultProps = {
   isLensOn: { type: 'boolean', value: false, compare: true },

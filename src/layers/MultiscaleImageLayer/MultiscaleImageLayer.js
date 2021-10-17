@@ -35,8 +35,6 @@ const defaultProps = {
  * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader Image pyramid. PixelSource[], where each PixelSource is decreasing in shape.
  * @property {Array} selections Selection to be used for fetching data.
- * @property {number=} opacity Opacity of the layer.
- * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @property {string=} viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
  * @property {String=} id Unique identifier for this layer.
@@ -45,11 +43,7 @@ const defaultProps = {
  * @property {number=} maxRequests Maximum parallel ongoing requests allowed before aborting.
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
- * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
- * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
- * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
- * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
- * @property {string=} refinementStrategy 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
+* @property {string=} refinementStrategy 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
  * @property {boolean=} excludeBackground Whether to exclude the background image. The background image is also excluded for opacity!=1.
  * @property {Array=} extensions [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers.
  */

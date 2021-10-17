@@ -64,9 +64,7 @@ const defaultProps = {
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
   contrastLimits: { type: 'array', value: [], compare: true },
   channelsVisible: { type: 'array', value: [], compare: true },
-  opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: 'Uint16', compare: true },
-  colormap: { type: 'string', value: '', compare: true },
   interpolation: {
     type: 'number',
     value: GL.NEAREST,
