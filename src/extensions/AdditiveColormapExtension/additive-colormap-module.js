@@ -13,6 +13,6 @@ export default {
   intensityCombo += max(0.,intensity4);
   intensityCombo += max(0.,intensity5);
   rgba = colormap(intensityCombo);
-`,
+`
   }
 };

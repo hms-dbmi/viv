@@ -25,7 +25,11 @@ const defaultProps = {
   transparentColor: { type: 'array', value: null, compare: true },
   refinementStrategy: { type: 'string', value: null, compare: true },
   excludeBackground: { type: 'boolean', value: false, compare: true },
-  extensions: { type: 'array', value: [new ColorPaletteExtension()], compare: true }
+  extensions: {
+    type: 'array',
+    value: [new ColorPaletteExtension()],
+    compare: true
+  }
 };
 
 /**
@@ -43,7 +47,7 @@ const defaultProps = {
  * @property {number=} maxRequests Maximum parallel ongoing requests allowed before aborting.
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
-* @property {string=} refinementStrategy 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
+ * @property {string=} refinementStrategy 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
  * @property {boolean=} excludeBackground Whether to exclude the background image. The background image is also excluded for opacity!=1.
  * @property {Array=} extensions [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers.
  */
@@ -163,7 +167,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       updateTriggers: {
         getTileData: [loader, selections]
       },
-      onTileError: onTileError || loader[0].onTileError,
+      onTileError: onTileError || loader[0].onTileError
     });
 
     // This gives us a background image and also solves the current
@@ -192,7 +196,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         onHover,
         onClick,
         // Background image is nicest when LINEAR in my opinion.
-        interpolation: GL.LINEAR,
+        interpolation: GL.LINEAR
       });
     const layers = [baseLayer, tiledLayer];
     return layers;

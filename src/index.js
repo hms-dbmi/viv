@@ -30,7 +30,11 @@ import {
   COLORMAPS,
   RENDERING_MODES
 } from './constants';
-import { AdditiveColormapExtension, LensExtension, ColorPaletteExtension } from './extensions';
+import {
+  AdditiveColormapExtension,
+  LensExtension,
+  ColorPaletteExtension
+} from './extensions';
 
 export {
   DTYPE_VALUES,

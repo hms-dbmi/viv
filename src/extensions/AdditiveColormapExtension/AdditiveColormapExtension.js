@@ -11,7 +11,7 @@ import { padColors } from '../utils';
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This propertyeter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent
-* */
+ * */
 const defaultProps = {
   colors: { type: 'array', value: [], compare: true },
   colormap: { type: 'string', value: 'viridis', compare: true },
@@ -20,15 +20,18 @@ const defaultProps = {
 
 const AdditiveColormapExtension = class extends LayerExtension {
   getShaders() {
-    const newColormapExtension = { ...additiveColormap, fs: additiveColormap.fs.replaceAll('COLORMAP_FUNCTION', 'viridis') } 
+    const newColormapExtension = {
+      ...additiveColormap,
+      fs: additiveColormap.fs.replaceAll('COLORMAP_FUNCTION', 'viridis')
+    };
     return {
       ...super.getShaders(),
       modules: [newColormapExtension]
     };
   }
-  
-  updateState({ props, oldProps, changeFlags, ...rest }){
-     super.updateState({ props, oldProps, changeFlags, ...rest });
+
+  updateState({ props, oldProps, changeFlags, ...rest }) {
+    super.updateState({ props, oldProps, changeFlags, ...rest });
     if (
       changeFlags.extensionsChanged ||
       props.colormap !== oldProps.colormap ||
@@ -38,27 +41,25 @@ const AdditiveColormapExtension = class extends LayerExtension {
       if (this.state.model) {
         this.state.model.delete();
       }
-     
+    }
   }
 
   draw() {
-    const {
-      colors,
-      channelsVisible,
-      opacity,
-    } = this.props;
+    const { colors, channelsVisible, opacity } = this.props;
     const paddedColors = padColors({
       channelsVisible,
       colors
     });
 
-    const uniforms = { colors: paddedColors,  opacity,
-      useTransparentColor: true,
-  };
+    const uniforms = {
+      colors: paddedColors,
+      opacity,
+      useTransparentColor: true
+    };
     // eslint-disable-next-line no-unused-expressions
     this.state.model?.setUniforms(uniforms);
   }
-}
+};
 
 AdditiveColormapExtension.extensionName = 'AdditiveColormapExtension';
 AdditiveColormapExtension.defaultProps = defaultProps;

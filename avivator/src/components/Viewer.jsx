@@ -49,7 +49,7 @@ const Viewer = () => {
       colors={colors}
       channelsVisible={channelsVisible}
       selections={selections}
-      colormap={colormap || "viridis"}
+      colormap={colormap || 'viridis'}
       xSlice={xSlice}
       ySlice={ySlice}
       zSlice={zSlice}
@@ -84,8 +84,10 @@ const Viewer = () => {
       lensSelection={lensSelection}
       isLensOn={isLensOn}
       onViewportLoad={onViewportLoad}
-      extensions={[colormap ? new AdditiveColormapExtension() : new LensExtension()]}
-      colormap={colormap || "viridis"}
+      extensions={[
+        colormap ? new AdditiveColormapExtension() : new LensExtension()
+      ]}
+      colormap={colormap || 'viridis'}
       lensSelection={lensSelection}
       isLensOn={isLensOn}
     />
@@ -106,8 +108,10 @@ const Viewer = () => {
       lensSelection={lensSelection}
       isLensOn={isLensOn}
       onViewportLoad={onViewportLoad}
-      extensions={[colormap ? new AdditiveColormapExtension() : new LensExtension()]}
-      colormap={colormap || "viridis"}
+      extensions={[
+        colormap ? new AdditiveColormapExtension() : new LensExtension()
+      ]}
+      colormap={colormap || 'viridis'}
       lensSelection={lensSelection}
       isLensOn={isLensOn}
     />

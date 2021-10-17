@@ -4,7 +4,7 @@ import GL from '@luma.gl/constants';
 import XRLayer from './XRLayer';
 import BitmapLayer from './BitmapLayer';
 import { isInterleaved, SIGNAL_ABORTED } from '../loaders/utils';
-import { ColorPaletteExtension } from '../extensions'; 
+import { ColorPaletteExtension } from '../extensions';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -31,7 +31,11 @@ const defaultProps = {
     value: GL.NEAREST,
     compare: true
   },
-  extensions: { type: 'array', value: [ new ColorPaletteExtension() ], compare: true },
+  extensions: {
+    type: 'array',
+    value: [new ColorPaletteExtension()],
+    compare: true
+  }
 };
 
 /**
@@ -142,7 +146,7 @@ const ImageLayer = class extends CompositeLayer {
       // Shared props with BitmapLayer:
       bounds,
       id: `image-sub-layer-${bounds}-${id}`,
-      dtype,
+      dtype
     });
   }
 };

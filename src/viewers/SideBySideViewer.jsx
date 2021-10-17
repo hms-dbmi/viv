@@ -59,7 +59,7 @@ const SideBySideViewer = props => {
     onHover,
     transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
     onViewportLoad,
-    extensions = [ new ColorPaletteExtension() ],
+    extensions = [new ColorPaletteExtension()],
     deckProps
   } = props;
   const {

@@ -9,8 +9,8 @@ import { padColors } from '../utils';
  * @property {number=} lensRadius Pixel radius of the lens (default: 100).
  * @property {Array.<number>=} lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
  * @property {number=} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
- * @property {Array<Array.<number>>=} colors Color palette to pseudo-color channels as.  
-* */
+ * @property {Array<Array.<number>>=} colors Color palette to pseudo-color channels as.
+ * */
 const defaultProps = {
   isLensOn: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true },
@@ -97,7 +97,7 @@ const LensExtension = class extends LayerExtension {
       lensBorderRadius,
       colors,
       dtype,
-      channelsVisible,
+      channelsVisible
     } = this.props;
     // Creating a unit-square scaled intersection box for rendering the lens.
     // It is ok if these coordinates are outside the unit square since
@@ -116,7 +116,7 @@ const LensExtension = class extends LayerExtension {
     const paddedColors = padColors({
       channelsVisible,
       colors,
-      dtype,
+      dtype
     });
     const uniforms = {
       majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
@@ -129,8 +129,7 @@ const LensExtension = class extends LayerExtension {
       lensSelection,
       lensBorderColor,
       lensBorderRadius,
-      colors: paddedColors,
-
+      colors: paddedColors
     };
     // eslint-disable-next-line no-unused-expressions
     this.state.model?.setUniforms(uniforms);

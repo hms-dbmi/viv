@@ -116,7 +116,7 @@ const XRLayer = class extends Layer {
       fs,
       vs: shaderModule.vs,
       defines: {
-        SAMPLER_TYPE: sampler,
+        SAMPLER_TYPE: sampler
       },
       modules: [project32, picking, newChannelsModule]
     });
@@ -274,12 +274,7 @@ const XRLayer = class extends Layer {
   draw({ uniforms }) {
     const { textures, model } = this.state;
     if (textures && model) {
-      const {
-        contrastLimits,
-        domain,
-        dtype,
-        channelsVisible,
-      } = this.props;
+      const { contrastLimits, domain, dtype, channelsVisible } = this.props;
       // Check number of textures not null.
       const numTextures = Object.values(textures).filter(t => t).length;
       // Slider values and color values can come in before textures since their data is async.
