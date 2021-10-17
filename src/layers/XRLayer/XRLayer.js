@@ -195,6 +195,17 @@ const XRLayer = class extends Layer {
     super.updateState({ props, oldProps, changeFlags, ...rest });
     // setup model first
     if (
+      changeFlags.extensionsChanged ||  props.interpolation !== oldProps.interpolation
+    ) {
+      const { gl } = this.context;
+      if (this.state.model) {
+        this.state.model.delete();
+      }
+      this.setState({ model: this._getModel(gl) });
+
+      this.getAttributeManager().invalidateAll();
+    }
+    if (
       (props.channelData !== oldProps.channelData &&
         props.channelData?.data !== oldProps.channelData?.data) ||
       props.interpolation !== oldProps.interpolation
