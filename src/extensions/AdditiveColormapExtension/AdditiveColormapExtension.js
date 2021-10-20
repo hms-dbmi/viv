@@ -12,7 +12,7 @@ import { padColors } from '../utils';
 const defaultProps = {
   colormap: { type: 'string', value: 'viridis', compare: true },
   opacity: { type: 'number', value: 1.0, compare: true },
-  useTransparentColor:{ type: 'boolean', value: false, compare: true }, 
+  useTransparentColor: { type: 'boolean', value: false, compare: true }
 };
 
 const AdditiveColormapExtension = class extends LayerExtension {
@@ -27,26 +27,26 @@ const AdditiveColormapExtension = class extends LayerExtension {
 
   updateState({ props, oldProps, changeFlags, ...rest }) {
     super.updateState({ props, oldProps, changeFlags, ...rest });
-    if (
-      props.colormap !== oldProps.colormap
-    ) {
+    if (props.colormap !== oldProps.colormap) {
       const { gl } = this.context;
       if (this.state.model) {
         this.state.model.delete();
- this.setState({ model: this._getModel(gl) });
-
-    
+        this.setState({ model: this._getModel(gl) });
       }
-      }
+    }
   }
 
   draw() {
-    const { useTransparentColor, colors, channelsVisible, opacity } = this.props;
+    const {
+      useTransparentColor = false,
+      colors,
+      channelsVisible,
+      opacity = 1.0
+    } = this.props;
     const paddedColors = padColors({
       channelsVisible,
       colors
     });
-    console.log(this.props)
     const uniforms = {
       colors: paddedColors,
       opacity,

@@ -17,7 +17,8 @@ const defaultProps = {
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
-  colors: { type: 'array', value: [], compare: true }
+  colors: { type: 'array', value: [], compare: true },
+  foo: { type: 'number', value: 10, compare: true }
 };
 
 const LensExtension = class extends LayerExtension {
@@ -91,10 +92,10 @@ const LensExtension = class extends LayerExtension {
     const { unprojectLensBounds } = this.state;
     const {
       bounds,
-      isLensOn,
-      lensSelection,
-      lensBorderColor,
-      lensBorderRadius,
+      isLensOn = false,
+      lensSelection = 0,
+      lensBorderColor = [255, 255, 255],
+      lensBorderRadius = 100,
       colors,
       dtype,
       channelsVisible

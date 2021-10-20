@@ -37,12 +37,18 @@ function validateWebGL2Filter(gl, interpolation) {
 function getRenderingAttrs(dtype, gl, interpolation) {
   const isLinear = interpolation === GL.LINEAR;
   if (!isWebGL2(gl)) {
+    // Need to remove es version tag so that shaders work in WebGL1 but the tag is needed for using usampler2d with WebGL2.
+    // Very cursed!
+    const downgradedShaderModule = { ...shaderModule };
+    downgradedShaderModule.fs = downgradedShaderModule.fs.replace("#version 300 es", "");
+    downgradedShaderModule.vs = downgradedShaderModule.vs.replace("#version 300 es", "");
+ 
     return {
       format: GL.LUMINANCE,
       dataFormat: GL.LUMINANCE,
       type: GL.FLOAT,
       sampler: 'sampler2D',
-      shaderModule,
+      shaderModule: downgradedShaderModule,
       filter: validateWebGL2Filter(gl, interpolation),
       cast: data => new Float32Array(data)
     };
@@ -195,7 +201,8 @@ const XRLayer = class extends Layer {
     super.updateState({ props, oldProps, changeFlags, ...rest });
     // setup model first
     if (
-      changeFlags.extensionsChanged ||  props.interpolation !== oldProps.interpolation
+      changeFlags.extensionsChanged ||
+      props.interpolation !== oldProps.interpolation
     ) {
       const { gl } = this.context;
       if (this.state.model) {

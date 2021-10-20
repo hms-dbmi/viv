@@ -181,8 +181,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         id: `Background-Image-${id}`,
         loader: lowestResolution,
         modelMatrix: layerModelMatrix.scale(2 ** (loader.length - 1)),
-        visible:
-          (!viewportId || this.context.viewport.id === viewportId),
+        visible: !viewportId || this.context.viewport.id === viewportId,
         onHover,
         onClick,
         // Background image is nicest when LINEAR in my opinion.
