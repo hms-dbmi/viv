@@ -1,12 +1,11 @@
-Viv's shaders can be modified via [deck.gl hook functions](https://deck.gl/docs/developer-guide/custom-layers/writing-shaders#standard-shader-hooks).  The `LensExtension` in Viv is implemented using this feature - look [here]() for an example.   To take advantage of this feature, pass in a deck.gl [layer extension](https://deck.gl/docs/api-reference/extensions/overview) where the `getShaders` function returns an `inject` method for one of the following supported hooks:
+Viv's shaders can be modified via [deck.gl hook functions](https://deck.gl/docs/developer-guide/custom-layers/writing-shaders#standard-shader-hooks).  The `LensExtension`, `AdditiveColormapExtension`, and `ColorPaletteExtesnion` (default) in Viv are implemented using these features - look [here](https://github.com/hms-dbmi/viv/tree/master/src/extensions) for examples.   To take advantage of this feature, pass in a deck.gl [layer extension](https://deck.gl/docs/api-reference/extensions/overview) where the `getShaders` function returns an `inject` method for one of the following supported hooks:
 
 ### `DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)`
 
-This hook allows for custom processing of raw pixel intensities. For example, an non-linear (or alternative) transformation function may be provided to override the default linear ramp function with 2 contrast limit endpoints. This hook is available on all layers in all modes.
+This hook allows for custom processing of raw pixel intensities. For example, an non-linear (or alternative) transformation function may be provided to override the default linear ramp function with 2 contrast limit endpoints. This hook is available on all layers in all modes.  By default, the layer provides a reasonable function for this.
 
-### `DECKGL_MUTATE_COLOR(inout vec3 rgb, float intensity, vec3 color, vec2 texCoord, int channelIndex)`
-
-This hook allows for users to mutate conversion of a processed intensity (from `DECKGL_PROCESS_INTENSITY`) into a color when not using a colormap like `viridis` or `jet` via the `colormap` prop. This is only available in 2D layers.
+### `DECKGL_MUTATE_COLOR(inout vec4 rgba, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)`
+This hook allows for users to mutate conversion of a processed intensity (from `DECKGL_PROCESS_INTENSITY`) into a color. This is only available in 2D layers.  There is no default for this, so one of the extensions used must implement this.
 
 ### `DECKGL_FILTER_COLOR(inout vec4 color, FragmentGeometry geometry)`
 
