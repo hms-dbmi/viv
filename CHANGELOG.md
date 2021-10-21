@@ -9,7 +9,8 @@
     - See https://deck.gl/docs/developer-guide/custom-layers/layer-extensions for more information on how to use `extensions` and what they are
 - Expose `DECKGL_FILTER_COLOR`, `DECKGL_PROCESS_INTENSITY`, AND `DECKGL_MUTATE_COLOR` hooks and document them.
 - Upgrade deck.gl to 8.6
-
+- `extensions` are now the main way for controlling how shaders render the image
+  - `LensExtension`, `ColorPaletteExtension`, and `AdditiveColormapExtension` are exported from `viv` to be used mutually exclusively for controlling how the fragment shader renders.  The `ColorPaletteExtension` is used by default and provides the normal one color per channel pseudo-coloring.  `AdditiveColormapExtension` provides things like `virids` `jet` and more.  There have been slight changes to the props so please see the docs for more infomation.
 ### Changed
 
 ## 0.11.0
