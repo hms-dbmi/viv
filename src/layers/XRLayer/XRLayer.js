@@ -40,9 +40,15 @@ function getRenderingAttrs(dtype, gl, interpolation) {
     // Need to remove es version tag so that shaders work in WebGL1 but the tag is needed for using usampler2d with WebGL2.
     // Very cursed!
     const downgradedShaderModule = { ...shaderModule };
-    downgradedShaderModule.fs = downgradedShaderModule.fs.replace("#version 300 es", "");
-    downgradedShaderModule.vs = downgradedShaderModule.vs.replace("#version 300 es", "");
- 
+    downgradedShaderModule.fs = downgradedShaderModule.fs.replace(
+      '#version 300 es',
+      ''
+    );
+    downgradedShaderModule.vs = downgradedShaderModule.vs.replace(
+      '#version 300 es',
+      ''
+    );
+
     return {
       format: GL.LUMINANCE,
       dataFormat: GL.LUMINANCE,
