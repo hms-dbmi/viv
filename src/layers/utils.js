@@ -1,7 +1,5 @@
 import { Matrix4 } from 'math.gl';
 import {
-  MAX_COLOR_INTENSITY,
-  DEFAULT_COLOR_OFF,
   MAX_CHANNELS,
   DTYPE_VALUES
 } from '../constants';
@@ -43,7 +41,7 @@ export function padContrastLimits({
   // Need to pad contrastLimits and colors with default values (required by shader)
   const padSize = MAX_CHANNELS - newContrastLimits.length;
   if (padSize < 0) {
-    throw Error(`${lengths} channels passed in, but only 6 are allowed.`);
+    throw Error(`${newContrastLimits.lengths} channels passed in, but only 6 are allowed.`);
   }
 
   const paddedContrastLimits = padWithDefault(

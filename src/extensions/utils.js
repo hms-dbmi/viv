@@ -1,4 +1,4 @@
-import { padWithDefault } from '../layers/utils.js';
+import { padWithDefault } from '../layers/utils';
 import {
   DEFAULT_COLOR_OFF,
   MAX_CHANNELS,

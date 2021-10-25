@@ -98,6 +98,7 @@ const PictureInPictureViewer = props => {
   const layerConfig = {
     loader,
     contrastLimits,
+    colors,
     channelsVisible,
     selections: oldselections,
     newselections,

@@ -88,8 +88,6 @@ const Viewer = () => {
         colormap ? new AdditiveColormapExtension() : new LensExtension()
       ]}
       colormap={colormap || 'viridis'}
-      lensSelection={lensSelection}
-      isLensOn={isLensOn}
     />
   ) : (
     <PictureInPictureViewer
@@ -112,8 +110,6 @@ const Viewer = () => {
         colormap ? new AdditiveColormapExtension() : new LensExtension()
       ]}
       colormap={colormap || 'viridis'}
-      lensSelection={lensSelection}
-      isLensOn={isLensOn}
     />
   );
 };

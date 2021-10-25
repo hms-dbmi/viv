@@ -39,16 +39,10 @@ const AdditiveColormapExtension = class extends LayerExtension {
   draw() {
     const {
       useTransparentColor = false,
-      colors,
       channelsVisible,
       opacity = 1.0
     } = this.props;
-    const paddedColors = padColors({
-      channelsVisible,
-      colors
-    });
     const uniforms = {
-      colors: paddedColors,
       opacity,
       useTransparentColor
     };

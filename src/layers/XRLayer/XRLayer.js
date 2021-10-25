@@ -12,7 +12,7 @@ import vs from './xr-layer-vertex.webgl.glsl';
 import { channels } from './shader-modules';
 import { padContrastLimits, getDtypeValues } from '../utils';
 
-const shaderModule = { fs, vs };
+const coreShaderModule = { fs, vs };
 
 function validateWebGL2Filter(gl, interpolation) {
   const canShowFloat = hasFeature(gl, FEATURES.TEXTURE_FLOAT);
@@ -39,7 +39,7 @@ function getRenderingAttrs(dtype, gl, interpolation) {
   if (!isWebGL2(gl)) {
     // Need to remove es version tag so that shaders work in WebGL1 but the tag is needed for using usampler2d with WebGL2.
     // Very cursed!
-    const downgradedShaderModule = { ...shaderModule };
+    const downgradedShaderModule = { ...coreShaderModule };
     downgradedShaderModule.fs = downgradedShaderModule.fs.replace(
       '#version 300 es',
       ''
@@ -63,7 +63,7 @@ function getRenderingAttrs(dtype, gl, interpolation) {
   const values = getDtypeValues(isLinear ? 'Float32' : dtype);
   return {
     ...values,
-    shaderModule,
+    shaderModule: coreShaderModule,
     filter: interpolation,
     cast: isLinear ? data => new Float32Array(data) : data => data
   };
@@ -114,7 +114,6 @@ const XRLayer = class extends Layer {
       this.context.gl,
       interpolation
     );
-    const fs = shaderModule.fs;
     const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
       'fs:DECKGL_PROCESS_INTENSITY'
     );
@@ -125,8 +124,7 @@ const XRLayer = class extends Layer {
       `;
     }
     return super.getShaders({
-      fs,
-      vs: shaderModule.vs,
+      ...shaderModule,
       defines: {
         SAMPLER_TYPE: sampler
       },
