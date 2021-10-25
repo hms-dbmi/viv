@@ -1,6 +1,6 @@
 import { LayerExtension } from '@deck.gl/core';
 import colorPalette from './color-palette-module';
-import { padColors } from '../utils';
+import { getDefaultPalette, padColors } from '../utils';
 
 /**
  * This deck.gl extension allows for a color palette to be used for pseudo-coloring channels.
@@ -13,7 +13,7 @@ import { padColors } from '../utils';
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent
  * */
 const defaultProps = {
-  colors: { type: 'array', value: [], compare: true },
+  colors: { type: 'array', value: null, compare: true },
   opacity: { type: 'number', value: 1.0, compare: true },
   transparentColor: { type: 'array', value: null, compare: true }
 };
@@ -29,7 +29,7 @@ const ColorPaletteExtension = class extends LayerExtension {
     const { colors, channelsVisible, opacity, transparentColor } = this.props;
     const paddedColors = padColors({
       channelsVisible,
-      colors
+      colors: colors || getDefaultPalette(this.props.selections.length)
     });
     const uniforms = {
       colors: paddedColors,

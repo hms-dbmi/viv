@@ -1,6 +1,6 @@
 import { LayerExtension } from '@deck.gl/core';
 import lens from './lens-module';
-import { padColors } from '../utils';
+import { getDefaultPalette, padColors } from '../utils';
 /**
  * This deck.gl extension allows for a lens that selectively shows one channel in its chosen color and then the others in white.
  * @type {Object}
@@ -17,7 +17,7 @@ const defaultProps = {
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
   lensBorderRadius: { type: 'number', value: 0.02, compare: true },
-  colors: { type: 'array', value: [], compare: true },
+  colors: { type: 'array', value: null, compare: true },
   foo: { type: 'number', value: 10, compare: true }
 };
 
@@ -116,7 +116,7 @@ const LensExtension = class extends LayerExtension {
     const topMouseBoundScaled = (topMouseBound - top) / (bottom - top);
     const paddedColors = padColors({
       channelsVisible,
-      colors,
+      colors: colors || getDefaultPalette(this.props.selections.length),
       dtype
     });
     const uniforms = {
