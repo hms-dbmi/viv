@@ -7,8 +7,6 @@ import {
   DETAIL_VIEW_ID,
   OVERVIEW_VIEW_ID
 } from '../views';
-import useGlobalSelection from './global-selection-hook';
-import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -70,16 +68,10 @@ const PictureInPictureViewer = props => {
     transparentColor,
     onViewStateChange,
     onHover,
-    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
     onViewportLoad,
     extensions = [],
     deckProps
   } = props;
-  const {
-    newselections,
-    oldselections,
-    onViewportLoad: transitionOnViewportLoad
-  } = useGlobalSelection(selections, transitionFields);
   const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
   const baseViewState = useMemo(() => {
     return (
@@ -99,11 +91,8 @@ const PictureInPictureViewer = props => {
     contrastLimits,
     colors,
     channelsVisible,
-    selections: oldselections,
-    newselections,
+    selections,
     onViewportLoad,
-    transitionOnViewportLoad,
-    transitionFields,
     colormap,
     isLensOn,
     lensSelection,
