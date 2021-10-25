@@ -1,6 +1,5 @@
 import { LayerExtension } from '@deck.gl/core';
 import additiveColormap from './additive-colormap-module';
-import { padColors } from '../utils';
 
 /**
  * This deck.gl extension allows for a color palette to be used for pseudo-coloring channels.
@@ -39,7 +38,6 @@ const AdditiveColormapExtension = class extends LayerExtension {
   draw() {
     const {
       useTransparentColor = false,
-      channelsVisible,
       opacity = 1.0
     } = this.props;
     const uniforms = {
