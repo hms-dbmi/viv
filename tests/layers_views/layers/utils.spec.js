@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
 import { range } from '../../../src/layers/MultiscaleImageLayer/utils';
-import { padWithDefault, padColorsAndWindows } from '../../../src/layers/utils';
+import { padWithDefault, padContrastLimits } from '../../../src/layers/utils';
 
 test('range test', t => {
   const expected = [0, 1, 2];
@@ -20,13 +20,8 @@ test('padWithDefault test', t => {
   t.end();
 });
 
-test('padColorsAndWindows test', t => {
-  const expectedNoDomain = {
-    paddedContrastLimits: [0, 5, 0, 5, 255, 255, 255, 255, 255, 255, 255, 255],
-    paddedColors: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-  };
-  const expectedChannelOff = {
-    paddedContrastLimits: [
+test('padContrastLimits test', t => {
+  const expectedChannelOff =[
       0,
       5,
       255,
@@ -39,28 +34,9 @@ test('padColorsAndWindows test', t => {
       255,
       255,
       255
-    ],
-    paddedColors: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-  };
-  const expectedDomain = {
-    paddedContrastLimits: [
-      0,
-      5,
-      0,
-      5,
-      1000,
-      1000,
-      1000,
-      1000,
-      1000,
-      1000,
-      1000,
-      1000
-    ],
-    paddedColors: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-  };
-  const expected16Bit = {
-    paddedContrastLimits: [
+    ];
+ 
+  const expected16Bit = [
       0,
       5,
       0,
@@ -73,35 +49,12 @@ test('padColorsAndWindows test', t => {
       2 ** 16 - 1,
       2 ** 16 - 1,
       2 ** 16 - 1
-    ],
-    paddedColors: [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-  };
-
+    ];
   t.deepEqual(
-    padColorsAndWindows({
+    padContrastLimits({
       contrastLimits: [
         [0, 5],
         [0, 5]
-      ],
-      colors: [
-        [255, 0, 0],
-        [255, 255, 0]
-      ],
-      channelsVisible: [true, true],
-      dtype: 'Uint8'
-    }),
-    expectedNoDomain,
-    'Pads with no domain provided'
-  );
-  t.deepEqual(
-    padColorsAndWindows({
-      contrastLimits: [
-        [0, 5],
-        [0, 5]
-      ],
-      colors: [
-        [255, 0, 0],
-        [255, 255, 0]
       ],
       channelsVisible: [true, false],
       dtype: 'Uint8'
@@ -109,32 +62,11 @@ test('padColorsAndWindows test', t => {
     expectedChannelOff,
     'Pads with one channel turned off'
   );
-  t.deepEqual(
-    padColorsAndWindows({
+    t.deepEqual(
+    padContrastLimits({
       contrastLimits: [
         [0, 5],
         [0, 5]
-      ],
-      colors: [
-        [255, 0, 0],
-        [255, 255, 0]
-      ],
-      channelsVisible: [true, true],
-      domain: [0, 1000],
-      dtype: 'Uint8'
-    }),
-    expectedDomain,
-    'Pads with provided domain value'
-  );
-  t.deepEqual(
-    padColorsAndWindows({
-      contrastLimits: [
-        [0, 5],
-        [0, 5]
-      ],
-      colors: [
-        [255, 0, 0],
-        [255, 255, 0]
       ],
       channelsVisible: [true, true],
       dtype: 'Uint16'
