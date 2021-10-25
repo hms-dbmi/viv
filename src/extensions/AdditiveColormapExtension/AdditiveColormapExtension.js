@@ -36,10 +36,7 @@ const AdditiveColormapExtension = class extends LayerExtension {
   }
 
   draw() {
-    const {
-      useTransparentColor = false,
-      opacity = 1.0
-    } = this.props;
+    const { useTransparentColor = false, opacity = 1.0 } = this.props;
     const uniforms = {
       opacity,
       useTransparentColor
