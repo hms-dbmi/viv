@@ -7,8 +7,6 @@ import {
   DETAIL_VIEW_ID,
   OVERVIEW_VIEW_ID
 } from '../views';
-import useGlobalSelection from './global-selection-hook';
-import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -42,7 +40,6 @@ import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
- * @param {Array} [props.transitionFields] A string array indicating which fields require a transition when making a new selection: Default: ['t', 'z'].
  * @param {function} [props.onViewportLoad] Function that gets called when the data in the viewport loads.
  * @param {Object} [props.deckProps] Additional options used when creating the DeckGL component.  See [the deck.gl docs.](https://deck.gl/docs/api-reference/core/deck#initialization-settings).  `layerFilter`, `layers`, `onViewStateChange`, `views`, `viewState`, `useDevicePixels`, and `getCursor` are already set.
  */
@@ -70,16 +67,10 @@ const PictureInPictureViewer = props => {
     transparentColor,
     onViewStateChange,
     onHover,
-    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
     onViewportLoad,
     extensions = [],
     deckProps
   } = props;
-  const {
-    newselections,
-    oldselections,
-    onViewportLoad: transitionOnViewportLoad
-  } = useGlobalSelection(selections, transitionFields);
   const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
   const baseViewState = useMemo(() => {
     return (
@@ -99,11 +90,8 @@ const PictureInPictureViewer = props => {
     contrastLimits,
     colors,
     channelsVisible,
-    selections: oldselections,
-    newselections,
+    selections,
     onViewportLoad,
-    transitionOnViewportLoad,
-    transitionFields,
     colormap,
     isLensOn,
     lensSelection,
