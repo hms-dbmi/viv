@@ -75,51 +75,19 @@ export function getDefaultInitialViewState(
  * @param {Object} props The layer properties.
  * @returns {Array} An array of layers.
  */
-export function getImageLayers(id, props) {
-  const {
-    selections,
-    newselections,
-    transitionFields,
-    transitionOnViewportLoad,
-    onViewportLoad,
-    ...layerProps
-  } = props;
-  const { loader } = layerProps;
+export function getImageLayer(id, props) {
+  const { loader } = props;
   // Grab name of PixelSource if a class instance (works for Tiff & Zarr).
   const sourceName = loader[0]?.constructor?.name;
 
   // Create at least one layer even without selections so that the tests pass.
   const Layer = loader.length > 1 ? MultiscaleImageLayer : ImageLayer;
   const layerLoader = loader.length > 1 ? loader : loader[0];
-  const layers = [selections, newselections]
-    .filter((s, i) => i === 0 || s)
-    .map((s, i) => {
-      const suffix =
-        s && s[0] ? `-${transitionFields.map(f => s[0][f]).join('-')}` : '';
-      const newProps =
-        i !== 0
-          ? {
-              onViewportLoad: args => {
-                // Slightly delay to avoid issues with a render in the middle of a deck.gl layer state update.
-                setTimeout(() => {
-                  onViewportLoad(args);
-                  transitionOnViewportLoad(args);
-                }, 0);
-              }
-            }
-          : { onViewportLoad };
-      if (loader.length > 1 && i !== 0) {
-        newProps.refinementStrategy = 'never';
-        newProps.excludeBackground = true;
-      }
-      return new Layer({
-        ...layerProps,
-        ...newProps,
-        selections: s,
-        id: `${sourceName}${getVivId(id)}${suffix}`,
-        viewportId: id,
-        loader: layerLoader
-      });
-    });
-  return layers;
+
+  return new Layer({
+    ...props,
+    id: `${sourceName}${getVivId(id)}`,
+    viewportId: id,
+    loader: layerLoader
+  });
 }

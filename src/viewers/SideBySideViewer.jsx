@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react'; // eslint-disable-line import/no-unresolved
 import VivViewer from './VivViewer';
 import { SideBySideView, getDefaultInitialViewState } from '../views';
-import useGlobalSelection from './global-selection-hook';
-import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../constants';
 import { ColorPaletteExtension } from '../extensions';
 
 /**
@@ -33,7 +31,6 @@ import { ColorPaletteExtension } from '../extensions';
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
- * @param {Array} [props.transitionFields] A string array indicating which fields require a transition: Default: ['t', 'z'].
  * @param {Object} [props.deckProps] Additional options used when creating the DeckGL component.  See [the deck.gl docs.](https://deck.gl/docs/api-reference/core/deck#initialization-settings).  `layerFilter`, `layers`, `onViewStateChange`, `views`, `viewState`, `useDevicePixels`, and `getCursor` are already set.
  */
 const SideBySideViewer = props => {
@@ -57,16 +54,10 @@ const SideBySideViewer = props => {
     transparentColor,
     onViewStateChange,
     onHover,
-    transitionFields = GLOBAL_SLIDER_DIMENSION_FIELDS,
     onViewportLoad,
     extensions = [new ColorPaletteExtension()],
     deckProps
   } = props;
-  const {
-    newselections,
-    oldselections,
-    onViewportLoad: transitionOnViewportLoad
-  } = useGlobalSelection(selections, transitionFields);
   const leftViewState = viewStatesProp?.find(v => v.id === 'left');
   const rightViewState = viewStatesProp?.find(v => v.id === 'right');
   const viewStates = useMemo(() => {
@@ -107,11 +98,8 @@ const SideBySideViewer = props => {
     contrastLimits,
     colors,
     channelsVisible,
-    selections: oldselections,
-    newselections,
+    selections,
     onViewportLoad,
-    transitionOnViewportLoad,
-    transitionFields,
     colormap,
     isLensOn,
     lensSelection,
