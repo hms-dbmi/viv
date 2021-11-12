@@ -10,7 +10,8 @@ import { getDefaultPalette, padColors } from '../utils';
  * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This propertyeter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
- * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent
+ * Defining `transparentColor` when a colormap is also defined instructs the shader should make that color transparent.
+``
  * */
 const defaultProps = {
   colors: { type: 'array', value: null, compare: true },

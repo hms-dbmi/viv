@@ -1,7 +1,7 @@
 import fs from './additive-colormap.glsl';
 
 export default {
-  name: 'color-palette-module',
+  name: 'additive-colormap',
   fs,
   inject: {
     'fs:DECKGL_MUTATE_COLOR': `
