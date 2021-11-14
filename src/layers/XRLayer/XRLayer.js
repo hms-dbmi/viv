@@ -51,8 +51,8 @@ function getRenderingAttrs(dtype, gl, interpolation) {
     // Need to add es version tag so that shaders work in WebGL2 since the tag is needed for using usampler2d with WebGL2.
     // Very cursed!
     const upgradedShaderModule = { ...coreShaderModule };
-    upgradedShaderModule.fs = '#version 300 es\n' + upgradedShaderModule.fs
-    upgradedShaderModule.vs = '#version 300 es\n' + upgradedShaderModule.vs
+    upgradedShaderModule.fs = '#version 300 es\n' + upgradedShaderModule.fs;
+    upgradedShaderModule.vs = '#version 300 es\n' + upgradedShaderModule.vs;
     const values = getDtypeValues(isLinear ? 'Float32' : dtype);
     return {
       ...values,
