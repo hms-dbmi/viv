@@ -1,4 +1,3 @@
-#version 300 es
 #define SHADER_NAME xr-layer-vertex-shader
 
 attribute vec2 texCoords;

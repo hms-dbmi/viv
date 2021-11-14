@@ -35,38 +35,32 @@ function validateWebGL2Filter(gl, interpolation) {
 }
 
 function getRenderingAttrs(dtype, gl, interpolation) {
-  const isLinear = interpolation === GL.LINEAR;
   if (!isWebGL2(gl)) {
-    // Need to remove es version tag so that shaders work in WebGL1 but the tag is needed for using usampler2d with WebGL2.
-    // Very cursed!
-    const downgradedShaderModule = { ...coreShaderModule };
-    downgradedShaderModule.fs = downgradedShaderModule.fs.replace(
-      '#version 300 es',
-      ''
-    );
-    downgradedShaderModule.vs = downgradedShaderModule.vs.replace(
-      '#version 300 es',
-      ''
-    );
-
     return {
       format: GL.LUMINANCE,
       dataFormat: GL.LUMINANCE,
       type: GL.FLOAT,
       sampler: 'sampler2D',
-      shaderModule: downgradedShaderModule,
+      shaderModule: coreShaderModule,
       filter: validateWebGL2Filter(gl, interpolation),
       cast: data => new Float32Array(data)
     };
+  } else {
+    // Linear filtering only works when the data type is cast to Float32.
+    const isLinear = interpolation === GL.LINEAR;
+    // Need to add es version tag so that shaders work in WebGL2 since the tag is needed for using usampler2d with WebGL2.
+    // Very cursed!
+    const upgradedShaderModule = { ...coreShaderModule };
+    upgradedShaderModule.fs = '#version 300 es\n' + upgradedShaderModule.fs
+    upgradedShaderModule.vs = '#version 300 es\n' + upgradedShaderModule.vs
+    const values = getDtypeValues(isLinear ? 'Float32' : dtype);
+    return {
+      ...values,
+      shaderModule: upgradedShaderModule,
+      filter: interpolation,
+      cast: isLinear ? data => new Float32Array(data) : data => data
+    };
   }
-  // Linear filtering only works when the data type is cast to Float32.
-  const values = getDtypeValues(isLinear ? 'Float32' : dtype);
-  return {
-    ...values,
-    shaderModule: coreShaderModule,
-    filter: interpolation,
-    cast: isLinear ? data => new Float32Array(data) : data => data
-  };
 }
 
 const defaultProps = {
