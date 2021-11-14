@@ -119,7 +119,7 @@ const PictureInPictureViewer = props => {
       ...overview
     });
     views.push(overviewView);
-    layerProps.push({ ...layerConfig, extensions: [] });
+    layerProps.push({ ...layerConfig, isLensOn: false });
     viewStates.push(overviewViewState);
   }
   if (!loader) return null;
