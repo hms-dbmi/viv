@@ -1,24 +1,25 @@
 import { LayerExtension } from '@deck.gl/core';
 import additiveColormap from './additive-colormap-module';
 
-/**
- * This deck.gl extension allows for a color palette to be used for pseudo-coloring channels.
- * @type {object}
- * @property {number=} opacity Opacity of the layer.
- * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
- * @property {boolean} useTransparentColor Indicates whether the shader should make the output of colormap_function(0) color transparent
- * */
 const defaultProps = {
   colormap: { type: 'string', value: 'viridis', compare: true },
   opacity: { type: 'number', value: 1.0, compare: true },
   useTransparentColor: { type: 'boolean', value: false, compare: true }
 };
 
+/**
+ * This deck.gl extension allows for a color palette to be used for pseudo-coloring channels.
+ * @typedef LayerProps
+ * @type {object}
+ * @property {number=} opacity Opacity of the layer.
+ * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @property {boolean=} useTransparentColor Indicates whether the shader should make the output of colormap_function(0) color transparent
+ * */
 const AdditiveColormapExtension = class extends LayerExtension {
   getShaders() {
     return {
       defines: {
-        COLORMAP_FUNCTION: this?.props?.colormap || 'viridis'
+        COLORMAP_FUNCTION: this?.props?.colormap || defaultProps.colormap.value
       },
       modules: [additiveColormap]
     };
@@ -36,7 +37,10 @@ const AdditiveColormapExtension = class extends LayerExtension {
   }
 
   draw() {
-    const { useTransparentColor = false, opacity = 1.0 } = this.props;
+    const {
+      useTransparentColor = defaultProps.useTransparentColor.value,
+      opacity = defaultProps.opacity.value
+    } = this.props;
     const uniforms = {
       opacity,
       useTransparentColor

@@ -59,7 +59,6 @@ interface VivProps<S extends string[]> {
   colors: [r: number, g: number, b: number][];
   selections: PixelSourceSelection<S>[];
   dtype: keyof typeof DTYPE_VALUES;
-  domain?: [min: number, max: number][];
   modelMatrix?: Matrix4 | undefined;
 }
 

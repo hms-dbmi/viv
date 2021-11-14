@@ -1,16 +1,6 @@
 import { LayerExtension } from '@deck.gl/core';
 import lens from './lens-module';
 import { getDefaultPalette, padColors } from '../utils';
-/**
- * This deck.gl extension allows for a lens that selectively shows one channel in its chosen color and then the others in white.
- * @type {Object}
- * @property {boolean=} isLensOn Whether or not to use the lens.
- * @property {number=} lensSelection Numeric index of the channel to be focused on by the lens.
- * @property {number=} lensRadius Pixel radius of the lens (default: 100).
- * @property {Array.<number>=} lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
- * @property {number=} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
- * @property {Array<Array.<number>>=} colors Color palette to pseudo-color channels as.
- * */
 const defaultProps = {
   isLensOn: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true },
@@ -21,6 +11,17 @@ const defaultProps = {
   foo: { type: 'number', value: 10, compare: true }
 };
 
+/**
+ * This deck.gl extension allows for a lens that selectively shows one channel in its chosen color and then the others in white.
+ * @typedef LayerProps
+ * @type {Object}
+ * @property {boolean=} isLensOn Whether or not to use the lens.
+ * @property {number=} lensSelection Numeric index of the channel to be focused on by the lens.
+ * @property {number=} lensRadius Pixel radius of the lens (default: 100).
+ * @property {Array.<number>=} lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
+ * @property {number=} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
+ * @property {Array<Array.<number>>=} colors Color palette to pseudo-color channels as.
+ * */
 const LensExtension = class extends LayerExtension {
   getShaders() {
     return {
@@ -37,7 +38,7 @@ const LensExtension = class extends LayerExtension {
     }
     const onMouseMove = () => {
       const { viewportId } = layer.props;
-      const { lensRadius = 100 } = this.props;
+      const { lensRadius = defaultProps.lensRadius.value } = this.props;
       // If there is no viewportId, don't try to do anything.
       if (!viewportId) {
         layer.setState({ unprojectLensBounds: [0, 0, 0, 0] });
@@ -92,10 +93,10 @@ const LensExtension = class extends LayerExtension {
     const { unprojectLensBounds = [0, 0, 0, 0] } = this.state;
     const {
       bounds,
-      isLensOn = false,
-      lensSelection = 0,
-      lensBorderColor = [255, 255, 255],
-      lensBorderRadius = 100,
+      isLensOn = defaultProps.isLensOn.value,
+      lensSelection = defaultProps.lensSelection.value,
+      lensBorderColor = defaultProps.lensBorderColor.value,
+      lensBorderRadius = defaultProps.lensBorderRadius.value,
       colors,
       dtype,
       channelsVisible
@@ -115,7 +116,7 @@ const LensExtension = class extends LayerExtension {
     const rightMouseBoundScaled = (rightMouseBound - left) / (right - left);
     const topMouseBoundScaled = (topMouseBound - top) / (bottom - top);
     const paddedColors = padColors({
-      channelsVisible,
+      channelsVisible: channelsVisible || this.selections.map(i => true),
       colors: colors || getDefaultPalette(this.props.selections.length),
       dtype
     });
