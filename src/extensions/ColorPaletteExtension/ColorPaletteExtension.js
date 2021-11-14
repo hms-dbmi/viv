@@ -34,7 +34,7 @@ const defaultProps = {
       useTransparentColor = defaultProps.useTransparentColor.value
     } = this.props;
     const paddedColors = padColors({
-      channelsVisible: channelsVisible || this.selections.map(i => true),
+      channelsVisible: channelsVisible || this.selections.map(() => true),
       colors: colors || getDefaultPalette(this.props.selections.length)
     });
     const uniforms = {

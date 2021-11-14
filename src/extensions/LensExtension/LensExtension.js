@@ -1,6 +1,7 @@
 import { LayerExtension } from '@deck.gl/core';
 import lens from './lens-module';
 import { getDefaultPalette, padColors } from '../utils';
+
 const defaultProps = {
   isLensOn: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true },
@@ -116,7 +117,7 @@ const LensExtension = class extends LayerExtension {
     const rightMouseBoundScaled = (rightMouseBound - left) / (right - left);
     const topMouseBoundScaled = (topMouseBound - top) / (bottom - top);
     const paddedColors = padColors({
-      channelsVisible: channelsVisible || this.selections.map(i => true),
+      channelsVisible: channelsVisible || this.selections.map(() => true),
       colors: colors || getDefaultPalette(this.props.selections.length),
       dtype
     });
