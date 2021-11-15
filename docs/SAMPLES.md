@@ -53,36 +53,36 @@ function load(url) {
 
 function App() {
   const [loader, setLoader]= useState(null);
-
+  const [autoProps, setAutoProps] = useState(null);
   useEffect(() => {
     load(url).then(setLoader);
   }, []);
 
   // Viv exposes the getChannelStats to produce nice initial settings
   // so that users can have an "in focus" image immediately.
-  const [autoProps, setAutoProps] = useState(null);
-  useEffect(async () => {
-    if(!loader) {
-      return; 
-    }
-    // Use lowest level of the image pyramid for calculating stats.
+
+  async function compute_props(loader){
+    if (!loader) return props
     const source = loader.data[loader.data.length - 1];
     const stats = await Promise.all(props.selections.map(async selection => {
       const raster = await source.getRaster({ selection });
       return getChannelStats(raster.data);
     }));
-    // These are calculated bounds for the contrastLimits
-    // that could be used for display purposes.
-    // domains = stats.map(stat => stat.domain);
 
-    // These are precalculated settings for the contrastLimits that
-    // should render a good, "in focus" image initially.
     const contrastLimits = stats.map(stat => stat.contrastLimits);
     const newProps = { ...props, contrastLimits };
-    setAutoProps(newProps)
+    return newProps
+  }
+  
+  useEffect(() => {
+
+    compute_props(loader).then(setAutoProps)
+    
   }, [loader])
 
   if (!loader || !autoProps) return null;
+
+  console.log(autoProps)
   return (
     <PictureInPictureViewer
       loader={loader.data}
