@@ -4,11 +4,10 @@ Start a simple web server to make your data avaiable to the browser via HTTP.
 $ http-server --cors='*' --port 8000 path/to/data
 ```
 
-If following the `Data Preparation` tutorial, this server exposes two URLs that Viv
+If following the `Data Preparation` tutorial, this server the following URL that Viv
 recognizes,
 
 - `http://localhost:8000/LuCa-7color_Scan1.ome.tif` (OME-TIFF)
-- `http://localhost:8000/LuCa-7color_Scan1/` (Bioformats-generated Zarr)
 
 ```javascript
 import React, { useState, useEffect } from 'react';
@@ -21,7 +20,6 @@ import {
 } from '@hms-dbmi/viv';
 
 const url = 'http://localhost:8000/LuCa-7color_Scan1.ome.tif'; // OME-TIFF
-// const url = 'http://localhost:8000/LuCa-7color_Scan1/';     // Bioformats-Zarr
 
 // Hardcoded rendering properties.
 const props = {
@@ -45,10 +43,7 @@ const props = {
 
 // Simple url handler.
 function load(url) {
-  if (url.includes('.tif')) {
-    return loadOmeTiff(url);
-  }
-  return loadBioformatsZarr(url);
+  return loadOmeTiff(url);
 }
 
 function App() {
