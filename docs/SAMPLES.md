@@ -61,8 +61,8 @@ function App() {
   // Viv exposes the getChannelStats to produce nice initial settings
   // so that users can have an "in focus" image immediately.
 
-  async function compute_props(loader){
-    if (!loader) return props
+  async function computeProps(loader){
+    if (!loader) return null;
     const source = loader.data[loader.data.length - 1];
     const stats = await Promise.all(props.selections.map(async selection => {
       const raster = await source.getRaster({ selection });
@@ -76,13 +76,11 @@ function App() {
   
   useEffect(() => {
 
-    compute_props(loader).then(setAutoProps)
+    computeProps(loader).then(setAutoProps)
     
   }, [loader])
 
   if (!loader || !autoProps) return null;
-
-  console.log(autoProps)
   return (
     <PictureInPictureViewer
       loader={loader.data}
