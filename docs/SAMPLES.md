@@ -11,7 +11,7 @@ recognizes,
 - `http://localhost:8000/LuCa-7color_Scan1/` (Bioformats-generated Zarr)
 
 ```javascript
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import {
   getChannelStats,
@@ -53,19 +53,18 @@ function load(url) {
 
 function App() {
   const [loader, setLoader]= useState(null);
-
+  const [autoProps, setAutoProps] = useState(null);
   useEffect(() => {
     load(url).then(setLoader);
   }, []);
 
   // Viv exposes the getChannelStats to produce nice initial settings
   // so that users can have an "in focus" image immediately.
-  const autoProps = useMemo(() => {
-    if(!loader) {
-      return props
-    }
+
+  async function computeProps(loader){
+    if (!loader) return null;
     // Use lowest level of the image pyramid for calculating stats.
-    const source = loader.data[loader.length - 1];
+    const source = loader.data[loader.data.length - 1];
     const stats = await Promise.all(props.selections.map(async selection => {
       const raster = await source.getRaster({ selection });
       return getChannelStats(raster.data);
@@ -76,11 +75,18 @@ function App() {
 
     // These are precalculated settings for the contrastLimits that
     // should render a good, "in focus" image initially.
-    contrastLimits = stats.map(stat => stat.contrastLimits);
+    const contrastLimits = stats.map(stat => stat.contrastLimits);
     const newProps = { ...props, contrastLimits };
+    return newProps
+  }
+  
+  useEffect(() => {
+
+    computeProps(loader).then(setAutoProps)
+    
   }, [loader])
 
-  if (!loader) return null;
+  if (!loader || !autoProps) return null;
   return (
     <PictureInPictureViewer
       loader={loader.data}
@@ -93,6 +99,8 @@ function App() {
     />
   );
 }
+export default App;
+
 ```
 
 If you wish to use the `SideBySideViewer`, simply replace `PictureInPictureViewer` with `SideBySideViewer` and add props for `zoomLock` and `panLock` while removing `overview` and `overviewOn`.
