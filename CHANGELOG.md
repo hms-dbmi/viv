@@ -9,6 +9,7 @@
     - See https://deck.gl/docs/developer-guide/custom-layers/layer-extensions for more information on how to use `extensions` and what they are
 - Expose `DECKGL_FILTER_COLOR`, `DECKGL_PROCESS_INTENSITY`, AND `DECKGL_MUTATE_COLOR` hooks and document them.
 - Upgrade deck.gl to 8.6
+- Add `@data` alias for serving local data during development
 
 ### Changed
 - Remove special selection mechanism in `Viewers`/`Views` by using deck.gl's fixed `TileLayer` capabilities for caching the tileset.

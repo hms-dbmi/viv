@@ -1,9 +1,42 @@
 import { defineConfig } from 'vite';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
+import serveStatic from 'serve-static';
 
-import reactRefresh from '@vitejs/plugin-react-refresh';
+import react from '@vitejs/plugin-react';
 import glslify from 'rollup-plugin-glslify';
 import esbuild from 'esbuild';
+
+const resolveDataDir = (fp) => {
+  if (fp[0] === '~') {
+    return join(process.env.HOME, fp.slice(1));
+  }
+  return resolve(__dirname, fp);
+};
+
+/**
+ * Vite plugins. Serves contents of `avivator/data` during
+ * development.
+ *
+ * @returns {import('vite').Plugin}
+ */
+const serveData = (dir) => {
+  dir = resolveDataDir(dir);
+  const serve = serveStatic(dir);
+  return {
+    name: 'serve-data-dir',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (/^\/@data\//.test(req.url)) {
+          req.url = req.url.replace('/@data/', '');
+          serve(req, res, next);
+        } else {
+          next();
+        }
+      });
+    },
+  };
+};
 
 /**
  * Vite plugin. Bundles code in `src/loaders/tiff/lib/decoder.worker.ts`
@@ -26,21 +59,22 @@ const bundleWebWorker = () => {
           entryPoints: [id],
           format: 'esm',
           bundle: true,
-          write: false
+          write: false,
         });
         if (bundle.outputFiles.length !== 1) {
           throw new Error('Worker must be a single module.');
         }
         return bundle.outputFiles[0].text;
       }
-    }
-  }
+    },
+  };
 };
 
 const plugins = [
-  reactRefresh(),
+  react(),
   glslify(),
   bundleWebWorker(),
+  serveData(process.env.VIV_DATA_DIR || 'avivator/data'),
 ];
 
 const configAvivator = defineConfig({
@@ -53,8 +87,8 @@ const configAvivator = defineConfig({
       '@hms-dbmi/viv': resolve(__dirname, 'src'),
       'react': resolve(__dirname, 'avivator/node_modules/react'),
       'react-dom': resolve(__dirname, 'avivator/node_modules/react-dom'),
-    }
-  }
+    },
+  },
 });
 
 const configViv = defineConfig({
@@ -64,13 +98,13 @@ const configViv = defineConfig({
     minify: false,
     lib: {
       entry: resolve(__dirname, 'src/index.js'),
-      formats: ['es']
+      formats: ['es'],
     },
     rollupOptions: {
       // All non-relative paths are external
       external: [/^[^.\/]|^\.[^.\/]|^\.\.[^\/]/],
-    }
-  }
+    },
+  },
 });
 
 export default ({ command, mode }) => {
