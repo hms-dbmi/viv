@@ -53,18 +53,16 @@ function load(url) {
 
 function App() {
   const [loader, setLoader]= useState(null);
-
+  const [autoProps, setAutoProps] = useState(null);
   useEffect(() => {
     load(url).then(setLoader);
   }, []);
 
   // Viv exposes the getChannelStats to produce nice initial settings
   // so that users can have an "in focus" image immediately.
-  const [autoProps, setAutoProps] = useState(null);
-  useEffect(async () => {
-    if(!loader) {
-      return; 
-    }
+
+  async function computeProps(loader){
+    if (!loader) return null;
     // Use lowest level of the image pyramid for calculating stats.
     const source = loader.data[loader.data.length - 1];
     const stats = await Promise.all(props.selections.map(async selection => {
@@ -79,7 +77,13 @@ function App() {
     // should render a good, "in focus" image initially.
     const contrastLimits = stats.map(stat => stat.contrastLimits);
     const newProps = { ...props, contrastLimits };
-    setAutoProps(newProps)
+    return newProps
+  }
+  
+  useEffect(() => {
+
+    computeProps(loader).then(setAutoProps)
+    
   }, [loader])
 
   if (!loader || !autoProps) return null;
