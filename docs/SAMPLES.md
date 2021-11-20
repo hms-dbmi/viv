@@ -63,12 +63,18 @@ function App() {
 
   async function computeProps(loader){
     if (!loader) return null;
+    // Use lowest level of the image pyramid for calculating stats.
     const source = loader.data[loader.data.length - 1];
     const stats = await Promise.all(props.selections.map(async selection => {
       const raster = await source.getRaster({ selection });
       return getChannelStats(raster.data);
     }));
+    // These are calculated bounds for the contrastLimits
+    // that could be used for display purposes.
+    // domains = stats.map(stat => stat.domain);
 
+    // These are precalculated settings for the contrastLimits that
+    // should render a good, "in focus" image initially.
     const contrastLimits = stats.map(stat => stat.contrastLimits);
     const newProps = { ...props, contrastLimits };
     return newProps
