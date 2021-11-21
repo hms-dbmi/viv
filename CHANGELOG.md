@@ -14,6 +14,7 @@
 ### Changed
 - Remove special selection mechanism in `Viewers`/`Views` by using deck.gl's fixed `TileLayer` capabilities for caching the tileset.
 - Fix `SAMPLES.md` demo
+- Update tutorial
 
 ## 0.11.0
 

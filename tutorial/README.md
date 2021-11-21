@@ -1,7 +1,13 @@
 Viv supports a subset of the files generated from the `bioformats2raw` + `raw2ometiff` pipeline, described
 [here](https://www.glencoesoftware.com/blog/2019/12/09/converting-whole-slide-images-to-OME-TIFF.html).
 This guide demonstrates how to generate a pyramidal OME-TIFF with Bio-Formats that can be viewed with
-[Avivator](http://avivator.gehlenborglab.org) via HTTP.
+[Avivator](http://avivator.gehlenborglab.org) via HTTP.  Viv (along with [Vizarr](https://github.com/hms-dbmi/vizarr))
+aim to support visualizing [OME-NGFF](https://github.com/ome/ngff) as well - Viv provides a JavaScript loader for 
+single-image multiscale (OME-NGFF)[http://viv.gehlenborglab.org/#loadomezarr].  However, the spec for OME-NGFF
+is much more broad and supports plates, wells, and increasingly more metadata features as the spec evolves.  To address this,
+[Vizarr](https://github.com/hms-dbmi/vizarr) uses building blocks from Viv to make a more compliant viewer for OME-NGFF.
+
+For this tutorial, we will focus on the stable (and simpler) OME-TIFF format.
 
 ### Getting Started
 
