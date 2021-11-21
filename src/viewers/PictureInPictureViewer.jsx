@@ -42,6 +42,7 @@ import {
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {function} [props.onViewportLoad] Function that gets called when the data in the viewport loads.
  * @param {Object} [props.deckProps] Additional options used when creating the DeckGL component.  See [the deck.gl docs.](https://deck.gl/docs/api-reference/core/deck#initialization-settings).  `layerFilter`, `layers`, `onViewStateChange`, `views`, `viewState`, `useDevicePixels`, and `getCursor` are already set.
+ * @param {Object} [props.onResolutionChange] Callback when a resolution changes in the detail view.
  */
 
 const PictureInPictureViewer = props => {
@@ -69,7 +70,8 @@ const PictureInPictureViewer = props => {
     onHover,
     onViewportLoad,
     extensions = [],
-    deckProps
+    deckProps,
+    onResolutionChange
   } = props;
   const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
   const baseViewState = useMemo(() => {
@@ -99,7 +101,8 @@ const PictureInPictureViewer = props => {
     lensBorderColor,
     lensBorderRadius,
     extensions,
-    transparentColor
+    transparentColor,
+    onResolutionChange
   };
   const views = [detailView];
   const layerProps = [layerConfig];

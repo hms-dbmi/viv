@@ -31,6 +31,7 @@ import { SideBySideView, getDefaultInitialViewState } from '../views';
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
  * @param {Object} [props.deckProps] Additional options used when creating the DeckGL component.  See [the deck.gl docs.](https://deck.gl/docs/api-reference/core/deck#initialization-settings).  `layerFilter`, `layers`, `onViewStateChange`, `views`, `viewState`, `useDevicePixels`, and `getCursor` are already set.
+ * @param {Object} [props.onResolutionChange] Callback handler when a resolution level changes in either split view.
  */
 const SideBySideViewer = props => {
   const {
@@ -55,7 +56,8 @@ const SideBySideViewer = props => {
     onHover,
     onViewportLoad,
     extensions = [],
-    deckProps
+    deckProps,
+    onResolutionChange = () => {}
   } = props;
   const leftViewState = viewStatesProp?.find(v => v.id === 'left');
   const rightViewState = viewStatesProp?.find(v => v.id === 'right');
@@ -109,7 +111,10 @@ const SideBySideViewer = props => {
     transparentColor
   };
   const views = [detailViewRight, detailViewLeft];
-  const layerProps = [layerConfig, layerConfig];
+  const layerProps = ['left', 'right'].map(side => ({
+    ...layerConfig,
+    onResolutionChange: props => onResolutionChange({ ...props, side })
+  }));
   return loader ? (
     <VivViewer
       layerProps={layerProps}
