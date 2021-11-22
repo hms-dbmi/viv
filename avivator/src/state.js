@@ -130,7 +130,8 @@ const DEFAULT_IMAGE_STATE = {
   xSlice: null,
   ySlice: null,
   zSlice: null,
-  onViewportLoad: () => {}
+  onViewportLoad: () => {},
+  pyramidResolution: 0
 };
 
 export const useImageSettingsStore = create(set => ({

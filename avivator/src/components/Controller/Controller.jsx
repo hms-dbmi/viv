@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Divider from '@material-ui/core/Divider';
+import Typography from '@material-ui/core/Typography';
 
 import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
@@ -23,7 +24,8 @@ import {
   useChannelSettings,
   useViewerStore,
   useImageSettingsStore,
-  useChannelSetters
+  useChannelSetters,
+  useChannelsStore
 } from '../../state';
 import { guessRgb, useWindowSize, getSingleSelectionStats } from '../../utils';
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
@@ -45,6 +47,14 @@ function TabPanel(props) {
   );
 }
 
+function ResolutionStatus() {
+  const loader = useChannelsStore(store => store.loader);
+  const resolution = useImageSettingsStore(store => store.pyramidResolution);
+  const level = loader[resolution];
+  if (!level) return null;
+  return <Typography>{`resolution: ${resolution + 1} / ${loader.length}`}</Typography>
+}
+
 const Controller = () => {
   const {
     channelsVisible,
@@ -60,7 +70,7 @@ const Controller = () => {
     toggleIsOn: toggleIsOnSetter,
     removeChannel
   } = useChannelSetters();
-  const { colormap, setImageSetting } = useImageSettingsStore();
+  const colormap = useImageSettingsStore(store => store.colormap);
   const {
     metadata,
     channelOptions,
@@ -92,13 +102,13 @@ const Controller = () => {
         selection,
         use3d
       }).then(({ domain, contrastLimits: newContrastLimit }) => {
-        setImageSetting({
+        useImageSettingsStore.setState({
           onViewportLoad: () => {
             setPropertiesForChannel(i, {
               contrastLimits: newContrastLimit,
               domains: domain
             });
-            setImageSetting({ onViewportLoad: () => {} });
+            useImageSettingsStore.setState({ onViewportLoad: () => {} });
             setIsChannelLoading(i, false);
           }
         });
@@ -163,6 +173,7 @@ const Controller = () => {
         <Tab label="Volume" style={{ fontSize: '.75rem', bottom: 12 }} />
       </Tabs>
       <Divider />
+      {!use3d ? <><ResolutionStatus /><Divider /></>: null}
       <TabPanel value={tab} index={0}>
         {useColormap && <ColormapSelect />}
         {useLens && !colormap && shape[labels.indexOf('c')] > 1 && (

@@ -24,8 +24,7 @@ const defaultProps = {
   onClick: { type: 'function', value: null, compare: true },
   transparentColor: { type: 'array', value: null, compare: true },
   refinementStrategy: { type: 'string', value: null, compare: true },
-  excludeBackground: { type: 'boolean', value: false, compare: true },
-  onResolutionChange: { type: 'function', value: () => {}, compare: false }
+  excludeBackground: { type: 'boolean', value: false, compare: true }
 };
 
 /**
@@ -73,8 +72,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       modelMatrix,
       transparentColor,
       excludeBackground,
-      refinementStrategy,
-      onResolutionChange
+      refinementStrategy
     } = this.props;
 
     // Get properties from highest resolution
@@ -102,15 +100,6 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         const config = { x, y, selection, signal };
         return loader[resolution].getTile(config);
       };
-
-      if (resolution !== this.state.resolution) {
-        onResolutionChange({
-          current: resolution,
-          total: loader.length,
-          size: getImageSize(loader[resolution])
-        });
-      }
-      this.setState({ resolution });
 
       try {
         /*
