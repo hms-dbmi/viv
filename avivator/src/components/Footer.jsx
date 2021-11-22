@@ -22,6 +22,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+function formatResolutionStatus(current, total, shape) {
+  return `${current}/${total} [${shape.join(', ')}]`;
+}
+
 export default function Footer() {
   const classes = useStyles();
 
@@ -45,9 +49,9 @@ export default function Footer() {
       }}
     >
       <Paper className={classes.paper}>
-        <Typography className={classes.typography}>{`${resolution + 1} / ${
-          loader.length
-        } – [${level.shape.join(', ')}]`}</Typography>
+        <Typography className={classes.typography}>
+          {formatResolutionStatus(resolution + 1, loader.length, level.shape)}
+        </Typography>
       </Paper>
     </Box>
   );
