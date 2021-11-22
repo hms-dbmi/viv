@@ -83,7 +83,7 @@ data
 ├── LuCa-7color_Scan1.offsets.json
 └── LuCa-7color_Scan1.ome.tif
 ```
-This index can be reused by other Viv-based applications and even clients in other languages to improve remote OME-TIFF performance. If using Viv, you must fetch the offsets.json directly in your application code. See [our example] (http://viv.gehlenborglab.org/#getting-started) for help getting started
+This index can be reused by other Viv-based applications and even clients in other languages to improve remote OME-TIFF performance. If using Viv, you must fetch the offsets.json directly in your application code. See [our example](http://viv.gehlenborglab.org/#getting-started) for help getting started
 
 ### Viewing in Avivator
 
