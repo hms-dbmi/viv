@@ -36,13 +36,6 @@ First use `bioformats2raw` to convert the `.qptiff` format to an intermediate "r
 $ bioformats2raw LuCa-7color_Scan1.qptiff LuCa-7color_Scan1/ 
 ```
 
-`bioformats2raw` creates the file directory `LuCa-7color_Scan1/` which contains the "raw" bioformats output. The root directory
-contains a `METADATA.ome.xml` file along with a `data.zarr/` directory containing the Zarr
-output. 
-> NOTE: Alternate tile dimensions can be specified with the `--tile_width` and `--tile_height` options.
-> In our experience, tile sizes of 512x512 and 1024x1024 (default) work well. Viv can only handle square tiles. For more information
-> see the [docs](https://github.com/glencoesoftware/bioformats2raw#performance).
-
 The next step is to convert this "raw" output to an OME-TIFF.
 
 ```bash
@@ -82,11 +75,15 @@ The TIFF file format is not designed for the cloud, and therefore certain images
  $ pip install generate-tiff-offsets
  $ generate_tiff_offsets --input_file Luca-7color_Scan1.ome.tif 
  ```
+> ⚠️ IMPORTANT ⚠️ 
+Avivator requires the `offsets.json` file to be adjacent to the OME-TIFF on the server in order to leverage this feature. For example, if an index is generated for the dataset in this tutorial, the following directory structure is correct:
 
-For viewing in Avivator, this file should live adjacent to the OME-TIFF file in its folder and will be automatically recognized and used.
-For use with Viv's loaders/layers, you need to fetch the `offsets.json` and pass it in as an argument to the [loader](http://viv.gehlenborglab.org/#createometiffloader).
-Please see [this sample](http://viv.gehlenborglab.org/#getting-started) for help getting started with using the Viv API.
-
+```
+data
+├── LuCa-7color_Scan1.offsets.json
+└── LuCa-7color_Scan1.ome.tif
+```
+This index can be reused by other Viv-based applications and even clients in other languages to improve remote OME-TIFF performance. If using Viv, you must fetch the offsets.json directly in your application code. See [our example] (http://viv.gehlenborglab.org/#getting-started) for help getting started
 ### Viewing in Avivator
 
 There are a few different ways to view your data in Avivator.
@@ -124,11 +121,6 @@ link by appending an `image_url` query parameter:
 > that the appropriate `Access-Control-Allow-Origin` response is sent from your local server. In addition, web servers must allow
 > [HTTP range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests) to support viewing OME-TIFF images.
 > Range requests are allowed by default by `http-server` but may need to be enabled explicitly for your production web server.
-
-### Final Note on File Formats and OME-Zarr
-
-The Glencoe software and OME teams hava been clear that the "raw" N5/Zarr formats produced by `bioformats2raw` should be considered
-experimental for the time being as intermediates for generating valid OME-TIFFs. Therefore using these intermediate outputs directly for viewing is not recommended.
 
 ### Other Examples
 

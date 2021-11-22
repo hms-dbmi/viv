@@ -14,7 +14,6 @@ import React, { useState, useEffect } from 'react';
 import {
   getChannelStats,
   loadOmeTiff,
-  loadBioformatsZarr,
   PictureInPictureViewer,
 } from '@hms-dbmi/viv';
 
@@ -40,16 +39,12 @@ const props = {
   channelsVisible: [true, true, true],
 }
 
-// Simple url handler.
-function load(url) {
-  return loadOmeTiff(url);
-}
 
 function App() {
   const [loader, setLoader]= useState(null);
 
   useEffect(() => {
-    load(url).then(setLoader);
+    loadOmeTiff(url).then(setLoader);
   }, []);
 
   // Viv exposes the getChannelStats to produce nice initial settings
