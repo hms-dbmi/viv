@@ -42,13 +42,10 @@ const Viewer = () => {
     useFixedAxis
   } = useImageSettingsStore();
 
-  const onViewportLoadWithResolution = data => {
-    if (Array.isArray(data)) {
-      const [tile] = data;
-      useImageSettingsStore.setState({ pyramidResolution: -tile.z });
-    }
-    return onViewportLoad(data);
-  };
+  const onViewStateChange = ({ viewState: { zoom } }) => {
+    const z = Math.max(Math.round(-zoom), 0);
+    useImageSettingsStore.setState({ pyramidResolution: z });
+  }
 
   return use3d ? (
     <VolumeViewer
@@ -92,8 +89,9 @@ const Viewer = () => {
       }}
       lensSelection={lensSelection}
       isLensOn={isLensOn}
-      onViewportLoad={onViewportLoadWithResolution}
+      onViewportLoad={onViewportLoad}
       extensions={[new LensExtension()]}
+      onViewStateChange={onViewStateChange}
     />
   ) : (
     <PictureInPictureViewer
@@ -112,8 +110,9 @@ const Viewer = () => {
       }}
       lensSelection={lensSelection}
       isLensOn={isLensOn}
-      onViewportLoad={onViewportLoadWithResolution}
+      onViewportLoad={onViewportLoad}
       extensions={[new LensExtension()]}
+      onViewStateChange={onViewStateChange}
     />
   );
 };

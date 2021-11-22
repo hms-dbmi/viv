@@ -49,10 +49,13 @@ function TabPanel(props) {
 
 function ResolutionStatus() {
   const loader = useChannelsStore(store => store.loader);
-  const resolution = useImageSettingsStore(store => store.pyramidResolution);
+  const resolution = Math.min(
+    useImageSettingsStore(store => store.pyramidResolution),
+    loader.length - 1,
+  )
   const level = loader[resolution];
   if (!level) return null;
-  return <Typography>{`resolution: ${resolution + 1} / ${loader.length}`}</Typography>
+  return <Typography>{`resolution: ${resolution + 1} / ${loader.length}, shape: [${level.shape}]`}</Typography>
 }
 
 const Controller = () => {
