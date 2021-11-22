@@ -84,6 +84,7 @@ data
 └── LuCa-7color_Scan1.ome.tif
 ```
 This index can be reused by other Viv-based applications and even clients in other languages to improve remote OME-TIFF performance. If using Viv, you must fetch the offsets.json directly in your application code. See [our example] (http://viv.gehlenborglab.org/#getting-started) for help getting started
+
 ### Viewing in Avivator
 
 There are a few different ways to view your data in Avivator.
