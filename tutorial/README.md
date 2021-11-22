@@ -1,13 +1,5 @@
-Viv supports a subset of the files generated from the `bioformats2raw` + `raw2ometiff` pipeline, described
-[here](https://www.glencoesoftware.com/blog/2019/12/09/converting-whole-slide-images-to-OME-TIFF.html).
-This guide demonstrates how to generate a pyramidal OME-TIFF with Bio-Formats that can be viewed with
-[Avivator](http://avivator.gehlenborglab.org) via HTTP.  Viv (along with [Vizarr](https://github.com/hms-dbmi/vizarr))
-aim to support visualizing [OME-NGFF](https://github.com/ome/ngff) as well - Viv provides a JavaScript loader for 
-single-image multiscale (OME-NGFF)[http://viv.gehlenborglab.org/#loadomezarr].  However, the spec for OME-NGFF
-is much more broad and supports plates, wells, and increasingly more metadata features as the spec evolves.  To address this,
-[Vizarr](https://github.com/hms-dbmi/vizarr) uses building blocks from Viv to make a more compliant viewer for OME-NGFF.
-
-For this tutorial, we will focus on the stable (and simpler) OME-TIFF format.
+This guide demonstrates how to generate a pyramidal OME-TIFF [with Bio-Formats](https://www.glencoesoftware.com/blog/2019/12/09/converting-whole-slide-images-to-OME-TIFF.html) that can be viewed with
+[Avivator](http://avivator.gehlenborglab.org).  Viv also supports [OME-NGFF](https://github.com/ome/ngff), but tooling to generate the format remains limited as the specification matures. We will update this tutorial accordingly when a method for generating OME-NGFF is endorsed by the Open Microscopy Environment.
 
 ### Getting Started
 
@@ -34,13 +26,11 @@ under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) on OME.
 $ wget https://downloads.openmicroscopy.org/images/Vectra-QPTIFF/perkinelmer/PKI_scans/LuCa-7color_Scan1.qptiff
 ```
 
-After the image has finished downloading, we proceed to using the downloaded tools for creating an Avivator/Viv-compliant image.
 
 ### Pyramid Generation
 
 
-The first step is to use `bioformats2raw`. This command will
-create the OME-XML metadata along with a pyramidal Zarr for high-resolution images.
+First use `bioformats2raw` to convert the `.qptiff` format to an intermediate "raw" format. This representation includes the multiscale binary pixel data (Zarr) and associated OME-XML metadata.
 
 ```bash
 $ bioformats2raw LuCa-7color_Scan1.qptiff LuCa-7color_Scan1/ 
@@ -53,7 +43,7 @@ output.
 > In our experience, tile sizes of 512x512 and 1024x1024 (default) work well. Viv can only handle square tiles. For more information
 > see the [docs](https://github.com/glencoesoftware/bioformats2raw#performance).
 
-The next step is to convert this raw output to a usable OMETIFF pyramid:
+The next step is to convert this "raw" output to an OME-TIFF.
 
 ```bash
 $ raw2ometiff n5_tile_directory/ LuCa-7color_Scan1.ome.tif
@@ -61,7 +51,7 @@ $ raw2ometiff n5_tile_directory/ LuCa-7color_Scan1.ome.tif
 
 > Note:  `LZW` is the default if you do not specify a `--compression` option (the syntax requires an "=" sign, like `--compression=zlib`).
 
-You may also use [`bfconvert` (Bioformats >= 6.0.0)](https://docs.openmicroscopy.org/bio-formats/6.4.0/users/comlinetools/conversion.html) to generate an OMETIFF image pyramid directly.
+You may also use [`bfconvert` (Bioformats >= 6.0.0)](https://docs.openmicroscopy.org/bio-formats/6.4.0/users/comlinetools/conversion.html) to generate an OME-TIFF.
 
 ```bash
 $ bfconvert -tilex 512 -tiley 512 -pyramid-resolutions 6 -pyramid-scale 2  -compression LZW LuCa-7color_Scan1.qptiff LuCa-7color_Scan1.ome.tif
@@ -86,8 +76,7 @@ Therefore for larger images, please use `bioformats2raw + raw2ometiff`.
 > by `raw2ometiff` - `LZW`, `zlib`, and `Uncompressed` as well as `jpeg` compression for 8 bit data. Support
 > for JPEG-2000 for >8 bit data is planned. Please open an issue if you would like this more immediately.
 
-If your OME-TIFF image has many [TIFF IFDs](https://en.wikipedia.org/wiki/TIFF#Multiple_subfiles), which correspond to indvidual time-z-channel sub-images, please generate an `offsets.json` file as well for remote HTTP viewing.
-This file contains the byte offsets to each IFD and allows fast interaction with remote data:
+The TIFF file format is not designed for the cloud, and therefore certain images are less suitable to be natively read remotely. If your OME-TIFF image contains large non-XY dimensions (e.g. Z=100, T=50), you are likely to experience latencies when switching planes in Avivator due to seeking the file over HTTP. We recommend generating an index (`offsets.json`) that contains the byte-offsets for each plane to complement OME-TIFF, solving this latency issue and enabling fast interactions.
 
  ```bash
  $ pip install generate-tiff-offsets
@@ -104,7 +93,6 @@ There are a few different ways to view your data in Avivator.
 
 If you have an OME-TIFF saved locally, you may simply drag and drop
 the file over the canvas or use the "Choose file" button to view your data.
-Note that this action does **NOT** necessarily load the entire dataset into memory. Viv still works as normal and will retrieve data tiles based on the viewport for an image pyramid and/or a specific channel/z/time selection.
 
 Otherwise Avivator relies on access to data over HTTP, and you can serve data locally using a simple web-server.
 It's easiest to use [`http-server`](https://github.com/http-party/http-server#readme) to start a web-server locally, which can be installed via `npm` or `Homebrew` if using a Mac.  
@@ -127,7 +115,7 @@ $ http-server --cors='*' --port 8000 .
 
 This command starts a web-server and makes the content in the current directory readable over HTTP. Once the server is running,
 open [Avivator] and paste  `http://localhost:8000/LuCa-7color_Scan1.ome.tif`
-into the input dialog to view the respective pyramids generated above. For convenience, you can also create a direct
+into the input dialog to view the OME-TIFF generated in this tutorial. For convenience, you can also create a direct
 link by appending an `image_url` query parameter:
 
 - http://avivator.gehlenborglab.org/?image_url=http://localhost:8000/LuCa-7color_Scan1.ome.tif (OME-TIFF)

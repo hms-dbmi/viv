@@ -4,8 +4,7 @@ Start a simple web server to make your data avaiable to the browser via HTTP.
 $ http-server --cors='*' --port 8000 path/to/data
 ```
 
-If following the `Data Preparation` tutorial, this server the following URL that Viv
-recognizes,
+If following the `Data Preparation` tutorial, the server provides Viv access to the OME-TIFF via URL:
 
 - `http://localhost:8000/LuCa-7color_Scan1.ome.tif` (OME-TIFF)
 
