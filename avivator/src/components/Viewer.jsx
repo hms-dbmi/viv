@@ -43,7 +43,10 @@ const Viewer = () => {
   } = useImageSettingsStore();
 
   const onViewStateChange = ({ viewState: { zoom } }) => {
-    const z = Math.max(Math.round(-zoom), 0);
+    const z = Math.min(
+      Math.max(Math.round(-zoom), 0),
+      loader.length - 1,
+    )
     useImageSettingsStore.setState({ pyramidResolution: z });
   };
 
