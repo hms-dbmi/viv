@@ -5,6 +5,7 @@ import { Matrix4 } from '@math.gl/core';
 import {
   loadOmeTiff,
   loadBioformatsZarr,
+  loadOmeZarr,
   getChannelStats
   // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
@@ -99,7 +100,21 @@ export async function createLoader(
       );
     }
 
-    const source = await loadBioformatsZarr(urlOrFile);
+    const source = await loadBioformatsZarr(urlOrFile).catch(async _ => {
+      // try ome-zarr
+      const res = await loadOmeZarr(urlOrFile, { type: 'multiscales' });
+      // extract metadata into form expected for OME-TIFF
+      console.log(res.metadata);
+      const metadata = {
+        Pixels: {
+          Channels: res.metadata.omero.channels.map(c => ({
+            Name: c.label,
+            SamplesPerPixel: 1
+          }))
+        }
+      };
+      return { data: res.data, metadata };
+    });
     return source;
   } catch (e) {
     if (e instanceof UnsupportedBrowserError) {
