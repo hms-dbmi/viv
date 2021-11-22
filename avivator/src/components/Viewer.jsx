@@ -45,7 +45,7 @@ const Viewer = () => {
   const onViewStateChange = ({ viewState: { zoom } }) => {
     const z = Math.max(Math.round(-zoom), 0);
     useImageSettingsStore.setState({ pyramidResolution: z });
-  }
+  };
 
   return use3d ? (
     <VolumeViewer
