@@ -15,9 +15,19 @@ More details can be found in our preprint describing the Viv library and related
 
 ### Related Software
 
-- **Avivator** Included in this repository is [`Avivator`](http://avivator.gehlenborglab.org), a lightweight viewer for remote imaging data. Avivator is a purely client-side program that only requires access to [Bio-Formats-compatiable Zarr](./tutorial#option-1-create-a-bio-formats-raw-zarr) or OME-TIFF data over HTTP or on local disk.
-- **Vizarr** [Vizarr](https://github.com/hms-dbmi/vizarr) is a minimal, purely client-side program for viewing Zarr-based images built with Viv. It exposes a Python API using the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) and can be directly embedded in Jupyter Notebooks or Google Colab Notebooks.
-- **Viv benchmark** A [set of scripts](https://github.com/hms-dbmi/viv-tile-benchmark) to benchmark Viv's retrieval of image tiles from pyramidal OME-TIFF files and Zarr stores via HTTP1 and HTTP2.
+- **Avivator** Included in this repository is [`Avivator`](http://avivator.gehlenborglab.org),
+a lightweight viewer for remote imaging data. Avivator is a purely client-side program
+requires access to OME-TIFF data over HTTP or on local disk. See our
+[video tutorial](https://www.youtube.com/watch?v=_GES8BTzyWc) to learn more.
+
+- **Vizarr** [Vizarr](https://github.com/hms-dbmi/vizarr) is a minimal, purely client-side
+program for viewing Zarr-based images built with Viv. It exposes a Python API using the
+[imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc) and can be directly embedded in
+Jupyter Notebooks or Google Colab Notebooks.
+
+- **Viv benchmark** A [set of scripts](https://github.com/hms-dbmi/viv-tile-benchmark) to 
+benchmark Viv's retrieval of image tiles from pyramidal OME-TIFF files and Zarr stores 
+via HTTP1 and HTTP2.
 
 ### Tools Built with Viv
 

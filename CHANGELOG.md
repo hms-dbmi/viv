@@ -10,6 +10,7 @@
 - Expose `DECKGL_FILTER_COLOR`, `DECKGL_PROCESS_INTENSITY`, AND `DECKGL_MUTATE_COLOR` hooks and document them.
 - Upgrade deck.gl to 8.6
 - Add `@data` alias for serving local data during development
+- Add Avivator video tutorial to README.md
 - Support basic OME-NGFF in Avivator
 
 ### Changed
