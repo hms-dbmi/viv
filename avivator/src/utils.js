@@ -100,11 +100,10 @@ export async function createLoader(
       );
     }
 
-    const source = await loadBioformatsZarr(urlOrFile).catch(async _ => {
+    const source = await loadBioformatsZarr(urlOrFile).catch(async () => {
       // try ome-zarr
       const res = await loadOmeZarr(urlOrFile, { type: 'multiscales' });
-      // extract metadata into form expected for OME-TIFF
-      console.log(res.metadata);
+      // extract metadata into OME-XML-like form
       const metadata = {
         Pixels: {
           Channels: res.metadata.omero.channels.map(c => ({
