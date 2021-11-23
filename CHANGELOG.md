@@ -11,6 +11,7 @@
 - Upgrade deck.gl to 8.6
 - Add `@data` alias for serving local data during development
 - Add Avivator video tutorial to README.md
+- Support basic OME-NGFF in Avivator
 
 ### Changed
 - Remove special selection mechanism in `Viewers`/`Views` by using deck.gl's fixed `TileLayer` capabilities for caching the tileset.
