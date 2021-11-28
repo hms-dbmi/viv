@@ -39,7 +39,7 @@ $ bioformats2raw LuCa-7color_Scan1.qptiff LuCa-7color_Scan1/
 The next step is to convert this "raw" output to an OME-TIFF.
 
 ```bash
-$ raw2ometiff n5_tile_directory/ LuCa-7color_Scan1.ome.tif
+raw2ometiff LuCa-7color_Scan1/ LuCa-7color_Scan.ome.tif
 ```
 
 > Note:  `LZW` is the default if you do not specify a `--compression` option (the syntax requires an "=" sign, like `--compression=zlib`).
