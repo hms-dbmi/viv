@@ -4,11 +4,9 @@ Start a simple web server to make your data avaiable to the browser via HTTP.
 $ http-server --cors='*' --port 8000 path/to/data
 ```
 
-If following the `Data Preparation` tutorial, this server exposes two URLs that Viv
-recognizes,
+If following the `Data Preparation` tutorial, the server provides Viv access to the OME-TIFF via URL:
 
 - `http://localhost:8000/LuCa-7color_Scan1.ome.tif` (OME-TIFF)
-- `http://localhost:8000/LuCa-7color_Scan1/` (Bioformats-generated Zarr)
 
 ```javascript
 import React, { useState, useEffect } from 'react';
@@ -16,12 +14,10 @@ import React, { useState, useEffect } from 'react';
 import {
   getChannelStats,
   loadOmeTiff,
-  loadBioformatsZarr,
   PictureInPictureViewer,
 } from '@hms-dbmi/viv';
 
 const url = 'http://localhost:8000/LuCa-7color_Scan1.ome.tif'; // OME-TIFF
-// const url = 'http://localhost:8000/LuCa-7color_Scan1/';     // Bioformats-Zarr
 
 // Hardcoded rendering properties.
 const props = {
@@ -43,19 +39,12 @@ const props = {
   channelsVisible: [true, true, true],
 }
 
-// Simple url handler.
-function load(url) {
-  if (url.includes('.tif')) {
-    return loadOmeTiff(url);
-  }
-  return loadBioformatsZarr(url);
-}
 
 function App() {
   const [loader, setLoader]= useState(null);
   const [autoProps, setAutoProps] = useState(null);
   useEffect(() => {
-    load(url).then(setLoader);
+    loadOmeTiff(url).then(setLoader);
   }, []);
 
   // Viv exposes the getChannelStats to produce nice initial settings
