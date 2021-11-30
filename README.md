@@ -2,7 +2,9 @@
 
 A WebGL-powered toolkit for interactive visualization of high-resolution, multiplexed bioimaging datasets.
 
+<p align="center">
 <img src="https://github.com/hms-dbmi/viv/raw/master/docs/3d-slicing.gif" alt="Interactive volumetric view in web browser; sliders control visible planes." width="400"/> <img src="https://github.com/hms-dbmi/viv/raw/master/docs/glomerular-lens.png" alt="Multi-channel rendering of high-resolution microscopy dataset" width="400"/>
+</p>
 
 ## About
 
@@ -17,7 +19,7 @@ More details and related work can be found in our preprint. Please cite this pre
 > "[Viv: Multiscale Visualization of High-resolution Multiplexed Bioimaging Data on the Web](https://osf.io/wd2gu/)."
 > **OSF Preprints** (2020), [doi:10.31219/osf.io/wd2gu](https://doi.org/10.31219/osf.io/wd2gu)
 
-### 💻 Related Software
+## 💻 Related Software
 
 | Screenshot   |     Description    |
 :-------------------------:|:-------------------------:
