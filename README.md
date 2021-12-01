@@ -37,17 +37,17 @@ More details and related work can be found in our preprint. Please cite this pre
 
 ## 💾 Supported Data Formats
 
-Viv's data loaders support OME-NGFF (Zarr), OME-TIFF, and Indexed OME-TIFF\*.
+Viv's data loaders support **OME-NGFF** (Zarr), **OME-TIFF**, and **Indexed OME-TIFF**\*.
 We recommend converting proprietrary file formats to open standard formats via the
 `bioformats2raw` + `raw2ometiff` pipeline. Non-pyramidal datasets are also supported 
 provided the individual texture can be uploaded to the GPU (< `4096 x 4096` in pixel size).
 
 Please see the [tutorial](./tutorial/README.md) for more information.
 
-> \*We describe Indexed OME-TIFF in our paper as an optional enhancement to provide
+> \*We describe **Indexed OME-TIFF** in our paper as an optional enhancement to provide
 > efficient random chunk access for OME-TIFF. Our approach substantially improves chunk
 > load times for OME-TIFF datasets with large Z, C, or T dimensions that otherwise may 
-> incur long latencies due to seeking. More information on generating an index (JSON) can
+> incur long latencies due to seeking. More information on generating an IFD index (JSON) can
 > be found in our tutorial or [documentation](http://viv.gehlenborglab.org/#data-preparation).
 
 ## 💽 Installation
