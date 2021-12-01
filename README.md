@@ -23,8 +23,8 @@ More details and related work can be found in our preprint. Please cite this pre
 
 | Screenshot   |     Description    |
 :-------------------------:|:-------------------------:
-<img src="./docs/avivator-browser.jpg" alt="Avivator viewer running in Chrome"/> | [**Avivator**](http://avivator.gehlenborglab.org) <br> A lightweight viewer for local and remote datasets. The source code is include in this repository under `avivator/`. See our [🎥 video tutorial](https://www.youtube.com/watch?v=_GES8BTzyWc) to learn more.
-<img src="./docs/vizarr-browser.jpg" alt="Vizarr viewer running in Jupyter Notebook"/> | [**Vizarr**](https://github.com/hms-dbmi/vizarr) <br> A minimal, purely client-side program for viewing OME-NGFF and other Zarr-based images. Vizarr supports a Python backend using the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc), allowing it to not only function as a standalone application but also directly embed in Jupyter or Google Colab Notebooks.
+<img src="./docs/avivator-browser.png" alt="Avivator viewer running in Chrome"/> | [**Avivator**](http://avivator.gehlenborglab.org) <br> A lightweight viewer for local and remote datasets. The source code is include in this repository under `avivator/`. See our [🎥 video tutorial](https://www.youtube.com/watch?v=_GES8BTzyWc) to learn more.
+<img src="./docs/vizarr-browser.png" alt="Vizarr viewer running in Jupyter Notebook"/> | [**Vizarr**](https://github.com/hms-dbmi/vizarr) <br> A minimal, purely client-side program for viewing OME-NGFF and other Zarr-based images. Vizarr supports a Python backend using the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc), allowing it to not only function as a standalone application but also directly embed in Jupyter or Google Colab Notebooks.
 
 ## 💥 In Action
 
