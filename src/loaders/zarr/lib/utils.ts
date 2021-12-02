@@ -80,7 +80,7 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
   if ('multiscales' in rootAttrs) {
     const { datasets, axes } = rootAttrs.multiscales[0];
     paths = datasets.map(d => d.path);
-    if(axes) {
+    if (axes) {
       labels = axes;
     }
   }
@@ -89,7 +89,7 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
   return {
     data: (await Promise.all(data)) as ZarrArray[],
     rootAttrs,
-    labels,
+    labels
   };
 }
 

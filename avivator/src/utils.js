@@ -116,7 +116,7 @@ export async function createLoader(
         }
       };
       source = { data: res.data, metadata };
-    };
+    }
     return source;
   } catch (e) {
     if (e instanceof UnsupportedBrowserError) {
