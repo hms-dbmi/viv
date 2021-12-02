@@ -3,6 +3,7 @@ import type { ZarrArray } from 'zarr';
 import type { OMEXML } from '../../omexml';
 import { getLabels, isInterleaved, prevPowerOf2 } from '../../utils';
 
+import type { Labels } from '../../../types';
 import type { RootAttrs } from '../ome-zarr';
 
 /*
@@ -74,15 +75,21 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
   const rootAttrs = (await grp.attrs.asObject()) as RootAttrs;
 
   let paths = ['0'];
+  // Default axes used for v0.1 and v0.2.
+  let labels = ['t', 'c', 'z', 'y', 'x'] as Labels<string[]>;
   if ('multiscales' in rootAttrs) {
-    const { datasets } = rootAttrs.multiscales[0];
+    const { datasets, axes } = rootAttrs.multiscales[0];
     paths = datasets.map(d => d.path);
+    if(axes) {
+      labels = axes;
+    }
   }
 
   const data = paths.map(path => grp.getItem(path));
   return {
     data: (await Promise.all(data)) as ZarrArray[],
-    rootAttrs
+    rootAttrs,
+    labels,
   };
 }
 
