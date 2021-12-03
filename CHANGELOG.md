@@ -12,6 +12,8 @@
 - Add `@data` alias for serving local data during development
 - Add Avivator video tutorial to README.md
 - Support basic OME-NGFF in Avivator
+- Add support for the `multiscales[].axes` field introduced in OME-NGFF v0.3
+- Bump zarr.js to get support for both `/` and `.` dimension separators
 - Add `onResolutionChange` callback and resolution indicator in Avivator
 
 ### Changed

@@ -100,7 +100,10 @@ export async function createLoader(
       );
     }
 
-    const source = await loadBioformatsZarr(urlOrFile).catch(async () => {
+    let source;
+    try {
+      source = await loadBioformatsZarr(urlOrFile);
+    } catch {
       // try ome-zarr
       const res = await loadOmeZarr(urlOrFile, { type: 'multiscales' });
       // extract metadata into OME-XML-like form
@@ -112,8 +115,8 @@ export async function createLoader(
           }))
         }
       };
-      return { data: res.data, metadata };
-    });
+      source = { data: res.data, metadata };
+    }
     return source;
   } catch (e) {
     if (e instanceof UnsupportedBrowserError) {
