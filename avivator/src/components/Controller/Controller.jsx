@@ -45,7 +45,6 @@ function TabPanel(props) {
   );
 }
 
-
 const Controller = () => {
   const {
     channelsVisible,
