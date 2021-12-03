@@ -19,7 +19,10 @@ import './index.css';
  * */
 export default function Avivator(props) {
   const { history, source: initSource, isDemoImage } = props;
-  const { isViewerLoading, setViewerState, source } = useViewerStore();
+  const isViewerLoading = useViewerStore(store => store.isViewerLoading);
+  const setViewerState = useViewerStore(store => store.setViewerState);
+  const source = useViewerStore(store => store.source);
+  const useLinkedView = useViewerStore(store => store.useLinkedView);
 
   useEffect(() => {
     setViewerState({ source: initSource, isNoImageUrlSnackbarOn: isDemoImage });
@@ -30,7 +33,7 @@ export default function Avivator(props) {
       <DropzoneWrapper>{!isViewerLoading && <Viewer />}</DropzoneWrapper>
       <Controller />
       <SnackBars />
-      <Footer />
+	  {!useLinkedView && <Footer />}
     </>
   );
 }

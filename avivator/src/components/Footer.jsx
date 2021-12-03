@@ -1,3 +1,4 @@
+import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
@@ -6,6 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import {
   useImageSettingsStore,
+  useResolutionStore,
   useChannelsStore,
   useViewerStore
 } from '../state';
@@ -28,10 +30,9 @@ function formatResolutionStatus(current, total, shape) {
 
 export default function Footer() {
   const classes = useStyles();
-
   const use3d = useViewerStore(store => store.use3d);
   const loader = useChannelsStore(store => store.loader);
-  const pyramidResolution = useImageSettingsStore(
+  const pyramidResolution = useResolutionStore(
     store => store.pyramidResolution
   );
   const volumeResolution = useImageSettingsStore(store => store.resolution);
