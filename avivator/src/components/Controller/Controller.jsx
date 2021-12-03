@@ -23,7 +23,7 @@ import {
   useChannelSettings,
   useViewerStore,
   useImageSettingsStore,
-  useChannelSetters,
+  useChannelSetters
 } from '../../state';
 import { guessRgb, useWindowSize, getSingleSelectionStats } from '../../utils';
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';

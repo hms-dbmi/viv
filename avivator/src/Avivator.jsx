@@ -33,7 +33,7 @@ export default function Avivator(props) {
       <DropzoneWrapper>{!isViewerLoading && <Viewer />}</DropzoneWrapper>
       <Controller />
       <SnackBars />
-	  {!useLinkedView && <Footer />}
+      {!useLinkedView && <Footer />}
     </>
   );
 }
