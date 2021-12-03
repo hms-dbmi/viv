@@ -89,7 +89,7 @@
     "geotiff": "https://github.com/ilan-gold/geotiff.js/archive/refs/tags/viv-0.0.2.tar.gz",
     "math.gl": "^3.3.0",
     "quickselect": "^2.0.0",
-    "zarr": "^0.4.0"
+    "zarr": "^0.5.1"
   },
   "prettier": {
     "singleQuote": true,
