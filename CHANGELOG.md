@@ -10,11 +10,16 @@
 - Expose `DECKGL_FILTER_COLOR`, `DECKGL_PROCESS_INTENSITY`, AND `DECKGL_MUTATE_COLOR` hooks and document them.
 - Upgrade deck.gl to 8.6
 - Add `@data` alias for serving local data during development
+- Add Avivator video tutorial to README.md
+- Support basic OME-NGFF in Avivator
 - Add `onResolutionChange` callback and resolution indicator in Avivator
 
 ### Changed
 - Remove special selection mechanism in `Viewers`/`Views` by using deck.gl's fixed `TileLayer` capabilities for caching the tileset.
 - Fix `SAMPLES.md` demo
+- Update tutorial
+- Clean up README.md with latest additions to Viv
+- Bold format names in README
 
 ## 0.11.0
 
