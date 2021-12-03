@@ -14,6 +14,7 @@
 - Support basic OME-NGFF in Avivator
 - Add support for the `multiscales[].axes` field introduced in OME-NGFF v0.3
 - Bump zarr.js to get support for both `/` and `.` dimension separators
+- Add `onResolutionChange` callback and resolution indicator in Avivator
 
 ### Changed
 - Remove special selection mechanism in `Viewers`/`Views` by using deck.gl's fixed `TileLayer` capabilities for caching the tileset.

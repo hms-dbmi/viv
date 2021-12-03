@@ -60,7 +60,7 @@ const Controller = () => {
     toggleIsOn: toggleIsOnSetter,
     removeChannel
   } = useChannelSetters();
-  const { colormap, setImageSetting } = useImageSettingsStore();
+  const colormap = useImageSettingsStore(store => store.colormap);
   const {
     metadata,
     channelOptions,
@@ -92,13 +92,13 @@ const Controller = () => {
         selection,
         use3d
       }).then(({ domain, contrastLimits: newContrastLimit }) => {
-        setImageSetting({
+        useImageSettingsStore.setState({
           onViewportLoad: () => {
             setPropertiesForChannel(i, {
               contrastLimits: newContrastLimit,
               domains: domain
             });
-            setImageSetting({ onViewportLoad: () => {} });
+            useImageSettingsStore.setState({ onViewportLoad: () => {} });
             setIsChannelLoading(i, false);
           }
         });

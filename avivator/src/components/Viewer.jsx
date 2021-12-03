@@ -11,7 +11,8 @@ import {
 import {
   useImageSettingsStore,
   useViewerStore,
-  useChannelSettings
+  useChannelSettings,
+  useResolutionStore
 } from '../state';
 import { useWindowSize } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
@@ -41,6 +42,12 @@ const Viewer = () => {
     onViewportLoad,
     useFixedAxis
   } = useImageSettingsStore();
+
+  const onViewStateChange = ({ viewState: { zoom } }) => {
+    const z = Math.min(Math.max(Math.round(-zoom), 0), loader.length - 1);
+    useResolutionStore.setState({ pyramidResolution: z });
+  };
+
   return use3d ? (
     <VolumeViewer
       loader={loader}
@@ -105,6 +112,7 @@ const Viewer = () => {
       isLensOn={isLensOn}
       onViewportLoad={onViewportLoad}
       extensions={[new LensExtension()]}
+      onViewStateChange={onViewStateChange}
     />
   );
 };
