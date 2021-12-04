@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useDropzone as useReactDropzone } from 'react-dropzone';
+import shallow from 'zustand/shallow';
 
 import {
   useChannelsStore,
@@ -15,7 +16,6 @@ import {
   isInterleaved
 } from './utils';
 import { COLOR_PALLETE, FILL_PIXEL_VALUE } from './constants';
-import shallow from 'zustand/shallow';
 
 export const useImage = (source, history) => {
   const [use3d, toggleUse3d, toggleIsOffsetsSnackbarOn] = useViewerStore(

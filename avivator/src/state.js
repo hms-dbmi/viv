@@ -1,9 +1,6 @@
 /* eslint-disable camelcase */
 import create from 'zustand';
-import pick from 'lodash/pick';
-import pickBy from 'lodash/pickBy';
-import isFunction from 'lodash/isFunction';
-import shallow from 'zustand/shallow';
+
 // eslint-disable-next-line import/no-unresolved
 import { RENDERING_MODES } from '@hms-dbmi/viv';
 
