@@ -51,7 +51,6 @@ export const useChannelsStore = create(set => ({
       channelsVisible[index] = !channelsVisible[index];
       return { ...state, channelsVisible };
     }),
-  setLoader: loader => set(state => ({ ...state, loader })),
   setPropertiesForChannel: (channel, newProperties) =>
     set(state => {
       const entries = Object.entries(newProperties);
@@ -108,15 +107,6 @@ export const useChannelsStore = create(set => ({
   resetChannels: () => set(state => ({ ...state, ...DEFAUlT_CHANNEL_STATE }))
 }));
 
-export const useChannelSettings = () =>
-  useChannelsStore(
-    state => pick(state, Object.keys(DEFAUlT_CHANNEL_STATE)),
-    shallow
-  );
-
-export const useChannelSetters = () =>
-  useChannelsStore(state => pickBy(state, isFunction), shallow);
-
 const DEFAULT_IMAGE_STATE = {
   lensSelection: 0,
   colormap: '',
@@ -133,16 +123,9 @@ const DEFAULT_IMAGE_STATE = {
   onViewportLoad: () => {}
 };
 
-export const useResolutionStore = create(() => ({ pyramidResolution: 0 }));
-
 export const useImageSettingsStore = create(set => ({
   ...DEFAULT_IMAGE_STATE,
-  ...generateToggles(DEFAULT_IMAGE_STATE, set),
-  setImageSetting: newState =>
-    set(state => ({
-      ...state,
-      ...newState
-    }))
+  ...generateToggles(DEFAULT_IMAGE_STATE, set)
 }));
 
 const DEFAULT_VIEWER_STATE = {
@@ -165,17 +148,13 @@ const DEFAULT_VIEWER_STATE = {
   channelOptions: [],
   metadata: null,
   viewState: null,
-  source: ''
+  source: '',
+  pyramidResolution: 0
 };
 
 export const useViewerStore = create(set => ({
   ...DEFAULT_VIEWER_STATE,
   ...generateToggles(DEFAULT_VIEWER_STATE, set),
-  setViewerState: newState =>
-    set(state => ({
-      ...state,
-      ...newState
-    })),
   setIsChannelLoading: (index, val) =>
     set(state => {
       const newIsChannelLoading = [...state.isChannelLoading];

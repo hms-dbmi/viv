@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Divider from '@material-ui/core/Divider';
+import shallow from 'zustand/shallow';
 
 import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
@@ -20,10 +21,9 @@ import SideBySideToggle from './components/SideBySideToggle';
 import PictureInPictureToggle from './components/PictureInPictureToggle';
 import CameraOptions from './components/CameraOptions';
 import {
-  useChannelSettings,
+  useChannelsStore,
   useViewerStore,
-  useImageSettingsStore,
-  useChannelSetters
+  useImageSettingsStore
 } from '../../state';
 import { guessRgb, useWindowSize, getSingleSelectionStats } from '../../utils';
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
@@ -46,22 +46,35 @@ function TabPanel(props) {
 }
 
 const Controller = () => {
-  const {
+  const [
     channelsVisible,
     contrastLimits,
     colors,
     domains,
     selections,
     loader,
-    ids
-  } = useChannelSettings();
-  const {
+    ids,
     setPropertiesForChannel,
-    toggleIsOn: toggleIsOnSetter,
+    toggleIsOnSetter,
     removeChannel
-  } = useChannelSetters();
+  ] = useChannelsStore(
+    store => [
+      store.channelsVisible,
+      store.contrastLimits,
+      store.colors,
+      store.domains,
+      store.selections,
+      store.loader,
+      store.ids,
+      store.setPropertiesForChannel,
+      store.toggleIsOn,
+      store.removeChannel
+    ],
+    shallow
+  );
+
   const colormap = useImageSettingsStore(store => store.colormap);
-  const {
+  const [
     metadata,
     channelOptions,
     useLinkedView,
@@ -73,7 +86,22 @@ const Controller = () => {
     removeIsChannelLoading,
     pixelValues,
     isViewerLoading
-  } = useViewerStore();
+  ] = useViewerStore(
+    store => [
+      store.metadata,
+      store.channelOptions,
+      store.useLinkedView,
+      store.use3d,
+      store.useColormap,
+      store.useLens,
+      store.isChannelLoading,
+      store.setIsChannelLoading,
+      store.removeIsChannelLoading,
+      store.pixelValues,
+      store.isViewerLoading
+    ],
+    shallow
+  );
   const viewSize = useWindowSize();
   const isRgb = metadata && guessRgb(metadata);
   const { shape, labels } = loader[0];

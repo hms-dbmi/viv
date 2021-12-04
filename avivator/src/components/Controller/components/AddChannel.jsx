@@ -1,27 +1,47 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
+import shallow from 'zustand/shallow';
 
 import { MAX_CHANNELS } from '../../../constants';
 import {
-  useChannelSettings,
-  useChannelSetters,
+  useChannelsStore,
   useViewerStore,
   useImageSettingsStore
 } from '../../../state';
 import { getSingleSelectionStats } from '../../../utils';
 
 const AddChannel = () => {
-  const {
+  const [
     globalSelection,
     isViewerLoading,
     use3d,
     setIsChannelLoading,
     addIsChannelLoading
-  } = useViewerStore();
-  const { loader, selections } = useChannelSettings();
-  const { addChannel, setPropertiesForChannel } = useChannelSetters();
-  const { setImageSetting } = useImageSettingsStore();
+  ] = useViewerStore(
+    store => [
+      store.globalSelection,
+      store.isViewerLoading,
+      store.use3d,
+      store.setIsChannelLoading,
+      store.addIsChannelLoading
+    ],
+    shallow
+  );
+  const [
+    loader,
+    selections,
+    addChannel,
+    setPropertiesForChannel
+  ] = useChannelsStore(
+    store => [
+      store.loader,
+      store.selections,
+      store.addChannel,
+      store.setPropertiesForChannel
+    ],
+    shallow
+  );
   const { labels } = loader[0];
   const handleChannelAdd = () => {
     let selection = Object.fromEntries(labels.map(l => [l, 0]));
@@ -32,14 +52,14 @@ const AddChannel = () => {
       selection,
       use3d
     }).then(({ domain, contrastLimits }) => {
-      setImageSetting({
+      useImageSettingsStore.setState({
         onViewportLoad: () => {
           setPropertiesForChannel(numSelectionsBeforeAdd, {
             domains: domain,
             contrastLimits,
             channelsVisible: true
           });
-          setImageSetting({ onViewportLoad: () => {} });
+          useImageSettingsStore.setState({ onViewportLoad: () => {} });
           setIsChannelLoading(numSelectionsBeforeAdd, false);
         }
       });

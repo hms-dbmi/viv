@@ -5,11 +5,12 @@ import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import Select from '@material-ui/core/Select';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import shallow from 'zustand/shallow';
 
 import ChannelOptions from './ChannelOptions';
 import { FILL_PIXEL_VALUE } from '../../../constants';
 import {
-  useChannelSettings,
+  useChannelsStore,
   useImageSettingsStore,
   useViewerStore
 } from '../../../state';
@@ -53,9 +54,12 @@ function ChannelController({
   handleColorSelect,
   isLoading
 }) {
-  const { loader } = useChannelSettings();
-  const { colormap } = useImageSettingsStore();
-  const { channelOptions, useLinkedView, use3d } = useViewerStore();
+  const loader = useChannelsStore(store => store.loader);
+  const colormap = useImageSettingsStore(store => store.colormap);
+  const [channelOptions, useLinkedView, use3d] = useViewerStore(
+    store => [store.channelOptions, store.useLinkedView, store.use3d],
+    shallow
+  );
   const rgbColor = toRgb(colormap, color);
   const [min, max] = domain;
   // If the min/max range is and the dtype is float, make the step size smaller so contrastLimits are smoother.
