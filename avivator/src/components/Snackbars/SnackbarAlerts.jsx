@@ -11,9 +11,9 @@ export function OffsetsWarning() {
       <Link
         target="_blank"
         rel="noopener noreferrer"
-        href="http://viv.gehlenborglab.org/#data-preparation"
+        href="http://viv.gehlenborglab.org/#indexed-tiff"
       >
-        here
+       in this section of our documentation 
       </Link>{' '}
       and then place the offsets.json adjacent to the OME-TIFF wherever hosted.
     </>
