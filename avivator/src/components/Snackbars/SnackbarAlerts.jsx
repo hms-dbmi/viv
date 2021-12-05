@@ -11,7 +11,7 @@ export function OffsetsWarning() {
       <Link
         target="_blank"
         rel="noopener noreferrer"
-        href="http://viv.gehlenborglab.org/#indexed-tiff"
+        href="http://viv.gehlenborglab.org/#data-preparation"
       >
        in this section of our documentation 
       </Link>{' '}
