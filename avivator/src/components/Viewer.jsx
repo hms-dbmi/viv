@@ -56,7 +56,7 @@ const Viewer = () => {
       colors={colors}
       channelsVisible={channelsVisible}
       selections={selections}
-      colormap={colormap || 'viridis'}
+      colormap={colormap}
       xSlice={xSlice}
       ySlice={ySlice}
       zSlice={zSlice}

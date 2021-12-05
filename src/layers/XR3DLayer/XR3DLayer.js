@@ -37,6 +37,7 @@ import fs from './xr-layer-fragment.glsl';
 import channels from './channel-intensity-module';
 import { padContrastLimits, padWithDefault, getDtypeValues } from '../utils';
 import { COLORMAPS, RENDERING_MODES as RENDERING_NAMES } from '../../constants';
+import { padColors } from '../../extensions/utils';
 import {
   RENDERING_MODES_BLEND,
   RENDERING_MODES_COLORMAP
@@ -276,13 +277,13 @@ const XR3DLayer = class extends Layer {
       projectionMatrix
     } = this.context.viewport;
     if (textures && model && scaleMatrix) {
-      const { paddedContrastLimits, paddedColors } = padContrastLimits({
+      const paddedContrastLimits = padContrastLimits({
         contrastLimits,
-        colors,
         channelsVisible,
         domain,
         dtype
       });
+      const paddedColors = padColors({ colors, channelsVisible });
       const invertedScaleMatrix = scaleMatrix.clone().invert();
       const invertedResolutionMatrix = resolutionMatrix.clone().invert();
       const paddedClippingPlanes = padWithDefault(
