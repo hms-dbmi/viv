@@ -22,6 +22,7 @@
 - Update tutorial
 - Clean up README.md with latest additions to Viv
 - Bold format names in README
+- Update snackbar.
 
 ## 0.11.0
 
