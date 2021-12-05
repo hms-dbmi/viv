@@ -6,12 +6,12 @@ export function OffsetsWarning() {
   return (
     <>
       A lot of channels have been detected in the requested OME-TIFF. To learn
-      how to speed up load times by providing byte offsets, refer to the first
-      point{' '}
+      how to speed up load times by providing byte offsets, refer to the point
+      about indexed TIFF{' '}
       <Link
         target="_blank"
         rel="noopener noreferrer"
-        href="http://viv.gehlenborglab.org/#ome-tiff-loading"
+        href="http://viv.gehlenborglab.org/#data-preparation"
       >
         here
       </Link>{' '}
