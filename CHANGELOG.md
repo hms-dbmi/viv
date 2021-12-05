@@ -12,10 +12,18 @@
 - `extensions` are now the main way for controlling how shaders render the image
   - `LensExtension`, `ColorPaletteExtension`, and `AdditiveColormapExtension` are exported from `viv` to be used mutually exclusively for controlling how the fragment shader renders.  The `ColorPaletteExtension` is used by default and provides the normal one color per channel pseudo-coloring.  `AdditiveColormapExtension` provides things like `virids` `jet` and more.  There have been slight changes to the props so please see the docs for more infomation.
 - Add `@data` alias for serving local data during development
+- Add Avivator video tutorial to README.md
+- Support basic OME-NGFF in Avivator
+- Add support for the `multiscales[].axes` field introduced in OME-NGFF v0.3
+- Bump zarr.js to get support for both `/` and `.` dimension separators
+- Add `onResolutionChange` callback and resolution indicator in Avivator
 
 ### Changed
 - Remove special selection mechanism in `Viewers`/`Views` by using deck.gl's fixed `TileLayer` capabilities for caching the tileset.
 - Fix `SAMPLES.md` demo
+- Update tutorial
+- Clean up README.md with latest additions to Viv
+- Bold format names in README
 
 ## 0.11.0
 

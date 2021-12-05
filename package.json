@@ -20,7 +20,7 @@
     "test:loaders": "rollup -c rollup.config.test.js tests/loaders/index.spec.js | node - | tap-spec",
     "test:prod": "npm run lint && npm run format && npm run test -- --no-cache",
     "lint": "eslint src/**/*.{js,jsx} avivator/src/**/*.{js,jsx} tests/**/*.js",
-    "format": "prettier --check \"src/**/*.{js,ts,jsx}\" avivator/src/**/*.{js,jsx} tests/**/*.js",
+    "format": "prettier --check \"src/**/*.{js,ts,jsx}\" \"avivator/src/**/*.{js,jsx}\" tests/**/*.js",
     "format:write": "npm run format -- --write",
     "version": "./version.sh",
     "postversion": "git push && git push --tags",
@@ -89,7 +89,7 @@
     "geotiff": "https://github.com/ilan-gold/geotiff.js/archive/refs/tags/viv-0.0.2.tar.gz",
     "math.gl": "^3.3.0",
     "quickselect": "^2.0.0",
-    "zarr": "^0.4.0"
+    "zarr": "^0.5.1"
   },
   "prettier": {
     "singleQuote": true,

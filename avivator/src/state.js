@@ -133,6 +133,8 @@ const DEFAULT_IMAGE_STATE = {
   onViewportLoad: () => {}
 };
 
+export const useResolutionStore = create(() => ({ pyramidResolution: 0 }));
+
 export const useImageSettingsStore = create(set => ({
   ...DEFAULT_IMAGE_STATE,
   ...generateToggles(DEFAULT_IMAGE_STATE, set),
