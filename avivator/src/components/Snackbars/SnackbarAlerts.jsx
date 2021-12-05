@@ -13,7 +13,7 @@ export function OffsetsWarning() {
         rel="noopener noreferrer"
         href="http://viv.gehlenborglab.org/#data-preparation"
       >
-       in this section of our documentation 
+        in this section of our documentation
       </Link>{' '}
       and then place the offsets.json adjacent to the OME-TIFF wherever hosted.
     </>
