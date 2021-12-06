@@ -1,16 +1,25 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
+import shallow from 'zustand/shallow';
 
 import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 const SideBySideToggle = () => {
-  const { isOverviewOn } = useImageSettingsStore();
-  const {
+  const isOverviewOn = useImageSettingsStore(store => store.isOverviewOn);
+  const [
     isViewerLoading,
     toggleUseLinkedView,
     useLinkedView,
     use3d
-  } = useViewerStore();
+  ] = useViewerStore(
+    store => [
+      store.isViewerLoading,
+      store.toggleUseLinkedView,
+      store.useLinkedView,
+      store.use3d
+    ],
+    shallow
+  );
   return (
     <Button
       disabled={isViewerLoading || isOverviewOn || use3d}

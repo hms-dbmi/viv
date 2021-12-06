@@ -4,12 +4,14 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
+import shallow from 'zustand/shallow';
+
 // eslint-disable-next-line import/no-unresolved
 import { getDefaultInitialViewState } from '@hms-dbmi/viv';
 import {
   useImageSettingsStore,
   useViewerStore,
-  useChannelSettings
+  useChannelsStore
 } from '../../../state';
 import { useWindowSize } from '../../../utils';
 
@@ -26,9 +28,15 @@ const useStyles = makeStyles(theme =>
 );
 
 const CameraOptions = () => {
-  const { loader } = useChannelSettings();
-  const { useFixedAxis, toggleUseFixedAxis } = useImageSettingsStore();
-  const { setViewerState, viewState, use3d } = useViewerStore();
+  const loader = useChannelsStore(store => store.loader);
+  const [useFixedAxis, toggleUseFixedAxis] = useImageSettingsStore(
+    store => [store.useFixedAxis, store.toggleUseFixedAxis],
+    shallow
+  );
+  const [viewState, use3d] = useViewerStore(store => [
+    store.viewState,
+    store.use3d
+  ]);
   const { height, width } = useWindowSize();
   const classes = useStyles();
   const toggleFixedAxisButton = (
@@ -50,7 +58,7 @@ const CameraOptions = () => {
     <Grid item xs="auto" key="recenter">
       <Button
         onClick={() =>
-          setViewerState({
+          useViewerStore.setState({
             viewState: {
               ...viewState,
               ...getDefaultInitialViewState(loader, { height, width }, 1, true),

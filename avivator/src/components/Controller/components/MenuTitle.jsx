@@ -11,7 +11,9 @@ const hideButtonStyle = {
   marginTop: '3px'
 };
 function MenuTitle() {
-  const { toggleIsControllerOn } = useViewerStore();
+  const toggleIsControllerOn = useViewerStore(
+    store => store.toggleIsControllerOn
+  );
   return (
     <Grid container direction="row" justify="flex-end" alignItems="center">
       <Grid style={{ marginRight: 'auto' }} item>

@@ -3,22 +3,21 @@ import React from 'react';
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
+import shallow from 'zustand/shallow';
 
 import {
-  useChannelSettings,
+  useChannelsStore,
   useImageSettingsStore,
   useViewerStore
 } from '../../../state';
 
 function LensSelect() {
-  const { selections } = useChannelSettings();
-  const {
-    setImageSetting,
-    isLensOn,
-    toggleIsLensOn,
-    lensSelection
-  } = useImageSettingsStore();
-  const { channelOptions } = useViewerStore();
+  const selections = useChannelsStore(store => store.selections);
+  const [isLensOn, toggleIsLensOn, lensSelection] = useImageSettingsStore(
+    store => [store.isLensOn, store.toggleIsLensOn, store.lensSelection],
+    shallow
+  );
+  const channelOptions = useViewerStore(store => store.channelOptions);
   const currChannelIndices = selections.map(sel => sel.c);
 
   const checkboxColor = `rgb(${[255, 255, 255]})`;
@@ -43,7 +42,9 @@ function LensSelect() {
         <Select
           native
           value={lensSelection}
-          onChange={e => setImageSetting({ lensSelection: e.target.value })}
+          onChange={e =>
+            useImageSettingsStore.setState({ lensSelection: e.target.value })
+          }
         >
           {currChannelIndices.map((channelIndex, relativeIndex) => (
             // eslint-disable-next-line react/no-array-index-key
