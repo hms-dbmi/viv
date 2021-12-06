@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import { useDropzone as useReactDropzone } from 'react-dropzone';
+import shallow from 'zustand/shallow';
 
 import {
-  useChannelSetters,
+  useChannelsStore,
   useImageSettingsStore,
   useViewerStore
 } from './state';
@@ -17,26 +18,30 @@ import {
 import { COLOR_PALLETE, FILL_PIXEL_VALUE } from './constants';
 
 export const useImage = (source, history) => {
-  const {
-    setViewerState,
-    use3d,
-    toggleUse3d,
-    toggleIsOffsetsSnackbarOn
-  } = useViewerStore();
-  const { setLoader, addChannels, resetChannels } = useChannelSetters();
-  const { isLensOn, toggleIsLensOn, setImageSetting } = useImageSettingsStore();
+  const [use3d, toggleUse3d, toggleIsOffsetsSnackbarOn] = useViewerStore(
+    store => [store.use3d, store.toggleUse3d, store.toggleIsOffsetsSnackbarOn],
+    shallow
+  );
+  const [addChannels, resetChannels] = useChannelsStore(
+    store => [store.addChannels, store.resetChannels],
+    shallow
+  );
+  const [isLensOn, toggleIsLensOn] = useImageSettingsStore(
+    store => [store.isLensOn, store.toggleIsLensOn],
+    shallow
+  );
   useEffect(() => {
     async function changeLoader() {
       // Placeholder
-      setViewerState({ isChannelLoading: [true] });
-      setViewerState({ isViewerLoading: true });
+      useViewerStore.setState({ isChannelLoading: [true] });
+      useViewerStore.setState({ isViewerLoading: true });
       resetChannels();
       const { urlOrFile } = source;
       const {
         data: nextLoader,
         metadata: nextMeta
       } = await createLoader(urlOrFile, toggleIsOffsetsSnackbarOn, message =>
-        setViewerState({ loaderErrorSnackbar: { on: true, message } })
+        useViewerStore.setState({ loaderErrorSnackbar: { on: true, message } })
       );
       console.info(
         'Metadata (in JSON-like form) for current file being viewed: ',
@@ -78,7 +83,7 @@ export const useImage = (source, history) => {
           if (isLensOn) {
             toggleIsLensOn();
           }
-          setViewerState({ useColormap: false, useLens: false });
+          useViewerStore.setState({ useColormap: false, useLens: false });
         } else {
           const stats = await getMultiSelectionStats({
             loader: nextLoader,
@@ -92,7 +97,7 @@ export const useImage = (source, history) => {
             newDomains.length === 1
               ? [[255, 255, 255]]
               : newDomains.map((_, i) => COLOR_PALLETE[i]);
-          setViewerState({
+          useViewerStore.setState({
             useLens: channelOptions.length !== 1,
             useColormap: true
           });
@@ -104,8 +109,8 @@ export const useImage = (source, history) => {
           contrastLimits: newContrastLimits,
           colors: newColors
         });
-        setLoader(nextLoader);
-        setViewerState({
+        useChannelsStore.setState({ loader: nextLoader });
+        useViewerStore.setState({
           isChannelLoading: newSelections.map(i => !i),
           isViewerLoading: false,
           metadata: nextMeta,
@@ -115,7 +120,7 @@ export const useImage = (source, history) => {
           channelOptions
         });
         const [xSlice, ySlice, zSlice] = getBoundingCube(nextLoader);
-        setImageSetting({
+        useImageSettingsStore.setState({
           xSlice,
           ySlice,
           zSlice
@@ -132,7 +137,6 @@ export const useImage = (source, history) => {
 };
 
 export const useDropzone = () => {
-  const { setViewerState } = useViewerStore();
   const handleSubmitFile = files => {
     let newSource;
     if (files.length === 1) {
@@ -147,7 +151,7 @@ export const useDropzone = () => {
         description: 'data.zarr'
       };
     }
-    setViewerState({ source: newSource });
+    useViewerStore.setState({ source: newSource });
   };
   return useReactDropzone({
     onDrop: handleSubmitFile

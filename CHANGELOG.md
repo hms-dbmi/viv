@@ -5,7 +5,7 @@
 ### Added
 
 - New `LensExtension` for controlling lensing on layers as a deck.gl extension
-  - props like `lensBorderRadius` no longer used directly by the layer in favor of using the `extensions` prop with new `LensExtension` in connjunction with these props.  So, to be able to use the lens feature, you must pass in the old props as well as the `LensExtension` to `extensions`.
+  - props like `lensBorderRadius` no longer used directly by the layer in favor of using the `extensions` prop with new `LensExtension` in connjunction with these props. So, to be able to use the lens feature, you must pass in the old props as well as the `LensExtension` to `extensions`.
     - See https://deck.gl/docs/developer-guide/custom-layers/layer-extensions for more information on how to use `extensions` and what they are
 - Expose `DECKGL_FILTER_COLOR`, `DECKGL_PROCESS_INTENSITY`, AND `DECKGL_MUTATE_COLOR` hooks and document them.
 - Upgrade deck.gl to 8.6
@@ -17,11 +17,13 @@
 - Add `onResolutionChange` callback and resolution indicator in Avivator
 
 ### Changed
+
 - Remove special selection mechanism in `Viewers`/`Views` by using deck.gl's fixed `TileLayer` capabilities for caching the tileset.
 - Fix `SAMPLES.md` demo
 - Update tutorial
 - Clean up README.md with latest additions to Viv
 - Bold format names in README
+- Refactor `zustand` stores to follow best practice in Avivator.
 
 ## 0.11.0
 

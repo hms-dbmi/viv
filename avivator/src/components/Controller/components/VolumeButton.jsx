@@ -9,11 +9,12 @@ import MenuList from '@material-ui/core/MenuList';
 
 import { makeStyles } from '@material-ui/core/styles';
 
+import shallow from 'zustand/shallow';
+
 import {
   useImageSettingsStore,
-  useChannelSettings,
   useViewerStore,
-  useChannelSetters
+  useChannelsStore
 } from '../../../state';
 import {
   range,
@@ -86,17 +87,26 @@ const useStyles = makeStyles(() => ({
 }));
 
 function VolumeButton() {
-  const { setImageSetting } = useImageSettingsStore();
-  const { loader, selections } = useChannelSettings();
-  const { setPropertiesForChannel } = useChannelSetters();
-  const {
+  const [loader, selections, setPropertiesForChannel] = useChannelsStore(
+    store => [store.loader, store.selections, store.setPropertiesForChannel],
+    shallow
+  );
+  const [
     use3d,
     toggleUse3d,
     metadata,
     toggleIsVolumeRenderingWarningOn,
-    setViewerState,
     isViewerLoading
-  } = useViewerStore();
+  ] = useViewerStore(
+    store => [
+      store.use3d,
+      store.toggleUse3d,
+      store.metadata,
+      store.toggleIsVolumeRenderingWarningOn,
+      store.isViewerLoading
+    ],
+    shallow
+  );
 
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
@@ -122,7 +132,7 @@ function VolumeButton() {
           // eslint-disable-next-line no-unused-expressions
           if (use3d) {
             toggleUse3d();
-            setViewerState({
+            useViewerStore.setState({
               isChannelLoading: Array(selections.length).fill(true)
             });
             getMultiSelectionStats({ loader, selections, use3d: !use3d }).then(
@@ -133,14 +143,14 @@ function VolumeButton() {
                     contrastLimits: contrastLimits[j]
                   })
                 );
-                setViewerState({
+                useViewerStore.setState({
                   isChannelLoading: Array(selections.length).fill(false)
                 });
               }
             );
             const isRgb = metadata && guessRgb(metadata);
             if (!isRgb && metadata) {
-              setViewerState({ useLens: true });
+              useViewerStore.setState({ useLens: true });
             }
           }
         }}
@@ -169,7 +179,7 @@ function VolumeButton() {
                           dense
                           disableGutters
                           onClick={() => {
-                            setViewerState({
+                            useViewerStore.setState({
                               isChannelLoading: Array(selections.length).fill(
                                 true
                               )
@@ -177,7 +187,7 @@ function VolumeButton() {
                             const [xSlice, ySlice, zSlice] = getBoundingCube(
                               loader
                             );
-                            setImageSetting({
+                            useImageSettingsStore.setState({
                               resolution,
                               xSlice,
                               ySlice,
@@ -189,7 +199,7 @@ function VolumeButton() {
                               selections,
                               use3d: true
                             }).then(({ domains, contrastLimits }) => {
-                              setImageSetting({
+                              useImageSettingsStore.setState({
                                 onViewportLoad: () => {
                                   range(selections.length).forEach(
                                     (channel, j) =>
@@ -198,8 +208,10 @@ function VolumeButton() {
                                         contrastLimits: contrastLimits[j]
                                       })
                                   );
-                                  setImageSetting({ onViewportLoad: () => {} });
-                                  setViewerState({
+                                  useImageSettingsStore.setState({
+                                    onViewportLoad: () => {}
+                                  });
+                                  useViewerStore.setState({
                                     isChannelLoading: Array(
                                       selections.length
                                     ).fill(false)
@@ -214,7 +226,7 @@ function VolumeButton() {
                                 toggleIsVolumeRenderingWarningOn();
                               }
                             });
-                            setViewerState({ useLens: false });
+                            useViewerStore.setState({ useLens: false });
                           }}
                           key={`(${height}, ${width}, ${depthDownsampled})`}
                         >

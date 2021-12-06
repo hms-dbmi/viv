@@ -3,10 +3,11 @@ import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles } from '@material-ui/core';
+import shallow from 'zustand/shallow';
 
 import {
   useImageSettingsStore,
-  useChannelSettings,
+  useChannelsStore,
   useViewerStore
 } from '../../../state';
 import { getBoundingCube, truncateDecimalNumber } from '../../../utils';
@@ -30,26 +31,29 @@ const useStyles = makeStyles(theme =>
 );
 
 const Slicer = () => {
-  const { setImageSetting, xSlice, ySlice, zSlice } = useImageSettingsStore();
-  const { loader } = useChannelSettings();
-  const { use3d } = useViewerStore();
+  const [xSlice, ySlice, zSlice] = useImageSettingsStore(
+    store => [store.xSlice, store.ySlice, store.zSlice],
+    shallow
+  );
+  const loader = useChannelsStore(store => store.loader);
+  const use3d = useViewerStore(store => store.use3d);
   const [xSliceInit, ySliceInit, zSliceInit] = getBoundingCube(loader);
   const sliceValuesAndSetSliceFunctions = [
     [
       xSlice,
-      xSliceNew => setImageSetting({ xSlice: xSliceNew }),
+      xSliceNew => useImageSettingsStore.setState({ xSlice: xSliceNew }),
       'x',
       xSliceInit
     ],
     [
       ySlice,
-      ySliceNew => setImageSetting({ ySlice: ySliceNew }),
+      ySliceNew => useImageSettingsStore.setState({ ySlice: ySliceNew }),
       'y',
       ySliceInit
     ],
     [
       zSlice,
-      zSliceNew => setImageSetting({ zSlice: zSliceNew }),
+      zSliceNew => useImageSettingsStore.setState({ zSlice: zSliceNew }),
       'z',
       zSliceInit
     ]

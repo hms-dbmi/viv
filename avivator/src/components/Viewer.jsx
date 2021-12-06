@@ -1,4 +1,5 @@
 /* eslint-disable no-nested-ternary */
+import shallow from 'zustand/shallow';
 import React from 'react';
 import debounce from 'lodash/debounce';
 import {
@@ -11,23 +12,34 @@ import {
 import {
   useImageSettingsStore,
   useViewerStore,
-  useChannelSettings,
-  useResolutionStore
+  useChannelsStore
 } from '../state';
 import { useWindowSize } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
 
 const Viewer = () => {
-  const { useLinkedView, setViewerState, use3d, viewState } = useViewerStore();
-  const {
+  const [useLinkedView, use3d, viewState] = useViewerStore(
+    store => [store.useLinkedView, store.use3d, store.viewState],
+    shallow
+  );
+  const [
     colors,
     contrastLimits,
     channelsVisible,
     selections,
     loader
-  } = useChannelSettings();
+  ] = useChannelsStore(
+    store => [
+      store.colors,
+      store.contrastLimits,
+      store.channelsVisible,
+      store.selections,
+      store.loader
+    ],
+    shallow
+  );
   const viewSize = useWindowSize();
-  const {
+  const [
     lensSelection,
     colormap,
     renderingMode,
@@ -41,11 +53,28 @@ const Viewer = () => {
     isOverviewOn,
     onViewportLoad,
     useFixedAxis
-  } = useImageSettingsStore();
+  ] = useImageSettingsStore(
+    store => [
+      store.lensSelection,
+      store.colormap,
+      store.renderingMode,
+      store.xSlice,
+      store.ySlice,
+      store.zSlice,
+      store.resolution,
+      store.isLensOn,
+      store.zoomLock,
+      store.panLock,
+      store.isOverviewOn,
+      store.onViewportLoad,
+      store.useFixedAxis
+    ],
+    shallow
+  );
 
   const onViewStateChange = ({ viewState: { zoom } }) => {
     const z = Math.min(Math.max(Math.round(-zoom), 0), loader.length - 1);
-    useResolutionStore.setState({ pyramidResolution: z });
+    useViewerStore.setState({ pyramidResolution: z });
   };
 
   return use3d ? (
@@ -68,7 +97,9 @@ const Viewer = () => {
       viewStates={[viewState]}
       onViewStateChange={debounce(
         ({ viewState: newViewState, viewId }) =>
-          setViewerState({ viewState: { ...newViewState, id: viewId } }),
+          useViewerStore.setState({
+            viewState: { ...newViewState, id: viewId }
+          }),
         250,
         { trailing: true }
       )}
@@ -86,7 +117,7 @@ const Viewer = () => {
       zoomLock={zoomLock}
       panLock={panLock}
       hoverHooks={{
-        handleValue: v => setViewerState({ pixelValues: v })
+        handleValue: v => useViewerStore.setState({ pixelValues: v })
       }}
       lensSelection={lensSelection}
       isLensOn={isLensOn}
@@ -106,7 +137,7 @@ const Viewer = () => {
       overview={DEFAULT_OVERVIEW}
       overviewOn={isOverviewOn}
       hoverHooks={{
-        handleValue: v => setViewerState({ pixelValues: v })
+        handleValue: v => useViewerStore.setState({ pixelValues: v })
       }}
       lensSelection={lensSelection}
       isLensOn={isLensOn}
