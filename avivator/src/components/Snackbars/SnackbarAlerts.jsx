@@ -5,9 +5,10 @@ import Link from '@material-ui/core/Link';
 export function OffsetsWarning() {
   return (
     <>
-      A lot of channels have been detected in the requested OME-TIFF. To learn
-      how to speed up load times by providing byte offsets, refer to the point
-      about &quot;Indexed TIFF&quot;{' '}
+      Avivator could not find an IFD index for the requested OME-TIFF, and
+      therefore longer latencies are expected. Please read our documentation on
+      &quot;Indexed TIFF&quot; to generate an IFD index for your OME-TIFF and
+      improve initial load times.
       <Link
         target="_blank"
         rel="noopener noreferrer"

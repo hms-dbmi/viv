@@ -69,7 +69,7 @@ Therefore for larger images, please use `bioformats2raw + raw2ometiff`.
 > by `raw2ometiff` - `LZW`, `zlib`, and `Uncompressed` as well as `jpeg` compression for 8 bit data. Support
 > for JPEG-2000 for >8 bit data is planned. Please open an issue if you would like this more immediately.
 
-### Indexed TIFF
+### Indexed OME-TIFF
 
 The TIFF file format is not designed for the cloud, and therefore certain images are less suitable to be natively read remotely. If your OME-TIFF image contains large non-XY dimensions (e.g. Z=100, T=50), you are likely to experience latencies when switching planes in Avivator due to seeking the file over HTTP. We recommend generating an index (`offsets.json`) that contains the byte-offsets for each plane to complement OME-TIFF, solving this latency issue and enabling fast interactions.
 
