@@ -23,6 +23,7 @@
 - Update tutorial
 - Clean up README.md with latest additions to Viv
 - Bold format names in README
+- Add description of "Indexed TIFF" to Avivator snackbar warning when offsets are missing
 - Refactor `zustand` stores to follow best practice in Avivator.
 
 ## 0.11.0
