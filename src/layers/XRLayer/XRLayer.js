@@ -7,19 +7,12 @@ import { Model, Geometry, Texture2D, isWebGL2 } from '@luma.gl/core';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { ProgramManager } from '@luma.gl/engine';
 import { hasFeature, FEATURES } from '@luma.gl/webgl';
-import fsColormap1 from './xr-layer-fragment-colormap.webgl1.glsl';
-import fsColormap2 from './xr-layer-fragment-colormap.webgl2.glsl';
-import fs1 from './xr-layer-fragment.webgl1.glsl';
-import fs2 from './xr-layer-fragment.webgl2.glsl';
-import vs1 from './xr-layer-vertex.webgl1.glsl';
-import vs2 from './xr-layer-vertex.webgl2.glsl';
+import fs from './xr-layer-fragment.webgl.glsl';
+import vs from './xr-layer-vertex.webgl.glsl';
 import { channels } from './shader-modules';
-import { padColorsAndWindows, getDtypeValues } from '../utils';
+import { padContrastLimits, getDtypeValues } from '../utils';
 
-const SHADER_MODULES = [
-  { fs: fs1, fscmap: fsColormap1, vs: vs1 },
-  { fs: fs2, fscmap: fsColormap2, vs: vs2 }
-];
+const coreShaderModule = { fs, vs };
 
 function validateWebGL2Filter(gl, interpolation) {
   const canShowFloat = hasFeature(gl, FEATURES.TEXTURE_FLOAT);
@@ -42,23 +35,29 @@ function validateWebGL2Filter(gl, interpolation) {
 }
 
 function getRenderingAttrs(dtype, gl, interpolation) {
-  const isLinear = interpolation === GL.LINEAR;
   if (!isWebGL2(gl)) {
     return {
       format: GL.LUMINANCE,
       dataFormat: GL.LUMINANCE,
       type: GL.FLOAT,
       sampler: 'sampler2D',
-      shaderModule: SHADER_MODULES[0],
+      shaderModule: coreShaderModule,
       filter: validateWebGL2Filter(gl, interpolation),
       cast: data => new Float32Array(data)
     };
   }
   // Linear filtering only works when the data type is cast to Float32.
+  const isLinear = interpolation === GL.LINEAR;
+  // Need to add es version tag so that shaders work in WebGL2 since the tag is needed for using usampler2d with WebGL2.
+  // Very cursed!
+  const upgradedShaderModule = { ...coreShaderModule };
+  const version300str = '#version 300 es\n';
+  upgradedShaderModule.fs = version300str.concat(upgradedShaderModule.fs);
+  upgradedShaderModule.vs = version300str.concat(upgradedShaderModule.vs);
   const values = getDtypeValues(isLinear ? 'Float32' : dtype);
   return {
     ...values,
-    shaderModule: SHADER_MODULES[1],
+    shaderModule: upgradedShaderModule,
     filter: interpolation,
     cast: isLinear ? data => new Float32Array(data) : data => data
   };
@@ -69,13 +68,9 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'object', value: {}, compare: true },
   bounds: { type: 'array', value: [0, 0, 1, 1], compare: true },
-  colors: { type: 'array', value: [], compare: true },
   contrastLimits: { type: 'array', value: [], compare: true },
   channelsVisible: { type: 'array', value: [], compare: true },
-  opacity: { type: 'number', value: 1, compare: true },
   dtype: { type: 'string', value: 'Uint16', compare: true },
-  colormap: { type: 'string', value: '', compare: true },
-  transparentColor: { type: 'array', value: null, compare: true },
   interpolation: {
     type: 'number',
     value: GL.NEAREST,
@@ -87,24 +82,13 @@ const defaultProps = {
  * @typedef LayerProps
  * @type {object}
  * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
- * @property {number=} opacity Opacity of the layer.
- * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<number>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @property {String=} id Unique identifier for this layer.
  * @property {function=} onHover Hook function from deck.gl to handle hover objects.
- * @property {boolean=} isLensOn Whether or not to use the lens.
- * @property {number=} lensSelection Numeric index of the channel to be focused on by the lens.
- * @property {number=} lensRadius Pixel radius of the lens (default: 100).
- * @property {Array.<number>=} lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
- * @property {number=} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
- * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
- * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
- * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
  */
@@ -114,29 +98,19 @@ const defaultProps = {
  */
 const XRLayer = class extends Layer {
   /**
-   * This function chooses a shader (colormapping or not) and
-   * replaces `usampler` with `sampler` if the data is not an unsigned integer
+   * This function replaces `usampler` with `sampler` if the data is not an unsigned integer
+   * and adds a standard ramp function default for DECKGL_PROCESS_INTENSITY.
    */
   getShaders() {
-    const { colormap, dtype, interpolation } = this.props;
+    const { dtype, interpolation } = this.props;
     const { shaderModule, sampler } = getRenderingAttrs(
       dtype,
       this.context.gl,
       interpolation
     );
-    const fs = colormap ? shaderModule.fscmap : shaderModule.fs;
-    const extensionDefinesDeckglMutateColor = this._isHookDefinedByExtensions(
-      'fs:DECKGL_MUTATE_COLOR'
-    );
     const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
       'fs:DECKGL_PROCESS_INTENSITY'
     );
-    const inject = {};
-    if (!extensionDefinesDeckglMutateColor) {
-      inject['fs:DECKGL_MUTATE_COLOR'] = `
-        rgbOut += max(0., min(1., intensity)) * vec3(color);
-      `;
-    }
     const newChannelsModule = { ...channels, inject: {} };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
@@ -144,13 +118,10 @@ const XRLayer = class extends Layer {
       `;
     }
     return super.getShaders({
-      fs,
-      vs: shaderModule.vs,
+      ...shaderModule,
       defines: {
-        SAMPLER_TYPE: sampler,
-        COLORMAP_FUNCTION: colormap || 'viridis'
+        SAMPLER_TYPE: sampler
       },
-      inject,
       modules: [project32, picking, newChannelsModule]
     });
   }
@@ -194,7 +165,7 @@ const XRLayer = class extends Layer {
     const programManager = ProgramManager.getDefaultProgramManager(gl);
 
     const mutateStr =
-      'fs:DECKGL_MUTATE_COLOR(inout vec3 rgbOut, float intensity, vec3 color, vec2 vTexCoord, int channelIndex)';
+      'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)';
     const processStr = `fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)`;
     // Only initialize shader hook functions _once globally_
     // Since the program manager is shared across all layers, but many layers
@@ -229,7 +200,6 @@ const XRLayer = class extends Layer {
     // setup model first
     if (
       changeFlags.extensionsChanged ||
-      props.colormap !== oldProps.colormap ||
       props.interpolation !== oldProps.interpolation
     ) {
       const { gl } = this.context;
@@ -320,35 +290,21 @@ const XRLayer = class extends Layer {
   draw({ uniforms }) {
     const { textures, model } = this.state;
     if (textures && model) {
-      const {
-        contrastLimits,
-        colors,
-        opacity,
-        domain,
-        dtype,
-        channelsVisible,
-        transparentColor
-      } = this.props;
+      const { contrastLimits, domain, dtype, channelsVisible } = this.props;
       // Check number of textures not null.
       const numTextures = Object.values(textures).filter(t => t).length;
       // Slider values and color values can come in before textures since their data is async.
       // Thus we pad based on the number of textures bound.
-      const { paddedContrastLimits, paddedColors } = padColorsAndWindows({
+      const paddedContrastLimits = padContrastLimits({
         contrastLimits: contrastLimits.slice(0, numTextures),
-        colors: colors.slice(0, numTextures),
         channelsVisible: channelsVisible.slice(0, numTextures),
         domain,
         dtype
       });
-
       model
         .setUniforms({
           ...uniforms,
-          colors: paddedColors,
           contrastLimits: paddedContrastLimits,
-          opacity,
-          transparentColor: (transparentColor || [0, 0, 0]).map(i => i / 255),
-          useTransparentColor: Boolean(transparentColor),
           ...textures
         })
         .draw();

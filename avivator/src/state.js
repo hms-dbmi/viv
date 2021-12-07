@@ -109,7 +109,7 @@ const DEFAULT_IMAGE_STATE = {
   colormap: '',
   renderingMode: RENDERING_MODES.MAX_INTENSITY_PROJECTION,
   resolution: 0,
-  isLensOn: false,
+  lensEnabled: false,
   zoomLock: true,
   panLock: true,
   isOverviewOn: false,

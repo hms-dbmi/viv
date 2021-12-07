@@ -26,8 +26,8 @@ export const useImage = (source, history) => {
     store => [store.addChannels, store.resetChannels],
     shallow
   );
-  const [isLensOn, toggleIsLensOn] = useImageSettingsStore(
-    store => [store.isLensOn, store.toggleIsLensOn],
+  const [lensEnabled, toggleLensEnabled] = useImageSettingsStore(
+    store => [store.lensEnabled, store.toggleLensEnabled],
     shallow
   );
   useEffect(() => {
@@ -80,8 +80,8 @@ export const useImage = (source, history) => {
               [0, 0, 255]
             ];
           }
-          if (isLensOn) {
-            toggleIsLensOn();
+          if (lensEnabled) {
+            toggleLensEnabled();
           }
           useViewerStore.setState({ useColormap: false, useLens: false });
         } else {

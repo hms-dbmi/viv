@@ -4,7 +4,6 @@ attribute vec2 texCoords;
 attribute vec3 positions;
 attribute vec3 positions64Low;
 attribute vec3 instancePickingColors;
-
 varying vec2 vTexCoord;
 
 void main(void) {

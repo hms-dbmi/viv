@@ -21,10 +21,6 @@ test('ImageLayer', t => {
         [0, 10],
         [0, 10]
       ],
-      colors: [
-        [0, 1, 1],
-        [0, 1, 1]
-      ],
       channelsVisible: [true, false],
       loader: {
         getRaster: async () => ({
@@ -67,10 +63,6 @@ test('ImageLayer', t => {
         contrastLimits: [
           [0, 10],
           [0, 10]
-        ],
-        colors: [
-          [0, 1, 1],
-          [0, 1, 1]
         ],
         channelsVisible: [true, false],
         loader: {

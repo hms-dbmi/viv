@@ -6,6 +6,7 @@ import {
   SideBySideViewer,
   PictureInPictureViewer,
   VolumeViewer,
+  AdditiveColormapExtension,
   LensExtension
   // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
@@ -47,7 +48,7 @@ const Viewer = () => {
     ySlice,
     zSlice,
     resolution,
-    isLensOn,
+    lensEnabled,
     zoomLock,
     panLock,
     isOverviewOn,
@@ -62,7 +63,7 @@ const Viewer = () => {
       store.ySlice,
       store.zSlice,
       store.resolution,
-      store.isLensOn,
+      store.lensEnabled,
       store.zoomLock,
       store.panLock,
       store.isOverviewOn,
@@ -84,7 +85,7 @@ const Viewer = () => {
       colors={colors}
       channelsVisible={channelsVisible}
       selections={selections}
-      colormap={colormap.length > 0 && colormap}
+      colormap={colormap}
       xSlice={xSlice}
       ySlice={ySlice}
       zSlice={zSlice}
@@ -113,16 +114,18 @@ const Viewer = () => {
       selections={selections}
       height={viewSize.height}
       width={viewSize.width}
-      colormap={colormap.length > 0 && colormap}
       zoomLock={zoomLock}
       panLock={panLock}
       hoverHooks={{
         handleValue: v => useViewerStore.setState({ pixelValues: v })
       }}
       lensSelection={lensSelection}
-      isLensOn={isLensOn}
+      lensEnabled={lensEnabled}
       onViewportLoad={onViewportLoad}
-      extensions={[new LensExtension()]}
+      extensions={[
+        colormap ? new AdditiveColormapExtension() : new LensExtension()
+      ]}
+      colormap={colormap || 'viridis'}
     />
   ) : (
     <PictureInPictureViewer
@@ -133,16 +136,18 @@ const Viewer = () => {
       selections={selections}
       height={viewSize.height}
       width={viewSize.width}
-      colormap={colormap.length > 0 && colormap}
       overview={DEFAULT_OVERVIEW}
       overviewOn={isOverviewOn}
       hoverHooks={{
         handleValue: v => useViewerStore.setState({ pixelValues: v })
       }}
       lensSelection={lensSelection}
-      isLensOn={isLensOn}
+      lensEnabled={lensEnabled}
       onViewportLoad={onViewportLoad}
-      extensions={[new LensExtension()]}
+      extensions={[
+        colormap ? new AdditiveColormapExtension() : new LensExtension()
+      ]}
+      colormap={colormap || 'viridis'}
       onViewStateChange={onViewStateChange}
     />
   );

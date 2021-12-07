@@ -7,6 +7,7 @@ import {
   DETAIL_VIEW_ID,
   OVERVIEW_VIEW_ID
 } from '../views';
+import { ColorPaletteExtension } from '../extensions';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).
@@ -28,7 +29,7 @@ import {
  * @param {number} props.width Current width of the component.
  * @param {Array} [props.extensions] [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers.
  * @param {Boolean} [props.clickCenter] Click to center the default view. Default is true.
- * @param {boolean} [props.isLensOn] Whether or not to use the lens (deafult false). Must be used with the `LensExtension` in the `extensions` prop.
+ * @param {boolean} [props.lensEnabled] Whether or not to use the lens (deafult false). Must be used with the `LensExtension` in the `extensions` prop.
  * @param {number} [props.lensSelection] Numeric index of the channel to be focused on by the lens (default 0). Must be used with the `LensExtension` in the `extensions` prop.
  * @param {number} [props.lensRadius] Pixel radius of the lens (default: 100). Must be used with the `LensExtension` in the `extensions` prop.
  * @param {Array} [props.lensBorderColor] RGB color of the border of the lens (default [255, 255, 255]). Must be used with the `LensExtension` in the `extensions` prop.
@@ -58,7 +59,7 @@ const PictureInPictureViewer = props => {
     hoverHooks = { handleValue: () => {}, handleCoordinate: () => {} },
     height,
     width,
-    isLensOn = false,
+    lensEnabled = false,
     lensSelection = 0,
     lensRadius = 100,
     lensBorderColor = [255, 255, 255],
@@ -68,7 +69,7 @@ const PictureInPictureViewer = props => {
     onViewStateChange,
     onHover,
     onViewportLoad,
-    extensions = [],
+    extensions = [new ColorPaletteExtension()],
     deckProps
   } = props;
   const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
@@ -93,7 +94,7 @@ const PictureInPictureViewer = props => {
     selections,
     onViewportLoad,
     colormap,
-    isLensOn,
+    lensEnabled,
     lensSelection,
     lensRadius,
     lensBorderColor,
@@ -118,7 +119,7 @@ const PictureInPictureViewer = props => {
       ...overview
     });
     views.push(overviewView);
-    layerProps.push({ ...layerConfig, extensions: [] });
+    layerProps.push({ ...layerConfig, lensEnabled: false });
     viewStates.push(overviewViewState);
   }
   if (!loader) return null;

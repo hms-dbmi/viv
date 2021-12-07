@@ -9,34 +9,33 @@ import {
   isInterleaved,
   SIGNAL_ABORTED
 } from '../../loaders/utils';
+import { ColorPaletteExtension } from '../../extensions';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   onHover: { type: 'function', value: null, compare: false },
   contrastLimits: { type: 'array', value: [], compare: true },
-  colors: { type: 'array', value: [], compare: true },
   channelsVisible: { type: 'array', value: [], compare: true },
-  opacity: { type: 'number', value: 1, compare: true },
-  colormap: { type: 'string', value: '', compare: true },
   domain: { type: 'array', value: [], compare: true },
   viewportId: { type: 'string', value: '', compare: true },
   maxRequests: { type: 'number', value: 10, compare: true },
   onClick: { type: 'function', value: null, compare: true },
-  transparentColor: { type: 'array', value: null, compare: true },
   refinementStrategy: { type: 'string', value: null, compare: true },
-  excludeBackground: { type: 'boolean', value: false, compare: true }
+  excludeBackground: { type: 'boolean', value: false, compare: true },
+  extensions: {
+    type: 'array',
+    value: [new ColorPaletteExtension()],
+    compare: true
+  }
 };
 
 /**
  * @typedef LayerProps
  * @type {object}
  * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader Image pyramid. PixelSource[], where each PixelSource is decreasing in shape.
  * @property {Array} selections Selection to be used for fetching data.
- * @property {number=} opacity Opacity of the layer.
- * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @property {string=} viewportId Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
  * @property {String=} id Unique identifier for this layer.
@@ -45,10 +44,6 @@ const defaultProps = {
  * @property {number=} maxRequests Maximum parallel ongoing requests allowed before aborting.
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
- * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
- * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
- * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
- * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {string=} refinementStrategy 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
  * @property {boolean=} excludeBackground Whether to exclude the background image. The background image is also excluded for opacity!=1.
  * @property {Array=} extensions [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers.
@@ -70,15 +65,12 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       id,
       onClick,
       modelMatrix,
-      transparentColor,
       excludeBackground,
       refinementStrategy
     } = this.props;
-
     // Get properties from highest resolution
     const { tileSize, dtype } = loader[0];
 
-    const { unprojectLensBounds } = this.state;
     // This is basically to invert:
     // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
     // The z level can be wrong for showing the correct scales because of the calculation deck.gl does
@@ -171,8 +163,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       updateTriggers: {
         getTileData: [loader, selections]
       },
-      onTileError: onTileError || loader[0].onTileError,
-      unprojectLensBounds
+      onTileError: onTileError || loader[0].onTileError
     });
 
     // This gives us a background image and also solves the current
@@ -190,20 +181,11 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         id: `Background-Image-${id}`,
         loader: lowestResolution,
         modelMatrix: layerModelMatrix.scale(2 ** (loader.length - 1)),
-        visible:
-          opacity === 1 &&
-          (!viewportId || this.context.viewport.id === viewportId) &&
-          // If we are using a transparent color, we shouldn't show the background image
-          // since the background image might not have the same color output from the fragment shader
-          // as the tiled layer at a higher resolution level.
-          !transparentColor,
+        visible: !viewportId || this.context.viewport.id === viewportId,
         onHover,
         onClick,
         // Background image is nicest when LINEAR in my opinion.
         interpolation: GL.LINEAR,
-        extensions: [],
-        // If the background image loads before the multiscale image,
-        // We don't want this to be called.
         onViewportLoad: null
       });
     const layers = [baseLayer, tiledLayer];
