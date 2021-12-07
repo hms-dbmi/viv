@@ -5,12 +5,12 @@ toc:
     file: docs/SAMPLES.md
   - name: API Structure
     file: docs/API_STRUCTURE.md
+  - name: Custom Shaders
+    file: docs/CUSTOM_SHADERS.md
   - name: Data preparation
     file: tutorial/README.md
   - name: 3D Rendering
     file: docs/3D_RENDERING_BRIEF.md
-  - name: Custom Shaders
-    file: docs/CUSTOM_SHADERS.md
   - name: Viewers (React Components)
   - PictureInPictureViewer
   - SideBySideViewer
