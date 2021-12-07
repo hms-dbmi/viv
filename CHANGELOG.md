@@ -10,7 +10,7 @@
 - Expose `DECKGL_FILTER_COLOR`, `DECKGL_PROCESS_INTENSITY`, AND `DECKGL_MUTATE_COLOR` hooks and document them.
 - Upgrade deck.gl to 8.6
 - `extensions` are now the main way for controlling how shaders render the image
-  - `LensExtension`, `ColorPaletteExtension`, and `AdditiveColormapExtension` are exported from `viv` to be used mutually exclusively for controlling how the fragment shader renders.  The `ColorPaletteExtension` is used by default and provides the normal one color per channel pseudo-coloring.  `AdditiveColormapExtension` provides things like `virids` `jet` and more.  There have been slight changes to the props so please see the docs for more infomation.
+  - `LensExtension`, `ColorPaletteExtension`, and `AdditiveColormapExtension` are exported from `viv` to be used mutually exclusively for controlling how the fragment shader renders. The `ColorPaletteExtension` is used by default and provides the normal one color per channel pseudo-coloring. `AdditiveColormapExtension` provides colormaps like `viridis`, `jet` and more. There have been slight changes to the props so please see the docs for more infomation.
 - Add `@data` alias for serving local data during development
 - Add Avivator video tutorial to README.md
 - Support basic OME-NGFF in Avivator
