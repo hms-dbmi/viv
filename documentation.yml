@@ -37,6 +37,8 @@ toc:
   - ScaleBarLayer
   - name: Extensions
   - LensExtension
+  - AdditiveColormapExtension
+  - ColorPaletteExtension
   - name: Loaders
   - loadOmeTiff
   - loadOmeZarr

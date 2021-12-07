@@ -8,7 +8,7 @@ const defaultProps = {
 };
 
 /**
- * This deck.gl extension allows for a color palette to be used for pseudo-coloring channels.
+ * This deck.gl extension allows for an additive colormap like viridis or jet to be used for pseudo-coloring channels.
  * @typedef LayerProps
  * @type {object}
  * @property {number=} opacity Opacity of the layer.
