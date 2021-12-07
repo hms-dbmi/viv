@@ -20,12 +20,14 @@ import './index.css';
 export default function Avivator(props) {
   const { history, source: initSource, isDemoImage } = props;
   const isViewerLoading = useViewerStore(store => store.isViewerLoading);
-  const setViewerState = useViewerStore(store => store.setViewerState);
   const source = useViewerStore(store => store.source);
   const useLinkedView = useViewerStore(store => store.useLinkedView);
 
   useEffect(() => {
-    setViewerState({ source: initSource, isNoImageUrlSnackbarOn: isDemoImage });
+    useViewerStore.setState({
+      source: initSource,
+      isNoImageUrlSnackbarOn: isDemoImage
+    });
   }, []);
   useImage(source, history);
   return (

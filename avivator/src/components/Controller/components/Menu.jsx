@@ -12,6 +12,7 @@ import Link from '@material-ui/core/Link';
 import Button from '@material-ui/core/Button';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { makeStyles } from '@material-ui/core/styles';
+import shallow from 'zustand/shallow';
 
 import MenuTitle from './MenuTitle';
 import DropzoneButton from './DropzoneButton';
@@ -50,7 +51,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Header(props) {
-  const { setViewerState, source } = useViewerStore();
+  const source = useViewerStore(store => store.source);
   const handleSubmitNewUrl = (event, newUrl) => {
     event.preventDefault();
     const newSource = {
@@ -58,7 +59,7 @@ function Header(props) {
       // Use the trailing part of the URL (file name, presumably) as the description.
       description: getNameFromUrl(newUrl)
     };
-    setViewerState({ source: newSource });
+    useViewerStore.setState({ source: newSource });
   };
   const url = typeof source.urlOrFile === 'string' ? source.urlOrFile : '';
   const [text, setText] = useState(url);
@@ -137,7 +138,10 @@ function Header(props) {
 
 function Menu({ children, ...props }) {
   const classes = useStyles(props);
-  const { isControllerOn, toggleIsControllerOn } = useViewerStore();
+  const [isControllerOn, toggleIsControllerOn] = useViewerStore(
+    store => [store.isControllerOn, store.toggleIsControllerOn],
+    shallow
+  );
   return isControllerOn ? (
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
       <Paper className={classes.paper}>

@@ -1,6 +1,7 @@
 import React from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
+import shallow from 'zustand/shallow';
 
 import {
   LoaderError,
@@ -11,16 +12,26 @@ import {
 import { useViewerStore } from '../../state';
 
 const SnackBars = () => {
-  const {
+  const [
     isOffsetsSnackbarOn,
     loaderErrorSnackbar,
     isNoImageUrlSnackbarOn,
     toggleIsOffsetsSnackbarOn,
     toggleIsNoImageUrlSnackbarOn,
     isVolumeRenderingWarningOn,
-    toggleIsVolumeRenderingWarningOn,
-    setViewerState
-  } = useViewerStore();
+    toggleIsVolumeRenderingWarningOn
+  ] = useViewerStore(
+    store => [
+      store.isOffsetsSnackbarOn,
+      store.loaderErrorSnackbar,
+      store.isNoImageUrlSnackbarOn,
+      store.toggleIsOffsetsSnackbarOn,
+      store.toggleIsNoImageUrlSnackbarOn,
+      store.isVolumeRenderingWarningOn,
+      store.toggleIsVolumeRenderingWarningOn
+    ],
+    shallow
+  );
   return (
     <>
       <Snackbar
@@ -41,7 +52,7 @@ const SnackBars = () => {
       >
         <Alert
           onClose={() =>
-            setViewerState({
+            useViewerStore.setState({
               loaderErrorSnackbar: { on: false, message: null }
             })
           } // eslint-disable-line react/jsx-curly-newline

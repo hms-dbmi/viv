@@ -2,23 +2,25 @@ import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import debounce from 'lodash/debounce';
+import shallow from 'zustand/shallow';
+
 import { range, getMultiSelectionStats } from '../../../utils';
 import {
-  useChannelSettings,
-  useChannelSetters,
+  useChannelsStore,
   useViewerStore,
   useImageSettingsStore
 } from '../../../state';
 
 export default function GlobalSelectionSlider(props) {
   const { size, label } = props;
-  const { setPropertiesForChannel } = useChannelSetters();
-  const { selections, loader } = useChannelSettings();
-  const { setViewerState, globalSelection } = useViewerStore();
-  const { setImageSetting } = useImageSettingsStore();
+  const [selections, loader, setPropertiesForChannel] = useChannelsStore(
+    store => [store.selections, store.loader, store.setPropertiesForChannel],
+    shallow
+  );
+  const globalSelection = useViewerStore(store => store.globalSelection);
   const changeSelection = debounce(
     (event, newValue) => {
-      setViewerState({
+      useViewerStore.setState({
         isChannelLoading: selections.map(() => true)
       });
       const newSelections = [...selections].map(sel => ({
@@ -30,7 +32,7 @@ export default function GlobalSelectionSlider(props) {
         selections: newSelections,
         use3d: false
       }).then(({ domains, contrastLimits }) => {
-        setImageSetting({
+        useImageSettingsStore.setState({
           onViewportLoad: () => {
             range(newSelections.length).forEach((channel, j) =>
               setPropertiesForChannel(channel, {
@@ -38,8 +40,8 @@ export default function GlobalSelectionSlider(props) {
                 contrastLimits: contrastLimits[j]
               })
             );
-            setImageSetting({ onViewportLoad: () => {} });
-            setViewerState({
+            useImageSettingsStore.setState({ onViewportLoad: () => {} });
+            useViewerStore.setState({
               isChannelLoading: selections.map(() => false)
             });
           }
@@ -63,7 +65,7 @@ export default function GlobalSelectionSlider(props) {
         <Slider
           value={globalSelection[label]}
           onChange={(event, newValue) => {
-            setViewerState({
+            useViewerStore.setState({
               globalSelection: {
                 ...globalSelection,
                 [label]: newValue
