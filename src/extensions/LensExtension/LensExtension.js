@@ -117,8 +117,7 @@ const LensExtension = class extends LayerExtension {
     const topMouseBoundScaled = (topMouseBound - top) / (bottom - top);
     const paddedColors = padColors({
       channelsVisible: channelsVisible || this.selections.map(() => true),
-      colors: colors || getDefaultPalette(this.props.selections.length),
-      dtype
+      colors: colors || getDefaultPalette(this.props.selections.length)
     });
     const uniforms = {
       majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
