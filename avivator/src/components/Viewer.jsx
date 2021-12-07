@@ -48,7 +48,7 @@ const Viewer = () => {
     ySlice,
     zSlice,
     resolution,
-    isLensOn,
+    lensEnabled,
     zoomLock,
     panLock,
     isOverviewOn,
@@ -63,7 +63,7 @@ const Viewer = () => {
       store.ySlice,
       store.zSlice,
       store.resolution,
-      store.isLensOn,
+      store.lensEnabled,
       store.zoomLock,
       store.panLock,
       store.isOverviewOn,
@@ -120,7 +120,7 @@ const Viewer = () => {
         handleValue: v => useViewerStore.setState({ pixelValues: v })
       }}
       lensSelection={lensSelection}
-      isLensOn={isLensOn}
+      lensEnabled={lensEnabled}
       onViewportLoad={onViewportLoad}
       extensions={[
         colormap ? new AdditiveColormapExtension() : new LensExtension()
@@ -142,7 +142,7 @@ const Viewer = () => {
         handleValue: v => useViewerStore.setState({ pixelValues: v })
       }}
       lensSelection={lensSelection}
-      isLensOn={isLensOn}
+      lensEnabled={lensEnabled}
       onViewportLoad={onViewportLoad}
       extensions={[
         colormap ? new AdditiveColormapExtension() : new LensExtension()

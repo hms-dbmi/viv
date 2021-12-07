@@ -3,7 +3,7 @@ import lens from './lens-module';
 import { getDefaultPalette, padColors } from '../utils';
 
 const defaultProps = {
-  isLensOn: { type: 'boolean', value: false, compare: true },
+  lensEnabled: { type: 'boolean', value: false, compare: true },
   lensSelection: { type: 'number', value: 0, compare: true },
   lensRadius: { type: 'number', value: 100, compare: true },
   lensBorderColor: { type: 'array', value: [255, 255, 255], compare: true },
@@ -16,7 +16,7 @@ const defaultProps = {
  * This deck.gl extension allows for a lens that selectively shows one channel in its chosen color and then the others in white.
  * @typedef LayerProps
  * @type {Object}
- * @property {boolean=} isLensOn Whether or not to use the lens.
+ * @property {boolean=} lensEnabled Whether or not to use the lens.
  * @property {number=} lensSelection Numeric index of the channel to be focused on by the lens.
  * @property {number=} lensRadius Pixel radius of the lens (default: 100).
  * @property {Array.<number>=} lensBorderColor RGB color of the border of the lens (default [255, 255, 255]).
@@ -94,7 +94,7 @@ const LensExtension = class extends LayerExtension {
     const { unprojectLensBounds = [0, 0, 0, 0] } = this.state;
     const {
       bounds,
-      isLensOn = defaultProps.isLensOn.value,
+      lensEnabled = defaultProps.lensEnabled.value,
       lensSelection = defaultProps.lensSelection.value,
       lensBorderColor = defaultProps.lensBorderColor.value,
       lensBorderRadius = defaultProps.lensBorderRadius.value,
@@ -128,7 +128,7 @@ const LensExtension = class extends LayerExtension {
         (rightMouseBoundScaled + leftMouseBoundScaled) / 2,
         (bottomMouseBoundScaled + topMouseBoundScaled) / 2
       ],
-      isLensOn,
+      lensEnabled,
       lensSelection,
       lensBorderColor,
       lensBorderRadius,

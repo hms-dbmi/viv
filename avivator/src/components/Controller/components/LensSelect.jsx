@@ -13,8 +13,8 @@ import {
 
 function LensSelect() {
   const selections = useChannelsStore(store => store.selections);
-  const [isLensOn, toggleIsLensOn, lensSelection] = useImageSettingsStore(
-    store => [store.isLensOn, store.toggleIsLensOn, store.lensSelection],
+  const [lensEnabled, toggleLensEnabled, lensSelection] = useImageSettingsStore(
+    store => [store.lensEnabled, store.toggleLensEnabled, store.lensSelection],
     shallow
   );
   const channelOptions = useViewerStore(store => store.channelOptions);
@@ -28,8 +28,8 @@ function LensSelect() {
       </Grid>
       <Grid item xs={2}>
         <Checkbox
-          onChange={toggleIsLensOn}
-          checked={isLensOn}
+          onChange={toggleLensEnabled}
+          checked={lensEnabled}
           style={{
             color: checkboxColor,
             '&$checked': {

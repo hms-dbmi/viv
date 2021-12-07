@@ -4,7 +4,7 @@ uniform float minorLensAxis;
 uniform vec2 lensCenter;
 
 // lens uniforms
-uniform bool isLensOn;
+uniform bool lensEnabled;
 uniform int lensSelection;
 uniform vec3 lensBorderColor;
 uniform float lensBorderRadius;
@@ -32,7 +32,7 @@ bool frag_on_lens_bounds(vec2 vTexCoord) {
 // Return a float for boolean arithmetic calculation.
 float get_use_color_float(vec2 vTexCoord, int channelIndex) {
   bool isFragInLensBounds = frag_in_lens_bounds(vTexCoord);
-  bool inLensAndUseLens = isLensOn && isFragInLensBounds;
+  bool inLensAndUseLens = lensEnabled && isFragInLensBounds;
   return float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));
  
 }

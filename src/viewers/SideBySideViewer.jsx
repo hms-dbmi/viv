@@ -19,7 +19,7 @@ import { ColorPaletteExtension } from '../extensions';
  * @param {number} props.height Current height of the component.
  * @param {number} props.width Current width of the component.
  * @param {Array} [props.extensions] [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers.
- * @param {boolean} [props.isLensOn] Whether or not to use the lens deafult (false).
+ * @param {boolean} [props.lensEnabled] Whether or not to use the lens deafult (false).
  * @param {number} [props.lensSelection] Numeric index of the channel to be focused on by the lens (default 0).
  * @param {Array} [props.lensBorderColor] RGB color of the border of the lens (default [255, 255, 255]).
  * @param {number} [props.lensBorderRadius] Percentage of the radius of the lens for a border (default 0.02).
@@ -46,7 +46,7 @@ const SideBySideViewer = props => {
     zoomLock,
     height,
     width,
-    isLensOn = false,
+    lensEnabled = false,
     lensSelection = 0,
     lensRadius = 100,
     lensBorderColor = [255, 255, 255],
@@ -101,7 +101,7 @@ const SideBySideViewer = props => {
     selections,
     onViewportLoad,
     colormap,
-    isLensOn,
+    lensEnabled,
     lensSelection,
     lensRadius,
     lensBorderColor,
