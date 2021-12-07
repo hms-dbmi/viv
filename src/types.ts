@@ -53,18 +53,31 @@ export interface PixelSource<S extends string[]> {
   meta?: PixelSourceMeta;
 }
 
-// Not an exported type. Used below with `Viv` utility type.
-interface VivProps<S extends string[]> {
-  contrastLimits: [begin: number, end: number][];
+// Not exported types. Used below with `Viv` utility type.
+type ColorPaletteExtensionProps = {
   colors?: [r: number, g: number, b: number][];
-  colormap?: string;
-  opacity?: number;
+  transparentColor?: [r: number, g: number, b: number];
+};
+
+type AdditiveColormapExtensionProps = {
+  transparentColor?: [r: number, g: number, b: number];
+};
+
+type LensExtensionProps = {
+  lensBorderColor?: [r: number, g: number, b: number];
+  colors?: [r: number, g: number, b: number][];
+};
+
+type VivProps<S extends string[]> = {
+  contrastLimits: [begin: number, end: number][];
   transparentColor?: [r: number, g: number, b: number];
   selections: PixelSourceSelection<S>[];
   dtype: keyof typeof DTYPE_VALUES;
   modelMatrix?: Matrix4 | undefined;
   [extensionProps: string]: any;
-}
+} & ColorPaletteExtensionProps &
+  AdditiveColormapExtensionProps &
+  LensExtensionProps;
 
 /**
  * DocumentationJS does not understand TS syntax in JSDoc annotations,
