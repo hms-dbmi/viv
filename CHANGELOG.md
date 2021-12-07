@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Fix image links in README.md.
 
 ## 0.12.0
 
