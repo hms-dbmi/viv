@@ -56,10 +56,14 @@ export interface PixelSource<S extends string[]> {
 // Not an exported type. Used below with `Viv` utility type.
 interface VivProps<S extends string[]> {
   contrastLimits: [begin: number, end: number][];
-  colors: [r: number, g: number, b: number][];
+  colors?: [r: number, g: number, b: number][];
+  colormap?: string;
+  opacity?: number;
+  transparentColor?: [r: number, g: number, b: number];
   selections: PixelSourceSelection<S>[];
   dtype: keyof typeof DTYPE_VALUES;
   modelMatrix?: Matrix4 | undefined;
+  [extensionProps: string]: any;
 }
 
 /**
