@@ -98,7 +98,6 @@ const LensExtension = class extends LayerExtension {
       lensBorderColor = defaultProps.lensBorderColor.value,
       lensBorderRadius = defaultProps.lensBorderRadius.value,
       colors,
-      dtype,
       channelsVisible
     } = this.props;
     // Creating a unit-square scaled intersection box for rendering the lens.
