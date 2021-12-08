@@ -1,4 +1,4 @@
-import type { DTYPE_VALUES } from './constants';
+import type { DTYPE_VALUES, COLORMAPS } from './constants';
 import type { Matrix4 } from 'math.gl';
 
 export type SupportedDtype = keyof typeof DTYPE_VALUES;
@@ -53,52 +53,68 @@ export interface PixelSource<S extends string[]> {
   meta?: PixelSourceMeta;
 }
 
+type Color = [r: number, g: number, b: number];
+
 // Not exported types. Used below with `Viv` utility type.
 type ColorPaletteExtensionProps = {
-  colors?: [r: number, g: number, b: number][];
-  transparentColor?: [r: number, g: number, b: number];
+  colors: Color[];
+  opacity: number;
+  transparentColor: Color;
+  useTransparentColor: boolean;
 };
 
 type AdditiveColormapExtensionProps = {
-  transparentColor?: [r: number, g: number, b: number];
+  colormap: typeof COLORMAPS[number];
+  opacity: number;
+  useTransparentColor: boolean;
 };
 
 type LensExtensionProps = {
-  lensBorderColor?: [r: number, g: number, b: number];
-  colors?: [r: number, g: number, b: number][];
+  lensEnabled: boolean;
+  lensSelection: number;
+  lensRadius: number;
+  lensBorderRadius: number;
+  colors: Color[]
+  lensBorderColor: Color;
 };
 
-type VivProps<S extends string[]> = {
+// types to be refined _if_ on LayerProps
+type PreciseLayerProps<S extends string[]> = {
   contrastLimits: [begin: number, end: number][];
-  transparentColor?: [r: number, g: number, b: number];
   selections: PixelSourceSelection<S>[];
   dtype: keyof typeof DTYPE_VALUES;
+  opacity?: number;
   modelMatrix?: Matrix4 | undefined;
-  [extensionProps: string]: any;
-} & ColorPaletteExtensionProps &
-  AdditiveColormapExtensionProps &
-  LensExtensionProps;
+};
+
+type Override<What, With> = Omit<What, keyof With> & With;
+
+type ExtractLoader<LayerProps, S extends string[]> = LayerProps extends {
+  loader: object[];
+}
+  ? { loader: PixelSource<S>[] }
+  : LayerProps extends { loader: object }
+  ? { loader: PixelSource<S> }
+  : {};
+
+// if loader is defined on layer, it is a extension-able layer and we should extend
+type WithExtensionProps<LayerProps> = LayerProps extends { loader: unknown }
+  ? Partial<ColorPaletteExtensionProps &
+      AdditiveColormapExtensionProps &
+      LensExtensionProps> & { [extensionProp: string]: any }
+  : {};
 
 /**
  * DocumentationJS does not understand TS syntax in JSDoc annotations,
  * which means our generated types from `LayerProps` aren't very precise.
  *
  * This utility type overrides keys from `LayerProps` with
- * more precise types if they exist in `VivProps`. We import this type in
+ * more precise types if they exist in `PreciseLayerProps`. We import this type in
  * each Layer constructor, ignored by DocumentationJS, meaning our documentation
  * stays the same (with less precise types) but code completion / type-checking
  * is much more strict and useful.
  */
-export type Viv<LayerProps, S extends string[] = string[]> =
-  // Remove all shared properties from VivProps from LayerProps
-  Omit<LayerProps, keyof VivProps<S> | 'loader'> &
-    // If a property from VivProps exists on LayerProps, replace it
-    Pick<VivProps<S>, keyof LayerProps & keyof VivProps<S>> &
-    // Loader type is special and depends on what is provided (Array or Object)
-    ('loader' extends keyof LayerProps
-      ? {
-          loader: LayerProps['loader'] extends Array<unknown>
-            ? PixelSource<S>[]
-            : PixelSource<S>;
-        }
-      : never);
+export type Viv<LayerProps, S extends string[] = string[]> = Override<
+  Omit<LayerProps, 'loader'>,
+  PreciseLayerProps<S>
+> & ExtractLoader<LayerProps, S> & WithExtensionProps<LayerProps>;
