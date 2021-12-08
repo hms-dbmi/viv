@@ -7,6 +7,7 @@
 ### Changed
 - Fix image links in README.md.
 - Add extensions to docs.
+- Fix exported types for Viv v0.12.
 
 ## 0.12.0
 
