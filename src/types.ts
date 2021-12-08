@@ -53,9 +53,9 @@ export interface PixelSource<S extends string[]> {
   meta?: PixelSourceMeta;
 }
 
+// Not exported types. Used below with `Viv` utility type.
 type Color = [r: number, g: number, b: number];
 
-// Not exported types. Used below with `Viv` utility type.
 type ColorPaletteExtensionProps = {
   colors: Color[];
   opacity: number;
@@ -74,7 +74,7 @@ type LensExtensionProps = {
   lensSelection: number;
   lensRadius: number;
   lensBorderRadius: number;
-  colors: Color[]
+  colors: Color[];
   lensBorderColor: Color;
 };
 
@@ -99,9 +99,11 @@ type ExtractLoader<LayerProps, S extends string[]> = LayerProps extends {
 
 // if loader is defined on layer, it is a extension-able layer and we should extend
 type WithExtensionProps<LayerProps> = LayerProps extends { loader: unknown }
-  ? Partial<ColorPaletteExtensionProps &
-      AdditiveColormapExtensionProps &
-      LensExtensionProps> & { [extensionProp: string]: any }
+  ? Partial<
+      ColorPaletteExtensionProps &
+        AdditiveColormapExtensionProps &
+        LensExtensionProps
+    > & { [extensionProp: string]: any }
   : {};
 
 /**
@@ -117,4 +119,6 @@ type WithExtensionProps<LayerProps> = LayerProps extends { loader: unknown }
 export type Viv<LayerProps, S extends string[] = string[]> = Override<
   Omit<LayerProps, 'loader'>,
   PreciseLayerProps<S>
-> & ExtractLoader<LayerProps, S> & WithExtensionProps<LayerProps>;
+> &
+  ExtractLoader<LayerProps, S> &
+  WithExtensionProps<LayerProps>;
