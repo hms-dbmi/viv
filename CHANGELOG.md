@@ -4,10 +4,12 @@
 
 ### Added
 - New note about port-forwarding to visualize remote data in the tutorial README
+- Setup workflow to deploy Avivator via GitHub Pages.
 
 ### Changed
 - Fix image links in README.md.
 - Add extensions to docs.
+- Fix broken GH-pages workflow.
 
 ## 0.12.0
 
