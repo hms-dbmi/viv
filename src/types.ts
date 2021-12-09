@@ -97,8 +97,8 @@ type ExtractLoader<LayerProps, S extends string[]> = LayerProps extends {
   ? { loader: PixelSource<S> }
   : {};
 
-// if loader is defined on layer, it is a extension-able layer and we should extend
-type WithExtensionProps<LayerProps> = LayerProps extends { loader: unknown }
+// Add optional extention props to layer if 'extensions' is defined on LayerProps.
+type WithExtensionProps<LayerProps> = LayerProps extends { extensions: unknown }
   ? Partial<
       ColorPaletteExtensionProps &
         AdditiveColormapExtensionProps &
