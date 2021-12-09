@@ -3,9 +3,9 @@ This guide demonstrates how to generate a pyramidal OME-TIFF [with Bio-Formats](
 
 ### Getting Started
 
-> NOTE: If you would like to follow this tutorial on a remote cluster or the like into which you would ssh i.e downloading the data and running the image pyramid pipeline, you can use port forwarding
-> to visualize the data at the `http://localhost:8000/LuCa-7color_Scan1.ome.tif` url that results from running `http-server --cors="*" -p 8000 .` at the end of this tutorial.
-> In other words, you will have to ssh via `ssh -L 12345:localhost:8000 myserver.tosshto.com` and then instead of pasting http://avivator.gehlenborglab.org/?image_url=http://localhost:8000/LuCa-7color_Scan1.ome.tif into your browser at the end, you will paste http://avivator.gehlenborglab.org/?image_url=http://localhost:12345/LuCa-7color_Scan1.ome.tif
+> NOTE: If you would like to follow this tutorial (i.e downloading the data and running the image pyramid pipeline) on a remote machine into which you would ssh, you can use port forwarding
+> to visualize the data that results from this tutorial. At the end of this tutorial, you run `http-server --cors="*" -p 8000 .` to start a web server from which the url `http://localhost:8000/LuCa-7color_Scan1.ome.tif` is pasted into the Avivator tool. If you have already ssh'ed into the remote machine via 
+> `ssh -L 12345:localhost:8000 myserver.tosshto.com`, then instead of pasting http://avivator.gehlenborglab.org/?image_url=http://localhost:8000/LuCa-7color_Scan1.ome.tif into your browser at the end, you will paste http://avivator.gehlenborglab.org/?image_url=http://localhost:12345/LuCa-7color_Scan1.ome.tif which uses the `12345` port locally that is being forwarded to `8000` on the remote machine.
 
 This tutorial requires Bio-Formats [`bioformats2raw`](https://github.com/glencoesoftware/bioformats2raw) and
 [`raw2ometiff`](https://github.com/glencoesoftware/raw2ometiff) command-line tools. It's easiest to install
