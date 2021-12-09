@@ -16,8 +16,8 @@ jobs:
         run: |
           npm install
           npm run build
-          npm run build:avivatortouch
-          avivator/dist/.nojekyll
+          npm run build:avivator
+          touch avivator/dist/.nojekyll
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
