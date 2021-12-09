@@ -12,6 +12,10 @@ jobs:
         with:
           persist-credentials: false
 
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
       - name: Install and Build 🔧
         run: |
           npm install
