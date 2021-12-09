@@ -8,6 +8,7 @@
 ### Changed
 - Fix image links in README.md.
 - Add extensions to docs.
+- Fix broken GH-pages workflow.
 
 ## 0.12.0
 
