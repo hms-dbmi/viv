@@ -3,6 +3,7 @@
 ## In Progress
 
 ### Added
+- Setup workflow to deploy Avivator via GitHub Pages.
 
 ### Changed
 - Fix image links in README.md.
