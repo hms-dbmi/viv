@@ -78,7 +78,7 @@ export async function createLoader(
     // OME-TIFF
     if (isOMETIFF(urlOrFile)) {
       if (urlOrFile instanceof File) {
-        const source = await loadOmeTiff(urlOrFile, use, true);
+        const source = await loadOmeTiff(urlOrFile, {}, true);
         return source;
       }
       const url = urlOrFile;
@@ -132,8 +132,6 @@ export async function createLoader(
     if (e instanceof UnsupportedBrowserError) {
       handleLoaderError(e.message);
     } else {
-      console.log(e);
-
       handleLoaderError(null);
     }
     return { data: null };

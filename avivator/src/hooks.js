@@ -24,10 +24,6 @@ export const useImage = (source, history) => {
     store => [store.use3d, store.toggleUse3d, store.toggleIsOffsetsSnackbarOn],
     shallow
   );
-  const [addChannels, resetChannels] = useChannelsStore(
-    store => [store.addChannels, store.resetChannels],
-    shallow
-  );
   const [lensEnabled, toggleLensEnabled] = useImageSettingsStore(
     store => [store.lensEnabled, store.toggleLensEnabled],
     shallow
@@ -115,7 +111,7 @@ export const useImage = (source, history) => {
         useViewerStore.setState({ useColormap: false, useLens: false });
       } else {
         const stats = await getMultiSelectionStats({
-          loader: loader,
+          loader,
           selections: newSelections,
           use3d
         });
