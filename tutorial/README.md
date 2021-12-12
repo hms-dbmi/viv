@@ -140,8 +140,8 @@ you would paste http://avivator.gehlenborglab.org/?image_url=http://localhost:12
 Note that at the end of the written tutorial above you run `http-server --cors="*" -p 8000 .` to start a web server from which the url
 http://localhost:8000/LuCa-7color_Scan1.ome.tif is pasted into the Avivator tool.
 But now, you are forwarding port `12345` on your machine to `8000` on the remote machine.
-Therefore the URL that you paste into Avivator now reflects the local behavior
-- Avivator makes requests to port `12345` locally which is then forwarded via ssh to `8000` remotely.
+Therefore the URL that you paste into Avivator now reflects the local behavior;
+Avivator makes requests to port `12345` locally which is then forwarded via ssh to `8000` remotely.
 
 ### Other Examples
 
