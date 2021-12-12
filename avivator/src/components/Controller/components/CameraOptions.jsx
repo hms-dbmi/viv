@@ -11,7 +11,8 @@ import { getDefaultInitialViewState } from '@hms-dbmi/viv';
 import {
   useImageSettingsStore,
   useViewerStore,
-  useChannelsStore
+  useChannelsStore,
+  useLoader
 } from '../../../state';
 import { useWindowSize } from '../../../utils';
 
@@ -28,7 +29,7 @@ const useStyles = makeStyles(theme =>
 );
 
 const CameraOptions = () => {
-  const loader = useChannelsStore(store => store.loader);
+  const loader = useLoader();
   const [useFixedAxis, toggleUseFixedAxis] = useImageSettingsStore(
     store => [store.useFixedAxis, store.toggleUseFixedAxis],
     shallow

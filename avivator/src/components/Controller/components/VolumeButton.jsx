@@ -14,7 +14,9 @@ import shallow from 'zustand/shallow';
 import {
   useImageSettingsStore,
   useViewerStore,
-  useChannelsStore
+  useChannelsStore,
+  useLoader,
+  useMetadata
 } from '../../../state';
 import {
   range,
@@ -87,26 +89,26 @@ const useStyles = makeStyles(() => ({
 }));
 
 function VolumeButton() {
-  const [loader, selections, setPropertiesForChannel] = useChannelsStore(
-    store => [store.loader, store.selections, store.setPropertiesForChannel],
+  const [selections, setPropertiesForChannel] = useChannelsStore(
+    store => [store.selections, store.setPropertiesForChannel],
     shallow
   );
+  const loader = useLoader();
   const [
     use3d,
     toggleUse3d,
-    metadata,
     toggleIsVolumeRenderingWarningOn,
     isViewerLoading
   ] = useViewerStore(
     store => [
       store.use3d,
       store.toggleUse3d,
-      store.metadata,
       store.toggleIsVolumeRenderingWarningOn,
       store.isViewerLoading
     ],
     shallow
   );
+  const metadata = useMetadata();
 
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);

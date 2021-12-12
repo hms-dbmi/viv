@@ -8,15 +8,17 @@ import { range, getMultiSelectionStats } from '../../../utils';
 import {
   useChannelsStore,
   useViewerStore,
-  useImageSettingsStore
+  useImageSettingsStore,
+  useLoader
 } from '../../../state';
 
 export default function GlobalSelectionSlider(props) {
   const { size, label } = props;
-  const [selections, loader, setPropertiesForChannel] = useChannelsStore(
-    store => [store.selections, store.loader, store.setPropertiesForChannel],
+  const [selections, setPropertiesForChannel] = useChannelsStore(
+    store => [store.selections, , store.setPropertiesForChannel],
     shallow
   );
+  const loader = useLoader();
   const globalSelection = useViewerStore(store => store.globalSelection);
   const changeSelection = debounce(
     (event, newValue) => {

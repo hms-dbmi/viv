@@ -23,7 +23,9 @@ import CameraOptions from './components/CameraOptions';
 import {
   useChannelsStore,
   useViewerStore,
-  useImageSettingsStore
+  useImageSettingsStore,
+  useLoader,
+  useMetadata
 } from '../../state';
 import { guessRgb, useWindowSize, getSingleSelectionStats } from '../../utils';
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
@@ -52,7 +54,6 @@ const Controller = () => {
     colors,
     domains,
     selections,
-    loader,
     ids,
     setPropertiesForChannel,
     toggleIsOnSetter,
@@ -64,7 +65,6 @@ const Controller = () => {
       store.colors,
       store.domains,
       store.selections,
-      store.loader,
       store.ids,
       store.setPropertiesForChannel,
       store.toggleIsOn,
@@ -72,10 +72,10 @@ const Controller = () => {
     ],
     shallow
   );
+  const loader = useLoader();
 
   const colormap = useImageSettingsStore(store => store.colormap);
   const [
-    metadata,
     channelOptions,
     useLinkedView,
     use3d,
@@ -88,7 +88,6 @@ const Controller = () => {
     isViewerLoading
   ] = useViewerStore(
     store => [
-      store.metadata,
       store.channelOptions,
       store.useLinkedView,
       store.use3d,
@@ -102,6 +101,7 @@ const Controller = () => {
     ],
     shallow
   );
+  const metadata = useMetadata();
   const viewSize = useWindowSize();
   const isRgb = metadata && guessRgb(metadata);
   const { shape, labels } = loader[0];
