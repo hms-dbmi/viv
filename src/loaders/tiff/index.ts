@@ -20,9 +20,10 @@ interface TiffOptions {
  * Options for initializing a tiff pixel source. Headers are passed to each underlying fetch request. Offests are
  * a performance enhancment to index the remote tiff source using pre-computed byte-offsets. Pool indicates whether a
  * multi-threaded pool of image decoders should be used to decode tiles (default = true).
- * @param {{ boolean }} useMultiImage Whether or not to return an array of multiple images in the OMEXML -
- * if false, only the first iamge is returned.
- * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>} data source and associated OME-Zarr metadata.
+ * @param {{ boolean }} useMultiImage Whether or not to return an array of multiple images if present in the OMEXML -
+ * if false, only the first iamge is returned as Promise<{ data: TiffPixelSource[], metadata: ImageMeta }> and if true, an array of images
+ * Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[] is returned.
+ * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }> | Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[]} data source and associated OME-Zarr metadata.
  */
 export async function loadOmeTiff(
   source: string | File,
