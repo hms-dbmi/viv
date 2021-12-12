@@ -151,9 +151,6 @@ function VolumeButton() {
               }
             );
             const isRgb = metadata && guessRgb(metadata);
-            if (!isRgb && metadata) {
-              useViewerStore.setState({ useLens: true });
-            }
           }
         }}
         fullWidth
@@ -228,7 +225,6 @@ function VolumeButton() {
                                 toggleIsVolumeRenderingWarningOn();
                               }
                             });
-                            useViewerStore.setState({ useLens: false });
                           }}
                           key={`(${height}, ${width}, ${depthDownsampled})`}
                         >

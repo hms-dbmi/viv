@@ -193,7 +193,7 @@ const Controller = () => {
       <Divider />
       <TabPanel value={tab} index={0}>
         {useColormap && <ColormapSelect />}
-        {useLens && !colormap && shape[labels.indexOf('c')] > 1 && (
+        {useLens && !colormap && !use3d && shape[labels.indexOf('c')] > 1 && (
           <LensSelect
             channelOptions={selections.map(sel => channelOptions[sel.c])}
           />
