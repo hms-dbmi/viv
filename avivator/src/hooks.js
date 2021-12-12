@@ -35,6 +35,7 @@ export const useImage = (source, history) => {
       // Placeholder
       useViewerStore.setState({ isChannelLoading: [true] });
       useViewerStore.setState({ isViewerLoading: true });
+      if (use3d) toggleUse3d();
       const { urlOrFile } = source;
       const newLoader = await createLoader(
         urlOrFile,
@@ -74,6 +75,7 @@ export const useImage = (source, history) => {
       // Placeholder
       useViewerStore.setState({ isChannelLoading: [true] });
       useViewerStore.setState({ isViewerLoading: true });
+      if (use3d) toggleUse3d();
       const newSelections = buildDefaultSelection(loader[0]);
       const { Channels } = metadata.Pixels;
       const channelOptions = Channels.map((c, i) => c.Name ?? `Channel ${i}`);
@@ -113,7 +115,7 @@ export const useImage = (source, history) => {
         const stats = await getMultiSelectionStats({
           loader,
           selections: newSelections,
-          use3d
+          use3d: false
         });
         newDomains = stats.domains;
         newContrastLimits = stats.contrastLimits;
