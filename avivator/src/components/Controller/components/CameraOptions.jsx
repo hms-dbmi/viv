@@ -11,7 +11,6 @@ import { getDefaultInitialViewState } from '@hms-dbmi/viv';
 import {
   useImageSettingsStore,
   useViewerStore,
-  useChannelsStore,
   useLoader
 } from '../../../state';
 import { useWindowSize } from '../../../utils';

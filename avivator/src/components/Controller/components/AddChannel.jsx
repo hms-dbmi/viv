@@ -66,7 +66,17 @@ const AddChannel = () => {
         channelsVisible: false
       });
     });
-  }, [labels, loader, globalSelection, use3d]);
+  }, [
+    labels,
+    loader,
+    globalSelection,
+    use3d,
+    addChannel,
+    addIsChannelLoading,
+    selections,
+    setIsChannelLoading,
+    setPropertiesForChannel
+  ]);
   return (
     <Button
       disabled={selections.length === MAX_CHANNELS || isViewerLoading}

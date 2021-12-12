@@ -150,7 +150,6 @@ function VolumeButton() {
                 });
               }
             );
-            const isRgb = metadata && guessRgb(metadata);
           }
         }}
         fullWidth

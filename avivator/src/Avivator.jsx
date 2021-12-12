@@ -28,7 +28,7 @@ export default function Avivator(props) {
       source: initSource,
       isNoImageUrlSnackbarOn: isDemoImage
     });
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useImage(source, history);
   return (
     <>

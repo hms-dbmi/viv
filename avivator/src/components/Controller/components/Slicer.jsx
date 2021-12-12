@@ -7,7 +7,6 @@ import shallow from 'zustand/shallow';
 
 import {
   useImageSettingsStore,
-  useChannelsStore,
   useViewerStore,
   useLoader
 } from '../../../state';

@@ -153,7 +153,7 @@ export const useImage = (source, history) => {
       });
     };
     if (metadata) changeSettings();
-  }, [loader, metadata]);
+  }, [loader, metadata]); // eslint-disable-line react-hooks/exhaustive-deps
 };
 
 export const useDropzone = () => {
