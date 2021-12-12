@@ -3,9 +3,7 @@ This guide demonstrates how to generate a pyramidal OME-TIFF [with Bio-Formats](
 
 ### Getting Started
 
-> NOTE: If you would like to follow this tutorial (i.e downloading the data and running the image pyramid pipeline) on a remote machine into which you would ssh, you can use port forwarding
-> to visualize the data that results from this tutorial. At the end of this tutorial, you run `http-server --cors="*" -p 8000 .` to start a web server from which the url `http://localhost:8000/LuCa-7color_Scan1.ome.tif` is pasted into the Avivator tool. If you have already ssh'ed into the remote machine via 
-> `ssh -L 12345:localhost:8000 myserver.tosshto.com`, then instead of pasting http://avivator.gehlenborglab.org/?image_url=http://localhost:8000/LuCa-7color_Scan1.ome.tif into your browser at the end, you will paste http://avivator.gehlenborglab.org/?image_url=http://localhost:12345/LuCa-7color_Scan1.ome.tif which uses the `12345` port locally that is being forwarded to `8000` on the remote machine.
+> NOTE: If you wish to view an image located on a remote machine accessible via SSH, please see the note at the end of this document about viewing images via SSH.
 
 This tutorial requires Bio-Formats [`bioformats2raw`](https://github.com/glencoesoftware/bioformats2raw) and
 [`raw2ometiff`](https://github.com/glencoesoftware/raw2ometiff) command-line tools. It's easiest to install
@@ -131,6 +129,19 @@ link by appending an `image_url` query parameter:
 > that the appropriate `Access-Control-Allow-Origin` response is sent from your local server. In addition, web servers must allow
 > [HTTP range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests) to support viewing OME-TIFF images.
 > Range requests are allowed by default by `http-server` but may need to be enabled explicitly for your production web server.
+
+#### Viewing an Image via SSH
+
+If you would like to follow this tutorial (i.e downloading the data and running the image pyramid pipeline) on a remote machine into which you would ssh,
+you can use port forwarding to visualize the data that results from this tutorial.
+That is, before starting this tutorial, you would ssh into the remote machine via `ssh -L 12345:localhost:8000 myserver.tosshto.com`.
+Then instead of pasting http://avivator.gehlenborglab.org/?image_url=http://localhost:8000/LuCa-7color_Scan1.ome.tif into your browser at the end,
+you would paste http://avivator.gehlenborglab.org/?image_url=http://localhost:12345/LuCa-7color_Scan1.ome.tif.
+Note that at the end of the written tutorial above you run `http-server --cors="*" -p 8000 .` to start a web server from which the url
+http://localhost:8000/LuCa-7color_Scan1.ome.tif is pasted into the Avivator tool.
+But now, you are forwarding port `12345` on your machine to `8000` on the remote machine.
+Therefore the URL that you paste into Avivator now reflects the local behavior
+- Avivator makes requests to port `12345` locally which is then forwarded via ssh to `8000` remotely.
 
 ### Other Examples
 
