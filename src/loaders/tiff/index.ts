@@ -20,11 +20,14 @@ interface TiffOptions {
  * Options for initializing a tiff pixel source. Headers are passed to each underlying fetch request. Offests are
  * a performance enhancment to index the remote tiff source using pre-computed byte-offsets. Pool indicates whether a
  * multi-threaded pool of image decoders should be used to decode tiles (default = true).
+ * @param {{ boolean }} useMultiImage Whether or not to return an array of multiple images in the OMEXML -
+ * if false, only the first iamge is returned.
  * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>} data source and associated OME-Zarr metadata.
  */
 export async function loadOmeTiff(
   source: string | File,
-  opts: TiffOptions = {}
+  opts: TiffOptions = {},
+  useMultiImage: boolean = false
 ) {
   const { headers, offsets, pool = true } = opts;
 
@@ -48,12 +51,13 @@ export async function loadOmeTiff(
      */
     tiff = createOffsetsProxy(tiff, offsets);
   }
-
   /*
    * Inspect tiff source for our performance enhancing proxies.
    * Prints warnings to console if `offsets` or `pool` are missing.
    */
   checkProxies(tiff);
 
-  return pool ? load(tiff, new Pool()) : load(tiff);
+  return pool
+    ? load(tiff, useMultiImage, new Pool())
+    : load(tiff, useMultiImage);
 }
