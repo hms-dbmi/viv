@@ -15,15 +15,9 @@ import {
   useImageSettingsStore,
   useViewerStore,
   useChannelsStore,
-  useLoader,
-  useMetadata
+  useLoader
 } from '../../../state';
-import {
-  range,
-  guessRgb,
-  getMultiSelectionStats,
-  getBoundingCube
-} from '../../../utils';
+import { range, getMultiSelectionStats, getBoundingCube } from '../../../utils';
 
 function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
@@ -108,7 +102,6 @@ function VolumeButton() {
     ],
     shallow
   );
-  const metadata = useMetadata();
 
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
