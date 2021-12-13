@@ -21,6 +21,14 @@
 - Upgrade deck.gl to 8.6
 - `extensions` are now the main way for controlling how shaders render the image
   - `LensExtension`, `ColorPaletteExtension`, and `AdditiveColormapExtension` are exported from `viv` to be used mutually exclusively for controlling how the fragment shader renders. The `ColorPaletteExtension` is used by default and provides the normal one color per channel pseudo-coloring. `AdditiveColormapExtension` provides colormaps like `viridis`, `jet` and more. There have been slight changes to the props so please see the docs for more infomation.
+  - These extensions are mutually exclusive and only available for 2D layers - for example you will need to add something like the following to your 2D layers for compatibility
+  ```
+  extensions: (colormap ? [
+    new AdditiveColormapExtension(),
+  ] : [
+    new ColorPaletteExtension(),
+  ])
+  ```
 - Add `@data` alias for serving local data during development
 - Add Avivator video tutorial to README.md
 - Support basic OME-NGFF in Avivator
