@@ -28,8 +28,6 @@
   ] : [
     new ColorPaletteExtension(),
   ])
-- There has been a small change to how `transparentColor` is handled - `useTransparentColor` is now necessary for `AdditiveColormapExtension` and `ColorPaletteExtension` to use the feature in addition to `transparentColor` for `ColorPaletteExtension`.  The truthiness of `transparentColor` is no longer relied on.
-
   ```
 - Add `@data` alias for serving local data during development
 - Add Avivator video tutorial to README.md
@@ -48,6 +46,7 @@
 - Add description of "Indexed TIFF" to Avivator snackbar warning when offsets are missing
 - Refactor `zustand` stores to follow best practice in Avivator.
 - Fix `onViewportLoad` callback for `MultiscaleImageLayer`
+- There has been a small change to how `transparentColor` is handled - `useTransparentColor` is now necessary for `AdditiveColormapExtension` and `ColorPaletteExtension` to use the feature in addition to `transparentColor` for `ColorPaletteExtension`.  The truthiness of `transparentColor` is no longer relied on.
 
 ## 0.11.0
 
