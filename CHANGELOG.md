@@ -28,6 +28,8 @@
   ] : [
     new ColorPaletteExtension(),
   ])
+- There has been a small change to how `transparentColor` is handled - `useTransparentColor` is now necessary for `AdditiveColormapExtension` and `ColorPaletteExtension` to use the feature in addition to `transparentColor` for `ColorPaletteExtension`.  The truthiness of `transparentColor` is no longer relied on.
+
   ```
 - Add `@data` alias for serving local data during development
 - Add Avivator video tutorial to README.md
