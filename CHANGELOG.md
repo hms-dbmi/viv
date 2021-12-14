@@ -3,6 +3,7 @@
 ## In Progress
 
 ### Added
+- New note about port-forwarding to visualize remote data in the tutorial README
 - Setup workflow to deploy Avivator via GitHub Pages.
 
 ### Changed
