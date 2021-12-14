@@ -3,7 +3,7 @@ This guide demonstrates how to generate a pyramidal OME-TIFF [with Bio-Formats](
 
 ### Getting Started
 
-> NOTE: If you wish to view an image located on a remote machine accessible via SSH, please see the note at the end of this document about viewing images via SSH.
+> NOTE: If you wish to view an image located on a remote machine accessible via SSH, please see the note at the end of this document.
 
 This tutorial requires Bio-Formats [`bioformats2raw`](https://github.com/glencoesoftware/bioformats2raw) and
 [`raw2ometiff`](https://github.com/glencoesoftware/raw2ometiff) command-line tools. It's easiest to install
@@ -132,8 +132,7 @@ link by appending an `image_url` query parameter:
 
 #### Viewing an Image via SSH
 
-If you would like to follow this tutorial (i.e downloading the data and running the image pyramid pipeline) on a remote machine into which you would ssh,
-you can use port forwarding to visualize the data that results from this tutorial.
+It is possible to generate the datasets in this tutorial on a remote machine and view them in Avivator via SSH and port forwarding.
 That is, before starting this tutorial, you would ssh into the remote machine via `ssh -L 12345:localhost:8000 myserver.tosshto.com`.
 Then instead of pasting http://avivator.gehlenborglab.org/?image_url=http://localhost:8000/LuCa-7color_Scan1.ome.tif into your browser at the end,
 you would paste http://avivator.gehlenborglab.org/?image_url=http://localhost:12345/LuCa-7color_Scan1.ome.tif.
