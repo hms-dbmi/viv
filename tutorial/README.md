@@ -140,7 +140,7 @@ $ ssh -L 12345:localhost:8000 <username>@<serverhost> # setup secure shell, link
 ```
 
 Since your local port `12345` is linked to the remote `8000` via SSH, you can now view the remote dataset locally via your `localhost:12345` in Avivator: http://avivator.gehlenborglab.org/?image_url=http://localhost:12345/LuCa-7color_Scan1.ome.tif.
-Then instead of pasting http://avivator.gehlenborglab.org/?image_url=http://localhost:8000/LuCa-7color_Scan1.ome.tif into your browser at the end,
+That is, instead of pasting http://avivator.gehlenborglab.org/?image_url=http://localhost:8000/LuCa-7color_Scan1.ome.tif into your browser at the end of the tutorial,
 you would paste http://avivator.gehlenborglab.org/?image_url=http://localhost:12345/LuCa-7color_Scan1.ome.tif.
 Note that at the end of the written tutorial above you run `http-server --cors="*" -p 8000 .` to start a web server from which the url
 http://localhost:8000/LuCa-7color_Scan1.ome.tif is pasted into the Avivator tool.
