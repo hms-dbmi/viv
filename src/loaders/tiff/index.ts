@@ -20,18 +20,22 @@ interface OmeTiffOptions extends TiffOptions {
 type UnwrapPromise<T> = T extends Promise<infer Inner> ? Inner : T;
 type MultiImage = UnwrapPromise<ReturnType<typeof load>>; // get return-type from `load`
 
+/** @ignore */
 export async function loadOmeTiff(
   source: string | File,
   opts: TiffOptions & { images: 'all' }
 ): Promise<MultiImage>;
+/** @ignore */
 export async function loadOmeTiff(
   source: string | File,
   opts: TiffOptions & { images: 'first' }
 ): Promise<MultiImage[0]>;
+/** @ignore */
 export async function loadOmeTiff(
   source: string | File,
   opts: TiffOptions
 ): Promise<MultiImage[0]>;
+/** @ignore */
 export async function loadOmeTiff(
   source: string | File
 ): Promise<MultiImage[0]>;
