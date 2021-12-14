@@ -4,6 +4,7 @@
 
 ### Added
 
+- New note about port-forwarding to visualize remote data in the tutorial README
 - Setup workflow to deploy Avivator via GitHub Pages.
 - Support multiple images within an OME-TIFF file
 
@@ -24,6 +25,14 @@
 - Upgrade deck.gl to 8.6
 - `extensions` are now the main way for controlling how shaders render the image
   - `LensExtension`, `ColorPaletteExtension`, and `AdditiveColormapExtension` are exported from `viv` to be used mutually exclusively for controlling how the fragment shader renders. The `ColorPaletteExtension` is used by default and provides the normal one color per channel pseudo-coloring. `AdditiveColormapExtension` provides colormaps like `viridis`, `jet` and more. There have been slight changes to the props so please see the docs for more infomation.
+  - These extensions are mutually exclusive and only available for 2D layers - for example you will need to add something like the following to your 2D layers for compatibility
+  ```
+  extensions: (colormap ? [
+    new AdditiveColormapExtension(),
+  ] : [
+    new ColorPaletteExtension(),
+  ])
+  ```
 - Add `@data` alias for serving local data during development
 - Add Avivator video tutorial to README.md
 - Support basic OME-NGFF in Avivator
@@ -41,6 +50,7 @@
 - Add description of "Indexed TIFF" to Avivator snackbar warning when offsets are missing
 - Refactor `zustand` stores to follow best practice in Avivator.
 - Fix `onViewportLoad` callback for `MultiscaleImageLayer`
+- There has been a small change to how `transparentColor` is handled - `useTransparentColor` is now necessary for `AdditiveColormapExtension` and `ColorPaletteExtension` to use the feature in addition to `transparentColor` for `ColorPaletteExtension`.  The truthiness of `transparentColor` is no longer relied on.
 
 ## 0.11.0
 
