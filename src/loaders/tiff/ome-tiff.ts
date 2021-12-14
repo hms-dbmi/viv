@@ -51,13 +51,14 @@ export async function load(
     );
   }
   const omexml = fromString(ImageDescription);
+
   let levels: number;
   if (SubIFDs) {
     // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.
     levels = SubIFDs.length + 1;
   } else {
     // Image is legacy format; resolutions are stored as separate images.
-    levels = omexml.length + 1;
+    levels = omexml.length;
   }
   if (!useMultiImage) {
     const image = 0;
@@ -84,7 +85,6 @@ export async function load(
       );
       return source;
     });
-
     return {
       data,
       metadata: imgMeta
