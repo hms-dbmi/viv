@@ -48,25 +48,32 @@ export const useImage = (source, history) => {
       let nextMeta;
       let nextLoader;
       if (Array.isArray(newLoader)) {
-        nextMeta = newLoader.map(l => l.metadata);
-        nextLoader = newLoader.map(l => l.data);
+        if (newLoader.length > 1) {
+          nextMeta = newLoader.map(l => l.metadata);
+          nextLoader = newLoader.map(l => l.data);
+        } else {
+          nextMeta = newLoader[0].metadata;
+          nextLoader = newLoader[0].data;
+        }
       } else {
         nextMeta = newLoader.metadata;
         nextLoader = newLoader.data;
       }
-      console.info(
-        'Metadata (in JSON-like form) for current file being viewed: ',
-        nextMeta
-      );
-      useChannelsStore.setState({ loader: nextLoader });
-      useViewerStore.setState({
-        metadata: nextMeta
-      });
-      if (use3d) toggleUse3d();
-      // eslint-disable-next-line no-unused-expressions
-      history?.push(
-        typeof urlOrFile === 'string' ? `?image_url=${urlOrFile}` : ''
-      );
+      if (nextLoader) {
+        console.info(
+          'Metadata (in JSON-like form) for current file being viewed: ',
+          nextMeta
+        );
+        useChannelsStore.setState({ loader: nextLoader });
+        useViewerStore.setState({
+          metadata: nextMeta
+        });
+        if (use3d) toggleUse3d();
+        // eslint-disable-next-line no-unused-expressions
+        history?.push(
+          typeof urlOrFile === 'string' ? `?image_url=${urlOrFile}` : ''
+        );
+      }
     }
     if (source) changeLoader();
   }, [source, history]); // eslint-disable-line react-hooks/exhaustive-deps
