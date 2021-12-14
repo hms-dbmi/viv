@@ -10,27 +10,26 @@ interface TiffOptions {
   headers?: object;
   offsets?: number[];
   pool?: boolean;
+  images?: 'first' | 'all';
 }
 
 /**
  * Opens an OME-TIFF via URL and returns data source and associated metadata for first image.
  *
  * @param {(string | File)} source url or File object.
- * @param {{ headers: (undefined | Headers), offsets: (undefined | number[]), pool: (undefined | boolean ) }} opts
+ * @param {{ headers: (undefined | Headers), offsets: (undefined | number[]), pool: (undefined | boolean ), images: (undefined | string) }} opts
  * Options for initializing a tiff pixel source. Headers are passed to each underlying fetch request. Offests are
  * a performance enhancment to index the remote tiff source using pre-computed byte-offsets. Pool indicates whether a
- * multi-threaded pool of image decoders should be used to decode tiles (default = true).
- * @param {{ boolean }} useMultiImage Whether or not to return an array of multiple images if present in the OMEXML -
- * if false, only the first iamge is returned as Promise<{ data: TiffPixelSource[], metadata: ImageMeta }> and if true, an array of images
- * Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[] is returned.
+ * multi-threaded pool of image decoders should be used to decode tiles (default = true). images indicates whether
+ * or not to return an array of multiple images if present in the OMEXML - if images is 'first', only the first image is returned
+ * and if images is 'all`, then all images are returned (default = 'first').
  * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }> | Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[]} data source and associated OME-Zarr metadata.
  */
 export async function loadOmeTiff(
   source: string | File,
-  opts: TiffOptions = {},
-  useMultiImage: boolean = false
+  opts: TiffOptions = {}
 ) {
-  const { headers, offsets, pool = true } = opts;
+  const { headers, offsets, pool = true, images = 'first' } = opts;
 
   let tiff: GeoTIFF;
 
@@ -58,7 +57,6 @@ export async function loadOmeTiff(
    */
   checkProxies(tiff);
 
-  return pool
-    ? load(tiff, useMultiImage, new Pool())
-    : load(tiff, useMultiImage);
+  const loaders = pool ? await load(tiff, new Pool()) : await load(tiff);
+  return images === 'all' ? loaders : loaders[0];
 }

@@ -32,31 +32,24 @@ function getIndexer(
   return getOmeLegacyIndexer(tiff, omexml);
 }
 
-export async function load(
-  tiff: GeoTIFF,
-  useMultiImage: boolean = false,
-  pool?: Pool
-) {
+export async function load(tiff: GeoTIFF, pool?: Pool) {
   const firstImage = await tiff.getImage(0);
   const {
     ImageDescription,
     SubIFDs,
     PhotometricInterpretation: photometricInterpretation
   } = firstImage.fileDirectory;
-  if (!SubIFDs && useMultiImage) {
-    console.warn(
-      'Multi-image selection is not supported with legacy bioformats pyramids.  Please open an issue if this is essential'
-    );
-  }
   const omexml = fromString(ImageDescription);
-
+  let rootMeta = omexml;
   let levels: number;
   if (SubIFDs) {
     // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.
     levels = SubIFDs.length + 1;
   } else {
     // Image is legacy format; resolutions are stored as separate images.
+    // We do not allow multi-images for legacy format.
     levels = omexml.length;
+    rootMeta = [omexml[0]];
   }
   const getSource = (
     resolution: number,
@@ -81,20 +74,7 @@ export async function load(
     );
     return source;
   };
-  if (!useMultiImage) {
-    const image = 0;
-    const pyramidIndexer = getIndexer(tiff, omexml, SubIFDs, image);
-    const imgMeta = omexml[image];
-
-    const data = Array.from({ length: levels }).map((_, resolution) =>
-      getSource(resolution, pyramidIndexer, imgMeta)
-    );
-    return {
-      data,
-      metadata: imgMeta
-    };
-  }
-  return omexml.map((imgMeta, image) => {
+  return rootMeta.map((imgMeta, image) => {
     const pyramidIndexer = getIndexer(tiff, omexml, SubIFDs, image);
     const data = Array.from({ length: levels }).map((_, resolution) =>
       getSource(resolution, pyramidIndexer, imgMeta)
