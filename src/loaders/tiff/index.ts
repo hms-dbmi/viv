@@ -20,18 +20,6 @@ interface OmeTiffOptions extends TiffOptions {
 type UnwrapPromise<T> = T extends Promise<infer Inner> ? Inner : T;
 type MultiImage = UnwrapPromise<ReturnType<typeof load>>; // get return-type from `load`
 
-/**
- * Opens an OME-TIFF via URL and returns data source and associated metadata for first or all images in files.
- *
- * @param {(string | File)} source url or File object.
- * @param {Object} opts
- * @param {Headers=} opts.header - Headers passed to each underling fetch request.
- * @param {Array<number>=} opts.offsets - Indexed-Tiff IFD offsets. See for more information.
- * @param {pool} [opts.bool=true] - Whether to use a multi-threaded pool of image decoders.
- * @param {images} [opts.images='first'] - Whether to return 'all' or only the 'first' image in the OME-TIFF.
- * Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[] is returned.
- * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }> | Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[]} data source and associated OME-Zarr metadata.
- */
 export async function loadOmeTiff(
   source: string | File,
   opts: TiffOptions & { images: 'all' }
@@ -47,6 +35,18 @@ export async function loadOmeTiff(
 export async function loadOmeTiff(
   source: string | File
 ): Promise<MultiImage[0]>;
+/**
+ * Opens an OME-TIFF via URL and returns data source and associated metadata for first or all images in files.
+ *
+ * @param {(string | File)} source url or File object.
+ * @param {Object} opts
+ * @param {Headers=} opts.header - Headers passed to each underlying fetch request.
+ * @param {Array<number>=} opts.offsets - [Indexed-Tiff](https://github.com/hms-dbmi/generate-tiff-offsets) IFD offsets.
+ * @param {pool} [opts.bool=true] - Whether to use a multi-threaded pool of image decoders.
+ * @param {images} [opts.images='first'] - Whether to return 'all' or only the 'first' image in the OME-TIFF.
+ * Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[] is returned.
+ * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }> | Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[]} data source and associated OME-Zarr metadata.
+ */
 export async function loadOmeTiff(
   source: string | File,
   opts: OmeTiffOptions = {}
