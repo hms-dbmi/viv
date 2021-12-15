@@ -5,6 +5,8 @@ import shallow from 'zustand/shallow';
 import {
   useChannelsStore,
   useImageSettingsStore,
+  useLoader,
+  useMetadata,
   useViewerStore
 } from './state';
 import {
@@ -22,108 +24,49 @@ export const useImage = (source, history) => {
     store => [store.use3d, store.toggleUse3d, store.toggleIsOffsetsSnackbarOn],
     shallow
   );
-  const [addChannels, resetChannels] = useChannelsStore(
-    store => [store.addChannels, store.resetChannels],
-    shallow
-  );
   const [lensEnabled, toggleLensEnabled] = useImageSettingsStore(
     store => [store.lensEnabled, store.toggleLensEnabled],
     shallow
   );
+  const loader = useLoader();
+  const metadata = useMetadata();
   useEffect(() => {
     async function changeLoader() {
       // Placeholder
       useViewerStore.setState({ isChannelLoading: [true] });
       useViewerStore.setState({ isViewerLoading: true });
-      resetChannels();
+      if (use3d) toggleUse3d();
       const { urlOrFile } = source;
-      const {
-        data: nextLoader,
-        metadata: nextMeta
-      } = await createLoader(urlOrFile, toggleIsOffsetsSnackbarOn, message =>
-        useViewerStore.setState({ loaderErrorSnackbar: { on: true, message } })
-      );
-      console.info(
-        'Metadata (in JSON-like form) for current file being viewed: ',
-        nextMeta
-      );
-
-      if (nextLoader) {
-        const newSelections = buildDefaultSelection(nextLoader[0]);
-        const { Channels } = nextMeta.Pixels;
-        const channelOptions = Channels.map((c, i) => c.Name ?? `Channel ${i}`);
-        // Default RGB.
-        let newContrastLimits = [];
-        let newDomains = [];
-        let newColors = [];
-        const isRgb = guessRgb(nextMeta);
-        if (isRgb) {
-          if (isInterleaved(nextLoader[0].shape)) {
-            // These don't matter because the data is interleaved.
-            newContrastLimits = [[0, 255]];
-            newDomains = [[0, 255]];
-            newColors = [[255, 0, 0]];
-          } else {
-            newContrastLimits = [
-              [0, 255],
-              [0, 255],
-              [0, 255]
-            ];
-            newDomains = [
-              [0, 255],
-              [0, 255],
-              [0, 255]
-            ];
-            newColors = [
-              [255, 0, 0],
-              [0, 255, 0],
-              [0, 0, 255]
-            ];
-          }
-          if (lensEnabled) {
-            toggleLensEnabled();
-          }
-          useViewerStore.setState({ useColormap: false, useLens: false });
-        } else {
-          const stats = await getMultiSelectionStats({
-            loader: nextLoader,
-            selections: newSelections,
-            use3d
-          });
-          newDomains = stats.domains;
-          newContrastLimits = stats.contrastLimits;
-          // If there is only one channel, use white.
-          newColors =
-            newDomains.length === 1
-              ? [[255, 255, 255]]
-              : newDomains.map((_, i) => COLOR_PALLETE[i]);
+      const newLoader = await createLoader(
+        urlOrFile,
+        toggleIsOffsetsSnackbarOn,
+        message =>
           useViewerStore.setState({
-            useLens: channelOptions.length !== 1,
-            useColormap: true
-          });
+            loaderErrorSnackbar: { on: true, message }
+          })
+      );
+      let nextMeta;
+      let nextLoader;
+      if (Array.isArray(newLoader)) {
+        if (newLoader.length > 1) {
+          nextMeta = newLoader.map(l => l.metadata);
+          nextLoader = newLoader.map(l => l.data);
+        } else {
+          nextMeta = newLoader[0].metadata;
+          nextLoader = newLoader[0].data;
         }
-        addChannels({
-          ids: newDomains.map(() => String(Math.random())),
-          selections: newSelections,
-          domains: newDomains,
-          contrastLimits: newContrastLimits,
-          colors: newColors
-        });
+      } else {
+        nextMeta = newLoader.metadata;
+        nextLoader = newLoader.data;
+      }
+      if (nextLoader) {
+        console.info(
+          'Metadata (in JSON-like form) for current file being viewed: ',
+          nextMeta
+        );
         useChannelsStore.setState({ loader: nextLoader });
         useViewerStore.setState({
-          isChannelLoading: newSelections.map(i => !i),
-          isViewerLoading: false,
-          metadata: nextMeta,
-          pixelValues: new Array(newSelections.length).fill(FILL_PIXEL_VALUE),
-          // Set the global selections (needed for the UI). All selections have the same global selection.
-          globalSelection: newSelections[0],
-          channelOptions
-        });
-        const [xSlice, ySlice, zSlice] = getBoundingCube(nextLoader);
-        useImageSettingsStore.setState({
-          xSlice,
-          ySlice,
-          zSlice
+          metadata: nextMeta
         });
         if (use3d) toggleUse3d();
         // eslint-disable-next-line no-unused-expressions
@@ -134,6 +77,90 @@ export const useImage = (source, history) => {
     }
     if (source) changeLoader();
   }, [source, history]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const changeSettings = async () => {
+      // Placeholder
+      useViewerStore.setState({ isChannelLoading: [true] });
+      useViewerStore.setState({ isViewerLoading: true });
+      if (use3d) toggleUse3d();
+      const newSelections = buildDefaultSelection(loader[0]);
+      const { Channels } = metadata.Pixels;
+      const channelOptions = Channels.map((c, i) => c.Name ?? `Channel ${i}`);
+      // Default RGB.
+      let newContrastLimits = [];
+      let newDomains = [];
+      let newColors = [];
+      const isRgb = guessRgb(metadata);
+      if (isRgb) {
+        if (isInterleaved(loader[0].shape)) {
+          // These don't matter because the data is interleaved.
+          newContrastLimits = [[0, 255]];
+          newDomains = [[0, 255]];
+          newColors = [[255, 0, 0]];
+        } else {
+          newContrastLimits = [
+            [0, 255],
+            [0, 255],
+            [0, 255]
+          ];
+          newDomains = [
+            [0, 255],
+            [0, 255],
+            [0, 255]
+          ];
+          newColors = [
+            [255, 0, 0],
+            [0, 255, 0],
+            [0, 0, 255]
+          ];
+        }
+        if (lensEnabled) {
+          toggleLensEnabled();
+        }
+        useViewerStore.setState({ useColormap: false, useLens: false });
+      } else {
+        const stats = await getMultiSelectionStats({
+          loader,
+          selections: newSelections,
+          use3d: false
+        });
+        newDomains = stats.domains;
+        newContrastLimits = stats.contrastLimits;
+        // If there is only one channel, use white.
+        newColors =
+          newDomains.length === 1
+            ? [[255, 255, 255]]
+            : newDomains.map((_, i) => COLOR_PALLETE[i]);
+        useViewerStore.setState({
+          useLens: channelOptions.length !== 1,
+          useColormap: true
+        });
+      }
+      useChannelsStore.setState({
+        ids: newDomains.map(() => String(Math.random())),
+        selections: newSelections,
+        domains: newDomains,
+        contrastLimits: newContrastLimits,
+        colors: newColors,
+        channelsVisible: newColors.map(() => true)
+      });
+      useViewerStore.setState({
+        isChannelLoading: newSelections.map(i => !i),
+        isViewerLoading: false,
+        pixelValues: new Array(newSelections.length).fill(FILL_PIXEL_VALUE),
+        // Set the global selections (needed for the UI). All selections have the same global selection.
+        globalSelection: newSelections[0],
+        channelOptions
+      });
+      const [xSlice, ySlice, zSlice] = getBoundingCube(loader);
+      useImageSettingsStore.setState({
+        xSlice,
+        ySlice,
+        zSlice
+      });
+    };
+    if (metadata) changeSettings();
+  }, [loader, metadata]); // eslint-disable-line react-hooks/exhaustive-deps
 };
 
 export const useDropzone = () => {

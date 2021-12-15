@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import shallow from 'zustand/shallow';
@@ -7,7 +7,8 @@ import { MAX_CHANNELS } from '../../../constants';
 import {
   useChannelsStore,
   useViewerStore,
-  useImageSettingsStore
+  useImageSettingsStore,
+  useLoader
 } from '../../../state';
 import { getSingleSelectionStats } from '../../../utils';
 
@@ -28,22 +29,17 @@ const AddChannel = () => {
     ],
     shallow
   );
-  const [
-    loader,
-    selections,
-    addChannel,
-    setPropertiesForChannel
-  ] = useChannelsStore(
+  const [selections, addChannel, setPropertiesForChannel] = useChannelsStore(
     store => [
-      store.loader,
       store.selections,
       store.addChannel,
       store.setPropertiesForChannel
     ],
     shallow
   );
+  const loader = useLoader();
   const { labels } = loader[0];
-  const handleChannelAdd = () => {
+  const handleChannelAdd = useCallback(() => {
     let selection = Object.fromEntries(labels.map(l => [l, 0]));
     selection = { ...selection, ...globalSelection };
     const numSelectionsBeforeAdd = selections.length;
@@ -70,7 +66,17 @@ const AddChannel = () => {
         channelsVisible: false
       });
     });
-  };
+  }, [
+    labels,
+    loader,
+    globalSelection,
+    use3d,
+    addChannel,
+    addIsChannelLoading,
+    selections,
+    setIsChannelLoading,
+    setPropertiesForChannel
+  ]);
   return (
     <Button
       disabled={selections.length === MAX_CHANNELS || isViewerLoading}

@@ -34,20 +34,30 @@ class UnsupportedBrowserError extends Error {
 /**
  *
  * @param {string | File} src
- * @param {import('../../src/loaders/omexml').OMEXML[0]} imgMeta
+ * @param {import('../../src/loaders/omexml').OMEXML} rootMeta
  * @param {number} levels
+ * @param {import('../../src/loaders/tiff/pixel-source').TiffPixelSource[]} data
  */
-async function getTotalImageCount(src, imgMeta, levels) {
+async function getTotalImageCount(src, rootMeta, data) {
   const from = typeof src === 'string' ? fromUrl : fromBlob;
   const tiff = await from(src);
-  const {
-    Pixels: { SizeC, SizeT, SizeZ }
-  } = imgMeta;
-  const numImagesPerResolution = SizeC * SizeT * SizeZ;
-
   const firstImage = await tiff.getImage(0);
   const hasSubIFDs = Boolean(firstImage?.fileDirectory?.SubIFDs);
-  return numImagesPerResolution * (hasSubIFDs ? 1 : levels);
+  if (hasSubIFDs) {
+    return rootMeta.reduce((sum, imgMeta) => {
+      const {
+        Pixels: { SizeC, SizeT, SizeZ }
+      } = imgMeta;
+      const numImagesPerResolution = SizeC * SizeT * SizeZ;
+      return numImagesPerResolution + sum;
+    }, 1);
+  }
+  const levels = data[0].length;
+  const {
+    Pixels: { SizeC, SizeT, SizeZ }
+  } = rootMeta[0];
+  const numImagesPerResolution = SizeC * SizeT * SizeZ;
+  return numImagesPerResolution * levels;
 }
 
 /**
@@ -68,22 +78,22 @@ export async function createLoader(
     // OME-TIFF
     if (isOMETIFF(urlOrFile)) {
       if (urlOrFile instanceof File) {
-        const source = await loadOmeTiff(urlOrFile);
+        const source = await loadOmeTiff(urlOrFile, { images: 'all' });
         return source;
       }
       const url = urlOrFile;
       const res = await fetch(url.replace(/ome\.tif(f?)/gi, 'offsets.json'));
       const isOffsets404 = res.status === 404;
       const offsets = !isOffsets404 ? await res.json() : undefined;
-      const source = await loadOmeTiff(urlOrFile, { offsets });
+      const source = await loadOmeTiff(urlOrFile, { offsets, images: 'all' });
 
       // Show a warning if the total number of channels/images exceeds a fixed amount.
       // Non-Bioformats6 pyramids use Image tags for pyramid levels and do not have offsets
       // built in to the format for them, hence the ternary.
       const totalImageCount = await getTotalImageCount(
         urlOrFile,
-        source.metadata,
-        source.data.length
+        source.map(s => s.metadata),
+        source.map(s => s.data)
       );
       if (isOffsets404 && totalImageCount > MAX_CHANNELS_FOR_SNACKBAR_WARNING) {
         handleOffsetsNotFound(true);

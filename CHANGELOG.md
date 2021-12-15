@@ -3,10 +3,13 @@
 ## In Progress
 
 ### Added
+
 - New note about port-forwarding to visualize remote data in the tutorial README
 - Setup workflow to deploy Avivator via GitHub Pages.
+- Support multiple images within an OME-TIFF file
 
 ### Changed
+
 - Fix image links in README.md.
 - Add extensions to docs.
 - Fix broken GH-pages workflow.

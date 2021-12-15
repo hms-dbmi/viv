@@ -13,11 +13,12 @@ import Button from '@material-ui/core/Button';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { makeStyles } from '@material-ui/core/styles';
 import shallow from 'zustand/shallow';
+import { Select } from '@material-ui/core';
 
 import MenuTitle from './MenuTitle';
 import DropzoneButton from './DropzoneButton';
 import { isMobileOrTablet, getNameFromUrl } from '../../../utils';
-import { useViewerStore } from '../../../state';
+import { useChannelsStore, useViewerStore } from '../../../state';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -51,7 +52,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Header(props) {
-  const source = useViewerStore(store => store.source);
+  const image = useChannelsStore(store => store.image);
+  const [source, metadata] = useViewerStore(store => [
+    store.source,
+    store.metadata
+  ]);
   const handleSubmitNewUrl = (event, newUrl) => {
     event.preventDefault();
     const newSource = {
@@ -61,6 +66,10 @@ function Header(props) {
     };
     useViewerStore.setState({ source: newSource });
   };
+  const onImageSelectionChange = e =>
+    useChannelsStore.setState({
+      image: e.target.value
+    });
   const url = typeof source.urlOrFile === 'string' ? source.urlOrFile : '';
   const [text, setText] = useState(url);
   const [open, toggle] = useReducer(v => !v, false);
@@ -127,6 +136,17 @@ function Header(props) {
       {!isMobileOrTablet() && (
         <Grid item xs={12} style={{ paddingTop: 16 }}>
           <DropzoneButton />
+        </Grid>
+      )}
+      {Array.isArray(metadata) && (
+        <Grid item xs={12}>
+          <Select native value={image} onChange={onImageSelectionChange}>
+            {metadata.map((meta, i) => (
+              <option key={meta.Name} value={i}>
+                {meta.Name}
+              </option>
+            ))}
+          </Select>
         </Grid>
       )}
       <Grid item xs={12} className={classes.divider}>

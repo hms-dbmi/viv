@@ -6,11 +6,7 @@ import shallow from 'zustand/shallow';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import {
-  useImageSettingsStore,
-  useChannelsStore,
-  useViewerStore
-} from '../state';
+import { useImageSettingsStore, useLoader, useViewerStore } from '../state';
 
 const useStyles = makeStyles(theme => ({
   typography: {
@@ -34,7 +30,7 @@ export default function Footer() {
     store => [store.use3d, store.pyramidResolution],
     shallow
   );
-  const loader = useChannelsStore(store => store.loader);
+  const loader = useLoader();
   const volumeResolution = useImageSettingsStore(store => store.resolution);
 
   const resolution = use3d ? volumeResolution : pyramidResolution;
