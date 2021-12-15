@@ -4,6 +4,8 @@ This guide demonstrates how to generate a pyramidal OME-TIFF [with Bio-Formats](
 ### Getting Started
 
 > NOTE: If you wish to view an image located on a remote machine accessible via SSH, please see the note at the end of this document.
+> NOTE 2: This tutorial does not work on Safari.  We had to make a choice (for now and to the best of our knowledge)
+> between supporting localhost connections in Safari and supporting them in Chrome, and decided to go with Chrome. 
 
 This tutorial requires Bio-Formats [`bioformats2raw`](https://github.com/glencoesoftware/bioformats2raw) and
 [`raw2ometiff`](https://github.com/glencoesoftware/raw2ometiff) command-line tools. It's easiest to install
