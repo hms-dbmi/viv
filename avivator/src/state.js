@@ -27,7 +27,8 @@ const DEFAUlT_CHANNEL_STATE = {
   domains: [],
   selections: [],
   ids: [],
-  loader: [{ labels: [], shape: [] }]
+  loader: [{ labels: [], shape: [] }],
+  image: 0
 };
 
 const DEFAUlT_CHANNEL_VALUES = {
@@ -82,26 +83,7 @@ export const useChannelsStore = create(set => ({
         }
       });
       return newState;
-    }),
-  addChannels: newProperties =>
-    set(state => {
-      const entries = Object.entries(newProperties);
-      const newState = { ...state };
-      entries.forEach(([property, values]) => {
-        newState[property] = [...state[property], ...values];
-      });
-      const numNewChannels = entries[0][1].length;
-      Object.entries(DEFAUlT_CHANNEL_VALUES).forEach(([k, v]) => {
-        if (!newState[k].length) {
-          newState[k] = [
-            ...state[k],
-            ...Array.from({ length: numNewChannels }).map(() => v)
-          ];
-        }
-      });
-      return newState;
-    }),
-  resetChannels: () => set(state => ({ ...state, ...DEFAUlT_CHANNEL_STATE }))
+    })
 }));
 
 const DEFAULT_IMAGE_STATE = {
@@ -170,3 +152,17 @@ export const useViewerStore = create(set => ({
       return { ...state, isChannelLoading: newIsChannelLoading };
     })
 }));
+
+export const useLoader = () => {
+  const [fullLoader, image] = useChannelsStore(store => [
+    store.loader,
+    store.image
+  ]);
+  return Array.isArray(fullLoader[0]) ? fullLoader[image] : fullLoader;
+};
+
+export const useMetadata = () => {
+  const image = useChannelsStore(store => store.image);
+  const metadata = useViewerStore(store => store.metadata);
+  return Array.isArray(metadata) ? metadata[image] : metadata;
+};

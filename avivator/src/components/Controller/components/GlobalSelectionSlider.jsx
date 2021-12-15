@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import debounce from 'lodash/debounce';
@@ -8,53 +8,58 @@ import { range, getMultiSelectionStats } from '../../../utils';
 import {
   useChannelsStore,
   useViewerStore,
-  useImageSettingsStore
+  useImageSettingsStore,
+  useLoader
 } from '../../../state';
 
 export default function GlobalSelectionSlider(props) {
   const { size, label } = props;
-  const [selections, loader, setPropertiesForChannel] = useChannelsStore(
-    store => [store.selections, store.loader, store.setPropertiesForChannel],
+  const [selections, setPropertiesForChannel] = useChannelsStore(
+    store => [store.selections, store.setPropertiesForChannel],
     shallow
   );
+  const loader = useLoader();
   const globalSelection = useViewerStore(store => store.globalSelection);
-  const changeSelection = debounce(
-    (event, newValue) => {
-      useViewerStore.setState({
-        isChannelLoading: selections.map(() => true)
-      });
-      const newSelections = [...selections].map(sel => ({
-        ...sel,
-        [label]: newValue
-      }));
-      getMultiSelectionStats({
-        loader,
-        selections: newSelections,
-        use3d: false
-      }).then(({ domains, contrastLimits }) => {
-        useImageSettingsStore.setState({
-          onViewportLoad: () => {
-            range(newSelections.length).forEach((channel, j) =>
-              setPropertiesForChannel(channel, {
-                domains: domains[j],
-                contrastLimits: contrastLimits[j]
-              })
-            );
-            useImageSettingsStore.setState({ onViewportLoad: () => {} });
-            useViewerStore.setState({
-              isChannelLoading: selections.map(() => false)
-            });
-          }
+  const changeSelection = useCallback(
+    debounce(
+      (event, newValue) => {
+        useViewerStore.setState({
+          isChannelLoading: selections.map(() => true)
         });
-        range(newSelections.length).forEach((channel, j) =>
-          setPropertiesForChannel(channel, {
-            selections: newSelections[j]
-          })
-        );
-      });
-    },
-    50,
-    { trailing: true }
+        const newSelections = [...selections].map(sel => ({
+          ...sel,
+          [label]: newValue
+        }));
+        getMultiSelectionStats({
+          loader,
+          selections: newSelections,
+          use3d: false
+        }).then(({ domains, contrastLimits }) => {
+          useImageSettingsStore.setState({
+            onViewportLoad: () => {
+              range(newSelections.length).forEach((channel, j) =>
+                setPropertiesForChannel(channel, {
+                  domains: domains[j],
+                  contrastLimits: contrastLimits[j]
+                })
+              );
+              useImageSettingsStore.setState({ onViewportLoad: () => {} });
+              useViewerStore.setState({
+                isChannelLoading: selections.map(() => false)
+              });
+            }
+          });
+          range(newSelections.length).forEach((channel, j) =>
+            setPropertiesForChannel(channel, {
+              selections: newSelections[j]
+            })
+          );
+        });
+      },
+      50,
+      { trailing: true }
+    ),
+    [loader, selections]
   );
   return (
     <Grid container direction="row" justify="space-between" alignItems="center">

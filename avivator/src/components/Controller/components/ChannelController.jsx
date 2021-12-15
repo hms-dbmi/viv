@@ -10,7 +10,7 @@ import shallow from 'zustand/shallow';
 import ChannelOptions from './ChannelOptions';
 import { FILL_PIXEL_VALUE } from '../../../constants';
 import {
-  useChannelsStore,
+  useLoader,
   useImageSettingsStore,
   useViewerStore
 } from '../../../state';
@@ -54,7 +54,7 @@ function ChannelController({
   handleColorSelect,
   isLoading
 }) {
-  const loader = useChannelsStore(store => store.loader);
+  const loader = useLoader();
   const colormap = useImageSettingsStore(store => store.colormap);
   const [channelOptions, useLinkedView, use3d] = useViewerStore(
     store => [store.channelOptions, store.useLinkedView, store.use3d],

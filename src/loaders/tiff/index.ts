@@ -10,23 +10,52 @@ interface TiffOptions {
   headers?: object;
   offsets?: number[];
   pool?: boolean;
+  images?: 'first' | 'all';
 }
 
+interface OmeTiffOptions extends TiffOptions {
+  images?: 'first' | 'all';
+}
+
+type UnwrapPromise<T> = T extends Promise<infer Inner> ? Inner : T;
+type MultiImage = UnwrapPromise<ReturnType<typeof load>>; // get return-type from `load`
+
+/** @ignore */
+export async function loadOmeTiff(
+  source: string | File,
+  opts: TiffOptions & { images: 'all' }
+): Promise<MultiImage>;
+/** @ignore */
+export async function loadOmeTiff(
+  source: string | File,
+  opts: TiffOptions & { images: 'first' }
+): Promise<MultiImage[0]>;
+/** @ignore */
+export async function loadOmeTiff(
+  source: string | File,
+  opts: TiffOptions
+): Promise<MultiImage[0]>;
+/** @ignore */
+export async function loadOmeTiff(
+  source: string | File
+): Promise<MultiImage[0]>;
 /**
- * Opens an OME-TIFF via URL and returns data source and associated metadata for first image.
+ * Opens an OME-TIFF via URL and returns data source and associated metadata for first or all images in files.
  *
  * @param {(string | File)} source url or File object.
- * @param {{ headers: (undefined | Headers), offsets: (undefined | number[]), pool: (undefined | boolean ) }} opts
- * Options for initializing a tiff pixel source. Headers are passed to each underlying fetch request. Offests are
- * a performance enhancment to index the remote tiff source using pre-computed byte-offsets. Pool indicates whether a
- * multi-threaded pool of image decoders should be used to decode tiles (default = true).
- * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>} data source and associated OME-Zarr metadata.
+ * @param {Object} opts
+ * @param {Headers=} opts.header - Headers passed to each underlying fetch request.
+ * @param {Array<number>=} opts.offsets - [Indexed-Tiff](https://github.com/hms-dbmi/generate-tiff-offsets) IFD offsets.
+ * @param {pool} [opts.bool=true] - Whether to use a multi-threaded pool of image decoders.
+ * @param {images} [opts.images='first'] - Whether to return 'all' or only the 'first' image in the OME-TIFF.
+ * Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[] is returned.
+ * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }> | Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[]} data source and associated OME-Zarr metadata.
  */
 export async function loadOmeTiff(
   source: string | File,
-  opts: TiffOptions = {}
+  opts: OmeTiffOptions = {}
 ) {
-  const { headers, offsets, pool = true } = opts;
+  const { headers, offsets, pool = true, images = 'first' } = opts;
 
   let tiff: GeoTIFF;
 
@@ -48,12 +77,12 @@ export async function loadOmeTiff(
      */
     tiff = createOffsetsProxy(tiff, offsets);
   }
-
   /*
    * Inspect tiff source for our performance enhancing proxies.
    * Prints warnings to console if `offsets` or `pool` are missing.
    */
   checkProxies(tiff);
 
-  return pool ? load(tiff, new Pool()) : load(tiff);
+  const loaders = pool ? await load(tiff, new Pool()) : await load(tiff);
+  return images === 'all' ? loaders : loaders[0];
 }

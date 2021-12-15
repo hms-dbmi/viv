@@ -30,9 +30,8 @@ export function getOmeLegacyIndexer(
   tiff: GeoTIFF,
   rootMeta: OMEXML
 ): OmeTiffIndexer {
-  const imgMeta = rootMeta[0];
-  const { SizeT, SizeC, SizeZ } = imgMeta.Pixels;
-  const ifdIndexer = getOmeIFDIndexer(imgMeta);
+  const { SizeT, SizeC, SizeZ } = rootMeta[0].Pixels;
+  const ifdIndexer = getOmeIFDIndexer(rootMeta, 0);
 
   return (sel: OmeTiffSelection, pyramidLevel: number) => {
     // Get IFD index at base pyramid level
@@ -60,10 +59,10 @@ export function getOmeLegacyIndexer(
  */
 export function getOmeSubIFDIndexer(
   tiff: GeoTIFF,
-  rootMeta: OMEXML
+  rootMeta: OMEXML,
+  image: number = 0
 ): OmeTiffIndexer {
-  const imgMeta = rootMeta[0];
-  const ifdIndexer = getOmeIFDIndexer(imgMeta);
+  const ifdIndexer = getOmeIFDIndexer(rootMeta, image);
   const ifdCache: Map<string, Promise<ImageFileDirectory>> = new Map();
 
   return async (sel: OmeTiffSelection, pyramidLevel: number) => {
@@ -107,27 +106,29 @@ export function getOmeSubIFDIndexer(
  * order and dimension sizes.
  */
 function getOmeIFDIndexer(
-  imgMeta: OMEXML[0]
+  rootMeta: OMEXML,
+  image: number = 0
 ): (sel: OmeTiffSelection) => number {
-  const { SizeC, SizeZ, SizeT, DimensionOrder } = imgMeta.Pixels;
+  const { SizeC, SizeZ, SizeT, DimensionOrder } = rootMeta[image].Pixels;
+  const imageOffset = image * (SizeC * SizeZ * SizeT);
   switch (DimensionOrder) {
     case 'XYZCT': {
-      return ({ t, c, z }) => t * SizeZ * SizeC + c * SizeZ + z;
+      return ({ t, c, z }) => imageOffset + t * SizeZ * SizeC + c * SizeZ + z;
     }
     case 'XYZTC': {
-      return ({ t, c, z }) => c * SizeZ * SizeT + t * SizeZ + z;
+      return ({ t, c, z }) => imageOffset + c * SizeZ * SizeT + t * SizeZ + z;
     }
     case 'XYCTZ': {
-      return ({ t, c, z }) => z * SizeC * SizeT + t * SizeC + c;
+      return ({ t, c, z }) => imageOffset + z * SizeC * SizeT + t * SizeC + c;
     }
     case 'XYCZT': {
-      return ({ t, c, z }) => t * SizeC * SizeZ + z * SizeC + c;
+      return ({ t, c, z }) => imageOffset + t * SizeC * SizeZ + z * SizeC + c;
     }
     case 'XYTCZ': {
-      return ({ t, c, z }) => z * SizeT * SizeC + c * SizeT + t;
+      return ({ t, c, z }) => imageOffset + z * SizeT * SizeC + c * SizeT + t;
     }
     case 'XYTZC': {
-      return ({ t, c, z }) => c * SizeT * SizeZ + z * SizeT + t;
+      return ({ t, c, z }) => imageOffset + c * SizeT * SizeZ + z * SizeT + t;
     }
     default: {
       throw new Error(`Invalid OME-XML DimensionOrder, got ${DimensionOrder}.`);

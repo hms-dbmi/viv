@@ -7,7 +7,7 @@ test('Creates correct TiffPixelSource for OME-TIFF.', async t => {
   t.plan(5);
   try {
     const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
-    const { data } = await load(tiff);
+    const [{ data }] = await load(tiff);
     t.equal(data.length, 1, 'image should not be pyramidal.');
     const [base] = data;
     t.deepEqual(
@@ -35,7 +35,7 @@ test('Get raster data.', async t => {
   t.plan(13);
   try {
     const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
-    const { data } = await load(tiff);
+    const [{ data }] = await load(tiff);
     const [base] = data;
 
     for (let c = 0; c < 3; c += 1) {
@@ -61,7 +61,7 @@ test('Correct OME-XML.', async t => {
   t.plan(9);
   try {
     const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
-    const { metadata } = await load(tiff);
+    const [{ metadata }] = await load(tiff);
     const { Name, Pixels } = metadata;
     t.equal(
       Name,

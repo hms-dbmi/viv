@@ -13,7 +13,8 @@ import {
 import {
   useImageSettingsStore,
   useViewerStore,
-  useChannelsStore
+  useChannelsStore,
+  useLoader
 } from '../state';
 import { useWindowSize } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
@@ -27,18 +28,17 @@ const Viewer = () => {
     colors,
     contrastLimits,
     channelsVisible,
-    selections,
-    loader
+    selections
   ] = useChannelsStore(
     store => [
       store.colors,
       store.contrastLimits,
       store.channelsVisible,
-      store.selections,
-      store.loader
+      store.selections
     ],
     shallow
   );
+  const loader = useLoader();
   const viewSize = useWindowSize();
   const [
     lensSelection,
