@@ -14,6 +14,7 @@
 - Add extensions to docs.
 - Fix broken GH-pages workflow.
 - Fix exported types for Viv v0.12.
+- Fix selection callbacks.
 
 ## 0.12.0
 
@@ -51,7 +52,7 @@
 - Add description of "Indexed TIFF" to Avivator snackbar warning when offsets are missing
 - Refactor `zustand` stores to follow best practice in Avivator.
 - Fix `onViewportLoad` callback for `MultiscaleImageLayer`
-- There has been a small change to how `transparentColor` is handled - `useTransparentColor` is now necessary for `AdditiveColormapExtension` and `ColorPaletteExtension` to use the feature in addition to `transparentColor` for `ColorPaletteExtension`.  The truthiness of `transparentColor` is no longer relied on.
+- There has been a small change to how `transparentColor` is handled - `useTransparentColor` is now necessary for `AdditiveColormapExtension` and `ColorPaletteExtension` to use the feature in addition to `transparentColor` for `ColorPaletteExtension`. The truthiness of `transparentColor` is no longer relied on.
 
 ## 0.11.0
 

@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { unstable_batchedUpdates } from 'react-dom';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import debounce from 'lodash/debounce';
@@ -35,25 +36,31 @@ export default function GlobalSelectionSlider(props) {
           selections: newSelections,
           use3d: false
         }).then(({ domains, contrastLimits }) => {
-          useImageSettingsStore.setState({
-            onViewportLoad: () => {
-              range(newSelections.length).forEach((channel, j) =>
-                setPropertiesForChannel(channel, {
-                  domains: domains[j],
-                  contrastLimits: contrastLimits[j]
-                })
-              );
-              useImageSettingsStore.setState({ onViewportLoad: () => {} });
-              useViewerStore.setState({
-                isChannelLoading: selections.map(() => false)
-              });
-            }
+          unstable_batchedUpdates(() => {
+            range(newSelections.length).forEach((channel, j) =>
+              setPropertiesForChannel(channel, {
+                domains: domains[j],
+                contrastLimits: contrastLimits[j]
+              })
+            );
           });
-          range(newSelections.length).forEach((channel, j) =>
-            setPropertiesForChannel(channel, {
-              selections: newSelections[j]
-            })
-          );
+          unstable_batchedUpdates(() => {
+            useImageSettingsStore.setState({
+              onViewportLoad: () => {
+                useImageSettingsStore.setState({
+                  onViewportLoad: () => {}
+                });
+                useViewerStore.setState({
+                  isChannelLoading: selections.map(() => false)
+                });
+              }
+            });
+            range(newSelections.length).forEach((channel, j) =>
+              setPropertiesForChannel(channel, {
+                selections: newSelections[j]
+              })
+            );
+          });
         });
       },
       50,
