@@ -120,12 +120,12 @@ const Controller = () => {
         selection,
         use3d
       }).then(({ domain, contrastLimits: newContrastLimit }) => {
+        setPropertiesForChannel(i, {
+          contrastLimits: newContrastLimit,
+          domains: domain
+        });
         useImageSettingsStore.setState({
           onViewportLoad: () => {
-            setPropertiesForChannel(i, {
-              contrastLimits: newContrastLimit,
-              domains: domain
-            });
             useImageSettingsStore.setState({ onViewportLoad: () => {} });
             setIsChannelLoading(i, false);
           }
