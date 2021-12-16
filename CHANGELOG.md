@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.12.1
+
+### Added
+
 - New note about port-forwarding to visualize remote data in the tutorial README
 - Setup workflow to deploy Avivator via GitHub Pages.
 - Support multiple images within an OME-TIFF file
