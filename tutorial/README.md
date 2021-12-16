@@ -93,6 +93,8 @@ This index can be reused by other Viv-based applications and even clients in oth
 
 ### Viewing in Avivator
 
+> ⚠️ Warning ⚠️ This section only works in Chrome, Firefox, and Edge (not Safari) due to differences in how browser restrict websites hosted at `https://` URLs (Avivator) from issuing requests to `http://` (the local data server) as a security measure. The supported browsers allow requests to `http://` from `https://` under the special case of `localhost`, whereas Safari prevents all requests to `http://`. As a workaround, you can start an Avivator client at `http://`, but we suggest trying a different supported browser. Alternatively, you can drag-and-drop an image (no local server) into the viewer in any browser.
+
 There are a few different ways to view your data in Avivator.
 
 If you have an OME-TIFF saved locally, you may simply drag and drop
