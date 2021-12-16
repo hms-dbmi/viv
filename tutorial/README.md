@@ -5,8 +5,6 @@ This guide demonstrates how to generate a pyramidal OME-TIFF [with Bio-Formats](
 
 > NOTE: If you wish to view an image located on a remote machine accessible via SSH, please see the note at the end of this document.
 
-> ⚠️ Warning ⚠️ This section only works in Chrome, Firefox, and Edge (not Safari) due to differences in how browser restrict websites hosted at `https://` URLs (Avivator) from issuing requests to `http://` (the local data server) as a security measure. The supported browsers allow requests to `http://` from `https://` under the special case of `localhost`, whereas Safari prevents all requests to `http://`. As a workaround, you can start an Avivator client at `http://`, but we suggest trying a different supported browser. Alternatively, you can drag-and-drop an image (no local server) into the viewer in any browser.
-
 This tutorial requires Bio-Formats [`bioformats2raw`](https://github.com/glencoesoftware/bioformats2raw) and
 [`raw2ometiff`](https://github.com/glencoesoftware/raw2ometiff) command-line tools. It's easiest to install
 these tools using [`conda`](https://docs.conda.io/projects/conda/en/latest/user-guide/install/), but
@@ -94,6 +92,8 @@ data
 This index can be reused by other Viv-based applications and even clients in other languages to improve remote OME-TIFF performance. If using Viv, you must fetch the offsets.json directly in your application code. See [our example](http://viv.gehlenborglab.org/#getting-started) for help getting started
 
 ### Viewing in Avivator
+
+> ⚠️ Warning ⚠️ This section only works in Chrome, Firefox, and Edge (not Safari) due to differences in how browser restrict websites hosted at `https://` URLs (Avivator) from issuing requests to `http://` (the local data server) as a security measure. The supported browsers allow requests to `http://` from `https://` under the special case of `localhost`, whereas Safari prevents all requests to `http://`. As a workaround, you can start an Avivator client at `http://`, but we suggest trying a different supported browser. Alternatively, you can drag-and-drop an image (no local server) into the viewer in any browser.
 
 There are a few different ways to view your data in Avivator.
 
