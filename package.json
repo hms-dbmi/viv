@@ -1,6 +1,6 @@
 {
   "name": "@hms-dbmi/viv",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "main": "dist/viv.es.js",
   "module": "dist/viv.es.js",
   "types": "dist/index.d.ts",
