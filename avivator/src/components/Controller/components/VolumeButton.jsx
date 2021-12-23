@@ -190,15 +190,14 @@ function VolumeButton() {
                               selections,
                               use3d: true
                             }).then(({ domains, contrastLimits }) => {
+                              range(selections.length).forEach((channel, j) =>
+                                setPropertiesForChannel(channel, {
+                                  domains: domains[j],
+                                  contrastLimits: contrastLimits[j]
+                                })
+                              );
                               useImageSettingsStore.setState({
                                 onViewportLoad: () => {
-                                  range(selections.length).forEach(
-                                    (channel, j) =>
-                                      setPropertiesForChannel(channel, {
-                                        domains: domains[j],
-                                        contrastLimits: contrastLimits[j]
-                                      })
-                                  );
                                   useImageSettingsStore.setState({
                                     onViewportLoad: () => {}
                                   });
