@@ -6,6 +6,12 @@
 
 ### Changed
 
+## 0.12.2
+
+### Added
+
+### Changed
+
 - Fix "Add Channel" and "Show Volume" buttons in Avivator
 
 ## 0.12.1
