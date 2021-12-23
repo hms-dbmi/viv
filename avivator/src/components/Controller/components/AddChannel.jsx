@@ -48,13 +48,13 @@ const AddChannel = () => {
       selection,
       use3d
     }).then(({ domain, contrastLimits }) => {
+      setPropertiesForChannel(numSelectionsBeforeAdd, {
+        domains: domain,
+        contrastLimits,
+        channelsVisible: true
+      });
       useImageSettingsStore.setState({
         onViewportLoad: () => {
-          setPropertiesForChannel(numSelectionsBeforeAdd, {
-            domains: domain,
-            contrastLimits,
-            channelsVisible: true
-          });
           useImageSettingsStore.setState({ onViewportLoad: () => {} });
           setIsChannelLoading(numSelectionsBeforeAdd, false);
         }
