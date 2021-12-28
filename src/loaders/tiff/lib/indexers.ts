@@ -110,7 +110,17 @@ function getOmeIFDIndexer(
   image: number = 0
 ): (sel: OmeTiffSelection) => number {
   const { SizeC, SizeZ, SizeT, DimensionOrder } = rootMeta[image].Pixels;
-  const imageOffset = image * (SizeC * SizeZ * SizeT);
+  // For multi-image OME-TIFF files, we need to offset by the full dimensions
+  // of the previous images dimensions i.e Z * C * T of image - 1 + that of image - 2 etc.
+  let imageOffset = 0;
+  if (image > 0) {
+    for (let i = 0; i < image; i += 1) {
+      const { SizeC: prevSizeC, SizeZ: prevSizeZ, SizeT: prevSizeT } = rootMeta[
+        i
+      ].Pixels;
+      imageOffset += prevSizeC * prevSizeZ * prevSizeT;
+    }
+  }
   switch (DimensionOrder) {
     case 'XYZCT': {
       return ({ t, c, z }) => imageOffset + t * SizeZ * SizeC + c * SizeZ + z;
