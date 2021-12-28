@@ -6,6 +6,12 @@
 
 ### Changed
 
+## 0.12.3
+
+### Added
+
+### Changed
+
 - Fix multi-image tiff indexing.
 
 ## 0.12.2
