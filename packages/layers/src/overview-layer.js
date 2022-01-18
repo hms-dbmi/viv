@@ -39,18 +39,15 @@ const defaultProps = {
  * @typedef LayerProps
  * @type {Object}
  * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {Array} loader PixelSource[]. Assumes multiscale if loader.length > 1.
  * @property {Array} selections Selection to be used for fetching data.
- * @property {number=} opacity Opacity of the layer.
- * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
- * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
  * @property {Array.<number>=} boundingBoxColor [r, g, b] color of the bounding box (default: [255, 0, 0]).
  * @property {number=} boundingBoxOutlineWidth Width of the bounding box in px (default: 1).
  * @property {Array.<number>=} viewportOutlineColor [r, g, b] color of the outline (default: [255, 190, 0]).
  * @property {number=} viewportOutlineWidth Viewport outline width in px (default: 2).
  * @property {String=} id Unique identifier for this layer.
+ * @property {Array=} extensions [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers.
  */
 
 /**
