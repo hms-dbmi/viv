@@ -13,6 +13,7 @@
 ### Changed
 
 - Fix multi-image tiff indexing.
+- Change `ScaleBarLayer` to use `toPrecision` instead of string cutoff.
 
 ## 0.12.2
 
