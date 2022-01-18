@@ -125,7 +125,7 @@ const ScaleBarLayer = class extends CompositeLayer {
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         {
-          text: String(numUnits).slice(0, 5).replace(/\.$/, '') + unit,
+          text: numUnits.toPrecision(5) + unit,
           position: [xLeftCoord + barLength * 0.5, yCoord + barHeight * 4]
         }
       ],
@@ -134,7 +134,13 @@ const ScaleBarLayer = class extends CompositeLayer {
       fontFamily: DEFAULT_FONT_FAMILY,
       sizeUnits: 'meters',
       sizeScale: 2 ** -zoom,
-      characterSet: [...unit.split(''), ...range(10).map(i => String(i)), '.']
+      characterSet: [
+        ...unit.split(''),
+        ...range(10).map(i => String(i)),
+        '.',
+        'e',
+        '+'
+      ]
     });
     return [lengthBar, tickBoundsLeft, tickBoundsRight, textLayer];
   }
