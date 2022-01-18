@@ -134,7 +134,13 @@ const ScaleBarLayer = class extends CompositeLayer {
       fontFamily: DEFAULT_FONT_FAMILY,
       sizeUnits: 'meters',
       sizeScale: 2 ** -zoom,
-      characterSet: [...unit.split(''), ...range(10).map(i => String(i)), '.', 'e', '+']
+      characterSet: [
+        ...unit.split(''),
+        ...range(10).map(i => String(i)),
+        '.',
+        'e',
+        '+'
+      ]
     });
     return [lengthBar, tickBoundsLeft, tickBoundsRight, textLayer];
   }
