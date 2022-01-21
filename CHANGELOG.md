@@ -5,6 +5,12 @@
 ### Added
 
 ### Changed
+
+## 0.12.4
+
+### Added
+
+### Changed
 - Upgrade geotiff fork to viv-0.0.3 to resolve 416 issue
 - Disable `@vite/plugin-react` for ESM build
 
