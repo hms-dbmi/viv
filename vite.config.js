@@ -71,14 +71,13 @@ const bundleWebWorker = () => {
 };
 
 const plugins = [
-  react(),
   glslify(),
   bundleWebWorker(),
   serveData(process.env.VIV_DATA_DIR || 'avivator/data'),
 ];
 
 const configAvivator = defineConfig({
-  plugins,
+  plugins: [react(), ...plugins],
   base: './',
   root: 'avivator',
   publicDir: 'avivator/public',
