@@ -5,6 +5,12 @@
 ### Added
 
 ### Changed
+
+## 0.12.5
+
+### Added
+
+### Changed
 - Fix geotiff file size check, implemented when fixing 416 issue.  Not all servers return file size as part of response.
 
 ## 0.12.4
