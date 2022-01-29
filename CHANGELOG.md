@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Bump `deck.gl` to 8.6.7
 
 ## 0.12.5
 
