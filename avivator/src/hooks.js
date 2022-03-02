@@ -67,11 +67,11 @@ export const useImage = (source, history) => {
           nextMeta
         );
         unstable_batchedUpdates(() => {
-useChannelsStore.setState({ loader: nextLoader });
-useViewerStore.setState({
-  metadata: nextMeta
-});
-        })
+          useChannelsStore.setState({ loader: nextLoader });
+          useViewerStore.setState({
+            metadata: nextMeta
+          });
+        });
         if (use3d) toggleUse3d();
         // eslint-disable-next-line no-unused-expressions
         history?.push(
@@ -95,7 +95,6 @@ useViewerStore.setState({
       let newDomains = [];
       let newColors = [];
       const isRgb = guessRgb(metadata);
-      console.log(isRgb, metadata)
       if (isRgb) {
         if (isInterleaved(loader[0].shape)) {
           // These don't matter because the data is interleaved.
@@ -122,7 +121,6 @@ useViewerStore.setState({
         if (lensEnabled) {
           toggleLensEnabled();
         }
-        console.log('here')
         useViewerStore.setState({ useColormap: false, useLens: false });
       } else {
         const stats = await getMultiSelectionStats({
@@ -137,7 +135,6 @@ useViewerStore.setState({
           newDomains.length === 1
             ? [[255, 255, 255]]
             : newDomains.map((_, i) => COLOR_PALLETE[i]);
-        console.log('here!')
         useViewerStore.setState({
           useLens: channelOptions.length !== 1,
           useColormap: true
