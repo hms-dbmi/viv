@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useDropzone as useReactDropzone } from 'react-dropzone';
 import shallow from 'zustand/shallow';
+// eslint-disable-next-line camelcase
+import { unstable_batchedUpdates } from 'react-dom';
 
 import {
   useChannelsStore,
@@ -64,9 +66,11 @@ export const useImage = (source, history) => {
           'Metadata (in JSON-like form) for current file being viewed: ',
           nextMeta
         );
-        useChannelsStore.setState({ loader: nextLoader });
-        useViewerStore.setState({
-          metadata: nextMeta
+        unstable_batchedUpdates(() => {
+          useChannelsStore.setState({ loader: nextLoader });
+          useViewerStore.setState({
+            metadata: nextMeta
+          });
         });
         if (use3d) toggleUse3d();
         // eslint-disable-next-line no-unused-expressions

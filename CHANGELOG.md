@@ -6,6 +6,7 @@
 
 ### Changed
 - Bump `deck.gl` to 8.6.7
+- Fix custom `BitmapLayer` compilation issue by providing `extensions: []`
 
 ## 0.12.5
 

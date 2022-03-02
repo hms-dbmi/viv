@@ -130,7 +130,8 @@ const ImageLayer = class extends CompositeLayer {
         photometricInterpretation,
         // Shared props with XRLayer:
         bounds,
-        id: `image-sub-layer-${bounds}-${id}`
+        id: `image-sub-layer-${bounds}-${id}`,
+        extensions: []
       });
     }
     return new XRLayer(this.props, {

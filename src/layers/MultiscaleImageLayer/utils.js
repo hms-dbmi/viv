@@ -37,7 +37,8 @@ export function renderSubLayers(props) {
       // Shared props with XRLayer:
       bounds,
       id: `tile-sub-layer-${bounds}-${id}`,
-      tileId: { x, y, z }
+      tileId: { x, y, z },
+      extensions: []
     });
   }
   return new XRLayer(props, {
