@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useDropzone as useReactDropzone } from 'react-dropzone';
 import shallow from 'zustand/shallow';
+// eslint-disable-next-line camelcase
+import { unstable_batchedUpdates } from 'react-dom';
 
 import {
   useChannelsStore,
@@ -64,10 +66,12 @@ export const useImage = (source, history) => {
           'Metadata (in JSON-like form) for current file being viewed: ',
           nextMeta
         );
-        useChannelsStore.setState({ loader: nextLoader });
-        useViewerStore.setState({
-          metadata: nextMeta
-        });
+        unstable_batchedUpdates(() => {
+useChannelsStore.setState({ loader: nextLoader });
+useViewerStore.setState({
+  metadata: nextMeta
+});
+        })
         if (use3d) toggleUse3d();
         // eslint-disable-next-line no-unused-expressions
         history?.push(
@@ -91,6 +95,7 @@ export const useImage = (source, history) => {
       let newDomains = [];
       let newColors = [];
       const isRgb = guessRgb(metadata);
+      console.log(isRgb, metadata)
       if (isRgb) {
         if (isInterleaved(loader[0].shape)) {
           // These don't matter because the data is interleaved.
@@ -117,6 +122,7 @@ export const useImage = (source, history) => {
         if (lensEnabled) {
           toggleLensEnabled();
         }
+        console.log('here')
         useViewerStore.setState({ useColormap: false, useLens: false });
       } else {
         const stats = await getMultiSelectionStats({
@@ -131,6 +137,7 @@ export const useImage = (source, history) => {
           newDomains.length === 1
             ? [[255, 255, 255]]
             : newDomains.map((_, i) => COLOR_PALLETE[i]);
+        console.log('here!')
         useViewerStore.setState({
           useLens: channelOptions.length !== 1,
           useColormap: true
