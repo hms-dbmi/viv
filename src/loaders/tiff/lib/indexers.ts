@@ -2,7 +2,6 @@ import { GeoTIFFImage, GeoTIFF } from 'geotiff';
 import type { OmeTiffSelection } from '../ome-tiff';
 import type { OMEXML } from '../../omexml';
 
-
 export type OmeTiffIndexer = (
   sel: OmeTiffSelection,
   z: number
@@ -64,7 +63,10 @@ export function getOmeSubIFDIndexer(
   image: number = 0
 ): OmeTiffIndexer {
   const ifdIndexer = getOmeIFDIndexer(rootMeta, image);
-  const ifdCache: Map<string, ReturnType<GeoTIFF['parseFileDirectoryAt']>> = new Map();
+  const ifdCache: Map<
+    string,
+    ReturnType<GeoTIFF['parseFileDirectoryAt']>
+  > = new Map();
 
   return async (sel: OmeTiffSelection, pyramidLevel: number) => {
     const index = ifdIndexer(sel);

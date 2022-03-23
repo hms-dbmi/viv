@@ -14,8 +14,9 @@ import type {
   PixelData
 } from '../../types';
 
-
-type ReadRastersOptions = NonNullable<Parameters<GeoTIFFImage["readRasters"]>[0]>;
+type ReadRastersOptions = NonNullable<
+  Parameters<GeoTIFFImage['readRasters']>[0]
+>;
 
 class TiffPixelSource<S extends string[]> implements PixelSource<S> {
   private _indexer: (sel: PixelSourceSelection<S>) => Promise<GeoTIFFImage>;
@@ -66,8 +67,8 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
     const data = (interleave ? raster : raster[0]) as TypedArray;
     return {
       data,
-      width: (raster as TypedArray & { width: number }).width, 
-      height: (raster as TypedArray & { height: number }).height, 
+      width: (raster as TypedArray & { width: number }).width,
+      height: (raster as TypedArray & { height: number }).height
     } as PixelData;
   }
 
