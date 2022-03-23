@@ -1,6 +1,7 @@
-import type { GeoTIFFImage, GeoTIFF, ImageFileDirectory } from 'geotiff';
+import { GeoTIFFImage, GeoTIFF } from 'geotiff';
 import type { OmeTiffSelection } from '../ome-tiff';
 import type { OMEXML } from '../../omexml';
+
 
 export type OmeTiffIndexer = (
   sel: OmeTiffSelection,
@@ -63,7 +64,7 @@ export function getOmeSubIFDIndexer(
   image: number = 0
 ): OmeTiffIndexer {
   const ifdIndexer = getOmeIFDIndexer(rootMeta, image);
-  const ifdCache: Map<string, Promise<ImageFileDirectory>> = new Map();
+  const ifdCache: Map<string, ReturnType<GeoTIFF['parseFileDirectoryAt']>> = new Map();
 
   return async (sel: OmeTiffSelection, pyramidLevel: number) => {
     const index = ifdIndexer(sel);
@@ -86,18 +87,17 @@ export function getOmeSubIFDIndexer(
       const subIfdOffset = SubIFDs[pyramidLevel - 1];
       ifdCache.set(key, tiff.parseFileDirectoryAt(subIfdOffset));
     }
-    const ifd = (await ifdCache.get(key)) as ImageFileDirectory;
+    const ifd = await ifdCache.get(key)!;
 
     // Create a new image object manually from IFD
-    // https://github.com/geotiffjs/geotiff.js/blob/8ef472f41b51d18074aece2300b6a8ad91a21ae1/src/geotiff.js#L447-L453
-    return new (baseImage.constructor as any)(
+    return new GeoTIFFImage(
       ifd.fileDirectory,
       ifd.geoKeyDirectory,
-      tiff.dataView,
+      baseImage.dataView,
       tiff.littleEndian,
       tiff.cache,
       tiff.source
-    ) as GeoTIFFImage;
+    );
   };
 }
 
