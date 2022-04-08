@@ -36,12 +36,7 @@ import vs from './xr-layer-vertex.glsl';
 import fs from './xr-layer-fragment.glsl';
 import channels from './channel-intensity-module';
 import { padContrastLimits, padWithDefault, getDtypeValues } from '../utils';
-import { COLORMAPS, RENDERING_MODES as RENDERING_NAMES } from '../../constants';
 import { padColors } from '../../extensions/utils';
-import {
-  RENDERING_MODES_BLEND,
-  RENDERING_MODES_COLORMAP
-} from './rendering-modes';
 
 // prettier-ignore
 const CUBE_STRIP = [
@@ -66,20 +61,14 @@ const defaultProps = {
   pickable: false,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'object', value: {}, compare: true },
-  colors: { type: 'array', value: [], compare: true },
   contrastLimits: { type: 'array', value: [], compare: true },
   dtype: { type: 'string', value: 'Uint8', compare: true },
-  colormap: { type: 'string', value: '', compare: true },
   xSlice: { type: 'array', value: null, compare: true },
   ySlice: { type: 'array', value: null, compare: true },
   zSlice: { type: 'array', value: null, compare: true },
   clippingPlanes: { type: 'array', value: [], compare: true },
-  renderingMode: {
-    type: 'string',
-    value: RENDERING_NAMES.ADDITIVE,
-    compare: true
-  },
-  resolutionMatrix: { type: 'object', value: new Matrix4(), compare: true }
+  resolutionMatrix: { type: 'object', value: new Matrix4(), compare: true },
+  channelsVisible: { type: 'array', value: [], compare: true }
 };
 
 function getRenderingAttrs() {
@@ -91,28 +80,13 @@ function getRenderingAttrs() {
   };
 }
 
-function removeExtraColormapFunctionsFromShader(colormap) {
-  // Always include viridis so shaders compile,
-  // but otherwise we discard all other colormaps via a regex.
-  // With all the colormaps, the shaders were too large
-  // and crashed our computers when we loaded volumes too large.
-  const discardColormaps = COLORMAPS.filter(
-    i => i !== (colormap || 'viridis')
-  ).map(i => i.replace(/-/g, '_'));
-  const discardRegex = new RegExp(
-    `vec4 (${discardColormaps.join(
-      '(_([0-9]*))?|'
-    )})\\(float x_[0-9]+\\){([^}]+)}`,
-    'g'
-  );
-  const channelsModules = {
-    ...channels,
-    fs: channels.fs.replace(discardRegex, ''),
-    defines: {
-      COLORMAP_FUNCTION: colormap || 'viridis'
-    }
-  };
-  return channelsModules;
+function getRenderingFromExtensions(extensions) {
+  console.log(extensions); // eslint-disable-line
+  let rendering = {};
+  extensions.forEach(extension => {
+    rendering = extension.rendering[extension.state.renderingMode];
+  });
+  return rendering;
 }
 
 /**
@@ -168,16 +142,17 @@ const XR3DLayer = class extends Layer {
    * This function compiles the shaders and the projection module.
    */
   getShaders() {
-    const { colormap, renderingMode, clippingPlanes } = this.props;
+    const { clippingPlanes, extensions } = this.props;
     const { sampler } = getRenderingAttrs();
-    const { _BEFORE_RENDER, _RENDER, _AFTER_RENDER } = colormap
-      ? RENDERING_MODES_COLORMAP[renderingMode]
-      : RENDERING_MODES_BLEND[renderingMode];
-    const channelsModules = removeExtraColormapFunctionsFromShader(colormap);
+    const {
+      _BEFORE_RENDER,
+      _RENDER,
+      _AFTER_RENDER
+    } = getRenderingFromExtensions(extensions);
     const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
       'fs:DECKGL_PROCESS_INTENSITY'
     );
-    const newChannelsModule = { ...channelsModules, inject: {} };
+    const newChannelsModule = { inject: {}, ...channels };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
         intensity = apply_contrast_limits(intensity, contrastLimits);
@@ -191,7 +166,6 @@ const XR3DLayer = class extends Layer {
         .replace('_AFTER_RENDER', _AFTER_RENDER),
       defines: {
         SAMPLER_TYPE: sampler,
-        COLORMAP_FUNCTION: colormap || 'viridis',
         NUM_PLANES: String(clippingPlanes.length || NUM_PLANES_DEFAULT)
       },
       modules: [newChannelsModule]

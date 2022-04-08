@@ -4,16 +4,14 @@ import { isWebGL2 } from '@luma.gl/core';
 import { Matrix4 } from 'math.gl';
 import XR3DLayer from '../XR3DLayer';
 import { getPhysicalSizeScalingMatrix } from '../utils';
-import { RENDERING_MODES } from '../../constants';
 import { getVolume, getTextLayer } from './utils';
+import ColorPalette3DExtension from '../../extensions/ColorPalette3DExtension';
 
 const defaultProps = {
   pickable: false,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   contrastLimits: { type: 'array', value: [], compare: true },
   channelsVisible: { type: 'array', value: [], compare: true },
-  colors: { type: 'array', value: [], compare: true },
-  colormap: { type: 'string', value: '', compare: true },
   selections: { type: 'array', value: [], compare: true },
   resolution: { type: 'number', value: 0, compare: true },
   domain: { type: 'array', value: [], compare: true },
@@ -33,14 +31,14 @@ const defaultProps = {
   ySlice: { type: 'array', value: null, compare: true },
   zSlice: { type: 'array', value: null, compare: true },
   clippingPlanes: { type: 'array', value: [], compare: true },
-  renderingMode: {
-    type: 'string',
-    value: RENDERING_MODES.MAX_INTENSITY_PROJECTION,
-    compare: true
-  },
   onUpdate: { type: 'function', value: () => {}, compare: true },
   useProgressIndicator: { type: 'boolean', value: true, compare: true },
-  useWebGL1Warning: { type: 'boolean', value: true, compare: true }
+  useWebGL1Warning: { type: 'boolean', value: true, compare: true },
+  extensions: {
+    type: 'array',
+    value: [new ColorPalette3DExtension()],
+    compare: true
+  }
 };
 
 /**
@@ -159,8 +157,10 @@ const VolumeLayer = class extends CompositeLayer {
       id,
       resolution,
       useProgressIndicator,
-      useWebGL1Warning
+      useWebGL1Warning,
+      extensions
     } = this.props;
+    console.log(extensions);
     const { dtype } = loader[resolution];
     const {
       data,
