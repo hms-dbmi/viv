@@ -78,6 +78,14 @@ type LensExtensionProps = {
   lensBorderColor: Color;
 };
 
+type ColorPalette3DExtensionProps = {
+  colors: Color[];
+};
+
+type AdditiveColormap3DExtensionProps = {
+  colormap: typeof COLORMAPS[number];
+};
+
 // types to be refined _if_ on LayerProps
 type PreciseLayerProps<S extends string[]> = {
   contrastLimits: [begin: number, end: number][];
@@ -102,7 +110,9 @@ type WithExtensionProps<LayerProps> = LayerProps extends { extensions: unknown }
   ? Partial<
       ColorPaletteExtensionProps &
         AdditiveColormapExtensionProps &
-        LensExtensionProps
+        LensExtensionProps &
+        ColorPalette3DExtensionProps &
+        AdditiveColormap3DExtensionProps
     > & { [extensionProp: string]: any }
   : {};
 
