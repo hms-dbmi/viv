@@ -38,9 +38,14 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * */
 const AdditiveColormap3DExtension = class extends LayerExtension {
   getShaders() {
-    return removeExtraColormapFunctionsFromShader(
-      this?.props?.colormap || defaultProps.colormap.value
-    );
+    return {
+      ...super.getShaders(),
+      modules: [
+        removeExtraColormapFunctionsFromShader(
+          this?.props?.colormap || defaultProps.colormap.value
+        )
+      ]
+    };
   }
 
   updateState({ props, oldProps, changeFlags, ...rest }) {

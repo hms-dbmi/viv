@@ -133,7 +133,9 @@ const XR3DLayer = class extends Layer {
       if (shaders) {
         const { inject = {}, modules = [] } = shaders;
         const definesInjection = inject[hookName];
-        const moduleDefinesInjection = modules.some(m => m?.inject[hookName]);
+        const moduleDefinesInjection = modules.some(
+          m => m.inject && m?.inject[hookName]
+        );
         return definesInjection || moduleDefinesInjection;
       }
       return false;
