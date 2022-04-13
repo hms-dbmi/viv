@@ -6,11 +6,15 @@ import {
   loadOmeTiff,
   loadBioformatsZarr,
   loadOmeZarr,
-  getChannelStats
+  getChannelStats,
+  RENDERING_MODES,
+  ColorPalette3DExtensions,
+  AdditiveColormap3DExtensions
   // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
+import { render } from 'react-dom';
 
 const MAX_CHANNELS_FOR_SNACKBAR_WARNING = 40;
 
@@ -360,4 +364,20 @@ export function getBoundingCube(loader) {
     physicalSizeScalingMatrix[10] * shape[labels.indexOf('z')]
   ];
   return [xSlice, ySlice, zSlice];
+}
+
+export function get3DExtension(colormap, renderingMode) {
+  const extensions = colormap
+    ? AdditiveColormap3DExtensions
+    : ColorPalette3DExtensions;
+  if (renderingMode === RENDERING_MODES.MAX_INTENSITY_PROJECTION) {
+    return new extensions.MaximumIntensityProjectionExtension();
+  }
+  if (renderingMode === RENDERING_MODES.MIN_INTENSITY_PROJECTION) {
+    return new extensions.MinimumIntensityProjectionExtension();
+  }
+  if (renderingMode === RENDERING_MODES.ADDITIVE) {
+    return new extensions.AdditiveBlendExtension();
+  }
+  throw new Error(`${renderingMode} rendering mode not supported`);
 }

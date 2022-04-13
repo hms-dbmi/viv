@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'; // eslint-disable-line import/no-unresol
 
 import VivViewer from './VivViewer';
 import { VolumeView, getDefaultInitialViewState } from '../views';
-import { RENDERING_MODES } from '../constants';
+import { ColorPalette3DExtensions } from '../extensions';
 
 /**
  * This component provides a volumetric viewer that provides provides volume-ray-casting.
@@ -40,7 +40,6 @@ const VolumeViewer = props => {
     resolution = Math.max(0, loader.length - 1),
     modelMatrix,
     onViewStateChange,
-    renderingMode = RENDERING_MODES.ADDITIVE,
     xSlice = null,
     ySlice = null,
     zSlice = null,
@@ -49,7 +48,8 @@ const VolumeViewer = props => {
     width: screenWidth,
     viewStates: viewStatesProp,
     clippingPlanes = [],
-    useFixedAxis = true
+    useFixedAxis = true,
+    extensions = [new ColorPalette3DExtensions.AdditiveBlendExtension()]
   } = props;
   const volumeViewState = viewStatesProp?.find(state => state?.id === '3d');
   const initialViewState = useMemo(() => {
@@ -87,7 +87,7 @@ const VolumeViewer = props => {
     ySlice,
     zSlice,
     resolution,
-    renderingMode,
+    extensions,
     modelMatrix,
     // Slightly delay to avoid issues with a render in the middle of a deck.gl layer state update.
     onViewportLoad: () => setTimeout(onViewportLoad, 0),
