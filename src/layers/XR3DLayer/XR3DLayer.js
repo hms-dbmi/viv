@@ -84,7 +84,7 @@ function getRenderingFromExtensions(extensions) {
   console.log(extensions); // eslint-disable-line
   let rendering = {};
   extensions.forEach(extension => {
-    rendering = extension.rendering[extension.state.renderingMode];
+    rendering = extension.rendering;
   });
   return rendering;
 }
@@ -131,10 +131,13 @@ const XR3DLayer = class extends Layer {
     const { extensions } = this.props;
     return extensions?.some(e => {
       const shaders = e.getShaders();
-      const { inject = {}, modules = [] } = shaders;
-      const definesInjection = inject[hookName];
-      const moduleDefinesInjection = modules.some(m => m?.inject[hookName]);
-      return definesInjection || moduleDefinesInjection;
+      if (shaders) {
+        const { inject = {}, modules = [] } = shaders;
+        const definesInjection = inject[hookName];
+        const moduleDefinesInjection = modules.some(m => m?.inject[hookName]);
+        return definesInjection || moduleDefinesInjection;
+      }
+      return false;
     });
   }
 

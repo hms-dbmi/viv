@@ -1,5 +1,4 @@
-import Base3DExtension from '../Base3DExtension';
-import rendering from './rendering-modes';
+import { LayerExtension } from '@deck.gl/core';
 import additiveColormap from './additive-colormap-module';
 import { COLORMAPS } from '../../constants';
 
@@ -37,7 +36,7 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * @type {object}
  * @property {string=} colormap String indicating a colormap (default: 'viridis').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * */
-const AdditiveColormap3DExtension = class extends Base3DExtension {
+const AdditiveColormap3DExtension = class extends LayerExtension {
   getShaders() {
     return removeExtraColormapFunctionsFromShader(
       this?.props?.colormap || defaultProps.colormap.value
@@ -58,6 +57,5 @@ const AdditiveColormap3DExtension = class extends Base3DExtension {
 
 AdditiveColormap3DExtension.extensionName = 'AdditiveColormap3DExtension';
 AdditiveColormap3DExtension.defaultProps = defaultProps;
-AdditiveColormap3DExtension.rendering = rendering;
 
 export default AdditiveColormap3DExtension;

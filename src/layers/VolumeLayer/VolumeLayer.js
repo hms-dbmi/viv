@@ -5,7 +5,7 @@ import { Matrix4 } from 'math.gl';
 import XR3DLayer from '../XR3DLayer';
 import { getPhysicalSizeScalingMatrix } from '../utils';
 import { getVolume, getTextLayer } from './utils';
-import ColorPalette3DExtension from '../../extensions/ColorPalette3DExtension';
+import ColorPalette3DExtensions from '../../extensions/ColorPalette3DExtensions';
 
 const defaultProps = {
   pickable: false,
@@ -36,7 +36,7 @@ const defaultProps = {
   useWebGL1Warning: { type: 'boolean', value: true, compare: true },
   extensions: {
     type: 'array',
-    value: [new ColorPalette3DExtension()],
+    value: [new ColorPalette3DExtensions.AdditiveBlendExtension()],
     compare: true
   }
 };

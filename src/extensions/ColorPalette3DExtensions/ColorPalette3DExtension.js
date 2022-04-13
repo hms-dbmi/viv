@@ -1,5 +1,4 @@
-import Base3DExtension from '../Base3DExtension';
-import rendering from './rendering-modes';
+import { LayerExtension } from '@deck.gl/core';
 import { getDefaultPalette, padColors } from '../utils';
 
 const defaultProps = {
@@ -11,7 +10,7 @@ const defaultProps = {
  * @typedef LayerProps
  * @type {object}
  * */
-const ColorPalette3DExtension = class extends Base3DExtension {
+const ColorPalette3DExtension = class extends LayerExtension {
   draw() {
     const { colors, channelsVisible } = this.props;
     const paddedColors = padColors({
@@ -27,7 +26,6 @@ const ColorPalette3DExtension = class extends Base3DExtension {
 };
 
 ColorPalette3DExtension.extensionName = 'ColorPalette3DExtension';
-ColorPalette3DExtension.rendering = rendering;
 ColorPalette3DExtension.defaultProps = defaultProps;
 
 export default ColorPalette3DExtension;
