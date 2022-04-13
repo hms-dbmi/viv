@@ -157,10 +157,8 @@ const VolumeLayer = class extends CompositeLayer {
       id,
       resolution,
       useProgressIndicator,
-      useWebGL1Warning,
-      extensions
+      useWebGL1Warning
     } = this.props;
-    console.log(extensions);
     const { dtype } = loader[resolution];
     const {
       data,

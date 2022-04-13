@@ -81,10 +81,9 @@ function getRenderingAttrs() {
 }
 
 function getRenderingFromExtensions(extensions) {
-  console.log(extensions); // eslint-disable-line
   let rendering = {};
   extensions.forEach(extension => {
-    rendering = extension.rendering;
+    rendering = extension.opts.rendering;
   });
   return rendering;
 }

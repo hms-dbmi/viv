@@ -11,7 +11,7 @@ import { RENDERING_MODES as RENDERING_NAMES } from '../../constants';
 const MinimumIntensityProjectionExtension = class extends AdditiveColormap3DExtension {
   constructor(args) {
     super(args);
-    this.rendering = rendering[RENDERING_NAMES.MIN_INTENSITY_PROJECTION];
+    this.opts.rendering = rendering[RENDERING_NAMES.MIN_INTENSITY_PROJECTION];
   }
 };
 
