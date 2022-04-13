@@ -85,6 +85,15 @@ function getRenderingFromExtensions(extensions) {
   extensions.forEach(extension => {
     rendering = extension.opts.rendering;
   });
+  if (
+    !rendering._RENDER ||
+    !rendering._AFTER_RENDER ||
+    !rendering._BEFORE_RENDER
+  ) {
+    throw new Error(
+      'XR3DLayer requires at least one extension to define opts.rendering as an object with _RENDER, _AFTER_RENDER, and _BEFORE_RENDER properties.'
+    );
+  }
   return rendering;
 }
 

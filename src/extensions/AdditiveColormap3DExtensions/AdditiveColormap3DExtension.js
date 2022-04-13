@@ -31,7 +31,7 @@ function removeExtraColormapFunctionsFromShader(colormap) {
 }
 
 /**
- * This deck.gl extension allows for an additive colormap like viridis or jet to be used for pseudo-coloring channels.
+ * This deck.gl extension allows for an additive colormap like viridis or jet to be used for pseudo-coloring channels in 3D.
  * @typedef LayerProps
  * @type {object}
  * @property {string=} colormap String indicating a colormap (default: 'viridis').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap

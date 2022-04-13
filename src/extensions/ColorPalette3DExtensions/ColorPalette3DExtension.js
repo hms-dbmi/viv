@@ -6,9 +6,10 @@ const defaultProps = {
 };
 
 /**
- * This deck.gl extension allows for an additive colormap like viridis or jet to be used for pseudo-coloring channels.
+ * This deck.gl extension allows for a color palette to be used for rendering in 3D.
  * @typedef LayerProps
  * @type {object}
+ * @property {Array<Array<number>>=} colors Array of colors to map channels to (RGB).
  * */
 const ColorPalette3DExtension = class extends LayerExtension {
   draw() {
