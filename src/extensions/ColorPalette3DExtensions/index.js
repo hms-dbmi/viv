@@ -1,11 +1,14 @@
 import AdditiveBlendExtension from './AdditiveBlendExtension';
 import MaximumIntensityProjectionExtension from './MaximumIntensityProjectionExtension';
 import MinimumIntensityProjectionExtension from './MinimumIntensityProjectionExtension';
-import ColorPalette3DExtension from './ColorPalette3DExtension';
+import BaseExtension from './BaseExtension';
 
-export default {
-  ColorPalette3DExtension,
+/** @type {Extension3D} */
+const ColorPalette3DExtensions = {
+  BaseExtension,
   AdditiveBlendExtension,
   MaximumIntensityProjectionExtension,
   MinimumIntensityProjectionExtension
 };
+
+export default ColorPalette3DExtensions;

@@ -1,11 +1,23 @@
 import AdditiveBlendExtension from './AdditiveBlendExtension';
 import MaximumIntensityProjectionExtension from './MaximumIntensityProjectionExtension';
 import MinimumIntensityProjectionExtension from './MinimumIntensityProjectionExtension';
-import AdditiveColormap3DExtension from './AdditiveColormap3DExtension';
+import BaseExtension from './BaseExtension';
 
-export default {
-  AdditiveColormap3DExtension,
+/**
+ * @typedef Extension3D
+ * @type {object}
+ * @property {object} BaseExtension
+ * @property {object} AdditiveBlendExtension
+ * @property {object} MaximumIntensityProjectionExtension
+ * @property {object} MinimumIntensityProjectionExtension
+ */
+
+/** @type {Extension3D} */
+const AdditiveColormap3DExtensions = {
+  BaseExtension,
   AdditiveBlendExtension,
   MaximumIntensityProjectionExtension,
   MinimumIntensityProjectionExtension
 };
+
+export default AdditiveColormap3DExtensions;

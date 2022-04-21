@@ -36,7 +36,7 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * @type {object}
  * @property {string=} colormap String indicating a colormap (default: 'viridis').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * */
-const AdditiveColormap3DExtension = class extends LayerExtension {
+const BaseExtension = class extends LayerExtension {
   getShaders() {
     return {
       ...super.getShaders(),
@@ -60,7 +60,7 @@ const AdditiveColormap3DExtension = class extends LayerExtension {
   }
 };
 
-AdditiveColormap3DExtension.extensionName = 'AdditiveColormap3DExtension';
-AdditiveColormap3DExtension.defaultProps = defaultProps;
+BaseExtension.extensionName = 'BaseExtension';
+BaseExtension.defaultProps = defaultProps;
 
-export default AdditiveColormap3DExtension;
+export default BaseExtension;

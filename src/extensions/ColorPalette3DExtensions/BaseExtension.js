@@ -11,7 +11,7 @@ const defaultProps = {
  * @type {object}
  * @property {Array<Array<number>>=} colors Array of colors to map channels to (RGB).
  * */
-const ColorPalette3DExtension = class extends LayerExtension {
+const BaseExtension = class extends LayerExtension {
   draw() {
     const { colors, channelsVisible } = this.props;
     const paddedColors = padColors({
@@ -26,7 +26,7 @@ const ColorPalette3DExtension = class extends LayerExtension {
   }
 };
 
-ColorPalette3DExtension.extensionName = 'ColorPalette3DExtension';
-ColorPalette3DExtension.defaultProps = defaultProps;
+BaseExtension.extensionName = 'BaseExtension';
+BaseExtension.defaultProps = defaultProps;
 
-export default ColorPalette3DExtension;
+export default BaseExtension;
