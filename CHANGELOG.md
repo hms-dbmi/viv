@@ -3,8 +3,10 @@
 ## In Progress
 
 ### Added
+- See documentation for a description of the newly added 3D extensions and how they work.
 
 ### Changed
+- Refactor 3D rendering to use extensions just like 2D.
 
 ## 0.12.6
 
