@@ -36,7 +36,7 @@ import vs from './xr-layer-vertex.glsl';
 import fs from './xr-layer-fragment.glsl';
 import channels from './channel-intensity-module';
 import { padContrastLimits, padWithDefault, getDtypeValues } from '../utils';
-import { padColors } from '../../extensions/utils';
+import ColorPalette3DExtensions from '../../extensions/ColorPalette3DExtensions';
 
 // prettier-ignore
 const CUBE_STRIP = [
@@ -68,7 +68,12 @@ const defaultProps = {
   zSlice: { type: 'array', value: null, compare: true },
   clippingPlanes: { type: 'array', value: [], compare: true },
   resolutionMatrix: { type: 'object', value: new Matrix4(), compare: true },
-  channelsVisible: { type: 'array', value: [], compare: true }
+  channelsVisible: { type: 'array', value: [], compare: true },
+  extensions: {
+    type: 'array',
+    value: [new ColorPalette3DExtensions.AdditiveBlendExtension()],
+    compare: true
+  }
 };
 
 function getRenderingAttrs() {
@@ -86,12 +91,10 @@ function getRenderingFromExtensions(extensions) {
     rendering = extension.opts.rendering;
   });
   if (
-    !rendering._RENDER ||
-    !rendering._AFTER_RENDER ||
-    !rendering._BEFORE_RENDER
+    !rendering._RENDER
   ) {
     throw new Error(
-      'XR3DLayer requires at least one extension to define opts.rendering as an object with _RENDER, _AFTER_RENDER, and _BEFORE_RENDER properties.'
+      'XR3DLayer requires at least one extension to define opts.rendering as an object with _RENDER as a property at the minimum.'
     );
   }
   return rendering;
@@ -101,18 +104,16 @@ function getRenderingFromExtensions(extensions) {
  * @typedef LayerProps
  * @type {Object}
  * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
- * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
- * @property {string=} renderingMode One of Maximum Intensity Projection, Minimum Intensity Projection, or Additive
  * @property {Object=} modelMatrix A column major affine transformation to be applied to the volume.
  * @property {Array.<number>=} xSlice 0-width (physical coordinates) interval on which to slice the volume.
  * @property {Array.<number>=} ySlice 0-height (physical coordinates) interval on which to slice the volume.
  * @property {Array.<number>=} zSlice 0-depth (physical coordinates) interval on which to slice the volume.
  * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  * @property {Object=} resolutionMatrix Matrix for scaling the volume based on the (downsampled) resolution being displayed.
+ * @property {Array=} extensions [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers - default is AdditiveBlendExtension from ColorPalette3DExtensions.
  */
 
 /**
@@ -247,7 +248,6 @@ const XR3DLayer = class extends Layer {
     const { textures, model, scaleMatrix } = this.state;
     const {
       contrastLimits,
-      colors,
       xSlice,
       ySlice,
       zSlice,
@@ -270,7 +270,6 @@ const XR3DLayer = class extends Layer {
         domain,
         dtype
       });
-      const paddedColors = padColors({ colors, channelsVisible });
       const invertedScaleMatrix = scaleMatrix.clone().invert();
       const invertedResolutionMatrix = resolutionMatrix.clone().invert();
       const paddedClippingPlanes = padWithDefault(
@@ -291,7 +290,6 @@ const XR3DLayer = class extends Layer {
           ...uniforms,
           ...textures,
           contrastLimits: paddedContrastLimits,
-          colors: paddedColors,
           xSlice: new Float32Array(
             xSlice
               ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])

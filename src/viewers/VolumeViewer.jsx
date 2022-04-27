@@ -8,14 +8,13 @@ import { ColorPalette3DExtensions } from '../extensions';
  * This component provides a volumetric viewer that provides provides volume-ray-casting.
  * @param {Object} props
  * @param {Array} props.contrastLimits List of [begin, end] values to control each channel's ramp function.
- * @param {Array} props.colors List of [r, g, b] values for each channel.
+ * @param {Array} [props.colors] List of [r, g, b] values for each channel - necessary if using one of the ColorPalette3DExtensions extensions.
  * @param {Array} props.channelsVisible List of boolean values for each channel for whether or not it is visible.
- * @param {string} [props.colormap] String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @param {string} [props.colormap] String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap - necessary if using one of the AdditiveColormap3DExtensions extensions.
  * @param {Array} props.loader This data source for the viewer. PixelSource[]. If loader.length > 1, data is assumed to be multiscale.
  * @param {Array} props.selections Selection to be used for fetching data
  * @param {Array} [props.resolution] Resolution at which you would like to see the volume and load it into memory (0 highest, loader.length - 1 the lowest with default loader.length - 1)
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
- * @param {Array} [props.renderingMode] One of Maximum Intensity Projection, Minimum Intensity Projection, or Additive
  * @param {Object} [props.modelMatrix] A column major affine transformation to be applied to the volume.
  * @param {Array} [props.xSlice] 0-1 interval on which to slice the volume.
  * @param {Array} [props.ySlice] 0-1 interval on which to slice the volume.
@@ -27,6 +26,7 @@ import { ColorPalette3DExtensions } from '../extensions';
  * @param {number} props.width Current width of the component.
  * @param {Array.<Object>} [props.clippingPlanes] List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  * @param {Boolean} [props.useFixedAxis] Whether or not to fix the axis of the camera (default is true).
+ * @param {Array=} extensions [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers - default is AdditiveBlendExtension from ColorPalette3DExtensions.
  */
 
 const VolumeViewer = props => {

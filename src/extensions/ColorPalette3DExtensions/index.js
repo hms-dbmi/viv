@@ -3,7 +3,16 @@ import MaximumIntensityProjectionExtension from './MaximumIntensityProjectionExt
 import MinimumIntensityProjectionExtension from './MinimumIntensityProjectionExtension';
 import BaseExtension from './BaseExtension';
 
-/** @type {Extension3D} */
+/**
+ * This object contains the BaseExtension, which can be extended for other color palette-style rendering, as well
+ * implementations of three ray casting algorithms as extensions.
+ * @typedef Extension3D
+ * @type {object}
+ * @property {object} BaseExtension
+ * @property {object} AdditiveBlendExtension
+ * @property {object} MaximumIntensityProjectionExtension
+ * @property {object} MinimumIntensityProjectionExtension
+ */
 const ColorPalette3DExtensions = {
   BaseExtension,
   AdditiveBlendExtension,

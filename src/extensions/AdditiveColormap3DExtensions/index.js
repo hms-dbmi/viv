@@ -4,6 +4,8 @@ import MinimumIntensityProjectionExtension from './MinimumIntensityProjectionExt
 import BaseExtension from './BaseExtension';
 
 /**
+ * This object contains the BaseExtension, which can be extended for other additive colormap-style (i.e viridis, jet etc.) rendering, as well
+ * implementations of three ray casting algorithms as extensions.
  * @typedef Extension3D
  * @type {object}
  * @property {object} BaseExtension
@@ -11,8 +13,6 @@ import BaseExtension from './BaseExtension';
  * @property {object} MaximumIntensityProjectionExtension
  * @property {object} MinimumIntensityProjectionExtension
  */
-
-/** @type {Extension3D} */
 const AdditiveColormap3DExtensions = {
   BaseExtension,
   AdditiveBlendExtension,
