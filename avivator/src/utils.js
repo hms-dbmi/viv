@@ -14,7 +14,6 @@ import {
 } from '@hms-dbmi/viv';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
-import { render } from 'react-dom';
 
 const MAX_CHANNELS_FOR_SNACKBAR_WARNING = 40;
 
@@ -366,6 +365,11 @@ export function getBoundingCube(loader) {
   return [xSlice, ySlice, zSlice];
 }
 
+/**
+ * Return an appropriate 3D extension for a given combination of `colormap` and `renderingMode`
+ * @param {String} colormap
+ * @param {String} renderingMode
+ */
 export function get3DExtension(colormap, renderingMode) {
   const extensions = colormap
     ? AdditiveColormap3DExtensions

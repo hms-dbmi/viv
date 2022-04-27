@@ -90,9 +90,7 @@ function getRenderingFromExtensions(extensions) {
   extensions.forEach(extension => {
     rendering = extension.opts.rendering;
   });
-  if (
-    !rendering._RENDER
-  ) {
+  if (!rendering._RENDER) {
     throw new Error(
       'XR3DLayer requires at least one extension to define opts.rendering as an object with _RENDER as a property at the minimum.'
     );
