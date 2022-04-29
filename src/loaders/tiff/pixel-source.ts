@@ -1,4 +1,4 @@
-import type { GeoTIFFImage, RasterOptions } from 'geotiff';
+import type { GeoTIFFImage } from 'geotiff';
 import type { TypedArray } from 'zarr';
 import { getImageSize, isInterleaved, SIGNAL_ABORTED } from '../utils';
 
@@ -13,6 +13,10 @@ import type {
   TileSelection,
   PixelData
 } from '../../types';
+
+type ReadRastersOptions = NonNullable<
+  Parameters<GeoTIFFImage['readRasters']>[0]
+>;
 
 class TiffPixelSource<S extends string[]> implements PixelSource<S> {
   private _indexer: (sel: PixelSourceSelection<S>) => Promise<GeoTIFFImage>;
@@ -44,7 +48,7 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
     return this._readRasters(image, { window, width, height, signal });
   }
 
-  private async _readRasters(image: GeoTIFFImage, props?: RasterOptions) {
+  private async _readRasters(image: GeoTIFFImage, props?: ReadRastersOptions) {
     const interleave = isInterleaved(this.shape);
     const raster = await image.readRasters({
       interleave,
@@ -63,8 +67,8 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
     const data = (interleave ? raster : raster[0]) as TypedArray;
     return {
       data,
-      width: raster.width,
-      height: raster.height
+      width: (raster as TypedArray & { width: number }).width,
+      height: (raster as TypedArray & { height: number }).height
     } as PixelData;
   }
 

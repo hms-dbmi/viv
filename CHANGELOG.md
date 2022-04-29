@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Migrate off `geotiff` fork to latest release from [`geotiff/geotiff.js`](https://github.com/geotiffjs/geotiff.js/)
 
 ## 0.12.6
 
