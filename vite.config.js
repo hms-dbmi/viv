@@ -81,6 +81,10 @@ const configAvivator = defineConfig({
   base: './',
   root: 'avivator',
   publicDir: 'avivator/public',
+  worker: {
+    format: "es",
+    rollupOptions: { inlineDynamicImports: true },
+  },
   resolve: {
     alias: {
       '@hms-dbmi/viv': resolve(__dirname, 'src'),
@@ -92,6 +96,10 @@ const configAvivator = defineConfig({
 
 const configViv = defineConfig({
   plugins,
+  worker: {
+    format: "es",
+    rollupOptions: { inlineDynamicImports: true },
+  },
   build: {
     target: 'esnext',
     minify: false,

@@ -4,7 +4,8 @@ import glslify from 'rollup-plugin-glslify';
 
 export default {
   output: {
-    format: 'cjs'
+    format: 'cjs',
+    inlineDynamicImports: true,
   },
   plugins: [
     resolve({ resolveOnly: ['geotiff'] }),

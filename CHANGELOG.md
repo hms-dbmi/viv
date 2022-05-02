@@ -7,6 +7,7 @@
 
 ### Changed
 - Refactor 3D rendering to use extensions just like 2D.
+- Migrate off `geotiff` fork to latest release from [`geotiff/geotiff.js`](https://github.com/geotiffjs/geotiff.js/)
 
 ## 0.12.6
 

@@ -1,10 +1,13 @@
-import { fromUrl, fromBlob } from 'geotiff';
+import { fromUrl, fromBlob, addDecoder } from 'geotiff';
 import type { GeoTIFF } from 'geotiff';
 
 import { createOffsetsProxy, checkProxies } from './lib/proxies';
+import LZWDecoder from './lib/lzw-decoder';
 import Pool from './lib/Pool';
 
 import { load } from './ome-tiff';
+
+addDecoder(5, () => LZWDecoder);
 
 interface TiffOptions {
   headers?: object;

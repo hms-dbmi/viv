@@ -1,21 +1,13 @@
-import type { FileDirectory } from 'geotiff';
-import { getDecoder } from 'geotiff/src/compression';
+import { getDecoder, addDecoder } from 'geotiff';
+import LZWDecoder from './lzw-decoder';
 
-async function decode(fileDirectory: FileDirectory, buffer: ArrayBuffer) {
-  const decoder = getDecoder(fileDirectory);
-  const result = await decoder.decode(fileDirectory, buffer);
-  self.postMessage(result, [result] as any);
-}
+addDecoder(5, () => LZWDecoder);
 
-if (typeof self !== 'undefined') {
-  self.addEventListener('message', event => {
-    const [name, ...args] = event.data;
-    switch (name) {
-      case 'decode':
-        decode(args[0], args[1]);
-        break;
-      default:
-        break;
-    }
-  });
-}
+const worker: Worker = self as any;
+
+worker.addEventListener('message', async e => {
+  const { id, fileDirectory, buffer } = e.data;
+  const decoder = await getDecoder(fileDirectory);
+  const decoded = await decoder.decode(fileDirectory, buffer);
+  worker.postMessage({ decoded, id }, [decoded]);
+});
