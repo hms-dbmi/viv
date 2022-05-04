@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Log errors for loading in Avivator
 
 ## 0.12.7
 
