@@ -132,7 +132,7 @@ export async function createLoader(
     if (e instanceof UnsupportedBrowserError) {
       handleLoaderError(e.message);
     } else {
-      console.error(e)
+      console.error(e) // eslint-disable-line
       handleLoaderError(null);
     }
     return { data: null };
