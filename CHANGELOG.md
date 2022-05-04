@@ -7,6 +7,7 @@
 
 ### Changed
 - Refactor 3D rendering to use extensions just like 2D.
+- Log errors for loading in Avivator
 
 ## 0.12.7
 
