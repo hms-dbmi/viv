@@ -6,6 +6,7 @@
 
 ### Changed
 - Log errors for loading in Avivator
+- Disable `Pool` usage temporarily in Avivator due to broken Worker module
 
 ## 0.12.7
 
