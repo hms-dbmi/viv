@@ -86,7 +86,11 @@ export async function createLoader(
       const isOffsets404 = res.status === 404;
       const offsets = !isOffsets404 ? await res.json() : undefined;
       // TODO(2021-05-06): temporarily disable `pool` until inline worker module is fixed.
-      const source = await loadOmeTiff(urlOrFile, { offsets, images: 'all', pool: false });
+      const source = await loadOmeTiff(urlOrFile, {
+        offsets,
+        images: 'all',
+        pool: false
+      });
 
       // Show a warning if the total number of channels/images exceeds a fixed amount.
       // Non-Bioformats6 pyramids use Image tags for pyramid levels and do not have offsets
