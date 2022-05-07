@@ -63,8 +63,9 @@ function ChannelController({
   const rgbColor = toRgb(colormap, color);
   const [min, max] = domain;
   // If the min/max range is and the dtype is float, make the step size smaller so contrastLimits are smoother.
-  const step =
-    max - min < 500 && loader[0]?.dtype === 'Float32' ? (max - min) / 500 : 1;
+  const { dtype } = loader[0];
+  const isFloat = dtype === 'Float32' || dtype === 'Float64';
+  const step = max - min < 500 && isFloat ? (max - min) / 500 : 1;
   const shouldShowPixelValue = !useLinkedView && !use3d;
   return (
     <Grid container direction="column" m={2} justify="center">
