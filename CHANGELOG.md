@@ -6,6 +6,7 @@
 
 ### Changed
 - Log errors for loading in Avivator
+- Fix casting bug for `Float64`
 - Disable `Pool` usage temporarily in Avivator due to broken Worker module
 
 ## 0.12.7
