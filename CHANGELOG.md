@@ -14,6 +14,7 @@
 - Log errors for loading in Avivator
 - Fix casting bug for `Float64`
 - Disable `Pool` usage temporarily in Avivator due to broken Worker module
+- Also disable `Pool` temporarily in Avivator for `File` OME-TIFF sources
 
 ## 0.12.7
 
