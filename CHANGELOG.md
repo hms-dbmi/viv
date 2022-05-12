@@ -16,6 +16,7 @@
 - Disable `Pool` usage temporarily in Avivator due to broken Worker module
 - Also disable `Pool` temporarily in Avivator for `File` OME-TIFF sources
 - Update ciatation in README
+- Add CITATION.cff
 
 ## 0.12.7
 
