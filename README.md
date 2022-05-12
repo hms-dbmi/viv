@@ -16,7 +16,7 @@ to create rich interactive visualizations.
 More details and related work can be found in our paper and original [preprint](https://osf.io/wd2gu/). Please cite our paper in your research:
 
 > Trevor Manz, Ilan Gold, Nathan Heath Patterson, Chuck McCallum, Mark S Keller, Bruce W Herr II, Katy Börner, Jeffrey M Spraggins, Nils Gehlenborg,
-> "[Viv: multiscale visualization of high-resolution multiplexed bioimaging data on the web](https://osf.io/wd2gu/)."
+> "[Viv: multiscale visualization of high-resolution multiplexed bioimaging data on the web](https://www.nature.com/articles/s41592-022-01482-7)."
 > **Nature Methods** (2022), [doi:10.31219/10.1038/s41592-022-01482-7](https://doi.org/10.1038/s41592-022-01482-7)
 
 ## 💻 Related Software

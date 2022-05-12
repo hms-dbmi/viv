@@ -17,6 +17,7 @@
 - Also disable `Pool` temporarily in Avivator for `File` OME-TIFF sources
 - Update ciatation in README
 - Add CITATION.cff
+- Separate Journal and Software citation information.
 
 ## 0.12.7
 
