@@ -17,7 +17,6 @@
 - Also disable `Pool` temporarily in Avivator for `File` OME-TIFF sources
 - Update ciatation in README
 - Add CITATION.cff
-- Fix CITATION.cff formatting..
 
 ## 0.12.7
 
