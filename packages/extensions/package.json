@@ -1,0 +1,10 @@
+{
+  "name": "@viv/extensions",
+  "version": "0.0.0",
+  "main": "src/index.js",
+  "dependencies": {
+    "@deck.gl/core": "^8.7.8",
+    "@viv/constants": "workspace:*",
+    "@viv/layers": "workspace:*"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "@vivjs/loaders",
+  "version": "0.0.0",
+  "scripts": {},
+  "dependencies": {
+    "fast-xml-parser": "^4.0.7",
+    "geotiff": "^2.0.5",
+    "lzw-tiff-decoder": "^0.1.1",
+    "quickselect": "^2.0.0",
+    "zarr": "^0.5.1"
+  }
+}

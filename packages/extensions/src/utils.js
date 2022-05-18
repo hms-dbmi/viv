@@ -1,9 +1,9 @@
-import { padWithDefault } from '../layers/utils';
+import { padWithDefault } from '@viv/layers/utils';
 import {
   DEFAULT_COLOR_OFF,
   MAX_CHANNELS,
   MAX_COLOR_INTENSITY
-} from '../constants';
+} from '@viv/constants';
 
 // prettier-ignore
 const COLOR_PALETTE = [

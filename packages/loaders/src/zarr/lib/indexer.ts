@@ -1,5 +1,4 @@
 import { getDims } from '../../utils';
-
 /*
  * The 'indexer' for a Zarr-based source translates
  * a 'selection' to an array of indices that align to

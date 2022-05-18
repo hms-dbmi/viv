@@ -1,0 +1,6 @@
+{
+  "name": "@hms-dbmi/viv",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "src/index.js"
+}

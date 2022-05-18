@@ -1,0 +1,10 @@
+{
+  "name": "@viv/types",
+  "version": "0.0.0",
+  "type": "module",
+  "types": "src/index.d.ts",
+  "dependencies": {
+    "@viv/constants": "workspace:*",
+    "math.gl": "^3.5.7"
+  }
+}

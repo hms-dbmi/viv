@@ -1,0 +1,17 @@
+{
+  "name": "@vivjs/layers",
+  "version": "0.0.0",
+  "scripts": {},
+  "dependencies": {
+    "@deck.gl/core": "^8.7.8",
+    "@deck.gl/extensions": "^8.7.8",
+    "@deck.gl/geo-layers": "^8.7.8",
+    "@deck.gl/layers": "^8.7.8",
+    "@deck.gl/mesh-layers": "^8.7.8",
+    "@loaders.gl/core": "^3.1.8",
+    "@luma.gl/constants": "^8.5.10",
+    "@luma.gl/core": "^8.5.10",
+    "@luma.gl/engine": "^8.5.10",
+    "math.gl": "^3.5.7"
+  }
+}

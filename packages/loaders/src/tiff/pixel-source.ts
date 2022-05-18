@@ -12,7 +12,7 @@ import type {
   RasterSelection,
   TileSelection,
   PixelData
-} from '../../types';
+} from '@vivjs/core';
 
 type ReadRastersOptions = NonNullable<
   Parameters<GeoTIFFImage['readRasters']>[0]
