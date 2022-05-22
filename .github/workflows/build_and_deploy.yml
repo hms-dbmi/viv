@@ -6,19 +6,25 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v2.3.1
-        with:
-          persist-credentials: false
 
-      - uses: actions/setup-node@v2
+    steps:
+        # check out the repository
+      - uses: actions/checkout@v3
+        # setup node.js
+      - uses: actions/setup-node@v3
         with:
           node-version: '14'
+        # cache the node_modules folder
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install and Build 🔧
         run: |
-          npm install
+          npm ci
           npm run build
           npm run build:avivator
           touch avivator/dist/.nojekyll

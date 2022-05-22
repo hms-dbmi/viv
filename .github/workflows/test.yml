@@ -6,42 +6,56 @@ jobs:
   build-windows:
     runs-on: windows-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x]
-
     # We want to run on external PRs, but not on our own internal PRs as they'll be run
     # by the push to the branch.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        # check out the repository
+      - uses: actions/checkout@v3
+        # setup node.js
+      - uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install dependencies for Viv
-        run: npm install
+          node-version: '14'
+        # cache the node_modules folder
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - run: npm ci
+
       - name: Build Avivator and Viv
         run: npm run build && npm run build:avivator
+
   test-linux:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x]
-
     # We want to run on external PRs, but not on our own internal PRs as they'll be run
     # by the push to the branch.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        # check out the repository
+      - uses: actions/checkout@v3
+        # setup node.js
+      - uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install dependencies for Viv
-        run: npm install
+          node-version: '14'
+        # cache the node_modules folder
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - run: npm ci
+
       - name: Install dependencies needed for testing with tape
         run: sudo apt-get install xvfb # needed for tape-run
+
       - name: Test library
         run: xvfb-run --auto-servernum ./test.sh # for tape-run
