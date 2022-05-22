@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Bump GH Action dependencies
 
 ## 0.12.8
 
