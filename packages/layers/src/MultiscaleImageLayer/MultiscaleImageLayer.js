@@ -4,11 +4,7 @@ import GL from '@luma.gl/constants';
 
 import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
 import ImageLayer from '../ImageLayer';
-import {
-  getImageSize,
-  isInterleaved,
-  SIGNAL_ABORTED
-} from '@viv/loaders';
+import { getImageSize, isInterleaved, SIGNAL_ABORTED } from '@viv/loaders';
 import { ColorPaletteExtension } from '@viv/extensions';
 
 const defaultProps = {

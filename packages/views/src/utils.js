@@ -1,7 +1,11 @@
 import { Matrix4 } from 'math.gl';
 import { getImageSize } from '@viv/loaders/utils';
 
-import { MultiscaleImageLayer, ImageLayer, getPhysicalSizeScalingMatrix } from '@viv/layers';
+import {
+  MultiscaleImageLayer,
+  ImageLayer,
+  getPhysicalSizeScalingMatrix
+} from '@viv/layers';
 
 export function getVivId(id) {
   return `-#${id}#`;

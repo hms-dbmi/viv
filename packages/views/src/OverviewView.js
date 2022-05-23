@@ -6,7 +6,6 @@ import { getImageSize } from '@viv/loaders/utils';
 import VivView from './VivView';
 import { getVivId } from './utils';
 
-
 export const OVERVIEW_VIEW_ID = 'overview';
 
 class OverviewState {}

@@ -53,8 +53,7 @@ export interface PixelSource<S extends string[]> {
   meta?: PixelSourceMeta;
 }
 
-// Not exported types. Used below with `Viv` utility type.
-type Color = [r: number, g: number, b: number];
+export type Color = [r: number, g: number, b: number];
 
 type ColorPaletteExtensionProps = {
   colors: Color[];

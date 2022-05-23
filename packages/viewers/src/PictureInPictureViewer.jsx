@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'; 
+import React, { useMemo } from 'react';
 import VivViewer from './VivViewer';
 import {
   DetailView,
