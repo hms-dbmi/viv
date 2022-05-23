@@ -133,7 +133,7 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  */
 
 /**
- * @type {{ new <S extends string[]>(...props: import('../../../types').Viv<LayerProps>[]) }}
+ * @type {{ new <S extends string[]>(...props: import('@viv/types').Viv<LayerProps>[]) }}
  * @ignore
  */
 const XR3DLayer = class extends Layer {

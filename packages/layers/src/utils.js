@@ -1,10 +1,18 @@
+import { OrthographicView } from '@deck.gl/core';
 import { Matrix4 } from 'math.gl';
-import { MAX_CHANNELS, DTYPE_VALUES } from '../constants';
+import { MAX_CHANNELS, DTYPE_VALUES } from '@viv/constants';
+
 
 export function range(len) {
   return [...Array(len).keys()];
 }
 
+/**
+ * @template T
+ * @param {T[]} arr
+ * @param {T} defaultValue
+ * @param {number} padWidth
+ */
 export function padWithDefault(arr, defaultValue, padWidth) {
   for (let i = 0; i < padWidth; i += 1) {
     arr.push(defaultValue);
@@ -14,7 +22,7 @@ export function padWithDefault(arr, defaultValue, padWidth) {
 
 /**
  * (Safely) get GL values for associated dtype.
- * @param {keyof typeof import('../constants').DTYPE_VALUES} dtype
+ * @param {keyof typeof DTYPE_VALUES} dtype
  */
 export function getDtypeValues(dtype) {
   const values = DTYPE_VALUES[dtype];
@@ -25,6 +33,14 @@ export function getDtypeValues(dtype) {
   return values;
 }
 
+/**
+ * @param {{
+ *   contrastLimits?: [min: number, max: number][],
+ *   channelsVisible: boolean[],
+ *   domain?: [min: number, max: number],
+ *   dtype: keyof typeof DTYPE_VALUES,
+ * }}
+ */
 export function padContrastLimits({
   contrastLimits = [],
   channelsVisible,
@@ -33,7 +49,7 @@ export function padContrastLimits({
 }) {
   const maxSliderValue = (domain && domain[1]) || getDtypeValues(dtype).max;
   const newContrastLimits = contrastLimits.map((slider, i) =>
-    channelsVisible[i] ? slider : [maxSliderValue, maxSliderValue]
+    channelsVisible[i] ? slider : /** @type {[number, number]} */ ([maxSliderValue, maxSliderValue])
   );
   // Need to pad contrastLimits and colors with default values (required by shader)
   const padSize = MAX_CHANNELS - newContrastLimits.length;
@@ -108,3 +124,25 @@ export function getPhysicalSizeScalingMatrix(loader) {
   }
   return new Matrix4().identity();
 }
+
+/**
+ * Create a boudning box from a viewport based on passed-in viewState.
+ * @param {Object} viewState The viewState for a certain viewport.
+ * @returns {View} The DeckGL View for this viewport.
+ */
+export function makeBoundingBox(viewState) {
+  const viewport = new OrthographicView().makeViewport({
+    // From the current `detail` viewState, we need its projection matrix (actually the inverse).
+    viewState,
+    height: viewState.height,
+    width: viewState.width
+  });
+  // Use the inverse of the projection matrix to map screen to the view space.
+  return [
+    viewport.unproject([0, 0]),
+    viewport.unproject([viewport.width, 0]),
+    viewport.unproject([viewport.width, viewport.height]),
+    viewport.unproject([0, viewport.height])
+  ];
+}
+

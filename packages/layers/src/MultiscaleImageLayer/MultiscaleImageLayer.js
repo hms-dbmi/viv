@@ -50,7 +50,7 @@ const defaultProps = {
  */
 
 /**
- * @type {{ new <S extends string[]>(...props: import('../../types').Viv<LayerProps, S>[]) }}
+ * @type {{ new <S extends string[]>(...props: import('@viv/types').Viv<LayerProps, S>[]) }}
  * @ignore
  */
 const MultiscaleImageLayer = class extends CompositeLayer {

@@ -92,7 +92,7 @@ const defaultProps = {
  * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
  */
 /**
- * @type {{ new (...props: import('../../types').Viv<LayerProps>[]) }}
+ * @type {{ new (...props: import('@viv/types').Viv<LayerProps>[]) }}
  * @ignore
  */
 const XRLayer = class extends Layer {
