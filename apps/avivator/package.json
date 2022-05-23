@@ -3,11 +3,7 @@
   "private": true,
   "scripts": {},
   "dependencies": {
-    "@deck.gl/core": "~8.6.7",
-    "@deck.gl/geo-layers": "~8.6.7",
-    "@deck.gl/react": "~8.6.7",
-    "@hms-dbmi/viv": "^0.12.8",
-    "@luma.gl/core": "~8.5.3",
+    "@hms-dbmi/viv": "workspace:*",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
