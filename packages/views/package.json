@@ -1,13 +1,14 @@
 {
   "name": "@viv/views",
   "version": "0.0.0",
-  "scripts": {},
+  "main": "src/index.js",
   "peerDependencies": {
     "@loaders.gl/core": "^3.0.0",
     "@deck.gl/core": "~8.6.7",
     "@deck.gl/layers": "~8.6.7"
   },
   "dependencies": {
+    "@viv/layers": "workspace:*",
     "math.gl": "^3.5.7"
   }
 }

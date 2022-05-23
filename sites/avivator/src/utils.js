@@ -1,3 +1,4 @@
+// @ts-check
 import { useState, useEffect } from 'react';
 import { fromBlob, fromUrl } from 'geotiff';
 import { Matrix4 } from '@math.gl/core';

@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react'; // eslint-disable-line import/no-unresolved
+import React, { useMemo } from 'react';
 
 import VivViewer from './VivViewer';
-import { VolumeView, getDefaultInitialViewState } from '../views';
+import { VolumeView, getDefaultInitialViewState } from '@viv/views';
 import { RENDERING_MODES } from '../constants';
 
 /**

@@ -10,5 +10,6 @@
     "outDir": "./dist",
     "declaration": true,
     "inlineSourceMap": true,
+    "allowJs": true,
   }
 }

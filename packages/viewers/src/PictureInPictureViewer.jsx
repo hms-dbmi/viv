@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'; // eslint-disable-line import/no-unresolved
+import React, { useMemo } from 'react'; 
 import VivViewer from './VivViewer';
 import {
   DetailView,

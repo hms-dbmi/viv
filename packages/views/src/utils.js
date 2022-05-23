@@ -1,34 +1,10 @@
-import { OrthographicView } from '@deck.gl/core';
 import { Matrix4 } from 'math.gl';
-import { getImageSize } from '../loaders/utils';
+import { getImageSize } from '@viv/loaders/utils';
 
-// Do not import from '../layers' because that causes a circular dependency.
-import MultiscaleImageLayer from '../layers/MultiscaleImageLayer';
-import ImageLayer from '../layers/ImageLayer';
-import { getPhysicalSizeScalingMatrix } from '../layers/utils';
+import { MultiscaleImageLayer, ImageLayer, getPhysicalSizeScalingMatrix } from '@viv/layers';
 
 export function getVivId(id) {
   return `-#${id}#`;
-}
-/**
- * Create a boudning box from a viewport based on passed-in viewState.
- * @param {viewState} Object The viewState for a certain viewport.
- * @returns {View} The DeckGL View for this viewport.
- */
-export function makeBoundingBox(viewState) {
-  const viewport = new OrthographicView().makeViewport({
-    // From the current `detail` viewState, we need its projection matrix (actually the inverse).
-    viewState,
-    height: viewState.height,
-    width: viewState.width
-  });
-  // Use the inverse of the projection matrix to map screen to the view space.
-  return [
-    viewport.unproject([0, 0]),
-    viewport.unproject([viewport.width, 0]),
-    viewport.unproject([viewport.width, viewport.height]),
-    viewport.unproject([0, viewport.height])
-  ];
 }
 
 /**

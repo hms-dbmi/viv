@@ -1,9 +1,9 @@
 import { PolygonLayer } from '@deck.gl/layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
+import { ScaleBarLayer, makeBoundingBox } from '@viv/layers';
 
-import { ScaleBarLayer } from '../layers';
 import VivView from './VivView';
-import { getImageLayer, getVivId, makeBoundingBox } from './utils';
+import { getImageLayer, getVivId } from './utils';
 /**
  * This class generates a MultiscaleImageLayer and a view for use in the SideBySideViewer.
  * It is linked with its other views as controlled by `linkedIds`, `zoomLock`, and `panLock` parameters.

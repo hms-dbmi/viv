@@ -41,16 +41,20 @@ importers:
       '@luma.gl/constants': ~8.5.3
       '@luma.gl/core': ~8.5.3
       '@luma.gl/engine': ~8.5.3
+      '@viv/constants': workspace:*
+      '@viv/types': workspace:*
       math.gl: ^3.5.7
     dependencies:
       '@luma.gl/constants': 8.5.12
       '@luma.gl/core': 8.5.12
       '@luma.gl/engine': 8.5.12
+      '@viv/constants': link:../constants
+      '@viv/types': link:../types
       math.gl: 3.5.7
 
   packages/loaders:
     specifiers:
-      '@viv/types': workspace:^0.0.0
+      '@viv/types': workspace:*
       fast-xml-parser: ^3.16.0
       geotiff: ^2.0.5
       lzw-tiff-decoder: ^0.1.1
@@ -65,7 +69,22 @@ importers:
       zarr: 0.5.1
 
   packages/main:
-    specifiers: {}
+    specifiers:
+      '@viv/constants': workspace:*
+      '@viv/extensions': workspace:*
+      '@viv/layers': workspace:*
+      '@viv/loaders': workspace:*
+      '@viv/types': workspace:*
+      '@viv/viewers': workspace:*
+      '@viv/views': workspace:*
+    dependencies:
+      '@viv/constants': link:../constants
+      '@viv/extensions': link:../extensions
+      '@viv/layers': link:../layers
+      '@viv/loaders': link:../loaders
+      '@viv/types': link:../types
+      '@viv/viewers': link:../viewers
+      '@viv/views': link:../views
 
   packages/types:
     specifiers:
@@ -75,10 +94,15 @@ importers:
       '@viv/constants': link:../constants
       math.gl: 3.5.7
 
+  packages/viewers:
+    specifiers: {}
+
   packages/views:
     specifiers:
+      '@viv/layers': workspace:*
       math.gl: ^3.5.7
     dependencies:
+      '@viv/layers': link:../layers
       math.gl: 3.5.7
 
   sites/avivator:

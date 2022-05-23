@@ -2,5 +2,15 @@
   "name": "@hms-dbmi/viv",
   "version": "0.0.0",
   "type": "module",
-  "main": "src/index.js"
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@viv/constants": "workspace:*",
+    "@viv/extensions": "workspace:*",
+    "@viv/layers": "workspace:*",
+    "@viv/loaders": "workspace:*",
+    "@viv/types": "workspace:*",
+    "@viv/viewers": "workspace:*",
+    "@viv/views": "workspace:*"
+  }
 }
