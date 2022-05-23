@@ -6,7 +6,6 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import shallow from 'zustand/shallow';
 
-// eslint-disable-next-line import/no-unresolved
 import { getDefaultInitialViewState } from '@hms-dbmi/viv';
 import {
   useImageSettingsStore,

@@ -95,7 +95,7 @@ type ExtractLoader<LayerProps, S extends string[]> = LayerProps extends {
   ? { loader: PixelSource<S>[] }
   : LayerProps extends { loader: object }
   ? { loader: PixelSource<S> }
-  : {};
+  : unknown;
 
 // Add optional extention props to layer if 'extensions' is defined on LayerProps.
 type WithExtensionProps<LayerProps> = LayerProps extends { extensions: unknown }
@@ -104,7 +104,7 @@ type WithExtensionProps<LayerProps> = LayerProps extends { extensions: unknown }
         AdditiveColormapExtensionProps &
         LensExtensionProps
     > & { [extensionProp: string]: any }
-  : {};
+  : unknown;
 
 /**
  * DocumentationJS does not understand TS syntax in JSDoc annotations,

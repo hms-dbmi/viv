@@ -60,7 +60,7 @@ export function getOmeLegacyIndexer(
 export function getOmeSubIFDIndexer(
   tiff: GeoTIFF,
   rootMeta: OMEXML,
-  image: number = 0
+  image = 0
 ): OmeTiffIndexer {
   const ifdIndexer = getOmeIFDIndexer(rootMeta, image);
   const ifdCache: Map<
@@ -109,7 +109,7 @@ export function getOmeSubIFDIndexer(
  */
 function getOmeIFDIndexer(
   rootMeta: OMEXML,
-  image: number = 0
+  image = 0
 ): (sel: OmeTiffSelection) => number {
   const { SizeC, SizeZ, SizeT, DimensionOrder } = rootMeta[image].Pixels;
   // For multi-image OME-TIFF files, we need to offset by the full dimensions

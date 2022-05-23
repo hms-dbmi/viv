@@ -77,12 +77,13 @@ export type DimensionOrder =
 // Structure of node is determined by the PARSER_OPTIONS.
 type Node<T, A> = T & { attr: A };
 type Attrs<Fields extends string, T = string> = { [K in Fields]: T };
+type AttrsOnlyNode<A> = Node<unknown, A>
 
 type OMEAttrs = Attrs<'xmlns' | 'xmlns:xsi' | 'xsi:schemaLocation'>;
 type OME = Node<{ Insturment: Insturment; Image: Image | Image[] }, OMEAttrs>;
 
 type Insturment = Node<
-  { Objective: Node<{}, Attrs<'ID' | 'Model' | 'NominalMagnification'>> },
+  { Objective: AttrsOnlyNode<Attrs<'ID' | 'Model' | 'NominalMagnification'>> },
   Attrs<'ID'>
 >;
 
@@ -90,8 +91,8 @@ interface ImageNodes {
   AquisitionDate?: string;
   Description?: string;
   Pixels: Pixels;
-  InstrumentRef: Node<{}, { ID: string }>;
-  ObjectiveSettings: Node<{}, { ID: string }>;
+  InstrumentRef: AttrsOnlyNode<{ ID: string }>;
+  ObjectiveSettings: AttrsOnlyNode<{ ID: string }>;
 }
 type Image = Node<ImageNodes, Attrs<'ID' | 'Name'>>;
 
@@ -164,7 +165,7 @@ type PixelAttrs = Attrs<
 type Pixels = Node<
   {
     Channel: Channel | Channel[];
-    TiffData: Node<{}, Attrs<'IFD' | 'PlaneCount'>>;
+    TiffData: AttrsOnlyNode<Attrs<'IFD' | 'PlaneCount'>>;
   },
   PixelAttrs
 >;
@@ -182,6 +183,6 @@ type ChannelAttrs =
       Color: number;
     };
 
-type Channel = Node<{}, ChannelAttrs>;
+type Channel = AttrsOnlyNode<ChannelAttrs>;
 
 type Root = { OME: OME };

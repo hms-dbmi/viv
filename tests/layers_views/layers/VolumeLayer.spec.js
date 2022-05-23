@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrbitView } from '@deck.gl/core';

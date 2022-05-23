@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fromBlob, fromUrl } from 'geotiff'; // eslint-disable-line import/no-extraneous-dependencies
+import { fromBlob, fromUrl } from 'geotiff'; 
 import { Matrix4 } from '@math.gl/core';
 
 import {
@@ -7,7 +7,6 @@ import {
   loadBioformatsZarr,
   loadOmeZarr,
   getChannelStats
-  // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';

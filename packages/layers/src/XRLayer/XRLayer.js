@@ -4,7 +4,6 @@
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer, project32, picking } from '@deck.gl/core';
 import { Model, Geometry, Texture2D, isWebGL2 } from '@luma.gl/core';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { ProgramManager } from '@luma.gl/engine';
 import { hasFeature, FEATURES } from '@luma.gl/webgl';
 import fs from './xr-layer-fragment.webgl.glsl';

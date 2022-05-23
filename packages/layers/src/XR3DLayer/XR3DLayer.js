@@ -28,7 +28,6 @@ More information about that is detailed in the comments there.
 import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer } from '@deck.gl/core';
 import { Model, Geometry, Texture3D } from '@luma.gl/core';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { ProgramManager } from '@luma.gl/engine';
 import { Matrix4 } from 'math.gl';
 import { Plane } from '@math.gl/culling';

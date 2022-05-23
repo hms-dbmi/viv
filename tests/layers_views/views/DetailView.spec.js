@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies, no-unused-expressions */
 import test from 'tape-catch';
 import { DetailView, DETAIL_VIEW_ID } from '../../../src/views';
 import { generateViewTests, defaultArguments } from './VivView.spec';

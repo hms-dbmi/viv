@@ -8,7 +8,6 @@ import {
   VolumeViewer,
   AdditiveColormapExtension,
   LensExtension
-  // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 import {
   useImageSettingsStore,
