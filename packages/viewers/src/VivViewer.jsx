@@ -1,8 +1,8 @@
-import React, { PureComponent } from 'react'; // eslint-disable-line import/no-unresolved
+import * as React from 'react';
 import DeckGL from '@deck.gl/react';
+import { getVivId } from '@viv/views';
 // No need to use the ES6 or React variants.
 import equal from 'fast-deep-equal';
-import { getVivId } from '../views/utils';
 
 const areViewStatesEqual = (viewState, otherViewState) => {
   return (
@@ -55,7 +55,7 @@ const areViewStatesEqual = (viewState, otherViewState) => {
  * @property {HandleCoordinate} handleCoordinate
  * @ignore
  */
-class VivViewerWrapper extends PureComponent {
+class VivViewerWrapper extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {

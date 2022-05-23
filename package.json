@@ -41,7 +41,7 @@
           "react-dom"
         ],
         "packages": [
-          "packages/**"
+          "**"
         ]
       },
       {

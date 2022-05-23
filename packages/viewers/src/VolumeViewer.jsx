@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
+import { VolumeView, getDefaultInitialViewState } from '@viv/views';
+import { RENDERING_MODES } from '@viv/constants';
 
 import VivViewer from './VivViewer';
-import { VolumeView, getDefaultInitialViewState } from '@viv/views';
-import { RENDERING_MODES } from '../constants';
 
 /**
  * This component provides a volumetric viewer that provides provides volume-ray-casting.

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
+import { SideBySideView, getDefaultInitialViewState } from '@viv/views';
+import { ColorPaletteExtension } from '@viv/extensions';
 import VivViewer from './VivViewer';
-import { SideBySideView, getDefaultInitialViewState } from '../views';
-import { ColorPaletteExtension } from '../extensions';
 
 /**
  * This component provides a side-by-side VivViewer with linked zoom/pan.

@@ -4,6 +4,18 @@
   "type": "module",
   "main": "src/index.ts",
   "types": "src/index.ts",
+  "peerDependencies": {
+    "react": "^16.0.0 || ^17.0.0",
+    "react-dom": "^16.0.0 || ^17.0.0",
+    "@deck.gl/core": "~8.6.7",
+    "@deck.gl/geo-layers": "~8.6.7",
+    "@deck.gl/layers": "~8.6.7",
+    "@deck.gl/react": "~8.6.7",
+    "@luma.gl/constants": "~8.5.3",
+    "@luma.gl/core": "~8.5.3",
+    "@luma.gl/shadertools": "~8.5.3",
+    "@luma.gl/webgl": "~8.5.3"
+  },
   "dependencies": {
     "@viv/constants": "workspace:*",
     "@viv/extensions": "workspace:*",

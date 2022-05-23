@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
-import VivViewer from './VivViewer';
 import {
   DetailView,
   OverviewView,
   getDefaultInitialViewState,
   DETAIL_VIEW_ID,
   OVERVIEW_VIEW_ID
-} from '../views';
-import { ColorPaletteExtension } from '../extensions';
+} from '@viv/views';
+import { ColorPaletteExtension } from '@viv/extensions';
+import VivViewer from './VivViewer';
 
 /**
  * This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).

@@ -8,6 +8,8 @@
     "@deck.gl/react": "~8.6.7"
   },
   "dependencies": {
+    "@viv/constants": "workspace:*",
+    "@viv/extensions": "workspace:*",
     "@viv/views": "workspace:*",
     "fast-deep-equal": "^3.1.3"
   }
