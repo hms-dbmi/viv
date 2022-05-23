@@ -1,9 +1,8 @@
 import { fromUrl, fromBlob, addDecoder } from 'geotiff';
-import type { GeoTIFF } from 'geotiff';
+import type { GeoTIFF, Pool } from 'geotiff';
 
 import { createOffsetsProxy, checkProxies } from './lib/proxies';
 import LZWDecoder from './lib/lzw-decoder';
-import Pool from './lib/Pool';
 
 import { load } from './ome-tiff';
 
@@ -12,7 +11,7 @@ addDecoder(5, () => LZWDecoder);
 interface TiffOptions {
   headers?: object;
   offsets?: number[];
-  pool?: boolean;
+  pool?: Pool;
   images?: 'first' | 'all';
 }
 
@@ -58,7 +57,7 @@ export async function loadOmeTiff(
   source: string | File,
   opts: OmeTiffOptions = {}
 ) {
-  const { headers, offsets, pool = true, images = 'first' } = opts;
+  const { headers, offsets, pool, images = 'first' } = opts;
 
   let tiff: GeoTIFF;
 
@@ -86,6 +85,6 @@ export async function loadOmeTiff(
    */
   checkProxies(tiff);
 
-  const loaders = pool ? await load(tiff, new Pool()) : await load(tiff);
+  const loaders = await load(tiff, pool);
   return images === 'all' ? loaders : loaders[0];
 }

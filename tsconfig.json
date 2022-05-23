@@ -1,18 +1,14 @@
 {
-  "include": ["src"],
   "compilerOptions": {
     "module": "esnext",
     "target": "esnext",
+    "lib": ["esnext", "dom"],
     "jsx": "react",
     "moduleResolution": "node",
     "strict": true,
-    "allowJs": true,
     "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
-    "importsNotUsedAsValues": "error",
-    "outDir": "dist",
-    "rootDir": "src/",
-    "declarationDir": "dist/",
-    "declaration": true
+    "outDir": "./dist",
+    "declaration": true,
+    "inlineSourceMap": true,
   }
 }

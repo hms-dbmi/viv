@@ -26,7 +26,7 @@ export function getOmePixelSourceMeta({ Pixels }: OMEXML[0]) {
 
   // Push extra dimension if data are interleaved.
   if (Pixels.Interleaved) {
-    // @ts-ignore
+    // @ts-expect-error private, unused dim name for selection
     labels.push('_c');
     shape.push(3);
   }

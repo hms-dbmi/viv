@@ -1,7 +1,7 @@
 import quickselect from 'quickselect';
-import type { TypedArray } from 'zarr';
 import type { OMEXML } from './omexml';
-import type { Labels, PixelSource } from '../types';
+import type { TypedArray } from 'zarr';
+import type { Labels, PixelSource } from '@viv/types';
 
 /**
  * Computes statics from pixel data.

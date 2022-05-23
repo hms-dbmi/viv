@@ -3,7 +3,7 @@ import type { ZarrArray } from 'zarr';
 import type { OMEXML } from '../../omexml';
 import { getLabels, isInterleaved, prevPowerOf2 } from '../../utils';
 
-import type { Labels } from '../../../types';
+import type { Labels } from '@viv/types';
 import type { RootAttrs } from '../ome-zarr';
 
 /*

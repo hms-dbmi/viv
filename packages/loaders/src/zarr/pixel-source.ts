@@ -12,7 +12,7 @@ import type {
   PixelSourceSelection,
   PixelData,
   TileSelection
-} from '../../types';
+} from '@viv/types';
 
 const DTYPE_LOOKUP = {
   u1: 'Uint8',

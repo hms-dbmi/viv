@@ -50,12 +50,14 @@ importers:
 
   packages/loaders:
     specifiers:
+      '@viv/types': workspace:^0.0.0
       fast-xml-parser: ^3.16.0
       geotiff: ^2.0.5
       lzw-tiff-decoder: ^0.1.1
       quickselect: ^2.0.0
       zarr: ^0.5.1
     dependencies:
+      '@viv/types': link:../types
       fast-xml-parser: 3.21.1
       geotiff: 2.0.5
       lzw-tiff-decoder: 0.1.1

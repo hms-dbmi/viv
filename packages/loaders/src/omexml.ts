@@ -1,4 +1,4 @@
-import parser from 'fast-xml-parser';
+import * as parser from 'fast-xml-parser';
 import { ensureArray, intToRgba } from './utils';
 
 // WARNING: Changes to the parser options _will_ effect the types in types/omexml.d.ts.

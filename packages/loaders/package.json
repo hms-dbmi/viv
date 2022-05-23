@@ -1,8 +1,11 @@
 {
   "name": "@vivjs/loaders",
   "version": "0.0.0",
-  "scripts": {},
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
   "dependencies": {
+    "@viv/types": "workspace:^0.0.0",
     "fast-xml-parser": "^3.16.0",
     "geotiff": "^2.0.5",
     "lzw-tiff-decoder": "^0.1.1",
