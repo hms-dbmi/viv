@@ -17,7 +17,8 @@
       {
         "pinVersion": "~8.6.7",
         "dependencies": [
-          "@deck.gl/**"
+          "@deck.gl/**",
+          "deck.gl"
         ],
         "packages": [
           "**"
@@ -39,7 +40,7 @@
           "react-dom"
         ],
         "packages": [
-          "**"
+          "packages/**"
         ]
       },
       {
