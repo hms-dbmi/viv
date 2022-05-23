@@ -11,7 +11,6 @@
     "@material-ui/lab": "^4.0.0-alpha.56",
     "@math.gl/core": "^3.4.2",
     "@math.gl/culling": "^3.4.2",
-    "deck.gl": "~8.6.7",
     "geotiff": "^2.0.5",
     "lodash": "^4.17.21",
     "react": "^16.8.6",

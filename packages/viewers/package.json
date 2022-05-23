@@ -2,5 +2,13 @@
   "name": "@viv/viewers",
   "version": "0.0.0",
   "type": "module",
-  "main": "src/index.js"
+  "main": "src/index.js",
+  "peerDependencies": {
+    "@deck.gl/core": "~8.6.7",
+    "@deck.gl/react": "~8.6.7"
+  },
+  "dependencies": {
+    "@viv/views": "workspace:*",
+    "fast-deep-equal": "^3.1.3"
+  }
 }

@@ -14,6 +14,8 @@
     "@luma.gl/constants": "~8.5.3",
     "@luma.gl/core": "~8.5.3",
     "@luma.gl/engine": "~8.5.3",
+    "@luma.gl/webgl": "~8.5.3",
+    "@math.gl/culling": "^3.4.2",
     "@viv/constants": "workspace:*",
     "@viv/extensions": "workspace:*",
     "@viv/loaders": "workspace:*",

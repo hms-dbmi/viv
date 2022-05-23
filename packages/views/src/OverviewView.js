@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { Controller, OrthographicView } from '@deck.gl/core';
 import { OverviewLayer, makeBoundingBox } from '@viv/layers';
-import { getImageSize } from '@viv/loaders/utils';
+import { getImageSize } from '@viv/loaders';
 
 import VivView from './VivView';
 import { getVivId } from './utils';

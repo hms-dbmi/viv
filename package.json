@@ -1,6 +1,7 @@
 {
   "name": "@viv/monorepo",
   "scripts": {
+    "dev": "pnpm -r dev --filter=avivator",
     "clean": "pnpm -r exec -- rm -rf node_modules",
     "syncpack": "syncpack fix-mismatches",
     "check-format": "prettier --check --ignore-path .gitignore sites/ packages/",

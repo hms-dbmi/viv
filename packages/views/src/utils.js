@@ -1,5 +1,5 @@
 import { Matrix4 } from 'math.gl';
-import { getImageSize } from '@viv/loaders/utils';
+import { getImageSize } from '@viv/loaders';
 
 import {
   MultiscaleImageLayer,

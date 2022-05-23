@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@viv/layers": "workspace:*",
+    "@viv/loaders": "workspace:*",
     "math.gl": "^3.5.7"
   }
 }
