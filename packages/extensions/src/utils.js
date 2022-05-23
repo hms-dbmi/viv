@@ -1,10 +1,27 @@
-import { padWithDefault } from '@viv/layers/utils';
 import {
   DEFAULT_COLOR_OFF,
   MAX_CHANNELS,
   MAX_COLOR_INTENSITY
 } from '@viv/constants';
 
+/** @typedef {import('@viv/types').Color} Color */
+
+/**
+ * @template T
+ * @param {T[]} arr
+ * @param {T} defaultValue
+ * @param {number} padWidth
+ *
+ * @TODO copied from `@viv/layers` to avoid circular deps
+ */
+export function padWithDefault(arr, defaultValue, padWidth) {
+  for (let i = 0; i < padWidth; i += 1) {
+    arr.push(defaultValue);
+  }
+  return arr;
+}
+
+/** @type {Color[]} */
 // prettier-ignore
 const COLOR_PALETTE = [
   [  0,   0, 255], // blue
@@ -17,6 +34,7 @@ const COLOR_PALETTE = [
   [255,   0,   0], // red
 ];
 
+/** @param {number} n */
 export function getDefaultPalette(n) {
   if (n > COLOR_PALETTE.length) {
     throw new Error('Too many colors');
@@ -24,7 +42,9 @@ export function getDefaultPalette(n) {
   return COLOR_PALETTE.slice(0, n);
 }
 
+/** @param {{ colors: Color[], channelsVisible: boolean[] }} */
 export function padColors({ colors, channelsVisible }) {
+  /** @type {Color[]} */
   const newColors = colors.map((color, i) =>
     channelsVisible[i]
       ? color.map(c => c / MAX_COLOR_INTENSITY)
@@ -33,7 +53,7 @@ export function padColors({ colors, channelsVisible }) {
   const padSize = MAX_CHANNELS - newColors.length;
   const paddedColors = padWithDefault(
     newColors,
-    DEFAULT_COLOR_OFF,
+    /** @type {Color} */ (DEFAULT_COLOR_OFF),
     padSize
   ).reduce((acc, val) => acc.concat(val), []);
   return paddedColors;

@@ -1,3 +1,1 @@
-import LensExtension from './LensExtension';
-
-export default LensExtension;
+export { default } from './LensExtension';

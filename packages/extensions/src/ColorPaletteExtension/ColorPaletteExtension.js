@@ -17,7 +17,8 @@ const defaultProps = {
  * @property {Array.<number>=} transparentColor An RGB (0-255 range) color to be considered "transparent" if provided.
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * @property {Boolean=} useTransparentColor Whether or not to use the value provided to transparentColor.
- * */ const ColorPaletteExtension = class extends LayerExtension {
+ */
+const ColorPaletteExtension = class extends LayerExtension {
   getShaders() {
     return {
       ...super.getShaders(),
