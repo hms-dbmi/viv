@@ -1,7 +1,8 @@
 {
   "name": "@viv/monorepo",
   "scripts": {
-    "syncpack": "syncpack fix-mismatches"
+    "syncpack": "syncpack fix-mismatches",
+    "lint": "eslint packages/*/src/** sites/*/src/**
   },
   "prettier": {
     "singleQuote": true,
