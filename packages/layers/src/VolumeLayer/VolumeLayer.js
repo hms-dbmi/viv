@@ -1,10 +1,11 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import GL from '@luma.gl/constants';
 import { isWebGL2 } from '@luma.gl/core';
+import { RENDERING_MODES } from '@viv/constants';
 import { Matrix4 } from 'math.gl';
+
 import XR3DLayer from '../XR3DLayer';
 import { getPhysicalSizeScalingMatrix } from '../utils';
-import { RENDERING_MODES } from '../../constants';
 import { getVolume, getTextLayer } from './utils';
 
 const defaultProps = {

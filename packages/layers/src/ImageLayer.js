@@ -3,8 +3,8 @@ import GL from '@luma.gl/constants';
 
 import XRLayer from './XRLayer';
 import BitmapLayer from './BitmapLayer';
-import { isInterleaved, SIGNAL_ABORTED } from '../loaders/utils';
-import { ColorPaletteExtension } from '../extensions';
+import { isInterleaved, SIGNAL_ABORTED } from '@viv/loaders';
+import { ColorPaletteExtension } from '@viv/extensions';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },

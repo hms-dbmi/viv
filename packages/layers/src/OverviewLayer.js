@@ -1,9 +1,9 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { PolygonLayer } from '@deck.gl/layers';
+import { getImageSize } from '@viv/loaders';
 import { Matrix4 } from 'math.gl';
 
 import ImageLayer from './ImageLayer';
-import { getImageSize } from '../loaders/utils';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },

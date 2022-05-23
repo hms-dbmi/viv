@@ -35,8 +35,8 @@ import vs from './xr-layer-vertex.glsl';
 import fs from './xr-layer-fragment.glsl';
 import channels from './channel-intensity-module';
 import { padContrastLimits, padWithDefault, getDtypeValues } from '../utils';
-import { COLORMAPS, RENDERING_MODES as RENDERING_NAMES } from '../../constants';
-import { padColors } from '../../extensions/utils';
+import { COLORMAPS, RENDERING_MODES as RENDERING_NAMES } from '@viv/constants';
+import { padColors } from '@viv/extensions';
 import {
   RENDERING_MODES_BLEND,
   RENDERING_MODES_COLORMAP

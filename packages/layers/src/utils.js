@@ -2,7 +2,6 @@ import { OrthographicView } from '@deck.gl/core';
 import { Matrix4 } from 'math.gl';
 import { MAX_CHANNELS, DTYPE_VALUES } from '@viv/constants';
 
-
 export function range(len) {
   return [...Array(len).keys()];
 }
@@ -49,7 +48,9 @@ export function padContrastLimits({
 }) {
   const maxSliderValue = (domain && domain[1]) || getDtypeValues(dtype).max;
   const newContrastLimits = contrastLimits.map((slider, i) =>
-    channelsVisible[i] ? slider : /** @type {[number, number]} */ ([maxSliderValue, maxSliderValue])
+    channelsVisible[i]
+      ? slider
+      : /** @type {[number, number]} */ ([maxSliderValue, maxSliderValue])
   );
   // Need to pad contrastLimits and colors with default values (required by shader)
   const padSize = MAX_CHANNELS - newContrastLimits.length;
@@ -145,4 +146,3 @@ export function makeBoundingBox(viewState) {
     viewport.unproject([0, viewport.height])
   ];
 }
-

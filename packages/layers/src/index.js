@@ -7,4 +7,4 @@ export { default as XRLayer } from './XRLayer';
 export { default as XR3DLayer } from './XR3DLayer';
 export { default as BitmapLayer } from './BitmapLayer';
 
-export { getPhysicalSizeScalingMatrix, makeBoundingBox } from './utils';
+export { getPhysicalSizeScalingMatrix, makeBoundingBox, padWithDefault } from './utils';

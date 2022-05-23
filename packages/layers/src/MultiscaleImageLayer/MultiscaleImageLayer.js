@@ -8,8 +8,8 @@ import {
   getImageSize,
   isInterleaved,
   SIGNAL_ABORTED
-} from '../../loaders/utils';
-import { ColorPaletteExtension } from '../../extensions';
+} from '@viv/loaders';
+import { ColorPaletteExtension } from '@viv/extensions';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
