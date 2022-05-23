@@ -8,7 +8,7 @@ import { ProgramManager } from '@luma.gl/engine';
 import { hasFeature, FEATURES } from '@luma.gl/webgl';
 import fs from './xr-layer-fragment.webgl.glsl';
 import vs from './xr-layer-vertex.webgl.glsl';
-import { channels } from './shader-modules';
+import { channels } from './shader-modules/index';
 import { padContrastLimits, getDtypeValues } from '../utils';
 
 const coreShaderModule = { fs, vs };

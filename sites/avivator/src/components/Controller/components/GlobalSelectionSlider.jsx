@@ -70,7 +70,7 @@ export default function GlobalSelectionSlider(props) {
     [loader, selections]
   );
   return (
-    <Grid container direction="row" justify="space-between" alignItems="center">
+    <Grid container direction="row" justifyContent="space-between" alignItems="center">
       <Grid item xs={1}>
         {label}:
       </Grid>

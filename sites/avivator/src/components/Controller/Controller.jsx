@@ -202,7 +202,7 @@ const Controller = () => {
         {!isViewerLoading && !isRgb ? (
           <Grid container>{channelControllers}</Grid>
         ) : (
-          <Grid container justify="center">
+          <Grid container justifyContent="center">
             {!isRgb && <CircularProgress />}
           </Grid>
         )}

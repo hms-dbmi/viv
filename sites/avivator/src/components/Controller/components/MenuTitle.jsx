@@ -15,7 +15,7 @@ function MenuTitle() {
     store => store.toggleIsControllerOn
   );
   return (
-    <Grid container direction="row" justify="flex-end" alignItems="center">
+    <Grid container direction="row" justifyContent="flex-end" alignItems="center">
       <Grid style={{ marginRight: 'auto' }} item>
         <Typography variant="body1">
           <strong>AVIVATOR</strong>

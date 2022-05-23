@@ -68,8 +68,8 @@ function ChannelController({
   const step = max - min < 500 && isFloat ? (max - min) / 500 : 1;
   const shouldShowPixelValue = !useLinkedView && !use3d;
   return (
-    <Grid container direction="column" m={2} justify="center">
-      <Grid container direction="row" justify="space-between">
+    <Grid container direction="column" m={2} justifyContent="center">
+      <Grid container direction="row" justifyContent="space-between">
         <Grid item xs={11}>
           <Select native value={name} onChange={onSelectionChange}>
             {channelOptions.map(opt => (
@@ -87,7 +87,7 @@ function ChannelController({
           />
         </Grid>
       </Grid>
-      <Grid container direction="row" justify="flex-start" alignItems="center">
+      <Grid container direction="row" justifyContent="flex-start" alignItems="center">
         <Grid item xs={2}>
           {getPixelValueDisplay(pixelValue, isLoading, shouldShowPixelValue)}
         </Grid>

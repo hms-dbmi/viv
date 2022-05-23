@@ -22,7 +22,7 @@ function LensSelect() {
 
   const checkboxColor = `rgb(${[255, 255, 255]})`;
   return (
-    <Grid container direction="row" justify="flex-start" alignItems="center">
+    <Grid container direction="row" justifyContent="flex-start" alignItems="center">
       <Grid item xs={2}>
         Lens:
       </Grid>

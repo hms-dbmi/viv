@@ -86,7 +86,7 @@ function Header(props) {
       <Grid
         container
         direction="row"
-        justify="space-between"
+        justifyContent="space-between"
         alignItems="center"
       >
         <Grid item xs={1}>
@@ -166,7 +166,7 @@ function Menu({ children, ...props }) {
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
       <Paper className={classes.paper}>
         <Header />
-        <Grid container direction="column" justify="center" alignItems="center">
+        <Grid container direction="column" justifyContent="center" alignItems="center">
           {children.map((child, i) => {
             return (
               // eslint-disable-next-line react/no-array-index-key

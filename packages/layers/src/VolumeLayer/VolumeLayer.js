@@ -4,7 +4,7 @@ import { isWebGL2 } from '@luma.gl/core';
 import { RENDERING_MODES } from '@viv/constants';
 import { Matrix4 } from 'math.gl';
 
-import XR3DLayer from '../XR3DLayer';
+import XR3DLayer from '../XR3DLayer/index';
 import { getPhysicalSizeScalingMatrix } from '../utils';
 import { getVolume, getTextLayer } from './utils';
 

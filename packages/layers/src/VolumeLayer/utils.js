@@ -1,7 +1,7 @@
 /* global globalThis */
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
 import { TextLayer } from '@deck.gl/layers';
-import { getImageSize } from '../../loaders/utils';
+import { getImageSize } from '@viv/loaders';
 
 /**
  * Creates a single continguous TypedArray that can visualized as a volume in 3D space where the y-axis going up is positive,

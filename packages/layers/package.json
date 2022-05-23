@@ -1,7 +1,11 @@
 {
   "name": "@viv/layers",
   "version": "0.0.0",
-  "main": "src/index.js",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rollup -p glslify -o dist/index.js src/index.js",
+    "dev": "npm run build -- --watch"
+  },
   "peerDependencies": {
     "@deck.gl/core": "~8.6.7",
     "@deck.gl/extensions": "~8.6.7",
@@ -21,5 +25,10 @@
     "@viv/loaders": "workspace:*",
     "@viv/types": "workspace:*",
     "math.gl": "^3.5.7"
+  },
+  "devDependencies": {
+    "glsl-colormap": "^1.0.1",
+    "rollup": "^2.74.1",
+    "rollup-plugin-glslify": "^1.2.1"
   }
 }

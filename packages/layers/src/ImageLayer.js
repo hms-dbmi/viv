@@ -1,7 +1,7 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import GL from '@luma.gl/constants';
 
-import XRLayer from './XRLayer';
+import XRLayer from './XRLayer/index';
 import BitmapLayer from './BitmapLayer';
 import { isInterleaved, SIGNAL_ABORTED } from '@viv/loaders';
 import { ColorPaletteExtension } from '@viv/extensions';

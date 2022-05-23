@@ -1,4 +1,4 @@
-import { ScaleBarLayer } from '../layers';
+import { ScaleBarLayer } from '@viv/layers';
 import VivView from './VivView';
 import { getImageLayer, getVivId } from './utils';
 import { OVERVIEW_VIEW_ID } from './OverviewView';

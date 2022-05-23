@@ -6,14 +6,14 @@ import {
   Switch,
   Route
 } from 'react-router-dom';
-import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider, createTheme } from '@material-ui/core/styles';
 import { grey } from '@material-ui/core/colors';
 
 import sources from './source-info';
 import Avivator from './Avivator';
 import { getNameFromUrl } from './utils';
 
-const darkTheme = createMuiTheme({
+const darkTheme = createTheme({
   palette: {
     type: 'dark',
     primary: grey,

@@ -1,4 +1,4 @@
-import { RENDERING_MODES as RENDERING_NAMES } from '../../constants';
+import { RENDERING_MODES as RENDERING_NAMES } from '@viv/constants';
 
 export const RENDERING_MODES_BLEND = {
   [RENDERING_NAMES.MAX_INTENSITY_PROJECTION]: {
