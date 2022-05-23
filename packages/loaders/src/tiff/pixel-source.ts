@@ -76,9 +76,8 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
    * Computes tile size given x, y coord.
    */
   private _getTileExtent(x: number, y: number) {
-    const { height: zoomLevelHeight, width: zoomLevelWidth } = getImageSize(
-      this
-    );
+    const { height: zoomLevelHeight, width: zoomLevelWidth } =
+      getImageSize(this);
     let height = this.tileSize;
     let width = this.tileSize;
     const maxXTileCoord = Math.floor(zoomLevelWidth / this.tileSize);

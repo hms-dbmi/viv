@@ -100,13 +100,8 @@ export default class SideBySideView extends VivView {
 
   getLayers({ props, viewStates }) {
     const { loader } = props;
-    const {
-      id,
-      viewportOutlineColor,
-      viewportOutlineWidth,
-      height,
-      width
-    } = this;
+    const { id, viewportOutlineColor, viewportOutlineWidth, height, width } =
+      this;
     const layerViewState = viewStates[id];
     const boundingBox = makeBoundingBox({ ...layerViewState, height, width });
     const layers = [getImageLayer(id, props)];

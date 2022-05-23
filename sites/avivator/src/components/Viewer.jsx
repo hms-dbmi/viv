@@ -23,20 +23,16 @@ const Viewer = () => {
     store => [store.useLinkedView, store.use3d, store.viewState],
     shallow
   );
-  const [
-    colors,
-    contrastLimits,
-    channelsVisible,
-    selections
-  ] = useChannelsStore(
-    store => [
-      store.colors,
-      store.contrastLimits,
-      store.channelsVisible,
-      store.selections
-    ],
-    shallow
-  );
+  const [colors, contrastLimits, channelsVisible, selections] =
+    useChannelsStore(
+      store => [
+        store.colors,
+        store.contrastLimits,
+        store.channelsVisible,
+        store.selections
+      ],
+      shallow
+    );
   const loader = useLoader();
   const viewSize = useWindowSize();
   const [

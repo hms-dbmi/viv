@@ -6,20 +6,16 @@ import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 const SideBySideToggle = () => {
   const isOverviewOn = useImageSettingsStore(store => store.isOverviewOn);
-  const [
-    isViewerLoading,
-    toggleUseLinkedView,
-    useLinkedView,
-    use3d
-  ] = useViewerStore(
-    store => [
-      store.isViewerLoading,
-      store.toggleUseLinkedView,
-      store.useLinkedView,
-      store.use3d
-    ],
-    shallow
-  );
+  const [isViewerLoading, toggleUseLinkedView, useLinkedView, use3d] =
+    useViewerStore(
+      store => [
+        store.isViewerLoading,
+        store.toggleUseLinkedView,
+        store.useLinkedView,
+        store.use3d
+      ],
+      shallow
+    );
   return (
     <Button
       disabled={isViewerLoading || isOverviewOn || use3d}

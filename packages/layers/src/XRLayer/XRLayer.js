@@ -107,9 +107,8 @@ const XRLayer = class extends Layer {
       this.context.gl,
       interpolation
     );
-    const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
-      'fs:DECKGL_PROCESS_INTENSITY'
-    );
+    const extensionDefinesDeckglProcessIntensity =
+      this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
     const newChannelsModule = { ...channels, inject: {} };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `

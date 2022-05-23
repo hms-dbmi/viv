@@ -173,9 +173,8 @@ const XR3DLayer = class extends Layer {
       ? RENDERING_MODES_COLORMAP[renderingMode]
       : RENDERING_MODES_BLEND[renderingMode];
     const channelsModules = removeExtraColormapFunctionsFromShader(colormap);
-    const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
-      'fs:DECKGL_PROCESS_INTENSITY'
-    );
+    const extensionDefinesDeckglProcessIntensity =
+      this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
     const newChannelsModule = { ...channelsModules, inject: {} };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
@@ -270,11 +269,8 @@ const XR3DLayer = class extends Layer {
       clippingPlanes,
       resolutionMatrix
     } = this.props;
-    const {
-      viewMatrix,
-      viewMatrixInverse,
-      projectionMatrix
-    } = this.context.viewport;
+    const { viewMatrix, viewMatrixInverse, projectionMatrix } =
+      this.context.viewport;
     if (textures && model && scaleMatrix) {
       const paddedContrastLimits = padContrastLimits({
         contrastLimits,

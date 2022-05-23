@@ -117,9 +117,11 @@ function getOmeIFDIndexer(
   let imageOffset = 0;
   if (image > 0) {
     for (let i = 0; i < image; i += 1) {
-      const { SizeC: prevSizeC, SizeZ: prevSizeZ, SizeT: prevSizeT } = rootMeta[
-        i
-      ].Pixels;
+      const {
+        SizeC: prevSizeC,
+        SizeZ: prevSizeZ,
+        SizeT: prevSizeT
+      } = rootMeta[i].Pixels;
       imageOffset += prevSizeC * prevSizeZ * prevSizeT;
     }
   }

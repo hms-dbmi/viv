@@ -3,7 +3,9 @@
   "scripts": {
     "clean": "pnpm -r exec -- rm -rf node_modules",
     "syncpack": "syncpack fix-mismatches",
-    "lint": "eslint \"packages/*/src/**/*\" \"sites/*/src/**/*\""
+    "check-format": "prettier --check --ignore-path .gitignore sites/ packages/",
+    "lint": "npm run check-format && eslint \"packages/*/src/**/*\" \"sites/*/src/**/*\"",
+    "format": "npm run check-format -- --write"
   },
   "prettier": {
     "singleQuote": true,
@@ -53,3 +55,4 @@
     "typescript": "^4.6.4"
   }
 }
+

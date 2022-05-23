@@ -1,23 +1,23 @@
 # Avivator
 
-Avivator is a lightweight "batteries-included" WebGL viewer for remote imaging data, built around Viv. 
-A hosted instance of Avivator can be accessed at  [avivator.gehlenborglab.org]( avivator.gehlenborglab.org ).
+Avivator is a lightweight "batteries-included" WebGL viewer for remote imaging data, built around Viv.
+A hosted instance of Avivator can be accessed at [avivator.gehlenborglab.org](avivator.gehlenborglab.org).
 
 Please checkout our [video tutorial](https://www.youtube.com/watch?v=_GES8BTzyWc) to get started.
 
 ## Development system requirements
 
 Avivator has been tested with the following dependency versions:
+
 - Operating system: macOS 10.15.5
 - NodeJS 14.0.0
 - NPM 6.14.4
 - Zsh 5.7.1
 - one of:
-    - Firefox Developer Edition 84.0b8
-    - Firefox 80.0.1 (and later)
-    - Safari 13.1.1 (and later)
-    - Google Chrome 87.0.4280.88
-
+  - Firefox Developer Edition 84.0b8
+  - Firefox 80.0.1 (and later)
+  - Safari 13.1.1 (and later)
+  - Google Chrome 87.0.4280.88
 
 ## Development guide
 
@@ -30,9 +30,8 @@ npm install # installs dependencies for both viv and avivator
 npm start
 ```
 
-
 This command starts a live development server. Navigate to `http://localhost:3000`
-in your web browser to view the site. You may edit the contents of `src/` (Viv codebase) 
+in your web browser to view the site. You may edit the contents of `src/` (Viv codebase)
 or `avivator/`, and the changes should be applied automatically.
 
 ## Production build

@@ -122,11 +122,10 @@ export function isInterleaved(shape: number[]) {
  * > imgMeta.Pixels.DimensionOrder === 'XYCZT'
  * > getLabels(imgMeta.Pixels) === ['t', 'z', 'c', 'y', 'x']
  */
-type Sel<
-  Dim extends string
-> = Dim extends `${infer Z}${infer X}${infer A}${infer B}${infer C}`
-  ? [C, B, A]
-  : 'error';
+type Sel<Dim extends string> =
+  Dim extends `${infer Z}${infer X}${infer A}${infer B}${infer C}`
+    ? [C, B, A]
+    : 'error';
 export function getLabels(dimOrder: OMEXML[0]['Pixels']['DimensionOrder']) {
   return dimOrder.toLowerCase().split('').reverse() as Labels<
     Sel<Lowercase<typeof dimOrder>>

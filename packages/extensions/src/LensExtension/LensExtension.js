@@ -103,12 +103,8 @@ const LensExtension = class extends LayerExtension {
     // Creating a unit-square scaled intersection box for rendering the lens.
     // It is ok if these coordinates are outside the unit square since
     // we check membership in or out of the lens on the fragment shader.
-    const [
-      leftMouseBound,
-      bottomMouseBound,
-      rightMouseBound,
-      topMouseBound
-    ] = unprojectLensBounds;
+    const [leftMouseBound, bottomMouseBound, rightMouseBound, topMouseBound] =
+      unprojectLensBounds;
     const [left, bottom, right, top] = bounds;
     const leftMouseBoundScaled = (leftMouseBound - left) / (right - left);
     const bottomMouseBoundScaled = (bottomMouseBound - top) / (bottom - top);

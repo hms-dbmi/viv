@@ -33,7 +33,8 @@ class ReadOnlyStore {
 
 export class FileStore
   extends ReadOnlyStore
-  implements AsyncStore<ArrayBuffer> {
+  implements AsyncStore<ArrayBuffer>
+{
   private _map: Map<string, File>;
   private _rootPrefix: string;
 

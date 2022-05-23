@@ -159,12 +159,8 @@ function VolumeButton() {
                 .map((_, resolution) => {
                   if (loader) {
                     if (canLoadResolution(loader, resolution)) {
-                      const {
-                        height,
-                        width,
-                        depthDownsampled,
-                        totalBytes
-                      } = getStatsForResolution(loader, resolution);
+                      const { height, width, depthDownsampled, totalBytes } =
+                        getStatsForResolution(loader, resolution);
                       return (
                         <MenuItem
                           dense
@@ -175,9 +171,8 @@ function VolumeButton() {
                                 true
                               )
                             });
-                            const [xSlice, ySlice, zSlice] = getBoundingCube(
-                              loader
-                            );
+                            const [xSlice, ySlice, zSlice] =
+                              getBoundingCube(loader);
                             useImageSettingsStore.setState({
                               resolution,
                               xSlice,

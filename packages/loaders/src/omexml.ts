@@ -77,7 +77,7 @@ export type DimensionOrder =
 // Structure of node is determined by the PARSER_OPTIONS.
 type Node<T, A> = T & { attr: A };
 type Attrs<Fields extends string, T = string> = { [K in Fields]: T };
-type AttrsOnlyNode<A> = Node<unknown, A>
+type AttrsOnlyNode<A> = Node<unknown, A>;
 
 type OMEAttrs = Attrs<'xmlns' | 'xmlns:xsi' | 'xsi:schemaLocation'>;
 type OME = Node<{ Insturment: Insturment; Image: Image | Image[] }, OMEAttrs>;
