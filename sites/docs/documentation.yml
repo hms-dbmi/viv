@@ -2,15 +2,15 @@ toc:
   - name: Introduction
     file: README.md
   - name: Getting Started
-    file: docs/SAMPLES.md
+    file: src/SAMPLES.md
   - name: API Structure
-    file: docs/API_STRUCTURE.md
+    file: src/API_STRUCTURE.md
   - name: Custom Shaders
-    file: docs/CUSTOM_SHADERS.md
+    file: src/CUSTOM_SHADERS.md
   - name: Data preparation
     file: tutorial/README.md
   - name: 3D Rendering
-    file: docs/3D_RENDERING_BRIEF.md
+    file: src/3D_RENDERING_BRIEF.md
   - name: Viewers (React Components)
   - PictureInPictureViewer
   - SideBySideViewer
@@ -26,7 +26,7 @@ toc:
   - getChannelStats
   - getDefaultInitialViewState
   - name: Layers
-    file: docs/LAYERS_DOCS_NOTE.md
+    file: src/LAYERS_DOCS_NOTE.md
   - MultiscaleImageLayer
   - ImageLayer
   - XRLayer

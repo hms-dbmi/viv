@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "build": "documentation build -f html --document-exported --shallow -o dist --config documentation.yml"
+  },
+  "devDependencies": {
+    "documentation": "^13.2.5"
+  }
+}
