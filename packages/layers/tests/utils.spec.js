@@ -20,35 +20,24 @@ test('padWithDefault test', t => {
 });
 
 test('padContrastLimits test', t => {
-  const expectedChannelOff =[
-      0,
-      5,
-      255,
-      255,
-      255,
-      255,
-      255,
-      255,
-      255,
-      255,
-      255,
-      255
-    ];
- 
+  const expectedChannelOff = [
+    0, 5, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+  ];
+
   const expected16Bit = [
-      0,
-      5,
-      0,
-      5,
-      2 ** 16 - 1,
-      2 ** 16 - 1,
-      2 ** 16 - 1,
-      2 ** 16 - 1,
-      2 ** 16 - 1,
-      2 ** 16 - 1,
-      2 ** 16 - 1,
-      2 ** 16 - 1
-    ];
+    0,
+    5,
+    0,
+    5,
+    2 ** 16 - 1,
+    2 ** 16 - 1,
+    2 ** 16 - 1,
+    2 ** 16 - 1,
+    2 ** 16 - 1,
+    2 ** 16 - 1,
+    2 ** 16 - 1,
+    2 ** 16 - 1
+  ];
   t.deepEqual(
     padContrastLimits({
       contrastLimits: [
@@ -61,7 +50,7 @@ test('padContrastLimits test', t => {
     expectedChannelOff,
     'Pads with one channel turned off'
   );
-    t.deepEqual(
+  t.deepEqual(
     padContrastLimits({
       contrastLimits: [
         [0, 5],

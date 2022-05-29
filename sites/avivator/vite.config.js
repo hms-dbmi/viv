@@ -10,7 +10,7 @@ import * as path from 'path';
  * @param {string} dir
  * @returns {import('vite').Plugin}
  */
-const serveData = (dir) => {
+const serveData = dir => {
   if (dir[0] === '~') {
     dir = path.join(process.env.HOME, dir.slice(1));
   } else {
@@ -29,14 +29,10 @@ const serveData = (dir) => {
           next();
         }
       });
-    },
+    }
   };
 };
 
-
 export default defineConfig({
-  plugins: [
-    react(),
-    serveData(process.env.VIV_DATA_DIR || 'avivator/data'),
-  ]
+  plugins: [react(), serveData(process.env.VIV_DATA_DIR || 'avivator/data')]
 });
