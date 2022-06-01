@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import * as React from 'react';
 import {
   DetailView,
   OverviewView,
@@ -73,7 +73,7 @@ const PictureInPictureViewer = props => {
     deckProps
   } = props;
   const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
-  const baseViewState = useMemo(() => {
+  const baseViewState = React.useMemo(() => {
     return (
       detailViewState ||
       getDefaultInitialViewState(loader, { height, width }, 0.5)

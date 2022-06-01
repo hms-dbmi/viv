@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import * as React from 'react';
 import { SideBySideView, getDefaultInitialViewState } from '@viv/views';
 import { ColorPaletteExtension } from '@viv/extensions';
 import VivViewer from './VivViewer';
@@ -60,7 +60,7 @@ const SideBySideViewer = props => {
   } = props;
   const leftViewState = viewStatesProp?.find(v => v.id === 'left');
   const rightViewState = viewStatesProp?.find(v => v.id === 'right');
-  const viewStates = useMemo(() => {
+  const viewStates = React.useMemo(() => {
     if (leftViewState && rightViewState) {
       return viewStatesProp;
     }

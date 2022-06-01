@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import * as React from 'react';
 import { VolumeView, getDefaultInitialViewState } from '@viv/views';
 import { RENDERING_MODES } from '@viv/constants';
 
@@ -52,7 +52,7 @@ const VolumeViewer = props => {
     useFixedAxis = true
   } = props;
   const volumeViewState = viewStatesProp?.find(state => state?.id === '3d');
-  const initialViewState = useMemo(() => {
+  const initialViewState = React.useMemo(() => {
     if (volumeViewState) {
       return volumeViewState;
     }
