@@ -4,10 +4,18 @@
   "type": "module",
   "main": "src/index.ts",
   "types": "src/index.ts",
+  "publishConfig": {
+    "main": "dist/index.mjs",
+    "types": "dist/index.d.ts"
+  },
   "scripts": {
     "check": "tsc --noEmit",
+    "prepare": "unbuild",
     "test": "esno tests/index.spec.js | tap-spec"
   },
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@viv/types": "workspace:*",
     "fast-xml-parser": "^3.16.0",
@@ -15,5 +23,11 @@
     "lzw-tiff-decoder": "^0.1.1",
     "quickselect": "^2.0.0",
     "zarr": "^0.5.1"
+  },
+  "unbuild": {
+    "entries": [
+      "src/index"
+    ],
+    "declaration": true
   }
 }
