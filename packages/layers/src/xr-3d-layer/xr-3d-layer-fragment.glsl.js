@@ -1,3 +1,4 @@
+export default `\
 #version 300 es
 precision highp int;
 precision highp float;
@@ -135,3 +136,4 @@ void main(void) {
   color.g = linear_to_srgb(color.g);
   color.b = linear_to_srgb(color.b);
 }
+`

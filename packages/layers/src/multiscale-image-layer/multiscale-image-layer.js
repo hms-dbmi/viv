@@ -2,8 +2,8 @@ import { CompositeLayer } from '@deck.gl/core';
 import { Matrix4 } from 'math.gl';
 import GL from '@luma.gl/constants';
 
-import MultiscaleImageLayerBase from './MultiscaleImageLayerBase';
-import ImageLayer from '../ImageLayer';
+import MultiscaleImageLayerBase from './multiscale-image-layer-base';
+import ImageLayer from '../image-layer';
 import { getImageSize, isInterleaved, SIGNAL_ABORTED } from '@viv/loaders';
 import { ColorPaletteExtension } from '@viv/extensions';
 

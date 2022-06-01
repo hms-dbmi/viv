@@ -31,12 +31,13 @@ import { Model, Geometry, Texture3D } from '@luma.gl/core';
 import { ProgramManager } from '@luma.gl/engine';
 import { Matrix4 } from 'math.gl';
 import { Plane } from '@math.gl/culling';
-import vs from './xr-layer-vertex.glsl';
-import fs from './xr-layer-fragment.glsl';
-import channels from './channel-intensity-module';
 import { padContrastLimits, padWithDefault, getDtypeValues } from '../utils';
 import { COLORMAPS, RENDERING_MODES as RENDERING_NAMES } from '@viv/constants';
 import { padColors } from '@viv/extensions';
+
+import vs from './xr-3d-layer-vertex.glsl';
+import fs from './xr-3d-layer-fragment.glsl';
+import channels from './shaderlib/channel-intensity';
 import {
   RENDERING_MODES_BLEND,
   RENDERING_MODES_COLORMAP

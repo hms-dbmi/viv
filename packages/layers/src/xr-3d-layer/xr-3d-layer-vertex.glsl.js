@@ -1,3 +1,4 @@
+export default `\
 #version 300 es
 #define SHADER_NAME xr-layer-vertex-shader
 
@@ -33,9 +34,9 @@ void main() {
   This first diagram is a skewed volume (i.e a "shear" model matrix applied) top down with the eye marked as #, all in world space
        ^
     ___|__
-    \  |  \         
-     \ |   \
-      \|____\
+    \\  |  \\
+     \\ |   \\
+      \\|____\\
        | 
        | 
        |
@@ -69,3 +70,4 @@ void main() {
   // Step 3: Rays are from eye to vertices so that they get interpolated over the fragments.
   vray_dir = positions - transformed_eye;
 }
+`

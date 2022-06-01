@@ -1,7 +1,8 @@
 import GL from '@luma.gl/constants';
 import { getImageSize, isInterleaved } from '@viv/loaders';
-import XRLayer from '../XRLayer/index';
-import BitmapLayer from '../BitmapLayer';
+
+import XRLayer from '../xr-layer/xr-layer';
+import BitmapLayer from '../bitmap-layer';
 
 export function range(len) {
   return [...Array(len).keys()];

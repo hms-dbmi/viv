@@ -3,7 +3,7 @@ import { PolygonLayer } from '@deck.gl/layers';
 import { getImageSize } from '@viv/loaders';
 import { Matrix4 } from 'math.gl';
 
-import ImageLayer from './ImageLayer';
+import ImageLayer from './image-layer';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },

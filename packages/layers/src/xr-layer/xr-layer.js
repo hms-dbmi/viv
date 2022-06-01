@@ -6,10 +6,11 @@ import { COORDINATE_SYSTEM, Layer, project32, picking } from '@deck.gl/core';
 import { Model, Geometry, Texture2D, isWebGL2 } from '@luma.gl/core';
 import { ProgramManager } from '@luma.gl/engine';
 import { hasFeature, FEATURES } from '@luma.gl/webgl';
-import fs from './xr-layer-fragment.webgl.glsl';
-import vs from './xr-layer-vertex.webgl.glsl';
-import { channels } from './shader-modules/index';
+import channels from './shader-modules/channel-intensity';
 import { padContrastLimits, getDtypeValues } from '../utils';
+
+import fs from './xr-layer-fragment.glsl';
+import vs from './xr-layer-vertex.glsl';
 
 const coreShaderModule = { fs, vs };
 

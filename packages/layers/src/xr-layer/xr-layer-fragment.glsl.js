@@ -1,3 +1,4 @@
+export default `\
 #define SHADER_NAME xr-layer-fragment-shader
 
 precision highp float;
@@ -38,3 +39,4 @@ void main() {
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }
+`

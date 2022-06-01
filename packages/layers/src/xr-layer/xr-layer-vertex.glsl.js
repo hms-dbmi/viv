@@ -1,3 +1,4 @@
+export default `\
 #define SHADER_NAME xr-layer-vertex-shader
 
 attribute vec2 texCoords;
@@ -16,3 +17,4 @@ void main(void) {
   vec4 color = vec4(0.);
   DECKGL_FILTER_COLOR(color, geometry);
 }
+`
