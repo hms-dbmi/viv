@@ -2,7 +2,20 @@
   "name": "@viv/views",
   "version": "0.0.0",
   "main": "src/index.js",
+  "types": "src/index.js",
+  "publishConfig": {
+    "main": "dist/index.mjs",
+    "types": "dist/index.d.ts"
+  },
+  "scripts": {
+    "prepack": "unbuild"
+  },
   "peerDependencies": {
+    "@loaders.gl/core": "^3.0.0",
+    "@deck.gl/core": "~8.6.7",
+    "@deck.gl/layers": "~8.6.7"
+  },
+  "devDependencies": {
     "@loaders.gl/core": "^3.0.0",
     "@deck.gl/core": "~8.6.7",
     "@deck.gl/layers": "~8.6.7"
@@ -11,5 +24,11 @@
     "@viv/layers": "workspace:*",
     "@viv/loaders": "workspace:*",
     "math.gl": "^3.5.7"
+  },
+  "unbuild": {
+    "entries": [
+      "src/index"
+    ],
+    "declaration": true
   }
 }

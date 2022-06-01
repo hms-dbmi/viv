@@ -13,6 +13,8 @@
     "@math.gl/culling": "^3.4.2",
     "geotiff": "^2.0.5",
     "lodash": "^4.17.21",
+    "react": "^16.0.0 || ^17.0.0",
+    "react-dom": "^16.0.0 || ^17.0.0",
     "react-dropzone": "^11.2.3",
     "react-router-dom": "^5.2.0",
     "zustand": "^3.4.1"

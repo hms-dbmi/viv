@@ -9,13 +9,15 @@
     "types": "dist/index.d.ts"
   },
   "scripts": {
-    "prepare": "unbuild"
+    "prepack": "unbuild"
   },
   "dependencies": {
     "@luma.gl/constants": "~8.5.3"
   },
   "unbuild": {
-    "entries": ["src/index"],
+    "entries": [
+      "src/index"
+    ],
     "declaration": true
   }
 }

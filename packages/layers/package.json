@@ -3,16 +3,19 @@
   "version": "0.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rollup -p glslify -o dist/index.js src/index.js",
+    "prepare": "rollup -p glslify -o dist/index.js src/index.js",
     "dev": "npm run build -- --watch"
   },
   "peerDependencies": {
     "@deck.gl/core": "~8.6.7",
-    "@deck.gl/extensions": "~8.6.7",
     "@deck.gl/geo-layers": "~8.6.7",
-    "@deck.gl/layers": "~8.6.7",
-    "@deck.gl/mesh-layers": "~8.6.7",
-    "@loaders.gl/core": "^3.0.0"
+    "@deck.gl/layers": "~8.6.7"
+  },
+  "devDependencies": {
+    "@deck.gl/core": "~8.6.7",
+    "glsl-colormap": "^1.0.1",
+    "rollup": "^2.74.1",
+    "rollup-plugin-glslify": "^1.2.1"
   },
   "dependencies": {
     "@luma.gl/constants": "~8.5.3",
@@ -25,10 +28,5 @@
     "@viv/loaders": "workspace:*",
     "@viv/types": "workspace:*",
     "math.gl": "^3.5.7"
-  },
-  "devDependencies": {
-    "glsl-colormap": "^1.0.1",
-    "rollup": "^2.74.1",
-    "rollup-plugin-glslify": "^1.2.1"
   }
 }

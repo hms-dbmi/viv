@@ -10,7 +10,7 @@
   },
   "scripts": {
     "check": "tsc --noEmit",
-    "prepare": "unbuild",
+    "prepack": "unbuild",
     "test": "esno tests/index.spec.js | tap-spec"
   },
   "files": [
