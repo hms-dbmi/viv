@@ -1,12 +1,17 @@
 import test from 'tape';
 import { fromFile } from 'geotiff';
+import { load } from '../src/tiff/ome-tiff';
 
-import { load } from '../../src/loaders/tiff/ome-tiff';
+import * as path from 'path';
+import * as url from 'url';
+
+const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
+const FIXTURE = path.resolve(__dirname, './fixtures/multi-channel.ome.tif');
 
 test('Creates correct TiffPixelSource for OME-TIFF.', async t => {
   t.plan(5);
   try {
-    const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
+    const tiff = await fromFile(FIXTURE);
     const [{ data }] = await load(tiff);
     t.equal(data.length, 1, 'image should not be pyramidal.');
     const [base] = data;
@@ -34,7 +39,7 @@ test('Creates correct TiffPixelSource for OME-TIFF.', async t => {
 test('Get raster data.', async t => {
   t.plan(13);
   try {
-    const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
+    const tiff = await fromFile(FIXTURE);
     const [{ data }] = await load(tiff);
     const [base] = data;
 
@@ -60,7 +65,7 @@ test('Get raster data.', async t => {
 test('Correct OME-XML.', async t => {
   t.plan(9);
   try {
-    const tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
+    const tiff = await fromFile(FIXTURE);
     const [{ metadata }] = await load(tiff);
     const { Name, Pixels } = metadata;
     t.equal(

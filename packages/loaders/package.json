@@ -1,10 +1,12 @@
 {
   "name": "@viv/loaders",
   "version": "0.0.0",
+  "type": "module",
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "test": "esno tests/index.spec.js | tap-spec"
   },
   "dependencies": {
     "@viv/types": "workspace:*",

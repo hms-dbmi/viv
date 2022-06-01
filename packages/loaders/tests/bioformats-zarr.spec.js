@@ -1,16 +1,20 @@
 import { test } from 'tape';
-import fs from 'fs/promises';
 import { FileSystemStore } from './common';
-import { load } from '../../src/loaders/zarr/bioformats-zarr';
+import { load } from '../src/zarr/bioformats-zarr';
 
-const FIXTURE = 'tests/loaders/fixtures/bioformats-zarr';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as url from 'url';
+
+const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
+const FIXTURE = path.resolve(__dirname, './fixtures/bioformats-zarr');
 const store = new FileSystemStore(`${FIXTURE}/data.zarr`);
-const meta = fs.readFile(`${FIXTURE}/METADATA.ome.xml`).then(b => b.toString());
+const meta = fs.readFileSync(`${FIXTURE}/METADATA.ome.xml`, { encoding: 'utf-8' });
 
 test('Creates correct ZarrPixelSource.', async t => {
   t.plan(4);
   try {
-    const { data } = await load(store, await meta);
+    const { data } = await load(store, meta);
     t.equal(data.length, 2, 'Image should have two levels.');
     const [base] = data;
     t.deepEqual(
@@ -32,7 +36,7 @@ test('Creates correct ZarrPixelSource.', async t => {
 test('Get raster data.', async t => {
   t.plan(13);
   try {
-    const { data } = await load(store, await meta);
+    const { data } = await load(store, meta);
     const [base] = data;
 
     for (let c = 0; c < 3; c += 1) {
@@ -57,7 +61,7 @@ test('Get raster data.', async t => {
 test('Correct OME-XML.', async t => {
   t.plan(9);
   try {
-    const { metadata } = await load(store, await meta);
+    const { metadata } = await load(store, meta);
     const { Name, Pixels } = metadata;
     t.equal(
       Name,

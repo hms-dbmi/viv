@@ -4,7 +4,7 @@ import {
   intToRgba,
   getChannelStats,
   isInterleaved
-} from '../../src/loaders/utils';
+} from '../src/utils';
 
 test('getChannelStats: All zeros', t => {
   t.plan(7);

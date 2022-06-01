@@ -1,9 +1,13 @@
 import { test } from 'tape';
 import { FileSystemStore } from './common';
-import { loadMultiscales } from '../../src/loaders/zarr/lib/utils';
-import { getIndexer } from '../../src/loaders/zarr/lib/indexer';
+import { loadMultiscales } from '../src/zarr/lib/utils';
+import { getIndexer } from '../src/zarr/lib/indexer';
 
-const FIXTURE = 'tests/loaders/fixtures/bioformats-zarr';
+import * as path from 'path';
+import * as url from 'url';
+
+const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
+const FIXTURE = path.resolve(__dirname, './fixtures/bioformats-zarr');
 test('Loads zarr-multiscales', async t => {
   t.plan(1);
   try {

@@ -1,12 +1,18 @@
 import { test } from 'tape';
 import { fromFile } from 'geotiff';
 
-import { createOffsetsProxy } from '../../src/loaders/tiff/lib/proxies';
+import { createOffsetsProxy } from '../src/tiff/lib/proxies';
+
+import * as path from 'path';
+import * as url from 'url';
+
+const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
+const FIXTURE = path.resolve(__dirname, './fixtures/multi-channel.ome.tif');
 
 test('Inspect tiff proxies.', async t => {
   t.plan(2);
   try {
-    let tiff = await fromFile('tests/loaders/fixtures/multi-channel.ome.tif');
+    let tiff = await fromFile(FIXTURE);
     t.equal(
       tiff['__viv-offsets'],
       undefined,
