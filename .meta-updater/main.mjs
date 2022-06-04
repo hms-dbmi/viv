@@ -9,10 +9,10 @@ const REACT_VERSION = '^16.8.0 || ^17.0.0';
 // Mutates package metadata in place
 function pinVersions(deps = {}) {
   for (let name of Object.keys(deps)) {
-    if (name.startsWith('@deck.gl/')) {
+    if (name.startsWith('@deck.gl/') || name === "deck.gl") {
       deps[name] = DECK_VERSION;
     }
-    if (name.startsWith('@luma.gl/')) {
+    if (name.startsWith('@luma.gl/') || name === "luma.gl") {
       deps[name] = LUMAGL_VERSION;
     }
     if (name.startsWith('@math.gl/')) {

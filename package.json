@@ -18,6 +18,14 @@
     "lint": "npm run check-format && eslint \"packages/*/src/**/*\" \"sites/*/src/**/*\"",
     "format": "npm run check-format -- --write"
   },
+  "dependencies": {
+    "@deck.gl/core": "8.6.7",
+    "@deck.gl/geo-layers": "8.6.7",
+    "@deck.gl/layers": "8.6.7",
+    "@luma.gl/constants": "8.5.3",
+    "@luma.gl/core": "8.5.3",
+    "@luma.gl/engine": "8.5.3"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
@@ -42,13 +50,13 @@
     "buffer": "Required to bundle `tape` for `tape-run`. See tsconfig.json 'paths' for esbuild resolution.",
     "path-browserify": "Required to bundle `tape` for `tape-run`. See tsconfig.json 'paths' for esbuild resolution.",
     "stream-browserify": "Required to bundle `tape` for `tape-run`. See tsconfig.json 'paths' for esbuild resolution.",
-    "eslint-plugin-glslify": "Bundles glslify modules used in .glsl files. Has too strict esbuild version requirement, overriden below.",
-    "esno": "Node.js runner. Used to run loader tests with"
+    "eslint-plugin-glslify": "Bundles glslify modules used in .glsl files. Has too strict esbuild version requirement, overriden below."
   },
   "pnpm": {
     "peerDependencyRules": {
       "allowedVersions": {
-        "esbuild": "*"
+        "esbuild": "*",
+        "@loaders.gl/core": "3.2"
       }
     }
   },
@@ -56,47 +64,5 @@
     "singleQuote": true,
     "trailingComma": "none",
     "arrowParens": "avoid"
-  },
-  "syncpack": {
-    "versionGroups": [
-      {
-        "pinVersion": "8.6.7",
-        "dependencies": [
-          "@deck.gl/**",
-          "deck.gl"
-        ],
-        "packages": [
-          "**"
-        ]
-      },
-      {
-        "pinVersion": "8.5.3",
-        "dependencies": [
-          "@luma.gl/**"
-        ],
-        "packages": [
-          "**"
-        ]
-      },
-      {
-        "pinVersion": "^16.0.0 || ^17.0.0",
-        "dependencies": [
-          "react",
-          "react-dom"
-        ],
-        "packages": [
-          "**"
-        ]
-      },
-      {
-        "pinVersion": "workspace:*",
-        "dependencies": [
-          "@viv/**"
-        ],
-        "packages": [
-          "**"
-        ]
-      }
-    ]
   }
 }
