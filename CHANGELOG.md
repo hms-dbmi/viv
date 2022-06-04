@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Convert to formal monorepo with `pnpm` workspaces
 
 ## 0.12.8
 
