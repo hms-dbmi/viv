@@ -29,6 +29,20 @@
     "typescript": "^4.6.4",
     "unbuild": "^0.7.4"
   },
+  "devDependenciesMeta": {
+    "buffer": "Required to bundle `tape` for `tape-run`. See tsconfig.json 'paths' for esbuild resolution.",
+    "path-browserify": "Required to bundle `tape` for `tape-run`. See tsconfig.json 'paths' for esbuild resolution.",
+    "stream-browserify": "Required to bundle `tape` for `tape-run`. See tsconfig.json 'paths' for esbuild resolution.",
+    "eslint-plugin-glslify": "Bundles glslify modules used in .glsl files. Has too strict esbuild version requirement, overriden below.",
+    "esno": "Node.js runner. Used to run loader tests with"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "esbuild": "*"
+      }
+    }
+  },
   "prettier": {
     "singleQuote": true,
     "trailingComma": "none",
