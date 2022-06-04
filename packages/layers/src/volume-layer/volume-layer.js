@@ -2,7 +2,7 @@ import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import GL from '@luma.gl/constants';
 import { isWebGL2 } from '@luma.gl/core';
 import { RENDERING_MODES } from '@viv/constants';
-import { Matrix4 } from 'math.gl';
+import { Matrix4 } from '@math.gl/core';
 
 import XR3DLayer from '../xr-3d-layer/xr-3d-layer';
 import { getPhysicalSizeScalingMatrix } from '../utils';

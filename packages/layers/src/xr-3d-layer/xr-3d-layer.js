@@ -29,7 +29,7 @@ import GL from '@luma.gl/constants';
 import { COORDINATE_SYSTEM, Layer } from '@deck.gl/core';
 import { Model, Geometry, Texture3D } from '@luma.gl/core';
 import { ProgramManager } from '@luma.gl/engine';
-import { Matrix4 } from 'math.gl';
+import { Matrix4 } from '@math.gl/core';
 import { Plane } from '@math.gl/culling';
 import { padContrastLimits, padWithDefault, getDtypeValues } from '../utils';
 import { COLORMAPS, RENDERING_MODES as RENDERING_NAMES } from '@viv/constants';

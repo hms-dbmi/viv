@@ -1,4 +1,5 @@
 {
+  "version": "0.12.8",
   "scripts": {
     "build": "documentation build -f html --document-exported --shallow -o dist --config documentation.yml"
   },

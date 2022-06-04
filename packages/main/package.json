@@ -1,6 +1,13 @@
 {
   "name": "@hms-dbmi/viv",
-  "version": "0.0.0",
+  "version": "0.12.8",
+  "author": "Ilan Gold",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hms-dbmi/viv.git"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/hms-dbmi/viv#readme",
   "type": "module",
   "main": "src/index.ts",
   "types": "src/index.ts",

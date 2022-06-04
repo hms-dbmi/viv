@@ -1,6 +1,13 @@
 {
   "name": "@viv/viewers",
-  "version": "0.0.0",
+  "version": "0.12.8",
+  "author": "Ilan Gold",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hms-dbmi/viv.git"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/hms-dbmi/viv#readme",
   "type": "module",
   "main": "src/index.js",
   "types": "src/index.js",
@@ -10,12 +17,6 @@
   },
   "scripts": {
     "prepack": "unbuild"
-  },
-  "peerDependencies": {
-    "@deck.gl/core": "~8.6.7",
-    "@deck.gl/react": "~8.6.7",
-    "react": "^16.0.0 || ^17.0.0",
-    "react-dom": "^16.0.0 || ^17.0.0"
   },
   "dependencies": {
     "@viv/constants": "workspace:*",

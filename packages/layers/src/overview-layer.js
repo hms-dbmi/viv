@@ -1,7 +1,7 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { PolygonLayer } from '@deck.gl/layers';
 import { getImageSize } from '@viv/loaders';
-import { Matrix4 } from 'math.gl';
+import { Matrix4 } from '@math.gl/core';
 
 import ImageLayer from './image-layer';
 

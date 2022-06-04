@@ -1,22 +1,26 @@
 {
   "name": "@viv/extensions",
-  "version": "0.0.0",
+  "version": "0.12.8",
+  "author": "Ilan Gold",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hms-dbmi/viv.git"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/hms-dbmi/viv#readme",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "prepare": "rollup -p glslify -e @viv/constants,@deck.gl/core -o dist/index.js src/index.js",
     "dev": "npm run build -- --watch"
   },
-  "peerDependencies": {
-    "@deck.gl/core": "~8.6.7"
-  },
   "dependencies": {
     "@viv/constants": "workspace:*"
   },
   "devDependencies": {
+    "@viv/types": "workspace:*",
     "glsl-colormap": "^1.0.1",
     "rollup": "^2.74.1",
-    "rollup-plugin-glslify": "^1.2.1",
-    "@viv/types": "workspace:*"
+    "rollup-plugin-glslify": "^1.2.1"
   }
 }
