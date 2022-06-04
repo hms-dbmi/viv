@@ -13,6 +13,7 @@
   "homepage": "https://github.com/hms-dbmi/viv#readme",
   "scripts": {
     "dev": "pnpm -r dev --filter=avivator",
+    "build": "pnpm -r build",
     "clean": "pnpm -r exec -- rm -rf node_modules",
     "test": "pnpm -r --parallel test",
     "check-format": "prettier --check --ignore-path .gitignore sites/avivator packages/",
