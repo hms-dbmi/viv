@@ -15,9 +15,11 @@
     "types": "dist/index.d.ts"
   },
   "scripts": {
-    "prepack": "unbuild"
+    "prepack": "unbuild",
+    "test": "node ../../scripts/bundle-test.mjs tests/index.js | tape-run | tap-spec"
   },
   "dependencies": {
+    "@math.gl/core": "^3.5.7",
     "@viv/layers": "workspace:*",
     "@viv/loaders": "workspace:*",
     "math.gl": "^3.5.7"

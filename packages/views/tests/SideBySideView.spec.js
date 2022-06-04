@@ -1,13 +1,13 @@
 import test from 'tape-catch';
 import { PolygonLayer } from '@deck.gl/layers';
 
-import { SideBySideView } from '../../../src/views';
+import { SideBySideView } from '../src';
 import { generateViewTests, defaultArguments } from './VivView.spec';
 import {
   MultiscaleImageLayer,
   ImageLayer,
   ScaleBarLayer
-} from '../../../src/layers';
+} from '@viv/layers';
 
 generateViewTests(SideBySideView, defaultArguments);
 

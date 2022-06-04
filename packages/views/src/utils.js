@@ -1,4 +1,4 @@
-import { Matrix4 } from 'math.gl';
+import { Matrix4 } from '@math.gl/core';
 import { getImageSize } from '@viv/loaders';
 
 import {

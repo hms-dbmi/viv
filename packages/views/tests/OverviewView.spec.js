@@ -3,13 +3,13 @@ import {
   OverviewView,
   DETAIL_VIEW_ID,
   OVERVIEW_VIEW_ID
-} from '../../../src/views';
+} from '../src';
 import {
   generateViewTests,
   defaultArguments,
   defaultViewState
 } from './VivView.spec';
-import { OverviewLayer } from '../../../src/layers';
+import { OverviewLayer } from '@viv/layers';
 
 const id = OVERVIEW_VIEW_ID;
 const loader = [

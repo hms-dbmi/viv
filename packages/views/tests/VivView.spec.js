@@ -1,7 +1,7 @@
 import test from 'tape-catch';
 
-import { VivView } from '../../../src/views';
-import { getVivId } from '../../../src/views/utils';
+import { VivView } from '../src';
+import { getVivId } from '../src/utils';
 
 export const defaultArguments = {
   id: 'foo',
