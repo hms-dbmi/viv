@@ -1,13 +1,7 @@
 import test from 'tape-catch';
-import 'abortcontroller-polyfill/dist/polyfill-patch-fetch';
-import { implementation } from 'promise.prototype.finally';
 import { generateLayerTests, testLayerAsync } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
 import MultiscaleImageLayerBase from '../src/multiscale-image-layer/multiscale-image-layer-base';
-
-// Tape-run uses an older electron that doesn't support this.
-// eslint-disable-next-line no-extend-native
-Promise.prototype.finally = implementation;
 
 test('MultiscaleImageLayerBase', async t => {
   const view = new OrthographicView({

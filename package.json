@@ -14,6 +14,7 @@
   "scripts": {
     "dev": "pnpm -r dev --filter=avivator",
     "clean": "pnpm -r exec -- rm -rf node_modules",
+    "test": "pnpm -r --parallel test",
     "check-format": "prettier --check --ignore-path .gitignore sites/avivator packages/",
     "lint": "npm run check-format && eslint \"packages/*/src/**/*\" \"sites/*/src/**/*\"",
     "format": "npm run check-format -- --write"
@@ -22,6 +23,7 @@
     "@deck.gl/core": "8.6.7",
     "@deck.gl/geo-layers": "8.6.7",
     "@deck.gl/layers": "8.6.7",
+    "@deck.gl/react": "8.6.7",
     "@luma.gl/constants": "8.5.13",
     "@luma.gl/core": "8.5.13",
     "@luma.gl/engine": "8.5.13",

@@ -1,5 +1,5 @@
 import { CompositeLayer } from '@deck.gl/core';
-import { Matrix4 } from 'math.gl';
+import { Matrix4 } from '@math.gl/core';
 import GL from '@luma.gl/constants';
 
 import MultiscaleImageLayerBase from './multiscale-image-layer-base';

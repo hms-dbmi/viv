@@ -1,7 +1,7 @@
 import test from 'tape-catch';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
-import ScaleBarLayer from '../src/layers/scale-bar-layer';
+import ScaleBarLayer from '../src/scale-bar-layer';
 
 test('ScaleBarLayer', t => {
   const view = new OrthographicView({

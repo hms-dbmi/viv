@@ -18,6 +18,10 @@
   "scripts": {
     "prepack": "unbuild"
   },
+  "peerDependencies": {
+    "@deck.gl/react": "8.6.7",
+    "react": "^16.8.0 || ^17.0.0"
+  },
   "dependencies": {
     "@viv/constants": "workspace:*",
     "@viv/extensions": "workspace:*",

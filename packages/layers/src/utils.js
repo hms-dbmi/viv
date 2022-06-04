@@ -1,5 +1,5 @@
 import { OrthographicView } from '@deck.gl/core';
-import { Matrix4 } from 'math.gl';
+import { Matrix4 } from '@math.gl/core';
 import { MAX_CHANNELS, DTYPE_VALUES } from '@viv/constants';
 
 export function range(len) {

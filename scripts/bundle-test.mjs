@@ -10,6 +10,7 @@ esbuild.build({
   entryPoints: [process.argv[2]],
   bundle: true,
   format: "iife",
+  inject: [path.resolve(__dirname, './node-globals-shim.js')],
   tsconfig: path.resolve(__dirname, "../tsconfig.json"),
   plugins: [glslify()],
 });

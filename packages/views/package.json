@@ -18,6 +18,10 @@
     "prepack": "unbuild",
     "test": "node ../../scripts/bundle-test.mjs tests/index.js | tape-run | tap-spec"
   },
+  "peerDependencies": {
+    "@deck.gl/core": "8.6.7",
+    "@deck.gl/layers": "8.6.7"
+  },
   "dependencies": {
     "@math.gl/core": "^3.5.7",
     "@viv/layers": "workspace:*",

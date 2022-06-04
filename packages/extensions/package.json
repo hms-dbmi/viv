@@ -11,16 +11,13 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "prepare": "rollup -p glslify -e @viv/constants,@deck.gl/core -o dist/index.js src/index.js",
-    "dev": "npm run build -- --watch"
+    "build": "node ../../scripts/bundle.mjs src/index.js"
   },
   "dependencies": {
     "@viv/constants": "workspace:*"
   },
   "devDependencies": {
     "@viv/types": "workspace:*",
-    "glsl-colormap": "^1.0.1",
-    "rollup": "^2.74.1",
-    "rollup-plugin-glslify": "^1.2.1"
+    "glsl-colormap": "^1.0.1"
   }
 }
