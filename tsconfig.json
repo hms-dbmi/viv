@@ -2,14 +2,17 @@
   "compilerOptions": {
     "module": "esnext",
     "target": "esnext",
-    "lib": ["esnext", "dom"],
     "jsx": "react",
     "moduleResolution": "node",
     "strict": true,
-    "skipLibCheck": true,
-    "outDir": "./dist",
-    "declaration": true,
-    "inlineSourceMap": true,
     "allowJs": true,
-  }
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "importsNotUsedAsValues": "error",
+    "paths": {
+      "path": ["./node_modules/path-browserify/index.js"],
+      "stream": ["./node_modules/stream-browserify/index.js"],
+      "buffer": ["./node_modules/buffer/index.js"],
+    }
+  },
 }

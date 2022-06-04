@@ -1,6 +1,6 @@
 import test from 'tape-catch';
-import { range } from '../../../src/layers/MultiscaleImageLayer/utils';
-import { padWithDefault, padContrastLimits } from '../../../src/layers/utils';
+import { range } from '../src/multiscale-image-layer/utils';
+import { padWithDefault, padContrastLimits } from '../src/utils';
 
 test('range test', t => {
   const expected = [0, 1, 2];

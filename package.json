@@ -8,6 +8,27 @@
     "lint": "npm run check-format && eslint \"packages/*/src/**/*\" \"sites/*/src/**/*\"",
     "format": "npm run check-format -- --write"
   },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.25.0",
+    "@typescript-eslint/parser": "^5.25.0",
+    "buffer": "^6.0.3",
+    "esbuild": "^0.14.42",
+    "esbuild-plugin-glslify": "^1.0.1",
+    "eslint": "^8.16.0",
+    "eslint-plugin-react": "^7.30.0",
+    "eslint-plugin-react-hooks": "^4.5.0",
+    "esno": "^0.16.3",
+    "path-browserify": "^1.0.1",
+    "prettier": "^2.6.2",
+    "stream-browserify": "^3.0.0",
+    "syncpack": "^7.2.1",
+    "tap-spec": "^5.0.0",
+    "tape": "^5.5.3",
+    "tape-catch": "^1.0.6",
+    "tape-run": "^10.0.0",
+    "typescript": "^4.6.4",
+    "unbuild": "^0.7.4"
+  },
   "prettier": {
     "singleQuote": true,
     "trailingComma": "none",
@@ -16,7 +37,7 @@
   "syncpack": {
     "versionGroups": [
       {
-        "pinVersion": "~8.6.7",
+        "pinVersion": "8.6.7",
         "dependencies": [
           "@deck.gl/**",
           "deck.gl"
@@ -26,7 +47,7 @@
         ]
       },
       {
-        "pinVersion": "~8.5.3",
+        "pinVersion": "8.5.3",
         "dependencies": [
           "@luma.gl/**"
         ],
@@ -54,19 +75,5 @@
         ]
       }
     ]
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.25.0",
-    "@typescript-eslint/parser": "^5.25.0",
-    "eslint": "^8.16.0",
-    "eslint-plugin-react": "^7.30.0",
-    "eslint-plugin-react-hooks": "^4.5.0",
-    "esno": "^0.16.3",
-    "prettier": "^2.6.2",
-    "syncpack": "^7.2.1",
-    "tap-spec": "^5.0.0",
-    "tape": "^5.5.3",
-    "typescript": "^4.6.4",
-    "unbuild": "^0.7.4"
   }
 }
