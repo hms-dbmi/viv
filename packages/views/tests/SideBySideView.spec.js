@@ -3,11 +3,7 @@ import { PolygonLayer } from '@deck.gl/layers';
 
 import { SideBySideView } from '../src';
 import { generateViewTests, defaultArguments } from './VivView.spec';
-import {
-  MultiscaleImageLayer,
-  ImageLayer,
-  ScaleBarLayer
-} from '@viv/layers';
+import { MultiscaleImageLayer, ImageLayer, ScaleBarLayer } from '@viv/layers';
 
 generateViewTests(SideBySideView, defaultArguments);
 

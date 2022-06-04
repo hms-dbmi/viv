@@ -70,4 +70,4 @@ void main() {
   // Step 3: Rays are from eye to vertices so that they get interpolated over the fragments.
   vray_dir = positions - transformed_eye;
 }
-`
+`;

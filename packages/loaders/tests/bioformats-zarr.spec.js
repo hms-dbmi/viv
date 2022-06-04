@@ -9,7 +9,9 @@ import * as url from 'url';
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 const FIXTURE = path.resolve(__dirname, './fixtures/bioformats-zarr');
 const store = new FileSystemStore(`${FIXTURE}/data.zarr`);
-const meta = fs.readFileSync(`${FIXTURE}/METADATA.ome.xml`, { encoding: 'utf-8' });
+const meta = fs.readFileSync(`${FIXTURE}/METADATA.ome.xml`, {
+  encoding: 'utf-8'
+});
 
 test('Creates correct ZarrPixelSource.', async t => {
   t.plan(4);

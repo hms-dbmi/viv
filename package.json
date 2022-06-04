@@ -16,7 +16,7 @@
     "clean": "pnpm -r exec -- rm -rf node_modules",
     "test": "pnpm -r --parallel test",
     "check-format": "prettier --check --ignore-path .gitignore sites/avivator packages/",
-    "lint": "npm run check-format && eslint \"packages/*/src/**/*\" \"sites/*/src/**/*\"",
+    "lint": "npm run check-format && eslint \"packages/*/src/**/*\" \"sites/avivator/src/**/*\"",
     "format": "npm run check-format -- --write"
   },
   "dependencies": {

@@ -10,6 +10,6 @@ export default {
   name: 'color-palette-module',
   fs,
   inject: {
-    'fs:DECKGL_MUTATE_COLOR': DECKGL_MUTATE_COLOR,
+    'fs:DECKGL_MUTATE_COLOR': DECKGL_MUTATE_COLOR
   }
 };

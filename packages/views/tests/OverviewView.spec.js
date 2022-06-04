@@ -1,9 +1,5 @@
 import test from 'tape-catch';
-import {
-  OverviewView,
-  DETAIL_VIEW_ID,
-  OVERVIEW_VIEW_ID
-} from '../src';
+import { OverviewView, DETAIL_VIEW_ID, OVERVIEW_VIEW_ID } from '../src';
 import {
   generateViewTests,
   defaultArguments,

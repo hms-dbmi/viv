@@ -136,4 +136,4 @@ void main(void) {
   color.g = linear_to_srgb(color.g);
   color.b = linear_to_srgb(color.b);
 }
-`
+`;
