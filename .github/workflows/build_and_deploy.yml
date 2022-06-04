@@ -8,25 +8,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v2.3.1
+        uses: actions/checkout@v3
         with:
           persist-credentials: false
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '16.x'
 
-      - name: Install and Build 🔧
-        run: |
-          npm install
-          npm run build
-          npm run build:avivator
-          touch avivator/dist/.nojekyll
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: true
+
+      - name: Build 🔧
+        run: pnpm -r build --filter=avivator && touch sites/avivator/dist/.nojekyll
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: avivator/dist
+          FOLDER: sites/avivator/dist
           CLEAN: true

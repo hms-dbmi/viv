@@ -6,42 +6,61 @@ jobs:
   build-windows:
     runs-on: windows-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x]
-
     # We want to run on external PRs, but not on our own internal PRs as they'll be run
     # by the push to the branch.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install dependencies for Viv
-        run: npm install
-      - name: Build Avivator and Viv
-        run: npm run build && npm run build:avivator
+          node-version: '16.x'
+
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: true
+
+      - name: Build Avivator
+        run: pnpm -r build --filter=avivator
+
   test-linux:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x]
-
     # We want to run on external PRs, but not on our own internal PRs as they'll be run
     # by the push to the branch.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install dependencies for Viv
-        run: npm install
+          node-version: '16.x'
+
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: true
+
       - name: Install dependencies needed for testing with tape
         run: sudo apt-get install xvfb # needed for tape-run
-      - name: Test library
-        run: xvfb-run --auto-servernum ./test.sh # for tape-run
+
+      - name: Format
+        run: pnpm format
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: xvfb-run --auto-servernum pnpm test
+
+      - name: Build avivator
+        run: pnpm -r build --filter=avivator
