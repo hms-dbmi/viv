@@ -30,8 +30,11 @@
     "@luma.gl/webgl": "8.5.13"
   },
   "devDependencies": {
+    "@deck.gl/extensions": "8.6.7",
+    "@deck.gl/mesh-layers": "8.6.7",
     "@deck.gl/test-utils": "8.6.7",
     "@luma.gl/test-utils": "8.5.13",
+    "@probe.gl/test-utils": "^3.5.0",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
     "assert": "^2.0.0",
