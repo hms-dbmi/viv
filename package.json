@@ -63,6 +63,10 @@
     "buffer": "Required to bundle `tape` for `tape-run`. See tsconfig.json 'paths' for esbuild resolution.",
     "path-browserify": "Required to bundle `tape` for `tape-run`. See tsconfig.json 'paths' for esbuild resolution.",
     "stream-browserify": "Required to bundle `tape` for `tape-run`. See tsconfig.json 'paths' for esbuild resolution.",
+    "util": "Required to bundle `tape` for `tape-run`. See tsconfig.json 'paths' for esbuild resolution.",
+    "browserify-zlib": "Required to bundle `tape` for `tape-run`. See tsconfig.json 'paths' for esbuild resolution.",
+    "assert": "Required to bundle `tape` for `tape-run`. See tsconfig.json 'paths' for esbuild resolution.",
+    "process": "Required to bundle `tape` for `tape-run`. See tsconfig.json 'paths' for esbuild resolution.",
     "eslint-plugin-glslify": "Bundles glslify modules used in .glsl files. Has too strict esbuild version requirement, overriden below."
   },
   "pnpm": {
