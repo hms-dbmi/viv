@@ -26,11 +26,11 @@ test('ImageLayer', t => {
           return {
             data: new Uint32Array([0, 2, 1, 2]),
             width: 2,
-            height: 2,
-          }
+            height: 2
+          };
         },
         dtype: 'Uint32',
-        shape: [2, 2, 2],
+        shape: [2, 2, 2]
       },
       selections: [{}, {}]
     },
@@ -72,15 +72,15 @@ test('ImageLayer', t => {
             const raster = {
               data: new Uint32Array([0, 2, 1, 2]),
               width: 2,
-              height: 2,
-            }
+              height: 2
+            };
             state.data.push(raster.data);
             state.data.width = raster.width;
             state.data.height = raster.height;
             return raster;
           },
           dtype: 'Uint32',
-          shape: [2, 2, 2],
+          shape: [2, 2, 2]
         },
         selections: []
       },

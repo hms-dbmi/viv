@@ -92,8 +92,8 @@ test('VolumeLayer', t => {
               const raster = {
                 data: new Uint32Array([0, 2, 1, 2]),
                 width: 2,
-                height: 2,
-              }
+                height: 2
+              };
               state.data.push(raster.data);
               state.data.width = raster.width;
               state.data.height = raster.height;
@@ -108,8 +108,8 @@ test('VolumeLayer', t => {
               const raster = {
                 data: new Uint32Array([0, 2, 1, 2]),
                 width: 2,
-                height: 2,
-              }
+                height: 2
+              };
               state.data.push(raster.data);
               state.data.width = raster.width;
               state.data.height = raster.height;

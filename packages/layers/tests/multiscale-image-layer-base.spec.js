@@ -84,7 +84,7 @@ test('MultiscaleImageLayerBaseBitmapLayer', async t => {
       ]
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title),
-    onAfterUpdate: ({ subLayers }) => 
+    onAfterUpdate: ({ subLayers }) =>
       t.ok(
         subLayers.length > 0
           ? subLayers.every(layer => layer instanceof BitmapLayer)
