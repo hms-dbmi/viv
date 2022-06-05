@@ -3,7 +3,8 @@
   "name": "avivator",
   "private": true,
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "build": "vite build"
   },
   "dependencies": {
     "@hms-dbmi/viv": "workspace:*",
