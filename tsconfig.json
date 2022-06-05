@@ -8,14 +8,6 @@
     "allowJs": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "importsNotUsedAsValues": "error",
-    "paths": {
-      "path": ["./node_modules/path-browserify/index.js"],
-      "stream": ["./node_modules/stream-browserify/index.js"],
-      "buffer": ["./node_modules/buffer/index.js"],
-      "zlib": ["./node_modules/browserify-zlib/lib/index.js"],
-      "assert": ["./node_modules/assert/build/assert.js"],
-      "util": ["./node_modules/util/util.js"],
-    }
+    "importsNotUsedAsValues": "error"
   },
 }
