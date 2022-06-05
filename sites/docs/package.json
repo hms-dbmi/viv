@@ -1,7 +1,14 @@
 {
   "version": "0.12.8",
   "scripts": {
-    "build": "documentation build -f html --document-exported --shallow -o dist --config documentation.yml"
+    "build": "documentation build -o dist -f html --document-exported --parse-extension ts --config documentation.yml ./node_modules/@viv/*/src/**/*.{js,ts}"
+  },
+  "dependencies": {
+    "@viv/extensions": "workspace:*",
+    "@viv/layers": "workspace:*",
+    "@viv/loaders": "workspace:*",
+    "@viv/viewers": "workspace:*",
+    "@viv/views": "workspace:*"
   },
   "devDependencies": {
     "documentation": "^13.2.5"

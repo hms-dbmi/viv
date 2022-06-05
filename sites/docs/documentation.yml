@@ -1,6 +1,6 @@
 toc:
   - name: Introduction
-    file: README.md
+    file: ../../README.md
   - name: Getting Started
     file: src/SAMPLES.md
   - name: API Structure

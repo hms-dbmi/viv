@@ -31,7 +31,6 @@
   "unbuild": {
     "entries": [
       "src/index"
-    ],
-    "declaration": true
+    ]
   }
 }
