@@ -12,7 +12,7 @@
   "main": "dist/index.js",
   "scripts": {
     "prepare": "node ../../scripts/bundle.mjs src/index.js",
-    "test": "node ../../scripts/bundle-test.mjs tests/index.js | tape-run | tap-spec"
+    "test": "node ../../scripts/bundle-test.mjs tests/index.spec.js | tape-run | tap-spec"
   },
   "peerDependencies": {
     "@deck.gl/core": "8.6.7",

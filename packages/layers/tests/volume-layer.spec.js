@@ -89,9 +89,15 @@ test('VolumeLayer', t => {
         loader: [
           {
             getRaster: async () => {
-              state.data.push(new Uint32Array([0, 2, 1, 2]));
-              state.width = 2;
-              state.width = 2;
+              const raster = {
+                data: new Uint32Array([0, 2, 1, 2]),
+                width: 2,
+                height: 2,
+              }
+              state.data.push(raster.data);
+              state.data.width = raster.width;
+              state.data.height = raster.height;
+              return raster;
             },
             shape: [1, 1, 4, 2, 2],
             labels: ['t', 'c', 'z', 'y', 'x'],
@@ -99,9 +105,15 @@ test('VolumeLayer', t => {
           },
           {
             getRaster: async () => {
-              state.data.push(new Uint32Array([0, 2, 1, 2]));
-              state.width = 2;
-              state.width = 2;
+              const raster = {
+                data: new Uint32Array([0, 2, 1, 2]),
+                width: 2,
+                height: 2,
+              }
+              state.data.push(raster.data);
+              state.data.width = raster.width;
+              state.data.height = raster.height;
+              return raster;
             },
             shape: [1, 1, 4, 2, 2],
             labels: ['t', 'c', 'z', 'y', 'x'],

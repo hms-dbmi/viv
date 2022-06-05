@@ -2,6 +2,7 @@ import test from 'tape-catch';
 import { generateLayerTests, testLayerAsync } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
 import MultiscaleImageLayerBase from '../src/multiscale-image-layer/multiscale-image-layer-base';
+import BitmapLayer from '../src/bitmap-layer';
 
 test('MultiscaleImageLayerBase', async t => {
   const view = new OrthographicView({
@@ -26,7 +27,6 @@ test('MultiscaleImageLayerBase', async t => {
       tileSize: 2,
       loader: [
         {
-          getTileData,
           dtype: 'Uint32',
           shape: [1, 1, 1, 2, 2]
         }
@@ -77,7 +77,6 @@ test('MultiscaleImageLayerBaseBitmapLayer', async t => {
       getTileData,
       loader: [
         {
-          getTileData,
           dtype: 'Uint8',
           shape: [1, 1, 1, 2, 2, 4],
           meta: { photometricInterpretation: 0 }
@@ -85,10 +84,10 @@ test('MultiscaleImageLayerBaseBitmapLayer', async t => {
       ]
     },
     onBeforeUpdate: ({ testCase }) => t.comment(testCase.title),
-    onAfterUpdate: ({ subLayers }) =>
+    onAfterUpdate: ({ subLayers }) => 
       t.ok(
         subLayers.length > 0
-          ? subLayers.every(layer => layer.constructor.name === 'BitmapLayer')
+          ? subLayers.every(layer => layer instanceof BitmapLayer)
           : true
       )
   });

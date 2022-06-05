@@ -18,7 +18,8 @@ const defaultProps = {
     type: 'object',
     value: {
       getRaster: async () => ({ data: [], height: 0, width: 0 }),
-      dtype: 'Uint16'
+      dtype: 'Uint16',
+      shape: [],
     },
     compare: true
   },
@@ -75,12 +76,13 @@ const ImageLayer = class extends CompositeLayer {
       const getRaster = selection => loader.getRaster({ selection, signal });
       const dataPromises = selections.map(getRaster);
 
+
       Promise.all(dataPromises)
         .then(rasters => {
           const raster = {
             data: rasters.map(d => d.data),
-            width: rasters[0].width,
-            height: rasters[0].height
+            width: rasters[0]?.width,
+            height: rasters[0]?.height,
           };
 
           if (isInterleaved(loader.shape)) {

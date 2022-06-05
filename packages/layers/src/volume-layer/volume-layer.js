@@ -140,9 +140,9 @@ const VolumeLayer = class extends CompositeLayer {
         }
         const volume = {
           data: volumes.map(d => d.data),
-          width: volumes[0].width,
-          height: volumes[0].height,
-          depth: volumes[0].depth
+          width: volumes[0]?.width,
+          height: volumes[0]?.height,
+          depth: volumes[0]?.depth
         };
 
         this.setState({

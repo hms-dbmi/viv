@@ -15,19 +15,22 @@ test('ImageLayer', t => {
   const testCases = generateLayerTests({
     Layer: ImageLayer,
     assert: t.ok,
-    sampleProps: {
+    props: {
       contrastLimits: [
         [0, 10],
         [0, 10]
       ],
       channelsVisible: [true, false],
       loader: {
-        getRaster: async () => ({
-          data: new Uint32Array([0, 2, 1, 2]),
-          width: 2,
-          height: 2
-        }),
-        dtype: 'Uint32'
+        async getRaster() {
+          return {
+            data: new Uint32Array([0, 2, 1, 2]),
+            width: 2,
+            height: 2,
+          }
+        },
+        dtype: 'Uint32',
+        shape: [2, 2, 2],
       },
       selections: [{}, {}]
     },
@@ -66,11 +69,18 @@ test('ImageLayer', t => {
         channelsVisible: [true, false],
         loader: {
           getRaster: async () => {
-            state.data.push(new Uint32Array([0, 2, 1, 2]));
-            state.width = 2;
-            state.width = 2;
+            const raster = {
+              data: new Uint32Array([0, 2, 1, 2]),
+              width: 2,
+              height: 2,
+            }
+            state.data.push(raster.data);
+            state.data.width = raster.width;
+            state.data.height = raster.height;
+            return raster;
           },
-          dtype: 'Uint32'
+          dtype: 'Uint32',
+          shape: [2, 2, 2],
         },
         selections: []
       },
