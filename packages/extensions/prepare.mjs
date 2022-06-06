@@ -14,7 +14,6 @@ const fh = await fsp.open(outfile, 'w');
 await fh.write(`\
 // The contents of this file are automatically written by
 // \`packages/extensions/prepare.mjs\`. Do not modify directly.
-
 `);
 
 // Gather `glsl-colormap` files which follow the `<name>.glsl` pattern

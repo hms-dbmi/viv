@@ -1,6 +1,6 @@
 import { LayerExtension } from '@deck.gl/core';
-import colorPalette from './color-palette-module.js';
-import { getDefaultPalette, padColors } from '../utils.js';
+import colorPalette from './color-palette-module';
+import { getDefaultPalette, padColors } from '../utils';
 
 const defaultProps = {
   colors: { type: 'array', value: null, compare: true },
