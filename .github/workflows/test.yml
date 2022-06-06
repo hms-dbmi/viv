@@ -11,7 +11,7 @@ jobs:
       - name: Updated CHANGELOG.md
         run: >-
           if [[ "$GITHUB_REF" != 'refs/heads/master' && "$GITHUB_REF" != *'dependabot'* ]]; then
-            diff -q CHANGELOG.md <(curl "https://raw.githubusercontent.com/hms-dbmi/viv/master/CHANGELOG.md")
+            ! diff CHANGELOG.md <(curl -s "https://raw.githubusercontent.com/hms-dbmi/viv/master/CHANGELOG.md")
           fi
 
   build-windows:
