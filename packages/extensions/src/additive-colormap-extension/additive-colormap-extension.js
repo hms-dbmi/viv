@@ -1,8 +1,51 @@
 import { LayerExtension } from '@deck.gl/core';
-import { createAdditiveColormapModule } from '../shader-utils';
+import { apply_transparent_color } from '../shader-utils';
 
 // This file is generated via `packages/extensions/prepare.mjs`
 import * as cmaps from './colormaps';
+
+/**
+ * A utility to create a Deck.gl shader module for a `glsl-colormap`.
+ *
+ * The colormap implemenation must be named `apply_cmap` and take the form,
+ *
+ * ```glsl
+ * vec4 apply_cmap (float x) {
+ *   // implementation
+ * }
+ * ```
+ *
+ * @param {string} name colormap function name
+ * @param {string} apply_cmap glsl colormap function implementation
+ *
+ */
+function colormapModuleFactory(name, apply_cmap) {
+  return {
+    name: `additive-colormap-${name}`,
+    fs: `\
+uniform float opacity;
+uniform bool useTransparentColor;
+
+${apply_transparent_color}
+${apply_cmap}
+
+vec4 colormap(float intensity) {
+  return vec4(apply_transparent_color(apply_cmap(min(1.,intensity)).xyz, apply_cmap(0.).xyz, useTransparentColor, opacity));
+}`,
+    inject: {
+      'fs:DECKGL_MUTATE_COLOR': `\
+  float intensityCombo = 0.;
+  intensityCombo += max(0.,intensity0);
+  intensityCombo += max(0.,intensity1);
+  intensityCombo += max(0.,intensity2);
+  intensityCombo += max(0.,intensity3);
+  intensityCombo += max(0.,intensity4);
+  intensityCombo += max(0.,intensity5);
+  rgba = colormap(intensityCombo);`
+    }
+  };
+}
+
 
 const defaultProps = {
   colormap: { type: 'string', value: 'viridis', compare: true },
@@ -25,7 +68,7 @@ const AdditiveColormapExtension = class extends LayerExtension {
     if (!apply_cmap) {
       throw Error(`No colormap named ${name} found in registry`);
     }
-    return { modules: [createAdditiveColormapModule(name, apply_cmap)] };
+    return { modules: [colormapModuleFactory(name, apply_cmap)] };
   }
 
   updateState({ props, oldProps, changeFlags, ...rest }) {
