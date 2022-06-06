@@ -1,6 +1,8 @@
 import { LayerExtension } from '@deck.gl/core';
-import * as cmaps from './colormaps';
 import { createAdditiveColormapModule } from '../shader-utils';
+
+// This file is generated via `packages/extensions/prepare.mjs`
+import * as cmaps from './colormaps';
 
 const defaultProps = {
   colormap: { type: 'string', value: 'viridis', compare: true },
