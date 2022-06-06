@@ -5,12 +5,11 @@ import react from '@vitejs/plugin-react';
 import * as path from 'path';
 
 /**
- * Vite plugins. Serves contents of `avivator/data` during
- * development.
+ * Vite plugins. Serves contents of `avivator/data` during development.
  * @param {string} dir
  * @returns {import('vite').Plugin}
  */
-const serveData = dir => {
+function serveData(dir) {
   if (dir[0] === '~') {
     dir = path.join(process.env.HOME, dir.slice(1));
   } else {
@@ -31,8 +30,10 @@ const serveData = dir => {
       });
     }
   };
-};
+}
+
+const dir = process.env.VIV_DATA_DIR || './data';
 
 export default defineConfig({
-  plugins: [react(), serveData(process.env.VIV_DATA_DIR || 'avivator/data')]
+  plugins: [react(), serveData(dir)]
 });

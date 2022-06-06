@@ -24,7 +24,7 @@ jobs:
           run_install: true
 
       - name: Build 🔧
-        run: pnpm -r build --filter=avivator && touch sites/avivator/dist/.nojekyll
+        run: pnpm --filter=avivator build && touch sites/avivator/dist/.nojekyll
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
