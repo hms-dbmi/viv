@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Migrate to pnpm monorepo
 
 ## 0.12.8
 
