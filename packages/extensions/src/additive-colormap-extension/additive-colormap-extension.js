@@ -1,5 +1,6 @@
 import { LayerExtension } from '@deck.gl/core';
-import additiveColormap from './additive-colormap-module';
+import * as cmaps from './colormaps';
+import { createAdditiveColormapModule } from '../shader-utils';
 
 const defaultProps = {
   colormap: { type: 'string', value: 'viridis', compare: true },
@@ -17,12 +18,12 @@ const defaultProps = {
  * */
 const AdditiveColormapExtension = class extends LayerExtension {
   getShaders() {
-    return {
-      defines: {
-        COLORMAP_FUNCTION: this?.props?.colormap || defaultProps.colormap.value
-      },
-      modules: [additiveColormap]
-    };
+    const name = this?.props?.colormap || defaultProps.colormap.value;
+    const apply_cmap = cmaps[name];
+    if (!apply_cmap) {
+      throw Error(`No colormap named ${name} found in registry`);
+    }
+    return { modules: [createAdditiveColormapModule(name, apply_cmap)] };
   }
 
   updateState({ props, oldProps, changeFlags, ...rest }) {

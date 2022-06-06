@@ -1,6 +1,6 @@
 import { LayerExtension } from '@deck.gl/core';
-import lens from './lens-module';
-import { getDefaultPalette, padColors } from '../utils';
+import lens from './lens-module.js';
+import { getDefaultPalette, padColors } from '../utils.js';
 
 const defaultProps = {
   lensEnabled: { type: 'boolean', value: false, compare: true },

@@ -19,3 +19,6 @@
 *.tgz
 
 .pnpm-debug.log
+
+# auto-generated
+packages/extensions/src/additive-colormap-extension/colormaps.js
