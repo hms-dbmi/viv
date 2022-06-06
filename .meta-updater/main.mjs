@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 const DECK_VERSION = '8.6.7';

@@ -16,7 +16,7 @@
   },
   "scripts": {
     "prepack": "unbuild",
-    "test": "node ../../scripts/bundle-test.mjs tests/index.js | tape-run | tap-spec"
+    "test": "esno tests/index.spec.js | tap-spec"
   },
   "peerDependencies": {
     "@deck.gl/core": "8.6.7",
