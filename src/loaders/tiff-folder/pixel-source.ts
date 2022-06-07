@@ -24,10 +24,10 @@ interface OmeTiffSelection {
   }
 
 class TiffFolderPixelSource<S extends string[]> implements PixelSource<S> {
-  private _images: GeoTIFFImage[];
+  private _channelImages: GeoTIFFImage[];
 
   constructor(
-    images: GeoTIFFImage[],
+    channelImages: GeoTIFFImage[],
     public dtype: SupportedDtype,
     public tileSize: number,
     public shape: number[],
@@ -35,12 +35,12 @@ class TiffFolderPixelSource<S extends string[]> implements PixelSource<S> {
     public meta?: PixelSourceMeta,
     public pool?: Pool
   ) {
-    this._images = images;
+    this._channelImages = channelImages;
   }
 
   async getRaster({ selection, signal }: RasterSelection<S>) {
     // @ts-ignore
-    const image = this._images[selection.c];
+    const image = this._channelImages[selection.c];
     return this._readRasters(image, { signal });
   }
 
@@ -50,7 +50,7 @@ class TiffFolderPixelSource<S extends string[]> implements PixelSource<S> {
     const y0 = y * this.tileSize;
     const window = [x0, y0, x0 + width, y0 + height];
     // @ts-ignore
-    const image = this._images[selection.c];
+    const image = this._channelImages[selection.c];
     return this._readRasters(image, { window, width, height, signal });
   }
 

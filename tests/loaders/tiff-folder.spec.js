@@ -3,13 +3,21 @@ import { fromFile } from 'geotiff';
 
 import { load } from '../../src/loaders/tiff-folder/tiff-folder';
 
-async function loadTiffs() {
+async function loadImage() {
     return {imageName: 'tiff-folder',
-            channelNames: ['Channel 0','Channel 1', 'Channel 2'],
-            tiffs: [
-                await fromFile('tests/loaders/fixtures/tiff-folder/Channel_0.tif'),
-                await fromFile('tests/loaders/fixtures/tiff-folder/Channel_1.tif'),
-                await fromFile('tests/loaders/fixtures/tiff-folder/Channel_2.tif')
+            channels: [
+              {
+                name: 'Channel 0',
+                tiff: await fromFile('tests/loaders/fixtures/tiff-folder/Channel_0.tif')
+              },
+              {
+                name: 'Channel 1',
+                tiff: await fromFile('tests/loaders/fixtures/tiff-folder/Channel_1.tif')
+              },
+              {
+                name: 'Channel 2',
+                tiff: await fromFile('tests/loaders/fixtures/tiff-folder/Channel_2.tif')
+              },
             ]
         }
 }
@@ -17,8 +25,8 @@ async function loadTiffs() {
 test('Creates correct TiffFolderPixelSource for TIFF folder.', async t => {
   t.plan(5);
   try {
-    const {imageName, channelNames, tiffs} = await loadTiffs();
-    const { data } = await load(imageName, channelNames, tiffs);
+    const {imageName, channels} = await loadImage();
+    const { data } = await load(imageName, channels);
     t.equal(data.length, 1, 'image should not be pyramidal.');
     const [base] = data;
     t.deepEqual(
@@ -45,8 +53,8 @@ test('Creates correct TiffFolderPixelSource for TIFF folder.', async t => {
 test('Get raster data for TIFF folder.', async t => {
   t.plan(13);
   try {
-    const {imageName, channelNames, tiffs} = await loadTiffs();
-    const { data } = await load(imageName, channelNames, tiffs);
+    const {imageName, channels} = await loadImage();
+    const { data } = await load(imageName, channels);
     const [base] = data;
 
     for (let c = 0; c < 3; c += 1) {
@@ -71,8 +79,8 @@ test('Get raster data for TIFF folder.', async t => {
 test('Correct TIFF folder metadata.', async t => {
   t.plan(10);
   try {
-    const {imageName, channelNames, tiffs} = await loadTiffs();
-    const { metadata } = await load(imageName, channelNames, tiffs);
+    const {imageName, channels} = await loadImage();
+    const { metadata } = await load(imageName, channels);
     const { Name, Pixels } = metadata;
     t.equal(
       Name,
