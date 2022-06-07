@@ -16,7 +16,6 @@ import * as cmaps from '../generated-colormaps.js';
  * @param {string} apply_cmap glsl colormap function implementation
  *
  */
-
 function colormapModuleFactory3D(name, apply_cmap) {
   const fs = `\
 ${apply_cmap}
