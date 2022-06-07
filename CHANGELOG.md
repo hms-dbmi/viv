@@ -7,7 +7,19 @@
 
 ### Changed
 - Refactor 3D rendering to use extensions just like 2D.
+
+## 0.12.8
+
+### Added
+
+### Changed
 - Log errors for loading in Avivator
+- Fix casting bug for `Float64`
+- Disable `Pool` usage temporarily in Avivator due to broken Worker module
+- Also disable `Pool` temporarily in Avivator for `File` OME-TIFF sources
+- Update ciatation in README
+- Add CITATION.cff
+- Separate Journal and Software citation information.
 
 ## 0.12.7
 

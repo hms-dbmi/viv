@@ -13,11 +13,11 @@ The rendering components of Viv are packaged as [deck.gl](https://deck.gl) layer
 easy to compose with [existing layers](https://deck.gl/docs/api-reference/layers)
 to create rich interactive visualizations.
 
-More details and related work can be found in our preprint. Please cite this preprint in your research:
+More details and related work can be found in our paper and original [preprint](https://osf.io/wd2gu/). Please cite our paper in your research:
 
 > Trevor Manz, Ilan Gold, Nathan Heath Patterson, Chuck McCallum, Mark S Keller, Bruce W Herr II, Katy Börner, Jeffrey M Spraggins, Nils Gehlenborg,
-> "[Viv: Multiscale Visualization of High-resolution Multiplexed Bioimaging Data on the Web](https://osf.io/wd2gu/)."
-> **OSF Preprints** (2020), [doi:10.31219/osf.io/wd2gu](https://doi.org/10.31219/osf.io/wd2gu)
+> "[Viv: multiscale visualization of high-resolution multiplexed bioimaging data on the web](https://www.nature.com/articles/s41592-022-01482-7)."
+> **Nature Methods** (2022), [doi:10.31219/10.1038/s41592-022-01482-7](https://doi.org/10.1038/s41592-022-01482-7)
 
 ## 💻 Related Software
 
