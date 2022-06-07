@@ -94,7 +94,6 @@ importers:
       '@viv/extensions': workspace:*
       '@viv/loaders': workspace:*
       '@viv/types': workspace:*
-      glsl-colormap: ^1.0.1
     dependencies:
       '@math.gl/core': 3.5.7
       '@math.gl/culling': 3.5.7
@@ -102,8 +101,6 @@ importers:
       '@viv/extensions': link:../extensions
       '@viv/loaders': link:../loaders
       '@viv/types': link:../types
-    devDependencies:
-      glsl-colormap: 1.0.1
 
   packages/loaders:
     specifiers:
@@ -7686,7 +7683,7 @@ packages:
     dev: true
 
   /readable-stream/1.0.34:
-    resolution: {integrity: sha1-Elgg40vIQtLyqq+v5MKRbuMsFXw=}
+    resolution: {integrity: sha512-ok1qVCJuRkNmvebYikljxJA/UEsKwLl2nI1OmaqAu4/UE+h0wKCHok4XkL/gvi39OacXvw59RJUOFUkDib2rHg==}
     dependencies:
       core-util-is: 1.0.3
       inherits: 2.0.4
@@ -7695,7 +7692,7 @@ packages:
     dev: true
 
   /readable-stream/1.1.14:
-    resolution: {integrity: sha1-fPTFTvZI44EwhMY23SB54WbAgdk=}
+    resolution: {integrity: sha512-+MeVjFf4L44XUkhM1eYbD8fyEsxcV81pqMSR5gblfcLCHfZvbrqy4/qYHE+/R5HoBUT11WV5O08Cr1n3YXkWVQ==}
     dependencies:
       core-util-is: 1.0.3
       inherits: 2.0.4
@@ -9020,7 +9017,7 @@ packages:
       html-select: 2.3.24
       html-tokenize: 1.2.5
       inherits: 2.0.4
-      readable-stream: 1.0.34
+      readable-stream: 1.1.14
       through2: 1.1.1
     dev: true
 
