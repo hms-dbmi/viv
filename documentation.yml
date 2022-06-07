@@ -39,6 +39,8 @@ toc:
   - LensExtension
   - AdditiveColormapExtension
   - ColorPaletteExtension
+  - ColorPalette3DExtensions
+  - AdditiveColormap3DExtensions
   - name: Loaders
   - loadOmeTiff
   - loadOmeZarr

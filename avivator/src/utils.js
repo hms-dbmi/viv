@@ -6,7 +6,10 @@ import {
   loadOmeTiff,
   loadBioformatsZarr,
   loadOmeZarr,
-  getChannelStats
+  getChannelStats,
+  RENDERING_MODES,
+  ColorPalette3DExtensions,
+  AdditiveColormap3DExtensions
   // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
 
@@ -370,4 +373,25 @@ export function getBoundingCube(loader) {
     physicalSizeScalingMatrix[10] * shape[labels.indexOf('z')]
   ];
   return [xSlice, ySlice, zSlice];
+}
+
+/**
+ * Return an appropriate 3D extension for a given combination of `colormap` and `renderingMode`
+ * @param {String} colormap
+ * @param {String} renderingMode
+ */
+export function get3DExtension(colormap, renderingMode) {
+  const extensions = colormap
+    ? AdditiveColormap3DExtensions
+    : ColorPalette3DExtensions;
+  if (renderingMode === RENDERING_MODES.MAX_INTENSITY_PROJECTION) {
+    return new extensions.MaximumIntensityProjectionExtension();
+  }
+  if (renderingMode === RENDERING_MODES.MIN_INTENSITY_PROJECTION) {
+    return new extensions.MinimumIntensityProjectionExtension();
+  }
+  if (renderingMode === RENDERING_MODES.ADDITIVE) {
+    return new extensions.AdditiveBlendExtension();
+  }
+  throw new Error(`${renderingMode} rendering mode not supported`);
 }

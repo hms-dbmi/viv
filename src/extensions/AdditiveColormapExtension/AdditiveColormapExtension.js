@@ -12,7 +12,7 @@ const defaultProps = {
  * @typedef LayerProps
  * @type {object}
  * @property {number=} opacity Opacity of the layer.
- * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @property {string=} colormap String indicating a colormap (default: 'viridis').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {boolean=} useTransparentColor Indicates whether the shader should make the output of colormap_function(0) color transparent
  * */
 const AdditiveColormapExtension = class extends LayerExtension {
