@@ -34,12 +34,6 @@ export {
   RENDERING_MODES
 } from '@viv/constants';
 
-export {
-  AdditiveColormapExtension,
-  ColorPaletteExtension,
-  LensExtension,
-  AdditiveColormap3DExtensions,
-  ColorPalette3DExtensions,
-} from '@viv/extensions';
+export * from '@viv/extensions';
 
 export * from '@viv/loaders';

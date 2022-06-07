@@ -34,10 +34,19 @@ import { Plane } from '@math.gl/culling';
 
 import vs from './xr-3d-layer-vertex.glsl';
 import fs from './xr-3d-layer-fragment.glsl';
-import channels from './shaderlib/channel-intensity';
 
 import { padContrastLimits, padWithDefault, getDtypeValues } from '../utils';
 import { ColorPalette3DExtensions } from '@viv/extensions';
+
+const channelsModule = {
+  name: 'channel-intensity-module',
+  fs: `\
+    float apply_contrast_limits(float intensity, vec2 contrastLimits) {
+      float contrastLimitsAppliedToIntensity = (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0]));
+      return max(0., contrastLimitsAppliedToIntensity);
+    }
+  `
+};
 
 // prettier-ignore
 const CUBE_STRIP = [
@@ -165,7 +174,7 @@ const XR3DLayer = class extends Layer {
     const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
       'fs:DECKGL_PROCESS_INTENSITY'
     );
-    const newChannelsModule = { inject: {}, ...channels };
+    const newChannelsModule = { inject: {}, ...channelsModule };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
         intensity = apply_contrast_limits(intensity, contrastLimits);
