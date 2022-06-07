@@ -7,8 +7,7 @@ const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 const outfile = path.resolve(
   __dirname,
   'src',
-  'additive-colormap-extension',
-  'colormaps.js'
+  'generated-colormaps.js'
 );
 const fh = await fsp.open(outfile, 'w');
 await fh.write(`\

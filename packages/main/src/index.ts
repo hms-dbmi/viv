@@ -36,8 +36,10 @@ export {
 
 export {
   AdditiveColormapExtension,
+  ColorPaletteExtension,
   LensExtension,
-  ColorPaletteExtension
+  AdditiveColormap3DExtensions,
+  ColorPalette3DExtensions,
 } from '@viv/extensions';
 
 export * from '@viv/loaders';

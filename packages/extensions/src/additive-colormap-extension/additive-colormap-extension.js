@@ -2,7 +2,7 @@ import { LayerExtension } from '@deck.gl/core';
 import { apply_transparent_color } from '../shader-utils';
 
 // This file is generated via `packages/extensions/prepare.mjs`
-import * as cmaps from './colormaps';
+import * as cmaps from '../generated-colormaps';
 
 /**
  * A utility to create a Deck.gl shader module for a `glsl-colormap`.
@@ -58,7 +58,7 @@ const defaultProps = {
  * @typedef LayerProps
  * @type {object}
  * @property {number=} opacity Opacity of the layer.
- * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
+ * @property {string=} colormap String indicating a colormap (default: 'viridis').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {boolean=} useTransparentColor Indicates whether the shader should make the output of colormap_function(0) color transparent
  * */
 const AdditiveColormapExtension = class extends LayerExtension {

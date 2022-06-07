@@ -21,4 +21,4 @@
 .pnpm-debug.log
 
 # auto-generated
-packages/extensions/src/additive-colormap-extension/colormaps.js
+packages/extensions/src/generated-colormaps.js

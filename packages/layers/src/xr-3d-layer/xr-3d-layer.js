@@ -31,17 +31,13 @@ import { Model, Geometry, Texture3D } from '@luma.gl/core';
 import { ProgramManager } from '@luma.gl/engine';
 import { Matrix4 } from '@math.gl/core';
 import { Plane } from '@math.gl/culling';
-import { padContrastLimits, padWithDefault, getDtypeValues } from '../utils';
-import { COLORMAPS, RENDERING_MODES as RENDERING_NAMES } from '@viv/constants';
-import { padColors } from '@viv/extensions';
 
 import vs from './xr-3d-layer-vertex.glsl';
 import fs from './xr-3d-layer-fragment.glsl';
 import channels from './shaderlib/channel-intensity';
-import {
-  RENDERING_MODES_BLEND,
-  RENDERING_MODES_COLORMAP
-} from './rendering-modes';
+
+import { padContrastLimits, padWithDefault, getDtypeValues } from '../utils';
+import { ColorPalette3DExtensions } from '@viv/extensions';
 
 // prettier-ignore
 const CUBE_STRIP = [
@@ -66,20 +62,19 @@ const defaultProps = {
   pickable: false,
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'object', value: {}, compare: true },
-  colors: { type: 'array', value: [], compare: true },
   contrastLimits: { type: 'array', value: [], compare: true },
   dtype: { type: 'string', value: 'Uint8', compare: true },
-  colormap: { type: 'string', value: '', compare: true },
   xSlice: { type: 'array', value: null, compare: true },
   ySlice: { type: 'array', value: null, compare: true },
   zSlice: { type: 'array', value: null, compare: true },
   clippingPlanes: { type: 'array', value: [], compare: true },
-  renderingMode: {
-    type: 'string',
-    value: RENDERING_NAMES.ADDITIVE,
+  resolutionMatrix: { type: 'object', value: new Matrix4(), compare: true },
+  channelsVisible: { type: 'array', value: [], compare: true },
+  extensions: {
+    type: 'array',
+    value: [new ColorPalette3DExtensions.AdditiveBlendExtension()],
     compare: true
-  },
-  resolutionMatrix: { type: 'object', value: new Matrix4(), compare: true }
+  }
 };
 
 function getRenderingAttrs() {
@@ -91,46 +86,33 @@ function getRenderingAttrs() {
   };
 }
 
-function removeExtraColormapFunctionsFromShader(colormap) {
-  // Always include viridis so shaders compile,
-  // but otherwise we discard all other colormaps via a regex.
-  // With all the colormaps, the shaders were too large
-  // and crashed our computers when we loaded volumes too large.
-  const discardColormaps = COLORMAPS.filter(
-    i => i !== (colormap || 'viridis')
-  ).map(i => i.replace(/-/g, '_'));
-  const discardRegex = new RegExp(
-    `vec4 (${discardColormaps.join(
-      '(_([0-9]*))?|'
-    )})\\(float x_[0-9]+\\){([^}]+)}`,
-    'g'
-  );
-  const channelsModules = {
-    ...channels,
-    fs: channels.fs.replace(discardRegex, ''),
-    defines: {
-      COLORMAP_FUNCTION: colormap || 'viridis'
-    }
-  };
-  return channelsModules;
+function getRenderingFromExtensions(extensions) {
+  let rendering = {};
+  extensions.forEach(extension => {
+    rendering = extension.opts.rendering;
+  });
+  if (!rendering._RENDER) {
+    throw new Error(
+      'XR3DLayer requires at least one extension to define opts.rendering as an object with _RENDER as a property at the minimum.'
+    );
+  }
+  return rendering;
 }
 
 /**
  * @typedef LayerProps
  * @type {Object}
  * @property {Array.<Array.<number>>} contrastLimits List of [begin, end] values to control each channel's ramp function.
- * @property {Array.<Array.<number>>} colors List of [r, g, b] values for each channel.
  * @property {Array.<boolean>} channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @property {string} dtype Dtype for the layer.
- * @property {string=} colormap String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {Array.<Array.<number>>=} domain Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
- * @property {string=} renderingMode One of Maximum Intensity Projection, Minimum Intensity Projection, or Additive
  * @property {Object=} modelMatrix A column major affine transformation to be applied to the volume.
  * @property {Array.<number>=} xSlice 0-width (physical coordinates) interval on which to slice the volume.
  * @property {Array.<number>=} ySlice 0-height (physical coordinates) interval on which to slice the volume.
  * @property {Array.<number>=} zSlice 0-depth (physical coordinates) interval on which to slice the volume.
  * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  * @property {Object=} resolutionMatrix Matrix for scaling the volume based on the (downsampled) resolution being displayed.
+ * @property {Array=} extensions [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers - default is AdditiveBlendExtension from ColorPalette3DExtensions.
  */
 
 /**
@@ -157,10 +139,15 @@ const XR3DLayer = class extends Layer {
     const { extensions } = this.props;
     return extensions?.some(e => {
       const shaders = e.getShaders();
-      const { inject = {}, modules = [] } = shaders;
-      const definesInjection = inject[hookName];
-      const moduleDefinesInjection = modules.some(m => m?.inject[hookName]);
-      return definesInjection || moduleDefinesInjection;
+      if (shaders) {
+        const { inject = {}, modules = [] } = shaders;
+        const definesInjection = inject[hookName];
+        const moduleDefinesInjection = modules.some(
+          m => m.inject && m?.inject[hookName]
+        );
+        return definesInjection || moduleDefinesInjection;
+      }
+      return false;
     });
   }
 
@@ -168,15 +155,17 @@ const XR3DLayer = class extends Layer {
    * This function compiles the shaders and the projection module.
    */
   getShaders() {
-    const { colormap, renderingMode, clippingPlanes } = this.props;
+    const { clippingPlanes, extensions } = this.props;
     const { sampler } = getRenderingAttrs();
-    const { _BEFORE_RENDER, _RENDER, _AFTER_RENDER } = colormap
-      ? RENDERING_MODES_COLORMAP[renderingMode]
-      : RENDERING_MODES_BLEND[renderingMode];
-    const channelsModules = removeExtraColormapFunctionsFromShader(colormap);
-    const extensionDefinesDeckglProcessIntensity =
-      this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
-    const newChannelsModule = { ...channelsModules, inject: {} };
+    const {
+      _BEFORE_RENDER,
+      _RENDER,
+      _AFTER_RENDER
+    } = getRenderingFromExtensions(extensions);
+    const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
+      'fs:DECKGL_PROCESS_INTENSITY'
+    );
+    const newChannelsModule = { inject: {}, ...channels };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
         intensity = apply_contrast_limits(intensity, contrastLimits);
@@ -190,7 +179,6 @@ const XR3DLayer = class extends Layer {
         .replace('_AFTER_RENDER', _AFTER_RENDER),
       defines: {
         SAMPLER_TYPE: sampler,
-        COLORMAP_FUNCTION: colormap || 'viridis',
         NUM_PLANES: String(clippingPlanes.length || NUM_PLANES_DEFAULT)
       },
       modules: [newChannelsModule]
@@ -259,7 +247,6 @@ const XR3DLayer = class extends Layer {
     const { textures, model, scaleMatrix } = this.state;
     const {
       contrastLimits,
-      colors,
       xSlice,
       ySlice,
       zSlice,
@@ -279,7 +266,6 @@ const XR3DLayer = class extends Layer {
         domain,
         dtype
       });
-      const paddedColors = padColors({ colors, channelsVisible });
       const invertedScaleMatrix = scaleMatrix.clone().invert();
       const invertedResolutionMatrix = resolutionMatrix.clone().invert();
       const paddedClippingPlanes = padWithDefault(
@@ -300,7 +286,6 @@ const XR3DLayer = class extends Layer {
           ...uniforms,
           ...textures,
           contrastLimits: paddedContrastLimits,
-          colors: paddedColors,
           xSlice: new Float32Array(
             xSlice
               ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])
