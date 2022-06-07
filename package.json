@@ -40,7 +40,6 @@
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
     "esbuild": "^0.14.42",
-    "esbuild-plugin-glslify": "^1.0.1",
     "eslint": "^8.16.0",
     "eslint-plugin-react": "^7.30.0",
     "eslint-plugin-react-hooks": "^4.5.0",
@@ -56,8 +55,7 @@
   },
   "devDependenciesMeta": {
     "@esbuild-plugins/node-globals-polyfill": "Necessary to run `tape` with browser-like `tape-run`.",
-    "@esbuild-plugins/node-modules-polyfill": "Necessary to run `tape` with browser-like `tape-run`.",
-    "eslint-plugin-glslify": "Bundles glslify modules used in .glsl files. Has too strict esbuild version requirement, overriden below."
+    "@esbuild-plugins/node-modules-polyfill": "Necessary to run `tape` with browser-like `tape-run`."
   },
   "pnpm": {
     "peerDependencyRules": {

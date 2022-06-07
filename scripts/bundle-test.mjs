@@ -1,5 +1,4 @@
 import * as esbuild from "esbuild";
-import { glslify } from "esbuild-plugin-glslify";
 
 // These are necessary as long as we use `tape` for tests in the browser.
 // The package relies on many node-isms and must be adapted.
@@ -13,6 +12,5 @@ esbuild.build({
   plugins: [
     globals({ process: true, buffer: true }),
     builtins(),
-    glslify(),
   ],
 });
