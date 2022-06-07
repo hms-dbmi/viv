@@ -2,6 +2,11 @@ import * as fsp from 'node:fs/promises';
 import * as path from 'node:path';
 import * as url from 'node:url';
 
+// https://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html#8-colors
+const YELLOW = '\u001b[33m';
+const GREEN = '\u001b[32m';
+const RESET = '\u001b[0m';
+
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 
 const outfile = path.resolve(
@@ -19,11 +24,7 @@ await fh.write(`\
 const dir = path.resolve(__dirname, 'node_modules', 'glsl-colormap');
 const files = (await fsp.readdir(dir)).filter(fname => fname.endsWith('.glsl'));
 
-const YELLOW = '\u001b[33m';
-const GREEN = '\u001b[32m';
-const RESET = '\u001b[0m';
-
-process.stdout.write(`Writing each ${YELLOW}\`glsl-colormap\`${RESET} to ${outfile}\n\n`);
+console.log(`Writing each ${YELLOW}\`glsl-colormap\`${RESET} to ${outfile}\n`);
 
 for (const file of files) {
   let contents = await fsp.readFile(path.resolve(dir, file), {
@@ -36,5 +37,5 @@ for (const file of files) {
     .replace(/^#pragma glslify.*\n/gm, ''); // strip off glslify export
 
   await fh.write(`export const ${name} = \`\\\n${impl}\`;\n`);
-  process.stdout.write(` - ${name} ${GREEN}✔${RESET}\n`);
+  console.log(` - ${name} ${GREEN}✔${RESET}`);
 }

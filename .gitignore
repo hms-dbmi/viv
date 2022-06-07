@@ -20,5 +20,5 @@
 
 .pnpm-debug.log
 
-# auto-generated
+# auto-generated, see packages/extensions/prepare.mjs
 packages/extensions/src/generated-colormaps.js
