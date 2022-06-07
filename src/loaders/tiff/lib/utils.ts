@@ -1,17 +1,5 @@
-import type { GeoTIFFImage } from 'geotiff';
-import { getDims, getLabels, prevPowerOf2 } from '../../utils';
+import { getDims, getLabels, DTYPE_LOOKUP } from '../../utils';
 import type { OMEXML, UnitsLength } from '../../omexml';
-
-const DTYPE_LOOKUP = {
-  uint8: 'Uint8',
-  uint16: 'Uint16',
-  uint32: 'Uint32',
-  float: 'Float32',
-  double: 'Float64',
-  int8: 'Int8',
-  int16: 'Int16',
-  int32: 'Int32'
-} as const;
 
 export function getOmePixelSourceMeta({ Pixels }: OMEXML[0]) {
   // e.g. 'XYZCT' -> ['t', 'c', 'z', 'y', 'x']
@@ -68,12 +56,4 @@ export function getOmePixelSourceMeta({ Pixels }: OMEXML[0]) {
   }
 
   return { labels, getShape, dtype };
-}
-
-export function guessTileSize(image: GeoTIFFImage) {
-  const tileWidth = image.getTileWidth();
-  const tileHeight = image.getTileHeight();
-  const size = Math.min(tileWidth, tileHeight);
-  // deck.gl requirement for power-of-two tile size.
-  return prevPowerOf2(size);
 }

@@ -29,3 +29,5 @@ rules:
   # https://github.com/benmosher/eslint-plugin-import/issues/1615#issuecomment-577500405
   import/extensions:
     ['error', 'ignorePackages', { js: 'never', ts: 'never', jsx: 'never' }]
+  prefer-template: "off"
+  class-methods-use-this: "off"
