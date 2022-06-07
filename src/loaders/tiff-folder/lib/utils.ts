@@ -92,11 +92,11 @@ function generatePixelMedatata(imageNumber: number,
     }
 }
 
-export function generateMetadata(imageName: string,
-    channelNames: string[],
+export function generateMetadata(folderName: string,
+    imageNames: string[],
+    images: GeoTIFFImage[],
     dimensionOrder: DimensionOrder,
-    dType: string, 
-    images: GeoTIFFImage[])
+    dType: string)
 {
     const firstImage = images[0]
     const imageNumber = 0
@@ -108,7 +108,7 @@ export function generateMetadata(imageName: string,
     const zSections = 1
     const timepoints = 1
 
-    const pixels = generatePixelMedatata(imageNumber, dimensionOrder, width, height, zSections, timepoints, dType, channelNames, images)
+    const pixels = generatePixelMedatata(imageNumber, dimensionOrder, width, height, zSections, timepoints, dType, imageNames, images)
 
     const format = () => {
         return {
@@ -122,7 +122,7 @@ export function generateMetadata(imageName: string,
     }
     return {
         ID: id,
-        Name: imageName,
+        Name: folderName,
         AcquisitionDate: date,
         Description: description,
         Pixels: pixels,

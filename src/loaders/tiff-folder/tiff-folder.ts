@@ -1,4 +1,4 @@
-import type { GeoTIFF } from 'geotiff';
+import type { GeoTIFF, GeoTIFFImage } from 'geotiff';
 
 import TiffFolderPixelSource from './pixel-source';
 import { guessTiffTileSize } from '../utils';
@@ -11,13 +11,14 @@ export interface TiffFolderSelection {
   z: number;
 }
 
-// TODO: Replace separate channelNames and tiffs arrays with object array containing name and tiff.
-export async function load(imageName: string, channelNames: string[], tiffs: GeoTIFF[], pool?: Pool) {
-    const images = []
+export async function load(folderName: string, tiffs: {name: string, image: GeoTIFF}[], pool?: Pool) {
+    const images: GeoTIFFImage[] = []
+    const names: string[] = []
     // eslint-disable-next-line no-restricted-syntax
     for (const tiff of tiffs){
         // eslint-disable-next-line no-await-in-loop
-        images.push(await tiff.getImage(0))
+        images.push(await tiff.image.getImage(0))
+        names.push(tiff.name)
     }
     const firstImage = images[0];
     const {
@@ -28,7 +29,7 @@ export async function load(imageName: string, channelNames: string[], tiffs: Geo
     const tileSize = guessTiffTileSize(firstImage);
     const meta = { photometricInterpretation };
     const {shape, labels, dtype} = getTiffMeta(dimensionOrder, images)
-    const metadata = generateMetadata(imageName, channelNames, dimensionOrder, dtype, images)
+    const metadata = generateMetadata(folderName, names, images, dimensionOrder, dtype)
     const source = new TiffFolderPixelSource(
         images,
         dtype,
