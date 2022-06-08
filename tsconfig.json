@@ -9,5 +9,5 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "importsNotUsedAsValues": "error"
-  },
+  }
 }

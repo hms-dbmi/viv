@@ -22,10 +22,10 @@ ${apply_cmap}
 
 vec4 colormap(float intensity, float opacity) {
   return vec4(apply_cmap(min(1.,intensity)).xyz, opacity);
-}`
+}`;
   return {
     name: `additive-colormap-3d-${name}`,
-    fs,
+    fs
   };
 }
 
@@ -45,7 +45,7 @@ const BaseExtension = class extends LayerExtension {
     const apply_cmap = cmaps[name];
     return {
       ...super.getShaders(),
-      modules: [colormapModuleFactory3D(name, apply_cmap)],
+      modules: [colormapModuleFactory3D(name, apply_cmap)]
     };
   }
 

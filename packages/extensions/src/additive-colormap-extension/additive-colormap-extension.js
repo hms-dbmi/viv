@@ -46,7 +46,6 @@ vec4 colormap(float intensity) {
   };
 }
 
-
 const defaultProps = {
   colormap: { type: 'string', value: 'viridis', compare: true },
   opacity: { type: 'number', value: 1.0, compare: true },

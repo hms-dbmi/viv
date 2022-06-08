@@ -166,14 +166,10 @@ const XR3DLayer = class extends Layer {
   getShaders() {
     const { clippingPlanes, extensions } = this.props;
     const { sampler } = getRenderingAttrs();
-    const {
-      _BEFORE_RENDER,
-      _RENDER,
-      _AFTER_RENDER
-    } = getRenderingFromExtensions(extensions);
-    const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions(
-      'fs:DECKGL_PROCESS_INTENSITY'
-    );
+    const { _BEFORE_RENDER, _RENDER, _AFTER_RENDER } =
+      getRenderingFromExtensions(extensions);
+    const extensionDefinesDeckglProcessIntensity =
+      this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
     const newChannelsModule = { inject: {}, ...channelsModule };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `

@@ -9,11 +9,7 @@ const RESET = '\u001b[0m';
 
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 
-const outfile = path.resolve(
-  __dirname,
-  'src',
-  'generated-colormaps.js'
-);
+const outfile = path.resolve(__dirname, 'src', 'generated-colormaps.js');
 const fh = await fsp.open(outfile, 'w');
 await fh.write(`\
 // The contents of this file are automatically written by
