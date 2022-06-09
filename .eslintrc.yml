@@ -35,3 +35,4 @@ rules:
   no-cond-assign: [2, "except-parens"]
   no-restricted-syntax: [0]
   no-await-in-loop: [0]
+  no-bitwise: [0]

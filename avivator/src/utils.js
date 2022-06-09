@@ -6,6 +6,7 @@ import {
   loadOmeTiff,
   loadBioformatsZarr,
   loadOmeZarr,
+  loadTiffFolder,
   getChannelStats
   // eslint-disable-next-line import/no-unresolved
 } from '@hms-dbmi/viv';
@@ -22,6 +23,18 @@ function isOMETIFF(urlOrFile) {
   if (Array.isArray(urlOrFile)) return false; // local Zarr is array of File Objects
   const name = typeof urlOrFile === 'string' ? urlOrFile : urlOrFile.name;
   return name.includes('ome.tiff') || name.includes('ome.tif');
+}
+
+function isTiffFolder(urlOrFile){
+  if (Array.isArray(urlOrFile)){
+    for (const file of urlOrFile){
+      const filename = file.name.toLowerCase();
+      if (!(filename.includes('.tiff') || filename.includes('.tif'))) return false;
+    }
+    return true;
+  }
+  if(typeof urlOrFile === 'string') return urlOrFile.includes('.csv') || urlOrFile.includes('.CSV');
+  return false;
 }
 
 class UnsupportedBrowserError extends Error {
@@ -109,16 +122,26 @@ export async function createLoader(
       }
       return source;
     }
-    // Bio-Formats Zarr
+
     if (
       Array.isArray(urlOrFile) &&
       typeof urlOrFile[0].arrayBuffer !== 'function'
     ) {
       throw new UnsupportedBrowserError(
-        'Cannot upload a local Zarr with this browser. Try using Chrome, Firefox, or Microsoft Edge.'
+        'Cannot upload a local Zarr or flat TIFF folder with this browser. Try using Chrome, Firefox, or Microsoft Edge.'
       );
     }
 
+    // Flat Tiff Folder
+    if(isTiffFolder(urlOrFile)){
+      const source = await loadTiffFolder(urlOrFile, {
+        images: 'all',
+        pool: false
+      });
+      return source;
+    }
+
+    // Bio-Formats Zarr
     let source;
     try {
       source = await loadBioformatsZarr(urlOrFile);
