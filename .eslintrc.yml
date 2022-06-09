@@ -31,3 +31,7 @@ rules:
     ['error', 'ignorePackages', { js: 'never', ts: 'never', jsx: 'never' }]
   prefer-template: "off"
   class-methods-use-this: "off"
+  semi: [2, "always"]
+  no-cond-assign: [2, "except-parens"]
+  no-restricted-syntax: [0]
+  no-await-in-loop: [0]
