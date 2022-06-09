@@ -16,9 +16,7 @@ export interface TiffFolderChannel {name: string, tiff: GeoTIFF}
 export async function load(imageName: string, channels: TiffFolderChannel[], pool?: Pool) {
     const channelImages: GeoTIFFImage[] = [];
     const channelNames: string[] = [];
-    // eslint-disable-next-line no-restricted-syntax
     for (const channel of channels){
-        // eslint-disable-next-line no-await-in-loop
         channelImages.push(await channel.tiff.getImage(0));
         channelNames.push(channel.name);
     }

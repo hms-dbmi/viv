@@ -17,12 +17,6 @@ type ReadRastersOptions = NonNullable<
   Parameters<GeoTIFFImage['readRasters']>[0]
 >;
 
-interface OmeTiffSelection {
-    t: number;
-    c: number;
-    z: number;
-  }
-
 class TiffFolderPixelSource<S extends string[]> implements PixelSource<S> {
   private _channelImages: GeoTIFFImage[];
 
