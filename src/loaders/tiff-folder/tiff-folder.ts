@@ -5,12 +5,6 @@ import { guessTiffTileSize } from '../utils';
 import { generateMetadata, getTiffMeta } from './lib/utils';
 import type Pool from '../tiff/lib/Pool';
 
-export interface TiffFolderSelection {
-  t: number;
-  c: number;
-  z: number;
-}
-
 export interface TiffFolderChannel {name: string, tiff: GeoTIFF}
 
 export async function load(imageName: string, channels: TiffFolderChannel[], pool?: Pool) {
