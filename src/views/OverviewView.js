@@ -4,7 +4,7 @@ import VivView from './VivView';
 import { OverviewLayer } from '../layers';
 import { makeBoundingBox, getVivId } from './utils';
 
-import { getImageSize } from '../loaders/lib/utils';
+import { getImageSize } from '../loaders/utils';
 
 export const OVERVIEW_VIEW_ID = 'overview';
 
