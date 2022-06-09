@@ -66,7 +66,7 @@ function generatePixelMedatata(imageNumber: number,
     height: number,
     z: number,
     t: number,
-    dType: string, 
+    dType: string,
     channelNames: string[],
     images: GeoTIFFImage[])
 {
@@ -128,7 +128,7 @@ export function generateMetadata(imageName: string,
             'Z-sections/Timepoints': `${zSections} x ${timepoints}`,
             Channels: channelImages.length
         };
-        
+
     };
     return {
         ID: id,
@@ -159,7 +159,7 @@ export function getParsedFilename(path: string){
     const filename = path.split('/').pop();
     const splitFilename = filename?.split('.');
     if(splitFilename){
-        parsedFilename.filename = splitFilename[0].split('.').slice(0, -1).join('.');
+        parsedFilename.filename = splitFilename.slice(0, -1).join('.');
         [, parsedFilename.extension ] = splitFilename;
     }
     return parsedFilename;
