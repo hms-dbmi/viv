@@ -4,28 +4,29 @@ import { fromFile } from 'geotiff';
 import { load } from '../../src/loaders/tiff-folder/tiff-folder';
 
 async function loadImage() {
-    return {imageName: 'tiff-folder',
-            channels: [
-              {
-                name: 'Channel 0',
-                tiff: await fromFile('tests/loaders/fixtures/tiff-folder/Channel_0.tif')
-              },
-              {
-                name: 'Channel 1',
-                tiff: await fromFile('tests/loaders/fixtures/tiff-folder/Channel_1.tif')
-              },
-              {
-                name: 'Channel 2',
-                tiff: await fromFile('tests/loaders/fixtures/tiff-folder/Channel_2.tif')
-              },
-            ]
-        }
+  return {
+    imageName: 'tiff-folder',
+    channels: [
+      {
+        name: 'Channel 0',
+        tiff: await fromFile('tests/loaders/fixtures/tiff-folder/Channel_0.tif')
+      },
+      {
+        name: 'Channel 1',
+        tiff: await fromFile('tests/loaders/fixtures/tiff-folder/Channel_1.tif')
+      },
+      {
+        name: 'Channel 2',
+        tiff: await fromFile('tests/loaders/fixtures/tiff-folder/Channel_2.tif')
+      }
+    ]
+  };
 }
 
 test('Creates correct TiffFolderPixelSource for TIFF folder.', async t => {
   t.plan(5);
   try {
-    const {imageName, channels} = await loadImage();
+    const { imageName, channels } = await loadImage();
     const { data } = await load(imageName, channels);
     t.equal(data.length, 1, 'image should not be pyramidal.');
     const [base] = data;
@@ -53,7 +54,7 @@ test('Creates correct TiffFolderPixelSource for TIFF folder.', async t => {
 test('Get raster data for TIFF folder.', async t => {
   t.plan(13);
   try {
-    const {imageName, channels} = await loadImage();
+    const { imageName, channels } = await loadImage();
     const { data } = await load(imageName, channels);
     const [base] = data;
 
@@ -62,8 +63,16 @@ test('Get raster data for TIFF folder.', async t => {
       const pixelData = await base.getRaster({ selection }); // eslint-disable-line no-await-in-loop
       t.equal(pixelData.width, 439, 'Should have width of 439.');
       t.equal(pixelData.height, 167, 'Should have height of 167.');
-      t.equal(pixelData.data.length, 439 * 167, 'Data should be width * height long.');
-      t.equal(pixelData.data.constructor.name, 'Uint8Array', 'Data constructor name should be Uint8Array.');
+      t.equal(
+        pixelData.data.length,
+        439 * 167,
+        'Data should be width * height long.'
+      );
+      t.equal(
+        pixelData.data.constructor.name,
+        'Uint8Array',
+        'Data constructor name should be Uint8Array.'
+      );
     }
 
     try {
@@ -79,14 +88,10 @@ test('Get raster data for TIFF folder.', async t => {
 test('Correct TIFF folder metadata.', async t => {
   t.plan(10);
   try {
-    const {imageName, channels} = await loadImage();
+    const { imageName, channels } = await loadImage();
     const { metadata } = await load(imageName, channels);
     const { Name, Pixels } = metadata;
-    t.equal(
-      Name,
-      'tiff-folder',
-      `Name should be 'tiff-folder'.`
-    );
+    t.equal(Name, 'tiff-folder', `Name should be 'tiff-folder'.`);
     t.equal(Pixels.SizeC, 3, 'Should have three channels.');
     t.equal(Pixels.SizeT, 1, 'Should have one time index.');
     t.equal(Pixels.SizeX, 439, 'Should have SizeX of 429.');
@@ -94,8 +99,16 @@ test('Correct TIFF folder metadata.', async t => {
     t.equal(Pixels.SizeZ, 1, 'Should have one z index.');
     t.equal(Pixels.Type, 'Uint8', 'Should be Uint8 pixel type.');
     t.equal(Pixels.Channels.length, 3, 'Should have 3 channels.');
-    t.equal(Pixels.Channels[0].SamplesPerPixel, 1, 'Should have 1 sample per pixel.');
-    t.equal(Pixels.Channels[0].Name, 'Channel 0', 'Should have name Channel 0.');
+    t.equal(
+      Pixels.Channels[0].SamplesPerPixel,
+      1,
+      'Should have 1 sample per pixel.'
+    );
+    t.equal(
+      Pixels.Channels[0].Name,
+      'Channel 0',
+      'Should have name Channel 0.'
+    );
   } catch (e) {
     t.fail(e);
   }

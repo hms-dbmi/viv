@@ -25,15 +25,17 @@ function isOMETIFF(urlOrFile) {
   return name.includes('ome.tiff') || name.includes('ome.tif');
 }
 
-function isTiffFolder(urlOrFile){
-  if (Array.isArray(urlOrFile)){
-    for (const file of urlOrFile){
+function isTiffFolder(urlOrFile) {
+  if (Array.isArray(urlOrFile)) {
+    for (const file of urlOrFile) {
       const filename = file.name.toLowerCase();
-      if (!(filename.includes('.tiff') || filename.includes('.tif'))) return false;
+      if (!(filename.includes('.tiff') || filename.includes('.tif')))
+        return false;
     }
     return true;
   }
-  if(typeof urlOrFile === 'string') return urlOrFile.includes('.csv') || urlOrFile.includes('.CSV');
+  if (typeof urlOrFile === 'string')
+    return urlOrFile.includes('.csv') || urlOrFile.includes('.CSV');
   return false;
 }
 
@@ -133,7 +135,7 @@ export async function createLoader(
     }
 
     // Flat Tiff Folder
-    if(isTiffFolder(urlOrFile)){
+    if (isTiffFolder(urlOrFile)) {
       const source = await loadTiffFolder(urlOrFile, {
         images: 'all',
         pool: false

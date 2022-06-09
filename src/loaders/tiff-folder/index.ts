@@ -1,12 +1,12 @@
 import { fromBlob, fromUrl } from 'geotiff';
 import { load, TiffFolderChannel } from './tiff-folder';
-import {getParsedFilename, csvStringToArray} from './lib/utils';
+import { getParsedFilename, csvStringToArray } from './lib/utils';
 
 interface TiffFolderOptions {
   fetchOptions: RequestInit;
 }
 
-const DEFAULT_IMAGE_NAME = "TiffFolder";
+const DEFAULT_IMAGE_NAME = 'TiffFolder';
 
 /**
  * Opens a folder of multiple tiffs each containing one image (no stacks, timepoints, or pyramids).
@@ -35,18 +35,23 @@ export async function loadTiffFolder(
   if (typeof source === 'string') {
     const sourceFilename = getParsedFilename(source);
 
-    if(sourceFilename.filename && sourceFilename.extension?.toLowerCase() === 'csv'){
+    if (
+      sourceFilename.filename &&
+      sourceFilename.extension?.toLowerCase() === 'csv'
+    ) {
       imageName = sourceFilename.filename;
-      const csvSource = await (await fetch(source, options.fetchOptions)).text();
+      const csvSource = await (
+        await fetch(source, options.fetchOptions)
+      ).text();
       const parsedCsv = csvStringToArray(csvSource);
 
-      for (const row of parsedCsv){
+      for (const row of parsedCsv) {
         const imagePath = row[0];
         const name = row[1] ? row[1] : getParsedFilename(imagePath).filename;
 
-        if(imagePath && name){
+        if (imagePath && name) {
           const tiff = await fromUrl(source, { cacheSize: Infinity });
-          channels.push({name, tiff});
+          channels.push({ name, tiff });
         }
       }
     }
@@ -57,15 +62,15 @@ export async function loadTiffFolder(
     if (source[0]) imageName = source[0].path.split('/')[-2];
     if (!imageName) imageName = DEFAULT_IMAGE_NAME;
 
-    for(const file of source){
+    for (const file of source) {
       const name = getParsedFilename(file.path).filename;
-      if(name){
+      if (name) {
         const tiff = await fromBlob(file);
-        channels.push({name, tiff});
+        channels.push({ name, tiff });
       }
     }
   }
-  if(imageName && channels.length > 0){
+  if (imageName && channels.length > 0) {
     return load(imageName, channels);
   }
   throw new Error('Unable to load image from provided TiffFolder source.');
