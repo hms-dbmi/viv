@@ -302,7 +302,11 @@ class VivViewerWrapper extends PureComponent {
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...(deckProps ?? {})}
         layerFilter={this.layerFilter}
-        layers={deckProps?.layers === undefined ? [...this._renderLayers()] : [...this._renderLayers(), ...deckProps.layers]}
+        layers={
+          deckProps?.layers === undefined
+            ? [...this._renderLayers()]
+            : [...this._renderLayers(), ...deckProps.layers]
+        }
         onViewStateChange={this._onViewStateChange}
         views={deckGLViews}
         viewState={viewStates}
