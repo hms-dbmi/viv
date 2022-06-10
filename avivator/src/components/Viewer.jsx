@@ -16,7 +16,7 @@ import {
   useChannelsStore,
   useLoader
 } from '../state';
-import { useWindowSize } from '../utils';
+import { useWindowSize, get3DExtension } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
 
 const Viewer = () => {
@@ -90,7 +90,7 @@ const Viewer = () => {
       ySlice={ySlice}
       zSlice={zSlice}
       resolution={resolution}
-      renderingMode={renderingMode}
+      extensions={[get3DExtension(colormap, renderingMode)]}
       height={viewSize.height}
       width={viewSize.width}
       onViewportLoad={onViewportLoad}
