@@ -50,7 +50,7 @@ export async function loadTiffFolder(
         const name = row[1] ? row[1] : getParsedFilename(imagePath).filename;
 
         if (imagePath && name) {
-          const tiff = await fromUrl(source, { cacheSize: Infinity });
+          const tiff = await fromUrl(imagePath, { cacheSize: Infinity });
           channels.push({ name, tiff });
         }
       }
