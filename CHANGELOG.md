@@ -6,6 +6,14 @@
 
 ### Changed
 
+## 0.12.9
+
+### Added
+
+- Support passing in additional layers to VivViewer through deckProps
+
+### Changed
+
 ## 0.12.8
 
 ### Added
