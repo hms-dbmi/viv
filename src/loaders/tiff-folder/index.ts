@@ -31,8 +31,10 @@ export async function loadTiffFolder(
 ) {
   let imageName: string | undefined;
   const channels: TiffFolderChannel[] = [];
-  // Load from a URL pointing to a CSV.
+
   if (typeof source === 'string') {
+    // Load from a URL pointing to a CSV.
+
     const sourceFilename = getParsedFilename(source);
 
     if (
