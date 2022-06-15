@@ -3,6 +3,12 @@
 ## In Progress
 
 ### Added
+
+### Changed
+
+## 0.12.9
+
+### Added
 - See documentation for a description of the newly added 3D extensions and how they work.
 
 ### Changed
