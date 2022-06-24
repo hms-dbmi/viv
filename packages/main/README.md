@@ -8,19 +8,19 @@
 <img src="https://github.com/hms-dbmi/viv/raw/master/docs/3d-slicing.gif" alt="Interactive volumetric view in web browser; sliders control visible planes." width="400"/> <img src="https://github.com/hms-dbmi/viv/raw/master/docs/glomerular-lens.png" alt="Multi-channel rendering of high-resolution microscopy dataset" width="400"/>
 </p>
 
-## 💽 Installation
+## Installation
 
-```bash
-$ npm install @hms-dbmi/viv
+```sh
+npm install @hms-dbmi/viv
 ```
 
 You will also need to install [deck.gl](https://deck.gl) and other `peerDependencies` manually.
 This step prevent users from installing multiple versions of deck.gl in their projects.
 
-```bash
-$ npm install deck.gl @luma.gl/core
+```sh
+npm install deck.gl @luma.gl/core
 ```
 
-## 📖 Documentation
+## Documentation
 
 Detailed API information and example sippets can be found in our [documentation](http://viv.gehlenborglab.org).
