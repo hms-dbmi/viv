@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Migrate to pnpm monorepo
 
 ## 0.12.9
 
@@ -13,7 +14,6 @@
 
 ### Changed
 - Refactor 3D rendering to use extensions just like 2D.
-- Migrate to pnpm monorepo
 
 ## 0.12.9
 
