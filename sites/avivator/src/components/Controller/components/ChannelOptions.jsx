@@ -29,7 +29,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function ChannelOptions({ handleRemoveChannel, handleColorSelect, disabled }) {
+function ChannelOptions({ handleColorSelect, disabled, setFull, setMaxMin }) {
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
 
@@ -49,11 +49,14 @@ function ChannelOptions({ handleRemoveChannel, handleColorSelect, disabled }) {
         <Paper className={classes.paper}>
           <ClickAwayListener onClickAway={toggle}>
             <MenuList id="channel-options">
-              <MenuItem dense disableGutters onClick={handleRemoveChannel}>
-                <span className={classes.span}>Remove</span>
-              </MenuItem>
               <MenuItem dense disableGutters className={classes.colors}>
                 <ColorPalette handleColorSelect={handleColorSelect} />
+              </MenuItem>
+              <MenuItem dense disableGutters onClick={setFull}>
+                <span className={classes.span}>Full</span>
+              </MenuItem>
+              <MenuItem dense disableGutters onClick={setMaxMin}>
+                <span className={classes.span}>Max/Min</span>
               </MenuItem>
             </MenuList>
           </ClickAwayListener>

@@ -4,6 +4,8 @@
 
 ### Added
 
+- Max/Min Option per channel in Avivator.
+
 ### Changed
 
 - Issue cloudfront invalidation on deployment.
