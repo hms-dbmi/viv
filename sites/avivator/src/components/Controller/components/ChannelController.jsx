@@ -8,6 +8,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import IconButton from '@material-ui/core/IconButton';
 import shallow from 'zustand/shallow';
+// eslint-disable-next-line import/no-unresolved
+import { DTYPE_VALUES } from '@hms-dbmi/viv';
 
 import ChannelOptions from './ChannelOptions';
 import { FILL_PIXEL_VALUE } from '../../../constants';
@@ -17,7 +19,7 @@ import {
   useViewerStore
 } from '../../../state';
 import { truncateDecimalNumber } from '../../../utils';
-import { DTYPE_VALUES } from '@hms-dbmi/viv';
+
 export const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
 
 const toRgb = (on, arr) => {
@@ -66,17 +68,20 @@ function ChannelController({
   const domainReducer = useCallback(
     (state, action) => {
       switch (action) {
-        case 'max/min':
+        case 'max/min': {
           return domain;
-        case 'full':
+        }
+        case 'full': {
           const { dtype } = loader[0];
           const { max } = DTYPE_VALUES[dtype];
           // Min is 0 for unsigned, or the negative of the max for signed dtypes.
           const min =
             dtype.startsWith('Int') || dtype.startsWith('Float') ? -max : 0;
           return [min, max];
-        default:
+        }
+        default: {
           throw new Error();
+        }
       }
     },
     [loader, domain]
