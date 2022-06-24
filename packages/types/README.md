@@ -11,4 +11,3 @@ npm install @viv/types
 ## License
 
 MIT
-

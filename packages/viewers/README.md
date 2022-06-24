@@ -11,4 +11,3 @@ npm install @viv/viewers
 ## License
 
 MIT
-

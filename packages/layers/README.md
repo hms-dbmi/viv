@@ -11,4 +11,3 @@ npm install @viv/layers
 ## License
 
 MIT
-

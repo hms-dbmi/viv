@@ -11,4 +11,3 @@ npm install @viv/loaders
 ## License
 
 MIT
-
