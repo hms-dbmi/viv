@@ -62,8 +62,8 @@ jobs:
       - name: Install dependencies needed for testing with tape
         run: sudo apt-get install xvfb # needed for tape-run
 
-      - name: Format
-        run: pnpm format
+      - name: Check formatting
+        run: pnpm check-format
 
       - name: Lint
         run: pnpm lint
