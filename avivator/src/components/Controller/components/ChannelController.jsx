@@ -1,12 +1,10 @@
-import React, { useCallback, useReducer } from 'react';
+import React from 'react';
 
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import Select from '@material-ui/core/Select';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import IconButton from '@material-ui/core/IconButton';
 import shallow from 'zustand/shallow';
 
 import ChannelOptions from './ChannelOptions';
@@ -17,7 +15,7 @@ import {
   useViewerStore
 } from '../../../state';
 import { truncateDecimalNumber } from '../../../utils';
-import { DTYPE_VALUES } from '@hms-dbmi/viv';
+
 export const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
 
 const toRgb = (on, arr) => {
@@ -63,34 +61,16 @@ function ChannelController({
     shallow
   );
   const rgbColor = toRgb(colormap, color);
-  const domainReducer = useCallback(
-    (state, action) => {
-      switch (action) {
-        case 'max/min':
-          return domain;
-        case 'full':
-          const { dtype } = loader[0];
-          const { max } = DTYPE_VALUES[dtype];
-          // Min is 0 for unsigned, or the negative of the max for signed dtypes.
-          const min =
-            dtype.startsWith('Int') || dtype.startsWith('Float') ? -max : 0;
-          return [min, max];
-        default:
-          throw new Error();
-      }
-    },
-    [loader, domain]
-  );
-  const [[left, right], setDomain] = useReducer(domainReducer, domain);
-  // If the min/right range is and the dtype is float, make the step size smaller so contrastLimits are smoother.
+  const [min, max] = domain;
+  // If the min/max range is and the dtype is float, make the step size smaller so contrastLimits are smoother.
   const { dtype } = loader[0];
   const isFloat = dtype === 'Float32' || dtype === 'Float64';
-  const step = right - left < 500 && isFloat ? (right - left) / 500 : 1;
+  const step = max - min < 500 && isFloat ? (max - min) / 500 : 1;
   const shouldShowPixelValue = !useLinkedView && !use3d;
   return (
     <Grid container direction="column" m={2} justify="center">
       <Grid container direction="row" justify="space-between">
-        <Grid item xs={10}>
+        <Grid item xs={11}>
           <Select native value={name} onChange={onSelectionChange}>
             {channelOptions.map(opt => (
               <option disabled={isLoading} key={opt} value={opt}>
@@ -99,23 +79,12 @@ function ChannelController({
             ))}
           </Select>
         </Grid>
-        <Grid item xs={1}>
+        <Grid item>
           <ChannelOptions
+            handleRemoveChannel={handleRemoveChannel}
             handleColorSelect={handleColorSelect}
             disabled={isLoading}
-            setFull={() => setDomain('full')}
-            setMaxMin={() => setDomain('max/min')}
           />
-        </Grid>
-        <Grid item xs={1}>
-          <IconButton
-            aria-label="remove-channel"
-            component="span"
-            size="small"
-            onClick={handleRemoveChannel}
-          >
-            <HighlightOffIcon fontSize="small" />
-          </IconButton>
         </Grid>
       </Grid>
       <Grid container direction="row" justify="flex-start" alignItems="center">
@@ -143,8 +112,8 @@ function ChannelController({
             valueLabelDisplay="auto"
             getAriaLabel={() => `${name}-${color}-${slider}`}
             valueLabelFormat={v => truncateDecimalNumber(v, 5)}
-            min={left}
-            max={right}
+            min={min}
+            max={max}
             step={step}
             orientation="horizontal"
             style={{
