@@ -42,7 +42,7 @@ jobs:
         run: pnpm --filter=avivator build
 
   test-linux:
-    runs-on: ubuntu-latest
+    runs-on: macos-11
 
     steps:
       - uses: actions/checkout@v3
@@ -59,9 +59,6 @@ jobs:
           version: 7
           run_install: true
 
-      - name: Install dependencies needed for testing with tape
-        run: sudo apt-get install xvfb # needed for tape-run
-
       - name: Check formatting
         run: pnpm check-format
 
@@ -69,7 +66,7 @@ jobs:
         run: pnpm lint
 
       - name: Test
-        run: xvfb-run --auto-servernum pnpm test
+        run: pnpm test
 
       - name: Build avivator
         run: pnpm --filter=avivator build
