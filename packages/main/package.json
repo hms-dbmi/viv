@@ -14,12 +14,12 @@
     "main": "dist/index.mjs",
     "types": "dist/index.d.ts"
   },
+  "scripts": {
+    "prepack": "mkdir -p dist && cp src/index.js dist/index.mjs && cp src/index.js dist/index.d.ts"
+  },
   "files": [
     "dist"
   ],
-  "scripts": {
-    "prepack": "unbuild"
-  },
   "dependencies": {
     "@vivjs/constants": "workspace:*",
     "@vivjs/extensions": "workspace:*",
@@ -28,12 +28,5 @@
     "@vivjs/types": "workspace:*",
     "@vivjs/viewers": "workspace:*",
     "@vivjs/views": "workspace:*"
-  },
-  "unbuild": {
-    "entries": [
-      "src/index"
-    ],
-    "declaration": true
-  },
-  "sideEffects": false
+  }
 }

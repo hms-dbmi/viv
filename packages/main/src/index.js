@@ -1,3 +1,5 @@
+// Top-level module for viv.
+// This file should _only_ export from other @vivjs packages.
 export {
   MultiscaleImageLayer,
   ImageLayer,
