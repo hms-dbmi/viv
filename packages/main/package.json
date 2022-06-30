@@ -34,5 +34,6 @@
       "src/index"
     ],
     "declaration": true
-  }
+  },
+  "sideEffects": false
 }

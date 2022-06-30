@@ -12,5 +12,6 @@
   },
   "devDependencies": {
     "documentation": "^13.2.5"
-  }
+  },
+  "sideEffects": false
 }
