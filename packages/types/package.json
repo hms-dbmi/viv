@@ -14,6 +14,5 @@
   "dependencies": {
     "@vivjs/constants": "workspace:*",
     "math.gl": "^3.5.7"
-  },
-  "sideEffects": false
+  }
 }

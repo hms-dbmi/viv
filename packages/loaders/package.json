@@ -13,7 +13,8 @@
   "types": "src/index.ts",
   "publishConfig": {
     "main": "dist/index.mjs",
-    "types": "dist/index.d.ts"
+    "types": "dist/index.d.ts",
+    "sideEffects": false
   },
   "files": [
     "dist"
@@ -36,6 +37,5 @@
       "src/index"
     ],
     "declaration": true
-  },
-  "sideEffects": false
+  }
 }

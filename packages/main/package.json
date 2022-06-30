@@ -12,7 +12,8 @@
   "main": "src/index.js",
   "publishConfig": {
     "main": "dist/index.mjs",
-    "types": "dist/index.d.ts"
+    "types": "dist/index.d.ts",
+    "sideEffects": false
   },
   "scripts": {
     "prepack": "mkdir -p dist && cp src/index.js dist/index.mjs && cp src/index.js dist/index.d.ts"
