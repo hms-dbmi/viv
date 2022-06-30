@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 // temporary - @vivjs/* should follow same version of `@hms-dbmi/viv` after we have successfully tested a release.
-const VIV_VERSION = '0.12.9';
+const VIV_VERSION = '0.12.10-alpha.0';
 
 const DECK_VERSION = '8.6.7';
 const LUMAGL_VERSION = '8.5.13';
