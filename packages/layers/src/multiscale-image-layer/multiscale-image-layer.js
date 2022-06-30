@@ -4,8 +4,8 @@ import GL from '@luma.gl/constants';
 
 import MultiscaleImageLayerBase from './multiscale-image-layer-base';
 import ImageLayer from '../image-layer';
-import { getImageSize, isInterleaved, SIGNAL_ABORTED } from '@viv/loaders';
-import { ColorPaletteExtension } from '@viv/extensions';
+import { getImageSize, isInterleaved, SIGNAL_ABORTED } from '@vivjs/loaders';
+import { ColorPaletteExtension } from '@vivjs/extensions';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -46,7 +46,7 @@ const defaultProps = {
  */
 
 /**
- * @type {{ new <S extends string[]>(...props: import('@viv/types').Viv<LayerProps, S>[]) }}
+ * @type {{ new <S extends string[]>(...props: import('@vivjs/types').Viv<LayerProps, S>[]) }}
  * @ignore
  */
 const MultiscaleImageLayer = class extends CompositeLayer {

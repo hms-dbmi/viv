@@ -1,6 +1,6 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { PolygonLayer } from '@deck.gl/layers';
-import { getImageSize } from '@viv/loaders';
+import { getImageSize } from '@vivjs/loaders';
 import { Matrix4 } from '@math.gl/core';
 
 import ImageLayer from './image-layer';
@@ -54,7 +54,7 @@ const defaultProps = {
  */
 
 /**
- * @type {{ new <S extends string[]>(...props: import('@viv/types').Viv<LayerProps, S>[]) }}
+ * @type {{ new <S extends string[]>(...props: import('@vivjs/types').Viv<LayerProps, S>[]) }}
  * @ignore
  */
 const OverviewLayer = class extends CompositeLayer {

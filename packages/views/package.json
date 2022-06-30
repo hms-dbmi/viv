@@ -1,5 +1,5 @@
 {
-  "name": "@viv/views",
+  "name": "@vivjs/views",
   "version": "0.0.0",
   "author": "Ilan Gold",
   "repository": {
@@ -27,8 +27,8 @@
   },
   "dependencies": {
     "@math.gl/core": "^3.5.7",
-    "@viv/layers": "workspace:*",
-    "@viv/loaders": "workspace:*",
+    "@vivjs/layers": "workspace:*",
+    "@vivjs/loaders": "workspace:*",
     "math.gl": "^3.5.7"
   },
   "unbuild": {

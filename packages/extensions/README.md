@@ -1,11 +1,11 @@
-# @viv/extensions
+# @vivjs/extensions
 
-> A collection of Deck.gl [`LayerExtension`](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions#layerextension-interface) modules for `@viv/layers`
+> A collection of Deck.gl [`LayerExtension`](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions#layerextension-interface) modules for `@vivjs/layers`
 
 ## Installation
 
 ```sh
-npm install @viv/extensions
+npm install @vivjs/extensions
 ```
 
 ## License

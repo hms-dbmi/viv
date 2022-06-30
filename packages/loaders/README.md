@@ -1,11 +1,11 @@
-# @viv/loaders
+# @vivjs/loaders
 
 > Utilities for loading multiscale imaging datasets in Viv
 
 ## Installation
 
 ```sh
-npm install @viv/loaders
+npm install @vivjs/loaders
 ```
 
 ## License

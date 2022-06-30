@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { VolumeView, getDefaultInitialViewState } from '@viv/views';
-import { ColorPalette3DExtensions } from '@viv/extensions';
+import { VolumeView, getDefaultInitialViewState } from '@vivjs/views';
+import { ColorPalette3DExtensions } from '@vivjs/extensions';
 
 import VivViewer from './VivViewer';
 

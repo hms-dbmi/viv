@@ -1,5 +1,5 @@
 {
-  "name": "@viv/types",
+  "name": "@vivjs/types",
   "version": "0.0.0",
   "author": "Ilan Gold",
   "repository": {
@@ -12,7 +12,7 @@
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "dependencies": {
-    "@viv/constants": "workspace:*",
+    "@vivjs/constants": "workspace:*",
     "math.gl": "^3.5.7"
   },
   "sideEffects": false

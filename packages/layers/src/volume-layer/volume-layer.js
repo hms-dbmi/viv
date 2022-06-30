@@ -1,7 +1,7 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import GL from '@luma.gl/constants';
 import { isWebGL2 } from '@luma.gl/core';
-import { ColorPalette3DExtensions } from '@viv/extensions';
+import { ColorPalette3DExtensions } from '@vivjs/extensions';
 import { Matrix4 } from '@math.gl/core';
 
 import XR3DLayer from '../xr-3d-layer/xr-3d-layer';
@@ -64,7 +64,7 @@ const defaultProps = {
  */
 
 /**
- * @type {{ new <S extends string[]>(...props: import('@viv/types').Viv<LayerProps, S>[]) }}
+ * @type {{ new <S extends string[]>(...props: import('@vivjs/types').Viv<LayerProps, S>[]) }}
  * @ignore
  */
 const VolumeLayer = class extends CompositeLayer {

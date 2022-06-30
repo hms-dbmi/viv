@@ -1,5 +1,5 @@
 import { OrbitView } from '@deck.gl/core';
-import { VolumeLayer } from '@viv/layers';
+import { VolumeLayer } from '@vivjs/layers';
 import { getVivId } from './utils';
 import VivView from './VivView';
 

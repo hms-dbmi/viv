@@ -1,5 +1,5 @@
 import GL from '@luma.gl/constants';
-import { getImageSize, isInterleaved } from '@viv/loaders';
+import { getImageSize, isInterleaved } from '@vivjs/loaders';
 
 import XRLayer from '../xr-layer/xr-layer';
 import BitmapLayer from '../bitmap-layer';

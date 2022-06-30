@@ -1,5 +1,5 @@
 {
-  "name": "@viv/extensions",
+  "name": "@vivjs/extensions",
   "version": "0.0.0",
   "author": "Ilan Gold",
   "repository": {
@@ -25,10 +25,10 @@
     "@deck.gl/core": "8.6.7"
   },
   "dependencies": {
-    "@viv/constants": "workspace:*"
+    "@vivjs/constants": "workspace:*"
   },
   "devDependencies": {
-    "@viv/types": "workspace:*",
+    "@vivjs/types": "workspace:*",
     "glsl-colormap": "^1.0.1"
   },
   "unbuild": {

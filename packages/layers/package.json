@@ -1,5 +1,5 @@
 {
-  "name": "@viv/layers",
+  "name": "@vivjs/layers",
   "version": "0.0.0",
   "author": "Ilan Gold",
   "repository": {
@@ -33,10 +33,10 @@
   "dependencies": {
     "@math.gl/core": "^3.5.7",
     "@math.gl/culling": "^3.5.7",
-    "@viv/constants": "workspace:*",
-    "@viv/extensions": "workspace:*",
-    "@viv/loaders": "workspace:*",
-    "@viv/types": "workspace:*"
+    "@vivjs/constants": "workspace:*",
+    "@vivjs/extensions": "workspace:*",
+    "@vivjs/loaders": "workspace:*",
+    "@vivjs/types": "workspace:*"
   },
   "unbuild": {
     "entries": [

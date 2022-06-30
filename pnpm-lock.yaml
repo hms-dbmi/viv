@@ -75,41 +75,41 @@ importers:
 
   packages/extensions:
     specifiers:
-      '@viv/constants': workspace:*
-      '@viv/types': workspace:*
+      '@vivjs/constants': workspace:*
+      '@vivjs/types': workspace:*
       glsl-colormap: ^1.0.1
     dependencies:
-      '@viv/constants': link:../constants
+      '@vivjs/constants': link:../constants
     devDependencies:
-      '@viv/types': link:../types
+      '@vivjs/types': link:../types
       glsl-colormap: 1.0.1
 
   packages/layers:
     specifiers:
       '@math.gl/core': ^3.5.7
       '@math.gl/culling': ^3.5.7
-      '@viv/constants': workspace:*
-      '@viv/extensions': workspace:*
-      '@viv/loaders': workspace:*
-      '@viv/types': workspace:*
+      '@vivjs/constants': workspace:*
+      '@vivjs/extensions': workspace:*
+      '@vivjs/loaders': workspace:*
+      '@vivjs/types': workspace:*
     dependencies:
       '@math.gl/core': 3.5.7
       '@math.gl/culling': 3.5.7
-      '@viv/constants': link:../constants
-      '@viv/extensions': link:../extensions
-      '@viv/loaders': link:../loaders
-      '@viv/types': link:../types
+      '@vivjs/constants': link:../constants
+      '@vivjs/extensions': link:../extensions
+      '@vivjs/loaders': link:../loaders
+      '@vivjs/types': link:../types
 
   packages/loaders:
     specifiers:
-      '@viv/types': workspace:*
+      '@vivjs/types': workspace:*
       fast-xml-parser: ^3.16.0
       geotiff: ^2.0.5
       lzw-tiff-decoder: ^0.1.1
       quickselect: ^2.0.0
       zarr: ^0.5.1
     dependencies:
-      '@viv/types': link:../types
+      '@vivjs/types': link:../types
       fast-xml-parser: 3.21.1
       geotiff: 2.0.5
       lzw-tiff-decoder: 0.1.1
@@ -118,52 +118,52 @@ importers:
 
   packages/main:
     specifiers:
-      '@viv/constants': workspace:*
-      '@viv/extensions': workspace:*
-      '@viv/layers': workspace:*
-      '@viv/loaders': workspace:*
-      '@viv/types': workspace:*
-      '@viv/viewers': workspace:*
-      '@viv/views': workspace:*
+      '@vivjs/constants': workspace:*
+      '@vivjs/extensions': workspace:*
+      '@vivjs/layers': workspace:*
+      '@vivjs/loaders': workspace:*
+      '@vivjs/types': workspace:*
+      '@vivjs/viewers': workspace:*
+      '@vivjs/views': workspace:*
     dependencies:
-      '@viv/constants': link:../constants
-      '@viv/extensions': link:../extensions
-      '@viv/layers': link:../layers
-      '@viv/loaders': link:../loaders
-      '@viv/types': link:../types
-      '@viv/viewers': link:../viewers
-      '@viv/views': link:../views
+      '@vivjs/constants': link:../constants
+      '@vivjs/extensions': link:../extensions
+      '@vivjs/layers': link:../layers
+      '@vivjs/loaders': link:../loaders
+      '@vivjs/types': link:../types
+      '@vivjs/viewers': link:../viewers
+      '@vivjs/views': link:../views
 
   packages/types:
     specifiers:
-      '@viv/constants': workspace:*
+      '@vivjs/constants': workspace:*
       math.gl: ^3.5.7
     dependencies:
-      '@viv/constants': link:../constants
+      '@vivjs/constants': link:../constants
       math.gl: 3.5.7
 
   packages/viewers:
     specifiers:
-      '@viv/constants': workspace:*
-      '@viv/extensions': workspace:*
-      '@viv/views': workspace:*
+      '@vivjs/constants': workspace:*
+      '@vivjs/extensions': workspace:*
+      '@vivjs/views': workspace:*
       fast-deep-equal: ^3.1.3
     dependencies:
-      '@viv/constants': link:../constants
-      '@viv/extensions': link:../extensions
-      '@viv/views': link:../views
+      '@vivjs/constants': link:../constants
+      '@vivjs/extensions': link:../extensions
+      '@vivjs/views': link:../views
       fast-deep-equal: 3.1.3
 
   packages/views:
     specifiers:
       '@math.gl/core': ^3.5.7
-      '@viv/layers': workspace:*
-      '@viv/loaders': workspace:*
+      '@vivjs/layers': workspace:*
+      '@vivjs/loaders': workspace:*
       math.gl: ^3.5.7
     dependencies:
       '@math.gl/core': 3.5.7
-      '@viv/layers': link:../layers
-      '@viv/loaders': link:../loaders
+      '@vivjs/layers': link:../layers
+      '@vivjs/loaders': link:../loaders
       math.gl: 3.5.7
 
   sites/avivator:
@@ -203,18 +203,18 @@ importers:
 
   sites/docs:
     specifiers:
-      '@viv/extensions': workspace:*
-      '@viv/layers': workspace:*
-      '@viv/loaders': workspace:*
-      '@viv/viewers': workspace:*
-      '@viv/views': workspace:*
+      '@vivjs/extensions': workspace:*
+      '@vivjs/layers': workspace:*
+      '@vivjs/loaders': workspace:*
+      '@vivjs/viewers': workspace:*
+      '@vivjs/views': workspace:*
       documentation: ^13.2.5
     dependencies:
-      '@viv/extensions': link:../../packages/extensions
-      '@viv/layers': link:../../packages/layers
-      '@viv/loaders': link:../../packages/loaders
-      '@viv/viewers': link:../../packages/viewers
-      '@viv/views': link:../../packages/views
+      '@vivjs/extensions': link:../../packages/extensions
+      '@vivjs/layers': link:../../packages/layers
+      '@vivjs/loaders': link:../../packages/loaders
+      '@vivjs/viewers': link:../../packages/viewers
+      '@vivjs/views': link:../../packages/views
     devDependencies:
       documentation: 13.2.5
 

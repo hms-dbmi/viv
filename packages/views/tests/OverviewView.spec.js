@@ -5,7 +5,7 @@ import {
   defaultArguments,
   defaultViewState
 } from './VivView.spec';
-import { OverviewLayer } from '@viv/layers';
+import { OverviewLayer } from '@vivjs/layers';
 
 const id = OVERVIEW_VIEW_ID;
 const loader = [

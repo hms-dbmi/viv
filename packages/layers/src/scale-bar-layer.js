@@ -2,7 +2,7 @@ import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { LineLayer, TextLayer } from '@deck.gl/layers';
 import { range, makeBoundingBox } from './utils';
 
-import { DEFAULT_FONT_FAMILY } from '@viv/constants';
+import { DEFAULT_FONT_FAMILY } from '@vivjs/constants';
 
 function getPosition(boundingBox, position, length) {
   const viewLength = boundingBox[2][0] - boundingBox[0][0];

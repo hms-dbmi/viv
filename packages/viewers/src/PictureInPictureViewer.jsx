@@ -5,8 +5,8 @@ import {
   getDefaultInitialViewState,
   DETAIL_VIEW_ID,
   OVERVIEW_VIEW_ID
-} from '@viv/views';
-import { ColorPaletteExtension } from '@viv/extensions';
+} from '@vivjs/views';
+import { ColorPaletteExtension } from '@vivjs/extensions';
 import VivViewer from './VivViewer';
 
 /**

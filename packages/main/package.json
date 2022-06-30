@@ -21,13 +21,13 @@
     "prepack": "unbuild"
   },
   "dependencies": {
-    "@viv/constants": "workspace:*",
-    "@viv/extensions": "workspace:*",
-    "@viv/layers": "workspace:*",
-    "@viv/loaders": "workspace:*",
-    "@viv/types": "workspace:*",
-    "@viv/viewers": "workspace:*",
-    "@viv/views": "workspace:*"
+    "@vivjs/constants": "workspace:*",
+    "@vivjs/extensions": "workspace:*",
+    "@vivjs/layers": "workspace:*",
+    "@vivjs/loaders": "workspace:*",
+    "@vivjs/types": "workspace:*",
+    "@vivjs/viewers": "workspace:*",
+    "@vivjs/views": "workspace:*"
   },
   "unbuild": {
     "entries": [

@@ -3,8 +3,8 @@ import GL from '@luma.gl/constants';
 
 import XRLayer from './xr-layer/xr-layer';
 import BitmapLayer from './bitmap-layer';
-import { isInterleaved, SIGNAL_ABORTED } from '@viv/loaders';
-import { ColorPaletteExtension } from '@viv/extensions';
+import { isInterleaved, SIGNAL_ABORTED } from '@vivjs/loaders';
+import { ColorPaletteExtension } from '@vivjs/extensions';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -55,7 +55,7 @@ const defaultProps = {
  */
 
 /**
- * @type {{ new <S extends string[]>(...props: import('@viv/types').Viv<LayerProps, S>[]) }}
+ * @type {{ new <S extends string[]>(...props: import('@vivjs/types').Viv<LayerProps, S>[]) }}
  * @ignore
  */
 const ImageLayer = class extends CompositeLayer {

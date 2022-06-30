@@ -1,5 +1,5 @@
 import type { ZarrArray } from 'zarr';
-import type { Labels } from '@viv/types';
+import type { Labels } from '@vivjs/types';
 import { loadMultiscales, guessTileSize } from './lib/utils';
 import ZarrPixelSource from './pixel-source';
 

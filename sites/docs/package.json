@@ -1,14 +1,14 @@
 {
   "version": "0.0.0",
   "scripts": {
-    "build": "documentation build -o dist -f html --document-exported --parse-extension ts --config documentation.yml ./node_modules/@viv/*/src/**/*.{js,ts}"
+    "build": "documentation build -o dist -f html --document-exported --parse-extension ts --config documentation.yml ./node_modules/@vivjs/*/src/**/*.{js,ts}"
   },
   "dependencies": {
-    "@viv/extensions": "workspace:*",
-    "@viv/layers": "workspace:*",
-    "@viv/loaders": "workspace:*",
-    "@viv/viewers": "workspace:*",
-    "@viv/views": "workspace:*"
+    "@vivjs/extensions": "workspace:*",
+    "@vivjs/layers": "workspace:*",
+    "@vivjs/loaders": "workspace:*",
+    "@vivjs/viewers": "workspace:*",
+    "@vivjs/views": "workspace:*"
   },
   "devDependencies": {
     "documentation": "^13.2.5"

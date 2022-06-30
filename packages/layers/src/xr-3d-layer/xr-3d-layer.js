@@ -36,7 +36,7 @@ import vs from './xr-3d-layer-vertex.glsl';
 import fs from './xr-3d-layer-fragment.glsl';
 
 import { padContrastLimits, padWithDefault, getDtypeValues } from '../utils';
-import { ColorPalette3DExtensions } from '@viv/extensions';
+import { ColorPalette3DExtensions } from '@vivjs/extensions';
 
 const channelsModule = {
   name: 'channel-intensity-module',
@@ -125,7 +125,7 @@ function getRenderingFromExtensions(extensions) {
  */
 
 /**
- * @type {{ new <S extends string[]>(...props: import('@viv/types').Viv<LayerProps>[]) }}
+ * @type {{ new <S extends string[]>(...props: import('@vivjs/types').Viv<LayerProps>[]) }}
  * @ignore
  */
 const XR3DLayer = class extends Layer {

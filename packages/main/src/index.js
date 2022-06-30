@@ -7,14 +7,14 @@ export {
   OverviewLayer,
   VolumeLayer,
   BitmapLayer
-} from '@viv/layers';
+} from '@vivjs/layers';
 
 export {
   VivViewer,
   PictureInPictureViewer,
   SideBySideViewer,
   VolumeViewer
-} from '@viv/viewers';
+} from '@vivjs/viewers';
 
 export {
   VivView,
@@ -25,15 +25,15 @@ export {
   getDefaultInitialViewState,
   DETAIL_VIEW_ID,
   OVERVIEW_VIEW_ID
-} from '@viv/views';
+} from '@vivjs/views';
 
 export {
   DTYPE_VALUES,
   MAX_CHANNELS,
   COLORMAPS,
   RENDERING_MODES
-} from '@viv/constants';
+} from '@vivjs/constants';
 
-export * from '@viv/extensions';
+export * from '@vivjs/extensions';
 
-export * from '@viv/loaders';
+export * from '@vivjs/loaders';

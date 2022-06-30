@@ -1,5 +1,5 @@
 {
-  "name": "@viv/loaders",
+  "name": "@vivjs/loaders",
   "version": "0.0.0",
   "author": "Ilan Gold",
   "repository": {
@@ -24,7 +24,7 @@
     "test": "pnpm check && esno tests/index.spec.js | tap-spec"
   },
   "dependencies": {
-    "@viv/types": "workspace:*",
+    "@vivjs/types": "workspace:*",
     "fast-xml-parser": "^3.16.0",
     "geotiff": "^2.0.5",
     "lzw-tiff-decoder": "^0.1.1",

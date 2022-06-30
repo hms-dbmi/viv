@@ -1,11 +1,11 @@
-# @viv/layers
+# @vivjs/layers
 
 > A collection of custom Deck.gl layers for bioimaging datasets
 
 ## Installation
 
 ```sh
-npm install @viv/layers
+npm install @vivjs/layers
 ```
 
 ## License

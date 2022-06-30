@@ -2,9 +2,9 @@ import {
   DEFAULT_COLOR_OFF,
   MAX_CHANNELS,
   MAX_COLOR_INTENSITY
-} from '@viv/constants';
+} from '@vivjs/constants';
 
-/** @typedef {import('@viv/types').Color} Color */
+/** @typedef {import('@vivjs/types').Color} Color */
 
 /**
  * @template T
@@ -12,7 +12,7 @@ import {
  * @param {T} defaultValue
  * @param {number} padWidth
  *
- * @TODO copied from `@viv/layers` to avoid circular deps
+ * @TODO copied from `@vivjs/layers` to avoid circular deps
  */
 export function padWithDefault(arr, defaultValue, padWidth) {
   for (let i = 0; i < padWidth; i += 1) {

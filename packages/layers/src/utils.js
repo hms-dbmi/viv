@@ -1,6 +1,6 @@
 import { OrthographicView } from '@deck.gl/core';
 import { Matrix4 } from '@math.gl/core';
-import { MAX_CHANNELS, DTYPE_VALUES } from '@viv/constants';
+import { MAX_CHANNELS, DTYPE_VALUES } from '@vivjs/constants';
 
 export function range(len) {
   return [...Array(len).keys()];
