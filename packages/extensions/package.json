@@ -10,11 +10,17 @@
   "homepage": "https://github.com/hms-dbmi/viv#readme",
   "type": "module",
   "main": "src/index.js",
-  "files": [
-    "src"
-  ],
+  "publishConfig": {
+    "main": "dist/index.mjs",
+    "types": "dist/index.d.ts"
+  },
+  "files": ["dist"],
   "scripts": {
+    "prepack": "unbuild",
     "prepare": "node prepare.mjs"
+  },
+  "peerDependencies": {
+    "@deck.gl/core": "8.6.7"
   },
   "dependencies": {
     "@viv/constants": "workspace:*"
@@ -22,5 +28,11 @@
   "devDependencies": {
     "@viv/types": "workspace:*",
     "glsl-colormap": "^1.0.1"
+  },
+  "unbuild": {
+    "entries": [
+      "src/index"
+    ],
+    "declaration": true
   }
 }

@@ -9,6 +9,7 @@
   "license": "MIT",
   "homepage": "https://github.com/hms-dbmi/viv#readme",
   "type": "module",
+  "main": "src/index.js",
   "types": "src/index.d.ts",
   "dependencies": {
     "@viv/constants": "workspace:*",

@@ -9,12 +9,12 @@
   "license": "MIT",
   "homepage": "https://github.com/hms-dbmi/viv#readme",
   "type": "module",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "main": "src/index.js",
   "publishConfig": {
     "main": "dist/index.mjs",
     "types": "dist/index.d.ts"
   },
+  "files": ["dist"],
   "scripts": {
     "prepack": "unbuild"
   },
@@ -26,5 +26,11 @@
     "@viv/types": "workspace:*",
     "@viv/viewers": "workspace:*",
     "@viv/views": "workspace:*"
+  },
+  "unbuild": {
+    "entries": [
+      "src/index"
+    ],
+    "declaration": true
   }
 }

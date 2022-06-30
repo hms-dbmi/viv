@@ -15,14 +15,14 @@
     "main": "dist/index.mjs",
     "types": "dist/index.d.ts"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "check": "tsc --noEmit",
     "prepack": "unbuild",
     "test": "pnpm check && esno tests/index.spec.js | tap-spec"
   },
-  "files": [
-    "dist"
-  ],
   "dependencies": {
     "@viv/types": "workspace:*",
     "fast-xml-parser": "^3.16.0",
