@@ -1,6 +1,6 @@
 {
   "name": "@viv/views",
-  "version": "0.12.8",
+  "version": "0.0.0",
   "author": "Ilan Gold",
   "repository": {
     "type": "git",
@@ -14,7 +14,9 @@
     "main": "dist/index.mjs",
     "types": "dist/index.d.ts"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "prepack": "unbuild",
     "test": "esno tests/index.spec.js | tap-spec"

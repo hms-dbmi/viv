@@ -27,12 +27,13 @@ function pinVersions(deps = {}) {
 export default (workspaceDir) => {
   let root = path.resolve(workspaceDir, 'package.json');
   let meta = JSON.parse(fs.readFileSync(root, { encoding: 'utf-8' }));
+  let testVersion = '0.0.0';
   return {
     'package.json': (manifest, dir) => {
       pinVersions(manifest.dependencies);
       pinVersions(manifest.devDependencies);
       pinVersions(manifest.peerDependencies);
-      return { ...manifest, version: meta.version };
+      return { ...manifest, version: meta.name === '@hms-dbmi/viv' ? meta.version : testVersion };
     },
   }
 }
