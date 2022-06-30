@@ -1,6 +1,6 @@
 {
   "name": "@vivjs/monorepo",
-  "version": "0.0.0",
+  "version": "0.0.1-alpha.0",
   "author": "Ilan Gold",
   "license": "MIT",
   "repository": {
@@ -37,6 +37,7 @@
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
     "@esbuild-plugins/node-modules-polyfill": "^0.1.4",
     "@luma.gl/test-utils": "8.5.13",
+    "@pnpm/types": "^8.4.0",
     "@probe.gl/test-utils": "^3.5.0",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",

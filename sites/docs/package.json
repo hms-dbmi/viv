@@ -1,5 +1,5 @@
 {
-  "version": "0.0.0",
+  "version": "0.0.1-alpha.0",
   "scripts": {
     "build": "documentation build -o dist -f html --document-exported --parse-extension ts --config documentation.yml ./node_modules/@vivjs/*/src/**/*.{js,ts}"
   },
