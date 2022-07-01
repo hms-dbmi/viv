@@ -93,10 +93,14 @@ pnpm -r build --filter=avivator # just build avivator website
 
 ## 📄 Publish
 
-First checkout a new branch like `release/version`. Update the `CHANGELOG.md` and bump
-the version via `npm verion [major | minor | patch]`. Commit locally and push a tag to Github. 
-Next, run `./publish.sh` to release the package on npm and publish Avivator.
-Finally, make a PR for `release/version` and squash + merge into `master`.
+Checkout latest `master` branch, run:
+
+```sh
+pnpm version [major | minor | patch]
+git push --follow-tags
+```
+
+Our CI will run a release workflow for tagged commits on `master`. Inspect the GitHub actions to ensure the workflow was successful.
 
 ## 🌎 Browser Support
 
