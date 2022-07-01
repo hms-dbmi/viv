@@ -1,17 +1,18 @@
 {
   "version": "0.0.1-alpha.0",
   "scripts": {
-    "build": "documentation build -o dist -f html --document-exported --parse-extension ts --config documentation.yml ./node_modules/@vivjs/*/src/**/*.{js,ts}"
+    "build": "npm run bundle && npm run build-docs",
+    "build-docs": "documentation build -o dist -f html --document-exported --config documentation.yml dist/index.js",
+    "bundle": "rollup -c"
   },
   "dependencies": {
-    "@vivjs/extensions": "workspace:*",
-    "@vivjs/layers": "workspace:*",
-    "@vivjs/loaders": "workspace:*",
-    "@vivjs/viewers": "workspace:*",
-    "@vivjs/views": "workspace:*"
+    "@hms-dbmi/viv": "workspace:*",
+    "@rollup/plugin-sucrase": "^4.0.4"
   },
   "devDependencies": {
-    "documentation": "^13.2.5"
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "documentation": "^13.2.5",
+    "rollup": "^2.75.7"
   },
   "sideEffects": false
 }
