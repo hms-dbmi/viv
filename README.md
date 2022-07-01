@@ -96,7 +96,9 @@ pnpm -r build --filter=avivator # just build avivator website
 Checkout latest `master` branch, run:
 
 ```sh
-pnpm version [major | minor | patch]
+pnpm version [major | minor | patch] # commit and tag version
+pnpm meta-updater # updates @vivjs/* packages to match root version
+git add . && git commit --amend --no-edit # check in other packages
 git push --follow-tags
 ```
 
