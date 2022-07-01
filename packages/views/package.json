@@ -19,7 +19,7 @@
     "dist"
   ],
   "scripts": {
-    "prepack": "unbuild",
+    "build": "unbuild",
     "test": "esno tests/index.spec.js | tap-spec"
   },
   "peerDependencies": {

@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "check": "tsc --noEmit",
-    "prepack": "unbuild",
+    "build": "unbuild",
     "test": "pnpm check && esno tests/index.spec.js | tap-spec"
   },
   "dependencies": {

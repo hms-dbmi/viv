@@ -76,8 +76,8 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Build avivator
-        run: pnpm --filter=avivator build
+      - name: Build packages and sites
+        run: pnpm build
 
   publish:
     needs: [check-changelog, build-windows, test-linux]
@@ -100,13 +100,13 @@ jobs:
           version: 7
           run_install: true
 
+      - name: Build packages and sites
+        run: pnpm build
+
       - name: Publish to NPM
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: pnpm publish --filter='./packages/*' --dry-run
-
-      - name: Build Avivator & Documentation
-        run: pnpm build
 
       - name: Upload to S3
         env:

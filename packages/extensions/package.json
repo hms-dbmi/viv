@@ -19,7 +19,7 @@
     "dist"
   ],
   "scripts": {
-    "prepack": "unbuild",
+    "build": "npm run prepare && unbuild",
     "prepare": "node prepare.mjs"
   },
   "peerDependencies": {

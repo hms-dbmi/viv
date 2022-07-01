@@ -87,8 +87,8 @@ To develop and test the `@hms-dbmi/viv` package:
 To build viv's documentation and the Avivator website (under `sites/`), run:
 
 ```sh
-pnpm build # build both avivator and docs
-pnpm -r build --filter=avivator # just build avivator website
+pnpm build # all packages, avivator, and documentation
+pnpm -r build --filter=avivator # build a specific package or site
 ```
 
 ## 📄 Publish

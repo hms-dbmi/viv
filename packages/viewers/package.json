@@ -20,7 +20,7 @@
     "dist"
   ],
   "scripts": {
-    "prepack": "unbuild"
+    "build": "unbuild"
   },
   "peerDependencies": {
     "@deck.gl/react": "8.6.7",

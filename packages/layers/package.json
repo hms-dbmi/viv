@@ -19,7 +19,7 @@
     "dist"
   ],
   "scripts": {
-    "prepack": "unbuild",
+    "build": "unbuild",
     "test": "node ../../scripts/bundle-test.mjs tests/index.spec.js | tape-run | tap-spec"
   },
   "peerDependencies": {
