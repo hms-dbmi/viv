@@ -100,7 +100,19 @@ jobs:
           version: 7
           run_install: true
 
-      - name: Build and publish to NPM
+      - name: Publish to NPM
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm publish --filter='./packages/*'
+        run: pnpm publish --filter='./packages/*' --dry-run
+
+      - name: Build Avivator & Documentation
+        run: pnpm build
+
+      - name: Upload to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.VIV_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.VIV_S3_ACCESS_KEY_SECRET }}
+        run: |
+          aws s3 cp --recursive sites/avivator/dist s3://avivator.gehlenborglab.org --dry-run
+          aws s3 cp --recursive sites/docs/dist s3://viv.gehlenborglab.org --dry-run
+
