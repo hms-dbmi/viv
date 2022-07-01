@@ -96,9 +96,15 @@ pnpm -r build --filter=avivator # build a specific package or site
 Checkout latest `master` branch, run:
 
 ```sh
-pnpm version [major | minor | patch] # commit and tag version
-pnpm meta-updater # updates @vivjs/* packages to match root version
-git add . && git commit --amend --no-edit # check in other packages
+# commit and tag a new version
+pnpm version [major | minor | patch]
+# sync @vivjs/* package versions with root
+pnpm meta-updater
+# update CHANGELOG.md for release
+./version.sh 
+# add changes to this versioned commit
+git add . && git commit --amend --no-edit 
+# push to `master` & trigger CI for release
 git push --follow-tags
 ```
 
