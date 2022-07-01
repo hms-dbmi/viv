@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Updated CHANGELOG.md
-        if: ${{ env.GITHUB_REF != 'refs/heads/master' }} && ${{ env.GITHUB_REF != *'dependabot'* }}
+        if: ${{ github.ref != 'refs/heads/main' }} && !contains(github.ref, 'dependabot')
         run: |
           ! diff CHANGELOG.md <(curl -s "https://raw.githubusercontent.com/hms-dbmi/viv/master/CHANGELOG.md")
 
