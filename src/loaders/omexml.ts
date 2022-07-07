@@ -47,7 +47,7 @@ export function fromString(str: string) {
         const sizes = (['X', 'Y', 'Z'] as const)
           .map(name => {
             const size = Pixels[`PhysicalSize${name}` as const];
-            const unit = Pixels[`PhysicalSize${name}Unit` as const];
+            const unit = Pixels[`PhysicalSize${name}Unit` as const] || 'µm'; // Not a required field
             return size && unit ? `${size} ${unit}` : '-';
           })
           .join(' x ');

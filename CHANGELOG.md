@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Use default `PhysicalSize_Unit` of µm in returned OMEXML.
 
 ## 0.12.9
 
