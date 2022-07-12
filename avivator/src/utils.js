@@ -6,7 +6,7 @@ import {
   loadOmeTiff,
   loadBioformatsZarr,
   loadOmeZarr,
-  loadTiffFolder,
+  loadMultiTiff,
   getChannelStats,
   RENDERING_MODES,
   ColorPalette3DExtensions,
@@ -28,18 +28,16 @@ function isOMETIFF(urlOrFile) {
   return name.includes('ome.tiff') || name.includes('ome.tif');
 }
 
-function isTiffFolder(urlOrFile) {
-  if (Array.isArray(urlOrFile)) {
-    for (const file of urlOrFile) {
-      const filename = file.name.toLowerCase();
-      if (!(filename.includes('.tiff') || filename.includes('.tif')))
-        return false;
-    }
-    return true;
+function isMultiTiff(urlOrFile) {
+  const filenames = Array.isArray(urlOrFile)
+    ? urlOrFile.map(f => f.name)
+    : urlOrFile.split(',');
+  for (const filename of filenames) {
+    const lowerCaseName = filename.toLowerCase();
+    if (!(lowerCaseName.includes('.tiff') || lowerCaseName.includes('.tif')))
+      return false;
   }
-  if (typeof urlOrFile === 'string')
-    return urlOrFile.includes('.csv') || urlOrFile.includes('.CSV');
-  return false;
+  return true;
 }
 
 class UnsupportedBrowserError extends Error {
@@ -138,8 +136,8 @@ export async function createLoader(
     }
 
     // Flat Tiff Folder
-    if (isTiffFolder(urlOrFile)) {
-      const source = await loadTiffFolder(urlOrFile, {
+    if (isMultiTiff(urlOrFile)) {
+      const source = await loadMultiTiff(urlOrFile, {
         images: 'all',
         pool: false
       });

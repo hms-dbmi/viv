@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 import { GeoTIFFImage, GeoTIFF } from 'geotiff';
 import type { OmeTiffSelection } from '../ome-tiff';
 import type { OMEXML } from '../../omexml';
@@ -146,4 +147,13 @@ function getOmeIFDIndexer(
       throw new Error(`Invalid OME-XML DimensionOrder, got ${DimensionOrder}.`);
     }
   }
+}
+
+export function getMultiTiffIndexer(
+  tiffImages: GeoTIFFImage[]
+): OmeTiffIndexer {
+  return async (sel: OmeTiffSelection) => {
+    // @ts-ignore
+    return tiffImages[sel.c];
+  };
 }

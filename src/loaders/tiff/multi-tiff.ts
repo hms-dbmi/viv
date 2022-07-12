@@ -1,18 +1,19 @@
 import type { GeoTIFF, GeoTIFFImage } from 'geotiff';
 
-import TiffFolderPixelSource from './pixel-source';
+import TiffPixelSource from './pixel-source';
 import { guessTiffTileSize } from '../utils';
-import { generateMetadata, getTiffMeta } from './lib/utils';
-import type Pool from '../tiff/lib/Pool';
+import { generateMultiTiffMetadata, getMultiTiffMeta } from './lib/utils';
+import type Pool from './lib/Pool';
+import { getMultiTiffIndexer } from './lib/indexers';
 
-export interface TiffFolderChannel {
+export interface MultiTiffChannel {
   name: string;
   tiff: GeoTIFF;
 }
 
 export async function load(
   imageName: string,
-  channels: TiffFolderChannel[],
+  channels: MultiTiffChannel[],
   pool?: Pool
 ) {
   const channelImages: GeoTIFFImage[] = [];
@@ -29,16 +30,21 @@ export async function load(
   const dimensionOrder = 'XYZCT';
   const tileSize = guessTiffTileSize(firstChannel);
   const meta = { photometricInterpretation };
-  const { shape, labels, dtype } = getTiffMeta(dimensionOrder, channelImages);
-  const metadata = generateMetadata(
+  const indexer = getMultiTiffIndexer(channelImages);
+  const { shape, labels, dtype } = getMultiTiffMeta(
+    dimensionOrder,
+    channelImages
+  );
+  const metadata = generateMultiTiffMetadata(
     imageName,
     channelNames,
     channelImages,
     dimensionOrder,
     dtype
   );
-  const source = new TiffFolderPixelSource(
-    channelImages,
+  const source = new TiffPixelSource(
+    // @ts-ignore
+    indexer,
     dtype,
     tileSize,
     shape,

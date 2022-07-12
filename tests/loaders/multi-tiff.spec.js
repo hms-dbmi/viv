@@ -1,7 +1,7 @@
 import test from 'tape';
 import { fromFile } from 'geotiff';
 
-import { load } from '../../src/loaders/tiff-folder/tiff-folder';
+import { load } from '../../src/loaders/tiff/multi-tiff';
 
 async function loadImage() {
   return {
@@ -23,7 +23,7 @@ async function loadImage() {
   };
 }
 
-test('Creates correct TiffFolderPixelSource for TIFF folder.', async t => {
+test('Creates correct TiffPixelSource for MultiTIFF.', async t => {
   t.plan(5);
   try {
     const { imageName, channels } = await loadImage();
@@ -51,7 +51,7 @@ test('Creates correct TiffFolderPixelSource for TIFF folder.', async t => {
   }
 });
 
-test('Get raster data for TIFF folder.', async t => {
+test('Get raster data for MultiTIFF.', async t => {
   t.plan(13);
   try {
     const { imageName, channels } = await loadImage();
@@ -85,7 +85,7 @@ test('Get raster data for TIFF folder.', async t => {
   }
 });
 
-test('Correct TIFF folder metadata.', async t => {
+test('Correct MultiTIFF metadata.', async t => {
   t.plan(10);
   try {
     const { imageName, channels } = await loadImage();
