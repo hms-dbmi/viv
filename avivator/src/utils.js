@@ -131,11 +131,11 @@ export async function createLoader(
       typeof urlOrFile[0].arrayBuffer !== 'function'
     ) {
       throw new UnsupportedBrowserError(
-        'Cannot upload a local Zarr or flat TIFF folder with this browser. Try using Chrome, Firefox, or Microsoft Edge.'
+        'Cannot upload a local Zarr or flat TIFF files with this browser. Try using Chrome, Firefox, or Microsoft Edge.'
       );
     }
 
-    // Flat Tiff Folder
+    // Multiple flat tiffs
     if (isMultiTiff(urlOrFile)) {
       const source = await loadMultiTiff(urlOrFile, {
         images: 'all',

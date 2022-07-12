@@ -44,6 +44,6 @@ of pixel sources decreasing in shape. Viv provides several helper functions to i
 loader via url: `loadOmeTiff`, `loadBioformatsZarr`, `loadOmeZarr`, and `loadMultiTiff`.
 Each function returns a `Promise` for an object of shape `{ data: PixelSouce[], metadata: M }`,
 where `M` is a JavaScript object containing the format-specific metadata for the image.
-For OME-TIFF and Bioformats-Zarr, and TiffFolder the metadata is identical (OME-XML representation),
+For OME-TIFF and Bioformats-Zarr, and MultiTiff the metadata is identical (OME-XML representation),
 for OME-Zarr,the metadata is that for a multiscale group (more information: https://ngff.openmicroscopy.org/latest/).
 This metadata can be useful for creating UI componenets that describe the data source.
