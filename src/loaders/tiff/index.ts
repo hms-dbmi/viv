@@ -99,10 +99,12 @@ const DEFAULT_MULTI_IMAGE_NAME = 'MultiTiff';
  * Loads each tiff as a channel.
  * Expects one of two possible inputs:
  *
- * string - A comma separated list of URLs.
+ * string - A single URL or a comma separated list of URLs where each URL points to a flat TIFF.
+ * In this case the name of the parent path element for the first image will be used as the image name
+ * and the file names will be used as the channel names.
  *
  * (File & { path: string })[] - A list of file objects paired with their paths. In this case
- * the parent folder name of the first image will be used as the image name and the filenames
+ * the parent folder name of the first image will be used as the image name and the file names
  * will be used to as the channel names.
  *
  * @param {string | File[]} source url or files with paths
