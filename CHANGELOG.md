@@ -3,13 +3,27 @@
 ## In Progress
 
 ### Added
-
-- See documentation for a description of the newly added 3D extensions and how they work.
 - Added support for loading multiple single channel TIFFs.
 
 ### Changed
 
+## 0.12.9
+
+### Added
+
+- See documentation for a description of the newly added 3D extensions and how they work.
+
+### Changed
+
 - Refactor 3D rendering to use extensions just like 2D.
+
+## 0.12.9
+
+### Added
+
+- Support passing in additional layers to VivViewer through deckProps
+
+### Changed
 
 ## 0.12.8
 
