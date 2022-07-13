@@ -210,20 +210,6 @@ export function generateMultiTiffMetadata(
   };
 }
 
-// Taken from https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75
-export function csvStringToArray(input: string) {
-  const re = /(,|\r?\n|\r|^)(?:"([^"]*(?:""[^"]*)*)"|([^,\r\n]*))/gi;
-  const result: string[][] = [[]];
-  let matches;
-  while ((matches = re.exec(input))) {
-    if (matches[1].length && matches[1] !== ',') result.push([]);
-    result[result.length - 1].push(
-      matches[2] !== undefined ? matches[2].replace(/""/g, '"') : matches[3]
-    );
-  }
-  return result;
-}
-
 export function parseFilename(path: string) {
   const parsedFilename: { name?: string; extension?: string } = {};
   const filename = path.split('/').pop();
