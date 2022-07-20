@@ -1,49 +1,40 @@
-import type { GeoTIFF, GeoTIFFImage } from 'geotiff';
+import type { GeoTIFFImage } from 'geotiff';
 
 import TiffPixelSource from './pixel-source';
 import { guessTiffTileSize } from '../utils';
-import { generateMultiTiffMetadata, getMultiTiffMeta } from './lib/utils';
+import { getMultiTiffMetadata, getMultiTiffMeta } from './lib/utils';
 import type Pool from './lib/Pool';
 import { getMultiTiffIndexer } from './lib/indexers';
+import type { TiffSelection } from './types';
 
-export interface MultiTiffChannel {
+export interface MultiTiffImage {
   name: string;
-  tiff: GeoTIFF;
+  selection: TiffSelection;
+  tiff: GeoTIFFImage;
 }
 
 export async function load(
   imageName: string,
-  channels: MultiTiffChannel[],
+  images: MultiTiffImage[],
   pool?: Pool
 ) {
-  const channelImages: GeoTIFFImage[] = [];
-  const channelNames: string[] = [];
-  for (const channel of channels) {
-    channelImages.push(await channel.tiff.getImage(0));
-    channelNames.push(channel.name);
-  }
-  const firstChannel = channelImages[0];
+  const firstImage = images[0].tiff;
   const {
     PhotometricInterpretation: photometricInterpretation
-  } = firstChannel.fileDirectory;
+  } = firstImage.fileDirectory;
   // Not sure if we need this or if the order matters for this use case.
   const dimensionOrder = 'XYZCT';
-  const tileSize = guessTiffTileSize(firstChannel);
+  const tileSize = guessTiffTileSize(firstImage);
   const meta = { photometricInterpretation };
-  const indexer = getMultiTiffIndexer(channelImages);
-  const { shape, labels, dtype } = getMultiTiffMeta(
-    dimensionOrder,
-    channelImages
-  );
-  const metadata = generateMultiTiffMetadata(
+  const indexer = getMultiTiffIndexer(images);
+  const { shape, labels, dtype } = getMultiTiffMeta(dimensionOrder, images);
+  const metadata = getMultiTiffMetadata(
     imageName,
-    channelNames,
-    channelImages,
+    images,
     dimensionOrder,
     dtype
   );
   const source = new TiffPixelSource(
-    // @ts-ignore
     indexer,
     dtype,
     tileSize,

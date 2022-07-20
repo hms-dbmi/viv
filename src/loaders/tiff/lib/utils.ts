@@ -1,6 +1,7 @@
 import type { GeoTIFFImage } from 'geotiff';
 import { getDims, getLabels, DTYPE_LOOKUP } from '../../utils';
 import type { OMEXML, UnitsLength, DimensionOrder } from '../../omexml';
+import type { MultiTiffImage } from '../multi-tiff';
 
 export function getOmePixelSourceMeta({ Pixels }: OMEXML[0]) {
   // e.g. 'XYZCT' -> ['t', 'c', 'z', 'y', 'x']
@@ -110,94 +111,98 @@ function guessImageDataType(image: GeoTIFFImage) {
   throw Error('Unsupported data format/bitsPerSample');
 }
 
-export function getMultiTiffMeta(
-  dimensionOrder: DimensionOrder,
-  tiffs: GeoTIFFImage[]
-) {
-  const firstImage = tiffs[0];
-  // Currently only supports flat tiffs, so set timepoints and z layers to 1.
-  const shape = [
-    1,
-    tiffs.length,
-    1,
-    firstImage.getHeight(),
-    firstImage.getWidth()
-  ];
-  // Not sure if the order of this is important for the flat folder use case
-  const labels = getLabels(dimensionOrder);
-  const dtype = guessImageDataType(firstImage);
-  return { shape, labels, dtype };
-}
-
-function generateMultiTiffPixelMedatata(
-  imageNumber: number,
-  dimensionOrder: DimensionOrder,
-  width: number,
-  height: number,
-  z: number,
-  t: number,
-  dType: string,
-  channelNames: string[],
-  images: GeoTIFFImage[]
-) {
-  const channels = [];
-  for (let i = 0; i < channelNames.length; i += 1) {
-    channels.push({
-      ID: `Channel:${imageNumber}:${i}`,
-      Name: channelNames[i],
-      SamplesPerPixel: images[i].getSamplesPerPixel()
-    });
+function getMultiTiffShapeMap(
+  tiffs: MultiTiffImage[]
+): { [key: string]: number } {
+  let [c, z, t] = [0, 0, 0];
+  for (const tiff of tiffs) {
+    c = Math.max(c, tiff.selection.c);
+    z = Math.max(z, tiff.selection.z);
+    t = Math.max(t, tiff.selection.t);
   }
+
+  const firstTiff = tiffs[0].tiff;
   return {
-    BigEndian: !images[0].littleEndian,
-    DimensionOrder: dimensionOrder,
-    ID: `Pixels:${imageNumber}`,
-    SizeC: images.length,
-    SizeT: t,
-    SizeX: width,
-    SizeY: height,
-    SizeZ: z,
-    Type: dType,
-    Channels: channels
+    x: firstTiff.getWidth(),
+    y: firstTiff.getHeight(),
+    z: z + 1,
+    c: c + 1,
+    t: t + 1
   };
 }
 
-export function generateMultiTiffMetadata(
+export function getMultiTiffMeta(
+  dimensionOrder: DimensionOrder,
+  tiffs: MultiTiffImage[]
+) {
+  const firstTiff = tiffs[0].tiff;
+  const shapeMap = getMultiTiffShapeMap(tiffs);
+  const shape = [];
+  for (const dim of dimensionOrder.toLowerCase()) {
+    shape.unshift(shapeMap[dim]);
+  }
+
+  const labels = getLabels(dimensionOrder);
+  const dtype = guessImageDataType(firstTiff);
+  return { shape, labels, dtype };
+}
+
+function getMultiTiffPixelMedatata(
+  imageNumber: number,
+  dimensionOrder: DimensionOrder,
+  shapeMap: { [key: string]: number },
+  dType: string,
+  tiffs: MultiTiffImage[]
+) {
+  const channelMetadata = [];
+  for (let i = 0; i < tiffs.length; i += 1) {
+    channelMetadata.push({
+      ID: `Channel:${imageNumber}:${i}`,
+      Name: tiffs[i].name,
+      SamplesPerPixel: tiffs[i].tiff.getSamplesPerPixel()
+    });
+  }
+  return {
+    BigEndian: !tiffs[0].tiff.littleEndian,
+    DimensionOrder: dimensionOrder,
+    ID: `Pixels:${imageNumber}`,
+    SizeC: shapeMap.c,
+    SizeT: shapeMap.t,
+    SizeX: shapeMap.x,
+    SizeY: shapeMap.y,
+    SizeZ: shapeMap.z,
+    Type: dType,
+    Channels: channelMetadata
+  };
+}
+
+export function getMultiTiffMetadata(
   imageName: string,
-  channelNames: string[],
-  channelImages: GeoTIFFImage[],
+  tiffImages: MultiTiffImage[],
   dimensionOrder: DimensionOrder,
   dType: string
 ) {
-  const firstChannel = channelImages[0];
   const imageNumber = 0;
   const id = `Image:${imageNumber}`;
   const date = '';
   const description = '';
-  const width = firstChannel.getWidth();
-  const height = firstChannel.getHeight();
-  const zSections = 1;
-  const timepoints = 1;
+  const shapeMap = getMultiTiffShapeMap(tiffImages);
 
-  const pixels = generateMultiTiffPixelMedatata(
+  const pixels = getMultiTiffPixelMedatata(
     imageNumber,
     dimensionOrder,
-    width,
-    height,
-    zSections,
-    timepoints,
+    shapeMap,
     dType,
-    channelNames,
-    channelImages
+    tiffImages
   );
 
   const format = () => {
     return {
       'Acquisition Date': date,
-      'Dimensions (XY)': `${width} x ${height}`,
+      'Dimensions (XY)': `${shapeMap.x} x ${shapeMap.y}`,
       PixelsType: dType,
-      'Z-sections/Timepoints': `${zSections} x ${timepoints}`,
-      Channels: channelImages.length
+      'Z-sections/Timepoints': `${shapeMap.z} x ${shapeMap.t}`,
+      Channels: shapeMap.c
     };
   };
   return {

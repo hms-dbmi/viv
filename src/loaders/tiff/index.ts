@@ -7,7 +7,8 @@ import Pool from './lib/Pool';
 import { parseFilename } from './lib/utils';
 
 import { load as loadOme } from './ome-tiff';
-import { load as loadMulti, MultiTiffChannel } from './multi-tiff';
+import { load as loadMulti, MultiTiffImage } from './multi-tiff';
+import type { TiffSelection } from './types';
 
 addDecoder(5, () => LZWDecoder);
 
@@ -21,6 +22,8 @@ interface TiffOptions {
 interface OmeTiffOptions extends TiffOptions {
   images?: 'first' | 'all';
 }
+
+export type MultiTiffOptions = OmeTiffOptions;
 
 type UnwrapPromise<T> = T extends Promise<infer Inner> ? Inner : T;
 type MultiImage = UnwrapPromise<ReturnType<typeof loadOme>>; // get return-type from `load`
@@ -112,55 +115,59 @@ const DEFAULT_MULTI_IMAGE_NAME = 'MultiTiff';
  * @return {Promise<{ data: TiffFolderPixelSource[], metadata: ImageMeta }>} data source and associated metadata.
  */
 export async function loadMultiTiff(
-  source: string | (File & { path: string })[],
-  opts: OmeTiffOptions = {}
+  sources: [TiffSelection, string | (File & { path: string })][],
+  opts: MultiTiffOptions = {}
 ) {
   let imageName: string | undefined;
   const { pool = true } = opts;
-  const channels: MultiTiffChannel[] = [];
+  const tiffImage: MultiTiffImage[] = [];
 
-  if (typeof source === 'string') {
-    // Load from a comma separated list of URLs pointing to flat TIFFs
-
-    const filepaths = source.split(',');
-    if (filepaths[0]) {
-      const splitPath = filepaths[0].split('/');
+  const firstSource = sources[0];
+  if (firstSource) {
+    const [, firstSourceFile] = firstSource;
+    if (typeof firstSourceFile === 'string') {
+      const splitPath = firstSourceFile.split('/');
       // We only want to get the image name from the path if the TIFF is in a folder.
       // If the TIFF url is == 2, then the first part is http and the second part is the filename.
       if (splitPath.length > 2) imageName = splitPath[-2];
+    } else {
+      // Try to get the imageName from the file path path
+      imageName = firstSourceFile.path.split('/')[-2];
     }
+    // If the image name still hasn't been set, set it to a default.
+    if (!imageName) imageName = DEFAULT_MULTI_IMAGE_NAME;
+  }
 
-    for (const filepath of filepaths) {
-      const parsedFilename = parseFilename(filepath);
+  for (const source of sources) {
+    const [selection, file] = source;
+    if (typeof file === 'string') {
+      const parsedFilename = parseFilename(file);
       const extension = parsedFilename.extension?.toLowerCase();
       if (extension === 'tif' || extension === 'tiff') {
-        const channelName = parsedFilename.name;
-        if (channelName) {
-          const tiff = await fromUrl(filepath, { cacheSize: Infinity });
-          channels.push({ name: channelName, tiff });
+        const tiffImageName = parsedFilename.name;
+        if (tiffImageName) {
+          const tiff = await (
+            await fromUrl(file, { cacheSize: Infinity })
+          ).getImage(0);
+          tiffImage.push({ name: tiffImageName, selection, tiff });
         }
       }
-    }
-  } else {
-    // Load from a list of file objects.
-
-    // Try to get the imageName from the path, otherwise set to a default.
-    if (source[0]) imageName = source[0].path.split('/')[-2];
-
-    for (const file of source) {
+    } else {
       const { name } = parseFilename(file.path);
       if (name) {
-        const tiff = await fromBlob(file);
-        channels.push({ name, tiff });
+        const tiff = await (await fromBlob(file)).getImage(0);
+        tiffImage.push({ name, selection, tiff });
       }
     }
   }
-  if (channels.length > 0) {
+
+  if (tiffImage.length > 0) {
     if (!imageName) imageName = DEFAULT_MULTI_IMAGE_NAME;
     const loader = pool
-      ? await loadMulti(imageName, channels, new Pool())
-      : await loadMulti(imageName, channels);
+      ? await loadMulti(imageName, tiffImage, new Pool())
+      : await loadMulti(imageName, tiffImage);
     return loader;
   }
+
   throw new Error('Unable to load image from provided TiffFolder source.');
 }

@@ -1,10 +1,11 @@
 /* eslint-disable no-use-before-define */
 import { GeoTIFFImage, GeoTIFF } from 'geotiff';
-import type { OmeTiffSelection } from '../ome-tiff';
+import type { TiffSelection } from '../types';
 import type { OMEXML } from '../../omexml';
+import type { MultiTiffImage } from '../multi-tiff';
 
 export type OmeTiffIndexer = (
-  sel: OmeTiffSelection,
+  sel: TiffSelection,
   z: number
 ) => Promise<GeoTIFFImage>;
 
@@ -34,7 +35,7 @@ export function getOmeLegacyIndexer(
   const { SizeT, SizeC, SizeZ } = rootMeta[0].Pixels;
   const ifdIndexer = getOmeIFDIndexer(rootMeta, 0);
 
-  return (sel: OmeTiffSelection, pyramidLevel: number) => {
+  return (sel: TiffSelection, pyramidLevel: number) => {
     // Get IFD index at base pyramid level
     const index = ifdIndexer(sel);
     // Get index of first image at pyramidal level
@@ -69,7 +70,7 @@ export function getOmeSubIFDIndexer(
     ReturnType<GeoTIFF['parseFileDirectoryAt']>
   > = new Map();
 
-  return async (sel: OmeTiffSelection, pyramidLevel: number) => {
+  return async (sel: TiffSelection, pyramidLevel: number) => {
     const index = ifdIndexer(sel);
     const baseImage = await tiff.getImage(index);
 
@@ -111,7 +112,7 @@ export function getOmeSubIFDIndexer(
 function getOmeIFDIndexer(
   rootMeta: OMEXML,
   image: number = 0
-): (sel: OmeTiffSelection) => number {
+): (sel: TiffSelection) => number {
   const { SizeC, SizeZ, SizeT, DimensionOrder } = rootMeta[image].Pixels;
   // For multi-image OME-TIFF files, we need to offset by the full dimensions
   // of the previous images dimensions i.e Z * C * T of image - 1 + that of image - 2 etc.
@@ -149,11 +150,17 @@ function getOmeIFDIndexer(
   }
 }
 
-export function getMultiTiffIndexer(
-  tiffImages: GeoTIFFImage[]
-): OmeTiffIndexer {
-  return async (sel: OmeTiffSelection) => {
-    // @ts-ignore
-    return tiffImages[sel.c];
+export function getMultiTiffIndexer(tiffs: MultiTiffImage[]) {
+  function selectionToKey({ c = 0, t = 0, z = 0 }: TiffSelection): string {
+    return `${c}-${t}-${z}`;
+  }
+  const lookup = new Map(
+    tiffs.map(({ selection, tiff }) => [selectionToKey(selection), tiff])
+  );
+  return async (sel: TiffSelection) => {
+    const key = selectionToKey(sel);
+    const img = lookup.get(key);
+    if (!img) throw new Error(`No image available for selection ${key}`);
+    return img;
   };
 }

@@ -6,18 +6,27 @@ import { load } from '../../src/loaders/tiff/multi-tiff';
 async function loadImage() {
   return {
     imageName: 'tiff-folder',
-    channels: [
+    tiffs: [
       {
         name: 'Channel 0',
-        tiff: await fromFile('tests/loaders/fixtures/tiff-folder/Channel_0.tif')
+        selection: { c: 0, t: 0, z: 0 },
+        tiff: await (
+          await fromFile('tests/loaders/fixtures/multi-tiff/Channel_0.tif')
+        ).getImage(0)
       },
       {
         name: 'Channel 1',
-        tiff: await fromFile('tests/loaders/fixtures/tiff-folder/Channel_1.tif')
+        selection: { c: 1, t: 0, z: 0 },
+        tiff: await (
+          await fromFile('tests/loaders/fixtures/multi-tiff/Channel_1.tif')
+        ).getImage(0)
       },
       {
         name: 'Channel 2',
-        tiff: await fromFile('tests/loaders/fixtures/tiff-folder/Channel_2.tif')
+        selection: { c: 2, t: 0, z: 0 },
+        tiff: await (
+          await fromFile('tests/loaders/fixtures/multi-tiff/Channel_2.tif')
+        ).getImage(0)
       }
     ]
   };
@@ -26,8 +35,8 @@ async function loadImage() {
 test('Creates correct TiffPixelSource for MultiTIFF.', async t => {
   t.plan(5);
   try {
-    const { imageName, channels } = await loadImage();
-    const { data } = await load(imageName, channels);
+    const { imageName, tiffs } = await loadImage();
+    const { data } = await load(imageName, tiffs);
     t.equal(data.length, 1, 'image should not be pyramidal.');
     const [base] = data;
     t.deepEqual(
@@ -54,8 +63,8 @@ test('Creates correct TiffPixelSource for MultiTIFF.', async t => {
 test('Get raster data for MultiTIFF.', async t => {
   t.plan(13);
   try {
-    const { imageName, channels } = await loadImage();
-    const { data } = await load(imageName, channels);
+    const { imageName, tiffs } = await loadImage();
+    const { data } = await load(imageName, tiffs);
     const [base] = data;
 
     for (let c = 0; c < 3; c += 1) {
@@ -88,8 +97,8 @@ test('Get raster data for MultiTIFF.', async t => {
 test('Correct MultiTIFF metadata.', async t => {
   t.plan(10);
   try {
-    const { imageName, channels } = await loadImage();
-    const { metadata } = await load(imageName, channels);
+    const { imageName, tiffs } = await loadImage();
+    const { metadata } = await load(imageName, tiffs);
     const { Name, Pixels } = metadata;
     t.equal(Name, 'tiff-folder', `Name should be 'tiff-folder'.`);
     t.equal(Pixels.SizeC, 3, 'Should have three channels.');

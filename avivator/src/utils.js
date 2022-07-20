@@ -137,7 +137,14 @@ export async function createLoader(
 
     // Multiple flat tiffs
     if (isMultiTiff(urlOrFile)) {
-      const source = await loadMultiTiff(urlOrFile, {
+      const multiTiffFiles = Array.isArray(urlOrFile)
+        ? urlOrFile
+        : urlOrFile.split(',');
+      const mutiTiffSources = multiTiffFiles.map((e, i) => [
+        { c: i, z: 0, t: 0 },
+        e
+      ]);
+      const source = await loadMultiTiff(mutiTiffSources, {
         images: 'all',
         pool: false
       });
