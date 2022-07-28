@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Upgrade deck.gl to 8.8
 
 ## 0.12.9
 
