@@ -155,7 +155,7 @@ type PixelAttrs = Attrs<
   | Size<'T' | 'C' | 'Z' | 'Y' | 'X'>,
   number
 > &
-  Attrs<PhysicalSizeUnit<'X' | 'Y' | 'Z'>, UnitsLength | undefined> &
+  Attrs<PhysicalSizeUnit<'X' | 'Y' | 'Z'>, UnitsLength> &
   Attrs<'BigEndian' | 'Interleaved', boolean> & {
     ID: string;
     DimensionOrder: DimensionOrder;
