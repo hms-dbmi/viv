@@ -47,7 +47,7 @@ export function fromString(str: string) {
         const sizes = (['X', 'Y', 'Z'] as const)
           .map(name => {
             const size = Pixels[`PhysicalSize${name}` as const];
-            const unit = Pixels[`PhysicalSize${name}Unit` as const] || 'µm'; // Not a required field
+            const unit: UnitsLength = Pixels[`PhysicalSize${name}Unit` as const] ?? 'µm';
             return size && unit ? `${size} ${unit}` : '-';
           })
           .join(' x ');
@@ -154,7 +154,7 @@ type PixelAttrs = Attrs<
   | Size<'T' | 'C' | 'Z' | 'Y' | 'X'>,
   number
 > &
-  Attrs<PhysicalSizeUnit<'X' | 'Y' | 'Z'>, UnitsLength> &
+  Attrs<PhysicalSizeUnit<'X' | 'Y' | 'Z'>, UnitsLength | undefined> &
   Attrs<'BigEndian' | 'Interleaved', boolean> & {
     ID: string;
     DimensionOrder: DimensionOrder;
