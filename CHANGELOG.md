@@ -6,6 +6,7 @@
 
 ### Changed
 - Migrate to pnpm monorepo
+- Fix image URLs in README
 
 ## 0.12.9
 
