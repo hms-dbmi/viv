@@ -14,7 +14,8 @@ const defaultProps = {
 const BaseExtension = class extends LayerExtension {
   constructor(args) {
     super(args);
-    this.opts = this.opts || {} // After deck.gl 8.8, it does not seem like this is always initialized.
+    // After deck.gl 8.8, it does not seem like this is always initialized.
+    this.opts = this.opts || {};
   }
 
   draw() {
