@@ -3,7 +3,7 @@
 A WebGL-powered toolkit for interactive visualization of high-resolution, multiplexed bioimaging datasets.
 
 <p align="center">
-<img src="https://github.com/hms-dbmi/viv/raw/master/sites/docs/src/3d-slicing.gif" alt="Interactive volumetric view in web browser; sliders control visible planes." width="400"/> <img src="https://github.com/hms-dbmi/viv/raw/master/docs/glomerular-lens.png" alt="Multi-channel rendering of high-resolution microscopy dataset" width="400"/>
+<img src="https://github.com/hms-dbmi/viv/raw/master/sites/docs/src/3d-slicing.gif" alt="Interactive volumetric view in web browser; sliders control visible planes." width="400"/> <img src="https://github.com/hms-dbmi/viv/raw/master/sites/docs/src/glomerular-lens.png" alt="Multi-channel rendering of high-resolution microscopy dataset" width="400"/>
 </p>
 
 ## About
