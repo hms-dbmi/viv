@@ -8,6 +8,7 @@
 - Migrate to pnpm monorepo
 - Fix all image URLs in README
 - Only run CHANGELOG action on pull_requests
+- fix(main): image URLs in README
 
 ## 0.12.9
 
