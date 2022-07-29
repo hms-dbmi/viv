@@ -72,33 +72,43 @@ Detailed API information and example sippets can be found in our [documentation]
 
 ## 🏗️  Development
 
-```bash
-$ git clone https://github.com/hms-dbmi/viv.git
-$ cd viv && npm install
-$ npm start
-```
+This repo is a monorepo using pnpm workspaces. The package manager used to install and link dependncies _must_ be [`pnpm`](https://pnpm.io/).
 
-Please install the [Prettier plug-in](https://prettier.io/docs/en/editors.html) for your
-preferred editor. Badly formatted code will fail in our CI. 
+Each folder under `packages/` are a published as a separate packages on npm under the `@vivjs` scope. The top-level package `@hms-dbmi/viv` exports from these dependencies.
 
-To run unit and integration tests locally, use `npm test`. Our full production test suite,
-including linting and formatting, is run via `npm run test:prod`.
+To develop and test the `@hms-dbmi/viv` package:
 
-To our knowledge, Viv can be developed with Node version greater than 10. You can check which
-current versions are tested in our CI by naviating to our
-[Github Workflow](https://github.com/hms-dbmi/viv/blob/master/.github/workflows/test.yml#L31).
+1. Run `pnpm install` in `viv` root folder
+2. Run `pnpm dev` to start a development server
+3. Run `pnpm test` to run all tests (or specific `pnpm test --filter=@vivjs/layers`
 
 ## 🛠️  Build
 
-- `@hms-dbmi/viv` library: `npm run build`
-- `Avivator` viewer: `npm run build:avivator`
+To build viv's documentation and the Avivator website (under `sites/`), run:
+
+```sh
+pnpm build # all packages, avivator, and documentation
+pnpm -r build --filter=avivator # build a specific package or site
+```
 
 ## 📄 Publish
 
-First checkout a new branch like `release/version`. Update the `CHANGELOG.md` and bump
-the version via `npm verion [major | minor | patch]`. Commit locally and push a tag to Github. 
-Next, run `./publish.sh` to release the package on npm and publish Avivator.
-Finally, make a PR for `release/version` and squash + merge into `master`.
+Checkout latest `master` branch, run:
+
+```sh
+# commit and tag a new version
+pnpm version [major | minor | patch]
+# sync @vivjs/* package versions with root
+pnpm meta-updater
+# update CHANGELOG.md for release
+./version.sh 
+# add changes to this versioned commit
+git add . && git commit --amend --no-edit 
+# push to `master` & trigger CI for release
+git push --follow-tags
+```
+
+Our CI will run a release workflow for tagged commits on `master`. Inspect the GitHub actions to ensure the workflow was successful.
 
 ## 🌎 Browser Support
 

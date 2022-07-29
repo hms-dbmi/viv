@@ -1,0 +1,33 @@
+{
+  "name": "@hms-dbmi/viv",
+  "version": "0.12.10-alpha.0",
+  "author": "Ilan Gold",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hms-dbmi/viv.git"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/hms-dbmi/viv#readme",
+  "type": "module",
+  "main": "src/index.js",
+  "publishConfig": {
+    "main": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "sideEffects": false
+  },
+  "scripts": {
+    "build": "mkdir -p dist && cp src/index.js dist/index.mjs && cp src/index.js dist/index.d.ts"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@vivjs/constants": "workspace:*",
+    "@vivjs/extensions": "workspace:*",
+    "@vivjs/layers": "workspace:*",
+    "@vivjs/loaders": "workspace:*",
+    "@vivjs/types": "workspace:*",
+    "@vivjs/viewers": "workspace:*",
+    "@vivjs/views": "workspace:*"
+  }
+}

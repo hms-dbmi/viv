@@ -1,0 +1,48 @@
+{
+  "name": "@vivjs/layers",
+  "version": "0.0.1-alpha.0",
+  "author": "Ilan Gold",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hms-dbmi/viv.git"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/hms-dbmi/viv#readme",
+  "type": "module",
+  "main": "src/index.js",
+  "publishConfig": {
+    "main": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "sideEffects": false
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "test": "node ../../scripts/bundle-test.mjs tests/index.spec.js | tape-run | tap-spec"
+  },
+  "peerDependencies": {
+    "@deck.gl/core": "8.6.7",
+    "@deck.gl/geo-layers": "8.6.7",
+    "@deck.gl/layers": "8.6.7",
+    "@luma.gl/constants": "8.5.13",
+    "@luma.gl/core": "8.5.13",
+    "@luma.gl/engine": "8.5.13",
+    "@luma.gl/webgl": "8.5.13"
+  },
+  "dependencies": {
+    "@math.gl/core": "^3.5.7",
+    "@math.gl/culling": "^3.5.7",
+    "@vivjs/constants": "workspace:*",
+    "@vivjs/extensions": "workspace:*",
+    "@vivjs/loaders": "workspace:*",
+    "@vivjs/types": "workspace:*"
+  },
+  "unbuild": {
+    "entries": [
+      "src/index"
+    ],
+    "declaration": true
+  }
+}

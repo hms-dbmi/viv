@@ -1,0 +1,2856 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 9,
+    "total": 9,
+    "workspacePrefix": "/Users/manzt/github/hms-dbmi/viv"
+  },
+  "1 debug pnpm:package-manifest": {
+    "initial": {
+      "name": "@hms-dbmi/viv",
+      "version": "0.12.8",
+      "main": "dist/viv.es.js",
+      "module": "dist/viv.es.js",
+      "types": "dist/index.d.ts",
+      "files": [
+        "dist",
+        "src"
+      ],
+      "description": "High bit depth, high resolution, many channels, low overhead",
+      "scripts": {
+        "start": "vite",
+        "build": "vite build --mode lib && tsc --emitDeclarationOnly",
+        "build:avivator": "vite build",
+        "preview": "vite preview",
+        "prepare": "cd avivator && npm install",
+        "test": "npm run test:layers_views && npm run test:loaders",
+        "test:layers_views": "rollup -c rollup.config.test.js tests/layers_views/index.spec.js | browserify - | tape-run | tap-spec",
+        "test:loaders": "rollup -c rollup.config.test.js tests/loaders/index.spec.js | node - | tap-spec",
+        "test:prod": "npm run lint && npm run format && npm run test -- --no-cache",
+        "lint": "eslint src/**/*.{js,jsx} avivator/src/**/*.{js,jsx} tests/**/*.js",
+        "format": "prettier --check \"src/**/*.{js,ts,jsx}\" \"avivator/src/**/*.{js,jsx}\" tests/**/*.js",
+        "format:write": "npm run format -- --write",
+        "version": "./version.sh",
+        "postversion": "git push && git push --tags",
+        "docs": "mkdir -p dist_docs || rm -r dist_docs && mkdir -p dist_docs && documentation build src/**/*.jsx src/loaders/**/*.ts dist/viv.es.js -f html --document-exported --config documentation.yml --shallow -o dist_docs"
+      },
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/hms-dbmi/viv.git"
+      },
+      "keywords": [],
+      "author": "Ilan Gold",
+      "license": "MIT",
+      "bugs": {
+        "url": "https://github.com/hms-dbmi/viv/issues"
+      },
+      "homepage": "https://github.com/hms-dbmi/viv#readme",
+      "peerDependencies": {
+        "react": "^16.12.0",
+        "react-dom": "^16.12.0",
+        "@deck.gl/core": "~8.6.7",
+        "@deck.gl/geo-layers": "~8.6.7",
+        "@deck.gl/layers": "~8.6.7",
+        "@deck.gl/react": "~8.6.7",
+        "@luma.gl/constants": "~8.5.3",
+        "@luma.gl/core": "~8.5.3",
+        "@luma.gl/shadertools": "~8.5.3",
+        "@luma.gl/webgl": "~8.5.3"
+      },
+      "devDependencies": {
+        "@deck.gl/test-utils": "^8.6.7",
+        "@luma.gl/core": "^8.5.10",
+        "@luma.gl/gltools": "^8.5.10",
+        "@luma.gl/test-utils": "^8.5.10",
+        "@probe.gl/test-utils": "^3.4.1",
+        "@rollup/plugin-node-resolve": "^10.0.0",
+        "@rollup/plugin-sucrase": "^3.1.0",
+        "@vitejs/plugin-react": "^1.0.1",
+        "abortcontroller-polyfill": "^1.5.0",
+        "browserify": "^17.0.0",
+        "deck.gl": "^8.6.7",
+        "documentation": "^13.1.0",
+        "eslint": "^7.12.1",
+        "eslint-config-airbnb": "^18.2.0",
+        "eslint-config-prettier": "^6.15.0",
+        "eslint-plugin-import": "^2.22.1",
+        "eslint-plugin-react": "^7.21.5",
+        "eslint-plugin-react-app": "^6.2.2",
+        "gl": "^4.4.1",
+        "glsl-colormap": "^1.0.1",
+        "prettier": "^2.2.1",
+        "promise.prototype.finally": "^3.1.2",
+        "rollup": "^2.32.1",
+        "rollup-plugin-glslify": "^1.2.0",
+        "serve-static": "^1.14.1",
+        "tap-spec": "^5.0.0",
+        "tape": "^5.0.1",
+        "tape-catch": "^1.0.6",
+        "tape-run": "^8.0.0",
+        "typescript": "^4.1.3",
+        "vite": "^2.8.6"
+      },
+      "dependencies": {
+        "@math.gl/culling": "^3.4.2",
+        "fast-deep-equal": "^3.1.3",
+        "fast-xml-parser": "^3.16.0",
+        "geotiff": "^2.0.5",
+        "lzw-tiff-decoder": "^0.1.1",
+        "math.gl": "^3.3.0",
+        "quickselect": "^2.0.0",
+        "zarr": "^0.5.1"
+      },
+      "prettier": {
+        "singleQuote": true,
+        "trailingComma": "none",
+        "arrowParens": "avoid"
+      }
+    },
+    "prefix": "/Users/manzt/github/hms-dbmi/viv"
+  },
+  "2 debug pnpm:package-manifest": {
+    "initial": {
+      "name": "@viv/constants",
+      "version": "0.0.0",
+      "type": "module",
+      "main": "src/index.ts",
+      "types": "src/index.ts",
+      "dependencies": {
+        "@luma.gl/constants": "^8.5.10",
+        "@viv/types": "workspace:*"
+      }
+    },
+    "prefix": "/Users/manzt/github/hms-dbmi/viv/packages/constants"
+  },
+  "3 debug pnpm:package-manifest": {
+    "initial": {
+      "name": "@viv/core",
+      "version": "0.0.0",
+      "type": "module",
+      "main": "src/index.js"
+    },
+    "prefix": "/Users/manzt/github/hms-dbmi/viv/packages/core"
+  },
+  "4 debug pnpm:package-manifest": {
+    "initial": {
+      "name": "@vivjs/extensions",
+      "version": "0.0.0",
+      "scripts": {},
+      "dependencies": {
+        "@deck.gl/core": "^8.7.8"
+      }
+    },
+    "prefix": "/Users/manzt/github/hms-dbmi/viv/packages/extensions"
+  },
+  "5 debug pnpm:package-manifest": {
+    "initial": {
+      "name": "@vivjs/layers",
+      "version": "0.0.0",
+      "scripts": {},
+      "dependencies": {
+        "@deck.gl/core": "^8.7.8",
+        "@deck.gl/extensions": "^8.7.8",
+        "@deck.gl/geo-layers": "^8.7.8",
+        "@deck.gl/layers": "^8.7.8",
+        "@deck.gl/mesh-layers": "^8.7.8",
+        "@loaders.gl/core": "^3.1.8",
+        "@luma.gl/constants": "^8.5.10",
+        "@luma.gl/core": "^8.5.10",
+        "@luma.gl/engine": "^8.5.10",
+        "math.gl": "^3.5.7"
+      }
+    },
+    "prefix": "/Users/manzt/github/hms-dbmi/viv/packages/layers"
+  },
+  "6 debug pnpm:package-manifest": {
+    "initial": {
+      "name": "@vivjs/loaders",
+      "version": "0.0.0",
+      "scripts": {},
+      "dependencies": {
+        "fast-xml-parser": "^4.0.7",
+        "geotiff": "^2.0.5",
+        "lzw-tiff-decoder": "^0.1.1",
+        "quickselect": "^2.0.0",
+        "zarr": "^0.5.1"
+      }
+    },
+    "prefix": "/Users/manzt/github/hms-dbmi/viv/packages/loaders"
+  },
+  "7 debug pnpm:package-manifest": {
+    "initial": {
+      "name": "@hms-dbmi/viv",
+      "version": "0.0.0",
+      "type": "module",
+      "main": "src/index.js"
+    },
+    "prefix": "/Users/manzt/github/hms-dbmi/viv/packages/main"
+  },
+  "8 debug pnpm:package-manifest": {
+    "initial": {
+      "name": "views",
+      "version": "0.0.0",
+      "scripts": {},
+      "dependencies": {
+        "@deck.gl/core": "^8.7.8",
+        "@deck.gl/layers": "^8.7.8",
+        "math.gl": "^3.5.7"
+      }
+    },
+    "prefix": "/Users/manzt/github/hms-dbmi/viv/packages/views"
+  },
+  "9 debug pnpm:package-manifest": {
+    "initial": {
+      "name": "@viv/constants",
+      "version": "0.0.0",
+      "type": "module",
+      "types": "src/index.d.ts",
+      "dependencies": {
+        "@viv/constants": "workspace:*"
+      }
+    },
+    "prefix": "/Users/manzt/github/hms-dbmi/viv/packages/types"
+  },
+  "10 debug pnpm:context": {
+    "currentLockfileExists": true,
+    "storeDir": "/Users/manzt/Library/pnpm/store/v3",
+    "virtualStoreDir": "/Users/manzt/github/hms-dbmi/viv/node_modules/.pnpm"
+  },
+  "11 debug pnpm:stage": {
+    "prefix": "/Users/manzt/github/hms-dbmi/viv",
+    "stage": "resolution_started"
+  },
+  "12 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@deck.gl/core/8.7.8",
+    "wanted": {
+      "dependentId": "packages/extensions",
+      "name": "@deck.gl/core",
+      "rawSpec": "^8.7.8"
+    }
+  },
+  "13 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@deck.gl/core/8.7.8",
+    "wanted": {
+      "dependentId": "packages/layers",
+      "name": "@deck.gl/core",
+      "rawSpec": "^8.7.8"
+    }
+  },
+  "14 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@deck.gl/extensions/8.7.8",
+    "wanted": {
+      "dependentId": "packages/layers",
+      "name": "@deck.gl/extensions",
+      "rawSpec": "^8.7.8"
+    }
+  },
+  "15 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@deck.gl/geo-layers/8.7.8",
+    "wanted": {
+      "dependentId": "packages/layers",
+      "name": "@deck.gl/geo-layers",
+      "rawSpec": "^8.7.8"
+    }
+  },
+  "16 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@deck.gl/layers/8.7.8",
+    "wanted": {
+      "dependentId": "packages/layers",
+      "name": "@deck.gl/layers",
+      "rawSpec": "^8.7.8"
+    }
+  },
+  "17 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@deck.gl/mesh-layers/8.7.8",
+    "wanted": {
+      "dependentId": "packages/layers",
+      "name": "@deck.gl/mesh-layers",
+      "rawSpec": "^8.7.8"
+    }
+  },
+  "18 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/core/3.1.8",
+    "wanted": {
+      "dependentId": "packages/layers",
+      "name": "@loaders.gl/core",
+      "rawSpec": "^3.1.8"
+    }
+  },
+  "19 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/core/8.5.10",
+    "wanted": {
+      "dependentId": "packages/layers",
+      "name": "@luma.gl/core",
+      "rawSpec": "^8.5.10"
+    }
+  },
+  "20 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/engine/8.5.10",
+    "wanted": {
+      "dependentId": "packages/layers",
+      "name": "@luma.gl/engine",
+      "rawSpec": "^8.5.10"
+    }
+  },
+  "21 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/math.gl/3.5.7",
+    "wanted": {
+      "dependentId": "packages/layers",
+      "name": "math.gl",
+      "rawSpec": "^3.5.7"
+    }
+  },
+  "22 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/fast-xml-parser/4.0.7",
+    "wanted": {
+      "dependentId": "packages/loaders",
+      "name": "fast-xml-parser",
+      "rawSpec": "^4.0.7"
+    }
+  },
+  "23 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/geotiff/2.0.5",
+    "wanted": {
+      "dependentId": "packages/loaders",
+      "name": "geotiff",
+      "rawSpec": "^2.0.5"
+    }
+  },
+  "24 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/lzw-tiff-decoder/0.1.1",
+    "wanted": {
+      "dependentId": "packages/loaders",
+      "name": "lzw-tiff-decoder",
+      "rawSpec": "^0.1.1"
+    }
+  },
+  "25 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/quickselect/2.0.0",
+    "wanted": {
+      "dependentId": "packages/loaders",
+      "name": "quickselect",
+      "rawSpec": "^2.0.0"
+    }
+  },
+  "26 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/zarr/0.5.1",
+    "wanted": {
+      "dependentId": "packages/loaders",
+      "name": "zarr",
+      "rawSpec": "^0.5.1"
+    }
+  },
+  "27 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@deck.gl/core/8.7.8",
+    "wanted": {
+      "dependentId": "packages/views",
+      "name": "@deck.gl/core",
+      "rawSpec": "^8.7.8"
+    }
+  },
+  "28 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@deck.gl/layers/8.7.8",
+    "wanted": {
+      "dependentId": "packages/views",
+      "name": "@deck.gl/layers",
+      "rawSpec": "^8.7.8"
+    }
+  },
+  "29 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/math.gl/3.5.7",
+    "wanted": {
+      "dependentId": "packages/views",
+      "name": "math.gl",
+      "rawSpec": "^3.5.7"
+    }
+  },
+  "30 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/constants/8.5.10",
+    "wanted": {
+      "dependentId": "packages/constants",
+      "name": "@luma.gl/constants",
+      "rawSpec": "^8.5.10"
+    }
+  },
+  "31 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/constants/8.5.10",
+    "wanted": {
+      "dependentId": "packages/layers",
+      "name": "@luma.gl/constants",
+      "rawSpec": "^8.5.10"
+    }
+  },
+  "32 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@deck.gl/core/8.7.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "33 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@deck.gl/core/8.7.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "34 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/core/3.1.8",
+    "wanted": {
+      "dependentId": "/@deck.gl/core/8.7.8",
+      "name": "@loaders.gl/core",
+      "rawSpec": "^3.1.5"
+    }
+  },
+  "35 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/images/3.1.8",
+    "wanted": {
+      "dependentId": "/@deck.gl/core/8.7.8",
+      "name": "@loaders.gl/images",
+      "rawSpec": "^3.1.5"
+    }
+  },
+  "36 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/core/8.5.10",
+    "wanted": {
+      "dependentId": "/@deck.gl/core/8.7.8",
+      "name": "@luma.gl/core",
+      "rawSpec": "^8.5.10"
+    }
+  },
+  "37 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "wanted": {
+      "dependentId": "/@deck.gl/core/8.7.8",
+      "name": "@math.gl/core",
+      "rawSpec": "^3.5.7"
+    }
+  },
+  "38 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/web-mercator/3.5.7",
+    "wanted": {
+      "dependentId": "/@deck.gl/core/8.7.8",
+      "name": "@math.gl/web-mercator",
+      "rawSpec": "^3.5.7"
+    }
+  },
+  "39 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@probe.gl/env/3.5.0",
+    "wanted": {
+      "dependentId": "/@deck.gl/core/8.7.8",
+      "name": "@probe.gl/env",
+      "rawSpec": "^3.5.0"
+    }
+  },
+  "40 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@probe.gl/log/3.5.0",
+    "wanted": {
+      "dependentId": "/@deck.gl/core/8.7.8",
+      "name": "@probe.gl/log",
+      "rawSpec": "^3.5.0"
+    }
+  },
+  "41 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@probe.gl/stats/3.5.0",
+    "wanted": {
+      "dependentId": "/@deck.gl/core/8.7.8",
+      "name": "@probe.gl/stats",
+      "rawSpec": "^3.5.0"
+    }
+  },
+  "42 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/gl-matrix/3.4.3",
+    "wanted": {
+      "dependentId": "/@deck.gl/core/8.7.8",
+      "name": "gl-matrix",
+      "rawSpec": "^3.0.0"
+    }
+  },
+  "43 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/math.gl/3.5.7",
+    "wanted": {
+      "dependentId": "/@deck.gl/core/8.7.8",
+      "name": "math.gl",
+      "rawSpec": "^3.5.7"
+    }
+  },
+  "44 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/mjolnir.js/2.6.0",
+    "wanted": {
+      "dependentId": "/@deck.gl/core/8.7.8",
+      "name": "mjolnir.js",
+      "rawSpec": "^2.5.0"
+    }
+  },
+  "45 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/constants/8.5.10",
+    "wanted": {
+      "dependentId": "/@deck.gl/core/8.7.8",
+      "name": "@luma.gl/constants",
+      "rawSpec": "^8.5.10"
+    }
+  },
+  "46 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@deck.gl/geo-layers/8.7.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "47 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@deck.gl/geo-layers/8.7.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "48 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@deck.gl/extensions/8.7.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "49 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@deck.gl/extensions/8.7.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "50 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@deck.gl/layers/8.7.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "51 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@deck.gl/layers/8.7.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "52 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@deck.gl/mesh-layers/8.7.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "53 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@deck.gl/mesh-layers/8.7.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "54 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/core/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "55 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/core/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "56 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/core/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "57 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/core/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "58 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/math.gl/3.5.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "59 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/math.gl/3.5.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "60 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/fast-xml-parser/4.0.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "61 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/fast-xml-parser/4.0.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "62 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/engine/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "63 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/engine/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "64 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/lzw-tiff-decoder/0.1.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "65 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/lzw-tiff-decoder/0.1.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "66 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/quickselect/2.0.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "67 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/quickselect/2.0.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "68 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/geotiff/2.0.5",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "69 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/geotiff/2.0.5",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "70 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/zarr/0.5.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "71 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/zarr/0.5.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "72 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/strnum/1.0.5",
+    "wanted": {
+      "dependentId": "/fast-xml-parser/4.0.7",
+      "name": "strnum",
+      "rawSpec": "^1.0.5"
+    }
+  },
+  "73 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@petamoriken/float16/3.6.3",
+    "wanted": {
+      "dependentId": "/geotiff/2.0.5",
+      "name": "@petamoriken/float16",
+      "rawSpec": "^3.4.7"
+    }
+  },
+  "74 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/lerc/3.0.0",
+    "wanted": {
+      "dependentId": "/geotiff/2.0.5",
+      "name": "lerc",
+      "rawSpec": "^3.0.0"
+    }
+  },
+  "75 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/pako/2.0.4",
+    "wanted": {
+      "dependentId": "/geotiff/2.0.5",
+      "name": "pako",
+      "rawSpec": "^2.0.4"
+    }
+  },
+  "76 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/parse-headers/2.0.5",
+    "wanted": {
+      "dependentId": "/geotiff/2.0.5",
+      "name": "parse-headers",
+      "rawSpec": "^2.0.2"
+    }
+  },
+  "77 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/quick-lru/6.1.1",
+    "wanted": {
+      "dependentId": "/geotiff/2.0.5",
+      "name": "quick-lru",
+      "rawSpec": "^6.1.0"
+    }
+  },
+  "78 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/web-worker/1.2.0",
+    "wanted": {
+      "dependentId": "/geotiff/2.0.5",
+      "name": "web-worker",
+      "rawSpec": "^1.2.0"
+    }
+  },
+  "79 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/xml-utils/1.0.2",
+    "wanted": {
+      "dependentId": "/geotiff/2.0.5",
+      "name": "xml-utils",
+      "rawSpec": "^1.0.2"
+    }
+  },
+  "80 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/numcodecs/0.2.2",
+    "wanted": {
+      "dependentId": "/zarr/0.5.1",
+      "name": "numcodecs",
+      "rawSpec": "^0.2.1"
+    }
+  },
+  "81 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/p-queue/6.2.0",
+    "wanted": {
+      "dependentId": "/zarr/0.5.1",
+      "name": "p-queue",
+      "rawSpec": "6.2.0"
+    }
+  },
+  "82 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/constants/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "83 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/constants/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "84 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/3d-tiles/3.1.8",
+    "wanted": {
+      "dependentId": "/@deck.gl/geo-layers/8.7.8",
+      "name": "@loaders.gl/3d-tiles",
+      "rawSpec": "^3.1.5"
+    }
+  },
+  "85 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/gis/3.1.8",
+    "wanted": {
+      "dependentId": "/@deck.gl/geo-layers/8.7.8",
+      "name": "@loaders.gl/gis",
+      "rawSpec": "^3.1.5"
+    }
+  },
+  "86 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@deck.gl/geo-layers/8.7.8",
+      "name": "@loaders.gl/loader-utils",
+      "rawSpec": "^3.1.5"
+    }
+  },
+  "87 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/mvt/3.1.8",
+    "wanted": {
+      "dependentId": "/@deck.gl/geo-layers/8.7.8",
+      "name": "@loaders.gl/mvt",
+      "rawSpec": "^3.1.5"
+    }
+  },
+  "88 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/terrain/3.1.8",
+    "wanted": {
+      "dependentId": "/@deck.gl/geo-layers/8.7.8",
+      "name": "@loaders.gl/terrain",
+      "rawSpec": "^3.1.5"
+    }
+  },
+  "89 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/tiles/3.1.8",
+    "wanted": {
+      "dependentId": "/@deck.gl/geo-layers/8.7.8",
+      "name": "@loaders.gl/tiles",
+      "rawSpec": "^3.1.5"
+    }
+  },
+  "90 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/experimental/8.5.10",
+    "wanted": {
+      "dependentId": "/@deck.gl/geo-layers/8.7.8",
+      "name": "@luma.gl/experimental",
+      "rawSpec": "^8.5.10"
+    }
+  },
+  "91 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "wanted": {
+      "dependentId": "/@deck.gl/geo-layers/8.7.8",
+      "name": "@math.gl/core",
+      "rawSpec": "^3.5.7"
+    }
+  },
+  "92 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/culling/3.5.7",
+    "wanted": {
+      "dependentId": "/@deck.gl/geo-layers/8.7.8",
+      "name": "@math.gl/culling",
+      "rawSpec": "^3.5.7"
+    }
+  },
+  "93 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/web-mercator/3.5.7",
+    "wanted": {
+      "dependentId": "/@deck.gl/geo-layers/8.7.8",
+      "name": "@math.gl/web-mercator",
+      "rawSpec": "^3.5.7"
+    }
+  },
+  "94 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/h3-js/3.7.2",
+    "wanted": {
+      "dependentId": "/@deck.gl/geo-layers/8.7.8",
+      "name": "h3-js",
+      "rawSpec": "^3.6.0"
+    }
+  },
+  "95 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/long/3.2.0",
+    "wanted": {
+      "dependentId": "/@deck.gl/geo-layers/8.7.8",
+      "name": "long",
+      "rawSpec": "^3.2.0"
+    }
+  },
+  "96 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/shadertools/8.5.10",
+    "wanted": {
+      "dependentId": "/@deck.gl/extensions/8.7.8",
+      "name": "@luma.gl/shadertools",
+      "rawSpec": "^8.5.10"
+    }
+  },
+  "97 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/images/3.1.8",
+    "wanted": {
+      "dependentId": "/@deck.gl/layers/8.7.8",
+      "name": "@loaders.gl/images",
+      "rawSpec": "^3.1.5"
+    }
+  },
+  "98 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@mapbox/tiny-sdf/1.2.5",
+    "wanted": {
+      "dependentId": "/@deck.gl/layers/8.7.8",
+      "name": "@mapbox/tiny-sdf",
+      "rawSpec": "^1.1.0"
+    }
+  },
+  "99 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/polygon/3.5.7",
+    "wanted": {
+      "dependentId": "/@deck.gl/layers/8.7.8",
+      "name": "@math.gl/polygon",
+      "rawSpec": "^3.5.7"
+    }
+  },
+  "100 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/earcut/2.2.3",
+    "wanted": {
+      "dependentId": "/@deck.gl/layers/8.7.8",
+      "name": "earcut",
+      "rawSpec": "^2.0.6"
+    }
+  },
+  "101 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/gltf/3.1.8",
+    "wanted": {
+      "dependentId": "/@deck.gl/mesh-layers/8.7.8",
+      "name": "@loaders.gl/gltf",
+      "rawSpec": "^3.1.5"
+    }
+  },
+  "102 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/core/8.5.10",
+    "wanted": {
+      "dependentId": "/@deck.gl/mesh-layers/8.7.8",
+      "name": "@luma.gl/core",
+      "rawSpec": "^8.5.10"
+    }
+  },
+  "103 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/experimental/8.5.10",
+    "wanted": {
+      "dependentId": "/@deck.gl/mesh-layers/8.7.8",
+      "name": "@luma.gl/experimental",
+      "rawSpec": "^8.5.10"
+    }
+  },
+  "104 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/shadertools/8.5.10",
+    "wanted": {
+      "dependentId": "/@deck.gl/mesh-layers/8.7.8",
+      "name": "@luma.gl/shadertools",
+      "rawSpec": "^8.5.10"
+    }
+  },
+  "105 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@loaders.gl/core/3.1.8",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.3.1"
+    }
+  },
+  "106 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/core/3.1.8",
+      "name": "@loaders.gl/loader-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "107 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/worker-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/core/3.1.8",
+      "name": "@loaders.gl/worker-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "108 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@probe.gl/log/3.5.0",
+    "wanted": {
+      "dependentId": "/@loaders.gl/core/3.1.8",
+      "name": "@probe.gl/log",
+      "rawSpec": "^3.5.0"
+    }
+  },
+  "109 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/probe.gl/3.5.0",
+    "wanted": {
+      "dependentId": "/@loaders.gl/core/3.1.8",
+      "name": "probe.gl",
+      "rawSpec": "^3.4.0"
+    }
+  },
+  "110 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@luma.gl/core/8.5.10",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.0.0"
+    }
+  },
+  "111 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/engine/8.5.10",
+    "wanted": {
+      "dependentId": "/@luma.gl/core/8.5.10",
+      "name": "@luma.gl/engine",
+      "rawSpec": "8.5.10"
+    }
+  },
+  "112 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/gltools/8.5.10",
+    "wanted": {
+      "dependentId": "/@luma.gl/core/8.5.10",
+      "name": "@luma.gl/gltools",
+      "rawSpec": "8.5.10"
+    }
+  },
+  "113 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/shadertools/8.5.10",
+    "wanted": {
+      "dependentId": "/@luma.gl/core/8.5.10",
+      "name": "@luma.gl/shadertools",
+      "rawSpec": "8.5.10"
+    }
+  },
+  "114 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/webgl/8.5.10",
+    "wanted": {
+      "dependentId": "/@luma.gl/core/8.5.10",
+      "name": "@luma.gl/webgl",
+      "rawSpec": "8.5.10"
+    }
+  },
+  "115 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "wanted": {
+      "dependentId": "/math.gl/3.5.7",
+      "name": "@math.gl/core",
+      "rawSpec": "3.5.7"
+    }
+  },
+  "116 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@luma.gl/engine/8.5.10",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.0.0"
+    }
+  },
+  "117 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/gltools/8.5.10",
+    "wanted": {
+      "dependentId": "/@luma.gl/engine/8.5.10",
+      "name": "@luma.gl/gltools",
+      "rawSpec": "8.5.10"
+    }
+  },
+  "118 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/shadertools/8.5.10",
+    "wanted": {
+      "dependentId": "/@luma.gl/engine/8.5.10",
+      "name": "@luma.gl/shadertools",
+      "rawSpec": "8.5.10"
+    }
+  },
+  "119 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/webgl/8.5.10",
+    "wanted": {
+      "dependentId": "/@luma.gl/engine/8.5.10",
+      "name": "@luma.gl/webgl",
+      "rawSpec": "8.5.10"
+    }
+  },
+  "120 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "wanted": {
+      "dependentId": "/@luma.gl/engine/8.5.10",
+      "name": "@math.gl/core",
+      "rawSpec": "^3.5.0"
+    }
+  },
+  "121 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/probe.gl/3.5.0",
+    "wanted": {
+      "dependentId": "/@luma.gl/engine/8.5.10",
+      "name": "probe.gl",
+      "rawSpec": "^3.4.0"
+    }
+  },
+  "122 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/constants/8.5.10",
+    "wanted": {
+      "dependentId": "/@deck.gl/mesh-layers/8.7.8",
+      "name": "@luma.gl/constants",
+      "rawSpec": "^8.5.10"
+    }
+  },
+  "123 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/constants/8.5.10",
+    "wanted": {
+      "dependentId": "/@luma.gl/core/8.5.10",
+      "name": "@luma.gl/constants",
+      "rawSpec": "8.5.10"
+    }
+  },
+  "124 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/constants/8.5.10",
+    "wanted": {
+      "dependentId": "/@luma.gl/engine/8.5.10",
+      "name": "@luma.gl/constants",
+      "rawSpec": "8.5.10"
+    }
+  },
+  "125 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "126 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "127 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/images/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "128 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/images/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "129 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@probe.gl/env/3.5.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "130 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@probe.gl/env/3.5.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "131 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@math.gl/web-mercator/3.5.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "132 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@math.gl/web-mercator/3.5.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "133 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@probe.gl/log/3.5.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "134 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@probe.gl/log/3.5.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "135 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@probe.gl/stats/3.5.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "136 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@probe.gl/stats/3.5.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "137 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/gl-matrix/3.4.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "138 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/gl-matrix/3.4.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "139 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/mjolnir.js/2.6.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "140 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/mjolnir.js/2.6.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "141 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@math.gl/core/3.5.7",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.12.0"
+    }
+  },
+  "142 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/gl-matrix/3.3.0",
+    "wanted": {
+      "dependentId": "/@math.gl/core/3.5.7",
+      "name": "gl-matrix",
+      "rawSpec": "~3.3.0"
+    }
+  },
+  "143 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/images/3.1.8",
+      "name": "@loaders.gl/loader-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "144 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@probe.gl/env/3.5.0",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.0.0"
+    }
+  },
+  "145 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@math.gl/web-mercator/3.5.7",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.12.0"
+    }
+  },
+  "146 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/gl-matrix/3.3.0",
+    "wanted": {
+      "dependentId": "/@math.gl/web-mercator/3.5.7",
+      "name": "gl-matrix",
+      "rawSpec": "~3.3.0"
+    }
+  },
+  "147 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@probe.gl/log/3.5.0",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.0.0"
+    }
+  },
+  "148 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@probe.gl/env/3.5.0",
+    "wanted": {
+      "dependentId": "/@probe.gl/log/3.5.0",
+      "name": "@probe.gl/env",
+      "rawSpec": "3.5.0"
+    }
+  },
+  "149 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@probe.gl/stats/3.5.0",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.0.0"
+    }
+  },
+  "150 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/mjolnir.js/2.6.0",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.0.0"
+    }
+  },
+  "151 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/hammerjs/2.0.8",
+    "wanted": {
+      "dependentId": "/mjolnir.js/2.6.0",
+      "name": "hammerjs",
+      "rawSpec": "^2.0.8"
+    }
+  },
+  "152 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/strnum/1.0.5",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "153 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/strnum/1.0.5",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "154 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@petamoriken/float16/3.6.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "155 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@petamoriken/float16/3.6.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "156 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/lerc/3.0.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "157 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/lerc/3.0.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "158 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/eslint-config-airbnb/18.2.1",
+    "wanted": {
+      "dependentId": ".",
+      "name": "eslint-config-airbnb",
+      "rawSpec": "^18.2.0"
+    }
+  },
+  "159 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eslint-config-airbnb/18.2.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "160 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@rollup/plugin-node-resolve/10.0.0",
+    "wanted": {
+      "dependentId": ".",
+      "name": "@rollup/plugin-node-resolve",
+      "rawSpec": "^10.0.0"
+    }
+  },
+  "161 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@rollup/plugin-node-resolve/10.0.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "162 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/pako/2.0.4",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "163 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/pako/2.0.4",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "164 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/quick-lru/6.1.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "165 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/quick-lru/6.1.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "166 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/parse-headers/2.0.5",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "167 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/parse-headers/2.0.5",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "168 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/xml-utils/1.0.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "169 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/xml-utils/1.0.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "170 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/web-worker/1.2.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "171 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/web-worker/1.2.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "172 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/numcodecs/0.2.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "173 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/numcodecs/0.2.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "174 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/p-queue/6.2.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "175 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/p-queue/6.2.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "176 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/eventemitter3/4.0.7",
+    "wanted": {
+      "dependentId": "/p-queue/6.2.0",
+      "name": "eventemitter3",
+      "rawSpec": "^4.0.0"
+    }
+  },
+  "177 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/p-timeout/3.2.0",
+    "wanted": {
+      "dependentId": "/p-queue/6.2.0",
+      "name": "p-timeout",
+      "rawSpec": "^3.1.0"
+    }
+  },
+  "178 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/gis/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "179 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/gis/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "180 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/3d-tiles/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "181 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/3d-tiles/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "182 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/mvt/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "183 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/mvt/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "184 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/terrain/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "185 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/terrain/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "186 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/eslint-config-prettier/6.15.0",
+    "wanted": {
+      "dependentId": ".",
+      "name": "eslint-config-prettier",
+      "rawSpec": "^6.15.0"
+    }
+  },
+  "187 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eslint-config-prettier/6.15.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "188 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/eslint-plugin-import/2.26.0",
+    "wanted": {
+      "dependentId": ".",
+      "name": "eslint-plugin-import",
+      "rawSpec": "^2.22.1"
+    }
+  },
+  "189 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eslint-plugin-import/2.26.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "190 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "191 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "192 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/long/3.2.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "193 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/long/3.2.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "194 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/h3-js/3.7.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "195 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/h3-js/3.7.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "196 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@math.gl/culling/3.5.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "197 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@math.gl/culling/3.5.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "198 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/eslint-plugin-react/7.29.4",
+    "wanted": {
+      "dependentId": ".",
+      "name": "eslint-plugin-react",
+      "rawSpec": "^7.21.5"
+    }
+  },
+  "199 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eslint-plugin-react/7.29.4",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "200 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/abortcontroller-polyfill/1.7.3",
+    "wanted": {
+      "dependentId": ".",
+      "name": "abortcontroller-polyfill",
+      "rawSpec": "^1.5.0"
+    }
+  },
+  "201 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/abortcontroller-polyfill/1.7.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "202 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/tiles/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "203 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/tiles/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "204 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/experimental/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "205 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/experimental/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "206 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/gis/3.1.8",
+      "name": "@loaders.gl/loader-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "207 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/schema/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/gis/3.1.8",
+      "name": "@loaders.gl/schema",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "208 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@mapbox/vector-tile/1.3.1",
+    "wanted": {
+      "dependentId": "/@loaders.gl/gis/3.1.8",
+      "name": "@mapbox/vector-tile",
+      "rawSpec": "^1.3.1"
+    }
+  },
+  "209 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/polygon/3.5.7",
+    "wanted": {
+      "dependentId": "/@loaders.gl/gis/3.1.8",
+      "name": "@math.gl/polygon",
+      "rawSpec": "^3.5.1"
+    }
+  },
+  "210 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/pbf/3.2.1",
+    "wanted": {
+      "dependentId": "/@loaders.gl/gis/3.1.8",
+      "name": "pbf",
+      "rawSpec": "^3.2.1"
+    }
+  },
+  "211 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/draco/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/3d-tiles/3.1.8",
+      "name": "@loaders.gl/draco",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "212 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/gltf/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/3d-tiles/3.1.8",
+      "name": "@loaders.gl/gltf",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "213 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/3d-tiles/3.1.8",
+      "name": "@loaders.gl/loader-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "214 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/math/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/3d-tiles/3.1.8",
+      "name": "@loaders.gl/math",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "215 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/tiles/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/3d-tiles/3.1.8",
+      "name": "@loaders.gl/tiles",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "216 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "wanted": {
+      "dependentId": "/@loaders.gl/3d-tiles/3.1.8",
+      "name": "@math.gl/core",
+      "rawSpec": "^3.5.1"
+    }
+  },
+  "217 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/geospatial/3.5.7",
+    "wanted": {
+      "dependentId": "/@loaders.gl/3d-tiles/3.1.8",
+      "name": "@math.gl/geospatial",
+      "rawSpec": "^3.5.1"
+    }
+  },
+  "218 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/gis/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/mvt/3.1.8",
+      "name": "@loaders.gl/gis",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "219 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/mvt/3.1.8",
+      "name": "@loaders.gl/loader-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "220 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/schema/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/mvt/3.1.8",
+      "name": "@loaders.gl/schema",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "221 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/polygon/3.5.7",
+    "wanted": {
+      "dependentId": "/@loaders.gl/mvt/3.1.8",
+      "name": "@math.gl/polygon",
+      "rawSpec": "^3.5.1"
+    }
+  },
+  "222 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/pbf/3.2.1",
+    "wanted": {
+      "dependentId": "/@loaders.gl/mvt/3.1.8",
+      "name": "pbf",
+      "rawSpec": "^3.2.1"
+    }
+  },
+  "223 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@loaders.gl/terrain/3.1.8",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.3.1"
+    }
+  },
+  "224 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/terrain/3.1.8",
+      "name": "@loaders.gl/loader-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "225 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/schema/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/terrain/3.1.8",
+      "name": "@loaders.gl/schema",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "226 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@mapbox/martini/0.2.0",
+    "wanted": {
+      "dependentId": "/@loaders.gl/terrain/3.1.8",
+      "name": "@mapbox/martini",
+      "rawSpec": "^0.2.0"
+    }
+  },
+  "227 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@loaders.gl/loader-utils/3.1.8",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.3.1"
+    }
+  },
+  "228 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/worker-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/loader-utils/3.1.8",
+      "name": "@loaders.gl/worker-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "229 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@probe.gl/stats/3.5.0",
+    "wanted": {
+      "dependentId": "/@loaders.gl/loader-utils/3.1.8",
+      "name": "@probe.gl/stats",
+      "rawSpec": "^3.5.0"
+    }
+  },
+  "230 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@math.gl/culling/3.5.7",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.12.0"
+    }
+  },
+  "231 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "wanted": {
+      "dependentId": "/@math.gl/culling/3.5.7",
+      "name": "@math.gl/core",
+      "rawSpec": "3.5.7"
+    }
+  },
+  "232 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/gl-matrix/3.3.0",
+    "wanted": {
+      "dependentId": "/@math.gl/culling/3.5.7",
+      "name": "gl-matrix",
+      "rawSpec": "~3.3.0"
+    }
+  },
+  "233 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/tiles/3.1.8",
+      "name": "@loaders.gl/loader-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "234 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/math/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/tiles/3.1.8",
+      "name": "@loaders.gl/math",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "235 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "wanted": {
+      "dependentId": "/@loaders.gl/tiles/3.1.8",
+      "name": "@math.gl/core",
+      "rawSpec": "^3.5.1"
+    }
+  },
+  "236 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/culling/3.5.7",
+    "wanted": {
+      "dependentId": "/@loaders.gl/tiles/3.1.8",
+      "name": "@math.gl/culling",
+      "rawSpec": "^3.5.1"
+    }
+  },
+  "237 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/geospatial/3.5.7",
+    "wanted": {
+      "dependentId": "/@loaders.gl/tiles/3.1.8",
+      "name": "@math.gl/geospatial",
+      "rawSpec": "^3.5.1"
+    }
+  },
+  "238 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/web-mercator/3.5.7",
+    "wanted": {
+      "dependentId": "/@loaders.gl/tiles/3.1.8",
+      "name": "@math.gl/web-mercator",
+      "rawSpec": "^3.5.1"
+    }
+  },
+  "239 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@probe.gl/stats/3.5.0",
+    "wanted": {
+      "dependentId": "/@loaders.gl/tiles/3.1.8",
+      "name": "@probe.gl/stats",
+      "rawSpec": "^3.5.0"
+    }
+  },
+  "240 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "wanted": {
+      "dependentId": "/@luma.gl/experimental/8.5.10",
+      "name": "@math.gl/core",
+      "rawSpec": "^3.5.0"
+    }
+  },
+  "241 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/earcut/2.2.3",
+    "wanted": {
+      "dependentId": "/@luma.gl/experimental/8.5.10",
+      "name": "earcut",
+      "rawSpec": "^2.0.6"
+    }
+  },
+  "242 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/constants/8.5.10",
+    "wanted": {
+      "dependentId": "/@luma.gl/experimental/8.5.10",
+      "name": "@luma.gl/constants",
+      "rawSpec": "8.5.10"
+    }
+  },
+  "243 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@mapbox/tiny-sdf/1.2.5",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "244 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@mapbox/tiny-sdf/1.2.5",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "245 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@math.gl/polygon/3.5.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "246 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@math.gl/polygon/3.5.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "247 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/earcut/2.2.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "248 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/earcut/2.2.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "249 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "wanted": {
+      "dependentId": "/@math.gl/polygon/3.5.7",
+      "name": "@math.gl/core",
+      "rawSpec": "3.5.7"
+    }
+  },
+  "250 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/shadertools/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "251 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/shadertools/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "252 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@luma.gl/shadertools/8.5.10",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.0.0"
+    }
+  },
+  "253 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "wanted": {
+      "dependentId": "/@luma.gl/shadertools/8.5.10",
+      "name": "@math.gl/core",
+      "rawSpec": "^3.5.0"
+    }
+  },
+  "254 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "255 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "256 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/probe.gl/3.5.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "257 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/probe.gl/3.5.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "258 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/gltools/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "259 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/gltools/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "260 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/prettier/2.6.2",
+    "wanted": {
+      "dependentId": ".",
+      "name": "prettier",
+      "rawSpec": "^2.2.1"
+    }
+  },
+  "261 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/prettier/2.6.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "262 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/browserify/17.0.0",
+    "wanted": {
+      "dependentId": ".",
+      "name": "browserify",
+      "rawSpec": "^17.0.0"
+    }
+  },
+  "263 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/browserify/17.0.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "264 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/gltf/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "265 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/gltf/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "266 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/draco/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/gltf/3.1.8",
+      "name": "@loaders.gl/draco",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "267 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/images/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/gltf/3.1.8",
+      "name": "@loaders.gl/images",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "268 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/gltf/3.1.8",
+      "name": "@loaders.gl/loader-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "269 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/textures/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/gltf/3.1.8",
+      "name": "@loaders.gl/textures",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "270 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/worker-utils/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "271 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/worker-utils/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "272 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/regenerator-runtime/0.13.9",
+    "wanted": {
+      "dependentId": "/@babel/runtime/7.17.9",
+      "name": "regenerator-runtime",
+      "rawSpec": "^0.13.4"
+    }
+  },
+  "273 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/probe.gl/3.5.0",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.0.0"
+    }
+  },
+  "274 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@probe.gl/env/3.5.0",
+    "wanted": {
+      "dependentId": "/probe.gl/3.5.0",
+      "name": "@probe.gl/env",
+      "rawSpec": "3.5.0"
+    }
+  },
+  "275 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@probe.gl/log/3.5.0",
+    "wanted": {
+      "dependentId": "/probe.gl/3.5.0",
+      "name": "@probe.gl/log",
+      "rawSpec": "3.5.0"
+    }
+  },
+  "276 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@probe.gl/stats/3.5.0",
+    "wanted": {
+      "dependentId": "/probe.gl/3.5.0",
+      "name": "@probe.gl/stats",
+      "rawSpec": "3.5.0"
+    }
+  },
+  "277 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@loaders.gl/worker-utils/3.1.8",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.3.1"
+    }
+  },
+  "278 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/webgl/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "279 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@luma.gl/webgl/8.5.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "280 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@luma.gl/gltools/8.5.10",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.0.0"
+    }
+  },
+  "281 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/probe.gl/3.5.0",
+    "wanted": {
+      "dependentId": "/@luma.gl/gltools/8.5.10",
+      "name": "probe.gl",
+      "rawSpec": "^3.4.0"
+    }
+  },
+  "282 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@luma.gl/webgl/8.5.10",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.0.0"
+    }
+  },
+  "283 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/gltools/8.5.10",
+    "wanted": {
+      "dependentId": "/@luma.gl/webgl/8.5.10",
+      "name": "@luma.gl/gltools",
+      "rawSpec": "8.5.10"
+    }
+  },
+  "284 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/probe.gl/3.5.0",
+    "wanted": {
+      "dependentId": "/@luma.gl/webgl/8.5.10",
+      "name": "probe.gl",
+      "rawSpec": "^3.4.0"
+    }
+  },
+  "285 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/constants/8.5.10",
+    "wanted": {
+      "dependentId": "/@luma.gl/gltools/8.5.10",
+      "name": "@luma.gl/constants",
+      "rawSpec": "8.5.10"
+    }
+  },
+  "286 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/constants/8.5.10",
+    "wanted": {
+      "dependentId": "/@luma.gl/webgl/8.5.10",
+      "name": "@luma.gl/constants",
+      "rawSpec": "8.5.10"
+    }
+  },
+  "287 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/gl-matrix/3.3.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "288 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/gl-matrix/3.3.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "289 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/hammerjs/2.0.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "290 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/hammerjs/2.0.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "291 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eslint-config-airbnb/18.2.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "292 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eventemitter3/4.0.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "293 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eventemitter3/4.0.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "294 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/p-timeout/3.2.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "295 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/p-timeout/3.2.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "296 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/p-finally/1.0.0",
+    "wanted": {
+      "dependentId": "/p-timeout/3.2.0",
+      "name": "p-finally",
+      "rawSpec": "^1.0.0"
+    }
+  },
+  "297 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eslint-config-prettier/6.15.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "298 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@rollup/plugin-node-resolve/10.0.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "299 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eslint-plugin-import/2.26.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "300 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/abortcontroller-polyfill/1.7.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "301 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/schema/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "302 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/schema/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "303 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@mapbox/vector-tile/1.3.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "304 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@mapbox/vector-tile/1.3.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "305 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/pbf/3.2.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "306 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/pbf/3.2.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "307 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@types/geojson/7946.0.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/schema/3.1.8",
+      "name": "@types/geojson",
+      "rawSpec": "^7946.0.7"
+    }
+  },
+  "308 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@mapbox/point-geometry/0.1.0",
+    "wanted": {
+      "dependentId": "/@mapbox/vector-tile/1.3.1",
+      "name": "@mapbox/point-geometry",
+      "rawSpec": "~0.1.0"
+    }
+  },
+  "309 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/ieee754/1.2.1",
+    "wanted": {
+      "dependentId": "/pbf/3.2.1",
+      "name": "ieee754",
+      "rawSpec": "^1.1.12"
+    }
+  },
+  "310 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/resolve-protobuf-schema/2.1.0",
+    "wanted": {
+      "dependentId": "/pbf/3.2.1",
+      "name": "resolve-protobuf-schema",
+      "rawSpec": "^2.1.0"
+    }
+  },
+  "311 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/draco/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "312 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/draco/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "313 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/math/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "314 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/math/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "315 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@mapbox/martini/0.2.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "316 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@mapbox/martini/0.2.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "317 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@math.gl/geospatial/3.5.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "318 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@math.gl/geospatial/3.5.7",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "319 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@loaders.gl/draco/3.1.8",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.3.1"
+    }
+  },
+  "320 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/draco/3.1.8",
+      "name": "@loaders.gl/loader-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "321 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/schema/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/draco/3.1.8",
+      "name": "@loaders.gl/schema",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "322 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/worker-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/draco/3.1.8",
+      "name": "@loaders.gl/worker-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "323 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/draco3d/1.4.1",
+    "wanted": {
+      "dependentId": "/@loaders.gl/draco/3.1.8",
+      "name": "draco3d",
+      "rawSpec": "1.4.1"
+    }
+  },
+  "324 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/images/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/math/3.1.8",
+      "name": "@loaders.gl/images",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "325 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/math/3.1.8",
+      "name": "@loaders.gl/loader-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "326 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "wanted": {
+      "dependentId": "/@loaders.gl/math/3.1.8",
+      "name": "@math.gl/core",
+      "rawSpec": "^3.5.1"
+    }
+  },
+  "327 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@babel/runtime/7.17.9",
+    "wanted": {
+      "dependentId": "/@math.gl/geospatial/3.5.7",
+      "name": "@babel/runtime",
+      "rawSpec": "^7.12.0"
+    }
+  },
+  "328 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@math.gl/core/3.5.7",
+    "wanted": {
+      "dependentId": "/@math.gl/geospatial/3.5.7",
+      "name": "@math.gl/core",
+      "rawSpec": "3.5.7"
+    }
+  },
+  "329 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/gl-matrix/3.3.0",
+    "wanted": {
+      "dependentId": "/@math.gl/geospatial/3.5.7",
+      "name": "gl-matrix",
+      "rawSpec": "~3.3.0"
+    }
+  },
+  "330 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/prettier/2.6.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "331 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eslint-plugin-react/7.29.4",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "332 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/browserify/17.0.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "333 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/textures/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "334 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@loaders.gl/textures/3.1.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "335 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/images/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/textures/3.1.8",
+      "name": "@loaders.gl/images",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "336 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/loader-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/textures/3.1.8",
+      "name": "@loaders.gl/loader-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "337 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@loaders.gl/worker-utils/3.1.8",
+    "wanted": {
+      "dependentId": "/@loaders.gl/textures/3.1.8",
+      "name": "@loaders.gl/worker-utils",
+      "rawSpec": "3.1.8"
+    }
+  },
+  "338 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/ktx-parse/0.0.4",
+    "wanted": {
+      "dependentId": "/@loaders.gl/textures/3.1.8",
+      "name": "ktx-parse",
+      "rawSpec": "^0.0.4"
+    }
+  },
+  "339 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/texture-compressor/1.0.2",
+    "wanted": {
+      "dependentId": "/@loaders.gl/textures/3.1.8",
+      "name": "texture-compressor",
+      "rawSpec": "^1.0.2"
+    }
+  },
+  "340 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/regenerator-runtime/0.13.9",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "341 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/regenerator-runtime/0.13.9",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "342 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/p-finally/1.0.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "343 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/p-finally/1.0.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "344 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@types/geojson/7946.0.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "345 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@types/geojson/7946.0.8",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "346 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/resolve-protobuf-schema/2.1.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "347 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/resolve-protobuf-schema/2.1.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "348 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@mapbox/point-geometry/0.1.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "349 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@mapbox/point-geometry/0.1.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "350 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/ieee754/1.2.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "351 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/ieee754/1.2.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "352 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/protocol-buffers-schema/3.6.0",
+    "wanted": {
+      "dependentId": "/resolve-protobuf-schema/2.1.0",
+      "name": "protocol-buffers-schema",
+      "rawSpec": "^3.3.1"
+    }
+  },
+  "353 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/draco3d/1.4.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "354 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/draco3d/1.4.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "355 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/ktx-parse/0.0.4",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "356 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/ktx-parse/0.0.4",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "357 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/texture-compressor/1.0.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "358 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/texture-compressor/1.0.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "359 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/argparse/1.0.10",
+    "wanted": {
+      "dependentId": "/texture-compressor/1.0.2",
+      "name": "argparse",
+      "rawSpec": "^1.0.10"
+    }
+  },
+  "360 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/image-size/0.7.5",
+    "wanted": {
+      "dependentId": "/texture-compressor/1.0.2",
+      "name": "image-size",
+      "rawSpec": "^0.7.4"
+    }
+  },
+  "361 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/protocol-buffers-schema/3.6.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "362 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/protocol-buffers-schema/3.6.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "363 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/image-size/0.7.5",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "364 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/image-size/0.7.5",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "365 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/argparse/1.0.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "366 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/argparse/1.0.10",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "367 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/sprintf-js/1.0.3",
+    "wanted": {
+      "dependentId": "/argparse/1.0.10",
+      "name": "sprintf-js",
+      "rawSpec": "~1.0.2"
+    }
+  },
+  "368 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/sprintf-js/1.0.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "369 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/sprintf-js/1.0.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "370 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/rollup/2.73.0",
+    "wanted": {
+      "dependentId": ".",
+      "name": "rollup",
+      "rawSpec": "^2.32.1"
+    }
+  },
+  "371 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/rollup/2.73.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "372 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/rollup/2.73.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "373 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/serve-static/1.15.0",
+    "wanted": {
+      "dependentId": ".",
+      "name": "serve-static",
+      "rawSpec": "^1.14.1"
+    }
+  },
+  "374 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/serve-static/1.15.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "375 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/serve-static/1.15.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "376 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/eslint-plugin-react-app/6.2.2",
+    "wanted": {
+      "dependentId": ".",
+      "name": "eslint-plugin-react-app",
+      "rawSpec": "^6.2.2"
+    }
+  },
+  "377 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eslint-plugin-react-app/6.2.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "378 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eslint-plugin-react-app/6.2.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "379 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/deck.gl/8.7.9",
+    "wanted": {
+      "dependentId": ".",
+      "name": "deck.gl",
+      "rawSpec": "^8.6.7"
+    }
+  },
+  "380 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/deck.gl/8.7.9",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "381 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/eslint/7.32.0",
+    "wanted": {
+      "dependentId": ".",
+      "name": "eslint",
+      "rawSpec": "^7.12.1"
+    }
+  },
+  "382 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eslint/7.32.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "383 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/gl/4.9.2",
+    "wanted": {
+      "dependentId": ".",
+      "name": "gl",
+      "rawSpec": "^4.4.1"
+    }
+  },
+  "384 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/gl/4.9.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "385 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/glsl-colormap/1.0.1",
+    "wanted": {
+      "dependentId": ".",
+      "name": "glsl-colormap",
+      "rawSpec": "^1.0.1"
+    }
+  },
+  "386 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/glsl-colormap/1.0.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "387 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@luma.gl/gltools/8.5.10",
+    "wanted": {
+      "dependentId": ".",
+      "name": "@luma.gl/gltools",
+      "rawSpec": "^8.5.10"
+    }
+  },
+  "388 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/tap-spec/5.0.0",
+    "wanted": {
+      "dependentId": ".",
+      "name": "tap-spec",
+      "rawSpec": "^5.0.0"
+    }
+  },
+  "389 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/tap-spec/5.0.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "390 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/promise.prototype.finally/3.1.3",
+    "wanted": {
+      "dependentId": ".",
+      "name": "promise.prototype.finally",
+      "rawSpec": "^3.1.2"
+    }
+  },
+  "391 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/promise.prototype.finally/3.1.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "392 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/deck.gl/8.7.9",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "393 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/documentation/13.2.5",
+    "wanted": {
+      "dependentId": ".",
+      "name": "documentation",
+      "rawSpec": "^13.1.0"
+    }
+  },
+  "394 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/documentation/13.2.5",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "395 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/eslint/7.32.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "396 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/fast-deep-equal/3.1.3",
+    "wanted": {
+      "dependentId": ".",
+      "name": "fast-deep-equal",
+      "rawSpec": "^3.1.3"
+    }
+  },
+  "397 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/fast-deep-equal/3.1.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "398 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/gl/4.9.2",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "399 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/glsl-colormap/1.0.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "400 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/tap-spec/5.0.0",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "401 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/promise.prototype.finally/3.1.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "402 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/fast-deep-equal/3.1.3",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "403 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/fast-xml-parser/3.21.1",
+    "wanted": {
+      "dependentId": ".",
+      "name": "fast-xml-parser",
+      "rawSpec": "^3.16.0"
+    }
+  },
+  "404 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/fast-xml-parser/3.21.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "405 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@rollup/plugin-sucrase/3.1.1",
+    "wanted": {
+      "dependentId": ".",
+      "name": "@rollup/plugin-sucrase",
+      "rawSpec": "^3.1.0"
+    }
+  },
+  "406 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@rollup/plugin-sucrase/3.1.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "407 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@rollup/plugin-sucrase/3.1.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "408 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/documentation/13.2.5",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "409 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/fast-xml-parser/3.21.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "410 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/rollup-plugin-glslify/1.2.1",
+    "wanted": {
+      "dependentId": ".",
+      "name": "rollup-plugin-glslify",
+      "rawSpec": "^1.2.0"
+    }
+  },
+  "411 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/rollup-plugin-glslify/1.2.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "resolved"
+  },
+  "412 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/rollup-plugin-glslify/1.2.1",
+    "requester": "/Users/manzt/github/hms-dbmi/viv",
+    "status": "found_in_store"
+  },
+  "413 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/quickselect/2.0.0",
+    "wanted": {
+      "dependentId": ".",
+      "name": "quickselect",
+      "rawSpec": "^2.0.0"
+    }
+  },
+  "414 debug pnpm:_dependency_resolved": {
+    "resolution": "link:",
+    "wanted": {
+      "dependentId": "packages/types",
+      "name": "@viv/constants",
+      "rawSpec": "workspace:*"
+    }
+  },
+  "415 error pnpm": {
+    "code": "ERR_PNPM_NO_MATCHING_VERSION_INSIDE_WORKSPACE",
+    "pkgsStack": [],
+    "err": {
+      "name": "pnpm",
+      "message": "In ../constants: No matching version found for @viv/types@* inside the workspace",
+      "code": "ERR_PNPM_NO_MATCHING_VERSION_INSIDE_WORKSPACE",
+      "stack": "pnpm: In ../constants: No matching version found for @viv/types@* inside the workspace\n    at tryResolveFromWorkspace (/Users/manzt/Library/Application Support/fnm/node-versions/v17.6.0/installation/pnpm-global/5/node_modules/.pnpm/pnpm@7.0.1/node_modules/pnpm/dist/pnpm.cjs:84540:15)\n    at resolveNpm (/Users/manzt/Library/Application Support/fnm/node-versions/v17.6.0/installation/pnpm-global/5/node_modules/.pnpm/pnpm@7.0.1/node_modules/pnpm/dist/pnpm.cjs:84432:39)\n    at Object.resolve (/Users/manzt/Library/Application Support/fnm/node-versions/v17.6.0/installation/pnpm-global/5/node_modules/.pnpm/pnpm@7.0.1/node_modules/pnpm/dist/pnpm.cjs:84662:34)\n    at ctx.requestsQueue.add.priority (/Users/manzt/Library/Application Support/fnm/node-versions/v17.6.0/installation/pnpm-global/5/node_modules/.pnpm/pnpm@7.0.1/node_modules/pnpm/dist/pnpm.cjs:91358:75)\n    at run (/Users/manzt/Library/Application Support/fnm/node-versions/v17.6.0/installation/pnpm-global/5/node_modules/.pnpm/pnpm@7.0.1/node_modules/pnpm/dist/pnpm.cjs:91119:90)\n    at PQueue._tryToStartAnother (/Users/manzt/Library/Application Support/fnm/node-versions/v17.6.0/installation/pnpm-global/5/node_modules/.pnpm/pnpm@7.0.1/node_modules/pnpm/dist/pnpm.cjs:91073:13)\n    at PQueue._next (/Users/manzt/Library/Application Support/fnm/node-versions/v17.6.0/installation/pnpm-global/5/node_modules/.pnpm/pnpm@7.0.1/node_modules/pnpm/dist/pnpm.cjs:91022:14)\n    at run (/Users/manzt/Library/Application Support/fnm/node-versions/v17.6.0/installation/pnpm-global/5/node_modules/.pnpm/pnpm@7.0.1/node_modules/pnpm/dist/pnpm.cjs:91129:18)\n    at runMicrotasks (<anonymous>)\n    at processTicksAndRejections (node:internal/process/task_queues:96:5)"
+    }
+  }
+}
