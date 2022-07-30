@@ -98,12 +98,6 @@ Checkout latest `master` branch, run:
 ```sh
 # commit and tag a new version
 pnpm version [major | minor | patch]
-# sync @vivjs/* package versions with root
-pnpm meta-updater
-# update CHANGELOG.md for release
-./version.sh 
-# add changes to this versioned commit
-git add . && git commit --amend --no-edit 
 # push to `master` & trigger CI for release
 git push --follow-tags
 ```
