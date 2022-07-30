@@ -10,6 +10,7 @@
 - Only run CHANGELOG action on pull_requests
 - fix(main): image URLs in README
 - test release (v0.13.0-alpha.0)
+- add `postversion` script to `package.json`
 
 ## 0.12.9
 
