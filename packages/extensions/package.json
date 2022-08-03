@@ -1,0 +1,41 @@
+{
+  "name": "@vivjs/extensions",
+  "version": "0.13.0-alpha.0",
+  "author": "Ilan Gold",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hms-dbmi/viv.git"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/hms-dbmi/viv#readme",
+  "type": "module",
+  "main": "src/index.js",
+  "publishConfig": {
+    "main": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "sideEffects": false
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run prepare && unbuild",
+    "prepare": "node prepare.mjs"
+  },
+  "peerDependencies": {
+    "@deck.gl/core": "8.6.7"
+  },
+  "dependencies": {
+    "@vivjs/constants": "workspace:*"
+  },
+  "devDependencies": {
+    "@vivjs/types": "workspace:*",
+    "glsl-colormap": "^1.0.1"
+  },
+  "unbuild": {
+    "entries": [
+      "src/index"
+    ],
+    "declaration": true
+  }
+}
