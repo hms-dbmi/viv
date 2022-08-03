@@ -4,11 +4,10 @@ import type { GeoTIFF } from 'geotiff';
 import { createOffsetsProxy, checkProxies } from './lib/proxies';
 import LZWDecoder from './lib/lzw-decoder';
 import Pool from './lib/Pool';
-import { parseFilename } from './lib/utils';
+import { parseFilename, OmeTiffSelection } from './lib/utils';
 
 import { load as loadOme } from './ome-tiff';
 import { load as loadMulti, MultiTiffImage } from './multi-tiff';
-import type { TiffSelection } from './types';
 
 addDecoder(5, () => LZWDecoder);
 
@@ -23,7 +22,9 @@ interface OmeTiffOptions extends TiffOptions {
   images?: 'first' | 'all';
 }
 
-export type MultiTiffOptions = OmeTiffOptions;
+interface MultiTiffOptions {
+  pool?: boolean;
+}
 
 type UnwrapPromise<T> = T extends Promise<infer Inner> ? Inner : T;
 type MultiImage = UnwrapPromise<ReturnType<typeof loadOme>>; // get return-type from `load`
@@ -115,7 +116,7 @@ const DEFAULT_MULTI_IMAGE_NAME = 'MultiTiff';
  * @return {Promise<{ data: TiffFolderPixelSource[], metadata: ImageMeta }>} data source and associated metadata.
  */
 export async function loadMultiTiff(
-  sources: [TiffSelection, string | (File & { path: string })][],
+  sources: [OmeTiffSelection, string | (File & { path: string })][],
   opts: MultiTiffOptions = {}
 ) {
   let imageName: string | undefined;

@@ -122,3 +122,26 @@ test('Correct MultiTIFF metadata.', async t => {
     t.fail(e);
   }
 });
+
+test('Check for comlete stack.', async t => {
+  t.plan(1);
+  try {
+    const imageName = 'tiff-folder';
+    const tiffs = [
+      {
+        name: 'Channel 1',
+        selection: { c: 1, t: 0, z: 0 },
+        tiff: await (
+          await fromFile('tests/loaders/fixtures/multi-tiff/Channel_1.tif')
+        ).getImage(0)
+      }
+    ];
+    try {
+      await load(imageName, tiffs);
+    } catch (e) {
+      t.ok(e instanceof Error, 'stack should be incomplete.');
+    }
+  } catch (e) {
+    t.fail(e);
+  }
+});

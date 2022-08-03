@@ -3,6 +3,12 @@ import { getDims, getLabels, DTYPE_LOOKUP } from '../../utils';
 import type { OMEXML, UnitsLength, DimensionOrder } from '../../omexml';
 import type { MultiTiffImage } from '../multi-tiff';
 
+export interface OmeTiffSelection {
+  t: number;
+  c: number;
+  z: number;
+}
+
 export function getOmePixelSourceMeta({ Pixels }: OMEXML[0]) {
   // e.g. 'XYZCT' -> ['t', 'c', 'z', 'y', 'x']
   const labels = getLabels(Pixels.DimensionOrder);

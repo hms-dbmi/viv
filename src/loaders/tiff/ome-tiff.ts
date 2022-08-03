@@ -3,9 +3,8 @@ import { fromString } from '../omexml';
 
 import TiffPixelSource from './pixel-source';
 import { getOmeLegacyIndexer, getOmeSubIFDIndexer } from './lib/indexers';
-import { getOmePixelSourceMeta } from './lib/utils';
+import { getOmePixelSourceMeta, OmeTiffSelection } from './lib/utils';
 import { guessTiffTileSize } from '../utils';
-import type { TiffSelection } from './types';
 import type Pool from './lib/Pool';
 import type { OmeTiffIndexer } from './lib/indexers';
 import type { OMEXML } from '../omexml';
@@ -58,7 +57,7 @@ export async function load(tiff: GeoTIFF, pool?: Pool) {
     const tileSize = guessTiffTileSize(firstImage);
     const meta = { photometricInterpretation, physicalSizes };
     const shape = getShape(resolution);
-    const indexer = (sel: TiffSelection) => pyramidIndexer(sel, resolution);
+    const indexer = (sel: OmeTiffSelection) => pyramidIndexer(sel, resolution);
     const source = new TiffPixelSource(
       indexer,
       dtype,
