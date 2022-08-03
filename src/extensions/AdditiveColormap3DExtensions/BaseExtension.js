@@ -37,6 +37,12 @@ function removeExtraColormapFunctionsFromShader(colormap) {
  * @property {string=} colormap String indicating a colormap (default: 'viridis').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * */
 const BaseExtension = class extends LayerExtension {
+  constructor(...args) {
+    super(args);
+    // After deck.gl 8.8, it does not seem like this is always initialized.
+    this.opts = this.opts || {};
+  }
+
   getShaders() {
     return {
       ...super.getShaders(),
