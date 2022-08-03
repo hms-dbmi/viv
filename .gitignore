@@ -19,6 +19,7 @@
 .vscode
 *.tgz
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+.pnpm-debug.log
+
+# auto-generated via `pnpm --filter=@viv/extensions prepare`
+packages/extensions/src/generated-colormaps.js

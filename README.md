@@ -3,7 +3,7 @@
 A WebGL-powered toolkit for interactive visualization of high-resolution, multiplexed bioimaging datasets.
 
 <p align="center">
-<img src="https://github.com/hms-dbmi/viv/raw/master/docs/3d-slicing.gif" alt="Interactive volumetric view in web browser; sliders control visible planes." width="400"/> <img src="https://github.com/hms-dbmi/viv/raw/master/docs/glomerular-lens.png" alt="Multi-channel rendering of high-resolution microscopy dataset" width="400"/>
+<img src="https://github.com/hms-dbmi/viv/raw/master/sites/docs/src/3d-slicing.gif" alt="Interactive volumetric view in web browser; sliders control visible planes." width="400"/> <img src="https://github.com/hms-dbmi/viv/raw/master/sites/docs/src/glomerular-lens.png" alt="Multi-channel rendering of high-resolution microscopy dataset" width="400"/>
 </p>
 
 ## About
@@ -23,8 +23,8 @@ More details and related work can be found in our paper and original [preprint](
 
 | Screenshot   |     Description    |
 :-------------------------:|:-------------------------:
-<img src="https://github.com/hms-dbmi/viv/raw/master/docs/avivator-browser.png" alt="Avivator viewer running in Chrome"/> | [**Avivator**](http://avivator.gehlenborglab.org) <br> A lightweight viewer for local and remote datasets. The source code is include in this repository under `avivator/`. See our [🎥 video tutorial](https://www.youtube.com/watch?v=_GES8BTzyWc) to learn more.
-<img src="https://github.com/hms-dbmi/viv/raw/master/docs/vizarr-browser.png" alt="Vizarr viewer running in Jupyter Notebook"/> | [**Vizarr**](https://github.com/hms-dbmi/vizarr) <br> A minimal, purely client-side program for viewing OME-NGFF and other Zarr-based images. Vizarr supports a Python backend using the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc), allowing it to not only function as a standalone application but also directly embed in Jupyter or Google Colab Notebooks.
+<img src="https://github.com/hms-dbmi/viv/raw/master/sites/docs/src/avivator-browser.png" alt="Avivator viewer running in Chrome"/> | [**Avivator**](http://avivator.gehlenborglab.org) <br> A lightweight viewer for local and remote datasets. The source code is include in this repository under `avivator/`. See our [🎥 video tutorial](https://www.youtube.com/watch?v=_GES8BTzyWc) to learn more.
+<img src="https://github.com/hms-dbmi/viv/raw/master/sites/docs/src/vizarr-browser.png" alt="Vizarr viewer running in Jupyter Notebook"/> | [**Vizarr**](https://github.com/hms-dbmi/vizarr) <br> A minimal, purely client-side program for viewing OME-NGFF and other Zarr-based images. Vizarr supports a Python backend using the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc), allowing it to not only function as a standalone application but also directly embed in Jupyter or Google Colab Notebooks.
 
 ## 💥 In Action
 
@@ -72,33 +72,37 @@ Detailed API information and example sippets can be found in our [documentation]
 
 ## 🏗️  Development
 
-```bash
-$ git clone https://github.com/hms-dbmi/viv.git
-$ cd viv && npm install
-$ npm start
-```
+This repo is a monorepo using pnpm workspaces. The package manager used to install and link dependncies _must_ be [`pnpm`](https://pnpm.io/).
 
-Please install the [Prettier plug-in](https://prettier.io/docs/en/editors.html) for your
-preferred editor. Badly formatted code will fail in our CI. 
+Each folder under `packages/` are a published as a separate packages on npm under the `@vivjs` scope. The top-level package `@hms-dbmi/viv` exports from these dependencies.
 
-To run unit and integration tests locally, use `npm test`. Our full production test suite,
-including linting and formatting, is run via `npm run test:prod`.
+To develop and test the `@hms-dbmi/viv` package:
 
-To our knowledge, Viv can be developed with Node version greater than 10. You can check which
-current versions are tested in our CI by naviating to our
-[Github Workflow](https://github.com/hms-dbmi/viv/blob/master/.github/workflows/test.yml#L31).
+1. Run `pnpm install` in `viv` root folder
+2. Run `pnpm dev` to start a development server
+3. Run `pnpm test` to run all tests (or specific `pnpm test --filter=@vivjs/layers`
 
 ## 🛠️  Build
 
-- `@hms-dbmi/viv` library: `npm run build`
-- `Avivator` viewer: `npm run build:avivator`
+To build viv's documentation and the Avivator website (under `sites/`), run:
+
+```sh
+pnpm build # all packages, avivator, and documentation
+pnpm -r build --filter=avivator # build a specific package or site
+```
 
 ## 📄 Publish
 
-First checkout a new branch like `release/version`. Update the `CHANGELOG.md` and bump
-the version via `npm verion [major | minor | patch]`. Commit locally and push a tag to Github. 
-Next, run `./publish.sh` to release the package on npm and publish Avivator.
-Finally, make a PR for `release/version` and squash + merge into `master`.
+Checkout latest `master` branch, run:
+
+```sh
+# commit and tag a new version
+pnpm version [major | minor | patch]
+# push to `master` & trigger CI for release
+git push --follow-tags
+```
+
+Our CI will run a release workflow for tagged commits on `master`. Inspect the GitHub actions to ensure the workflow was successful.
 
 ## 🌎 Browser Support
 
