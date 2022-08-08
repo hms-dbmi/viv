@@ -5,6 +5,12 @@
 ### Added
 
 ### Changed
+
+## 0.13.0-next.0
+
+### Added
+
+### Changed
 - Migrate to pnpm monorepo
 - Fix all image URLs in README
 - Only run CHANGELOG action on pull_requests
