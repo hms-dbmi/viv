@@ -52,9 +52,8 @@ export async function load(
   assertSameResolution(images);
 
   const firstImage = images[0].tiff;
-  const {
-    PhotometricInterpretation: photometricInterpretation
-  } = firstImage.fileDirectory;
+  const { PhotometricInterpretation: photometricInterpretation } =
+    firstImage.fileDirectory;
   // Not sure if we need this or if the order matters for this use case.
   const dimensionOrder = 'XYZCT';
   const tileSize = guessTiffTileSize(firstImage);

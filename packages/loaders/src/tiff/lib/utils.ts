@@ -117,9 +117,9 @@ function guessImageDataType(image: GeoTIFFImage) {
   throw Error('Unsupported data format/bitsPerSample');
 }
 
-function getMultiTiffShapeMap(
-  tiffs: MultiTiffImage[]
-): { [key: string]: number } {
+function getMultiTiffShapeMap(tiffs: MultiTiffImage[]): {
+  [key: string]: number;
+} {
   let [c, z, t] = [0, 0, 0];
   for (const tiff of tiffs) {
     c = Math.max(c, tiff.selection.c);

@@ -51,9 +51,8 @@ export async function load(tiff: GeoTIFF, pool?: Pool) {
     pyramidIndexer: OmeTiffIndexer,
     imgMeta: OMEXML[0]
   ) => {
-    const { labels, getShape, physicalSizes, dtype } = getOmePixelSourceMeta(
-      imgMeta
-    );
+    const { labels, getShape, physicalSizes, dtype } =
+      getOmePixelSourceMeta(imgMeta);
     const tileSize = guessTiffTileSize(firstImage);
     const meta = { photometricInterpretation, physicalSizes };
     const shape = getShape(resolution);
