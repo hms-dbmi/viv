@@ -11,7 +11,7 @@ import { load as loadMulti, MultiTiffImage } from './multi-tiff';
 addDecoder(5, () => LZWDecoder);
 
 interface TiffOptions {
-  headers?: Headers | Record<string, string>,
+  headers?: Headers | Record<string, string>;
   offsets?: number[];
   pool?: Pool;
   images?: 'first' | 'all';
@@ -24,7 +24,7 @@ interface OmeTiffOptions extends TiffOptions {
 interface MultiTiffOptions {
   pool?: Pool;
   name?: string;
-  headers?: Headers | Record<string, string>,
+  headers?: Headers | Record<string, string>;
 }
 
 type MultiImage = Awaited<ReturnType<typeof loadOme>>; // get return-type from `load`
@@ -96,8 +96,6 @@ export async function loadOmeTiff(
   return images === 'all' ? loaders : loaders[0];
 }
 
-const DEFAULT_MULTI_IMAGE_NAME = 'MultiTiff';
-
 /**
  * Opens multiple tiffs as a multidimensional "stack" of 2D planes. Returns the data source and OME-TIFF-like metadata.
  *
@@ -115,7 +113,7 @@ const DEFAULT_MULTI_IMAGE_NAME = 'MultiTiff';
  * @param {Array<[OmeTiffSelection, (string | File)]>} sources pairs of `[Selection, string | File]` entries indicating the multidimensional selection in the virtual stack in image source (url string, or `File`).
  * @param {Object} opts
  * @param {GeoTIFF.Pool} [opts.pool] - A geotiff.js [Pool](https://geotiffjs.github.io/geotiff.js/module-pool-Pool.html) for decoding image chunks.
- * @param {string} [opts.name] - a name for the "virtual" image stack. If none is provided a name is inferred from the source paths or defaults to "MultiTiff".
+ * @param {string} [opts.name='MultiTiff'] - a name for the "virtual" image stack.
  * @param {Headers=} opts.headers - Headers passed to each underlying fetch request.
  * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>} data source and associated metadata.
  */
@@ -123,25 +121,8 @@ export async function loadMultiTiff(
   sources: [OmeTiffSelection, string | (File & { path: string })][],
   opts: MultiTiffOptions = {}
 ) {
-  let imageName: string | undefined;
-  const { pool, headers = {} } = opts;
+  const { pool, headers = {}, name = 'MultiTiff' } = opts;
   const tiffImage: MultiTiffImage[] = [];
-
-  const firstSource = sources[0];
-  if (firstSource) {
-    const [, firstSourceFile] = firstSource;
-    if (typeof firstSourceFile === 'string') {
-      const splitPath = firstSourceFile.split('/');
-      // We only want to get the image name from the path if the TIFF is in a folder.
-      // If the TIFF url is == 2, then the first part is http and the second part is the filename.
-      if (splitPath.length > 2) imageName = splitPath[-2];
-    } else {
-      // Try to get the imageName from the file path path
-      imageName = firstSourceFile.path.split('/')[-2];
-    }
-    // If the image name still hasn't been set, set it to a default.
-    if (!imageName) imageName = DEFAULT_MULTI_IMAGE_NAME;
-  }
 
   for (const source of sources) {
     const [selection, file] = source;
@@ -167,11 +148,7 @@ export async function loadMultiTiff(
   }
 
   if (tiffImage.length > 0) {
-    if (!imageName) imageName = DEFAULT_MULTI_IMAGE_NAME;
-    const loader = pool
-      ? await loadMulti(imageName, tiffImage, pool)
-      : await loadMulti(imageName, tiffImage);
-    return loader;
+    return loadMulti(name, tiffImage, pool);
   }
 
   throw new Error('Unable to load image from provided TiffFolder source.');
