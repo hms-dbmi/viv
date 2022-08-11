@@ -6,6 +6,12 @@
 
 ### Changed
 - Upgrade deck.gl to 8.8
+
+## 0.13.0
+
+### Added
+
+### Changed
 - Migrate to pnpm monorepo
 - Fix all image URLs in README
 - Only run CHANGELOG action on pull_requests

@@ -1,5 +1,5 @@
 {
-  "version": "0.13.0-alpha.0",
+  "version": "0.13.0",
   "scripts": {
     "build": "npm run bundle && documentation build -o dist -f html --document-exported --config documentation.yml dist/index.js",
     "bundle": "rollup -c"
