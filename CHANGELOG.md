@@ -6,6 +6,7 @@
 - Added support for loading multiple single channel TIFFs.
 
 ### Changed
+- Update doc strings for `loadMultiTiff`
 
 ## 0.13.0
 
