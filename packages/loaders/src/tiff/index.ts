@@ -3,8 +3,10 @@ import type { GeoTIFF, Pool } from 'geotiff';
 
 import { createOffsetsProxy, checkProxies } from './lib/proxies';
 import LZWDecoder from './lib/lzw-decoder';
+import { parseFilename, OmeTiffSelection } from './lib/utils';
 
-import { load } from './ome-tiff';
+import { load as loadOme } from './ome-tiff';
+import { load as loadMulti, MultiTiffImage } from './multi-tiff';
 
 addDecoder(5, () => LZWDecoder);
 
@@ -19,8 +21,12 @@ interface OmeTiffOptions extends TiffOptions {
   images?: 'first' | 'all';
 }
 
+interface MultiTiffOptions {
+  pool?: Pool;
+}
+
 type UnwrapPromise<T> = T extends Promise<infer Inner> ? Inner : T;
-type MultiImage = UnwrapPromise<ReturnType<typeof load>>; // get return-type from `load`
+type MultiImage = UnwrapPromise<ReturnType<typeof loadOme>>; // get return-type from `load`
 
 /** @ignore */
 export async function loadOmeTiff(
@@ -85,6 +91,83 @@ export async function loadOmeTiff(
    */
   checkProxies(tiff);
 
-  const loaders = await load(tiff, pool);
+  const loaders = await loadOme(tiff, pool);
   return images === 'all' ? loaders : loaders[0];
+}
+
+const DEFAULT_MULTI_IMAGE_NAME = 'MultiTiff';
+
+/**
+ * Opens a folder of multiple tiffs each containing one image (no stacks, timepoints, or pyramids).
+ * Loads each tiff as a channel.
+ * Expects one of two possible inputs:
+ *
+ * string - A single URL or a comma separated list of URLs where each URL points to a flat TIFF.
+ * In this case the name of the parent path element for the first image will be used as the image name
+ * and the file names will be used as the channel names.
+ *
+ * (File & { path: string })[] - A list of file objects paired with their paths. In this case
+ * the parent folder name of the first image will be used as the image name and the file names
+ * will be used to as the channel names.
+ *
+ * @param {string | File[]} source url or files with paths
+ * @param {{ fetchOptions: (undefined | RequestInit) }} options
+ * @return {Promise<{ data: TiffFolderPixelSource[], metadata: ImageMeta }>} data source and associated metadata.
+ */
+export async function loadMultiTiff(
+  sources: [OmeTiffSelection, string | (File & { path: string })][],
+  opts: MultiTiffOptions = {}
+) {
+  let imageName: string | undefined;
+  const { pool } = opts;
+  const tiffImage: MultiTiffImage[] = [];
+
+  const firstSource = sources[0];
+  if (firstSource) {
+    const [, firstSourceFile] = firstSource;
+    if (typeof firstSourceFile === 'string') {
+      const splitPath = firstSourceFile.split('/');
+      // We only want to get the image name from the path if the TIFF is in a folder.
+      // If the TIFF url is == 2, then the first part is http and the second part is the filename.
+      if (splitPath.length > 2) imageName = splitPath[-2];
+    } else {
+      // Try to get the imageName from the file path path
+      imageName = firstSourceFile.path.split('/')[-2];
+    }
+    // If the image name still hasn't been set, set it to a default.
+    if (!imageName) imageName = DEFAULT_MULTI_IMAGE_NAME;
+  }
+
+  for (const source of sources) {
+    const [selection, file] = source;
+    if (typeof file === 'string') {
+      const parsedFilename = parseFilename(file);
+      const extension = parsedFilename.extension?.toLowerCase();
+      if (extension === 'tif' || extension === 'tiff') {
+        const tiffImageName = parsedFilename.name;
+        if (tiffImageName) {
+          const tiff = await (
+            await fromUrl(file, { cacheSize: Infinity })
+          ).getImage(0);
+          tiffImage.push({ name: tiffImageName, selection, tiff });
+        }
+      }
+    } else {
+      const { name } = parseFilename(file.path);
+      if (name) {
+        const tiff = await (await fromBlob(file)).getImage(0);
+        tiffImage.push({ name, selection, tiff });
+      }
+    }
+  }
+
+  if (tiffImage.length > 0) {
+    if (!imageName) imageName = DEFAULT_MULTI_IMAGE_NAME;
+    const loader = pool
+      ? await loadMulti(imageName, tiffImage, pool)
+      : await loadMulti(imageName, tiffImage);
+    return loader;
+  }
+
+  throw new Error('Unable to load image from provided TiffFolder source.');
 }

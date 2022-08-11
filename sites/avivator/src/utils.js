@@ -6,6 +6,7 @@ import {
   loadOmeTiff,
   loadBioformatsZarr,
   loadOmeZarr,
+  loadMultiTiff,
   getChannelStats,
   RENDERING_MODES,
   ColorPalette3DExtensions,
@@ -24,6 +25,18 @@ function isOMETIFF(urlOrFile) {
   if (Array.isArray(urlOrFile)) return false; // local Zarr is array of File Objects
   const name = typeof urlOrFile === 'string' ? urlOrFile : urlOrFile.name;
   return name.includes('ome.tiff') || name.includes('ome.tif');
+}
+
+function isMultiTiff(urlOrFile) {
+  const filenames = Array.isArray(urlOrFile)
+    ? urlOrFile.map(f => f.name)
+    : urlOrFile.split(',');
+  for (const filename of filenames) {
+    const lowerCaseName = filename.toLowerCase();
+    if (!(lowerCaseName.includes('.tiff') || lowerCaseName.includes('.tif')))
+      return false;
+  }
+  return true;
 }
 
 class UnsupportedBrowserError extends Error {
@@ -111,16 +124,33 @@ export async function createLoader(
       }
       return source;
     }
-    // Bio-Formats Zarr
+
     if (
       Array.isArray(urlOrFile) &&
       typeof urlOrFile[0].arrayBuffer !== 'function'
     ) {
       throw new UnsupportedBrowserError(
-        'Cannot upload a local Zarr with this browser. Try using Chrome, Firefox, or Microsoft Edge.'
+        'Cannot upload a local Zarr or flat TIFF files with this browser. Try using Chrome, Firefox, or Microsoft Edge.'
       );
     }
 
+    // Multiple flat tiffs
+    if (isMultiTiff(urlOrFile)) {
+      const multiTiffFiles = Array.isArray(urlOrFile)
+        ? urlOrFile
+        : urlOrFile.split(',');
+      const mutiTiffSources = multiTiffFiles.map((e, i) => [
+        { c: i, z: 0, t: 0 },
+        e
+      ]);
+      const source = await loadMultiTiff(mutiTiffSources, {
+        images: 'all',
+        pool: false
+      });
+      return source;
+    }
+
+    // Bio-Formats Zarr
     let source;
     try {
       source = await loadBioformatsZarr(urlOrFile);

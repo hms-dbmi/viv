@@ -3,6 +3,7 @@
 ## In Progress
 
 ### Added
+- Added support for loading multiple single channel TIFFs.
 
 ### Changed
 
@@ -21,9 +22,11 @@
 ## 0.12.9
 
 ### Added
+
 - See documentation for a description of the newly added 3D extensions and how they work.
 
 ### Changed
+
 - Refactor 3D rendering to use extensions just like 2D.
 
 ## 0.12.9
@@ -39,6 +42,7 @@
 ### Added
 
 ### Changed
+
 - Log errors for loading in Avivator
 - Fix casting bug for `Float64`
 - Disable `Pool` usage temporarily in Avivator due to broken Worker module
@@ -52,6 +56,7 @@
 ### Added
 
 ### Changed
+
 - Migrate off `geotiff` fork to latest release from [`geotiff/geotiff.js`](https://github.com/geotiffjs/geotiff.js/)
 
 ## 0.12.6
@@ -59,6 +64,7 @@
 ### Added
 
 ### Changed
+
 - Bump `deck.gl` to 8.6.7
 - Fix custom `BitmapLayer` compilation issue by providing `extensions: []`
 
@@ -67,13 +73,15 @@
 ### Added
 
 ### Changed
-- Fix geotiff file size check, implemented when fixing 416 issue.  Not all servers return file size as part of response.
+
+- Fix geotiff file size check, implemented when fixing 416 issue. Not all servers return file size as part of response.
 
 ## 0.12.4
 
 ### Added
 
 ### Changed
+
 - Upgrade geotiff fork to viv-0.0.3 to resolve 416 issue
 - Disable `@vite/plugin-react` for ESM build
 
