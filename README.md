@@ -96,13 +96,16 @@ pnpm -r build --filter=avivator # build a specific package or site
 Checkout latest `master` branch, run:
 
 ```sh
+# checkout a new release branch
+git checkout <branch name>
 # commit and tag a new version
 pnpm version [major | minor | patch]
-# push to `master` & trigger CI for release
-git push --follow-tags
+# push commit and tag simultaneously
+git push --atomic origin <branch name> <tag>
 ```
 
-Our CI will run a release workflow for tagged commits on `master`. Inspect the GitHub actions to ensure the workflow was successful.
+Open a PR for `<branch name>`. Our CI will run a release workflow for tagged commits starting
+with `v*` automatically. Inspect the GitHub Actions to ensure the workflow was successful.
 
 ## 🌎 Browser Support
 

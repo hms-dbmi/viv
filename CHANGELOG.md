@@ -7,6 +7,7 @@
 
 ### Changed
 - Update doc strings for `loadMultiTiff`
+- Update release notes in `README.md`
 
 ## 0.13.0
 
