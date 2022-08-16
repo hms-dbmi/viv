@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Replace `postversion` script with `version` script for CI release.
 
 ## 0.13.1
 
