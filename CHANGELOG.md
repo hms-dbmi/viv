@@ -3,6 +3,12 @@
 ## In Progress
 
 ### Added
+
+### Changed
+
+## 0.13.1
+
+### Added
 - Added support for loading multiple single channel TIFFs.
 
 ### Changed
