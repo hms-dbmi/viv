@@ -17,7 +17,7 @@ import { ColorPaletteExtension } from '../extensions';
  * @param {Array} props.channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @param {string} [props.colormap] String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.loader The data source for the viewer, PixelSource[]. If loader.length > 1, data is assumed to be multiscale.
- * @param {Array} props.loaders Array of loaders
+ * @param {Array} props.multipleDatasets Object with the following properties: loaders, spacingX, spacingY, numberOfColumns. loaders is an array of loaders. spacingX, spacingY, numberOfColumns are numbers.
  * @param {Array} props.selections Selection to be used for fetching data.
  * @param {Object} props.overview Allows you to pass settings into the OverviewView: { scale, margin, position, minimumWidth, maximumWidth,
  * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.  See http://viv.gehlenborglab.org/#overviewview for defaults.
@@ -49,7 +49,7 @@ import { ColorPaletteExtension } from '../extensions';
 const PictureInPictureViewer = props => {
   const {
     loader,
-    loaders,
+    multipleDatasets,
     contrastLimits,
     colors,
     channelsVisible,
@@ -127,7 +127,7 @@ const PictureInPictureViewer = props => {
   if (!loader) return null;
   return (
     <VivViewer
-      loaders={loaders}
+      multipleDatasets={multipleDatasets}
       layerProps={layerProps}
       views={views}
       viewStates={viewStates}

@@ -304,9 +304,8 @@ class VivViewerWrapper extends PureComponent {
       0, 1, 0, 0,
       0, 0, 1, 0,
       0, 0, 0, 1];
-      const row =20;
-    const layers=this.props.loaders.map((loader, i)=>{
-      const modelMatrix = new Matrix4(IDENTITY).translate([140000*(i%row), 140000*Math.floor(i/row), 0]);
+    const layers=this.props.multipleDatasets.loaders.map((loader, i)=>{
+      const modelMatrix = new Matrix4(IDENTITY).translate([this.props.multipleDatasets.spacingX*(i%this.props.multipleDatasets.numberOfColumns), this.props.multipleDatasets.spacingY*Math.floor(i/this.props.multipleDatasets.numberOfColumns), 0]);
       return this._renderLayers(loader.data)[0][0].clone({id:"ZarrPixelSource-"+i+"-#detail#", modelMatrix});
     })
 
@@ -335,7 +334,7 @@ class VivViewerWrapper extends PureComponent {
 /**
  * This component wraps the DeckGL component.
  * @param {Object} props
- * @param {Array} props.loaders Array of loaders
+ * @param {Array} props.multipleDatasets Object with the following properties: loaders, spacingX, spacingY, numberOfColumns. loaders is an array of loaders. spacingX, spacingY, numberOfColumns are numbers.
  * @param {Array} props.layerProps  Props for the layers in each view.
  * @param {boolean} [props.randomize] Whether or not to randomize which view goes first (for dynamic rendering of multiple linked views).
  * @param {Array.<import('../views').VivView>} props.views Various `VivView`s to render.
