@@ -312,7 +312,7 @@ class VivViewerWrapper extends PureComponent {
                 Math.floor(i / this.props.multipleDatasets.numberOfColumns),
               0
             ]);
-            return this._renderLayers(loader.data)[0][0].clone({
+            return this._renderLayers(loader)[0][0].clone({
               id: 'ZarrPixelSource-' + i + '-#detail#',
               modelMatrix
             });

@@ -52,7 +52,6 @@ import { ColorPaletteExtension } from '../extensions';
 
 const PictureInPictureViewer = props => {
   const {
-    loader,
     multipleDatasets,
     contrastLimits,
     colors,
@@ -78,6 +77,7 @@ const PictureInPictureViewer = props => {
     extensions = [new ColorPaletteExtension()],
     deckProps
   } = props;
+  const loader = props.loader !== undefined ? props.loader : props?.multipleDatasets?.loaders?.[0];
   const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
   const baseViewState = useMemo(() => {
     return (
