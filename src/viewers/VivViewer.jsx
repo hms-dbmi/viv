@@ -343,7 +343,11 @@ class VivViewerWrapper extends PureComponent {
 /**
  * This component wraps the DeckGL component.
  * @param {Object} props
- * @param {Array} props.multipleDatasets Object with the following properties: loaders, spacingX, spacingY, numberOfColumns. loaders is an array of loaders. spacingX, spacingY, numberOfColumns are numbers.
+ * @param {Object} props.multipleDatasets
+ * @param {Array} props.multipleDatasets.loaders Array of loaders
+ * @param {Number} props.multipleDatasets.spacingX Horizontal spacing between datasets
+ * @param {Number} props.multipleDatasets.spacingY Vertical spacing between datasets
+ * @param {Number} props.multipleDatasets.numberOfColumns This determines after how many datasets a new row should be started
  * @param {Array} props.layerProps  Props for the layers in each view.
  * @param {boolean} [props.randomize] Whether or not to randomize which view goes first (for dynamic rendering of multiple linked views).
  * @param {Array.<import('../views').VivView>} props.views Various `VivView`s to render.
