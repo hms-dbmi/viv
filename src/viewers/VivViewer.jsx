@@ -270,7 +270,7 @@ class VivViewerWrapper extends PureComponent {
         viewStates,
         props: {
           ...layerProps[i],
-          ...(loader ? {loader} : {}),
+          ...(loader ? { loader } : {}),
           onHover
         }
       })
@@ -300,16 +300,23 @@ class VivViewerWrapper extends PureComponent {
       deckGLViews[randomizedIndex] = holdFirstElement;
     }
 
-    const IDENTITY = [1, 0, 0, 0,
-      0, 1, 0, 0,
-      0, 0, 1, 0,
-      0, 0, 0, 1];
-    const layers=this.props.multipleDatasets === undefined ?
-    this._renderLayers() :
-    this.props.multipleDatasets.loaders.map((loader, i)=>{
-      const modelMatrix = new Matrix4(IDENTITY).translate([this.props.multipleDatasets.spacingX*(i%this.props.multipleDatasets.numberOfColumns), this.props.multipleDatasets.spacingY*Math.floor(i/this.props.multipleDatasets.numberOfColumns), 0]);
-      return this._renderLayers(loader.data)[0][0].clone({id:"ZarrPixelSource-"+i+"-#detail#", modelMatrix});
-    })
+    const IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+    const layers =
+      this.props.multipleDatasets === undefined
+        ? this._renderLayers()
+        : this.props.multipleDatasets.loaders.map((loader, i) => {
+            const modelMatrix = new Matrix4(IDENTITY).translate([
+              this.props.multipleDatasets.spacingX *
+                (i % this.props.multipleDatasets.numberOfColumns),
+              this.props.multipleDatasets.spacingY *
+                Math.floor(i / this.props.multipleDatasets.numberOfColumns),
+              0
+            ]);
+            return this._renderLayers(loader.data)[0][0].clone({
+              id: 'ZarrPixelSource-' + i + '-#detail#',
+              modelMatrix
+            });
+          });
 
     return (
       <DeckGL
