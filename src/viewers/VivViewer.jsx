@@ -304,7 +304,9 @@ class VivViewerWrapper extends PureComponent {
       0, 1, 0, 0,
       0, 0, 1, 0,
       0, 0, 0, 1];
-    const layers=this.props.multipleDatasets.loaders.map((loader, i)=>{
+    const layers=this.props.multipleDatasets === undefined ?
+    this._renderLayers() :
+    this.props.multipleDatasets.loaders.map((loader, i)=>{
       const modelMatrix = new Matrix4(IDENTITY).translate([this.props.multipleDatasets.spacingX*(i%this.props.multipleDatasets.numberOfColumns), this.props.multipleDatasets.spacingY*Math.floor(i/this.props.multipleDatasets.numberOfColumns), 0]);
       return this._renderLayers(loader.data)[0][0].clone({id:"ZarrPixelSource-"+i+"-#detail#", modelMatrix});
     })
