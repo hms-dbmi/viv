@@ -270,7 +270,7 @@ class VivViewerWrapper extends PureComponent {
         viewStates,
         props: {
           ...layerProps[i],
-          ...(loader ? { loader } : {}),
+          ...(loader !== undefined ? { loader } : {}),
           onHover
         }
       })
