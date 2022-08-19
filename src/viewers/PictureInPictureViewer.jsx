@@ -17,11 +17,11 @@ import { ColorPaletteExtension } from '../extensions';
  * @param {Array} props.channelsVisible List of boolean values for each channel for whether or not it is visible.
  * @param {string} [props.colormap] String indicating a colormap (default: '').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @param {Array} props.loader The data source for the viewer, PixelSource[]. If loader.length > 1, data is assumed to be multiscale.
- * @param {Object} props.multipleDatasets
- * @param {Array} props.multipleDatasets.loaders Array of loaders
- * @param {Number} props.multipleDatasets.spacingX Horizontal spacing between datasets
- * @param {Number} props.multipleDatasets.spacingY Vertical spacing between datasets
- * @param {Number} props.multipleDatasets.numberOfColumns This determines after how many datasets a new row should be started
+ * @param {Object} props.gridLoaders
+ * @param {Array} props.gridLoaders.loaders Array of loaders
+ * @param {Number} props.gridLoaders.spacingX Horizontal spacing between datasets
+ * @param {Number} props.gridLoaders.spacingY Vertical spacing between datasets
+ * @param {Number} props.gridLoaders.numberOfColumns This determines after how many datasets a new row should be started
  * @param {Array} props.selections Selection to be used for fetching data.
  * @param {Object} props.overview Allows you to pass settings into the OverviewView: { scale, margin, position, minimumWidth, maximumWidth,
  * boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.  See http://viv.gehlenborglab.org/#overviewview for defaults.
@@ -52,7 +52,7 @@ import { ColorPaletteExtension } from '../extensions';
 
 const PictureInPictureViewer = props => {
   const {
-    multipleDatasets,
+    gridLoaders,
     contrastLimits,
     colors,
     channelsVisible,
@@ -77,7 +77,7 @@ const PictureInPictureViewer = props => {
     extensions = [new ColorPaletteExtension()],
     deckProps
   } = props;
-  const loader = props.loader !== undefined ? props.loader : props?.multipleDatasets?.loaders?.[0];
+  const loader = props.loader !== undefined ? props.loader : props?.gridLoaders?.loaders?.[0];
   const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
   const baseViewState = useMemo(() => {
     return (
@@ -131,7 +131,7 @@ const PictureInPictureViewer = props => {
   if (!loader) return null;
   return (
     <VivViewer
-      multipleDatasets={multipleDatasets}
+      gridLoaders={gridLoaders}
       layerProps={layerProps}
       views={views}
       viewStates={viewStates}

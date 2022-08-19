@@ -302,14 +302,14 @@ class VivViewerWrapper extends PureComponent {
 
     const IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
     const layers =
-      this.props.multipleDatasets === undefined
+      this.props.gridLoaders === undefined
         ? this._renderLayers()
-        : this.props.multipleDatasets.loaders.map((loader, i) => {
+        : this.props.gridLoaders.loaders.map((loader, i) => {
             const modelMatrix = new Matrix4(IDENTITY).translate([
-              this.props.multipleDatasets.spacingX *
-                (i % this.props.multipleDatasets.numberOfColumns),
-              this.props.multipleDatasets.spacingY *
-                Math.floor(i / this.props.multipleDatasets.numberOfColumns),
+              this.props.gridLoaders.spacingX *
+                (i % this.props.gridLoaders.numberOfColumns),
+              this.props.gridLoaders.spacingY *
+                Math.floor(i / this.props.gridLoaders.numberOfColumns),
               0
             ]);
             return this._renderLayers(loader)[0][0].clone({
@@ -343,11 +343,11 @@ class VivViewerWrapper extends PureComponent {
 /**
  * This component wraps the DeckGL component.
  * @param {Object} props
- * @param {Object} props.multipleDatasets
- * @param {Array} props.multipleDatasets.loaders Array of loaders
- * @param {Number} props.multipleDatasets.spacingX Horizontal spacing between datasets
- * @param {Number} props.multipleDatasets.spacingY Vertical spacing between datasets
- * @param {Number} props.multipleDatasets.numberOfColumns This determines after how many datasets a new row should be started
+ * @param {Object} props.gridLoaders
+ * @param {Array} props.gridLoaders.loaders Array of loaders
+ * @param {Number} props.gridLoaders.spacingX Horizontal spacing between datasets
+ * @param {Number} props.gridLoaders.spacingY Vertical spacing between datasets
+ * @param {Number} props.gridLoaders.numberOfColumns This determines after how many datasets a new row should be started
  * @param {Array} props.layerProps  Props for the layers in each view.
  * @param {boolean} [props.randomize] Whether or not to randomize which view goes first (for dynamic rendering of multiple linked views).
  * @param {Array.<import('../views').VivView>} props.views Various `VivView`s to render.
