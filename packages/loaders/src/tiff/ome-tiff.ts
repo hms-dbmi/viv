@@ -3,16 +3,11 @@ import { fromString } from '../omexml';
 
 import TiffPixelSource from './pixel-source';
 import { getOmeLegacyIndexer, getOmeSubIFDIndexer } from './lib/indexers';
-import { getOmePixelSourceMeta, guessTileSize } from './lib/utils';
+import { getOmePixelSourceMeta, OmeTiffSelection } from './lib/utils';
+import { guessTiffTileSize } from '../utils';
 import type Pool from './lib/Pool';
 import type { OmeTiffIndexer } from './lib/indexers';
 import type { OMEXML } from '../omexml';
-
-export interface OmeTiffSelection {
-  t: number;
-  c: number;
-  z: number;
-}
 
 function getIndexer(
   tiff: GeoTIFF,
@@ -58,7 +53,7 @@ export async function load(tiff: GeoTIFF, pool?: Pool) {
   ) => {
     const { labels, getShape, physicalSizes, dtype } =
       getOmePixelSourceMeta(imgMeta);
-    const tileSize = guessTileSize(firstImage);
+    const tileSize = guessTiffTileSize(firstImage);
     const meta = { photometricInterpretation, physicalSizes };
     const shape = getShape(resolution);
     const indexer = (sel: OmeTiffSelection) => pyramidIndexer(sel, resolution);

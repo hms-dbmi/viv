@@ -1,9 +1,8 @@
 import { BoundsCheckError, slice } from 'zarr';
-import { getImageSize, isInterleaved } from '../utils';
-import { getIndexer } from './lib/indexer';
-
 import type { ZarrArray } from 'zarr';
 import type { RawArray } from 'zarr/types/rawArray';
+import { getImageSize, isInterleaved } from '../utils';
+import { getIndexer } from './lib/indexer';
 
 import type {
   PixelSource,
@@ -38,7 +37,9 @@ interface ZarrTileSelection {
 
 class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
   private _data: ZarrArray;
+
   private _indexer: ZarrIndexer<S>;
+
   private _readChunks: boolean;
 
   constructor(

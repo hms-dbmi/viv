@@ -17,7 +17,7 @@ We have an open issue for implementing this deck.gl: https://github.com/visgl/de
 
 - We convert all of our data to Float32Array so we can use LINEAR sampling while also maintaing the dynamic range and integrity of the data.
 
-- Will uses a colormap via a sampled texture, which is a very good idea, but not something we are geared up for in 2D, so not something we will do in 3D either: 
+- Will uses a colormap via a sampled texture, which is a very good idea, but not something we are geared up for in 2D, so not something we will do in 3D either:
 https://github.com/visgl/luma.gl/issues/1415
 
 - We allow for multiple rendering settings (Max/Min Int. Proj., Additive, etc.)

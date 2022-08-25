@@ -1,7 +1,19 @@
+import type { GeoTIFFImage } from 'geotiff';
 import quickselect from 'quickselect';
 import type { OMEXML } from './omexml';
 import type { TypedArray } from 'zarr';
 import type { Labels, PixelSource } from '@vivjs/types';
+
+export const DTYPE_LOOKUP = {
+  uint8: 'Uint8',
+  uint16: 'Uint16',
+  uint32: 'Uint32',
+  float: 'Float32',
+  double: 'Float64',
+  int8: 'Int8',
+  int16: 'Int16',
+  int32: 'Int32'
+} as const;
 
 /**
  * Computes statics from pixel data.
@@ -166,3 +178,11 @@ export function prevPowerOf2(x: number) {
 }
 
 export const SIGNAL_ABORTED = '__vivSignalAborted';
+
+export function guessTiffTileSize(image: GeoTIFFImage) {
+  const tileWidth = image.getTileWidth();
+  const tileHeight = image.getTileHeight();
+  const size = Math.min(tileWidth, tileHeight);
+  // deck.gl requirement for power-of-two tile size.
+  return prevPowerOf2(size);
+}

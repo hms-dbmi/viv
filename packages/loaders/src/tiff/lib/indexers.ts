@@ -1,6 +1,8 @@
+/* eslint-disable no-use-before-define */
 import { GeoTIFFImage, GeoTIFF } from 'geotiff';
-import type { OmeTiffSelection } from '../ome-tiff';
+import type { OmeTiffSelection } from './utils';
 import type { OMEXML } from '../../omexml';
+import type { MultiTiffImage } from '../multi-tiff';
 
 export type OmeTiffIndexer = (
   sel: OmeTiffSelection,
@@ -148,4 +150,19 @@ function getOmeIFDIndexer(
       throw new Error(`Invalid OME-XML DimensionOrder, got ${DimensionOrder}.`);
     }
   }
+}
+
+export function getMultiTiffIndexer(tiffs: MultiTiffImage[]) {
+  function selectionToKey({ c = 0, t = 0, z = 0 }: OmeTiffSelection): string {
+    return `${c}-${t}-${z}`;
+  }
+  const lookup = new Map(
+    tiffs.map(({ selection, tiff }) => [selectionToKey(selection), tiff])
+  );
+  return async (sel: OmeTiffSelection) => {
+    const key = selectionToKey(sel);
+    const img = lookup.get(key);
+    if (!img) throw new Error(`No image available for selection ${key}`);
+    return img;
+  };
 }
