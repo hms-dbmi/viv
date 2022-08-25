@@ -5,16 +5,20 @@
 ### Added
 
 ### Changed
+
 - Upgrade deck.gl to 8.8
+- Use correct deck.gl 8.8 `getTileData` args.
 - Replace `postversion` script with `version` script for CI release.
 - Remove `package-lock.json` from root (since we use pnpm)
 
 ## 0.13.1
 
 ### Added
+
 - Added support for loading multiple single channel TIFFs.
 
 ### Changed
+
 - Update doc strings for `loadMultiTiff`
 - Update release notes in `README.md`
 
@@ -23,6 +27,7 @@
 ### Added
 
 ### Changed
+
 - Migrate to pnpm monorepo
 - Fix all image URLs in README
 - Only run CHANGELOG action on pull_requests
