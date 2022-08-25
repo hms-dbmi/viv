@@ -83,8 +83,17 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       // The image-tile example works without, this but I have a feeling there is something
       // going on with our pyramids and/or rendering that is different.
       const resolution = Math.round(-z);
+
+      // Here we set up variables for checking whether or not we should cip the black border of incoming tiles
+      // at low resolutions i.e for zarr tiles.  We need to check a few things before trimming:
+      //  1. The height/width of the full image at the current resolution produces an image smaller than the current tileSize
+      //  2. The incoming image is not exactly this size (i.e tiles that are not "padded" as in zarr)
+      // Once these have been confirmed, we trim the tile by going over it in row major order,
+      // keeping only the data that is not out of the clipped bounds.
       const planarSize = loader[0].shape.slice(-2);
-      const [clippedHeight, clippedWidth] = planarSize.map(size => Math.ceil(size / (2 ** resolution)));
+      const [clippedHeight, clippedWidth] = planarSize.map(size =>
+        Math.floor(size / 2 ** resolution)
+      );
       const useClippedHeight = clippedHeight < tileSize;
       const useClippedWidth = clippedWidth < tileSize;
       const getTile = selection => {
@@ -92,20 +101,20 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         return loader[resolution].getTile(config);
       };
       const clip = tile => {
-        if ((useClippedHeight || useClippedWidth) && (clippedHeight * clippedWidth !== tile.length)) {
+        if (
+          (useClippedHeight || useClippedWidth) &&
+          clippedHeight * clippedWidth !== tile.length
+        ) {
           return tile.filter((data, ind) => {
-            if (
+            return !(
               (ind % tileSize >= clippedWidth && useClippedWidth) ||
               (useClippedHeight &&
                 Math.floor(ind / clippedWidth) >= clippedHeight)
-            ) {
-              return false;
-            }
-            return true;
+            );
           });
         }
         return tile;
-      }
+      };
 
       try {
         /*
@@ -117,13 +126,11 @@ const MultiscaleImageLayer = class extends CompositeLayer {
          * return type, and optional throw for performance.
          */
         const tiles = await Promise.all(selections.map(getTile));
-
         const tile = {
           data: tiles.map(d => clip(d.data)),
           width: useClippedWidth ? clippedWidth : tiles[0].width,
           height: useClippedHeight ? clippedHeight : tiles[0].height
         };
-        console.log(tile, clippedHeight, clippedWidth)
 
         if (isInterleaved(loader[resolution].shape)) {
           // eslint-disable-next-line prefer-destructuring
