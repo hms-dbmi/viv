@@ -98,7 +98,7 @@ function getRenderingAttrs() {
 function getRenderingFromExtensions(extensions) {
   let rendering = {};
   extensions.forEach(extension => {
-    rendering = extension.opts.rendering;
+    rendering = extension.rendering;
   });
   if (!rendering._RENDER) {
     throw new Error(

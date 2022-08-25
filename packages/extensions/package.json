@@ -23,7 +23,7 @@
     "prepare": "node prepare.mjs"
   },
   "peerDependencies": {
-    "@deck.gl/core": "8.6.7"
+    "@deck.gl/core": "~8.8.6"
   },
   "dependencies": {
     "@vivjs/constants": "workspace:*"
