@@ -84,10 +84,29 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       // The image-tile example works without, this but I have a feeling there is something
       // going on with our pyramids and/or rendering that is different.
       const resolution = Math.round(-z);
+      const planarSize = loader[0].shape.slice(-2);
+      const [clippedHeight, clippedWidth] = planarSize.map(size => Math.ceil(size / (2 ** resolution)));
+      const useClippedHeight = clippedHeight < tileSize;
+      const useClippedWidth = clippedWidth < tileSize;
       const getTile = selection => {
         const config = { x, y, selection, signal };
         return loader[resolution].getTile(config);
       };
+      const clip = tile => {
+        if ((useClippedHeight || useClippedWidth) && (clippedHeight * clippedWidth !== tile.length)) {
+          return tile.filter((data, ind) => {
+            if (
+              (ind % tileSize >= clippedWidth && useClippedWidth) ||
+              (useClippedHeight &&
+                Math.floor(ind / clippedWidth) >= clippedHeight)
+            ) {
+              return false;
+            }
+            return true;
+          });
+        }
+        return tile;
+      }
 
       try {
         /*
@@ -101,10 +120,11 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         const tiles = await Promise.all(selections.map(getTile));
 
         const tile = {
-          data: tiles.map(d => d.data),
-          width: tiles[0].width,
-          height: tiles[0].height
+          data: tiles.map(d => clip(d.data)),
+          width: useClippedWidth ? clippedWidth : tiles[0].width,
+          height: useClippedHeight ? clippedHeight : tiles[0].height
         };
+        console.log(tile, clippedHeight, clippedWidth)
 
         if (isInterleaved(loader[resolution].shape)) {
           // eslint-disable-next-line prefer-destructuring
