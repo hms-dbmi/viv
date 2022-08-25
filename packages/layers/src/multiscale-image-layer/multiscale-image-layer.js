@@ -100,20 +100,34 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         const config = { x, y, selection, signal };
         return loader[resolution].getTile(config);
       };
-      const clip = tile => {
+      const clip = ({ data, height, width }) => {
+        console.log(
+          tileSize,
+          useClippedHeight,
+          useClippedWidth,
+          clippedHeight,
+          clippedWidth,
+          data.length,
+          resolution,
+          width,
+          height
+        );
         if (
           (useClippedHeight || useClippedWidth) &&
-          clippedHeight * clippedWidth !== tile.length
+          width !== clippedHeight && height !== clippedHeight
         ) {
-          return tile.filter((data, ind) => {
+          return data.filter((d, ind) => {
             return !(
-              (ind % tileSize >= clippedWidth && useClippedWidth) ||
+              (ind % tileSize >= clippedWidth &&
+                useClippedWidth &&
+                ) ||
               (useClippedHeight &&
-                Math.floor(ind / clippedWidth) >= clippedHeight)
+                Math.floor(ind / clippedWidth) >= clippedHeight &&
+                height !== clippedHeight)
             );
           });
         }
-        return tile;
+        return data;
       };
 
       try {
@@ -127,9 +141,21 @@ const MultiscaleImageLayer = class extends CompositeLayer {
          */
         const tiles = await Promise.all(selections.map(getTile));
         const tile = {
-          data: tiles.map(d => clip(d.data)),
-          width: useClippedWidth ? clippedWidth : tiles[0].width,
-          height: useClippedHeight ? clippedHeight : tiles[0].height
+          data: tiles.map(d =>
+            clip({
+              data: d.data,
+              width: tiles[0].width,
+              height: tiles[0].height
+            })
+          ),
+          width:
+            useClippedWidth && tiles[0].height !== tileSize
+              ? clippedWidth
+              : tiles[0].width,
+          height:
+            useClippedHeight && tiles[0].height !== tileSize
+              ? clippedHeight
+              : tiles[0].height
         };
 
         if (isInterleaved(loader[resolution].shape)) {
