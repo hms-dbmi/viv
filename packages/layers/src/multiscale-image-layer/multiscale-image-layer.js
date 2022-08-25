@@ -83,7 +83,6 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       // The image-tile example works without, this but I have a feeling there is something
       // going on with our pyramids and/or rendering that is different.
       const resolution = Math.round(-z);
-      console.log(resolution, z);
       const getTile = selection => {
         const config = { x, y, selection, signal };
         return loader[resolution].getTile(config);
