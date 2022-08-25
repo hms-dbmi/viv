@@ -86,44 +86,32 @@ const MultiscaleImageLayer = class extends CompositeLayer {
 
       // Here we set up variables for checking whether or not we should cip the black border of incoming tiles
       // at low resolutions i.e for zarr tiles.  We need to check a few things before trimming:
-      //  1. The height/width of the full image at the current resolution produces an image smaller than the current tileSize
-      //  2. The incoming image is not exactly this size (i.e tiles that are not "padded" as in zarr)
+      //  1. The height/width of the full image at the current resolution
+      //  produces an image smaller than the current tileSize
+      //  2. The incoming image is indeed padded out to the tile size
+      //  in some dimension i.e it should be clipped down to the smaller size
       // Once these have been confirmed, we trim the tile by going over it in row major order,
       // keeping only the data that is not out of the clipped bounds.
       const planarSize = loader[0].shape.slice(-2);
       const [clippedHeight, clippedWidth] = planarSize.map(size =>
         Math.floor(size / 2 ** resolution)
       );
-      const useClippedHeight = clippedHeight < tileSize;
-      const useClippedWidth = clippedWidth < tileSize;
+      const isHeightUnderTileSize = clippedHeight < tileSize;
+      const isWidthUnderTileSize = clippedWidth < tileSize;
       const getTile = selection => {
         const config = { x, y, selection, signal };
         return loader[resolution].getTile(config);
       };
       const clip = ({ data, height, width }) => {
-        console.log(
-          tileSize,
-          useClippedHeight,
-          useClippedWidth,
-          clippedHeight,
-          clippedWidth,
-          data.length,
-          resolution,
-          width,
-          height
-        );
         if (
-          (useClippedHeight || useClippedWidth) &&
-          width !== clippedHeight && height !== clippedHeight
+          (isHeightUnderTileSize && height === tileSize) ||
+          (width === tileSize && isWidthUnderTileSize)
         ) {
           return data.filter((d, ind) => {
             return !(
-              (ind % tileSize >= clippedWidth &&
-                useClippedWidth &&
-                ) ||
-              (useClippedHeight &&
-                Math.floor(ind / clippedWidth) >= clippedHeight &&
-                height !== clippedHeight)
+              (ind % tileSize >= clippedWidth && isWidthUnderTileSize) ||
+              (isHeightUnderTileSize &&
+                Math.floor(ind / clippedWidth) >= clippedHeight)
             );
           });
         }
@@ -149,11 +137,11 @@ const MultiscaleImageLayer = class extends CompositeLayer {
             })
           ),
           width:
-            useClippedWidth && tiles[0].height !== tileSize
+            isWidthUnderTileSize && tiles[0].height === tileSize
               ? clippedWidth
               : tiles[0].width,
           height:
-            useClippedHeight && tiles[0].height !== tileSize
+            isHeightUnderTileSize && tiles[0].height === tileSize
               ? clippedHeight
               : tiles[0].height
         };
