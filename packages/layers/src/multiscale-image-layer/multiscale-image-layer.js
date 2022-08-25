@@ -66,12 +66,11 @@ const MultiscaleImageLayer = class extends CompositeLayer {
     } = this.props;
     // Get properties from highest resolution
     const { tileSize, dtype } = loader[0];
-
     // This is basically to invert:
     // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
     // The z level can be wrong for showing the correct scales because of the calculation deck.gl does
     // so we need to invert it for fetching tiles and minZoom/maxZoom.
-    const getTileData = async ({ x, y, z, signal }) => {
+    const getTileData = async ({ index: { x, y, z }, signal }) => {
       // Early return if no selections
       if (!selections || selections.length === 0) {
         return null;
@@ -84,6 +83,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       // The image-tile example works without, this but I have a feeling there is something
       // going on with our pyramids and/or rendering that is different.
       const resolution = Math.round(-z);
+      console.log(resolution, z);
       const getTile = selection => {
         const config = { x, y, selection, signal };
         return loader[resolution].getTile(config);
