@@ -1,0 +1,18 @@
+{
+  "name": "@vivjs/types",
+  "version": "0.13.1",
+  "author": "Ilan Gold",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hms-dbmi/viv.git"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/hms-dbmi/viv#readme",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "dependencies": {
+    "@vivjs/constants": "workspace:*",
+    "math.gl": "^3.5.7"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "version": "0.13.1",
+  "scripts": {
+    "build": "npm run bundle && documentation build -o dist -f html --document-exported --config documentation.yml dist/index.js",
+    "bundle": "rollup -c"
+  },
+  "dependencies": {
+    "@hms-dbmi/viv": "workspace:*",
+    "@rollup/plugin-sucrase": "^4.0.4"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "documentation": "^13.2.5",
+    "rollup": "^2.75.7"
+  },
+  "sideEffects": false
+}

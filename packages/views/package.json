@@ -1,0 +1,41 @@
+{
+  "name": "@vivjs/views",
+  "version": "0.13.1",
+  "author": "Ilan Gold",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hms-dbmi/viv.git"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/hms-dbmi/viv#readme",
+  "main": "src/index.js",
+  "types": "src/index.js",
+  "publishConfig": {
+    "main": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "sideEffects": false
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "test": "esno tests/index.spec.js | tap-spec"
+  },
+  "peerDependencies": {
+    "@deck.gl/core": "8.6.7",
+    "@deck.gl/layers": "8.6.7"
+  },
+  "dependencies": {
+    "@math.gl/core": "^3.5.7",
+    "@vivjs/layers": "workspace:*",
+    "@vivjs/loaders": "workspace:*",
+    "math.gl": "^3.5.7"
+  },
+  "unbuild": {
+    "entries": [
+      "src/index"
+    ],
+    "declaration": true
+  }
+}
