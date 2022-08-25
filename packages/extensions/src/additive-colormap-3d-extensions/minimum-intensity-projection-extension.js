@@ -30,7 +30,7 @@ const _AFTER_RENDER = `\
 const MinimumIntensityProjectionExtension = class extends BaseExtension {
   constructor(args) {
     super(args);
-    this.opts.rendering = { _BEFORE_RENDER, _RENDER, _AFTER_RENDER };
+    this.rendering = { _BEFORE_RENDER, _RENDER, _AFTER_RENDER };
   }
 };
 

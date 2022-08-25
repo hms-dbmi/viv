@@ -5,7 +5,9 @@
 ### Added
 
 ### Changed
+- Upgrade deck.gl to 8.8
 - Replace `postversion` script with `version` script for CI release.
+- Remove `package-lock.json` from root (since we use pnpm)
 
 ## 0.13.1
 
