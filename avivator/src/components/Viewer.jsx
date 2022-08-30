@@ -9,7 +9,7 @@ import {
   AdditiveColormapExtension,
   LensExtension
   // eslint-disable-next-line import/no-unresolved
-} from '@hms-dbmi/viv';
+} from '@labshare/viv';
 import {
   useImageSettingsStore,
   useViewerStore,

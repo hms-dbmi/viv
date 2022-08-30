@@ -15,7 +15,7 @@ import {
   getChannelStats,
   loadOmeTiff,
   PictureInPictureViewer,
-} from '@hms-dbmi/viv';
+} from '@labshare/viv';
 
 const url = 'http://localhost:8000/LuCa-7color_Scan1.ome.tif'; // OME-TIFF
 

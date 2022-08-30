@@ -2,7 +2,7 @@
 import create from 'zustand';
 
 // eslint-disable-next-line import/no-unresolved
-import { RENDERING_MODES } from '@hms-dbmi/viv';
+import { RENDERING_MODES } from '@labshare/viv';
 
 const captialize = string => string.charAt(0).toUpperCase() + string.slice(1);
 

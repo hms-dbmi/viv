@@ -5,7 +5,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import shallow from 'zustand/shallow';
 
 // eslint-disable-next-line import/no-unresolved
-import { RENDERING_MODES } from '@hms-dbmi/viv';
+import { RENDERING_MODES } from '@labshare/viv';
 import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 const renderingOptions = Object.values(RENDERING_MODES);

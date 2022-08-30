@@ -11,7 +11,7 @@ import {
   ColorPalette3DExtensions,
   AdditiveColormap3DExtensions
   // eslint-disable-next-line import/no-unresolved
-} from '@hms-dbmi/viv';
+} from '@labshare/viv';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
 

@@ -53,7 +53,7 @@ Please see the [tutorial](./tutorial/README.md) for more information.
 ## 💽 Installation
 
 ```bash
-$ npm install @hms-dbmi/viv
+$ npm install @labshare/viv
 ```
 
 You will also need to install [deck.gl](https://deck.gl) and other `peerDependencies` manually.
@@ -90,7 +90,7 @@ current versions are tested in our CI by naviating to our
 
 ## 🛠️  Build
 
-- `@hms-dbmi/viv` library: `npm run build`
+- `@labshare/viv` library: `npm run build`
 - `Avivator` viewer: `npm run build:avivator`
 
 ## 📄 Publish

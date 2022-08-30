@@ -87,7 +87,7 @@ const configAvivator = defineConfig({
   },
   resolve: {
     alias: {
-      '@hms-dbmi/viv': resolve(__dirname, 'src'),
+      '@labshare/viv': resolve(__dirname, 'src'),
       'react': resolve(__dirname, 'avivator/node_modules/react'),
       'react-dom': resolve(__dirname, 'avivator/node_modules/react-dom'),
     },

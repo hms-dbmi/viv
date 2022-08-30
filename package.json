@@ -1,6 +1,6 @@
 {
   "name": "@labshare/viv",
-  "version": "0.12.10",
+  "version": "0.12.11",
   "main": "dist/viv.es.js",
   "module": "dist/viv.es.js",
   "types": "dist/index.d.ts",

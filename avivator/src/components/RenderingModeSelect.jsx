@@ -3,7 +3,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 
-import { RENDERING_MODES } from '@hms-dbmi/viv'; // eslint-disable-line import/no-unresolved
+import { RENDERING_MODES } from '@labshare/viv'; // eslint-disable-line import/no-unresolved
 
 function RenderingModeSelect({ value, handleChange, disabled }) {
   return (
