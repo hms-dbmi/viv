@@ -21,7 +21,7 @@ const defaultProps = {
   maxRequests: { type: 'number', value: 10, compare: true },
   onClick: { type: 'function', value: null, compare: true },
   refinementStrategy: { type: 'string', value: null, compare: true },
-  excludeBackground: { type: 'boolean', value: false, compare: true },
+  excludeBackground: { type: 'boolean', value: true, compare: true },
   extensions: {
     type: 'array',
     value: [new ColorPaletteExtension()],
