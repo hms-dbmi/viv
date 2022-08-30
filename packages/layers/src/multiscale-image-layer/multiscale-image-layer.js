@@ -111,7 +111,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
             return !(
               (ind % tileSize >= clippedWidth && isWidthUnderTileSize) ||
               (isHeightUnderTileSize &&
-                Math.floor(ind / clippedWidth) >= clippedHeight)
+                Math.floor(ind / tileSize) >= clippedHeight)
             );
           });
         }
