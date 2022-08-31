@@ -7,6 +7,50 @@ import ImageLayer from '../image-layer';
 import { getImageSize, isInterleaved, SIGNAL_ABORTED } from '@vivjs/loaders';
 import { ColorPaletteExtension } from '@vivjs/extensions';
 
+/**
+ * Here we create an object for checking clipping the black border of incoming tiles
+ * at low resolutions i.e for zarr tiles which are padded by zarr.
+ * We need to check a few things before trimming:
+ *  1. The height/width of the full image at the current resolution
+ *  produces an image smaller than the current tileSize
+ *  2. The incoming image is padded to the tile size i.e one of its dimensions matches the tile size
+ * Once these have been confirmed, we trim the tile by going over it in row major order,
+ * keeping only the data that is not out of the clipped bounds.
+ * @param {{
+ *   loader: PixelSource[],
+ *   resolution: number,
+ *   tileSize: number,
+ * }}
+ * @return {{ clip: function, height: number, width: number }}
+ */
+const createTileClipper = ({ loader, resolution, tileSize }) => {
+  const planarSize = Object.values(getImageSize(loader[0]));
+  const [clippedHeight, clippedWidth] = planarSize.map(size =>
+    Math.floor(size / 2 ** resolution)
+  );
+  const isHeightUnderTileSize = clippedHeight < tileSize;
+  const isWidthUnderTileSize = clippedWidth < tileSize;
+  return {
+    clip: ({ data, height, width }) => {
+      if (
+        (isHeightUnderTileSize && height === tileSize) ||
+        (width === tileSize && isWidthUnderTileSize)
+      ) {
+        return data.filter((d, ind) => {
+          return !(
+            (ind % tileSize >= clippedWidth && isWidthUnderTileSize) ||
+            (isHeightUnderTileSize &&
+              Math.floor(ind / tileSize) >= clippedHeight)
+          );
+        });
+      }
+      return data;
+    },
+    height: clippedHeight,
+    width: clippedWidth
+  };
+};
+
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   onHover: { type: 'function', value: null, compare: false },
@@ -83,41 +127,11 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       // The image-tile example works without, this but I have a feeling there is something
       // going on with our pyramids and/or rendering that is different.
       const resolution = Math.round(-z);
-
-      // Here we set up variables for checking whether or not we should cip the black border of incoming tiles
-      // at low resolutions i.e for zarr tiles.  We need to check a few things before trimming:
-      //  1. The height/width of the full image at the current resolution
-      //  produces an image smaller than the current tileSize
-      //  2. The incoming image is indeed padded out to the tile size
-      //  in some dimension i.e it should be clipped down to the smaller size
-      // Once these have been confirmed, we trim the tile by going over it in row major order,
-      // keeping only the data that is not out of the clipped bounds.
-      const planarSize = getImageSize(loader[0]);
-      const [clippedHeight, clippedWidth] = planarSize.map(size =>
-        Math.floor(size / 2 ** resolution)
-      );
-      const isHeightUnderTileSize = clippedHeight < tileSize;
-      const isWidthUnderTileSize = clippedWidth < tileSize;
       const getTile = selection => {
         const config = { x, y, selection, signal };
         return loader[resolution].getTile(config);
       };
-      const clip = ({ data, height, width }) => {
-        if (
-          (isHeightUnderTileSize && height === tileSize) ||
-          (width === tileSize && isWidthUnderTileSize)
-        ) {
-          return data.filter((d, ind) => {
-            return !(
-              (ind % tileSize >= clippedWidth && isWidthUnderTileSize) ||
-              (isHeightUnderTileSize &&
-                Math.floor(ind / tileSize) >= clippedHeight)
-            );
-          });
-        }
-        return data;
-      };
-
+      const clipper = createTileClipper({ loader, resolution, tileSize });
       try {
         /*
          * Try to request the tile data. The pixels sources can throw
@@ -130,19 +144,19 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         const tiles = await Promise.all(selections.map(getTile));
         const tile = {
           data: tiles.map(d =>
-            clip({
+            clipper.clip({
               data: d.data,
               width: tiles[0].width,
               height: tiles[0].height
             })
           ),
           width:
-            isWidthUnderTileSize && tiles[0].height === tileSize
-              ? clippedWidth
+            clipper.width < tileSize && tiles[0].width === tileSize
+              ? clipper.width
               : tiles[0].width,
           height:
-            isHeightUnderTileSize && tiles[0].height === tileSize
-              ? clippedHeight
+            clipper.height < tileSize && tiles[0].height === tileSize
+              ? clipper.height
               : tiles[0].height
         };
 
