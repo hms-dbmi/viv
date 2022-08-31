@@ -7,6 +7,7 @@
 ### Changed
 
 - Upgrade deck.gl to 8.8
+- Use correct deck.gl 8.8 `getTileData` args.
 - Replace `postversion` script with `version` script for CI release.
 - Remove `package-lock.json` from root (since we use pnpm)
 - Clip low resolution tiles that might be padded by a loader.
