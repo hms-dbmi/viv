@@ -92,7 +92,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       //  in some dimension i.e it should be clipped down to the smaller size
       // Once these have been confirmed, we trim the tile by going over it in row major order,
       // keeping only the data that is not out of the clipped bounds.
-      const planarSize = loader[0].shape.slice(-2);
+      const planarSize = getImageSize(loader[0]);
       const [clippedHeight, clippedWidth] = planarSize.map(size =>
         Math.floor(size / 2 ** resolution)
       );
