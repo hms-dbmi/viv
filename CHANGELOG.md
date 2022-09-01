@@ -10,6 +10,7 @@
 - Use correct deck.gl 8.8 `getTileData` args.
 - Replace `postversion` script with `version` script for CI release.
 - Remove `package-lock.json` from root (since we use pnpm)
+- Update HTTP response check to `!==200` in `avivator/utils.js`, and changed variable name `isOffsets404` to `isOffsetsNot200`
 
 ## 0.13.1
 

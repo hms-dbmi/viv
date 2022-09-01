@@ -102,8 +102,8 @@ export async function createLoader(
       }
       const url = urlOrFile;
       const res = await fetch(url.replace(/ome\.tif(f?)/gi, 'offsets.json'));
-      const isOffsets404 = res.status === 404;
-      const offsets = !isOffsets404 ? await res.json() : undefined;
+      const isOffsetsNot200 = res.status !== 200;
+      const offsets = !isOffsetsNot200 ? await res.json() : undefined;
       // TODO(2021-05-06): temporarily disable `pool` until inline worker module is fixed.
       const source = await loadOmeTiff(urlOrFile, {
         offsets,
@@ -119,7 +119,7 @@ export async function createLoader(
         source.map(s => s.metadata),
         source.map(s => s.data)
       );
-      if (isOffsets404 && totalImageCount > MAX_CHANNELS_FOR_SNACKBAR_WARNING) {
+      if (isOffsetsNot200 && totalImageCount > MAX_CHANNELS_FOR_SNACKBAR_WARNING) {
         handleOffsetsNotFound(true);
       }
       return source;
