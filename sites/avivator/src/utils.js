@@ -119,7 +119,10 @@ export async function createLoader(
         source.map(s => s.metadata),
         source.map(s => s.data)
       );
-      if (isOffsetsNot200 && totalImageCount > MAX_CHANNELS_FOR_SNACKBAR_WARNING) {
+      if (
+        isOffsetsNot200 &&
+        totalImageCount > MAX_CHANNELS_FOR_SNACKBAR_WARNING
+      ) {
         handleOffsetsNotFound(true);
       }
       return source;
