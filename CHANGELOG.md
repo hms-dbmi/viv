@@ -4,6 +4,8 @@
 
 ### Added
 
+- `@pnpm/meta-updater` added to project
+
 ### Changed
 
 - Upgrade deck.gl to 8.8
