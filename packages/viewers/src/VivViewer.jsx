@@ -210,7 +210,7 @@ class VivViewerWrapper extends React.PureComponent {
       if (!tile?.content) {
         return null;
       }
-      const { content, bbox, z } = tile;
+      const { content, bbox, index: { z } } = tile;
       if (!content.data || !bbox) {
         return null;
       }
