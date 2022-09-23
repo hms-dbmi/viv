@@ -8,6 +8,12 @@
 
 ### Changed
 
+## 0.13.2
+
+### Added
+
+### Changed
+
 - Upgrade deck.gl to 8.8
 - Use correct deck.gl 8.8 `getTileData` args.
 - Replace `postversion` script with `version` script for CI release.
