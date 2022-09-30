@@ -5,6 +5,7 @@
 ### Added
 
 - `@pnpm/meta-updater` added to project
+- Added support for loading stacked TIFFs to the Multi TIFF loader.
 
 ### Changed
 
