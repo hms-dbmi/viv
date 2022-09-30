@@ -11,7 +11,6 @@ import type Pool from './lib/Pool';
 import { getMultiTiffIndexer } from './lib/indexers';
 
 export interface MultiTiffImage {
-  name: string;
   selection: OmeTiffSelection;
   tiff: GeoTIFFImage;
 }
@@ -26,7 +25,7 @@ function assertSameResolution(images: MultiTiffImage[]) {
   }
 }
 
-async function assertCompleteStack<T>(
+async function assertCompleteStack(
   images: MultiTiffImage[],
   indexer: (sel: OmeTiffSelection) => Promise<GeoTIFFImage>
 ) {
@@ -46,6 +45,7 @@ async function assertCompleteStack<T>(
 export async function load(
   imageName: string,
   images: MultiTiffImage[],
+  channelNames: string[],
   pool?: Pool
 ) {
   // Before doing any work make sure all of the images have the same resolution
@@ -63,6 +63,7 @@ export async function load(
   const metadata = getMultiTiffMetadata(
     imageName,
     images,
+    channelNames,
     dimensionOrder,
     dtype
   );

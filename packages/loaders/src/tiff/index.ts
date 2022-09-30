@@ -24,6 +24,7 @@ interface OmeTiffOptions extends TiffOptions {
 interface MultiTiffOptions {
   pool?: Pool;
   name?: string;
+  channelNames?: string[];
   headers?: Headers | Record<string, string>;
 }
 
@@ -96,21 +97,35 @@ export async function loadOmeTiff(
   return images === 'all' ? loaders : loaders[0];
 }
 
+function getImageSelectionName(
+  imageName: string,
+  imageNumber: number,
+  imageSelections: [number, OmeTiffSelection][]
+) {
+  return imageSelections.length === 1
+    ? imageName
+    : imageName + `_${imageNumber.toString()}`;
+}
+
 /**
- * Opens multiple tiffs as a multidimensional "stack" of 2D planes. Returns the data source and OME-TIFF-like metadata.
- *
+ * Opens multiple tiffs as a multidimensional "stack" of 2D planes.
+ * Also supports loading multiple slickes of a stack from a stacked tiff.
+ * Returns the data source and OME-TIFF-like metadata.
  *
  * @example
  * const { data, metadata } = await loadMultiTiff([
  *  [{ c: 0, t: 0, z: 0 }, 'https://example.com/channel_0.tif'],
  *  [{ c: 1, t: 0, z: 0 }, 'https://example.com/channel_1.tif'],
- *  [{ c: 2, t: 0, z: 0 }, 'https://example.com/channel_1.tif'],
+ *  [[[0, { c: 2, t: 0, z: 0 }], [1, { c: 3, t: 0, z: 0 }]], 'https://example.com/channels_2-3.tif'],
  * ]);
  *
  * await data.getRaster({ selection: { c: 0, t: 0, z: 0 } });
  * // { data: Uint16Array[...], width: 500, height: 500 }
  *
- * @param {Array<[OmeTiffSelection, (string | File)]>} sources pairs of `[Selection, string | File]` entries indicating the multidimensional selection in the virtual stack in image source (url string, or `File`).
+ * @param {Array<[OmeTiffSelection | [number, OmeTiffSelection][], (string | File)]>} sources
+ * Pairs of `[Selection | [number, Selection][], string | File]` entries indicating the multidimensional selection in the virtual stack in image source (url string, or `File`).
+ * You should only provide [number, Selection][] when loading from stacked tiffs. In this case the number corresponds to the image index in the stack, and the selection is the
+ * selection that image corresponds to.
  * @param {Object} opts
  * @param {GeoTIFF.Pool} [opts.pool] - A geotiff.js [Pool](https://geotiffjs.github.io/geotiff.js/module-pool-Pool.html) for decoding image chunks.
  * @param {string} [opts.name='MultiTiff'] - a name for the "virtual" image stack.
@@ -118,37 +133,66 @@ export async function loadOmeTiff(
  * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>} data source and associated metadata.
  */
 export async function loadMultiTiff(
-  sources: [OmeTiffSelection, string | (File & { path: string })][],
+  sources: [
+    OmeTiffSelection | [number, OmeTiffSelection][],
+    string | (File & { path: string })
+  ][],
   opts: MultiTiffOptions = {}
 ) {
   const { pool, headers = {}, name = 'MultiTiff' } = opts;
   const tiffImage: MultiTiffImage[] = [];
+  const channelNames = [];
 
   for (const source of sources) {
-    const [selection, file] = source;
+    const [s, file] = source;
+    const imageSelections: [number, OmeTiffSelection][] = Array.isArray(s)
+      ? s
+      : [[0, s]];
     if (typeof file === 'string') {
+      // If the file is a string then we're dealing with loading from a URL.
       const parsedFilename = parseFilename(file);
       const extension = parsedFilename.extension?.toLowerCase();
       if (extension === 'tif' || extension === 'tiff') {
         const tiffImageName = parsedFilename.name;
         if (tiffImageName) {
-          const tiff = await (
-            await fromUrl(file, { headers, cacheSize: Infinity })
-          ).getImage(0);
-          tiffImage.push({ name: tiffImageName, selection, tiff });
+          for (const imageSelection of imageSelections) {
+            const [imageNumber, selection] = imageSelection;
+            const tiff = await (
+              await fromUrl(file, { headers, cacheSize: Infinity })
+            ).getImage(imageNumber);
+            tiffImage.push({ selection, tiff });
+            channelNames[selection.c] = getImageSelectionName(
+              tiffImageName,
+              imageNumber,
+              imageSelections
+            );
+          }
         }
       }
     } else {
+      // If the file is not a string then we're loading from a File/Blob.
       const { name } = parseFilename(file.path);
       if (name) {
-        const tiff = await (await fromBlob(file)).getImage(0);
-        tiffImage.push({ name, selection, tiff });
+        for (const imageSelection of imageSelections) {
+          const [imageNumber, selection] = imageSelection;
+          const tiff = await (await fromBlob(file)).getImage(imageNumber);
+          tiffImage.push({ selection, tiff });
+          channelNames[selection.c] = getImageSelectionName(
+            name,
+            imageNumber,
+            imageSelections
+          );
+        }
       }
     }
   }
+  // eslint-disable-next-line no-console
+  console.log(channelNames);
+  // eslint-disable-next-line no-console
+  console.log(opts.channelNames);
 
   if (tiffImage.length > 0) {
-    return loadMulti(name, tiffImage, pool);
+    return loadMulti(name, tiffImage, opts.channelNames || channelNames, pool);
   }
 
   throw new Error('Unable to load image from provided TiffFolder source.');
