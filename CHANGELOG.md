@@ -5,7 +5,7 @@
 ### Added
 
 - `@pnpm/meta-updater` added to project
-- Added 10X Xenium to the "In Action" page
+- Added 10x Xenium to the "In Action" page
 
 ### Changed
 

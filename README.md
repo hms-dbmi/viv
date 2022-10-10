@@ -34,7 +34,7 @@ More details and related work can be found in our paper and original [preprint](
 [OME-NGFF HCS](https://blog.openmicroscopy.org/file-formats/community/2020/12/01/zarr-hcs/) announcements
 - ImJoy [I2K Tutorial](https://imjoy.io/docs/#/i2k_tutorial?id=open-integration-with-imjoy)
 - Galaxy Project includes Avivator as [default viewer for OME-TIFF files](https://docs.galaxyproject.org/en/release_21.05/releases/21.05_announce_user.html#new-datatypes)
-- 10X Genomics uses Viv in their viewer for [Xenium In Situ Analysis Technology](https://www.10xgenomics.com/in-situ-technology): [demo](https://xenium.10xgenomics.com/?image=s3/10x.files/xenium/preview/hbreast/experiment.xenium&z=17&cell_f=true&cell_c=groups)
+- 10x Genomics uses Viv in their viewer for [Xenium In Situ Analysis Technology](https://www.10xgenomics.com/in-situ-technology): [demo](https://xenium.10xgenomics.com/?image=s3/10x.files/xenium/preview/hbreast/experiment.xenium&z=17&cell_f=true&cell_c=groups)
 
 ## 💾 Supported Data Formats
 
