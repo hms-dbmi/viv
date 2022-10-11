@@ -146,7 +146,15 @@ function getChannelSamplesPerPixel(
   const channelSamplesPerPixel = Array(numChannels).fill(0);
   for (const tiff of tiffs) {
     const curChannel = tiff.selection.c;
-    channelSamplesPerPixel[curChannel] = tiff.tiff.getSamplesPerPixel();
+    const curSamplesPerPixel = tiff.tiff.getSamplesPerPixel();
+    const existingSamplesPerPixel = channelSamplesPerPixel[curChannel];
+    if (
+      existingSamplesPerPixel &&
+      existingSamplesPerPixel != curSamplesPerPixel
+    ) {
+      throw Error('Channel samples per pixel mismatch');
+    }
+    channelSamplesPerPixel[curChannel] = curSamplesPerPixel;
   }
   return channelSamplesPerPixel;
 }
