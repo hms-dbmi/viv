@@ -91,7 +91,7 @@ async function generateMultiTiffSources(urlOrFiles) {
     const selections = [];
     const numImages = await getTiffImageCount(tiffFile);
     for (let i = 0; i < numImages; i++) {
-      selections.push([i, { c, z: 0, t: 0 }]);
+      selections.push({ c, z: 0, t: 0 });
       c += 1;
     }
     sources.push([selections, tiffFile]);
