@@ -27,16 +27,76 @@ function isOMETIFF(urlOrFile) {
   return name.includes('ome.tiff') || name.includes('ome.tif');
 }
 
-function isMultiTiff(urlOrFile) {
-  const filenames = Array.isArray(urlOrFile)
-    ? urlOrFile.map(f => f.name)
-    : urlOrFile.split(',');
+/**
+ * Gets an array of filenames for a multi tiff input.
+ * @param {string | File | File[]} urlOrFiles
+ */
+function getMultiTiffFilenames(urlOrFiles) {
+  if (Array.isArray(urlOrFiles)) {
+    return urlOrFiles.map(f => f.name);
+  } else if (urlOrFiles instanceof File) {
+    return [urlOrFiles.name];
+  } else {
+    return urlOrFiles.split(',');
+  }
+}
+
+/**
+ * Guesses whether string URL or File is one or multiple standard TIFF images.
+ * @param {string | File | File[]} urlOrFiles
+ */
+function isMultiTiff(urlOrFiles) {
+  const filenames = getMultiTiffFilenames(urlOrFiles);
   for (const filename of filenames) {
     const lowerCaseName = filename.toLowerCase();
     if (!(lowerCaseName.includes('.tiff') || lowerCaseName.includes('.tif')))
       return false;
   }
   return true;
+}
+
+/**
+ * Turns an input string of one or many urls, file, or file array into a uniform array.
+ * @param {string | File | File[]} urlOrFiles
+ */
+async function generateMultiTiffFileArray(urlOrFiles) {
+  if (Array.isArray(urlOrFiles)) {
+    return urlOrFiles;
+  } else if (urlOrFiles instanceof File) {
+    return [urlOrFiles];
+  } else {
+    return urlOrFiles.split(',');
+  }
+}
+
+/**
+ * Gets the basic image count for a TIFF using geotiff's getImageCount.
+ * @param {string | File} src
+ */
+async function getTiffImageCount(src) {
+  const from = typeof src === 'string' ? fromUrl : fromBlob;
+  const tiff = await from(src);
+  return tiff.getImageCount();
+}
+
+/**
+ * Guesses whether string URL or File is one or multiple standard TIFF images.
+ * @param {string | File | File[]} urlOrFiles
+ */
+async function generateMultiTiffSources(urlOrFiles) {
+  const multiTiffFiles = await generateMultiTiffFileArray(urlOrFiles);
+  const sources = [];
+  let c = 0;
+  for (const tiffFile of multiTiffFiles) {
+    const selections = [];
+    const numImages = await getTiffImageCount(tiffFile);
+    for (let i = 0; i < numImages; i++) {
+      selections.push({ c, z: 0, t: 0 });
+      c += 1;
+    }
+    sources.push([selections, tiffFile]);
+  }
+  return sources;
 }
 
 class UnsupportedBrowserError extends Error {
@@ -139,13 +199,7 @@ export async function createLoader(
 
     // Multiple flat tiffs
     if (isMultiTiff(urlOrFile)) {
-      const multiTiffFiles = Array.isArray(urlOrFile)
-        ? urlOrFile
-        : urlOrFile.split(',');
-      const mutiTiffSources = multiTiffFiles.map((e, i) => [
-        { c: i, z: 0, t: 0 },
-        e
-      ]);
+      const mutiTiffSources = await generateMultiTiffSources(urlOrFile);
       const source = await loadMultiTiff(mutiTiffSources, {
         images: 'all',
         pool: false

@@ -5,6 +5,7 @@
 ### Added
 
 - `@pnpm/meta-updater` added to project
+- Added support for loading stacked TIFFs to the Multi TIFF loader.
 - Added 10x Xenium to the "In Action" page
 
 ### Changed
