@@ -10,6 +10,8 @@
 
 ### Changed
 
+- Fix visualization of interpolation at highest level to be pixelated in `MultiscaleImageLayer` after breaking in deck.gl 8.8
+
 ## 0.13.2
 
 ### Added
