@@ -4,16 +4,34 @@
 
 ### Added
 
-### Changed
-- Replace `postversion` script with `version` script for CI release.
+- `@pnpm/meta-updater` added to project
+- Added support for loading stacked TIFFs to the Multi TIFF loader.
+- Added 10x Xenium to the "In Action" page
 - Use default `PhysicalSize_Unit` of µm in returned OMEXML.
+
+### Changed
+
+## 0.13.2
+
+### Added
+
+### Changed
+
+- Upgrade deck.gl to 8.8
+- Use correct deck.gl 8.8 `getTileData` args.
+- Replace `postversion` script with `version` script for CI release.
+- Remove `package-lock.json` from root (since we use pnpm)
+- Update HTTP response check to `!==200` in `avivator/utils.js`, and changed variable name `isOffsets404` to `isOffsetsNot200`
+- Fix `onHover` function in `VivViewer` after deck.gl 8.8 upgrade.
 
 ## 0.13.1
 
 ### Added
+
 - Added support for loading multiple single channel TIFFs.
 
 ### Changed
+
 - Update doc strings for `loadMultiTiff`
 - Update release notes in `README.md`
 
@@ -22,6 +40,7 @@
 ### Added
 
 ### Changed
+
 - Migrate to pnpm monorepo
 - Fix all image URLs in README
 - Only run CHANGELOG action on pull_requests
