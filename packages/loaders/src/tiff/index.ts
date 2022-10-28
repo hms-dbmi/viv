@@ -1,4 +1,4 @@
-import { fromUrl, fromBlob, addDecoder } from 'geotiff';
+import { fromUrl, fromBlob, fromFile, addDecoder } from 'geotiff';
 import type { GeoTIFF, Pool } from 'geotiff';
 
 import { createOffsetsProxy, checkProxies } from './lib/proxies';
@@ -29,6 +29,8 @@ interface MultiTiffOptions {
 }
 
 type MultiImage = Awaited<ReturnType<typeof loadOme>>; // get return-type from `load`
+
+const FILE_PREFIX = 'file://';
 
 /** @ignore */
 export async function loadOmeTiff(
@@ -71,10 +73,14 @@ export async function loadOmeTiff(
 
   // Create tiff source
   if (typeof source === 'string') {
-    // https://github.com/ilan-gold/geotiff.js/tree/viv#abortcontroller-support
-    // https://www.npmjs.com/package/lru-cache#options
-    // Cache size needs to be infinite due to consistency issues.
-    tiff = await fromUrl(source, { headers, cacheSize: Infinity });
+    if (source.startsWith(FILE_PREFIX)) {
+      tiff = await fromFile(source.slice(FILE_PREFIX.length));
+    } else {
+      // https://github.com/ilan-gold/geotiff.js/tree/viv#abortcontroller-support
+      // https://www.npmjs.com/package/lru-cache#options
+      // Cache size needs to be infinite due to consistency issues.
+      tiff = await fromUrl(source, { headers, cacheSize: Infinity });
+    }
   } else {
     tiff = await fromBlob(source);
   }
@@ -153,10 +159,12 @@ export async function loadMultiTiff(
       if (extension === 'tif' || extension === 'tiff') {
         const tiffImageName = parsedFilename.name;
         if (tiffImageName) {
-          const curImage = await fromUrl(file, {
-            headers,
-            cacheSize: Infinity
-          });
+          let curImage: GeoTIFF;
+          if (file.startsWith(FILE_PREFIX)) {
+            curImage = await fromFile(file.slice(FILE_PREFIX.length));
+          } else {
+            curImage = await fromUrl(file, { headers, cacheSize: Infinity });
+          }
           for (let i = 0; i < imageSelections.length; i++) {
             const curSelection = imageSelections[i];
 

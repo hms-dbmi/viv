@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added support for loading local TIFFs using GeoTIFF's `fromFile` loader.
+
 ### Changed
 
 ## 0.13.3
