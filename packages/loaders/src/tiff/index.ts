@@ -54,7 +54,8 @@ export async function loadOmeTiff(
 /**
  * Opens an OME-TIFF via URL and returns data source and associated metadata for first or all images in files.
  *
- * @param {(string | File)} source url or File object.
+ * @param {(string | File)} source url or File object. If the url is prefixed with file:// will attempt to load with GeoTIFF's 'fromFile',
+ * which requires access to Node's fs module.
  * @param {Object} opts
  * @param {Headers=} opts.headers - Headers passed to each underlying fetch request.
  * @param {Array<number>=} opts.offsets - [Indexed-Tiff](https://github.com/hms-dbmi/generate-tiff-offsets) IFD offsets.
@@ -130,6 +131,7 @@ function getImageSelectionName(
  *
  * @param {Array<[OmeTiffSelection | (OmeTiffSelection | undefined)[], (string | File)]>} sources
  * Pairs of `[Selection | (OmeTiffSelection | undefined)[], string | File]` entries indicating the multidimensional selection in the virtual stack in image source (url string, or `File`).
+ * If the url is prefixed with file:// will attempt to load with GeoTIFF's 'fromFile', which requires access to Node's fs module.
  * You should only provide (OmeTiffSelection | undefined)[] when loading from stacked tiffs. In this case the array index corresponds to the image index in the stack, and the selection is the
  * selection that image corresponds to. Undefined selections are for images that should not be loaded.
  * @param {Object} opts
