@@ -30,7 +30,7 @@ interface MultiTiffOptions {
 
 type MultiImage = Awaited<ReturnType<typeof loadOme>>; // get return-type from `load`
 
-const FILE_PREFIX = 'file://';
+export const FILE_PREFIX = 'file://';
 
 /** @ignore */
 export async function loadOmeTiff(

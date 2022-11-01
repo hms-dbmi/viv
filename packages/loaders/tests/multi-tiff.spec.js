@@ -1,6 +1,7 @@
 import test from 'tape';
 import { fromFile } from 'geotiff';
 import { load } from '../src/tiff/multi-tiff';
+import { loadMultiTiff, FILE_PREFIX } from '../src/tiff';
 
 import * as path from 'path';
 import * as url from 'url';
@@ -18,6 +19,9 @@ const CHANNEL_2_FIXTURE = path.resolve(
   __dirname,
   './fixtures/multi-tiff/Channel_2.tif'
 );
+const CHANNEL_0_LOCAL_FIXTURE = `${FILE_PREFIX}${CHANNEL_0_FIXTURE}`;
+const CHANNEL_1_LOCAL_FIXTURE = `${FILE_PREFIX}${CHANNEL_1_FIXTURE}`;
+const CHANNEL_2_LOCAL_FIXTURE = `${FILE_PREFIX}${CHANNEL_2_FIXTURE}`;
 
 async function loadImage() {
   return {
@@ -40,29 +44,47 @@ async function loadImage() {
   };
 }
 
+function testPixelSource(t, data) {
+  t.equal(data.length, 1, 'image should not be pyramidal.');
+  const [base] = data;
+  t.deepEqual(
+    base.labels,
+    ['t', 'c', 'z', 'y', 'x'],
+    'should have DimensionOrder "XYZCT".'
+  );
+  t.deepEqual(
+    base.shape,
+    [1, 3, 1, 167, 439],
+    'shape should match dimensions.'
+  );
+  t.equal(
+    base.meta.photometricInterpretation,
+    1,
+    'Photometric interpretation is 1.'
+  );
+  t.equal(base.meta.physicalSizes, undefined, 'No physical sizes.');
+}
+
 test('Creates correct TiffPixelSource for MultiTIFF.', async t => {
   t.plan(5);
   try {
     const { imageName, tiffs, channelNames } = await loadImage();
     const { data } = await load(imageName, tiffs, channelNames);
-    t.equal(data.length, 1, 'image should not be pyramidal.');
-    const [base] = data;
-    t.deepEqual(
-      base.labels,
-      ['t', 'c', 'z', 'y', 'x'],
-      'should have DimensionOrder "XYZCT".'
-    );
-    t.deepEqual(
-      base.shape,
-      [1, 3, 1, 167, 439],
-      'shape should match dimensions.'
-    );
-    t.equal(
-      base.meta.photometricInterpretation,
-      1,
-      'Photometric interpretation is 1.'
-    );
-    t.equal(base.meta.physicalSizes, undefined, 'No physical sizes.');
+    testPixelSource(t, data);
+  } catch (e) {
+    t.fail(e);
+  }
+});
+
+test('Is able to load MultiTIFF from local file.', async t => {
+  t.plan(5);
+  try {
+    const { data } = await loadMultiTiff([
+      [{ c: 0, t: 0, z: 0 }, CHANNEL_0_LOCAL_FIXTURE],
+      [{ c: 1, t: 0, z: 0 }, CHANNEL_1_LOCAL_FIXTURE],
+      [{ c: 2, t: 0, z: 0 }, CHANNEL_2_LOCAL_FIXTURE]
+    ]);
+    testPixelSource(t, data);
   } catch (e) {
     t.fail(e);
   }

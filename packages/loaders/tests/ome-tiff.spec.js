@@ -1,36 +1,52 @@
 import test from 'tape';
 import { fromFile } from 'geotiff';
 import { load } from '../src/tiff/ome-tiff';
+import { loadOmeTiff, FILE_PREFIX } from '../src/tiff';
 
 import * as path from 'path';
 import * as url from 'url';
 
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 const FIXTURE = path.resolve(__dirname, './fixtures/multi-channel.ome.tif');
+const LOCAL_FIXTURE = `${FILE_PREFIX}${FIXTURE}`;
+
+function testPixelSource(t, data) {
+  t.equal(data.length, 1, 'image should not be pyramidal.');
+  const [base] = data;
+  t.deepEqual(
+    base.labels,
+    ['t', 'c', 'z', 'y', 'x'],
+    'should have DimensionOrder "XYZCT".'
+  );
+  t.deepEqual(
+    base.shape,
+    [1, 3, 1, 167, 439],
+    'shape should match dimensions.'
+  );
+  t.equal(
+    base.meta.photometricInterpretation,
+    1,
+    'Photometric interpretation is 1.'
+  );
+  t.equal(base.meta.physicalSizes, undefined, 'No physical sizes.');
+}
 
 test('Creates correct TiffPixelSource for OME-TIFF.', async t => {
   t.plan(5);
   try {
     const tiff = await fromFile(FIXTURE);
     const [{ data }] = await load(tiff);
-    t.equal(data.length, 1, 'image should not be pyramidal.');
-    const [base] = data;
-    t.deepEqual(
-      base.labels,
-      ['t', 'c', 'z', 'y', 'x'],
-      'should have DimensionOrder "XYZCT".'
-    );
-    t.deepEqual(
-      base.shape,
-      [1, 3, 1, 167, 439],
-      'shape should match dimensions.'
-    );
-    t.equal(
-      base.meta.photometricInterpretation,
-      1,
-      'Photometric interpretation is 1.'
-    );
-    t.equal(base.meta.physicalSizes, undefined, 'No physical sizes.');
+    testPixelSource(t, data);
+  } catch (e) {
+    t.fail(e);
+  }
+});
+
+test('Is able to load OME-TIFF from a local file.', async t => {
+  t.plan(5);
+  try {
+    const { data } = await loadOmeTiff(LOCAL_FIXTURE);
+    testPixelSource(t, data);
   } catch (e) {
     t.fail(e);
   }
