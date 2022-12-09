@@ -134,7 +134,7 @@ export const useImage = (source, history) => {
         newColors =
           newDomains.length === 1
             ? [[255, 255, 255]]
-            : newDomains.map((_, i) => COLOR_PALLETE[i]);
+            : Channels.map((c, i) => (c.Color && c.Color.slice(0, -1)) ?? COLOR_PALLETE[i]);
         useViewerStore.setState({
           useLens: channelOptions.length !== 1,
           useColormap: true
