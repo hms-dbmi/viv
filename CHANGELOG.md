@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.13.4
+
+### Added
+
 - Added support for loading local TIFFs using GeoTIFF's `fromFile` loader.
 - Added `Color` attribute support for  `Channel` meta-tag.
 
