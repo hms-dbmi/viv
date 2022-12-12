@@ -6,6 +6,7 @@
 
 - Added support for loading local TIFFs using GeoTIFF's `fromFile` loader.
 - Added `Color` attribute support for  `Channel` meta-tag.
+- Run tests only on ubuntu 20 in CI to prevent WebGL context creation failures.
 
 ### Changed
 
