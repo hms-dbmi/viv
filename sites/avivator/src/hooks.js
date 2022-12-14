@@ -134,8 +134,10 @@ export const useImage = (source, history) => {
         newColors =
           newDomains.length === 1
             ? [[255, 255, 255]]
-            : Channels.map(
-                (c, i) => (c.Color && c.Color.slice(0, -1)) ?? COLOR_PALLETE[i]
+            : newDomains.map(
+                (_, i) =>
+                  (Channels[i].Color && Channels[i].Color.slice(0, -1)) ??
+                  COLOR_PALLETE[i]
               );
         useViewerStore.setState({
           useLens: channelOptions.length !== 1,

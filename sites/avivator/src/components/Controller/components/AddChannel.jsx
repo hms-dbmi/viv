@@ -3,12 +3,13 @@ import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import shallow from 'zustand/shallow';
 
-import { MAX_CHANNELS } from '../../../constants';
+import { MAX_CHANNELS, COLOR_PALLETE } from '../../../constants';
 import {
   useChannelsStore,
   useViewerStore,
   useImageSettingsStore,
-  useLoader
+  useLoader,
+  useMetadata
 } from '../../../state';
 import { getSingleSelectionStats } from '../../../utils';
 
@@ -38,6 +39,7 @@ const AddChannel = () => {
     shallow
   );
   const loader = useLoader();
+  const metadata = useMetadata();
   const { labels } = loader[0];
   const handleChannelAdd = useCallback(() => {
     let selection = Object.fromEntries(labels.map(l => [l, 0]));
@@ -60,10 +62,17 @@ const AddChannel = () => {
         }
       });
       addIsChannelLoading(true);
+      const {
+        Pixels: { Channels }
+      } = metadata;
+      const { c } = selection;
       addChannel({
         selections: selection,
         ids: String(Math.random()),
-        channelsVisible: false
+        channelsVisible: false,
+        colors:
+          (Channels[c].Color && Channels[c].Color.slice(0, -1)) ??
+          (COLOR_PALLETE[c] || [255, 255, 255])
       });
     });
   }, [
@@ -75,7 +84,8 @@ const AddChannel = () => {
     addIsChannelLoading,
     selections,
     setIsChannelLoading,
-    setPropertiesForChannel
+    setPropertiesForChannel,
+    metadata
   ]);
   return (
     <Button

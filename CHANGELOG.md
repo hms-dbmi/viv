@@ -6,12 +6,14 @@
 
 ### Changed
 
+- Fix Avivator to not require `Color` attribute.
+
 ## 0.13.4
 
 ### Added
 
 - Added support for loading local TIFFs using GeoTIFF's `fromFile` loader.
-- Added `Color` attribute support for  `Channel` meta-tag.
+- Added `Color` attribute support for `Channel` meta-tag.
 - Run tests only on ubuntu 20 in CI to prevent WebGL context creation failures.
 
 ### Changed
