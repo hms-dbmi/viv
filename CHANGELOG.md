@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Issue cloudfront invalidation on deployment.
+
 ## 0.13.5
 
 ### Added
