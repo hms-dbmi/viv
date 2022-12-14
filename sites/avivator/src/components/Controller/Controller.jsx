@@ -28,7 +28,7 @@ import {
   useMetadata
 } from '../../state';
 import { guessRgb, useWindowSize, getSingleSelectionStats } from '../../utils';
-import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
+import { COLOR_PALLETE, GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -120,10 +120,18 @@ const Controller = () => {
         selection,
         use3d
       }).then(({ domain, contrastLimits: newContrastLimit }) => {
-        setPropertiesForChannel(i, {
+        const {
+          Pixels: { Channels }
+        } = metadata;
+        const { c } = selection;
+        const newProps = {
           contrastLimits: newContrastLimit,
           domains: domain
-        });
+        };
+        if (Channels[c].Color) {
+          newProps.colors = Channels[c].Color.slice(0, -1);
+        }
+        setPropertiesForChannel(i, newProps);
         useImageSettingsStore.setState({
           onViewportLoad: () => {
             useImageSettingsStore.setState({ onViewportLoad: () => {} });
