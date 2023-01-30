@@ -73,7 +73,7 @@ Detailed API information and example sippets can be found in our [documentation]
 
 ## 🏗️  Development
 
-This repo is a monorepo using pnpm workspaces. The package manager used to install and link dependncies _must_ be [`pnpm`](https://pnpm.io/).
+This repo is a monorepo using pnpm workspaces. The package manager used to install and link dependencies _must_ be [`pnpm`](https://pnpm.io/).
 
 Each folder under `packages/` are a published as a separate packages on npm under the `@vivjs` scope. The top-level package `@hms-dbmi/viv` exports from these dependencies.
 
@@ -81,7 +81,7 @@ To develop and test the `@hms-dbmi/viv` package:
 
 1. Run `pnpm install` in `viv` root folder
 2. Run `pnpm dev` to start a development server
-3. Run `pnpm test` to run all tests (or specific `pnpm test --filter=@vivjs/layers`
+3. Run `pnpm test` to run all tests (or specific, e.g., `pnpm test --filter=@vivjs/layers`)
 
 ## 🛠️  Build
 
