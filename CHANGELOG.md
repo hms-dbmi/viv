@@ -7,6 +7,7 @@
 ### Changed
 
 - Issue cloudfront invalidation on deployment.
+- Fixed typos in README
 
 ## 0.13.5
 
