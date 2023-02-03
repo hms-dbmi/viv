@@ -4,7 +4,7 @@ import type { OMEXML } from '../../omexml';
 import { getLabels, isInterleaved, prevPowerOf2 } from '../../utils';
 
 import type { Labels } from '@vivjs/types';
-import type { RootAttrs } from '../ome-zarr';
+import type { RootAttrs, Axis } from '../ome-zarr';
 
 /*
  * Returns true if data shape is that expected for OME-Zarr.
@@ -70,6 +70,10 @@ export function getRootPrefix(files: { path: string }[], rootName: string) {
   return first.path.slice(0, prefixLength);
 }
 
+function isAxis(axisOrLabel: Labels<string[]> | Axis[]): axisOrLabel is Axis[] {
+  return typeof axisOrLabel[0] !== 'string';
+}
+
 export async function loadMultiscales(store: ZarrArray['store'], path = '') {
   const grp = await openGroup(store, path);
   const rootAttrs = (await grp.attrs.asObject()) as RootAttrs;
@@ -81,7 +85,11 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
     const { datasets, axes } = rootAttrs.multiscales[0];
     paths = datasets.map(d => d.path);
     if (axes) {
-      labels = axes;
+      if (isAxis(axes)) {
+        labels = axes.map(axis => axis.name) as Labels<string[]>;
+      } else {
+        labels = axes as Labels<string[]>;
+      }
     }
   }
 
