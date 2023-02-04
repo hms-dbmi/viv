@@ -70,8 +70,12 @@ export function getRootPrefix(files: { path: string }[], rootName: string) {
   return first.path.slice(0, prefixLength);
 }
 
-function isAxis(axisOrLabel: Labels<string[]> | Axis[]): axisOrLabel is Axis[] {
+function isAxis(axisOrLabel: string[] | Axis[]): axisOrLabel is Axis[] {
   return typeof axisOrLabel[0] !== 'string';
+}
+
+function castLabels(dimnames: string[]) {
+  return dimnames as Labels<string[]>;
 }
 
 export async function loadMultiscales(store: ZarrArray['store'], path = '') {
@@ -80,15 +84,15 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
 
   let paths = ['0'];
   // Default axes used for v0.1 and v0.2.
-  let labels = ['t', 'c', 'z', 'y', 'x'] as Labels<string[]>;
+  let labels = castLabels(['t', 'c', 'z', 'y', 'x']);
   if ('multiscales' in rootAttrs) {
     const { datasets, axes } = rootAttrs.multiscales[0];
     paths = datasets.map(d => d.path);
     if (axes) {
       if (isAxis(axes)) {
-        labels = axes.map(axis => axis.name) as Labels<string[]>;
+        labels = castLabels(axes.map(axis => axis.name));
       } else {
-        labels = axes as Labels<string[]>;
+        labels = castLabels(axes);
       }
     }
   }
