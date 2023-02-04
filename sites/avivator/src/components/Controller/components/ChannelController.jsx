@@ -73,8 +73,7 @@ function ChannelController({
         const { dtype } = l[0];
         const { max } = DTYPE_VALUES[dtype];
         // Min is 0 for unsigned, or the negative of the max for signed dtypes.
-        const min =
-          dtype.startsWith('Int') || dtype.startsWith('Float') ? -max : 0;
+        const min = dtype.startsWith('Int') ? -max : 0;
         return [min, max];
       }
       default: {
