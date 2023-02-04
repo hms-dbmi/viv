@@ -29,11 +29,15 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function ChannelOptions({ handleRemoveChannel, handleColorSelect, disabled }) {
+function ChannelOptions({ handleColorSelect, disabled, handleModeSelect }) {
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
 
   const classes = useStyles();
+  function handleClick(evt) {
+    const { mode } = evt.currentTarget.dataset;
+    handleModeSelect(mode);
+  }
   return (
     <>
       <IconButton
@@ -49,11 +53,24 @@ function ChannelOptions({ handleRemoveChannel, handleColorSelect, disabled }) {
         <Paper className={classes.paper}>
           <ClickAwayListener onClickAway={toggle}>
             <MenuList id="channel-options">
-              <MenuItem dense disableGutters onClick={handleRemoveChannel}>
-                <span className={classes.span}>Remove</span>
-              </MenuItem>
               <MenuItem dense disableGutters className={classes.colors}>
                 <ColorPalette handleColorSelect={handleColorSelect} />
+              </MenuItem>
+              <MenuItem
+                data-mode="full"
+                dense
+                disableGutters
+                onClick={handleClick}
+              >
+                <span className={classes.span}>Full</span>
+              </MenuItem>
+              <MenuItem
+                data-mode="max/min"
+                dense
+                disableGutters
+                onClick={handleClick}
+              >
+                <span className={classes.span}>Max/Min</span>
               </MenuItem>
             </MenuList>
           </ClickAwayListener>
