@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
@@ -64,28 +64,26 @@ function ChannelController({
     shallow
   );
   const rgbColor = toRgb(colormap, color);
-  const domainReducer = useCallback(
-    (state, action) => {
-      switch (action) {
-        case 'max/min': {
-          return domain;
-        }
-        case 'full': {
-          const { dtype } = loader[0];
-          const { max } = DTYPE_VALUES[dtype];
-          // Min is 0 for unsigned, or the negative of the max for signed dtypes.
-          const min =
-            dtype.startsWith('Int') || dtype.startsWith('Float') ? -max : 0;
-          return [min, max];
-        }
-        default: {
-          throw new Error();
-        }
+  const getMinMax = ({ domain: d, mode, loader: l }) => {
+    switch (mode) {
+      case 'max/min': {
+        return d;
       }
-    },
-    [loader, domain]
-  );
-  const [[left, right], setDomain] = useReducer(domainReducer, domain);
+      case 'full': {
+        const { dtype } = l[0];
+        const { max } = DTYPE_VALUES[dtype];
+        // Min is 0 for unsigned, or the negative of the max for signed dtypes.
+        const min =
+          dtype.startsWith('Int') || dtype.startsWith('Float') ? -max : 0;
+        return [min, max];
+      }
+      default: {
+        throw new Error();
+      }
+    }
+  };
+  const [mode, setDomain] = useState('max/min');
+  const [left, right] = getMinMax({ domain, mode, loader });
   // If the min/right range is and the dtype is float, make the step size smaller so contrastLimits are smoother.
   const { dtype } = loader[0];
   const isFloat = dtype === 'Float32' || dtype === 'Float64';
