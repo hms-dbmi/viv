@@ -34,7 +34,7 @@ export interface Axis {
 
 interface Multiscale {
   datasets: { path: string }[];
-  axes?: Labels<string[]> | Axis[];
+  axes?: string[] | Axis[];
   version?: string;
 }
 
