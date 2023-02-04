@@ -4,6 +4,12 @@
 
 ### Added
 
+### Changed
+
+## 0.13.6
+
+### Added
+
 - Max/Min Option per channel in Avivator.
 
 ### Changed
