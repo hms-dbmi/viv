@@ -10,6 +10,7 @@
 
 - Issue cloudfront invalidation on deployment.
 - Fixed typos in README
+- Fix loading of omengff `multiscales` by allowing loading `labels` from new `axes` metadata
 
 ## 0.13.5
 

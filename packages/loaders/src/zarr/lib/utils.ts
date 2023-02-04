@@ -4,7 +4,7 @@ import type { OMEXML } from '../../omexml';
 import { getLabels, isInterleaved, prevPowerOf2 } from '../../utils';
 
 import type { Labels } from '@vivjs/types';
-import type { RootAttrs } from '../ome-zarr';
+import type { RootAttrs, Axis } from '../ome-zarr';
 
 /*
  * Returns true if data shape is that expected for OME-Zarr.
@@ -70,18 +70,30 @@ export function getRootPrefix(files: { path: string }[], rootName: string) {
   return first.path.slice(0, prefixLength);
 }
 
+function isAxis(axisOrLabel: string[] | Axis[]): axisOrLabel is Axis[] {
+  return typeof axisOrLabel[0] !== 'string';
+}
+
+function castLabels(dimnames: string[]) {
+  return dimnames as Labels<string[]>;
+}
+
 export async function loadMultiscales(store: ZarrArray['store'], path = '') {
   const grp = await openGroup(store, path);
   const rootAttrs = (await grp.attrs.asObject()) as RootAttrs;
 
   let paths = ['0'];
   // Default axes used for v0.1 and v0.2.
-  let labels = ['t', 'c', 'z', 'y', 'x'] as Labels<string[]>;
+  let labels = castLabels(['t', 'c', 'z', 'y', 'x']);
   if ('multiscales' in rootAttrs) {
     const { datasets, axes } = rootAttrs.multiscales[0];
     paths = datasets.map(d => d.path);
     if (axes) {
-      labels = axes;
+      if (isAxis(axes)) {
+        labels = castLabels(axes.map(axis => axis.name));
+      } else {
+        labels = castLabels(axes);
+      }
     }
   }
 
