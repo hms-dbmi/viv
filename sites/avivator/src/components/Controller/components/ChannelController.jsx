@@ -82,7 +82,7 @@ function ChannelController({
       }
     }
   };
-  const [mode, setDomain] = useState('max/min');
+  const [mode, setMode] = useState('max/min');
   const [left, right] = getMinMax({ domain, mode, loader });
   // If the min/right range is and the dtype is float, make the step size smaller so contrastLimits are smoother.
   const { dtype } = loader[0];
@@ -105,8 +105,7 @@ function ChannelController({
           <ChannelOptions
             handleColorSelect={handleColorSelect}
             disabled={isLoading}
-            setFull={() => setDomain('full')}
-            setMaxMin={() => setDomain('max/min')}
+            handleModeSelect={setMode}
           />
         </Grid>
         <Grid item xs={1}>

@@ -29,11 +29,15 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function ChannelOptions({ handleColorSelect, disabled, setFull, setMaxMin }) {
+function ChannelOptions({ handleColorSelect, disabled, handleModeSelect }) {
   const [open, toggle] = useReducer(v => !v, false);
   const anchorRef = useRef(null);
 
   const classes = useStyles();
+  function handleClick(evt) {
+    const { mode } = evt.currentTarget.dataset;
+    handleModeSelect(mode);
+  }
   return (
     <>
       <IconButton
@@ -52,10 +56,20 @@ function ChannelOptions({ handleColorSelect, disabled, setFull, setMaxMin }) {
               <MenuItem dense disableGutters className={classes.colors}>
                 <ColorPalette handleColorSelect={handleColorSelect} />
               </MenuItem>
-              <MenuItem dense disableGutters onClick={setFull}>
+              <MenuItem
+                data-mode="full"
+                dense
+                disableGutters
+                onClick={handleClick}
+              >
                 <span className={classes.span}>Full</span>
               </MenuItem>
-              <MenuItem dense disableGutters onClick={setMaxMin}>
+              <MenuItem
+                data-mode="max/min"
+                dense
+                disableGutters
+                onClick={handleClick}
+              >
                 <span className={classes.span}>Max/Min</span>
               </MenuItem>
             </MenuList>
