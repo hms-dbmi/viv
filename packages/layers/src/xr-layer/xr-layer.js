@@ -55,11 +55,14 @@ function getRenderingAttrs(dtype, gl, interpolation) {
   upgradedShaderModule.fs = version300str.concat(upgradedShaderModule.fs);
   upgradedShaderModule.vs = version300str.concat(upgradedShaderModule.vs);
   const values = getDtypeValues(isLinear ? 'Float32' : dtype);
+  // Check if a cast function is present in the returned data for the dtype
+  const identity = x => x;
+  const cast = typeof values.cast === 'function' ? values.cast : identity;
   return {
     ...values,
     shaderModule: upgradedShaderModule,
     filter: interpolation,
-    cast: isLinear ? data => new Float32Array(data) : data => data
+    cast: isLinear ? data => new Float32Array(data) : cast
   };
 }
 
