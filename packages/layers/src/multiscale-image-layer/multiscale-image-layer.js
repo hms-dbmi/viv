@@ -8,7 +8,7 @@ import { getImageSize, isInterleaved, SIGNAL_ABORTED } from '@vivjs/loaders';
 import { ColorPaletteExtension } from '@vivjs/extensions';
 
 /**
- * Here we create an object for checking clipping the black border of incoming tiles
+ * Here we process the clipping of the black border of incoming tiles
  * at low resolutions i.e for zarr tiles which are padded by zarr.
  * We need to check a few things before trimming:
  *  1. The height/width of the full image at the current resolution
@@ -21,9 +21,9 @@ import { ColorPaletteExtension } from '@vivjs/extensions';
  *   resolution: number,
  *   tileSize: number,
  * }}
- * @return {{ clip: function, height: number, width: number }}
+ * @return {{ data: TypedArray, height: number, width: number }}
  */
-const createTileClipper = ({ loader, resolution }) => {
+const clipTiles = ({ loader, resolution, tiles }) => {
   const { tileSize } = loader[0];
   const planarSize = getImageSize(loader[0]);
   const [clippedHeight, clippedWidth] = [
@@ -33,34 +33,33 @@ const createTileClipper = ({ loader, resolution }) => {
   const isUnderTileSize = dimSize => dimSize < tileSize;
   const shouldClip = ({ clippedDimSize, dataDimSize }) =>
     isUnderTileSize(clippedDimSize) && dataDimSize === tileSize;
-  const dimSizeGetterFactory =
-    ({ clippedDimSize }) =>
-    ({ dataDimSize }) =>
-      shouldClip({ clippedDimSize, dataDimSize })
-        ? clippedDimSize
-        : dataDimSize;
+  const getDimSize = ({ clippedDimSize, dataDimSize }) =>
+    shouldClip({ clippedDimSize, dataDimSize }) ? clippedDimSize : dataDimSize;
 
-  return {
-    clip: ({ data, height, width }) => {
-      if (
-        shouldClip({ clippedDimSize: clippedHeight, dataDimSize: height }) ||
-        shouldClip({ clippedDimSize: clippedWidth, dataDimSize: width })
-      ) {
-        const isHeightUnderTileSize = isUnderTileSize(clippedHeight);
-        const isWidthUnderTileSize = isUnderTileSize(clippedWidth);
-        return data.filter((d, ind) => {
-          return !(
-            (ind % tileSize >= clippedWidth && isWidthUnderTileSize) ||
-            (isHeightUnderTileSize &&
-              Math.floor(ind / tileSize) >= clippedHeight)
-          );
-        });
-      }
-      return data;
-    },
-    getHeight: dimSizeGetterFactory({ clippedDimSize: clippedHeight }),
-    getWidth: dimSizeGetterFactory({ clippedDimSize: clippedWidth })
-  };
+  return tiles.map(({ data, height, width }) => {
+    let clippedData = data;
+    if (
+      shouldClip({ clippedDimSize: clippedHeight, dataDimSize: height }) ||
+      shouldClip({ clippedDimSize: clippedWidth, dataDimSize: width })
+    ) {
+      const isHeightUnderTileSize = isUnderTileSize(clippedHeight);
+      const isWidthUnderTileSize = isUnderTileSize(clippedWidth);
+      clippedData = data.filter((d, ind) => {
+        return !(
+          (ind % tileSize >= clippedWidth && isWidthUnderTileSize) ||
+          (isHeightUnderTileSize && Math.floor(ind / tileSize) >= clippedHeight)
+        );
+      });
+    }
+    return {
+      data: clippedData,
+      height: getDimSize({
+        clippedDimSize: clippedHeight,
+        dataDimSize: height
+      }),
+      width: getDimSize({ clippedDimSize: clippedWidth, dataDimSize: width })
+    };
+  });
 };
 
 const defaultProps = {
@@ -143,7 +142,6 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         const config = { x, y, selection, signal };
         return loader[resolution].getTile(config);
       };
-      const clipper = createTileClipper({ loader, resolution });
       try {
         /*
          * Try to request the tile data. The pixels sources can throw
@@ -153,11 +151,12 @@ const MultiscaleImageLayer = class extends CompositeLayer {
          * This means that our pixels sources _always_ have the same
          * return type, and optional throw for performance.
          */
-        const tiles = await Promise.all(selections.map(getTile));
+        let tiles = await Promise.all(selections.map(getTile));
+        tiles = clipTiles({ loader, resolution, tiles });
         const tile = {
-          data: tiles.map(clipper.clip),
-          width: clipper.getWidth({ dataDimSize: tiles[0].width }),
-          height: clipper.getHeight({ dataDimSize: tiles[0].height })
+          data: tiles.map(d => d.data),
+          width: tiles[0].width,
+          height: tiles[0].height
         };
 
         if (isInterleaved(loader[resolution].shape)) {
