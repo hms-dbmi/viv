@@ -23,19 +23,31 @@ import { ColorPaletteExtension } from '@vivjs/extensions';
  * }}
  * @return {{ clip: function, height: number, width: number }}
  */
-const createTileClipper = ({ loader, resolution, tileSize }) => {
-  const planarSize = Object.values(getImageSize(loader[0]));
-  const [clippedHeight, clippedWidth] = planarSize.map(size =>
-    Math.floor(size / 2 ** resolution)
-  );
-  const isHeightUnderTileSize = clippedHeight < tileSize;
-  const isWidthUnderTileSize = clippedWidth < tileSize;
+const createTileClipper = ({ loader, resolution }) => {
+  const { tileSize } = loader[0];
+  const planarSize = getImageSize(loader[0]);
+  const [clippedHeight, clippedWidth] = [
+    planarSize.height,
+    planarSize.width
+  ].map(size => Math.floor(size / 2 ** resolution));
+  const isUnderTileSize = dimSize => dimSize < tileSize;
+  const shouldClip = ({ clippedDimSize, dataDimSize }) =>
+    isUnderTileSize(clippedDimSize) && dataDimSize === tileSize;
+  const dimSizeGetterFactory =
+    ({ clippedDimSize }) =>
+    ({ dataDimSize }) =>
+      shouldClip({ clippedDimSize, dataDimSize })
+        ? clippedDimSize
+        : dataDimSize;
+
   return {
     clip: ({ data, height, width }) => {
       if (
-        (isHeightUnderTileSize && height === tileSize) ||
-        (width === tileSize && isWidthUnderTileSize)
+        shouldClip({ clippedDimSize: clippedHeight, dataDimSize: height }) ||
+        shouldClip({ clippedDimSize: clippedWidth, dataDimSize: width })
       ) {
+        const isHeightUnderTileSize = isUnderTileSize(clippedHeight);
+        const isWidthUnderTileSize = isUnderTileSize(clippedWidth);
         return data.filter((d, ind) => {
           return !(
             (ind % tileSize >= clippedWidth && isWidthUnderTileSize) ||
@@ -46,8 +58,8 @@ const createTileClipper = ({ loader, resolution, tileSize }) => {
       }
       return data;
     },
-    height: clippedHeight,
-    width: clippedWidth
+    getHeight: dimSizeGetterFactory({ clippedDimSize: clippedHeight }),
+    getWidth: dimSizeGetterFactory({ clippedDimSize: clippedWidth })
   };
 };
 
@@ -131,7 +143,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         const config = { x, y, selection, signal };
         return loader[resolution].getTile(config);
       };
-      const clipper = createTileClipper({ loader, resolution, tileSize });
+      const clipper = createTileClipper({ loader, resolution });
       try {
         /*
          * Try to request the tile data. The pixels sources can throw
@@ -143,21 +155,9 @@ const MultiscaleImageLayer = class extends CompositeLayer {
          */
         const tiles = await Promise.all(selections.map(getTile));
         const tile = {
-          data: tiles.map(d =>
-            clipper.clip({
-              data: d.data,
-              width: tiles[0].width,
-              height: tiles[0].height
-            })
-          ),
-          width:
-            clipper.width < tileSize && tiles[0].width === tileSize
-              ? clipper.width
-              : tiles[0].width,
-          height:
-            clipper.height < tileSize && tiles[0].height === tileSize
-              ? clipper.height
-              : tiles[0].height
+          data: tiles.map(clipper.clip),
+          width: clipper.getWidth({ dataDimSize: tiles[0].width }),
+          height: clipper.getHeight({ dataDimSize: tiles[0].height })
         };
 
         if (isInterleaved(loader[resolution].shape)) {
