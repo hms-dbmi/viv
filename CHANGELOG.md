@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Fix `Float64` reversion from the fix in 0.12.8
 
 ## 0.13.6
 
