@@ -137,6 +137,28 @@ function getMultiTiffShapeMap(tiffs: MultiTiffImage[]): {
   };
 }
 
+// If a channel has multiple z or t slices with different samples per pixel
+// this function will just use the samples per pixel from a random slice.
+function getChannelSamplesPerPixel(
+  tiffs: MultiTiffImage[],
+  numChannels: number
+): number[] {
+  const channelSamplesPerPixel = Array(numChannels).fill(0);
+  for (const tiff of tiffs) {
+    const curChannel = tiff.selection.c;
+    const curSamplesPerPixel = tiff.tiff.getSamplesPerPixel();
+    const existingSamplesPerPixel = channelSamplesPerPixel[curChannel];
+    if (
+      existingSamplesPerPixel &&
+      existingSamplesPerPixel != curSamplesPerPixel
+    ) {
+      throw Error('Channel samples per pixel mismatch');
+    }
+    channelSamplesPerPixel[curChannel] = curSamplesPerPixel;
+  }
+  return channelSamplesPerPixel;
+}
+
 export function getMultiTiffMeta(
   dimensionOrder: DimensionOrder,
   tiffs: MultiTiffImage[]
@@ -158,14 +180,16 @@ function getMultiTiffPixelMedatata(
   dimensionOrder: DimensionOrder,
   shapeMap: { [key: string]: number },
   dType: string,
-  tiffs: MultiTiffImage[]
+  tiffs: MultiTiffImage[],
+  channelNames: string[],
+  channelSamplesPerPixel: number[]
 ) {
   const channelMetadata = [];
-  for (let i = 0; i < tiffs.length; i += 1) {
+  for (let i = 0; i < shapeMap.c; i += 1) {
     channelMetadata.push({
       ID: `Channel:${imageNumber}:${i}`,
-      Name: tiffs[i].name,
-      SamplesPerPixel: tiffs[i].tiff.getSamplesPerPixel()
+      Name: channelNames[i],
+      SamplesPerPixel: channelSamplesPerPixel[i]
     });
   }
   return {
@@ -185,6 +209,7 @@ function getMultiTiffPixelMedatata(
 export function getMultiTiffMetadata(
   imageName: string,
   tiffImages: MultiTiffImage[],
+  channelNames: string[],
   dimensionOrder: DimensionOrder,
   dType: string
 ) {
@@ -193,13 +218,24 @@ export function getMultiTiffMetadata(
   const date = '';
   const description = '';
   const shapeMap = getMultiTiffShapeMap(tiffImages);
+  const channelSamplesPerPixel = getChannelSamplesPerPixel(
+    tiffImages,
+    shapeMap.c
+  );
+
+  if (channelNames.length !== shapeMap.c)
+    throw Error(
+      'Wrong number of channel names for number of channels provided'
+    );
 
   const pixels = getMultiTiffPixelMedatata(
     imageNumber,
     dimensionOrder,
     shapeMap,
     dType,
-    tiffImages
+    tiffImages,
+    channelNames,
+    channelSamplesPerPixel
   );
 
   const format = () => {

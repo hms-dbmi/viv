@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import Select from '@material-ui/core/Select';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import IconButton from '@material-ui/core/IconButton';
 import shallow from 'zustand/shallow';
+import { DTYPE_VALUES } from '@hms-dbmi/viv';
 
 import ChannelOptions from './ChannelOptions';
 import { FILL_PIXEL_VALUE } from '../../../constants';
@@ -61,16 +64,34 @@ function ChannelController({
     shallow
   );
   const rgbColor = toRgb(colormap, color);
-  const [min, max] = domain;
-  // If the min/max range is and the dtype is float, make the step size smaller so contrastLimits are smoother.
+  const getMinMax = ({ domain: d, mode, loader: l }) => {
+    switch (mode) {
+      case 'max/min': {
+        return d;
+      }
+      case 'full': {
+        const { dtype } = l[0];
+        const { max } = DTYPE_VALUES[dtype];
+        // Min is 0 for unsigned, or the negative of the max for signed dtypes.
+        const min = dtype.startsWith('Int') ? -max : 0;
+        return [min, max];
+      }
+      default: {
+        throw new Error();
+      }
+    }
+  };
+  const [mode, setMode] = useState('max/min');
+  const [left, right] = getMinMax({ domain, mode, loader });
+  // If the min/right range is and the dtype is float, make the step size smaller so contrastLimits are smoother.
   const { dtype } = loader[0];
   const isFloat = dtype === 'Float32' || dtype === 'Float64';
-  const step = max - min < 500 && isFloat ? (max - min) / 500 : 1;
+  const step = right - left < 500 && isFloat ? (right - left) / 500 : 1;
   const shouldShowPixelValue = !useLinkedView && !use3d;
   return (
     <Grid container direction="column" m={2} justifyContent="center">
       <Grid container direction="row" justifyContent="space-between">
-        <Grid item xs={11}>
+        <Grid item xs={10}>
           <Select native value={name} onChange={onSelectionChange}>
             {channelOptions.map(opt => (
               <option disabled={isLoading} key={opt} value={opt}>
@@ -79,12 +100,22 @@ function ChannelController({
             ))}
           </Select>
         </Grid>
-        <Grid item>
+        <Grid item xs={1}>
           <ChannelOptions
-            handleRemoveChannel={handleRemoveChannel}
             handleColorSelect={handleColorSelect}
             disabled={isLoading}
+            handleModeSelect={setMode}
           />
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton
+            aria-label="remove-channel"
+            component="span"
+            size="small"
+            onClick={handleRemoveChannel}
+          >
+            <HighlightOffIcon fontSize="small" />
+          </IconButton>
         </Grid>
       </Grid>
       <Grid
@@ -117,8 +148,8 @@ function ChannelController({
             valueLabelDisplay="auto"
             getAriaLabel={() => `${name}-${color}-${slider}`}
             valueLabelFormat={v => truncateDecimalNumber(v, 5)}
-            min={min}
-            max={max}
+            min={left}
+            max={right}
             step={step}
             orientation="horizontal"
             style={{

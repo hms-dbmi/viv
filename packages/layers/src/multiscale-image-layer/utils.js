@@ -11,9 +11,7 @@ export function range(len) {
 export function renderSubLayers(props) {
   const {
     bbox: { left, top, right, bottom },
-    x,
-    y,
-    z
+    index: { x, y, z }
   } = props.tile;
   const { data, id, loader, maxZoom } = props;
   // Only render in positive coorinate system

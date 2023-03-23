@@ -25,9 +25,16 @@ interface Omero {
   name?: string;
 }
 
+// See https://ngff.openmicroscopy.org/latest/#axes-md
+export interface Axis {
+  name: string;
+  type?: string;
+  unit?: string;
+}
+
 interface Multiscale {
   datasets: { path: string }[];
-  axes?: Labels<string[]>;
+  axes?: string[] | Axis[];
   version?: string;
 }
 

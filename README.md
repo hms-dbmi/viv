@@ -34,6 +34,7 @@ More details and related work can be found in our paper and original [preprint](
 [OME-NGFF HCS](https://blog.openmicroscopy.org/file-formats/community/2020/12/01/zarr-hcs/) announcements
 - ImJoy [I2K Tutorial](https://imjoy.io/docs/#/i2k_tutorial?id=open-integration-with-imjoy)
 - Galaxy Project includes Avivator as [default viewer for OME-TIFF files](https://docs.galaxyproject.org/en/release_21.05/releases/21.05_announce_user.html#new-datatypes)
+- 10x Genomics uses Viv in their viewer for [Xenium In Situ Analysis Technology](https://www.10xgenomics.com/in-situ-technology): [demo](https://xenium.10xgenomics.com/?image=s3/10x.files/xenium/preview/hbreast/experiment.xenium&z=17&cell_f=true&cell_c=groups)
 
 ## 💾 Supported Data Formats
 
@@ -72,7 +73,7 @@ Detailed API information and example sippets can be found in our [documentation]
 
 ## 🏗️  Development
 
-This repo is a monorepo using pnpm workspaces. The package manager used to install and link dependncies _must_ be [`pnpm`](https://pnpm.io/).
+This repo is a monorepo using pnpm workspaces. The package manager used to install and link dependencies _must_ be [`pnpm`](https://pnpm.io/).
 
 Each folder under `packages/` are a published as a separate packages on npm under the `@vivjs` scope. The top-level package `@hms-dbmi/viv` exports from these dependencies.
 
@@ -80,7 +81,7 @@ To develop and test the `@hms-dbmi/viv` package:
 
 1. Run `pnpm install` in `viv` root folder
 2. Run `pnpm dev` to start a development server
-3. Run `pnpm test` to run all tests (or specific `pnpm test --filter=@vivjs/layers`
+3. Run `pnpm test` to run all tests (or specific, e.g., `pnpm test --filter=@vivjs/layers`)
 
 ## 🛠️  Build
 

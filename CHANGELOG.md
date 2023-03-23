@@ -5,12 +5,63 @@
 ### Added
 
 ### Changed
+- Fix `Float64` reversion from the fix in 0.12.8
+- Clip low resolution tiles that might be padded by a loader.
+
+## 0.13.6
+
+### Added
+
+- Max/Min Option per channel in Avivator.
+
+### Changed
+
+- Issue cloudfront invalidation on deployment.
+- Fixed typos in README
+- Fix loading of omengff `multiscales` by allowing loading `labels` from new `axes` metadata
+
+## 0.13.5
+
+### Added
+
+### Changed
+
+- Fix Avivator to not require `Color` attribute.
+
+## 0.13.4
+
+### Added
+
+- Added support for loading local TIFFs using GeoTIFF's `fromFile` loader.
+- Added `Color` attribute support for `Channel` meta-tag.
+- Run tests only on ubuntu 20 in CI to prevent WebGL context creation failures.
+
+### Changed
+
+## 0.13.3
+
+### Added
+
+- `@pnpm/meta-updater` added to project
+- Added support for loading stacked TIFFs to the Multi TIFF loader.
+- Added 10x Xenium to the "In Action" page
+
+### Changed
+
+- Fix visualization of interpolation at highest level to be pixelated in `MultiscaleImageLayer` after breaking in deck.gl 8.8
+
+## 0.13.2
+
+### Added
+
+### Changed
 
 - Upgrade deck.gl to 8.8
 - Use correct deck.gl 8.8 `getTileData` args.
 - Replace `postversion` script with `version` script for CI release.
 - Remove `package-lock.json` from root (since we use pnpm)
-- Clip low resolution tiles that might be padded by a loader.
+- Update HTTP response check to `!==200` in `avivator/utils.js`, and changed variable name `isOffsets404` to `isOffsetsNot200`
+- Fix `onHover` function in `VivViewer` after deck.gl 8.8 upgrade.
 
 ## 0.13.1
 
