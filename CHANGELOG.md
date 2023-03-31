@@ -2,6 +2,9 @@
 
 ## In Progress
 
+### Changed
+- Fixed `click` event not firing on Overview panel
+
 ### Added
 
 ### Changed
