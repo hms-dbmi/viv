@@ -8,11 +8,9 @@ import { getVivId } from './utils';
 
 export const OVERVIEW_VIEW_ID = 'overview';
 
-class OverviewState {}
-
 class OverviewController extends Controller {
   constructor(props) {
-    super(OverviewState, props);
+    super(props);
     this.events = ['click'];
   }
 
@@ -21,7 +19,7 @@ class OverviewController extends Controller {
       return;
     }
     let [x, y] = this.getCenter(event);
-    const { width, height, zoom, scale } = this.controllerStateProps;
+    const { width, height, zoom, scale } = this.props;
     if (x < 0 || y < 0 || x > width || y > height) {
       return;
     }
