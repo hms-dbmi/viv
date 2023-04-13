@@ -30,17 +30,23 @@ export function getDefaultInitialViewState(
   modelMatrix
 ) {
   const source = Array.isArray(loader) ? loader[0] : loader;
-  const { width, height } = getImageSize(source);
+  const { width: pixelWidth, height: pixelHeight } = getImageSize(source);
+  const scale = (modelMatrix || new Matrix4()).getScale();
+  const [trueWidth, trueHeight] = [
+    scale[0] * pixelWidth,
+    scale[1] * pixelHeight
+  ];
   const depth = source.shape[source.labels.indexOf('z')];
   const zoom =
-    Math.log2(Math.min(viewSize.width / width, viewSize.height / height)) -
-    zoomBackOff;
+    Math.log2(
+      Math.min(viewSize.width / trueWidth, viewSize.height / trueHeight)
+    ) - zoomBackOff;
   const physicalSizeScalingMatrix = getPhysicalSizeScalingMatrix(source);
   const loaderInitialViewState = {
     target: (modelMatrix || new Matrix4()).transformPoint(
       (use3d ? physicalSizeScalingMatrix : new Matrix4()).transformPoint([
-        width / 2,
-        height / 2,
+        pixelWidth / 2,
+        pixelHeight / 2,
         use3d ? depth / 2 : 0
       ])
     ),
