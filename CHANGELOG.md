@@ -4,7 +4,7 @@
 
 ### Changed
 - Fixed `click` event not firing on Overview panel
-
+- Fixed `zoom` in `getDefaultInitialViewState`
 ### Added
 
 ### Changed
