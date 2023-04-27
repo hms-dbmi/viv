@@ -79,21 +79,24 @@ function castLabels(dimnames: string[]) {
 }
 
 export async function loadMultiscales(store: ZarrArray['store'], path = '') {
-  const grp = await openGroup(store, path);
-  const rootAttrs = (await grp.attrs.asObject()) as RootAttrs;
+  let grp = await openGroup(store, path);
+  let rootAttrs = (await grp.attrs.asObject()) as RootAttrs;
+
+  if ('multiscales' in rootAttrs === false) {
+    grp = await openGroup(store, '0');
+    rootAttrs = (await grp.attrs.asObject()) as RootAttrs;
+  }
 
   let paths = ['0'];
   // Default axes used for v0.1 and v0.2.
   let labels = castLabels(['t', 'c', 'z', 'y', 'x']);
-  if ('multiscales' in rootAttrs) {
-    const { datasets, axes } = rootAttrs.multiscales[0];
-    paths = datasets.map(d => d.path);
-    if (axes) {
-      if (isAxis(axes)) {
-        labels = castLabels(axes.map(axis => axis.name));
-      } else {
-        labels = castLabels(axes);
-      }
+  const { datasets, axes } = rootAttrs.multiscales[0];
+  paths = datasets.map(d => d.path);
+  if (axes) {
+    if (isAxis(axes)) {
+      labels = castLabels(axes.map(axis => axis.name));
+    } else {
+      labels = castLabels(axes);
     }
   }
 
