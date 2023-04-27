@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Fixed Avivator crashing when opening OME-ZARR without path in the URL
 
 ## 0.13.7
 
