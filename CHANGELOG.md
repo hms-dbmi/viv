@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Fixed typo in `sites/docs/src/IMAGE_RENDERING.md`
 
 ## 0.13.7
 
