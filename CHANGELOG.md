@@ -3,6 +3,7 @@
 ## In Progress
 
 ### Added
+- Create playground "app" for experimenting with `@vivjs/*` modules
 
 ### Changed
 - Fixed typo in `sites/docs/src/IMAGE_RENDERING.md`
