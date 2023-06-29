@@ -1,0 +1,14 @@
+{
+  "name": "playground",
+  "main": "./index.js",
+  "scripts": {
+    "dev": "vite"
+  },
+  "dependencies": {
+    "@vivjs/layers": "workspace:^",
+    "@vivjs/loaders": "workspace:^"
+  },
+  "devDependencies": {
+    "vite": "^2.9.9"
+  }
+}

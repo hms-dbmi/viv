@@ -45,7 +45,7 @@ export async function getVolume({
         signal
       });
       let r = 0;
-      onUpdate();
+      onUpdate({ z, total: depthDownsampled, progress: 0.5 });
       // For now this process fills in each raster plane anti-diagonally transposed.
       // This is to ensure that the image looks right in three dimensional space.
       while (r < rasterSize) {
@@ -55,7 +55,7 @@ export async function getVolume({
         volumeData[volIndex] = rasterData[rasterIndex];
         r += 1;
       }
-      onUpdate();
+      onUpdate({ z, total: depthDownsampled, progress: 1 });
     })
   );
   return {
