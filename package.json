@@ -16,8 +16,8 @@
     "build": "pnpm -r --parallel build",
     "clean": "pnpm -r exec -- rm -rf node_modules",
     "test": "pnpm -r --parallel test",
-    "check-format": "prettier --check --ignore-path .gitignore tsconfig.json sites/avivator packages/",
-    "lint": "npm run check-format && eslint \"packages/*/src/**/*\" \"sites/avivator/src/**/*\"",
+    "check-format": "prettier --check --ignore-path .gitignore tsconfig.json sites/playground sites/avivator packages/",
+    "lint": "npm run check-format && eslint \"packages/*/src/**/*\" \"sites/avivator/src/**/*\" \"sites/playground/src/**/*\"",
     "format": "npm run check-format -- --write",
     "version": "pnpm meta-updater && ./version.sh && git add ."
   },
