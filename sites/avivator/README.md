@@ -28,7 +28,7 @@ the Viv repository and run the following commands in a `zsh` or `bash` shell:
 git clone https://github.com/hms-dbmi/viv.git && cd viv
 npm install # installs dependencies for both viv and avivator
 npm start
-```
+``
 
 This command starts a live development server. Navigate to `http://localhost:3000`
 in your web browser to view the site. You may edit the contents of `src/` (Viv codebase)
