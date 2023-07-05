@@ -13,6 +13,11 @@ import * as loaders from '@vivjs/loaders';
 // TODO: move into loaders / public interface?
 import { getVolume } from '@vivjs/layers/src/volume-layer/utils.js';
 
+// @ts-expect-error
+import cmGrayTextureUrl from '../textures/cm_gray.png';
+// @ts-expect-error
+import cmViridisTextureUrl from '../textures/cm_viridis.png';
+
 // https://viv-demo.storage.googleapis.com/2018-12-18_ASY_H2B_bud_05_3D_8_angles.ome.tif
 // 'https://viv-demo.storage.googleapis.com/brain.pyramid.ome.tif'
 let url = new URL(
@@ -126,8 +131,8 @@ texture.needsUpdate = true;
 
 // Colormap textures
 let cmtextures = {
-  viridis: new THREE.TextureLoader().load('textures/cm_viridis.png'),
-  gray: new THREE.TextureLoader().load('textures/cm_gray.png')
+  viridis: new THREE.TextureLoader().load(cmViridisTextureUrl),
+  gray: new THREE.TextureLoader().load(cmGrayTextureUrl)
 };
 
 // Material
