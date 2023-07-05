@@ -14,11 +14,11 @@ import { getVolume } from '@vivjs/layers/src/volume-layer/utils.js';
 // https://viv-demo.storage.googleapis.com/2018-12-18_ASY_H2B_bud_05_3D_8_angles.ome.tif
 // 'https://viv-demo.storage.googleapis.com/brain.pyramid.ome.tif'
 let url = new URL(
-  'https://viv-demo.storage.googleapis.com/brain.pyramid.ome.tif'
+  'https://viv-demo.storage.googleapis.com/2018-12-18_ASY_H2B_bud_05_3D_8_angles.ome.tif'
 );
 let { data: resolutions, metadata } = await loaders.loadOmeTiff(url.href);
 
-// console.log({ resolutions, metadata });
+console.log({ resolutions, metadata });
 
 for (let [i, resolution] of Object.entries(resolutions)) {
   let dims = Object.fromEntries(
@@ -66,9 +66,7 @@ let volume = new Volume();
 volume.xLength = volumeOrigin.height;
 volume.yLength = volumeOrigin.width;
 volume.zLength = volumeOrigin.depth;
-volume.data = volumeOrigin.data
-
-console.log(volume)
+volume.data = volumeOrigin.data;
 
 // Get into Three Js with the Volume and initialize a custom shader with DVR (Can be taken from the ScrollyVis Project)
 let container = Object.assign(document.createElement('div'), {});
@@ -91,6 +89,8 @@ volume.data = dataASFloat32;
 min_max = volume.computeMinMax();
 
 console.log("after min max: " + min_max)
+console.log(volumeOrigin)
+console.log(volume)
 
 let scene = new THREE.Scene();
 var context = canvas.getContext('webgl2', {alpha: false, antialias: false});
@@ -112,13 +112,15 @@ let camera = new THREE.OrthographicCamera(-h * aspect / 2,
 camera.position.set(0, 0, 500);
 camera.up.set(0, 0, 1); // In our data, z is up
 // camera.zoom = 1.8;
-let volconfig = {clim1: 0, clim2: 1, renderstyle: 'mip', isothreshold: 0.15, opacity: 1.0, colormap: 'viridis'};
+let volconfig = {clim1: 0.15, clim2: 0.8, renderstyle: 'dvr' , isothreshold: 0.15, opacity: 1.0, colormap: 'viridis'};
 
+// @ts-ignore
 var texture = new THREE.Data3DTexture(volume.data, volume.xLength, volume.yLength, volume.zLength);
 texture.format = THREE.RedFormat;
 texture.type = THREE.FloatType;
 texture.minFilter = texture.magFilter = THREE.LinearFilter;
 texture.unpackAlignment = 1;
+texture.needsUpdate = true;
 
 // Colormap textures
 let cmtextures = {
@@ -150,12 +152,13 @@ material.customProgramCacheKey = function () {
   return '1';
 };
 // THREE.Mesh
-var geometry = new THREE.BoxGeometry(volume.xLength, volume.yLength, volume.zLength);
+var geometry = new THREE.BoxBufferGeometry(volume.xLength, volume.yLength, volume.zLength);
 geometry.translate(volume.xLength / 2 - 0.5, volume.yLength / 2 - 0.5, volume.zLength / 2 - 0.5);
 var mesh = new THREE.Mesh(geometry, material);
-mesh.scale.set(1,1,0.5);
+mesh.scale.set(1,1,4);
 mesh.position.set(-volume.xLength / 2, -volume.yLength / 2, -volume.zLength / 2); //if gi
 scene.add(mesh)
+
 camera.updateProjectionMatrix();
 // renderer.render(scene,camera)
 

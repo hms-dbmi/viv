@@ -17,7 +17,7 @@ var VolumeRenderShader1 = {
         "u_renderstyle": {value: 0},
         "u_renderthreshold": {value: 0.5},
         "u_opacity": {value: 0.5},
-        "u_clim": {value: new Vector2(1, 1)},
+        "u_clim": {value: new Vector2(0, 1)},
         "u_data": {value: null},
         "u_cmdata": {value: null}
     },
@@ -195,10 +195,7 @@ var VolumeRenderShader1 = {
         "				if(val <  u_clim[0]){",
         "					return vec4(0,0,0,0);",
         "				}",
-// "                        if(val >  u_clim[1]){",
-//     "					    return vec4(1,0,0,0.2);",
-//         "				}",
-        "               vec3 color = texture2D(u_cmdata, vec2(val, 0.5)).rgb;",
+        "       vec3 color = texture2D(u_cmdata, vec2(val, 0.5)).rgb;",
         "				return vec4(color,u_opacity);",
         "		}",
 
