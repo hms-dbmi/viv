@@ -1,6 +1,8 @@
 /* eslint-disable */
 // @ts-ignore
 import * as THREE from "three";
+// @ts-ignore
+import { VRButton } from 'three/examples/jsm/webxr/VRButton';
 import {VolumeRenderShader1} from '../jsm/shaders/VolumeShader.js';
 import {Volume} from "../jsm/misc/Volume.js";
 import {Arcball} from './arcball';
@@ -176,3 +178,7 @@ container.addEventListener('wheel', (event) => {
   arcball.onDocumentMouseWheel(event);
 }, false);
 arcball.animate()
+
+
+document.body.appendChild( VRButton.createButton( renderer ) );
+renderer.xr.enabled = true;
