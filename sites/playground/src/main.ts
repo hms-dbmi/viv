@@ -154,7 +154,7 @@ material.customProgramCacheKey = function () {
   return '1';
 };
 // THREE.Mesh
-var geometry = new THREE.BoxBufferGeometry(volume.xLength, volume.yLength, volume.zLength);
+var geometry = new THREE.BoxGeometry(volume.xLength, volume.yLength, volume.zLength);
 geometry.translate(volume.xLength / 2 - 0.5, volume.yLength / 2 - 0.5, volume.zLength / 2 - 0.5);
 var mesh = new THREE.Mesh(geometry, material);
 mesh.scale.set(1,1,4);
