@@ -2,7 +2,8 @@
   "name": "playground",
   "main": "./index.js",
   "scripts": {
-    "dev_test": "vite"
+    "dev_test": "vite",
+    "build": "vite build"
   },
   "dependencies": {
     "@vivjs/layers": "workspace:^",
