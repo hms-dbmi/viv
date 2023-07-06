@@ -108,6 +108,13 @@ while (container.childNodes.length > 0) {
   container.removeChild(container.childNodes[0]);
 }
 container.appendChild(renderer.domElement);
+
+
+var user = new THREE.Group();
+user.position.set(0,0,0);
+
+// Setting up the CAMERA for the THREE.js Rendering
+
 var h = 500; // frustum height
 var aspect = container.offsetWidth / container.offsetHeight;
 let camera = new THREE.OrthographicCamera(-h * aspect / 2,
@@ -118,6 +125,9 @@ let camera = new THREE.OrthographicCamera(-h * aspect / 2,
   100000);
 camera.position.set(0, 0, 500);
 camera.up.set(0, 0, 1); // In our data, z is up
+
+user.add(camera);
+
 // camera.zoom = 1.8;
 let volconfig = {clim1: 0.15, clim2: 0.8, renderstyle: 'dvr' , isothreshold: 0.15, opacity: 1.0, colormap: 'viridis'};
 
@@ -166,9 +176,11 @@ mesh.scale.set(1,1,4);
 mesh.position.set(-volume.xLength / 2, -volume.yLength / 2, -volume.zLength / 2); //if gi
 scene.add(mesh)
 
+
+scene.add(user);
 camera.updateProjectionMatrix();
 
-let arcball = new Arcball(renderer, camera, scene, container, mesh);
+let arcball = new Arcball(renderer, camera, scene, container, mesh, user);
 container.addEventListener('mousedown', (event) => {
   arcball.onDocumentMouseDown(event)
 }, false);

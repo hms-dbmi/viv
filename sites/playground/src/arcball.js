@@ -1,5 +1,5 @@
 export class Arcball {
-  constructor(renderer, camera, scene, window, object) {
+  constructor(renderer, camera, scene, window, object, user) {
     this.arcCamera = camera;
     this.arcScene = scene;
     this.arcRenderer = renderer;
@@ -7,6 +7,8 @@ export class Arcball {
     this.type = -1;
     this.arcObject = object;
     this.firstTime = true;
+    this.camera_z_pos = -1;
+    this.user = user;
   }
 
   // Declares the start of a click
