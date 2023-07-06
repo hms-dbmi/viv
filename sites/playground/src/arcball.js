@@ -47,8 +47,7 @@ export class Arcball {
   }
 
   animate() {
-    requestAnimationFrame(() => this.animate());
-    this.arcRenderer.setAnimationLoop(() => this.animate());
+    // requestAnimationFrame(() => this.animate());
     if (this.isClicking) {
       this.mouseVector = [this.mousePosition[0] - this.mousePositionStart[0], this.mousePosition[1] - this.mousePositionStart[1]];
       if (this.type === 1) {
@@ -67,6 +66,7 @@ export class Arcball {
       this.arcRenderer.render(this.arcScene, this.arcCamera);
     } else if (this.firstTime) {
       this.arcRenderer.render(this.arcScene, this.arcCamera);
+      this.arcRenderer.setAnimationLoop(() => this.animate());
     }
   }
 
