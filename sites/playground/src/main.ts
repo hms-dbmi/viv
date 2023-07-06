@@ -187,3 +187,4 @@ arcball.animate()
 
 document.body.appendChild( VRButton.createButton( renderer ) );
 renderer.xr.enabled = true;
+renderer.vr.enabled = true;
