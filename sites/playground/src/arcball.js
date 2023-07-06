@@ -48,6 +48,7 @@ export class Arcball {
 
   animate() {
     requestAnimationFrame(() => this.animate());
+    this.arcRenderer.setAnimationLoop(() => this.animate());
     if (this.isClicking) {
       this.mouseVector = [this.mousePosition[0] - this.mousePositionStart[0], this.mousePosition[1] - this.mousePositionStart[1]];
       if (this.type === 1) {
