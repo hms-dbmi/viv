@@ -73,7 +73,7 @@ volume.data = volumeOrigin.data;
 // Get into Three Js with the Volume and initialize a custom shader with DVR (Can be taken from the ScrollyVis Project)
 let container = Object.assign(document.createElement('div'), {});
 document.body.appendChild(container);
-container.style.height = "500px";
+container.style.height = "1000px";
 var canvas = document.createElement('canvas');
 
 // get the min and max intensities
