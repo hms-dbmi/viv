@@ -167,7 +167,6 @@ mesh.position.set(-volume.xLength / 2, -volume.yLength / 2, -volume.zLength / 2)
 scene.add(mesh)
 
 camera.updateProjectionMatrix();
-// renderer.render(scene,camera)
 
 let arcball = new Arcball(renderer, camera, scene, container, mesh);
 container.addEventListener('mousedown', (event) => {
@@ -185,6 +184,5 @@ container.addEventListener('wheel', (event) => {
 arcball.animate()
 
 
-document.body.appendChild( VRButton.createButton( renderer ) );
+document.body.appendChild(VRButton.createButton( renderer ) );
 renderer.xr.enabled = true;
-renderer.vr.enabled = true;

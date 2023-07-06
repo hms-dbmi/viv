@@ -6,6 +6,7 @@ export class Arcball {
     this.arcWindow = window;
     this.type = -1;
     this.arcObject = object;
+    this.firstTime = true;
   }
 
   // Declares the start of a click
@@ -62,6 +63,8 @@ export class Arcball {
         this.arcObject.position.x = posX;
         this.arcObject.position.y = posY;
       }
+      this.arcRenderer.render(this.arcScene, this.arcCamera);
+    } else if (this.firstTime) {
       this.arcRenderer.render(this.arcScene, this.arcCamera);
     }
   }
