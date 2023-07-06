@@ -100,7 +100,7 @@ console.log(volumeOrigin)
 console.log(volume)
 
 let scene = new THREE.Scene();
-var context = canvas.getContext('webgl2', {alpha: false, antialias: false});
+var context = canvas.getContext('webgl2', {alpha: false, antialias: true});
 let renderer = new THREE.WebGLRenderer({canvas: canvas, context: context});
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(container.offsetWidth, container.offsetHeight);
