@@ -68,14 +68,20 @@ var VolumeRenderShader1 = {
         "				a31 * b01 - a30 * b03 - a32 * b00,",
         "				a20 * b03 - a21 * b01 + a22 * b00) / det;",
         "		}",
-
-
+        "vec4 frustumToWorld(vec3 viewportPoint) {\n",
+        "    vec4 worldCoord = inverse(projectionMatrix * viewMatrix) * vec4(viewportPoint.x, viewportPoint.y, 1.0 - viewportPoint.z, 1.0);\n" ,
+        "    worldCoord.x /= worldCoord.w;\n" ,
+        "    worldCoord.y /= worldCoord.w;\n" ,
+        "    worldCoord.z /= worldCoord.w;\n" ,
+        "    \n" ,
+        "    return worldCoord;\n" ,
+        "  }" ,
+        "",
         "		void main() {",
         // Prepare transforms to map to "camera view". See also:
         // https://threejs.org/docs/#api/renderers/webgl/WebGLProgram
         "				mat4 viewtransformf = modelViewMatrix;",
         "				mat4 viewtransformi = inversemat(modelViewMatrix);",
-
         // Project local vertex coordinate to camera position. Then do a step
         // backward (in cam coords) to the near clipping plane, and project back. Do
         // the same for the far clipping plane. This gives us all the information we
@@ -94,6 +100,7 @@ var VolumeRenderShader1 = {
         // Set varyings and output pos
         "				v_position = position;",
         "				gl_Position = projectionMatrix * viewMatrix * modelMatrix * position4;",
+        // "       gl_Position = frustumToWorld(position);",
         "		}",
     ].join("\n"),
     fragmentShader: [

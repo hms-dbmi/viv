@@ -3,7 +3,7 @@
 import * as THREE from "three";
 // @ts-ignore
 import { VRButton } from 'three/examples/jsm/webxr/VRButton';
-import {VolumeRenderShader1} from '../jsm/shaders/VolumeShader.js';
+import {VolumeRenderShaderPerspective} from '../jsm/shaders/VolumeShaderPerspective.js';
 import {Volume} from "../jsm/misc/Volume.js";
 import {Arcball} from './arcball';
 
@@ -65,8 +65,13 @@ pre.textContent = `loaded volume.\n${JSON.stringify(dimensions, null, 2)}`;
 console.log(volumeOrigin);
 console.log(volumeOrigin.data.length)
 
-/*** RENDERING FOLLOWS FROM HERE
- *
+/**************************************************************
+ * ************************************************************
+ * ************************************************************
+ * **********    RENDERING FOLLOWS FROM HERE    ***************
+ * ************************************************************
+ * ************************************************************
+ * ************************************************************
  */
 
 let volume = new Volume();
@@ -117,15 +122,15 @@ user.position.set(0,0,0);
 
 var h = 500; // frustum height
 var aspect = container.offsetWidth / container.offsetHeight;
-let camera = new THREE.OrthographicCamera(-h * aspect / 2,
-  h * aspect / 2,
-  h / 2,
-  -h / 2,
-  1,
-  100000);
-camera.position.set(0, 0, 500);
-camera.up.set(0, 0, 1); // In our data, z is up
-
+// let camera = new THREE.OrthographicCamera(-h * aspect / 2,
+//   h * aspect / 2,
+//   h / 2,
+//   -h / 2,
+//   1,
+//   100000);
+// camera.up.set(0, 0, 1); // In our data, z is up
+const camera = new THREE.PerspectiveCamera( 45, 1, 1, 10000 );
+camera.position.set(0, 0, -2);
 user.add(camera);
 
 // camera.zoom = 1.8;
@@ -146,25 +151,34 @@ let cmtextures = {
 };
 
 // Material
-var shader = VolumeRenderShader1;
+var shader = VolumeRenderShaderPerspective;
 var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-uniforms["u_data"].value = texture;
-uniforms["u_size"].value.set(volume.xLength, volume.yLength, volume.zLength);
-uniforms["u_clim"].value.set(volconfig.clim1, volconfig.clim2);
-uniforms["u_renderstyle"].value = volconfig.renderstyle === 'mip' ? 0 : volconfig.renderstyle === 'iso' ? 1 : 2; // 0: MIP, 1: ISO
-uniforms["u_renderthreshold"].value = volconfig.isothreshold; // For ISO renderstyle
-uniforms["u_opacity"].value = volconfig.opacity;
+// uniforms["u_data"].value = texture;
+uniforms["boxSize"].value.set(volume.xLength, volume.yLength, volume.zLength);
+uniforms["volumeTex"].value = texture;
+uniforms["near"].value = 1;
+uniforms["far"].value = 1000;
+uniforms["alphaScale"].value = 1.0;
+uniforms["dtScale"].value = 1;
+uniforms["finalGamma"].value = 4.5;
+uniforms["useVolumeMirrorX"].value = false;
+// uniforms["u_size"].value.set(volume.xLength, volume.yLength, volume.zLength);
+// uniforms["u_clim"].value.set(volconfig.clim1, volconfig.clim2);
+// uniforms["u_renderstyle"].value = volconfig.renderstyle === 'mip' ? 0 : volconfig.renderstyle === 'iso' ? 1 : 2; // 0: MIP, 1: ISO
+// uniforms["u_renderthreshold"].value = volconfig.isothreshold; // For ISO renderstyle
+// uniforms["u_opacity"].value = volconfig.opacity;
 // @ts-ignore
-uniforms["u_cmdata"].value = cmtextures[volconfig.colormap];
+// uniforms["u_cmdata"].value = cmtextures[volconfig.colormap];
 
 let material = new THREE.ShaderMaterial({
   uniforms: uniforms,
   vertexShader: shader.vertexShader,
   fragmentShader: shader.fragmentShader,
   side: THREE.BackSide, // The volume shader uses the backface as its "reference point"
-  blending: THREE.NormalBlending,
-  transparent: true,
+  // blending: THREE.NormalBlending,
+  // transparent: true,
 });
+material.needsUpdate = true;
 material.customProgramCacheKey = function () {
   return '1';
 };
@@ -175,7 +189,6 @@ var mesh = new THREE.Mesh(geometry, material);
 mesh.scale.set(1,1,4);
 mesh.position.set(-volume.xLength / 2, -volume.yLength / 2, -volume.zLength / 2); //if gi
 scene.add(mesh)
-
 
 scene.add(user);
 camera.updateProjectionMatrix();
