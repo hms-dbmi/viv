@@ -8,7 +8,6 @@
   "dependencies": {
     "@vivjs/layers": "workspace:^",
     "@vivjs/loaders": "workspace:^",
-    "@janelia/three-orbit-unlimited-controls": ">=1.1.0",
     "three": "^0.154.0"
   },
   "devDependencies": {

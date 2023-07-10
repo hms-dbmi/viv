@@ -34,7 +34,7 @@ var VolumeRenderShaderPerspective = {
   fragmentShader: [
     "precision highp float;",
    " precision mediump sampler3D;",
-    "varying vec3 rayDirUnnorm;",
+    "in vec3 rayDirUnnorm;",
 
     // " uniform sampler2D transferTex;",
     "uniform sampler3D volumeTex;",
@@ -51,7 +51,7 @@ var VolumeRenderShaderPerspective = {
     "uniform float far;",
     // "uniform sampler2D surfaceColorTex;",
     // "uniform sampler2D surfaceDepthTex;",
-    "		vec4 apply_colormap(float val);",
+    "vec4 apply_colormap(float val);",
 
     "vec2 intersectBox(vec3 orig, vec3 dir) {",
     "  vec3 boxMin = vec3(-0.5) * boxSize;",
@@ -72,27 +72,16 @@ var VolumeRenderShaderPerspective = {
     "				vec3 color = texture2D(u_cmdata, vec2(val, 0.5)).rgb;",
     "               return vec4(color, 0.5);",
     "		}",
-
-    "float cameraDistanceFromDepth(float depth) {",
-    "  float zN = 2.0 * depth - 1.0;",
-    "  float z = 2.0 * near * far / (far + near - zN * (far - near));",
-    "  return near + z;",
-    "}",
-
     "void main(void) {",
     "  vec3 rayDir = normalize(rayDirUnnorm);",
-
-    "  rayDir.x = useVolumeMirrorX ? -rayDir.x : rayDir.x;",
     "  vec3 cameraPositionAdjusted = cameraPosition;",
-    "  cameraPositionAdjusted.x = useVolumeMirrorX ? -cameraPositionAdjusted.x : cameraPositionAdjusted.x;",
-
     "  // Find the part of the ray that intersects the box, where this part is",
     "  // expressed as a range of t values (with t being the traditional",
     "  // parameter for a how far a point is along a ray).",
     "  vec2 tBox = intersectBox(cameraPositionAdjusted, rayDir);",
 
-    "  ivec2 surfaceTexSize = ivec2(0);",
-    "  vec2 surfaceTexCoord = vec2(0);",
+    // "  ivec2 surfaceTexSize = ivec2(0);",
+    // "  vec2 surfaceTexCoord = vec2(0);",
 
     "  if (tBox.x >= tBox.y) {",
     "    discard;",
@@ -175,10 +164,10 @@ var VolumeRenderShaderPerspective = {
     // "   // Move to the next point along the ray.",
     "    pSized += dPSized;",
     "  }",
-    "		if(max_val < 0.05){",
-    "       gl_FragColor = vec4(0,0,0,0.5);",
+    "		if(max_val < u_clim[0]){",
+    "       gl_FragColor = vec4(0,0,0,0);",
     "   }else{",
-    "	  			gl_FragColor = apply_colormap(max_val);",
+    "	  		gl_FragColor = apply_colormap(max_val);",
     "   }",
     // "  float g = 1.0 / finalGamma;",
     // "  gl_FragColor = pow(gl_FragColor, vec4(g, g, g, 1));",
