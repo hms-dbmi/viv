@@ -74,6 +74,16 @@ pre.textContent = `loaded volume.\n${JSON.stringify(dimensions, null, 2)}`;
  * ************************************************************
  */
 
+export function getBoxSize(volumeSize: THREE.Vector3, voxelSize: THREE.Vector3)
+{
+  const s = volumeSize[0] * voxelSize[0];
+  const boxWidth = 1;
+  const boxHeight = volumeSize[1] * voxelSize[1] / s;
+  const boxDepth = volumeSize[2] * voxelSize[2] / s;
+  const boxSize = [boxWidth, boxHeight, boxDepth];
+  return boxSize;
+}
+
 let volume = new Volume();
 volume.xLength = volumeOrigin.height;
 volume.yLength = volumeOrigin.width;
@@ -118,8 +128,9 @@ let volconfig = {clim1: 0.2, clim2: 0.8, renderstyle: 'dvr' , isothreshold: 0.15
 var texture = new THREE.Data3DTexture(volume.data, volume.xLength, volume.yLength, volume.zLength);
 texture.format = THREE.RedFormat;
 texture.type = THREE.FloatType;
+texture.generateMipmaps = false;
 texture.minFilter = texture.magFilter = THREE.LinearFilter;
-texture.unpackAlignment = 1;
+// texture.unpackAlignment = 1;
 texture.needsUpdate = true;
 
 // Colormap textures
@@ -140,7 +151,7 @@ uniforms["alphaScale"].value = 1.0;
 uniforms["dtScale"].value = 1;
 uniforms["finalGamma"].value = 4.5;
 uniforms["useVolumeMirrorX"].value = false;
-// uniforms["u_size"].value.set(volume.xLength, volume.yLength, volume.zLength);
+uniforms["u_size"].value.set(volume.xLength, volume.yLength, volume.zLength);
 uniforms["u_clim"].value.set(volconfig.clim1, volconfig.clim2);
 // uniforms["u_renderstyle"].value = volconfig.renderstyle === 'mip' ? 0 : volconfig.renderstyle === 'iso' ? 1 : 2; // 0: MIP, 1: ISO
 // uniforms["u_renderthreshold"].value = volconfig.isothreshold; // For ISO renderstyle
@@ -153,7 +164,7 @@ let material = new THREE.ShaderMaterial({
   vertexShader: shader.vertexShader,
   fragmentShader: shader.fragmentShader,
   side: THREE.BackSide, // The volume shader uses the backface as its "reference point"
-  blending: THREE.NormalBlending,
+  // blending: THREE.NormalBlending,
   // transparent: true,
 });
 material.needsUpdate = true;
