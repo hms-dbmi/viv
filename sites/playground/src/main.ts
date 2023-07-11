@@ -120,7 +120,9 @@ const camera = new THREE.PerspectiveCamera( 45, container.offsetWidth/container.
 camera.position.set(0, 0, 500);
 camera.up.set(0,0,1);
 user.add(camera);
-user.translateZ(500)
+
+//TODO Only move the user group if in VR
+// user.translateZ(500)
 
 // camera.zoom = 1.8;
 let volconfig = {clim1: 0.2, clim2: 0.8, renderstyle: 'dvr' , isothreshold: 0.15, opacity: 1.0, colormap: 'viridis'};
@@ -191,8 +193,3 @@ function animate() {
   controls.update();
   renderer.render( scene, camera );
 }
-
-renderer.xr.addEventListener( 'sessionstart', () => {
-  let controller0 = renderer.xr.getController(0);
-  controller0.add(mesh)
-} );
