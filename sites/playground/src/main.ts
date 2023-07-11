@@ -174,7 +174,7 @@ material.customProgramCacheKey = function () {
 // THREE.Mesh
 var geometry = new THREE.BoxGeometry(volume.xLength, volume.yLength, volume.zLength);
 var mesh = new THREE.Mesh(geometry, material);
-mesh.scale.set(1,1,4);
+// mesh.scale.set(1,1,4);
 scene.add(mesh)
 
 scene.add(user);
