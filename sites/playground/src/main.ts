@@ -191,3 +191,8 @@ function animate() {
   controls.update();
   renderer.render( scene, camera );
 }
+
+renderer.xr.addEventListener( 'sessionstart', () => {
+  let controller0 = renderer.xr.getController(0);
+  controller0.add(mesh)
+} );
