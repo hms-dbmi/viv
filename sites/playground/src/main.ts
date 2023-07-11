@@ -120,6 +120,7 @@ const camera = new THREE.PerspectiveCamera( 45, container.offsetWidth/container.
 camera.position.set(0, 0, 500);
 camera.up.set(0,0,1);
 user.add(camera);
+user.translateZ(500)
 
 // camera.zoom = 1.8;
 let volconfig = {clim1: 0.2, clim2: 0.8, renderstyle: 'dvr' , isothreshold: 0.15, opacity: 1.0, colormap: 'viridis'};
@@ -185,12 +186,6 @@ controls.update();
 document.body.appendChild(VRButton.createButton( renderer ) );
 renderer.xr.enabled = true;
 renderer.setAnimationLoop(() => animate());
-
-renderer.xr.addEventListener("sessionstart", () => {
-  renderer.xr.getCamera().position.copy( camera.position);
-  renderer.xr.getCamera().lookAt( camera.target );
-});
-
 
 function animate() {
   controls.update();
