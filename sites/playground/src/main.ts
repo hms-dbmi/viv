@@ -186,6 +186,12 @@ document.body.appendChild(VRButton.createButton( renderer ) );
 renderer.xr.enabled = true;
 renderer.setAnimationLoop(() => animate());
 
+renderer.xr.addEventListener("sessionstart", () => {
+  renderer.xr.getCamera().position.copy( camera.position);
+  renderer.xr.getCamera().lookAt( camera.target );
+});
+
+
 function animate() {
   controls.update();
   renderer.render( scene, camera );
