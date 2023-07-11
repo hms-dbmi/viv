@@ -122,7 +122,7 @@ camera.up.set(0,0,1);
 user.add(camera);
 
 //TODO Only move the user group if in VR
-// user.translateZ(500)
+user.translateZ(500)
 
 // camera.zoom = 1.8;
 let volconfig = {clim1: 0.2, clim2: 0.8, renderstyle: 'dvr' , isothreshold: 0.15, opacity: 1.0, colormap: 'viridis'};
