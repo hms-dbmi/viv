@@ -173,6 +173,7 @@ material.customProgramCacheKey = function () {
 };
 // THREE.Mesh
 var geometry = new THREE.BoxGeometry(volume.xLength, volume.yLength, volume.zLength);
+// geometry.scale(1,1,4);
 var mesh = new THREE.Mesh(geometry, material);
 // mesh.scale.set(1,1,4);
 scene.add(mesh)
