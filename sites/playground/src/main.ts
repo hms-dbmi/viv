@@ -6,6 +6,7 @@ import { VRButton } from 'three/examples/jsm/webxr/VRButton';
 import {VolumeRenderShaderPerspective} from '../jsm/shaders/VolumeShaderPerspective.js';
 import {Volume} from "../jsm/misc/Volume.js";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls';
 
 /* eslint-disable */
 import * as loaders from '@vivjs/loaders';
@@ -118,7 +119,7 @@ var user = new THREE.Group();
 user.position.set(0,0,0);
 const camera = new THREE.PerspectiveCamera( 45, container.offsetWidth/container.offsetHeight, 0.01, 100000);
 camera.position.set(0, 0, 500);
-camera.up.set(0,0,1);
+camera.up.set(0,1,0);
 user.add(camera);
 
 // camera.zoom = 1.8;
@@ -175,7 +176,7 @@ material.customProgramCacheKey = function () {
 var geometry = new THREE.BoxGeometry(volume.xLength, volume.yLength, volume.zLength);
 // geometry.scale(1,1,4);
 var mesh = new THREE.Mesh(geometry, material);
-// mesh.scale.set(1,1,4);
+mesh.scale.set(1,1,4);
 scene.add(mesh)
 
 scene.add(user);
@@ -189,6 +190,7 @@ renderer.setAnimationLoop(() => animate());
 
 function animate() {
   controls.update();
+  camera.updateProjectionMatrix()
   renderer.render( scene, camera );
 }
 
