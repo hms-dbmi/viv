@@ -6,7 +6,8 @@ import { VRButton } from 'three/examples/jsm/webxr/VRButton';
 import {VolumeRenderShaderPerspective} from '../jsm/shaders/VolumeShaderPerspective.js';
 import {Volume} from "../jsm/misc/Volume.js";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls';
+
+
 
 /* eslint-disable */
 import * as loaders from '@vivjs/loaders';
@@ -188,12 +189,38 @@ document.body.appendChild(VRButton.createButton( renderer ) );
 renderer.xr.enabled = true;
 renderer.setAnimationLoop(() => animate());
 
+var translate = false;
+var rotate = false;
+var zoomIn = true;
+
+const dolly = new THREE.Object3D();
+dolly.add(camera);
+scene.add(dolly);
+
 function animate() {
+  if(translate) dolly.position.z = dolly.position.z + (zoomIn ? -5 : 5);
+  // if(rotate) dolly.rotateZ(0.1); // Orbit the camera around the object !! Difficult !! Need to translate and change the view direction
   controls.update();
   camera.updateProjectionMatrix()
   renderer.render( scene, camera );
 }
 
 renderer.xr.addEventListener('sessionstart', ()=>{
-  user.translateZ(500)
+  dolly.position.z = 500;
+});
+
+
+let controller = renderer.xr.getController(0);
+controller.addEventListener('selectstart', () => {
+  // User pressed the select button
+  console.log("Select Start");
+  translate = true;
+  rotate = true;
+});
+controller.addEventListener('selectend', () => {
+  // User pressed the select button
+  console.log("Select End");
+  translate = false;
+  rotate = false;
+  zoomIn = !zoomIn;
 });
