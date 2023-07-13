@@ -5,9 +5,8 @@ import * as THREE from "three";
 import { VRButton } from 'three/examples/jsm/webxr/VRButton';
 import {VolumeRenderShaderPerspective} from '../jsm/shaders/VolumeShaderPerspective.js';
 import {Volume} from "../jsm/misc/Volume.js";
+// @ts-ignore
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
-
 
 /* eslint-disable */
 import * as loaders from '@vivjs/loaders';
@@ -23,6 +22,7 @@ import cmViridisTextureUrl from '../textures/cm_viridis.png';
 // https://viv-demo.storage.googleapis.com/2018-12-18_ASY_H2B_bud_05_3D_8_angles.ome.tif
 // 'https://viv-demo.storage.googleapis.com/brain.pyramid.ome.tif'
 let url = new URL(
+  // 'https://viv-demo.storage.googleapis.com/brain.pyramid.ome.tif'
   'https://viv-demo.storage.googleapis.com/2018-12-18_ASY_H2B_bud_05_3D_8_angles.ome.tif'
 );
 let { data: resolutions, metadata } = await loaders.loadOmeTiff(url.href);
@@ -51,6 +51,7 @@ let resolution = resolutions.length - 1;
 let volumeOrigin = await getVolume({
   source: resolutions[resolution],
   selection: { t: 0, c: 0 }, // corresponds to the first channel of the first timepoint
+  // @ts-ignore
   downsampleDepth: 2 ** resolution,
   onUpdate({ z, total }: { z: number; total: number }) {
     pre.textContent = `loading volume ... ${z}/${total} (${(z / total).toFixed(
