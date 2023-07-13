@@ -27,8 +27,6 @@ let url = new URL(
 );
 let { data: resolutions, metadata } = await loaders.loadOmeTiff(url.href);
 
-// console.log({ resolutions, metadata });
-
 for (let [i, resolution] of Object.entries(resolutions)) {
   let dims = Object.fromEntries(
     resolution.labels.map((label: string, i: number) => [
@@ -42,12 +40,10 @@ for (let [i, resolution] of Object.entries(resolutions)) {
 let pre = Object.assign(document.createElement('pre'), {
   textContent: 'loading volume ...'
 });
-
 document.body.appendChild(pre);
 
 // lowest resolution
 let resolution = resolutions.length - 1;
-
 let volumeOrigin = await getVolume({
   source: resolutions[resolution],
   selection: { t: 0, c: 0 }, // corresponds to the first channel of the first timepoint
@@ -59,14 +55,9 @@ let volumeOrigin = await getVolume({
     )}%)`;
   }
 });
-
-// console.log(volume);
-
 let { data, ...dimensions } = volumeOrigin;
-pre.textContent = `loaded volume.\n${JSON.stringify(dimensions, null, 2)}`;
 
-// console.log(volumeOrigin);
-// console.log(volumeOrigin.data.length)
+pre.textContent = `loaded volume.\n${JSON.stringify(dimensions, null, 2)}`;
 
 /**************************************************************
  * ************************************************************
@@ -76,17 +67,6 @@ pre.textContent = `loaded volume.\n${JSON.stringify(dimensions, null, 2)}`;
  * ************************************************************
  * ************************************************************
  */
-
-export function getBoxSize(volumeSize: THREE.Vector3, voxelSize: THREE.Vector3)
-{
-  const s = volumeSize[0] * voxelSize[0];
-  const boxWidth = 1;
-  const boxHeight = volumeSize[1] * voxelSize[1] / s;
-  const boxDepth = volumeSize[2] * voxelSize[2] / s;
-  const boxSize = [boxWidth, boxHeight, boxDepth];
-  return boxSize;
-}
-
 let volume = new Volume();
 volume.xLength = volumeOrigin.height;
 volume.yLength = volumeOrigin.width;
