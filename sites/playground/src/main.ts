@@ -233,4 +233,5 @@ controller2.addEventListener('selectend', () => {
   // User pressed the select button
   console.log("Select End 2");
   rotate = false;
+  // CHeck if that changes somehting with the publishing
 });
