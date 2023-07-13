@@ -116,12 +116,9 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(container.offsetWidth, container.offsetHeight);
 container.appendChild(renderer.domElement);
 
-var user = new THREE.Group();
-user.position.set(0,0,0);
 const camera = new THREE.PerspectiveCamera( 45, container.offsetWidth/container.offsetHeight, 0.01, 100000);
 camera.position.set(0, 0, 500);
 camera.up.set(0,1,0);
-user.add(camera);
 
 // camera.zoom = 1.8;
 let volconfig = {clim1: 0.2, clim2: 0.8, renderstyle: 'dvr' , isothreshold: 0.15, opacity: 1.0, colormap: 'viridis'};
@@ -173,14 +170,15 @@ material.needsUpdate = true;
 material.customProgramCacheKey = function () {
   return '1';
 };
+
+const objectGroup = new THREE.Object3D();
 // THREE.Mesh
 var geometry = new THREE.BoxGeometry(volume.xLength, volume.yLength, volume.zLength);
 // geometry.scale(1,1,4);
 var mesh = new THREE.Mesh(geometry, material);
 mesh.scale.set(1,1,4);
-scene.add(mesh)
-
-scene.add(user);
+objectGroup.add(mesh)
+scene.add(objectGroup)
 camera.updateProjectionMatrix();
 
 const controls = new OrbitControls( camera, renderer.domElement );
@@ -199,14 +197,14 @@ scene.add(dolly);
 
 function animate() {
   if(translate) dolly.position.z = dolly.position.z + (zoomIn ? -5 : 5);
-  // if(rotate) dolly.rotateZ(0.1); // Orbit the camera around the object !! Difficult !! Need to translate and change the view direction
+  if(rotate) objectGroup.rotateY(0.01); // Orbit the camera around the object !! Difficult !! Need to translate and change the view direction
   controls.update();
   camera.updateProjectionMatrix()
   renderer.render( scene, camera );
 }
 
 renderer.xr.addEventListener('sessionstart', ()=>{
-  dolly.position.z = 500;
+  dolly.position.z = 250;
 });
 
 
@@ -215,12 +213,24 @@ controller.addEventListener('selectstart', () => {
   // User pressed the select button
   console.log("Select Start");
   translate = true;
-  rotate = true;
 });
 controller.addEventListener('selectend', () => {
   // User pressed the select button
   console.log("Select End");
   translate = false;
-  rotate = false;
   zoomIn = !zoomIn;
+});
+
+
+
+let controller2 = renderer.xr.getController(1);
+controller2.addEventListener('selectstart', () => {
+  // User pressed the select button
+  console.log("Select Start 2");
+  rotate = true;
+});
+controller2.addEventListener('selectend', () => {
+  // User pressed the select button
+  console.log("Select End 2");
+  rotate = false;
 });
