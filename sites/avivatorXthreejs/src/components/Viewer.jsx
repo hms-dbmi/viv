@@ -5,7 +5,6 @@ import debounce from 'lodash/debounce';
 import {
   SideBySideViewer,
   PictureInPictureViewer,
-  VolumeViewer,
   AdditiveColormapExtension,
   LensExtension
 } from '@hms-dbmi/viv';
@@ -17,6 +16,7 @@ import {
 } from '../state';
 import { useWindowSize, get3DExtension } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
+import ThreeJsVolumeViewer from '../VolumeViewerThreeJs';
 
 const Viewer = () => {
   const [useLinkedView, use3d, viewState] = useViewerStore(
@@ -74,7 +74,7 @@ const Viewer = () => {
   };
 
   return use3d ? (
-    <VolumeViewer
+    <ThreeJsVolumeViewer
       loader={loader}
       contrastLimits={contrastLimits}
       colors={colors}

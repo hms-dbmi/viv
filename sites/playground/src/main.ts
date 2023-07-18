@@ -24,6 +24,8 @@ import cmViridisTextureUrl from '../textures/cm_viridis.png';
 let url = new URL(
   // 'https://viv-demo.storage.googleapis.com/brain.pyramid.ome.tif'
   'https://viv-demo.storage.googleapis.com/2018-12-18_ASY_H2B_bud_05_3D_8_angles.ome.tif'
+  // 'https://assets.hubmapconsortium.org/bc875d49ed4aaa112398aa32160d88c8/ometiff-pyramids/Level0/Channel1/UFL0002-TH-1-4-1.ome.tif?token=Agl2jdenpGyWdwVYwy80qDz52Nx7QaNlM4rzaJoKYlWqo0bgg5i8CYJ7DpavKzOYNyzJll1pGMO1JmCYYkwmmIvXnzN'
+  // 'https://assets.hubmapconsortium.org/30bc1823e0c19be58557fb979499bac2/ometiff-pyramids/data/3D_image_stack.ome.tif?token='
 );
 let { data: resolutions, metadata } = await loaders.loadOmeTiff(url.href);
 
@@ -42,11 +44,13 @@ let pre = Object.assign(document.createElement('pre'), {
 });
 document.body.appendChild(pre);
 
+console.log(resolutions)
+
 // lowest resolution
-let resolution = resolutions.length - 1;
+let resolution = resolutions.length - 2;
 let volumeOrigin = await getVolume({
   source: resolutions[resolution],
-  selection: { t: 0, c: 0 }, // corresponds to the first channel of the first timepoint
+  selection: { t: 0, c: 20 }, // corresponds to the first channel of the first timepoint
   // @ts-ignore
   downsampleDepth: 2 ** resolution,
   onUpdate({ z, total }: { z: number; total: number }) {
@@ -57,7 +61,34 @@ let volumeOrigin = await getVolume({
 });
 let { data, ...dimensions } = volumeOrigin;
 
-pre.textContent = `loaded volume.\n${JSON.stringify(dimensions, null, 2)}`;
+// lowest resolution
+let volumeOrigin2 = await getVolume({
+  source: resolutions[resolution],
+  selection: { t: 0, c: 1 }, // corresponds to the first channel of the first timepoint
+  // @ts-ignore
+  downsampleDepth: 2 ** resolution,
+  onUpdate({ z, total }: { z: number; total: number }) {
+    pre.textContent = `loading volume ... ${z}/${total} (${(z / total).toFixed(
+      2
+    )}%)`;
+  }
+});
+let { data2, ...dimensions2 } = volumeOrigin2;
+
+// lowest resolution
+let volumeOrigin3 = await getVolume({
+  source: resolutions[resolution],
+  selection: { t: 0, c: 0 }, // corresponds to the first channel of the first timepoint
+  // @ts-ignore
+  downsampleDepth: 2 ** resolution,
+  onUpdate({ z, total }: { z: number; total: number }) {
+    pre.textContent = `loading volume ... ${z}/${total} (${(z / total).toFixed(
+      2
+    )}%)`;
+  }
+});
+let { data3, ...dimensions3 } = volumeOrigin3;
+
 
 /**************************************************************
  * ************************************************************
@@ -67,28 +98,53 @@ pre.textContent = `loaded volume.\n${JSON.stringify(dimensions, null, 2)}`;
  * ************************************************************
  * ************************************************************
  */
-let volume = new Volume();
-volume.xLength = volumeOrigin.height;
-volume.yLength = volumeOrigin.width;
-volume.zLength = volumeOrigin.depth;
-volume.data = volumeOrigin.data;
+
+function minMaxVolume(volume: Volume): Float32Array{
+  // get the min and max intensities
+  var min_max = volume.computeMinMax();
+  var min = min_max[0];
+  var max = min_max[1];
+
+  var dataASFloat32 = new Float32Array(volume.data.length);
+  for (var i = 0; i < volume.data.length; i++) {
+    dataASFloat32 [i] = (volume.data[i] - min) / Math.sqrt(Math.pow(max, 2) - Math.pow(min, 2));
+  }
+  return dataASFloat32;
+}
+
+// @ts-ignore
+function getVolumeFromOrigin(volumeOrigin) : Volume{
+  let volume = new Volume();
+  volume.xLength = volumeOrigin.width;
+  volume.yLength = volumeOrigin.height;
+  volume.zLength = volumeOrigin.depth;
+  volume.data = volumeOrigin.data;
+  volume.data = minMaxVolume(volume)
+  return volume;
+}
+
+function getData3DTexture(volume: Volume): THREE.Data3DTexture{
+  // @ts-ignore
+  var texture = new THREE.Data3DTexture(volume.data, volume.xLength, volume.yLength, volume.zLength);
+  texture.format = THREE.RedFormat;
+  texture.type = THREE.FloatType;
+  texture.generateMipmaps = false;
+  texture.minFilter = texture.magFilter = THREE.LinearFilter;
+// texture.unpackAlignment = 1;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+let volume = getVolumeFromOrigin(volumeOrigin);
+let texture = getData3DTexture(volume);
+let texture2 = getData3DTexture(getVolumeFromOrigin(volumeOrigin2));
+let texture3 = getData3DTexture(getVolumeFromOrigin(volumeOrigin3));
 
 // Get into Three Js with the Volume and initialize a custom shader with DVR (Can be taken from the ScrollyVis Project)
 let container = Object.assign(document.createElement('div'), {});
 document.body.appendChild(container);
 container.style.height = "1000px";
 container.style.background = "black";
-// get the min and max intensities
-var min_max = volume.computeMinMax();
-var min = min_max[0];
-var max = min_max[1];
-
-var dataASFloat32 = new Float32Array(volume.data.length);
-for (var i = 0; i < volume.data.length; i++) {
-  dataASFloat32 [i] = (volume.data[i] - min) / Math.sqrt(Math.pow(max, 2) - Math.pow(min, 2));
-}
-volume.data = dataASFloat32;
-min_max = volume.computeMinMax();
 
 let scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer({antialias: true});
@@ -102,16 +158,7 @@ camera.position.set(0, 0, 500);
 camera.up.set(0,1,0);
 
 // camera.zoom = 1.8;
-let volconfig = {clim1: 0.2, clim2: 0.8, renderstyle: 'dvr' , isothreshold: 0.15, opacity: 1.0, colormap: 'viridis'};
-
-// @ts-ignore
-var texture = new THREE.Data3DTexture(volume.data, volume.xLength, volume.yLength, volume.zLength);
-texture.format = THREE.RedFormat;
-texture.type = THREE.FloatType;
-texture.generateMipmaps = false;
-texture.minFilter = texture.magFilter = THREE.LinearFilter;
-// texture.unpackAlignment = 1;
-texture.needsUpdate = true;
+let volconfig = {clim1: 0.1, clim2: 0.7, renderstyle: 'dvr' , isothreshold: 0.15, opacity: 1.0, colormap: 'gray'};
 
 // Colormap textures
 let cmtextures = {
@@ -125,6 +172,8 @@ var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 // uniforms["u_data"].value = texture;
 uniforms["boxSize"].value.set(volume.xLength, volume.yLength, volume.zLength);
 uniforms["volumeTex"].value = texture;
+uniforms["volumeTex2"].value = texture2;
+uniforms["volumeTex3"].value = texture3;
 uniforms["near"].value = 0.01;
 uniforms["far"].value = 100000;
 uniforms["alphaScale"].value = 1.0;
@@ -157,7 +206,7 @@ const objectGroup = new THREE.Object3D();
 var geometry = new THREE.BoxGeometry(volume.xLength, volume.yLength, volume.zLength);
 // geometry.scale(1,1,4);
 var mesh = new THREE.Mesh(geometry, material);
-mesh.scale.set(1,1,4);
+mesh.scale.set(1,1,resolutions.length-1);
 objectGroup.add(mesh)
 scene.add(objectGroup)
 camera.updateProjectionMatrix();
@@ -178,7 +227,7 @@ scene.add(dolly);
 
 function animate() {
   if(translate) dolly.position.z = dolly.position.z + (zoomIn ? -5 : 5);
-  if(rotate) objectGroup.rotateY(0.01); // Orbit the camera around the object !! Difficult !! Need to translate and change the view direction
+  if(rotate) objectGroup.rotateY(0.08); // Orbit the camera around the object !! Difficult !! Need to translate and change the view direction
   controls.update();
   camera.updateProjectionMatrix()
   renderer.render( scene, camera );
