@@ -16,9 +16,13 @@ class ThreeJsViewWrapper extends React.PureComponent {
   constructor(props) {
     super(props);
     const { layerProps, views, viewStates, useDevicePixels } = this.props;
-    const {loader, channelsVisible, resolution, colors, contrastLimits} = layerProps[0];
+    const {loader, channelsVisible, resolution, colors, contrastLimits, selections, onViewportLoad} = layerProps[0];
+    onViewportLoad();
     this.loader = loader;
     this.resolution = resolution;
+    this.channelsVisible = channelsVisible;
+    this.colorsIn = colors;
+    this.contrastLimitsIn = contrastLimits;
   }
 
   // TODO: Use the imported function from VIV: Ask Trevor how to get there
@@ -96,8 +100,13 @@ class ThreeJsViewWrapper extends React.PureComponent {
     volume.yLength = volumeOrigin.height;
     volume.zLength = volumeOrigin.depth;
     volume.data = volumeOrigin.data;
-    volume.data = this.minMaxVolume(volume);
     return volume;
+  }
+
+  getMinMaxValue(value, minMax){
+    let min = minMax[0];
+    let max = minMax[1];
+    return (value - min) / Math.sqrt(Math.pow(max, 2) - Math.pow(min, 2));
   }
 
   getData3DTexture(volume){
@@ -120,14 +129,30 @@ class ThreeJsViewWrapper extends React.PureComponent {
   }
 
   async componentDidMount() {
+    let textures = [];
+    this.contrastLimits = [];
+    this.colors = [];
+    let volume = null;
+    for(let channelStr in this.channelsVisible){
+      let channel = parseInt(channelStr);
+      if(this.channelsVisible[channel]){
+        let volumeOrigin = await this.getVolumeByChannel(channel);
+        volume = this.getVolumeFromOrigin(volumeOrigin);
+        var minMax = volume.computeMinMax();
+        volume.data = this.minMaxVolume(volume);
+        textures.push(this.getData3DTexture(volume));
+        this.colors.push([this.colorsIn[channel][0]/255,this.colorsIn[channel][1]/255,this.colorsIn[channel][2]/255]);
+        this.contrastLimits.push([this.getMinMaxValue(this.contrastLimitsIn[channel][0], minMax),
+        this.getMinMaxValue(this.contrastLimitsIn[channel][1], minMax)]);
+      }
+    }
     // eslint-disable-next-line no-console
-    let volumeOrigin = await this.getVolumeByChannel(0);
-    let volume = this.getVolumeFromOrigin(volumeOrigin);
-    let texture = this.getData3DTexture(volume);
+    console.log(this.contrastLimits);
+    // eslint-disable-next-line no-console
+    console.log(this.colors);
     this.container = document.getElementById("ThreeJs");
     this.container.style.height = "1000px";
     this.container.style.background = "black";
-
     this.scene = new THREE.Scene();
     this.renderer = new THREE.WebGLRenderer({antialias: true});
     this.renderer.setClearColor("#000000");
@@ -148,9 +173,12 @@ class ThreeJsViewWrapper extends React.PureComponent {
     var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
     // uniforms["u_data"].value = texture;
     uniforms["boxSize"].value.set(volume.xLength, volume.yLength, volume.zLength);
-    uniforms["volumeTex"].value = texture;
-    // uniforms["volumeTex2"].value = texture2;
-    // uniforms["volumeTex3"].value = texture3;
+    uniforms["volumeTex"].value = textures.length > 0 ? textures[0] : null;
+    uniforms["volumeTex2"].value = textures.length > 1 ? textures[1] : null;
+    uniforms["volumeTex3"].value = textures.length > 2 ? textures[2] : null;
+    uniforms["volumeTex3"].value = textures.length > 3 ? textures[3] : null;
+    uniforms["volumeTex3"].value = textures.length > 4 ? textures[4] : null;
+    uniforms["volumeTex3"].value = textures.length > 5 ? textures[5] : null;
     uniforms["near"].value = 0.01;
     uniforms["far"].value = 100000;
     uniforms["alphaScale"].value = 1.0;
@@ -158,10 +186,31 @@ class ThreeJsViewWrapper extends React.PureComponent {
     uniforms["finalGamma"].value = 4.5;
     uniforms["useVolumeMirrorX"].value = false;
     uniforms["u_size"].value.set(volume.xLength, volume.yLength, volume.zLength);
-    uniforms["u_clim"].value.set(volconfig.clim1, volconfig.clim2);
-    // uniforms["u_renderstyle"].value = volconfig.renderstyle === 'mip' ? 0 : volconfig.renderstyle === 'iso' ? 1 : 2; // 0: MIP, 1: ISO
-    // uniforms["u_renderthreshold"].value = volconfig.isothreshold; // For ISO renderstyle
-    // uniforms["u_opacity"].value = volconfig.opacity;
+    uniforms["u_clim"].value.set(this.contrastLimits.length > 0 ? this.contrastLimits[0][0] : null, this.contrastLimits.length > 0 ? this.contrastLimits[0][1] : null);
+    uniforms["u_clim2"].value.set(this.contrastLimits.length > 1 ? this.contrastLimits[1][0] : null, this.contrastLimits.length > 1 ? this.contrastLimits[1][1] : null);
+    uniforms["u_clim3"].value.set(this.contrastLimits.length > 2 ? this.contrastLimits[2][0] : null, this.contrastLimits.length > 2 ? this.contrastLimits[2][1] : null);
+    uniforms["u_clim4"].value.set(this.contrastLimits.length > 3 ? this.contrastLimits[3][0] : null, this.contrastLimits.length > 3 ? this.contrastLimits[3][1] : null);
+    uniforms["u_clim5"].value.set(this.contrastLimits.length > 4 ? this.contrastLimits[4][0] : null, this.contrastLimits.length > 4 ? this.contrastLimits[4][1] : null);
+    uniforms["u_clim6"].value.set(this.contrastLimits.length > 5 ? this.contrastLimits[5][0] : null, this.contrastLimits.length > 5 ? this.contrastLimits[5][1] : null);
+    uniforms["u_color"].value.set(this.colors.length > 0 ? this.colors[0][0] : null,
+      this.colors.length > 0 ? this.colors[0][1] : null,
+      this.colors.length > 0 ? this.colors[0][2] : null);
+    uniforms["u_color2"].value.set(this.colors.length > 1 ? this.colors[1][0] : null,
+      this.colors.length > 1 ? this.colors[1][1] : null,
+      this.colors.length > 1 ? this.colors[1][2] : null);
+    uniforms["u_color3"].value.set(this.colors.length > 2 ? this.colors[2][0] : null,
+      this.colors.length > 2 ? this.colors[2][1] : null,
+      this.colors.length > 2 ? this.colors[2][2] : null);
+    uniforms["u_color4"].value.set(this.colors.length > 3 ? this.colors[3][0] : null,
+      this.colors.length > 3 ? this.colors[3][1] : null,
+      this.colors.length > 3 ? this.colors[3][2] : null);
+    uniforms["u_color5"].value.set(this.colors.length > 4 ? this.colors[4][0] : null,
+      this.colors.length > 4 ? this.colors[4][1] : null,
+      this.colors.length > 4 ? this.colors[4][2] : null);
+    uniforms["u_color6"].value.set(this.colors.length > 5 ? this.colors[5][0] : null,
+      this.colors.length > 5 ? this.colors[5][1] : null,
+      this.colors.length > 5 ? this.colors[5][2] : null);
+
     uniforms["u_cmdata"].value = cmtextures[volconfig.colormap];
 
     let material = new THREE.ShaderMaterial({
@@ -182,7 +231,8 @@ class ThreeJsViewWrapper extends React.PureComponent {
     var geometry = new THREE.BoxGeometry(volume.xLength, volume.yLength, volume.zLength);
     // geometry.scale(1,1,4);
     var mesh = new THREE.Mesh(geometry, material);
-    mesh.scale.set(1,1,this.resolution+1); // TODO check if that makes sense
+//    mesh.scale.set(1,1,Math.pow(2,this.resolution)); // TODO check if that makes sense
+    mesh.scale.set(1,1,1);
     objectGroup.add(mesh);
     this.scene.add(objectGroup);
     this.camera.updateProjectionMatrix();

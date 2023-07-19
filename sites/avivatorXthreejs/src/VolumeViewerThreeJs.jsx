@@ -89,8 +89,7 @@ const ThreeJsVolumeViewer = props => {
     resolution,
     extensions,
     modelMatrix,
-    // Slightly delay to avoid issues with a render in the middle of a deck.gl layer state update.
-    onViewportLoad: () => setTimeout(onViewportLoad, 0),
+    onViewportLoad,
     clippingPlanes
   };
   const views = [volumeView];

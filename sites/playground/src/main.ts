@@ -26,6 +26,7 @@ let url = new URL(
   'https://viv-demo.storage.googleapis.com/2018-12-18_ASY_H2B_bud_05_3D_8_angles.ome.tif'
   // 'https://assets.hubmapconsortium.org/bc875d49ed4aaa112398aa32160d88c8/ometiff-pyramids/Level0/Channel1/UFL0002-TH-1-4-1.ome.tif?token=Agl2jdenpGyWdwVYwy80qDz52Nx7QaNlM4rzaJoKYlWqo0bgg5i8CYJ7DpavKzOYNyzJll1pGMO1JmCYYkwmmIvXnzN'
   // 'https://assets.hubmapconsortium.org/30bc1823e0c19be58557fb979499bac2/ometiff-pyramids/data/3D_image_stack.ome.tif?token='
+  // 'https://viv-demo.storage.googleapis.com/idr0106.pyramid.ome.tif'
 );
 let { data: resolutions, metadata } = await loaders.loadOmeTiff(url.href);
 
