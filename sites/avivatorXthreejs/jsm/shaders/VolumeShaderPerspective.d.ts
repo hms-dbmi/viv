@@ -32,6 +32,7 @@ export const VolumeRenderShaderPerspective: {
     far: Uniform;
     "alphaScale": Uniform,
     "dtScale": Uniform,
+    "volumeCount": Uniform,
     "finalGamma": Uniform,
     "boxSize": Uniform,
     "useVolumeMirrorX": Uniform

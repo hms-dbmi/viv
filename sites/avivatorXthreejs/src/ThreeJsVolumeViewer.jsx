@@ -17,7 +17,7 @@ class ThreeJsViewWrapper extends React.PureComponent {
     super(props);
     const { layerProps, views, viewStates, useDevicePixels } = this.props;
     const {loader, channelsVisible, resolution, colors, contrastLimits, selections, onViewportLoad} = layerProps[0];
-    onViewportLoad();
+    this.onViewportLoad = () => onViewportLoad();
     this.loader = loader;
     this.resolution = resolution;
     this.channelsVisible = channelsVisible;
@@ -74,6 +74,15 @@ class ThreeJsViewWrapper extends React.PureComponent {
     };
   }
 
+  /**
+   * Get physical size scaling Matrix4
+   * @param {Object} loader PixelSource
+   */
+  getPhysicalSizeScalingMatrix(loader) {
+    const { x, y, z } = loader?.meta?.physicalSizes ?? {};
+    return [x,y,z];
+  }
+
   async getVolumeByChannel(channel){
     return this.getVolumeIntern({
       source: this.loader[this.resolution],
@@ -127,10 +136,70 @@ class ThreeJsViewWrapper extends React.PureComponent {
     this.camera.updateProjectionMatrix();
     this.renderer.render( this.scene, this.camera );
   }
+  setUniforms(){
+    this.uniforms["u_clim"].value.set(this.contrastLimits.length > 0 ? this.contrastLimits[0][0] : null, this.contrastLimits.length > 0 ? this.contrastLimits[0][1] : null);
+    this.uniforms["u_clim2"].value.set(this.contrastLimits.length > 1 ? this.contrastLimits[1][0] : null, this.contrastLimits.length > 1 ? this.contrastLimits[1][1] : null);
+    this.uniforms["u_clim3"].value.set(this.contrastLimits.length > 2 ? this.contrastLimits[2][0] : null, this.contrastLimits.length > 2 ? this.contrastLimits[2][1] : null);
+    this.uniforms["u_clim4"].value.set(this.contrastLimits.length > 3 ? this.contrastLimits[3][0] : null, this.contrastLimits.length > 3 ? this.contrastLimits[3][1] : null);
+    this.uniforms["u_clim5"].value.set(this.contrastLimits.length > 4 ? this.contrastLimits[4][0] : null, this.contrastLimits.length > 4 ? this.contrastLimits[4][1] : null);
+    this.uniforms["u_clim6"].value.set(this.contrastLimits.length > 5 ? this.contrastLimits[5][0] : null, this.contrastLimits.length > 5 ? this.contrastLimits[5][1] : null);
+    this.uniforms["u_color"].value.set(this.colors.length > 0 ? this.colors[0][0] : null,
+      this.colors.length > 0 ? this.colors[0][1] : null,
+      this.colors.length > 0 ? this.colors[0][2] : null);
+    this.uniforms["u_color2"].value.set(this.colors.length > 1 ? this.colors[1][0] : null,
+      this.colors.length > 1 ? this.colors[1][1] : null,
+      this.colors.length > 1 ? this.colors[1][2] : null);
+    this.uniforms["u_color3"].value.set(this.colors.length > 2 ? this.colors[2][0] : null,
+      this.colors.length > 2 ? this.colors[2][1] : null,
+      this.colors.length > 2 ? this.colors[2][2] : null);
+    this.uniforms["u_color4"].value.set(this.colors.length > 3 ? this.colors[3][0] : null,
+      this.colors.length > 3 ? this.colors[3][1] : null,
+      this.colors.length > 3 ? this.colors[3][2] : null);
+    this.uniforms["u_color5"].value.set(this.colors.length > 4 ? this.colors[4][0] : null,
+      this.colors.length > 4 ? this.colors[4][1] : null,
+      this.colors.length > 4 ? this.colors[4][2] : null);
+    this.uniforms["u_color6"].value.set(this.colors.length > 5 ? this.colors[5][0] : null,
+      this.colors.length > 5 ? this.colors[5][1] : null,
+      this.colors.length > 5 ? this.colors[5][2] : null);
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    const { layerProps, views, viewStates, useDevicePixels } = prevProps;
+    const {loader, channelsVisible, resolution, colors, contrastLimits, selections, onViewportLoad} = layerProps[0];
+    // eslint-disable-next-line no-console
+    // console.log(contrastLimits, colors, channelsVisible);
+    // console.log(this.volumeLimits);
+    //CHECK what changed and change the Three.JS rendering accordingly
+
+    // LET's assume the channels didn't change, just overtake the colors and the limits
+    let i = 0;
+    this.colors = [];
+    this.contrastLimits = [];
+    for(let channelStr in this.channelsVisible){
+      let channel = parseInt(channelStr);
+      if(this.channelsVisible[channel]){
+        let minMax = this.volumeLimits[i];
+        if(minMax !== undefined && minMax.length>0) {
+          this.colors.push([colors[channel][0] / 255, colors[channel][1] / 255, colors[channel][2] / 255]);
+          this.contrastLimits.push([this.getMinMaxValue(contrastLimits[channel][0], minMax),
+            this.getMinMaxValue(contrastLimits[channel][1], minMax)]);
+          i++;
+        }
+      }
+    }
+    this.setUniforms();
+    // console.log(this.contrastLimits[0]);
+    this.mesh.material.uniforms = this.uniforms;
+    // this.mesh.material.uniforms["u_color"].value.set(this.colors[0][0],this.colors[0][1],this.colors[0][2]);
+    // this.mesh.material.uniforms["u_clim"].value.set(this.contrastLimits[0][0], this.contrastLimits[0][1]);
+    this.renderer.render( this.scene, this.camera );
+  }
 
   async componentDidMount() {
     let textures = [];
+    this.volumes = [];
     this.contrastLimits = [];
+    this.volumeLimits = [];
     this.colors = [];
     let volume = null;
     for(let channelStr in this.channelsVisible){
@@ -138,18 +207,18 @@ class ThreeJsViewWrapper extends React.PureComponent {
       if(this.channelsVisible[channel]){
         let volumeOrigin = await this.getVolumeByChannel(channel);
         volume = this.getVolumeFromOrigin(volumeOrigin);
+        this.volumes.push(volume);
         var minMax = volume.computeMinMax();
         volume.data = this.minMaxVolume(volume);
         textures.push(this.getData3DTexture(volume));
         this.colors.push([this.colorsIn[channel][0]/255,this.colorsIn[channel][1]/255,this.colorsIn[channel][2]/255]);
         this.contrastLimits.push([this.getMinMaxValue(this.contrastLimitsIn[channel][0], minMax),
         this.getMinMaxValue(this.contrastLimitsIn[channel][1], minMax)]);
+        this.volumeLimits.push(minMax);
       }
     }
     // eslint-disable-next-line no-console
-    console.log(this.contrastLimits);
-    // eslint-disable-next-line no-console
-    console.log(this.colors);
+    //console.log(this.getPhysicalSizeScalingMatrix(this.loader[this.resolution]));
     this.container = document.getElementById("ThreeJs");
     this.container.style.height = "1000px";
     this.container.style.background = "black";
@@ -170,71 +239,50 @@ class ThreeJsViewWrapper extends React.PureComponent {
     };
 
     var shader = VolumeRenderShaderPerspective;
-    var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
+    this.uniforms = THREE.UniformsUtils.clone(shader.uniforms);
     // uniforms["u_data"].value = texture;
-    uniforms["boxSize"].value.set(volume.xLength, volume.yLength, volume.zLength);
-    uniforms["volumeTex"].value = textures.length > 0 ? textures[0] : null;
-    uniforms["volumeTex2"].value = textures.length > 1 ? textures[1] : null;
-    uniforms["volumeTex3"].value = textures.length > 2 ? textures[2] : null;
-    uniforms["volumeTex3"].value = textures.length > 3 ? textures[3] : null;
-    uniforms["volumeTex3"].value = textures.length > 4 ? textures[4] : null;
-    uniforms["volumeTex3"].value = textures.length > 5 ? textures[5] : null;
-    uniforms["near"].value = 0.01;
-    uniforms["far"].value = 100000;
-    uniforms["alphaScale"].value = 1.0;
-    uniforms["dtScale"].value = 1;
-    uniforms["finalGamma"].value = 4.5;
-    uniforms["useVolumeMirrorX"].value = false;
-    uniforms["u_size"].value.set(volume.xLength, volume.yLength, volume.zLength);
-    uniforms["u_clim"].value.set(this.contrastLimits.length > 0 ? this.contrastLimits[0][0] : null, this.contrastLimits.length > 0 ? this.contrastLimits[0][1] : null);
-    uniforms["u_clim2"].value.set(this.contrastLimits.length > 1 ? this.contrastLimits[1][0] : null, this.contrastLimits.length > 1 ? this.contrastLimits[1][1] : null);
-    uniforms["u_clim3"].value.set(this.contrastLimits.length > 2 ? this.contrastLimits[2][0] : null, this.contrastLimits.length > 2 ? this.contrastLimits[2][1] : null);
-    uniforms["u_clim4"].value.set(this.contrastLimits.length > 3 ? this.contrastLimits[3][0] : null, this.contrastLimits.length > 3 ? this.contrastLimits[3][1] : null);
-    uniforms["u_clim5"].value.set(this.contrastLimits.length > 4 ? this.contrastLimits[4][0] : null, this.contrastLimits.length > 4 ? this.contrastLimits[4][1] : null);
-    uniforms["u_clim6"].value.set(this.contrastLimits.length > 5 ? this.contrastLimits[5][0] : null, this.contrastLimits.length > 5 ? this.contrastLimits[5][1] : null);
-    uniforms["u_color"].value.set(this.colors.length > 0 ? this.colors[0][0] : null,
-      this.colors.length > 0 ? this.colors[0][1] : null,
-      this.colors.length > 0 ? this.colors[0][2] : null);
-    uniforms["u_color2"].value.set(this.colors.length > 1 ? this.colors[1][0] : null,
-      this.colors.length > 1 ? this.colors[1][1] : null,
-      this.colors.length > 1 ? this.colors[1][2] : null);
-    uniforms["u_color3"].value.set(this.colors.length > 2 ? this.colors[2][0] : null,
-      this.colors.length > 2 ? this.colors[2][1] : null,
-      this.colors.length > 2 ? this.colors[2][2] : null);
-    uniforms["u_color4"].value.set(this.colors.length > 3 ? this.colors[3][0] : null,
-      this.colors.length > 3 ? this.colors[3][1] : null,
-      this.colors.length > 3 ? this.colors[3][2] : null);
-    uniforms["u_color5"].value.set(this.colors.length > 4 ? this.colors[4][0] : null,
-      this.colors.length > 4 ? this.colors[4][1] : null,
-      this.colors.length > 4 ? this.colors[4][2] : null);
-    uniforms["u_color6"].value.set(this.colors.length > 5 ? this.colors[5][0] : null,
-      this.colors.length > 5 ? this.colors[5][1] : null,
-      this.colors.length > 5 ? this.colors[5][2] : null);
+    this.uniforms["boxSize"].value.set(volume.xLength, volume.yLength, volume.zLength);
+    this.uniforms["volumeTex"].value = textures.length > 0 ? textures[0] : null;
+    this.uniforms["volumeTex2"].value = textures.length > 1 ? textures[1] : null;
+    this.uniforms["volumeTex3"].value = textures.length > 2 ? textures[2] : null;
+    this.uniforms["volumeTex4"].value = textures.length > 3 ? textures[3] : null;
+    this.uniforms["volumeTex5"].value = textures.length > 4 ? textures[4] : null;
+    this.uniforms["volumeTex6"].value = textures.length > 5 ? textures[5] : null;
+    this.uniforms["near"].value = 0.01;
+    this.uniforms["far"].value = 100000;
+    this.uniforms["alphaScale"].value = 1.0;
+    this.uniforms["dtScale"].value = 1;
+    this.uniforms["finalGamma"].value = 4.5;
+    this.uniforms["useVolumeMirrorX"].value = false;
+    this.uniforms["volumeCount"].value = textures.length;
+    this.uniforms["u_size"].value.set(volume.xLength, volume.yLength, volume.zLength);
+    this.setUniforms();
+    this.uniforms["u_cmdata"].value = cmtextures[volconfig.colormap];
 
-    uniforms["u_cmdata"].value = cmtextures[volconfig.colormap];
-
-    let material = new THREE.ShaderMaterial({
-      uniforms: uniforms,
+    this.material = new THREE.ShaderMaterial({
+      uniforms: this.uniforms,
       vertexShader: shader.vertexShader,
       fragmentShader: shader.fragmentShader,
       side: THREE.BackSide, // The volume shader uses the backface as its "reference point"
       // blending: THREE.NormalBlending,
       // transparent: true,
     });
-    material.needsUpdate = true;
-    material.customProgramCacheKey = function () {
+    this.material.needsUpdate = true;
+    this.material.customProgramCacheKey = function () {
       return '1';
     };
 
-    const objectGroup = new THREE.Object3D();
+    this.objectGroup = new THREE.Object3D();
     // THREE.Mesh
     var geometry = new THREE.BoxGeometry(volume.xLength, volume.yLength, volume.zLength);
     // geometry.scale(1,1,4);
-    var mesh = new THREE.Mesh(geometry, material);
+    this.mesh = new THREE.Mesh(geometry, this.material);
 //    mesh.scale.set(1,1,Math.pow(2,this.resolution)); // TODO check if that makes sense
-    mesh.scale.set(1,1,1);
-    objectGroup.add(mesh);
-    this.scene.add(objectGroup);
+    var scale = this.getPhysicalSizeScalingMatrix(this.loader[this.resolution]);
+  //  mesh.scale.set(scale[0].size,scale[1].size,scale[2].size);
+    this.mesh.scale.set(1,scale[1].size/scale[0].size,scale[2].size/scale[0].size);
+    this.objectGroup.add(this.mesh);
+    this.scene.add(this.objectGroup);
     this.camera.updateProjectionMatrix();
 
     this.controls = new OrbitControls( this.camera, this.renderer.domElement );
@@ -273,6 +321,8 @@ class ThreeJsViewWrapper extends React.PureComponent {
       this.rotate = false;
     });
 
+    // FINISH so call Back
+    this.onViewportLoad();
   }
 
   render() {
