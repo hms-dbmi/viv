@@ -65,7 +65,7 @@ const defaultProps = {
  */
 const ScaleBarLayer = class extends CompositeLayer {
   renderLayers() {
-    const { id, unit, size, position, viewState, length } = this.props;
+    const { id, unit, size, position, viewState, length, transformValue } = this.props;
     const boundingBox = makeBoundingBox(viewState);
     const { zoom } = viewState;
     const viewLength = boundingBox[2][0] - boundingBox[0][0];
@@ -125,7 +125,7 @@ const ScaleBarLayer = class extends CompositeLayer {
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         {
-          text: numUnits.toPrecision(5) + unit,
+          text: transformValue ? transformValue(numUnits, unit) : numUnits.toPrecision(5) + unit,
           position: [xLeftCoord + barLength * 0.5, yCoord + barHeight * 4]
         }
       ],

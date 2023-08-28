@@ -11,7 +11,7 @@ export const DETAIL_VIEW_ID = 'detail';
  * */
 export default class DetailView extends VivView {
   getLayers({ props, viewStates }) {
-    const { loader } = props;
+    const { loader, scaleBar } = props;
     const { id, height, width } = this;
     const layerViewState = viewStates[id];
     const layers = [getImageLayer(id, props)];
@@ -25,7 +25,8 @@ export default class DetailView extends VivView {
           loader,
           unit,
           size,
-          viewState: { ...layerViewState, height, width }
+          viewState: { ...layerViewState, height, width },
+          transformValue: scaleBar.transform
         })
       );
     }
