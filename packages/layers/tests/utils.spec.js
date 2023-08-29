@@ -1,6 +1,6 @@
 import test from 'tape-catch';
 import { range } from '../src/multiscale-image-layer/utils';
-import { padWithDefault, padContrastLimits } from '../src/utils';
+import { padWithDefault, padContrastLimits, snapValue } from '../src/utils';
 import { createTestContext } from '@luma.gl/test-utils';
 import GL from '@luma.gl/constants';
 import { FEATURES } from '@luma.gl/webgl';
@@ -160,6 +160,18 @@ test('getRenderingAttrs WebGL2', t => {
         );
       });
     });
+  } catch (e) {
+    t.fail(e);
+  }
+  t.end();
+});
+
+test('snapValue', t => {
+  t.plan(3);
+  try {
+    t.deepEqual(snapValue(1.234), [5, 5], 'Snapping value inside extent of targets');
+    t.deepEqual(snapValue(0.0234), [5, 0.05], 'Snapping value below minimum target');
+    t.deepEqual(snapValue(2345.0), [250, 2500], 'Snapping value above maximum target');
   } catch (e) {
     t.fail(e);
   }

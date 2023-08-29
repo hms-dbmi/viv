@@ -1,6 +1,6 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { LineLayer, TextLayer } from '@deck.gl/layers';
-import { range, makeBoundingBox } from './utils';
+import { range, makeBoundingBox, snapValue } from './utils';
 
 import { DEFAULT_FONT_FAMILY } from '@vivjs/constants';
 
@@ -77,14 +77,21 @@ const ScaleBarLayer = class extends CompositeLayer {
       (boundingBox[2][1] - boundingBox[0][1]) * 0.007
     );
     const numUnits = barLength * size;
-    const [yCoord, xLeftCoord] = getPosition(boundingBox, position, length);
+    // TODO: account for different units returned by snapValue
+    // eslint-disable-next-line no-unused-vars
+    const [snappedOrigUnits, snappedNewUnits] = snapValue(numUnits);
+    // Get snapped value in original units and new units.
+    const adjustedBarLength = (numUnits * (snappedOrigUnits / numUnits)) / size;
+
+    const [yCoord, xRightCoordPartial] = getPosition(boundingBox, position, length);
+    const xRightCoord = xRightCoordPartial + barLength;
     const lengthBar = new LineLayer({
       id: `scale-bar-length-${id}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         [
-          [xLeftCoord, yCoord],
-          [xLeftCoord + barLength, yCoord]
+          [xRightCoord - adjustedBarLength, yCoord],
+          [xRightCoord, yCoord],
         ]
       ],
       getSourcePosition: d => d[0],
@@ -97,8 +104,8 @@ const ScaleBarLayer = class extends CompositeLayer {
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         [
-          [xLeftCoord, yCoord - barHeight],
-          [xLeftCoord, yCoord + barHeight]
+          [xRightCoord - adjustedBarLength, yCoord - barHeight],
+          [xRightCoord - adjustedBarLength, yCoord + barHeight],
         ]
       ],
       getSourcePosition: d => d[0],
@@ -111,8 +118,8 @@ const ScaleBarLayer = class extends CompositeLayer {
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         [
-          [xLeftCoord + barLength, yCoord - barHeight],
-          [xLeftCoord + barLength, yCoord + barHeight]
+          [xRightCoord, yCoord - barHeight],
+          [xRightCoord, yCoord + barHeight],
         ]
       ],
       getSourcePosition: d => d[0],
@@ -125,8 +132,8 @@ const ScaleBarLayer = class extends CompositeLayer {
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         {
-          text: numUnits.toPrecision(5) + unit,
-          position: [xLeftCoord + barLength * 0.5, yCoord + barHeight * 4]
+          text: snappedOrigUnits + unit,
+          position: [xRightCoord - barLength * 0.5, yCoord + barHeight * 4],
         }
       ],
       getColor: [220, 220, 220, 255],

@@ -146,3 +146,43 @@ export function makeBoundingBox(viewState) {
     viewport.unproject([0, viewport.height])
   ];
 }
+
+const TARGETS = [1, 5, 10, 20, 25, 50, 100, 200, 250, 500];
+const MIN_TARGET = TARGETS[0];
+const MAX_TARGET = TARGETS[TARGETS.length - 1];
+
+/**
+ * Snap any scale bar value to a "nice" value
+ * like 1, 5, 10, 20, 25, 50, 100, 200, 250, 500.
+ * If needed, will use different units.
+ * @param {number} value Intended value for scale bar,
+ * in original units, not necessarily a "nice" value.
+ * @returns {[number, number]} Tuple like
+ * [nice value in original units, nice value in new units].
+ * The value in original units can be used to compute the size
+ * in pixels for the scale bar. The value in new units can be
+ * displayed in the text label of the scale bar.
+ */
+export function snapValue(value) {
+  let magnitude = 0;
+
+  if (value < MIN_TARGET) {
+    // Change units
+    magnitude = Math.ceil(Math.log10(MIN_TARGET / value));
+  } else if (value > MAX_TARGET) {
+    // Change units
+    magnitude = -1 * Math.ceil(Math.log10(value / MAX_TARGET));
+  }
+
+  const adjustedValue = value * (10 ** magnitude);
+
+  const targetNewUnits = TARGETS.find(t => t > adjustedValue);
+  const targetOrigUnits = targetNewUnits / (10 ** magnitude);
+
+  // TODO: return:
+  // - snapped value in original units
+  // - snapped value in new units
+  // - new units, or unit prefix/exponent (with respect to meters)
+
+  return [targetOrigUnits, targetNewUnits];
+}
