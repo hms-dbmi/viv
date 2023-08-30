@@ -43,9 +43,9 @@ const defaultProps = {
   },
   unit: { type: 'string', value: '', compare: true },
   size: { type: 'number', value: 1, compare: true },
-  position: { type: 'string', value: 'bottom-right', compare: true },
+  position: { type: 'string', value: 'bottom-left', compare: true },
   length: { type: 'number', value: 0.085, compare: true },
-  snap: { type: 'boolean', value: true, compare: true }
+  snap: { type: 'boolean', value: false, compare: true }
 };
 /**
  * @typedef LayerProps
