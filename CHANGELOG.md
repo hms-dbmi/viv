@@ -6,6 +6,7 @@
 
 ### Changed
 - Fixed typo in `sites/docs/src/IMAGE_RENDERING.md`
+- Migrate `tape` test runner to Vitest
 
 ## 0.13.7
 
