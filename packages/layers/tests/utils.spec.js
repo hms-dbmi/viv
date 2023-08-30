@@ -1,6 +1,6 @@
 import test from 'tape-catch';
 import { range } from '../src/multiscale-image-layer/utils';
-import { padWithDefault, padContrastLimits, snapValue } from '../src/utils';
+import { padWithDefault, padContrastLimits, snapValue, sizeToMeters } from '../src/utils';
 import { createTestContext } from '@luma.gl/test-utils';
 import GL from '@luma.gl/constants';
 import { FEATURES } from '@luma.gl/webgl';
@@ -18,18 +18,6 @@ test('range test', t => {
     const expected = [0, 1, 2];
     t.deepEqual(range(3), expected, 'Create list for range(3)');
     t.deepEqual(range(0), [], 'Empty list for range(0)');
-  } catch (e) {
-    t.fail(e);
-  }
-  t.end();
-});
-
-test('snapValue test', t => {
-  t.plan(3);
-  try {
-    t.deepEqual(snapValue(1.234), [5, 5, ''], 'Snapping value inside extent of targets');
-    t.deepEqual(snapValue(0.0234), [100, 0.1, 'm'], 'Snapping value below minimum target');
-    t.deepEqual(snapValue(2345.0), [5, 5000, 'k'], 'Snapping value above maximum target');
   } catch (e) {
     t.fail(e);
   }
@@ -172,6 +160,33 @@ test('getRenderingAttrs WebGL2', t => {
         );
       });
     });
+  } catch (e) {
+    t.fail(e);
+  }
+  t.end();
+});
+
+test('sizeToMeters test', t => {
+  t.plan(5);
+  try {
+    t.equal(sizeToMeters(5, 'km'), 5000, 'Size in meters when unit is kilometers');
+    t.equal(sizeToMeters(10, 'm'), 10, 'Size in meters when unit is already meters');
+    t.equal(sizeToMeters(10, 'cm'), 0.1, 'Size in meters when unit is centimeters');
+    t.equal(sizeToMeters(10, 'µm'), 1e-5, 'Size in meters when unit is micrometers with Greek letter');
+    t.equal(sizeToMeters(10, 'um'), 1e-5, 'Size in meters when unit is micrometers with regular u character');
+  } catch (e) {
+    t.fail(e);
+  }
+  t.end();
+});
+
+test('snapValue test', t => {
+  t.plan(4);
+  try {
+    t.deepEqual(snapValue(1.234), [2, 2, ''], 'Snapping value inside extent of targets');
+    t.deepEqual(snapValue(0.0234), [0.025, 25, 'm'], 'Snapping value below minimum target');
+    t.deepEqual(snapValue(2345.0), [3000, 3, 'k'], 'Snapping value above maximum target');
+    t.deepEqual(snapValue(999.0), [1, 1000, 'k'], 'Snapping value between 500 and 1000');
   } catch (e) {
     t.fail(e);
   }

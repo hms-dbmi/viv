@@ -147,7 +147,7 @@ export function makeBoundingBox(viewState) {
   ];
 }
 
-const TARGETS = [1, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000];
+const TARGETS = [1, 2, 3, 4, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000];
 const MIN_TARGET = TARGETS[0];
 const MAX_TARGET = TARGETS[TARGETS.length - 1];
 
@@ -160,7 +160,11 @@ const SI_PREFIXES = [
   { symbol: 'G', exponent: 9 },
   { symbol: 'M', exponent: 6 },
   { symbol: 'k', exponent: 3 },
+  { symbol: 'h', exponent: 2 },
+  { symbol: 'da', exponent: 1 },
   { symbol: '', exponent: 0 },
+  { symbol: 'd', exponent: -1 },
+  { symbol: 'c', exponent: -2 },
   { symbol: 'm', exponent: -3 },
   { symbol: 'µ', exponent: -6 },
   { symbol: 'n', exponent: -9 },
@@ -170,6 +174,32 @@ const SI_PREFIXES = [
   { symbol: 'z', exponent: -21 },
   { symbol: 'y', exponent: -24 },
 ];
+
+/**
+ * Convert a size value to meters.
+ * @param {number} size Size in original units.
+ * @param {string} unit String like 'mm', 'cm', 'dam', 'm', 'km', etc.
+ * @returns {number} Size in meters.
+ */
+export function sizeToMeters(size, unit) {
+  if(!unit || unit === 'm') {
+    // Already in meters.
+    return size;
+  }
+  if(unit.length > 1) {
+    let unitPrefix = unit.substring(0, unit.length - 1);
+    // Support 'u' as a prefix for micrometers.
+    if(unitPrefix === 'u') {
+      unitPrefix = 'µ';
+    }
+    // We remove the trailing 'm' from the unit, so 'cm' becomes 'c' and 'dam' becomes 'da'.
+    const unitObj = SI_PREFIXES.find(p => p.symbol === unitPrefix);
+    if(unitObj) {
+      return size * (10 ** unitObj.exponent);
+    }
+  }
+  throw new Error("Received unknown unit");
+}
 
 /**
  * Snap any scale bar value to a "nice" value
@@ -197,7 +227,7 @@ export function snapValue(value) {
   // While the magnitude will re-scale the value correctly,
   // it might not be a multiple of 3, so we use the nearest
   // SI prefix exponent.
-  let snappedUnit = SI_PREFIXES.find(p => p.exponent <= magnitude);
+  let snappedUnit = SI_PREFIXES.find(p => p.exponent % 3 === 0 && p.exponent <= magnitude);
 
   // We re-scale the original value so it is in the range of our
   // "nice" targets (between 1 and 1000).
@@ -208,7 +238,7 @@ export function snapValue(value) {
   // snap to the next lower SI prefix. This will result in an adjusted
   // value of 1 (in the next SI unit) rather than 1000 (in the previous one).
   if(adjustedValue > 500 && adjustedValue <= 1000) {
-    snappedUnit = SI_PREFIXES.find(p => p.exponent <= magnitude + 3);
+    snappedUnit = SI_PREFIXES.find(p => p.exponent % 3 === 0 && p.exponent <= magnitude + 3);
     adjustedValue = value / (10 ** snappedUnit.exponent);
   }
   

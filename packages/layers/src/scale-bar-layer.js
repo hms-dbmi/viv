@@ -1,6 +1,6 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { LineLayer, TextLayer } from '@deck.gl/layers';
-import { range, makeBoundingBox, snapValue } from './utils';
+import { range, makeBoundingBox, snapValue, sizeToMeters } from './utils';
 
 import { DEFAULT_FONT_FAMILY } from '@vivjs/constants';
 
@@ -77,20 +77,13 @@ const ScaleBarLayer = class extends CompositeLayer {
       (boundingBox[2][1] - boundingBox[0][1]) * 0.007
     );
     
-    // Convert `size` to meters.
-    // TODO: clean this up
-    let meterSize = size;
-    if(unit === 'm') {
-      meterSize = size;
-    } else if(unit === 'um' || unit === 'µm') {
-      meterSize = size * (10 ** -6);
-    } else if(unit === 'nm') {
-      meterSize = size * (10 ** -9);
-    } else {
-      console.warn('Received unknown unit')
-    }
+    // Convert `size` to meters, since `snapValue`
+    // assumes the value is in meters.
+    const meterSize = sizeToMeters(size, unit);
 
-
+    console.log(snapValue(1.234));
+    console.log(snapValue(0.0234));
+    console.log(snapValue(999.0));
 
     const numUnits = barLength * meterSize;
     // TODO: account for different units returned by snapValue
@@ -148,7 +141,7 @@ const ScaleBarLayer = class extends CompositeLayer {
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         {
-          text: `${snappedNewUnits}${newSymbol === 'µ' ? 'u' : newSymbol}m`,
+          text: `${snappedNewUnits}${newSymbol}m`,
           position: [xRightCoord - barLength * 0.5, yCoord + barHeight * 4],
         }
       ],
@@ -158,9 +151,9 @@ const ScaleBarLayer = class extends CompositeLayer {
       sizeUnits: 'meters',
       sizeScale: 2 ** -zoom,
       characterSet: [
-        newSymbol === 'µ' ? 'u' : newSymbol,
-        'm',
         ...range(10).map(i => String(i)),
+        newSymbol,
+        'm',
         '.',
         'e',
         '+'
