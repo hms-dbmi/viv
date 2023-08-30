@@ -79,12 +79,14 @@ const ScaleBarLayer = class extends CompositeLayer {
       (boundingBox[2][1] - boundingBox[0][1]) * 0.007
     );
     
-    // Convert `size` to meters, since `snapValue`
-    // assumes the value is in meters.
+    
+    // Initialize values for the non-snapped case.
     let adjustedBarLength = barLength;
     let displayNumber = (barLength * size).toPrecision(5);
     let displayUnit = unit;
     if(snap) {
+      // Convert `size` to meters, since `snapValue`
+      // assumes the value is in meters.
       const meterSize = sizeToMeters(size, unit);
       const numUnits = barLength * meterSize;
       const [snappedOrigUnits, snappedNewUnits, snappedUnitPrefix] = snapValue(numUnits);
