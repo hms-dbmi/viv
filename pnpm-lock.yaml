@@ -193,10 +193,6 @@ importers:
       zarr:
         specifier: ^0.5.1
         version: 0.5.2
-    devDependencies:
-      vitest:
-        specifier: ^0.34.3
-        version: 0.34.3
 
   packages/main:
     dependencies:
