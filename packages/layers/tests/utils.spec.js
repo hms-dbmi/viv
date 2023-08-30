@@ -24,6 +24,18 @@ test('range test', t => {
   t.end();
 });
 
+test('snapValue test', t => {
+  t.plan(3);
+  try {
+    t.deepEqual(snapValue(1.234), [5, 5, ''], 'Snapping value inside extent of targets');
+    t.deepEqual(snapValue(0.0234), [100, 0.1, 'm'], 'Snapping value below minimum target');
+    t.deepEqual(snapValue(2345.0), [5, 5000, 'k'], 'Snapping value above maximum target');
+  } catch (e) {
+    t.fail(e);
+  }
+  t.end();
+});
+
 test('padWithDefault test', t => {
   t.plan(1);
   try {
@@ -160,18 +172,6 @@ test('getRenderingAttrs WebGL2', t => {
         );
       });
     });
-  } catch (e) {
-    t.fail(e);
-  }
-  t.end();
-});
-
-test('snapValue', t => {
-  t.plan(3);
-  try {
-    t.deepEqual(snapValue(1.234), [5, 5], 'Snapping value inside extent of targets');
-    t.deepEqual(snapValue(0.0234), [5, 0.05], 'Snapping value below minimum target');
-    t.deepEqual(snapValue(2345.0), [250, 2500], 'Snapping value above maximum target');
   } catch (e) {
     t.fail(e);
   }

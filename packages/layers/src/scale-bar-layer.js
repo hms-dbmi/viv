@@ -76,12 +76,28 @@ const ScaleBarLayer = class extends CompositeLayer {
       2 ** (-zoom + 1.5),
       (boundingBox[2][1] - boundingBox[0][1]) * 0.007
     );
-    const numUnits = barLength * size;
+    
+    // Convert `size` to meters.
+    // TODO: clean this up
+    let meterSize = size;
+    if(unit === 'm') {
+      meterSize = size;
+    } else if(unit === 'um' || unit === 'µm') {
+      meterSize = size * (10 ** -6);
+    } else if(unit === 'nm') {
+      meterSize = size * (10 ** -9);
+    } else {
+      console.warn('Received unknown unit')
+    }
+
+
+
+    const numUnits = barLength * meterSize;
     // TODO: account for different units returned by snapValue
     // eslint-disable-next-line no-unused-vars
-    const [snappedOrigUnits, snappedNewUnits] = snapValue(numUnits);
+    const [snappedOrigUnits, snappedNewUnits, newSymbol] = snapValue(numUnits);
     // Get snapped value in original units and new units.
-    const adjustedBarLength = (numUnits * (snappedOrigUnits / numUnits)) / size;
+    const adjustedBarLength = (numUnits * (snappedOrigUnits / numUnits)) / meterSize;
 
     const [yCoord, xRightCoordPartial] = getPosition(boundingBox, position, length);
     const xRightCoord = xRightCoordPartial + barLength;
@@ -132,7 +148,7 @@ const ScaleBarLayer = class extends CompositeLayer {
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         {
-          text: snappedOrigUnits + unit,
+          text: `${snappedNewUnits}${newSymbol === 'µ' ? 'u' : newSymbol}m`,
           position: [xRightCoord - barLength * 0.5, yCoord + barHeight * 4],
         }
       ],
@@ -142,7 +158,8 @@ const ScaleBarLayer = class extends CompositeLayer {
       sizeUnits: 'meters',
       sizeScale: 2 ** -zoom,
       characterSet: [
-        ...unit.split(''),
+        newSymbol === 'µ' ? 'u' : newSymbol,
+        'm',
         ...range(10).map(i => String(i)),
         '.',
         'e',

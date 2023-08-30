@@ -147,18 +147,39 @@ export function makeBoundingBox(viewState) {
   ];
 }
 
-const TARGETS = [1, 5, 10, 20, 25, 50, 100, 200, 250, 500];
+const TARGETS = [1, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000];
 const MIN_TARGET = TARGETS[0];
 const MAX_TARGET = TARGETS[TARGETS.length - 1];
+
+const SI_PREFIXES = [
+  { symbol: 'Y', exponent: 24 },
+  { symbol: 'Z', exponent: 21 },
+  { symbol: 'E', exponent: 18 },
+  { symbol: 'P', exponent: 15 },
+  { symbol: 'T', exponent: 12 },
+  { symbol: 'G', exponent: 9 },
+  { symbol: 'M', exponent: 6 },
+  { symbol: 'k', exponent: 3 },
+  { symbol: '', exponent: 0 },
+  { symbol: 'm', exponent: -3 },
+  { symbol: 'µ', exponent: -6 },
+  { symbol: 'n', exponent: -9 },
+  { symbol: 'p', exponent: -12 },
+  { symbol: 'f', exponent: -15 },
+  { symbol: 'a', exponent: -18 },
+  { symbol: 'z', exponent: -21 },
+  { symbol: 'y', exponent: -24 },
+];
 
 /**
  * Snap any scale bar value to a "nice" value
  * like 1, 5, 10, 20, 25, 50, 100, 200, 250, 500.
  * If needed, will use different units.
  * @param {number} value Intended value for scale bar,
- * in original units, not necessarily a "nice" value.
- * @returns {[number, number]} Tuple like
- * [nice value in original units, nice value in new units].
+ * in original units, not necessarily a "nice" value. Assumed
+ * to be in meters.
+ * @returns {[number, number, string]} Tuple like
+ * [nice value in original units, nice value in new units, SI unit prefix].
  * The value in original units can be used to compute the size
  * in pixels for the scale bar. The value in new units can be
  * displayed in the text label of the scale bar.
@@ -166,23 +187,38 @@ const MAX_TARGET = TARGETS[TARGETS.length - 1];
 export function snapValue(value) {
   let magnitude = 0;
 
-  if (value < MIN_TARGET) {
-    // Change units
-    magnitude = Math.ceil(Math.log10(MIN_TARGET / value));
-  } else if (value > MAX_TARGET) {
-    // Change units
-    magnitude = -1 * Math.ceil(Math.log10(value / MAX_TARGET));
+  // If the value is outside the range of our "nice" targets,
+  // we compute the magnitude of change needed to bring it
+  // into this range.
+  if (value < MIN_TARGET || value > MAX_TARGET) {
+    magnitude = Math.floor(Math.log10(value));
   }
 
-  const adjustedValue = value * (10 ** magnitude);
+  // While the magnitude will re-scale the value correctly,
+  // it might not be a multiple of 3, so we use the nearest
+  // SI prefix exponent.
+  let snappedUnit = SI_PREFIXES.find(p => p.exponent <= magnitude);
 
+  // We re-scale the original value so it is in the range of our
+  // "nice" targets (between 1 and 1000).
+  let adjustedValue = value / (10 ** snappedUnit.exponent);
+  
+  // The problem is that a value between 500 and 1000 will be snapped
+  // to 1000, which is not what we want. We check for this here, and
+  // snap to the next lower SI prefix. This will result in an adjusted
+  // value of 1 (in the next SI unit) rather than 1000 (in the previous one).
+  if(adjustedValue > 500 && adjustedValue <= 1000) {
+    snappedUnit = SI_PREFIXES.find(p => p.exponent <= magnitude + 3);
+    adjustedValue = value / (10 ** snappedUnit.exponent);
+  }
+  
+  // We snap to the nearest target value. This will be the
+  // number used in the text label.
   const targetNewUnits = TARGETS.find(t => t > adjustedValue);
-  const targetOrigUnits = targetNewUnits / (10 ** magnitude);
 
-  // TODO: return:
-  // - snapped value in original units
-  // - snapped value in new units
-  // - new units, or unit prefix/exponent (with respect to meters)
+  // We use the "nice" target value to re-compute the value in the
+  // original units, which will be used to compute the size in pixels.
+  const targetOrigUnits = targetNewUnits * (10 ** snappedUnit.exponent);
 
-  return [targetOrigUnits, targetNewUnits];
+  return [targetOrigUnits, targetNewUnits, snappedUnit.symbol];
 }
