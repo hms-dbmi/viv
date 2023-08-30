@@ -1,103 +1,151 @@
-import test from 'tape';
+import { describe, test, expect } from 'vitest';
 import { fromFile } from 'geotiff';
 import { load } from '../src/tiff/ome-tiff';
-import { loadOmeTiff, FILE_PREFIX } from '../src/tiff';
+import { loadOmeTiff } from '../src/tiff';
 
 import * as path from 'path';
 import * as url from 'url';
 
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 const FIXTURE = path.resolve(__dirname, './fixtures/multi-channel.ome.tif');
-const LOCAL_FIXTURE = `${FILE_PREFIX}${FIXTURE}`;
 
-function testPixelSource(t, data) {
-  t.equal(data.length, 1, 'image should not be pyramidal.');
-  const [base] = data;
-  t.deepEqual(
-    base.labels,
-    ['t', 'c', 'z', 'y', 'x'],
-    'should have DimensionOrder "XYZCT".'
-  );
-  t.deepEqual(
-    base.shape,
-    [1, 3, 1, 167, 439],
-    'shape should match dimensions.'
-  );
-  t.equal(
-    base.meta.photometricInterpretation,
-    1,
-    'Photometric interpretation is 1.'
-  );
-  t.equal(base.meta.physicalSizes, undefined, 'No physical sizes.');
+function loadOmeTiffFixture() {
+  return loadOmeTiff(url.pathToFileURL(FIXTURE).href);
 }
 
-test('Creates correct TiffPixelSource for OME-TIFF.', async t => {
-  t.plan(5);
-  try {
+describe('OME-TIFF', () => {
+  function expectPixelSource(data) {
+    expect(data.length).toBe(1);
+    expect(data[0].labels).toStrictEqual(['t', 'c', 'z', 'y', 'x']);
+    expect(data[0].shape).toStrictEqual([1, 3, 1, 167, 439]);
+    expect(data[0].meta).toStrictEqual({
+      photometricInterpretation: 1,
+      physicalSizes: undefined
+    });
+  }
+
+  test('Creates TiffPixelSource', async () => {
     const tiff = await fromFile(FIXTURE);
     const [{ data }] = await load(tiff);
-    testPixelSource(t, data);
-  } catch (e) {
-    t.fail(e);
-  }
-});
+    expect(data).toMatchInlineSnapshot(`
+      [
+        TiffPixelSource {
+          "_indexer": [Function],
+          "dtype": "Int8",
+          "labels": [
+            "t",
+            "c",
+            "z",
+            "y",
+            "x",
+          ],
+          "meta": {
+            "photometricInterpretation": 1,
+            "physicalSizes": undefined,
+          },
+          "pool": undefined,
+          "shape": [
+            1,
+            3,
+            1,
+            167,
+            439,
+          ],
+          "tileSize": 128,
+        },
+      ]
+    `);
+    expectPixelSource(data);
+  });
 
-test('Is able to load OME-TIFF from a local file.', async t => {
-  t.plan(5);
-  try {
-    const { data } = await loadOmeTiff(LOCAL_FIXTURE);
-    testPixelSource(t, data);
-  } catch (e) {
-    t.fail(e);
-  }
-});
+  test('Loads from local file', async () => {
+    const { data } = await loadOmeTiffFixture();
+    expect(data).toMatchInlineSnapshot(`
+      [
+        TiffPixelSource {
+          "_indexer": [Function],
+          "dtype": "Int8",
+          "labels": [
+            "t",
+            "c",
+            "z",
+            "y",
+            "x",
+          ],
+          "meta": {
+            "photometricInterpretation": 1,
+            "physicalSizes": undefined,
+          },
+          "pool": undefined,
+          "shape": [
+            1,
+            3,
+            1,
+            167,
+            439,
+          ],
+          "tileSize": 128,
+        },
+      ]
+    `);
+    expectPixelSource(data);
+  });
 
-test('Get raster data.', async t => {
-  t.plan(13);
-  try {
-    const tiff = await fromFile(FIXTURE);
-    const [{ data }] = await load(tiff);
-    const [base] = data;
-
-    for (let c = 0; c < 3; c += 1) {
+  describe('Gets raster data', async () => {
+    const {
+      data: [base]
+    } = await loadOmeTiffFixture();
+    test.each([0, 1, 2])(`Get raster data for channel %i.`, async c => {
       const selection = { c, z: 0, t: 0 };
-      const pixelData = await base.getRaster({ selection }); // eslint-disable-line no-await-in-loop
-      t.equal(pixelData.width, 439);
-      t.equal(pixelData.height, 167);
-      t.equal(pixelData.data.length, 439 * 167);
-      t.equal(pixelData.data.constructor.name, 'Int8Array');
-    }
+      const pixelData = await base.getRaster({ selection });
+      expect(pixelData.width).toBe(439);
+      expect(pixelData.height).toBe(167);
+      expect(pixelData.data.length).toBe(439 * 167);
+      expect(pixelData.data).toBeInstanceOf(Int8Array);
+    });
 
-    try {
-      await base.getRaster({ selection: { c: 3, z: 0, t: 0 } });
-    } catch (e) {
-      t.ok(e instanceof Error, 'index should be out of bounds.');
-    }
-  } catch (e) {
-    t.fail(e);
-  }
-});
+    test('Gets raster data for channel 3 (out of bounds).', async () => {
+      await expect(() =>
+        base.getRaster({ selection: { c: 3, z: 0, t: 0 } })
+      ).rejects.toThrowError();
+    });
+  });
 
-test('Correct OME-XML.', async t => {
-  t.plan(9);
-  try {
-    const tiff = await fromFile(FIXTURE);
-    const [{ metadata }] = await load(tiff);
-    const { Name, Pixels } = metadata;
-    t.equal(
-      Name,
-      'multi-channel.ome.tif',
-      `Name should be 'multi-channel.ome.tif'.`
-    );
-    t.equal(Pixels.SizeC, 3, 'Should have three channels.');
-    t.equal(Pixels.SizeT, 1, 'Should have one time index.');
-    t.equal(Pixels.SizeX, 439, 'Should have SizeX of 429.');
-    t.equal(Pixels.SizeY, 167, 'Should have SizeY of 167.');
-    t.equal(Pixels.SizeZ, 1, 'Should have one z index.');
-    t.equal(Pixels.Type, 'int8', 'Should be int8 pixel type.');
-    t.equal(Pixels.Channels.length, 3);
-    t.equal(Pixels.Channels[0].SamplesPerPixel, 1);
-  } catch (e) {
-    t.fail(e);
-  }
+  test('Correct OME-XML.', async () => {
+    const { metadata } = await loadOmeTiffFixture();
+    expect(metadata).toMatchInlineSnapshot(`
+      {
+        "AquisitionDate": "",
+        "Description": "",
+        "ID": "Image:0",
+        "Name": "multi-channel.ome.tif",
+        "Pixels": {
+          "BigEndian": true,
+          "Channels": [
+            {
+              "ID": "Channel:0:0",
+              "SamplesPerPixel": 1,
+            },
+            {
+              "ID": "Channel:0:1",
+              "SamplesPerPixel": 1,
+            },
+            {
+              "ID": "Channel:0:2",
+              "SamplesPerPixel": 1,
+            },
+          ],
+          "DimensionOrder": "XYZCT",
+          "ID": "Pixels:0",
+          "SizeC": 3,
+          "SizeT": 1,
+          "SizeX": 439,
+          "SizeY": 167,
+          "SizeZ": 1,
+          "Type": "int8",
+        },
+        "format": [Function],
+      }
+    `);
+  });
 });

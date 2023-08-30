@@ -55,7 +55,8 @@
     "tape-catch": "^1.0.6",
     "tape-run": "^10.0.0",
     "typescript": "^4.6.4",
-    "unbuild": "^0.7.4"
+    "unbuild": "^0.7.4",
+    "vitest": "^0.34.3"
   },
   "devDependenciesMeta": {
     "@esbuild-plugins/node-globals-polyfill": "Necessary to run `tape` with browser-like `tape-run`.",

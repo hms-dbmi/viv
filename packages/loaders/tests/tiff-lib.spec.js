@@ -1,4 +1,4 @@
-import { test } from 'tape';
+import { describe, test, expect } from 'vitest';
 import { fromFile } from 'geotiff';
 
 import { createOffsetsProxy } from '../src/tiff/lib/proxies';
@@ -9,18 +9,17 @@ import * as url from 'url';
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 const FIXTURE = path.resolve(__dirname, './fixtures/multi-channel.ome.tif');
 
-test('Inspect tiff proxies.', async t => {
-  t.plan(2);
-  try {
+describe('Offset proxy', async () => {
+  let tag = '__viv-offsets';
+
+  test('no proxy tag', async () => {
     let tiff = await fromFile(FIXTURE);
-    t.equal(
-      tiff['__viv-offsets'],
-      undefined,
-      'Regular tiff should not have any proxies.'
-    );
+    expect(tiff[tag]).toBeUndefined();
+  });
+
+  test('adds tag to object', async () => {
+    let tiff = await fromFile(FIXTURE);
     tiff = createOffsetsProxy(tiff, []);
-    t.equal(tiff['__viv-offsets'], true, 'Should have both proxies.');
-  } catch (e) {
-    t.fail(e);
-  }
+    expect(tiff[tag]).toBe(true);
+  });
 });
