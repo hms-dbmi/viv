@@ -94,8 +94,8 @@ const ScaleBarLayer = class extends CompositeLayer {
       displayUnit = `${snappedUnitPrefix}m`;
     }
 
-    const [yCoord, xRightCoordPartial] = getPosition(boundingBox, position, length);
-    const xRightCoord = xRightCoordPartial + barLength;
+    const [yCoord, xLeftCoord] = getPosition(boundingBox, position, length);
+    const xRightCoord = xLeftCoord + barLength;
     const lengthBar = new LineLayer({
       id: `scale-bar-length-${id}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
