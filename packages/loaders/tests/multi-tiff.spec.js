@@ -172,6 +172,15 @@ describe('MultiTIFF', () => {
         "format": [Function],
       }
     `);
+    expect(metadata.format()).toMatchInlineSnapshot(`
+      {
+        "Acquisition Date": "",
+        "Channels": 3,
+        "Dimensions (XY)": "439 x 167",
+        "PixelsType": "Uint8",
+        "Z-sections/Timepoints": "1 x 1",
+      }
+    `);
   });
 
   test('Checks for complete stack.', async () => {

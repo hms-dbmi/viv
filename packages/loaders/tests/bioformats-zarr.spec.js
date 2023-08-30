@@ -79,4 +79,14 @@ test('Correct OME-XML.', async () => {
       "format": [Function],
     }
   `);
+  expect(metadata.format()).toMatchInlineSnapshot(`
+    {
+      "Acquisition Date": "",
+      "Channels": 3,
+      "Dimensions (XY)": "439 x 167",
+      "Pixels Size (XYZ)": "- x - x -",
+      "Pixels Type": "int8",
+      "Z-sections/Timepoints": "1 x 1",
+    }
+  `);
 });
