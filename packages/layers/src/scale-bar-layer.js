@@ -5,28 +5,27 @@ import { range, makeBoundingBox, snapValue, sizeToMeters } from './utils';
 import { DEFAULT_FONT_FAMILY } from '@vivjs/constants';
 
 function getPosition(boundingBox, position, length) {
-  const viewLength = boundingBox[2][0] - boundingBox[0][0];
+  const viewWidth = boundingBox[2][0] - boundingBox[0][0];
+  const viewHeight = boundingBox[2][1] - boundingBox[0][1];
   switch (position) {
     case 'bottom-right': {
-      const yCoord =
-        boundingBox[2][1] - (boundingBox[2][1] - boundingBox[0][1]) * length;
-      const xLeftCoord = boundingBox[2][0] - viewLength * length;
+      const yCoord = boundingBox[2][1] - viewHeight * length;
+      const xLeftCoord = boundingBox[2][0] - viewWidth * length;
       return [yCoord, xLeftCoord];
     }
     case 'top-right': {
-      const yCoord = (boundingBox[2][1] - boundingBox[0][1]) * length;
-      const xLeftCoord = boundingBox[2][0] - viewLength * length;
+      const yCoord = boundingBox[0][1] + viewHeight * length;
+      const xLeftCoord = boundingBox[2][0] - viewWidth * length;
       return [yCoord, xLeftCoord];
     }
     case 'top-left': {
-      const yCoord = (boundingBox[2][1] - boundingBox[0][1]) * length;
-      const xLeftCoord = viewLength * length;
+      const yCoord = boundingBox[0][1] + viewHeight * length;
+      const xLeftCoord = boundingBox[0][0] + viewWidth * length;
       return [yCoord, xLeftCoord];
     }
     case 'bottom-left': {
-      const yCoord =
-        boundingBox[2][1] - (boundingBox[2][1] - boundingBox[0][1]) * length;
-      const xLeftCoord = viewLength * length;
+      const yCoord = boundingBox[2][1] - viewHeight * length;
+      const xLeftCoord = boundingBox[0][0] + viewWidth * length;
       return [yCoord, xLeftCoord];
     }
     default: {
@@ -46,7 +45,7 @@ const defaultProps = {
   size: { type: 'number', value: 1, compare: true },
   position: { type: 'string', value: 'bottom-right', compare: true },
   length: { type: 'number', value: 0.085, compare: true },
-  snap: { type: 'boolean', value: false, compare: true }
+  snap: { type: 'boolean', value: true, compare: true }
 };
 /**
  * @typedef LayerProps
@@ -101,13 +100,16 @@ const ScaleBarLayer = class extends CompositeLayer {
 
     const [yCoord, xLeftCoord] = getPosition(boundingBox, position, length);
     const xRightCoord = xLeftCoord + barLength;
+
+    const isLeft = position.endsWith('-left');
+
     const lengthBar = new LineLayer({
       id: `scale-bar-length-${id}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         [
-          [xRightCoord - adjustedBarLength, yCoord],
-          [xRightCoord, yCoord]
+          [isLeft ? xLeftCoord : xRightCoord - adjustedBarLength, yCoord],
+          [isLeft ? xLeftCoord + adjustedBarLength : xRightCoord, yCoord]
         ]
       ],
       getSourcePosition: d => d[0],
@@ -120,8 +122,14 @@ const ScaleBarLayer = class extends CompositeLayer {
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         [
-          [xRightCoord - adjustedBarLength, yCoord - barHeight],
-          [xRightCoord - adjustedBarLength, yCoord + barHeight]
+          [
+            isLeft ? xLeftCoord : xRightCoord - adjustedBarLength,
+            yCoord - barHeight
+          ],
+          [
+            isLeft ? xLeftCoord : xRightCoord - adjustedBarLength,
+            yCoord + barHeight
+          ]
         ]
       ],
       getSourcePosition: d => d[0],
@@ -134,8 +142,14 @@ const ScaleBarLayer = class extends CompositeLayer {
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         [
-          [xRightCoord, yCoord - barHeight],
-          [xRightCoord, yCoord + barHeight]
+          [
+            isLeft ? xLeftCoord + adjustedBarLength : xRightCoord,
+            yCoord - barHeight
+          ],
+          [
+            isLeft ? xLeftCoord + adjustedBarLength : xRightCoord,
+            yCoord + barHeight
+          ]
         ]
       ],
       getSourcePosition: d => d[0],
@@ -149,7 +163,12 @@ const ScaleBarLayer = class extends CompositeLayer {
       data: [
         {
           text: `${displayNumber}${displayUnit}`,
-          position: [xRightCoord - barLength * 0.5, yCoord + barHeight * 4]
+          position: [
+            isLeft
+              ? xLeftCoord + barLength * 0.5
+              : xRightCoord - barLength * 0.5,
+            yCoord + barHeight * 4
+          ]
         }
       ],
       getColor: [220, 220, 220, 255],
