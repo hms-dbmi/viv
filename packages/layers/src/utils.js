@@ -172,7 +172,7 @@ const SI_PREFIXES = [
   { symbol: 'f', exponent: -15 },
   { symbol: 'a', exponent: -18 },
   { symbol: 'z', exponent: -21 },
-  { symbol: 'y', exponent: -24 },
+  { symbol: 'y', exponent: -24 }
 ];
 
 /**
@@ -182,23 +182,23 @@ const SI_PREFIXES = [
  * @returns {number} Size in meters.
  */
 export function sizeToMeters(size, unit) {
-  if(!unit || unit === 'm') {
+  if (!unit || unit === 'm') {
     // Already in meters.
     return size;
   }
-  if(unit.length > 1) {
+  if (unit.length > 1) {
     let unitPrefix = unit.substring(0, unit.length - 1);
     // Support 'u' as a prefix for micrometers.
-    if(unitPrefix === 'u') {
+    if (unitPrefix === 'u') {
       unitPrefix = 'µ';
     }
     // We remove the trailing 'm' from the unit, so 'cm' becomes 'c' and 'dam' becomes 'da'.
     const unitObj = SI_PREFIXES.find(p => p.symbol === unitPrefix);
-    if(unitObj) {
-      return size * (10 ** unitObj.exponent);
+    if (unitObj) {
+      return size * 10 ** unitObj.exponent;
     }
   }
-  throw new Error("Received unknown unit");
+  throw new Error('Received unknown unit');
 }
 
 /**
@@ -227,28 +227,32 @@ export function snapValue(value) {
   // While the magnitude will re-scale the value correctly,
   // it might not be a multiple of 3, so we use the nearest
   // SI prefix exponent.
-  let snappedUnit = SI_PREFIXES.find(p => p.exponent % 3 === 0 && p.exponent <= magnitude);
+  let snappedUnit = SI_PREFIXES.find(
+    p => p.exponent % 3 === 0 && p.exponent <= magnitude
+  );
 
   // We re-scale the original value so it is in the range of our
   // "nice" targets (between 1 and 1000).
-  let adjustedValue = value / (10 ** snappedUnit.exponent);
-  
+  let adjustedValue = value / 10 ** snappedUnit.exponent;
+
   // The problem is that a value between 500 and 1000 will be snapped
   // to 1000, which is not what we want. We check for this here, and
   // snap to the next lower SI prefix. This will result in an adjusted
   // value of 1 (in the next SI unit) rather than 1000 (in the previous one).
-  if(adjustedValue > 500 && adjustedValue <= 1000) {
-    snappedUnit = SI_PREFIXES.find(p => p.exponent % 3 === 0 && p.exponent <= magnitude + 3);
-    adjustedValue = value / (10 ** snappedUnit.exponent);
+  if (adjustedValue > 500 && adjustedValue <= 1000) {
+    snappedUnit = SI_PREFIXES.find(
+      p => p.exponent % 3 === 0 && p.exponent <= magnitude + 3
+    );
+    adjustedValue = value / 10 ** snappedUnit.exponent;
   }
-  
+
   // We snap to the nearest target value. This will be the
   // number used in the text label.
   const targetNewUnits = TARGETS.find(t => t > adjustedValue);
 
   // We use the "nice" target value to re-compute the value in the
   // original units, which will be used to compute the size in pixels.
-  const targetOrigUnits = targetNewUnits * (10 ** snappedUnit.exponent);
+  const targetOrigUnits = targetNewUnits * 10 ** snappedUnit.exponent;
 
   return [targetOrigUnits, targetNewUnits, snappedUnit.symbol];
 }

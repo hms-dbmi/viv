@@ -46,7 +46,7 @@ const defaultProps = {
   size: { type: 'number', value: 1, compare: true },
   position: { type: 'string', value: 'bottom-right', compare: true },
   length: { type: 'number', value: 0.085, compare: true },
-  snap: { type: 'boolean', value: false, compare: true },
+  snap: { type: 'boolean', value: false, compare: true }
 };
 /**
  * @typedef LayerProps
@@ -78,20 +78,21 @@ const ScaleBarLayer = class extends CompositeLayer {
       2 ** (-zoom + 1.5),
       (boundingBox[2][1] - boundingBox[0][1]) * 0.007
     );
-    
-    
+
     // Initialize values for the non-snapped case.
     let adjustedBarLength = barLength;
     let displayNumber = (barLength * size).toPrecision(5);
     let displayUnit = unit;
-    if(snap) {
+    if (snap) {
       // Convert `size` to meters, since `snapValue`
       // assumes the value is in meters.
       const meterSize = sizeToMeters(size, unit);
       const numUnits = barLength * meterSize;
-      const [snappedOrigUnits, snappedNewUnits, snappedUnitPrefix] = snapValue(numUnits);
+      const [snappedOrigUnits, snappedNewUnits, snappedUnitPrefix] =
+        snapValue(numUnits);
       // Get snapped value in original units and new units.
-      adjustedBarLength = (numUnits * (snappedOrigUnits / numUnits)) / meterSize;
+      adjustedBarLength =
+        (numUnits * (snappedOrigUnits / numUnits)) / meterSize;
       displayNumber = snappedNewUnits;
       displayUnit = `${snappedUnitPrefix}m`;
     }
@@ -104,7 +105,7 @@ const ScaleBarLayer = class extends CompositeLayer {
       data: [
         [
           [xRightCoord - adjustedBarLength, yCoord],
-          [xRightCoord, yCoord],
+          [xRightCoord, yCoord]
         ]
       ],
       getSourcePosition: d => d[0],
@@ -118,7 +119,7 @@ const ScaleBarLayer = class extends CompositeLayer {
       data: [
         [
           [xRightCoord - adjustedBarLength, yCoord - barHeight],
-          [xRightCoord - adjustedBarLength, yCoord + barHeight],
+          [xRightCoord - adjustedBarLength, yCoord + barHeight]
         ]
       ],
       getSourcePosition: d => d[0],
@@ -132,7 +133,7 @@ const ScaleBarLayer = class extends CompositeLayer {
       data: [
         [
           [xRightCoord, yCoord - barHeight],
-          [xRightCoord, yCoord + barHeight],
+          [xRightCoord, yCoord + barHeight]
         ]
       ],
       getSourcePosition: d => d[0],
@@ -146,7 +147,7 @@ const ScaleBarLayer = class extends CompositeLayer {
       data: [
         {
           text: `${displayNumber}${displayUnit}`,
-          position: [xRightCoord - barLength * 0.5, yCoord + barHeight * 4],
+          position: [xRightCoord - barLength * 0.5, yCoord + barHeight * 4]
         }
       ],
       getColor: [220, 220, 220, 255],
