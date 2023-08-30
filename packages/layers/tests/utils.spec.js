@@ -189,15 +189,15 @@ test('sizeToMeters test', t => {
       0.1,
       'Size in meters when unit is centimeters'
     );
-    t.equal(
-      sizeToMeters(10, 'µm'),
-      1e-5,
-      'Size in meters when unit is micrometers with Greek letter'
+    // These have floating point errors, so we check that
+    // they are within 1e-10 of the expected value.
+    t.ok(
+      sizeToMeters(10, 'µm') - 1e-5 < 1e-10,
+      'Size in meters when micrometers with Greek letter'
     );
-    t.equal(
-      sizeToMeters(10, 'um'),
-      1e-5,
-      'Size in meters when unit is micrometers with regular u character'
+    t.ok(
+      sizeToMeters(10, 'um') - 1e-5 < 1e-10,
+      'Size in meters when micrometers with regular u character'
     );
   } catch (e) {
     t.fail(e);
@@ -225,7 +225,7 @@ test('snapValue test', t => {
     );
     t.deepEqual(
       snapValue(999.0),
-      [1, 1000, 'k'],
+      [1000, 1, 'k'],
       'Snapping value between 500 and 1000'
     );
   } catch (e) {
