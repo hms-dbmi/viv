@@ -45,11 +45,13 @@ const defaultProps = {
   unit: { type: 'string', value: '', compare: true },
   size: { type: 'number', value: 1, compare: true },
   position: { type: 'string', value: 'bottom-right', compare: true },
-  length: { type: 'number', value: 0.085, compare: true }
+  length: { type: 'number', value: 0.085, compare: true },
+  snap: { type: 'boolean', value: false, compare: true },
 };
 /**
  * @typedef LayerProps
  * @type {Object}
+ * @property {boolean} snap Should the value be snapped?
  * @property {String} unit Physical unit size per pixel at full resolution.
  * @property {Number} size Physical size of a pixel.
  * @property {Object} viewState The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
@@ -65,7 +67,7 @@ const defaultProps = {
  */
 const ScaleBarLayer = class extends CompositeLayer {
   renderLayers() {
-    const { id, unit, size, position, viewState, length } = this.props;
+    const { id, unit, size, position, viewState, length, snap } = this.props;
     const boundingBox = makeBoundingBox(viewState);
     const { zoom } = viewState;
     const viewLength = boundingBox[2][0] - boundingBox[0][0];
@@ -79,18 +81,18 @@ const ScaleBarLayer = class extends CompositeLayer {
     
     // Convert `size` to meters, since `snapValue`
     // assumes the value is in meters.
-    const meterSize = sizeToMeters(size, unit);
-
-    console.log(snapValue(1.234));
-    console.log(snapValue(0.0234));
-    console.log(snapValue(999.0));
-
-    const numUnits = barLength * meterSize;
-    // TODO: account for different units returned by snapValue
-    // eslint-disable-next-line no-unused-vars
-    const [snappedOrigUnits, snappedNewUnits, newSymbol] = snapValue(numUnits);
-    // Get snapped value in original units and new units.
-    const adjustedBarLength = (numUnits * (snappedOrigUnits / numUnits)) / meterSize;
+    let adjustedBarLength = barLength;
+    let displayNumber = (barLength * size).toPrecision(5);
+    let displayUnit = unit;
+    if(snap) {
+      const meterSize = sizeToMeters(size, unit);
+      const numUnits = barLength * meterSize;
+      const [snappedOrigUnits, snappedNewUnits, snappedUnitPrefix] = snapValue(numUnits);
+      // Get snapped value in original units and new units.
+      adjustedBarLength = (numUnits * (snappedOrigUnits / numUnits)) / meterSize;
+      displayNumber = snappedNewUnits;
+      displayUnit = `${snappedUnitPrefix}m`;
+    }
 
     const [yCoord, xRightCoordPartial] = getPosition(boundingBox, position, length);
     const xRightCoord = xRightCoordPartial + barLength;
@@ -141,7 +143,7 @@ const ScaleBarLayer = class extends CompositeLayer {
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         {
-          text: `${snappedNewUnits}${newSymbol}m`,
+          text: `${displayNumber}${displayUnit}`,
           position: [xRightCoord - barLength * 0.5, yCoord + barHeight * 4],
         }
       ],
@@ -151,9 +153,8 @@ const ScaleBarLayer = class extends CompositeLayer {
       sizeUnits: 'meters',
       sizeScale: 2 ** -zoom,
       characterSet: [
+        ...displayUnit.split(''),
         ...range(10).map(i => String(i)),
-        newSymbol,
-        'm',
         '.',
         'e',
         '+'
