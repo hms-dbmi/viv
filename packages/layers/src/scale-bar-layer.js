@@ -88,9 +88,11 @@ const ScaleBarLayer = class extends CompositeLayer {
       // assumes the value is in meters.
       const meterSize = sizeToMeters(size, unit);
       const numUnits = barLength * meterSize;
+      // Get snapped value in original units and new units.
       const [snappedOrigUnits, snappedNewUnits, snappedUnitPrefix] =
         snapValue(numUnits);
-      // Get snapped value in original units and new units.
+      // We adjust the bar length by using the ratio of the snapped
+      // value in original units to the original value in original units.
       adjustedBarLength =
         (numUnits * (snappedOrigUnits / numUnits)) / meterSize;
       displayNumber = snappedNewUnits;
