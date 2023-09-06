@@ -50,7 +50,7 @@ const defaultProps = {
 /**
  * @typedef LayerProps
  * @type {Object}
- * @property {boolean} snap Should the value be snapped?
+ * @property {boolean} snap - If true, aligns the scale bar value to predefined intervals for clearer readings, adjusting units if necessary.
  * @property {String} unit Physical unit size per pixel at full resolution.
  * @property {Number} size Physical size of a pixel.
  * @property {Object} viewState The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
