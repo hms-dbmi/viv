@@ -14,6 +14,8 @@ import { getImageLayer, getVivId } from './utils';
  * @param {Boolean} args.zoomLock Whether or not we lock zoom.
  * @param {Array=} args.viewportOutlineColor Outline color of the border (default [255, 255, 255])
  * @param {number=} args.viewportOutlineWidth Default outline width (default 10)
+ * @param {boolean=} args.snapScaleBar If true, aligns the scale bar value to predefined intervals
+ * for clearer readings, adjusting units if necessary. By default, false.
  * @param {number=} args.x X (top-left) location on the screen for the current view
  * @param {number=} args.y Y (top-left) location on the screen for the current view
  * @param {number} args.height Width of the view.
@@ -31,7 +33,8 @@ export default class SideBySideView extends VivView {
     panLock = true,
     zoomLock = true,
     viewportOutlineColor = [255, 255, 255],
-    viewportOutlineWidth = 10
+    viewportOutlineWidth = 10,
+    snapScaleBar = false
   }) {
     super({ id, x, y, height, width });
     this.linkedIds = linkedIds;
@@ -39,6 +42,7 @@ export default class SideBySideView extends VivView {
     this.zoomLock = zoomLock;
     this.viewportOutlineColor = viewportOutlineColor;
     this.viewportOutlineWidth = viewportOutlineWidth;
+    this.snapScaleBar = snapScaleBar;
   }
 
   filterViewState({ viewState, oldViewState, currentViewState }) {
@@ -126,6 +130,7 @@ export default class SideBySideView extends VivView {
           loader,
           unit,
           size,
+          snap: this.snapScaleBar,
           viewState: { ...layerViewState, height, width }
         })
       );

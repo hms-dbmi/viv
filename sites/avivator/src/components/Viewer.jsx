@@ -121,6 +121,7 @@ const Viewer = () => {
         colormap ? new AdditiveColormapExtension() : new LensExtension()
       ]}
       colormap={colormap || 'viridis'}
+      snapScaleBar
     />
   ) : (
     <PictureInPictureViewer
@@ -144,6 +145,7 @@ const Viewer = () => {
       ]}
       colormap={colormap || 'viridis'}
       onViewStateChange={onViewStateChange}
+      snapScaleBar
     />
   );
 };
