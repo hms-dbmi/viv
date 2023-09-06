@@ -206,11 +206,11 @@ export function sizeToMeters(size, unit) {
  * like 1, 5, 10, 20, 25, 50, 100, 200, 250, 500.
  * If needed, will use different units.
  * @param {number} value Intended value for scale bar,
- * in original units, not necessarily a "nice" value. Assumed
+ * not necessarily a "nice" value. Assumed
  * to be in meters.
  * @returns {[number, number, string]} Tuple like
- * [nice value in original units, nice value in new units, SI unit prefix].
- * The value in original units can be used to compute the size
+ * [nice value in meters, nice value in new units, SI prefix for new units].
+ * The value in original units (meters) can be used to compute the size
  * in pixels for the scale bar. The value in new units can be
  * displayed in the text label of the scale bar.
  */
@@ -239,7 +239,7 @@ export function snapValue(value) {
 
   // The problem is that a value between 500 and 1000 will be snapped
   // to 1000, which is not what we want. We check for this here, and
-  // snap to the next lower SI prefix. This will result in an adjusted
+  // snap to the next SI prefix if necessary. This will result in an adjusted
   // value of 1 (in the next SI unit) rather than 1000 (in the previous one).
   if (adjustedValue > 500 && adjustedValue <= 1000) {
     snappedUnit = SI_PREFIXES.find(
