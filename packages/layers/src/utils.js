@@ -187,12 +187,12 @@ export function sizeToMeters(size, unit) {
     return size;
   }
   if (unit.length > 1) {
+    // We remove the trailing 'm' from the unit, so 'cm' becomes 'c' and 'dam' becomes 'da'.
     let unitPrefix = unit.substring(0, unit.length - 1);
     // Support 'u' as a prefix for micrometers.
     if (unitPrefix === 'u') {
       unitPrefix = 'µ';
     }
-    // We remove the trailing 'm' from the unit, so 'cm' becomes 'c' and 'dam' becomes 'da'.
     const unitObj = SI_PREFIXES.find(p => p.symbol === unitPrefix);
     if (unitObj) {
       return size * 10 ** unitObj.exponent;
@@ -226,7 +226,9 @@ export function snapValue(value) {
 
   // While the magnitude will re-scale the value correctly,
   // it might not be a multiple of 3, so we use the nearest
-  // SI prefix exponent.
+  // SI prefix exponent. For example, if the magnitude is 4 or 5,
+  // we would want to use an exponent of 3 (for 10 or 100 km),
+  // since there is not an SI unit for exponents 4 nor 5.
   let snappedUnit = SI_PREFIXES.find(
     p => p.exponent % 3 === 0 && p.exponent <= magnitude
   );

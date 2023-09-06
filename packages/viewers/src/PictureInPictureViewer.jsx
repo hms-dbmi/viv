@@ -38,6 +38,8 @@ import VivViewer from './VivViewer';
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
+ * @param {boolean} [props.snapScaleBar] If true, aligns the scale bar value to predefined intervals
+ * for clearer readings, adjusting units if necessary. By default, false.
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
@@ -66,6 +68,7 @@ const PictureInPictureViewer = props => {
     lensBorderRadius = 0.02,
     clickCenter = true,
     transparentColor,
+    snapScaleBar = false,
     onViewStateChange,
     onHover,
     onViewportLoad,
@@ -84,7 +87,8 @@ const PictureInPictureViewer = props => {
   const detailView = new DetailView({
     id: DETAIL_VIEW_ID,
     height,
-    width
+    width,
+    snapScaleBar
   });
   const layerConfig = {
     loader,

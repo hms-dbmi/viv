@@ -7,9 +7,22 @@ export const DETAIL_VIEW_ID = 'detail';
 
 /**
  * This class generates a MultiscaleImageLayer and a view for use in the VivViewer as a detailed view.
- * It takes the same arguments for its constructor as its base class VivView.
+ * It takes the same arguments for its constructor as its base class VivView plus the following:
+ * @param {Object} args
+ * @param {boolean=} args.snapScaleBar If true, aligns the scale bar value to predefined intervals
+ * for clearer readings, adjusting units if necessary. By default, false.
+ * @param {number=} args.x X (top-left) location on the screen for the current view
+ * @param {number=} args.y Y (top-left) location on the screen for the current view
+ * @param {number} args.height Width of the view.
+ * @param {number} args.width Height of the view.
+ * @param {string} args.id id of the View
  * */
 export default class DetailView extends VivView {
+  constructor({ id, x = 0, y = 0, height, width, snapScaleBar = false }) {
+    super({ id, x, y, height, width });
+    this.snapScaleBar = snapScaleBar;
+  }
+
   getLayers({ props, viewStates }) {
     const { loader } = props;
     const { id, height, width } = this;
@@ -25,6 +38,7 @@ export default class DetailView extends VivView {
           loader,
           unit,
           size,
+          snap: this.snapScaleBar,
           viewState: { ...layerViewState, height, width }
         })
       );
