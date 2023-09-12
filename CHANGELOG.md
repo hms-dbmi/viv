@@ -3,6 +3,12 @@
 ## In Progress
 
 ### Added
+
+### Changed
+
+## 0.13.8
+
+### Added
 - Added ScaleBarLayer snapping feature. Will convert scale value to one of `[1, 2, 3, 4, 5, 10, 20, 25, 50, 100, 200, 250, 500]` and adjust units accordingly, rescaling the length of the bar in pixels to match. Use `snap: true` prop to enable.
 
 ### Changed
