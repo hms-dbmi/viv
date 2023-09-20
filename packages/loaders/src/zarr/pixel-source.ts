@@ -1,4 +1,3 @@
-import { BoundsCheckError, slice } from 'zarr';
 import type { ZarrArray } from 'zarr';
 import type { RawArray } from 'zarr/types/rawArray';
 import { getImageSize, isInterleaved } from '../utils';
@@ -35,20 +34,28 @@ interface ZarrTileSelection {
   signal?: AbortSignal;
 }
 
-class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
+class AbstractZarrPixelSource<S extends string[]> implements PixelSource<S> {
   private _data: ZarrArray;
 
   private _indexer: ZarrIndexer<S>;
 
   private _readChunks: boolean;
 
+  private _boundsCheckErrorType: any;
+
+  private _sliceFunction: Function;
+
   constructor(
     data: ZarrArray,
     public labels: Labels<S>,
-    public tileSize: number
+    public tileSize: number,
+    boundsCheckErrorType: any,
+    sliceFunction: Function,
   ) {
     this._indexer = getIndexer(labels);
     this._data = data;
+    this._boundsCheckErrorType = boundsCheckErrorType;
+    this._sliceFunction = sliceFunction;
 
     const xChunkSize = data.chunks[this._xIndex];
     const yChunkSize = data.chunks[this._xIndex - 1];
@@ -87,6 +94,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
    * Converts x, y tile indices to zarr dimension Slices within image bounds.
    */
   private _getSlices(x: number, y: number) {
+    const { _sliceFunction: slice, _boundsCheckErrorType: BoundsCheckError } = this;
     const { height, width } = getImageSize(this);
     const [xStart, xStop] = [
       x * this.tileSize,
@@ -135,6 +143,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
   }
 
   onTileError(err: Error) {
+    const { _boundsCheckErrorType: BoundsCheckError } = this;
     if (!(err instanceof BoundsCheckError)) {
       // Rethrow error if something other than tile being requested is out of bounds.
       throw err;
@@ -142,4 +151,4 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
   }
 }
 
-export default ZarrPixelSource;
+export default AbstractZarrPixelSource;

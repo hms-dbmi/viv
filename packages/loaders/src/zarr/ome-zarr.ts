@@ -1,7 +1,7 @@
 import type { ZarrArray } from 'zarr';
 import type { Labels } from '@vivjs/types';
 import { loadMultiscales, guessTileSize } from './lib/utils';
-import ZarrPixelSource from './pixel-source';
+import ZarrPixelSource from './pixel-source-zarrjs';
 
 interface Channel {
   channelsVisible: boolean;
