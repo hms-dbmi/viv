@@ -22,7 +22,7 @@
   "scripts": {
     "check": "tsc --noEmit",
     "build": "unbuild",
-    "test": "pnpm check && esno tests/index.spec.js | tap-spec"
+    "test": "vitest --run"
   },
   "dependencies": {
     "@vivjs/types": "workspace:*",
