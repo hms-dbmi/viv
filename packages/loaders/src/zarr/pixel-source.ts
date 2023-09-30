@@ -1,15 +1,13 @@
-import { BoundsCheckError, slice } from 'zarr';
-import type { ZarrArray } from 'zarr';
-import type { RawArray } from 'zarr/types/rawArray';
+import type { TypedArray } from 'geotiff';
 import { getImageSize, isInterleaved } from '../utils';
 import { getIndexer } from './lib/indexer';
 
 import type {
-  PixelSource,
   Labels,
-  RasterSelection,
-  PixelSourceSelection,
   PixelData,
+  PixelSource,
+  PixelSourceSelection,
+  RasterSelection,
   TileSelection
 } from '@vivjs/types';
 
@@ -35,24 +33,51 @@ interface ZarrTileSelection {
   signal?: AbortSignal;
 }
 
-class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
-  private _data: ZarrArray;
+interface ZarrRasterSelection {
+  selection: number[];
+  signal?: AbortSignal;
+}
 
+interface Slice {
+  start: number;
+  stop: number;
+  step: number;
+  _slice: true;
+}
+
+function slice(start: number, stop: number): Slice {
+  return { start, stop, step: 1, _slice: true };
+}
+
+interface ZarrSource {
+  shape: number[];
+  chunks: number[];
+  dtype: string;
+  getRaw(
+    selection: (Slice | null)[],
+    // getOptions?: { storageOptions?: any }
+  ): Promise<
+    | {
+        data: TypedArray;
+        shape: number[];
+      }
+    | number
+  >;
+}
+
+class BoundsCheckError extends Error {}
+
+class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
+  private _data: ZarrSource;
   private _indexer: ZarrIndexer<S>;
 
-  private _readChunks: boolean;
-
   constructor(
-    data: ZarrArray,
+    data: ZarrSource,
     public labels: Labels<S>,
     public tileSize: number
   ) {
     this._indexer = getIndexer(labels);
     this._data = data;
-
-    const xChunkSize = data.chunks[this._xIndex];
-    const yChunkSize = data.chunks[this._xIndex - 1];
-    this._readChunks = tileSize === xChunkSize && tileSize === yChunkSize;
   }
 
   get shape() {
@@ -74,8 +99,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
 
   private _chunkIndex<T>(
     selection: PixelSourceSelection<S> | number[],
-    x: T,
-    y: T
+    { x, y }: { x: T; y: T },
   ) {
     const sel: (number | T)[] = this._indexer(selection);
     sel[this._xIndex] = x;
@@ -86,7 +110,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
   /**
    * Converts x, y tile indices to zarr dimension Slices within image bounds.
    */
-  private _getSlices(x: number, y: number) {
+  private _getSlices(x: number, y: number): [Slice, Slice] {
     const { height, width } = getImageSize(this);
     const [xStart, xStop] = [
       x * this.tileSize,
@@ -101,37 +125,39 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     // and ignored by deck.gl.
     if (xStart === xStop || yStart === yStop) {
       throw new BoundsCheckError('Tile slice is zero-sized.');
+    } else if (xStart < 0 || yStart < 0 || xStop > width || yStop > height) {
+      throw new BoundsCheckError('Tile slice is out of bounds.');
     }
+
     return [slice(xStart, xStop), slice(yStart, yStop)];
   }
 
-  async getRaster({ selection }: RasterSelection<S> | { selection: number[] }) {
-    const sel = this._chunkIndex(selection, null, null);
-    const { data, shape } = (await this._data.getRaw(sel)) as RawArray;
-    const [height, width] = shape;
+  private async _getRaw(
+    selection: (null | Slice | number)[],
+    getOptions?: { storageOptions?: any }
+  ) {
+    // @ts-expect-error - storageOptions is not supported yet in ZarrJS
+    const result = await this._data.getRaw(selection, getOptions);
+    if (typeof result !== 'object') {
+      throw new Error('Expected object from getRaw');
+    }
+    return result;
+  }
+
+  async getRaster({ selection, signal }: RasterSelection<S> | ZarrRasterSelection) {
+    const sel = this._chunkIndex(selection, { x: null, y: null });
+    const result = await this._getRaw(sel, { storageOptions: { signal } });
+    const { data, shape: [height, width] } = result;
     return { data, width, height } as PixelData;
   }
 
   async getTile(props: TileSelection<S> | ZarrTileSelection) {
     const { x, y, selection, signal } = props;
-
-    let res;
-    if (this._readChunks) {
-      // Can read chunks directly by key since tile size matches chunk shape
-      const sel = this._chunkIndex(selection, x, y);
-      res = await this._data.getRawChunk(sel, { storeOptions: { signal } });
-    } else {
-      // Need to use zarr fancy indexing to get desired tile size.
-      const [xSlice, ySlice] = this._getSlices(x, y);
-      const sel = this._chunkIndex(selection, xSlice, ySlice);
-      res = await this._data.getRaw(sel);
-    }
-
-    const {
-      data,
-      shape: [height, width]
-    } = res as RawArray;
-    return { data, width, height } as PixelData;
+    const [xSlice, ySlice] = this._getSlices(x, y);
+    const sel = this._chunkIndex(selection, { x: xSlice, y: ySlice });
+    const tile = await this._getRaw(sel, { storageOptions: { signal } });
+    const { data, shape: [height, width] } = tile;
+    return { data, height, width } as PixelData;
   }
 
   onTileError(err: Error) {
