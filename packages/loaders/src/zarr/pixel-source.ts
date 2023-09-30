@@ -1,4 +1,4 @@
-import type { TypedArray } from 'geotiff';
+import type { ZarrArray } from 'zarr';
 import { getImageSize, isInterleaved } from '../utils';
 import { getIndexer } from './lib/indexer';
 
@@ -49,21 +49,7 @@ function slice(start: number, stop: number): Slice {
   return { start, stop, step: 1, _slice: true };
 }
 
-interface ZarrSource {
-  shape: number[];
-  chunks: number[];
-  dtype: string;
-  getRaw(
-    selection: (Slice | null)[],
-    // getOptions?: { storageOptions?: any }
-  ): Promise<
-    | {
-        data: TypedArray;
-        shape: number[];
-      }
-    | number
-  >;
-}
+type ZarrSource = Pick<ZarrArray, 'shape' | 'chunks' | 'dtype' | 'getRaw'>;
 
 class BoundsCheckError extends Error {}
 
@@ -99,7 +85,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
 
   private _chunkIndex<T>(
     selection: PixelSourceSelection<S> | number[],
-    { x, y }: { x: T; y: T },
+    { x, y }: { x: T; y: T }
   ) {
     const sel: (number | T)[] = this._indexer(selection);
     sel[this._xIndex] = x;
@@ -136,7 +122,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     selection: (null | Slice | number)[],
     getOptions?: { storageOptions?: any }
   ) {
-    // @ts-expect-error - storageOptions is not supported yet in ZarrJS
+    // @ts-expect-error - TODO: fix ZarrJS types, this is correct
     const result = await this._data.getRaw(selection, getOptions);
     if (typeof result !== 'object') {
       throw new Error('Expected object from getRaw');
@@ -144,10 +130,16 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     return result;
   }
 
-  async getRaster({ selection, signal }: RasterSelection<S> | ZarrRasterSelection) {
+  async getRaster({
+    selection,
+    signal
+  }: RasterSelection<S> | ZarrRasterSelection) {
     const sel = this._chunkIndex(selection, { x: null, y: null });
     const result = await this._getRaw(sel, { storageOptions: { signal } });
-    const { data, shape: [height, width] } = result;
+    const {
+      data,
+      shape: [height, width]
+    } = result;
     return { data, width, height } as PixelData;
   }
 
@@ -156,7 +148,10 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     const [xSlice, ySlice] = this._getSlices(x, y);
     const sel = this._chunkIndex(selection, { x: xSlice, y: ySlice });
     const tile = await this._getRaw(sel, { storageOptions: { signal } });
-    const { data, shape: [height, width] } = tile;
+    const {
+      data,
+      shape: [height, width]
+    } = tile;
     return { data, height, width } as PixelData;
   }
 
