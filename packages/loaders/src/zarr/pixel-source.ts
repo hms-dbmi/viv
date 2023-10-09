@@ -120,9 +120,8 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
 
   private async _getRaw(
     selection: (null | Slice | number)[],
-    getOptions?: { storageOptions?: any }
+    getOptions?: { storeOptions?: any }
   ) {
-    // @ts-expect-error - TODO: fix ZarrJS types, this is correct
     const result = await this._data.getRaw(selection, getOptions);
     if (typeof result !== 'object') {
       throw new Error('Expected object from getRaw');
@@ -135,7 +134,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     signal
   }: RasterSelection<S> | ZarrRasterSelection) {
     const sel = this._chunkIndex(selection, { x: null, y: null });
-    const result = await this._getRaw(sel, { storageOptions: { signal } });
+    const result = await this._getRaw(sel, { storeOptions: { signal } });
     const {
       data,
       shape: [height, width]
@@ -147,7 +146,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     const { x, y, selection, signal } = props;
     const [xSlice, ySlice] = this._getSlices(x, y);
     const sel = this._chunkIndex(selection, { x: xSlice, y: ySlice });
-    const tile = await this._getRaw(sel, { storageOptions: { signal } });
+    const tile = await this._getRaw(sel, { storeOptions: { signal } });
     const {
       data,
       shape: [height, width]
