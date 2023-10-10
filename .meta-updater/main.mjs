@@ -1,10 +1,10 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-const DECK_VERSION = '~8.8.6';
-const LUMAGL_VERSION = '~8.5.16';
+const DECK_VERSION = '~8.9.30';
+const LUMAGL_VERSION = '~8.5.21';
 const MATHGL_VERSION = '^3.5.7';
-const REACT_VERSION = '^16.8.0 || ^17.0.0';
+const REACT_VERSION = '^16.8.0 || ^17.0.0 || ^18.0.0';
 
 
 /** @typedef {import('@pnpm/types').PackageManifest} PackageManifest */
