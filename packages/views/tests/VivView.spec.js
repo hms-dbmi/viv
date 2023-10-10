@@ -60,7 +60,7 @@ export function generateViewTests(ViewType, args, linkedViewIds = []) {
     const viewStates = { [view.id]: defaultViewState };
     linkedViewIds.forEach(id => {
       // endow linked views with some properties
-      viewStates[id] = defaultViewState;
+      viewStates[id] = view.filterViewState(defaultViewState);
     });
     const layers = view.getLayers({
       props: {
