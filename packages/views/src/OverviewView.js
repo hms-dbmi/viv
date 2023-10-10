@@ -64,10 +64,8 @@ export default class OverviewView extends VivView {
     minimumHeight = 150,
     maximumHeight = 350,
     clickCenter = true,
-    width,
-    height
   }) {
-    super({ id, width, height });
+    super({ id });
     this.margin = margin;
     this.loader = loader;
     this.position = position;
