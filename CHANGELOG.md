@@ -6,6 +6,7 @@
 
 ### Changed
 - Bump `gl` to v6 and move to Node.js 18 in CI.
+- Bump `deck.gl` to v8.9.30 and `luma.gl` to v8.5.21.
 
 ## 0.13.8
 
