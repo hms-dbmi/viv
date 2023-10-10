@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@vivjs/types": "workspace:*",
-    "fast-xml-parser": "^3.16.0",
     "geotiff": "^2.0.5",
     "lzw-tiff-decoder": "^0.1.1",
     "quickselect": "^2.0.0",

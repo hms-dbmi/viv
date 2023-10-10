@@ -1,28 +1,11 @@
-import * as parser from 'fast-xml-parser';
-import { ensureArray, intToRgba } from './utils';
-
-// WARNING: Changes to the parser options _will_ effect the types in types/omexml.d.ts.
-const PARSER_OPTIONS = {
-  // Nests attributes withtout prefix under 'attr' key for each node
-  attributeNamePrefix: '',
-  attrNodeName: 'attr',
-
-  // Parses numbers for both attributes and nodes
-  parseNodeValue: true,
-  parseAttributeValue: true,
-
-  // Forces attributes to be parsed
-  ignoreAttributes: false
-};
-
-const parse = (str: string): Root => parser.parse(str, PARSER_OPTIONS);
+import { ensureArray, intToRgba, parseXML } from './utils';
 
 export function fromString(str: string) {
-  const res = parse(str);
-  if (!res.OME) {
+  const res = parseXML(str);
+  if (!isOme(res)) {
     throw Error('Failed to parse OME-XML metadata.');
   }
-  return ensureArray(res.OME.Image).map(img => {
+  return ensureArray(res.Image).map(img => {
     const Channels = ensureArray(img.Pixels.Channel).map(c => {
       if ('Color' in c.attr) {
         return { ...c.attr, Color: intToRgba(c.attr.Color) };
@@ -185,4 +168,6 @@ type ChannelAttrs =
 
 type Channel = AttrsOnlyNode<ChannelAttrs>;
 
-type Root = { OME: OME };
+function isOme(obj: unknown): obj is OME {
+  return typeof obj === 'object' && obj !== null && 'Image' in obj;
+}

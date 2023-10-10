@@ -186,3 +186,92 @@ export function guessTiffTileSize(image: GeoTIFFImage) {
   // deck.gl requirement for power-of-two tile size.
   return prevPowerOf2(size);
 }
+
+function convertString(value: string): string | number | boolean {
+  // Attempt to convert to number
+  const numValue = parseFloat(value);
+  if (!isNaN(numValue)) {
+    return numValue;
+  }
+  // Attempt to convert to boolean
+  if (value.toLowerCase() === 'true') {
+    return true;
+  } else if (value.toLowerCase() === 'false') {
+    return false;
+  }
+  // Default to string
+  return value;
+}
+
+function isElement(node: Node): node is HTMLElement {
+  return node.nodeType === 1;
+}
+
+function isText(node: Node): node is Text {
+  return node.nodeType === 3;
+}
+
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | { [x: string]: JsonValue }
+  | Array<JsonValue>;
+
+function xmlToJson(
+  xmlNode: HTMLElement,
+  options: { attrNodeName: string }
+): JsonValue | string | number | boolean {
+  if (isText(xmlNode)) {
+    // If the node is a text node
+    return convertString(xmlNode.nodeValue?.trim() ?? '');
+  }
+
+  // If the node has no attributes and no children, return an empty string
+  if (
+    xmlNode.childNodes.length === 0 &&
+    (!xmlNode.attributes || xmlNode.attributes.length === 0)
+  ) {
+    return '';
+  }
+
+  const jsonObj: JsonValue = {};
+
+  if (xmlNode.attributes && xmlNode.attributes.length > 0) {
+    const attrsObj: Record<string, string | boolean | number> = {};
+    for (let i = 0; i < xmlNode.attributes.length; i++) {
+      const attr = xmlNode.attributes[i];
+      attrsObj[attr.name] = convertString(attr.value);
+    }
+    jsonObj[options.attrNodeName] = attrsObj;
+  }
+
+  for (let i = 0; i < xmlNode.childNodes.length; i++) {
+    const childNode = xmlNode.childNodes[i];
+    if (!isElement(childNode)) {
+      throw new Error('Unexpected child node type');
+    }
+    const childJson = xmlToJson(childNode, options);
+    if (childJson !== undefined && childJson !== '') {
+      if (childNode.nodeName === '#text' && xmlNode.childNodes.length === 1) {
+        return childJson;
+      }
+      if (jsonObj[childNode.nodeName]) {
+        if (!Array.isArray(jsonObj[childNode.nodeName])) {
+          jsonObj[childNode.nodeName] = [jsonObj[childNode.nodeName]];
+        }
+        (jsonObj[childNode.nodeName] as JsonValue[]).push(childJson);
+      } else {
+        jsonObj[childNode.nodeName] = childJson;
+      }
+    }
+  }
+
+  return jsonObj;
+}
+
+export function parseXML(xmlStr: string) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xmlStr, 'application/xml');
+  return xmlToJson(doc.documentElement, { attrNodeName: 'attr' });
+}
