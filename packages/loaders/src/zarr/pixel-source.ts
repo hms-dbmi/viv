@@ -122,7 +122,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     selection: (null | Slice | number)[],
     getOptions?: { storeOptions?: any }
   ) {
-    const result = await this._data.getRaw(selection, getOptions);
+    const result = await this._data.getRaw(selection as any, getOptions as any);
     if (typeof result !== 'object') {
       throw new Error('Expected object from getRaw');
     }
