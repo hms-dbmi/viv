@@ -125,6 +125,7 @@ export function intToRgba(int: number) {
  * > isInterleaved([1, 24, 24, 3]) === true;
  */
 export function isInterleaved(shape: number[]) {
+  return true;
   const lastDimSize = shape[shape.length - 1];
   return lastDimSize === 3 || lastDimSize === 4;
 }
