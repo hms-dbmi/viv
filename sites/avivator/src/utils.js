@@ -7,6 +7,7 @@ import {
   loadBioformatsZarr,
   loadOmeZarr,
   loadMultiTiff,
+  loadSingleTiff,
   getChannelStats,
   RENDERING_MODES,
   ColorPalette3DExtensions,
@@ -151,7 +152,7 @@ export async function createLoader(
   // Otherwise load.
   try {
     // OME-TIFF
-    if (isOMETIFF(urlOrFile)) {
+    if (isOMETIFF(urlOrFile) || true) {
       if (urlOrFile instanceof File) {
         // TODO(2021-05-09): temporarily disable `pool` until inline worker module is fixed.
         const source = await loadOmeTiff(urlOrFile, {
@@ -160,31 +161,11 @@ export async function createLoader(
         });
         return source;
       }
-      const url = urlOrFile;
-      const res = await fetch(url.replace(/ome\.tif(f?)/gi, 'offsets.json'));
-      const isOffsetsNot200 = res.status !== 200;
-      const offsets = !isOffsetsNot200 ? await res.json() : undefined;
       // TODO(2021-05-06): temporarily disable `pool` until inline worker module is fixed.
-      const source = await loadOmeTiff(urlOrFile, {
-        offsets,
-        images: 'all',
+      const source = await loadSingleTiff(urlOrFile, {
         pool: false
       });
 
-      // Show a warning if the total number of channels/images exceeds a fixed amount.
-      // Non-Bioformats6 pyramids use Image tags for pyramid levels and do not have offsets
-      // built in to the format for them, hence the ternary.
-      const totalImageCount = await getTotalImageCount(
-        urlOrFile,
-        source.map(s => s.metadata),
-        source.map(s => s.data)
-      );
-      if (
-        isOffsetsNot200 &&
-        totalImageCount > MAX_CHANNELS_FOR_SNACKBAR_WARNING
-      ) {
-        handleOffsetsNotFound(true);
-      }
       return source;
     }
 

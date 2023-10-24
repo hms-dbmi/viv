@@ -137,6 +137,18 @@ function getMultiTiffShapeMap(tiffs: MultiTiffImage[]): {
   };
 }
 
+function getSingleTiffShapeMap(tiff: GeoTIFFImage): {
+  [key: string]: number;
+} {
+  return {
+    x: tiff.getWidth(),
+    y: tiff.getHeight(),
+    z: 1,
+    c: 3, // RGB?
+    t: 1
+  };
+}
+
 // If a channel has multiple z or t slices with different samples per pixel
 // this function will just use the samples per pixel from a random slice.
 function getChannelSamplesPerPixel(
@@ -175,6 +187,21 @@ export function getMultiTiffMeta(
   return { shape, labels, dtype };
 }
 
+export function getSingleTiffMeta(
+  dimensionOrder: DimensionOrder,
+  tiff: GeoTIFFImage
+) {
+  const shapeMap = getSingleTiffShapeMap(tiff);
+  const shape = [];
+  for (const dim of dimensionOrder.toLowerCase()) {
+    shape.unshift(shapeMap[dim]);
+  }
+
+  const labels = getLabels(dimensionOrder);
+  const dtype = guessImageDataType(tiff);
+  return { shape, labels, dtype };
+}
+
 function getMultiTiffPixelMedatata(
   imageNumber: number,
   dimensionOrder: DimensionOrder,
@@ -194,6 +221,37 @@ function getMultiTiffPixelMedatata(
   }
   return {
     BigEndian: !tiffs[0].tiff.littleEndian,
+    DimensionOrder: dimensionOrder,
+    ID: `Pixels:${imageNumber}`,
+    SizeC: shapeMap.c,
+    SizeT: shapeMap.t,
+    SizeX: shapeMap.x,
+    SizeY: shapeMap.y,
+    SizeZ: shapeMap.z,
+    Type: dType,
+    Channels: channelMetadata
+  };
+}
+
+function getSingleTiffPixelMedatata(
+  imageNumber: number,
+  dimensionOrder: DimensionOrder,
+  shapeMap: { [key: string]: number },
+  dType: string,
+  tiff: GeoTIFFImage,
+  channelNames: string[],
+  channelSamplesPerPixel: number[]
+) {
+  const channelMetadata = [];
+  for (let i = 0; i < shapeMap.c; i += 1) {
+    channelMetadata.push({
+      ID: `Channel:${imageNumber}:${i}`,
+      Name: channelNames[i],
+      SamplesPerPixel: channelSamplesPerPixel[i]
+    });
+  }
+  return {
+    BigEndian: !tiff.littleEndian,
     DimensionOrder: dimensionOrder,
     ID: `Pixels:${imageNumber}`,
     SizeC: shapeMap.c,
@@ -234,6 +292,59 @@ export function getMultiTiffMetadata(
     shapeMap,
     dType,
     tiffImages,
+    channelNames,
+    channelSamplesPerPixel
+  );
+
+  const format = () => {
+    return {
+      'Acquisition Date': date,
+      'Dimensions (XY)': `${shapeMap.x} x ${shapeMap.y}`,
+      PixelsType: dType,
+      'Z-sections/Timepoints': `${shapeMap.z} x ${shapeMap.t}`,
+      Channels: shapeMap.c
+    };
+  };
+  return {
+    ID: id,
+    Name: imageName,
+    AcquisitionDate: date,
+    Description: description,
+    Pixels: pixels,
+    format
+  };
+}
+
+export function getSingleTiffMetadata(
+  imageName: string,
+  tiffImage: GeoTIFFImage,
+  channelNames: string[],
+  dimensionOrder: DimensionOrder,
+  dType: string
+) {
+  const imageNumber = 0;
+  const id = `Image:${imageNumber}`;
+  const date = '';
+  const description = '';
+  const shapeMap = getSingleTiffShapeMap(tiffImage);
+  const channelSamplesPerPixel = [
+    // RGB?
+    tiffImage.getSamplesPerPixel(),
+    tiffImage.getSamplesPerPixel(),
+    tiffImage.getSamplesPerPixel(),
+  ];
+
+  if (channelNames.length !== shapeMap.c)
+    throw Error(
+      'Wrong number of channel names for number of channels provided'
+    );
+
+  const pixels = getSingleTiffPixelMedatata(
+    imageNumber,
+    dimensionOrder,
+    shapeMap,
+    dType,
+    tiffImage,
     channelNames,
     channelSamplesPerPixel
   );

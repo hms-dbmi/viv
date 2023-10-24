@@ -1,4 +1,4 @@
-import { fromUrl, fromBlob, fromFile, addDecoder } from 'geotiff';
+import { fromUrl, fromBlob, fromArrayBuffer, fromFile, addDecoder } from 'geotiff';
 import type { GeoTIFF, Pool } from 'geotiff';
 
 import { createOffsetsProxy, checkProxies } from './lib/proxies';
@@ -7,6 +7,7 @@ import { parseFilename, OmeTiffSelection } from './lib/utils';
 
 import { load as loadOme } from './ome-tiff';
 import { load as loadMulti, MultiTiffImage } from './multi-tiff';
+import { load as loadSingle } from './single-tiff';
 
 addDecoder(5, () => LZWDecoder);
 
@@ -102,6 +103,46 @@ export async function loadOmeTiff(
 
   const loaders = await loadOme(tiff, pool);
   return images === 'all' ? loaders : loaders[0];
+}
+
+/**
+ * Opens a TIFF via URL and returns data source and associated metadata for first or all images in files.
+ *
+ * @param {(string | File)} source url or File object. If the url is prefixed with file:// will attempt to load with GeoTIFF's 'fromFile',
+ * which requires access to Node's fs module.
+ * @param {Object} opts
+ * @param {Headers=} opts.headers - Headers passed to each underlying fetch request.
+ * @param {Array<number>=} opts.offsets - [Indexed-Tiff](https://github.com/hms-dbmi/generate-tiff-offsets) IFD offsets.
+ * @param {GeoTIFF.Pool} [opts.pool] - A geotiff.js [Pool](https://geotiffjs.github.io/geotiff.js/module-pool-Pool.html) for decoding image chunks.
+ * @param {("first" | "all")} [opts.images='first'] - Whether to return 'all' or only the 'first' image in the OME-TIFF.
+ * Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[] is returned.
+ * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }> | Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[]} data source and associated OME-Zarr metadata.
+ */
+export async function loadSingleTiff(
+  source: string | ArrayBuffer,
+  opts: OmeTiffOptions = {}
+) {
+  const { headers = {}, pool } = opts;
+
+  let tiff: GeoTIFF;
+
+  // Create tiff source
+  if (typeof source === 'string') {
+    if (source.startsWith(FILE_PREFIX)) {
+      tiff = await fromFile(source.slice(FILE_PREFIX.length));
+    } else {
+      // https://github.com/ilan-gold/geotiff.js/tree/viv#abortcontroller-support
+      // https://www.npmjs.com/package/lru-cache#options
+      // Cache size needs to be infinite due to consistency issues.
+      tiff = await fromUrl(source, { headers, cacheSize: Infinity });
+    }
+  } else {
+    tiff = await fromArrayBuffer(source);
+  }
+
+  const tiffImage = await tiff.getImage(0);
+
+  return loadSingle('image', tiffImage, ['R', 'G', 'B'], pool);
 }
 
 function getImageSelectionName(
