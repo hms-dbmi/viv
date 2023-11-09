@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import * as React from 'react';
 
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
@@ -81,7 +81,7 @@ function ChannelController({
       }
     }
   };
-  const [mode, setMode] = useState('max/min');
+  const [mode, setMode] = React.useState('max/min');
   const [left, right] = getMinMax({ domain, mode, loader });
   // If the min/right range is and the dtype is float, make the step size smaller so contrastLimits are smoother.
   const { dtype } = loader[0];

@@ -55,5 +55,5 @@ export default class VivView {
    * @returns {Layer} Instance of a layer.
    */
   // eslint-disable-next-line class-methods-use-this,no-unused-vars
-  getLayers({ viewStates, props }) {}
+  getLayers({ viewStates, props }) {} // eslint-disable-line @typescript-eslint/no-unused-vars
 }
