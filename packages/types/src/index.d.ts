@@ -112,7 +112,7 @@ type WithExtensionProps<LayerProps> = LayerProps extends { extensions: unknown }
         LensExtensionProps &
         ColorPalette3DExtensionProps &
         AdditiveColormap3DExtensionProps
-    > & { [extensionProp: string]: any }
+    > & { [extensionProp: string]: any } // eslint-disable-line @typescript-eslint/no-explicit-any
   : unknown;
 
 /**
