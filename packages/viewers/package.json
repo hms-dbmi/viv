@@ -23,7 +23,7 @@
     "build": "unbuild"
   },
   "peerDependencies": {
-    "@deck.gl/react": "~8.9.30",
+    "@deck.gl/react": "8.8.27",
     "react": "^16.8.0 || ^17.0.0"
   },
   "dependencies": {
