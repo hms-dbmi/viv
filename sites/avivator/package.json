@@ -18,7 +18,7 @@
     "react-dom": "^16.8.0 || ^17.0.0",
     "react-dropzone": "^11.2.3",
     "react-router-dom": "^5.2.0",
-    "zustand": "^3.4.1"
+    "zustand": "^4.4.6"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.1.1",
