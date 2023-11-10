@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 
 import { MAX_CHANNELS, COLOR_PALLETE } from '../../../constants';
 import {

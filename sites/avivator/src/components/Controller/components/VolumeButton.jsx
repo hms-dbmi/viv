@@ -9,7 +9,7 @@ import MenuList from '@material-ui/core/MenuList';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 
 import {
   useImageSettingsStore,

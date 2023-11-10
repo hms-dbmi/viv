@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDropzone as useReactDropzone } from 'react-dropzone';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 

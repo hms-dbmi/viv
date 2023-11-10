@@ -1,6 +1,7 @@
 import { createContext, useContext, useRef, createElement } from 'react';
 import { RENDERING_MODES } from '@hms-dbmi/viv';
-import { createStore, useStore } from 'zustand';
+import { createStore } from 'zustand';
+import { useStoreWithEqualityFn } from 'zustand/traditional';
 
 const captialize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -173,9 +174,13 @@ function useStoreApi(storeName) {
 export const useChannelsStoreApi = () => useStoreApi('channels');
 export const useImageSettingsStoreApi = () => useStoreApi('imageSettings');
 export const useViewerStoreApi = () => useStoreApi('viewer');
-export const useChannelsStore = selector => useStore(useChannelsStoreApi(), selector);
-export const useImageSettingsStore = selector => useStore(useImageSettingsStoreApi(), selector);
-export const useViewerStore = selector => useStore(useViewerStoreApi(), selector);
+function useAviStore(storeName, selector, eqFn) {
+  const store = useStoreApi(storeName);
+  return useStoreWithEqualityFn(store, selector, eqFn);
+}
+export const useChannelsStore = (selector, eqFn) => useAviStore('channels', selector, eqFn);
+export const useImageSettingsStore = (selector, eqFn) => useAviStore('imageSettings', selector, eqFn);
+export const useViewerStore = (selector, eqFn) => useAviStore('viewer', selector, eqFn);
 
 export const useLoader = () => {
   const [fullLoader, image] = useChannelsStore(store => [

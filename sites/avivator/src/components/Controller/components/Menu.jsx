@@ -12,7 +12,7 @@ import Link from '@material-ui/core/Link';
 import Button from '@material-ui/core/Button';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { makeStyles } from '@material-ui/core/styles';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 import { Select } from '@material-ui/core';
 
 import MenuTitle from './MenuTitle';

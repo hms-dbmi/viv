@@ -7,7 +7,7 @@ import Select from '@material-ui/core/Select';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import IconButton from '@material-ui/core/IconButton';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 import { DTYPE_VALUES } from '@hms-dbmi/viv';
 
 import ChannelOptions from './ChannelOptions';

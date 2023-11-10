@@ -4,7 +4,7 @@ import { unstable_batchedUpdates } from 'react-dom';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import debounce from 'lodash/debounce';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 
 import { range, getMultiSelectionStats } from '../../../utils';
 import {

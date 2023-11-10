@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Divider from '@material-ui/core/Divider';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 
 import ChannelController from './components/ChannelController';
 import Menu from './components/Menu';
