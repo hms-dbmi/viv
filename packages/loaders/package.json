@@ -36,5 +36,8 @@
       "src/index"
     ],
     "declaration": true
+  },
+  "devDependencies": {
+    "xmldom": "^0.6.0"
   }
 }

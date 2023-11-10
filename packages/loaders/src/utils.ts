@@ -249,7 +249,7 @@ function xmlToJson(
   for (let i = 0; i < xmlNode.childNodes.length; i++) {
     const childNode = xmlNode.childNodes[i];
     if (!isElement(childNode)) {
-      throw new Error('Unexpected child node type');
+      continue;
     }
     const childJson = xmlToJson(childNode, options);
     if (childJson !== undefined && childJson !== '') {

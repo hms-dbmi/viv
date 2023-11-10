@@ -1,3 +1,6 @@
+import { DOMParser } from "xmldom";
+globalThis.DOMParser = DOMParser;
+
 import './utils.spec';
 
 import './ome-tiff.spec';
