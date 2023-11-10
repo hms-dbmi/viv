@@ -9,6 +9,7 @@
 - Narrow required interface for `ZarrPixelSource`.
 - Update dev dependencies
 - Drop `fast-xml-parser` dependency in `@vivjs/loaders`
+- Validate expected OME-XML data-types
 
 ## 0.13.8
 
