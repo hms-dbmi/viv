@@ -7,6 +7,7 @@
 ### Changed
 - Bump `gl` to v6 and move to Node.js 18 in CI.
 - Narrow required interface for `ZarrPixelSource`.
+- Update dev dependencies
 
 ## 0.13.8
 
