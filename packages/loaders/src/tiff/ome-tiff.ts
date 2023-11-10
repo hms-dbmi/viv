@@ -3,7 +3,7 @@ import { fromString } from '../omexml';
 
 import TiffPixelSource from './pixel-source';
 import { getOmeLegacyIndexer, getOmeSubIFDIndexer } from './lib/indexers';
-import { getOmePixelSourceMeta, OmeTiffSelection } from './lib/utils';
+import { getOmePixelSourceMeta, type OmeTiffSelection } from './lib/utils';
 import { guessTiffTileSize } from '../utils';
 import type Pool from './lib/Pool';
 import type { OmeTiffIndexer } from './lib/indexers';

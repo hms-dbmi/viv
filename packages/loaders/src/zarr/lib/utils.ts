@@ -38,7 +38,8 @@ export function guessBioformatsLabels(
   const labels = getLabels(Pixels.DimensionOrder);
   labels.forEach((lower, i) => {
     const label = lower.toUpperCase();
-    const xmlSize = (Pixels as any)[`Size${label}`] as number;
+    // @ts-expect-error - FIXME: safer type access
+    const xmlSize: number = Pixels[`Size${label}`];
     if (!xmlSize) {
       throw Error(`Dimension ${label} is invalid for OME-XML.`);
     }

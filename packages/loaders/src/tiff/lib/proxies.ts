@@ -8,7 +8,7 @@ const OFFSETS_PROXY_KEY = `${VIV_PROXY_KEY}-offsets` as const;
  * and warn if missing.
  */
 export function checkProxies(tiff: GeoTIFF) {
-  if (!isProxy(tiff, OFFSETS_PROXY_KEY)) {
+  if (!isProxy(tiff)) {
     console.warn('GeoTIFF source is missing offsets proxy.');
   }
 }
@@ -18,8 +18,8 @@ export function checkProxies(tiff: GeoTIFF) {
  * > tiff = createPoolProxy(tiff, new Pool());
  * > isProxy(tiff, POOL_PROXY_KEY) === true; // true
  */
-function isProxy(tiff: GeoTIFF, proxyFlag: string) {
-  return (tiff as any)[proxyFlag] as boolean;
+function isProxy(tiff: GeoTIFF & { [VIV_PROXY_KEY]?: boolean }) {
+  return tiff[VIV_PROXY_KEY];
 }
 
 /*
@@ -33,7 +33,7 @@ function isProxy(tiff: GeoTIFF, proxyFlag: string) {
  * rather than traversing the file system remotely.
  */
 export function createOffsetsProxy(tiff: GeoTIFF, offsets: number[]) {
-  const get = (target: GeoTIFF, key: any) => {
+  const get = (target: GeoTIFF, key: unknown) => {
     // Intercept `tiff.getImage`
     if (key === 'getImage') {
       return (index: number) => {
@@ -51,6 +51,7 @@ export function createOffsetsProxy(tiff: GeoTIFF, offsets: number[]) {
       return true;
     }
 
+    // @ts-expect-error Just forwarding the key
     return Reflect.get(target, key);
   };
   return new Proxy(tiff, { get });

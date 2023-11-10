@@ -3,10 +3,10 @@ import type { GeoTIFF, Pool } from 'geotiff';
 
 import { createOffsetsProxy, checkProxies } from './lib/proxies';
 import LZWDecoder from './lib/lzw-decoder';
-import { parseFilename, OmeTiffSelection } from './lib/utils';
+import { parseFilename, type OmeTiffSelection } from './lib/utils';
 
 import { load as loadOme } from './ome-tiff';
-import { load as loadMulti, MultiTiffImage } from './multi-tiff';
+import { load as loadMulti, type MultiTiffImage } from './multi-tiff';
 
 addDecoder(5, () => LZWDecoder);
 

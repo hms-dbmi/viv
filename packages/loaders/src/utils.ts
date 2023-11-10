@@ -135,9 +135,9 @@ export function isInterleaved(shape: number[]) {
  * > getLabels(imgMeta.Pixels) === ['t', 'z', 'c', 'y', 'x']
  */
 type Sel<Dim extends string> =
-  Dim extends `${infer Z}${infer X}${infer A}${infer B}${infer C}`
+  Dim extends `${infer Z}${infer X}${infer A}${infer B}${infer C}` // eslint-disable-line @typescript-eslint/no-unused-vars
     ? [C, B, A]
-    : 'error';
+    : never;
 export function getLabels(dimOrder: OMEXML[0]['Pixels']['DimensionOrder']) {
   return dimOrder.toLowerCase().split('').reverse() as Labels<
     Sel<Lowercase<typeof dimOrder>>

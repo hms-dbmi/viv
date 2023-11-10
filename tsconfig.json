@@ -8,6 +8,6 @@
     "allowJs": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "importsNotUsedAsValues": "error"
+    "verbatimModuleSyntax": true
   }
 }

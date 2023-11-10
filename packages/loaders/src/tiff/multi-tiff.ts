@@ -5,7 +5,7 @@ import { guessTiffTileSize } from '../utils';
 import {
   getMultiTiffMetadata,
   getMultiTiffMeta,
-  OmeTiffSelection
+  type OmeTiffSelection
 } from './lib/utils';
 import type Pool from './lib/Pool';
 import { getMultiTiffIndexer } from './lib/indexers';
