@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { useViewerStore } from './state';
+import { useViewerStore, useViewerStoreApi } from './state';
 import { useImage } from './hooks';
 import SnackBars from './components/Snackbars';
 import Viewer from './components/Viewer';
@@ -22,9 +22,10 @@ export default function Avivator(props) {
   const isViewerLoading = useViewerStore(store => store.isViewerLoading);
   const source = useViewerStore(store => store.source);
   const useLinkedView = useViewerStore(store => store.useLinkedView);
+  const viewerStore = useViewerStoreApi();
 
   useEffect(() => {
-    useViewerStore.setState({
+    viewerStore.setState({
       source: initSource,
       isNoImageUrlSnackbarOn: isDemoImage
     });

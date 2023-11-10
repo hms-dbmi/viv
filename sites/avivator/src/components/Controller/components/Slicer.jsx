@@ -8,7 +8,8 @@ import shallow from 'zustand/shallow';
 import {
   useImageSettingsStore,
   useViewerStore,
-  useLoader
+  useLoader,
+  useImageSettingsStoreApi
 } from '../../../state';
 import { getBoundingCube, truncateDecimalNumber } from '../../../utils';
 
@@ -38,22 +39,23 @@ const Slicer = () => {
   const loader = useLoader();
   const use3d = useViewerStore(store => store.use3d);
   const [xSliceInit, ySliceInit, zSliceInit] = getBoundingCube(loader);
+  const imageSettingsStore = useImageSettingsStoreApi();
   const sliceValuesAndSetSliceFunctions = [
     [
       xSlice,
-      xSliceNew => useImageSettingsStore.setState({ xSlice: xSliceNew }),
+      xSliceNew => imageSettingsStore.setState({ xSlice: xSliceNew }),
       'x',
       xSliceInit
     ],
     [
       ySlice,
-      ySliceNew => useImageSettingsStore.setState({ ySlice: ySliceNew }),
+      ySliceNew => imageSettingsStore.setState({ ySlice: ySliceNew }),
       'y',
       ySliceInit
     ],
     [
       zSlice,
-      zSliceNew => useImageSettingsStore.setState({ zSlice: zSliceNew }),
+      zSliceNew => imageSettingsStore.setState({ zSlice: zSliceNew }),
       'z',
       zSliceInit
     ]

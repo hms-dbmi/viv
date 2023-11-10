@@ -12,6 +12,7 @@ import { grey } from '@material-ui/core/colors';
 import sources from './source-info';
 import Avivator from './Avivator';
 import { getNameFromUrl } from './utils';
+import { AvivatorProvider } from './state';
 
 const darkTheme = createTheme({
   palette: {
@@ -63,10 +64,12 @@ function RoutedAvivator(props) {
 ReactDOM.render(
   <Router>
     <Switch>
-      <Route
-        path="/"
-        render={routeProps => <RoutedAvivator routeProps={routeProps} />}
-      />
+      <AvivatorProvider>
+        <Route
+          path="/"
+          render={routeProps => <RoutedAvivator routeProps={routeProps} />}
+        />
+      </AvivatorProvider>
     </Switch>
   </Router>,
   document.getElementById('root')

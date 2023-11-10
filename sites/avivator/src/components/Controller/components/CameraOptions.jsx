@@ -10,7 +10,8 @@ import { getDefaultInitialViewState } from '@hms-dbmi/viv';
 import {
   useImageSettingsStore,
   useViewerStore,
-  useLoader
+  useLoader,
+  useViewerStoreApi
 } from '../../../state';
 import { useWindowSize } from '../../../utils';
 
@@ -53,11 +54,12 @@ const CameraOptions = () => {
       </Grid>
     </Grid>
   );
+  const viewerStore = useViewerStoreApi();
   const reCenterButton = (
     <Grid item xs="auto" key="recenter">
       <Button
         onClick={() =>
-          useViewerStore.setState({
+          viewerStore.setState({
             viewState: {
               ...viewState,
               ...getDefaultInitialViewState(loader, { height, width }, 1, true),

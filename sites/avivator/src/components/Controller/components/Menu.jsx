@@ -18,7 +18,7 @@ import { Select } from '@material-ui/core';
 import MenuTitle from './MenuTitle';
 import DropzoneButton from './DropzoneButton';
 import { isMobileOrTablet, getNameFromUrl } from '../../../utils';
-import { useChannelsStore, useViewerStore } from '../../../state';
+import { useChannelsStore, useChannelsStoreApi, useViewerStore, useViewerStoreApi } from '../../../state';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -57,6 +57,8 @@ function Header(props) {
     store.source,
     store.metadata
   ]);
+  const viewerStore = useViewerStoreApi();
+  const channelsStore = useChannelsStoreApi();
   const handleSubmitNewUrl = (event, newUrl) => {
     event.preventDefault();
     const newSource = {
@@ -64,10 +66,10 @@ function Header(props) {
       // Use the trailing part of the URL (file name, presumably) as the description.
       description: getNameFromUrl(newUrl)
     };
-    useViewerStore.setState({ source: newSource });
+    viewerStore.setState({ source: newSource });
   };
   const onImageSelectionChange = e =>
-    useChannelsStore.setState({
+    channelsStore.setState({
       image: e.target.value
     });
   const url = typeof source.urlOrFile === 'string' ? source.urlOrFile : '';

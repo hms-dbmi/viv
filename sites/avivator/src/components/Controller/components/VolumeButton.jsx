@@ -15,7 +15,9 @@ import {
   useImageSettingsStore,
   useViewerStore,
   useChannelsStore,
-  useLoader
+  useLoader,
+  useViewerStoreApi,
+  useImageSettingsStoreApi
 } from '../../../state';
 import { range, getMultiSelectionStats, getBoundingCube } from '../../../utils';
 
@@ -111,6 +113,8 @@ function VolumeButton() {
   const hasViewableResolutions = Array.from({
     length: loader.length
   }).filter((_, resolution) => canLoadResolution(loader, resolution)).length;
+  const viewerStore = useViewerStoreApi();
+  const imageSettingsStore = useImageSettingsStoreApi();
   return (
     <>
       <Button
@@ -127,7 +131,7 @@ function VolumeButton() {
           // eslint-disable-next-line no-unused-expressions
           if (use3d) {
             toggleUse3d();
-            useViewerStore.setState({
+            viewerStore.setState({
               isChannelLoading: Array(selections.length).fill(true)
             });
             getMultiSelectionStats({ loader, selections, use3d: !use3d }).then(
@@ -138,7 +142,7 @@ function VolumeButton() {
                     contrastLimits: contrastLimits[j]
                   })
                 );
-                useViewerStore.setState({
+                viewerStore.setState({
                   isChannelLoading: Array(selections.length).fill(false)
                 });
               }
@@ -166,14 +170,14 @@ function VolumeButton() {
                           dense
                           disableGutters
                           onClick={() => {
-                            useViewerStore.setState({
+                            viewerStore.setState({
                               isChannelLoading: Array(selections.length).fill(
                                 true
                               )
                             });
                             const [xSlice, ySlice, zSlice] =
                               getBoundingCube(loader);
-                            useImageSettingsStore.setState({
+                            imageSettingsStore.setState({
                               resolution,
                               xSlice,
                               ySlice,
@@ -191,12 +195,12 @@ function VolumeButton() {
                                   contrastLimits: contrastLimits[j]
                                 })
                               );
-                              useImageSettingsStore.setState({
+                              imageSettingsStore.setState({
                                 onViewportLoad: () => {
-                                  useImageSettingsStore.setState({
+                                  imageSettingsStore.setState({
                                     onViewportLoad: () => {}
                                   });
-                                  useViewerStore.setState({
+                                  viewerStore.setState({
                                     isChannelLoading: Array(
                                       selections.length
                                     ).fill(false)

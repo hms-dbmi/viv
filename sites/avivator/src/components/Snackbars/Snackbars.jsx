@@ -9,7 +9,7 @@ import {
   NoImageUrlInfo,
   VolumeRenderingWarning
 } from './SnackbarAlerts';
-import { useViewerStore } from '../../state';
+import { useViewerStore, useViewerStoreApi } from '../../state';
 
 const SnackBars = () => {
   const [
@@ -32,6 +32,7 @@ const SnackBars = () => {
     ],
     shallow
   );
+  const viewerStore = useViewerStoreApi();
   return (
     <>
       <Snackbar
@@ -52,7 +53,7 @@ const SnackBars = () => {
       >
         <Alert
           onClose={() =>
-            useViewerStore.setState({
+            viewerStore.setState({
               loaderErrorSnackbar: { on: false, message: null }
             })
           } // eslint-disable-line react/jsx-curly-newline

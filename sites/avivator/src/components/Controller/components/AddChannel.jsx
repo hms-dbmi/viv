@@ -7,7 +7,7 @@ import { MAX_CHANNELS, COLOR_PALLETE } from '../../../constants';
 import {
   useChannelsStore,
   useViewerStore,
-  useImageSettingsStore,
+  useImageSettingsStoreApi,
   useLoader,
   useMetadata
 } from '../../../state';
@@ -41,6 +41,7 @@ const AddChannel = () => {
   const loader = useLoader();
   const metadata = useMetadata();
   const { labels } = loader[0];
+  const imageSettingsStore = useImageSettingsStoreApi();
   const handleChannelAdd = useCallback(() => {
     let selection = Object.fromEntries(labels.map(l => [l, 0]));
     selection = { ...selection, ...globalSelection };
@@ -55,9 +56,9 @@ const AddChannel = () => {
         contrastLimits,
         channelsVisible: true
       });
-      useImageSettingsStore.setState({
+      imageSettingsStore.setState({
         onViewportLoad: () => {
-          useImageSettingsStore.setState({ onViewportLoad: () => {} });
+          imageSettingsStore.setState({ onViewportLoad: () => {} });
           setIsChannelLoading(numSelectionsBeforeAdd, false);
         }
       });
@@ -85,6 +86,7 @@ const AddChannel = () => {
     selections,
     setIsChannelLoading,
     setPropertiesForChannel,
+    imageSettingsStore,
     metadata
   ]);
   return (

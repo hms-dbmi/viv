@@ -8,6 +8,7 @@ import shallow from 'zustand/shallow';
 import {
   useChannelsStore,
   useImageSettingsStore,
+  useImageSettingsStoreApi,
   useViewerStore
 } from '../../../state';
 
@@ -21,6 +22,7 @@ function LensSelect() {
   const currChannelIndices = selections.map(sel => sel.c);
 
   const checkboxColor = `rgb(${[255, 255, 255]})`;
+  const imageSettingsStore = useImageSettingsStoreApi();
   return (
     <Grid
       container
@@ -48,7 +50,7 @@ function LensSelect() {
           native
           value={lensSelection}
           onChange={e =>
-            useImageSettingsStore.setState({ lensSelection: e.target.value })
+            imageSettingsStore.setState({ lensSelection: e.target.value })
           }
         >
           {currChannelIndices.map((channelIndex, relativeIndex) => (

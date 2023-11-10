@@ -1,6 +1,6 @@
-import create from 'zustand';
-
+import { createContext, useContext, useRef, createElement } from 'react';
 import { RENDERING_MODES } from '@hms-dbmi/viv';
+import { createStore, useStore } from 'zustand';
 
 const captialize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -38,7 +38,7 @@ const DEFAUlT_CHANNEL_VALUES = {
   ids: ''
 };
 
-export const useChannelsStore = create(set => ({
+const createChannelsStore = () => createStore(set => ({
   ...DEFAUlT_CHANNEL_STATE,
   ...generateToggles(DEFAUlT_CHANNEL_VALUES, set),
   toggleIsOn: index =>
@@ -100,7 +100,7 @@ const DEFAULT_IMAGE_STATE = {
   onViewportLoad: () => {}
 };
 
-export const useImageSettingsStore = create(set => ({
+const createImageSettingsStore = () => createStore(set => ({
   ...DEFAULT_IMAGE_STATE,
   ...generateToggles(DEFAULT_IMAGE_STATE, set)
 }));
@@ -129,7 +129,7 @@ const DEFAULT_VIEWER_STATE = {
   pyramidResolution: 0
 };
 
-export const useViewerStore = create(set => ({
+const createViewerStore = () => createStore(set => ({
   ...DEFAULT_VIEWER_STATE,
   ...generateToggles(DEFAULT_VIEWER_STATE, set),
   setIsChannelLoading: (index, val) =>
@@ -150,6 +150,32 @@ export const useViewerStore = create(set => ({
       return { ...state, isChannelLoading: newIsChannelLoading };
     })
 }));
+
+export const AvivatorContext = createContext(null);
+
+export const AvivatorProvider = ({ children }) => {
+  const storesRef = useRef(null);
+  if (!storesRef.current) {
+    storesRef.current = {
+      channels: createChannelsStore(),
+      imageSettings: createImageSettingsStore(),
+      viewer: createViewerStore()
+    };
+  }
+  return createElement(AvivatorContext.Provider, {value: storesRef.current}, children);
+};
+
+function useStoreApi(storeName) {
+  const store = useContext(AvivatorContext);
+  if (!store) throw 'useStore must be used within a AvivatorProvider';
+  return store[storeName];
+}
+export const useChannelsStoreApi = () => useStoreApi('channels');
+export const useImageSettingsStoreApi = () => useStoreApi('imageSettings');
+export const useViewerStoreApi = () => useStoreApi('viewer');
+export const useChannelsStore = selector => useStore(useChannelsStoreApi(), selector);
+export const useImageSettingsStore = selector => useStore(useImageSettingsStoreApi(), selector);
+export const useViewerStore = selector => useStore(useViewerStoreApi(), selector);
 
 export const useLoader = () => {
   const [fullLoader, image] = useChannelsStore(store => [
