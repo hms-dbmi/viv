@@ -1,8 +1,7 @@
 import { ensureArray, intToRgba, parseXML } from './utils';
 import * as z from 'zod';
 
-export type OMEXML = ReturnType<typeof fromString>;
-export type DimensionOrder = z.infer<typeof DimensionOrderSchema>;
+export type OmeXml = ReturnType<typeof fromString>;
 
 type Prettify<T> = {
   [K in keyof T]: T[K];
@@ -16,6 +15,7 @@ function flattenAttributes<T extends { attr: Record<string, unknown> }>({
   return { ...attr, ...rest };
 }
 
+export type DimensionOrder = z.infer<typeof DimensionOrderSchema>;
 const DimensionOrderSchema = z.enum([
   'XYZCT',
   'XYZTC',
@@ -39,7 +39,8 @@ const PixelTypeSchema = z.enum([
   'double-complex'
 ]);
 
-const UnitLengthSchema = z.enum([
+export type UnitsLength = z.infer<typeof UnitsLengthSchema>;
+const UnitsLengthSchema = z.enum([
   'Ym',
   'Zm',
   'Em',
@@ -120,18 +121,18 @@ const PixelsSchema = z
       ID: z.string(),
       DimensionOrder: DimensionOrderSchema,
       Type: PixelTypeSchema,
+      SizeT: z.coerce.number(),
+      SizeC: z.coerce.number(),
+      SizeZ: z.coerce.number(),
+      SizeY: z.coerce.number(),
+      SizeX: z.coerce.number(),
       PhysicalSizeX: z.coerce.number().optional(),
       PhysicalSizeY: z.coerce.number().optional(),
       PhysicalSizeZ: z.coerce.number().optional(),
       SignificantBits: z.coerce.number().optional(),
-      SizeT: z.coerce.number().optional(),
-      SizeC: z.coerce.number().optional(),
-      SizeZ: z.coerce.number().optional(),
-      SizeY: z.coerce.number().optional(),
-      SizeX: z.coerce.number().optional(),
-      PhysicalSizeXUnit: UnitLengthSchema.optional(),
-      PhysicalSizeYUnit: UnitLengthSchema.optional(),
-      PhysicalSizeZUnit: UnitLengthSchema.optional(),
+      PhysicalSizeXUnit: UnitsLengthSchema.optional(),
+      PhysicalSizeYUnit: UnitsLengthSchema.optional(),
+      PhysicalSizeZUnit: UnitsLengthSchema.optional(),
       BigEndian: z
         .string()
         .transform(v => v.toLowerCase() === 'true')

@@ -1,6 +1,6 @@
 import type { GeoTIFFImage } from 'geotiff';
 import quickselect from 'quickselect';
-import type { OMEXML } from './omexml';
+import type { OmeXml } from './omexml';
 import type { TypedArray } from 'zarr';
 import type { Labels, PixelSource } from '@vivjs/types';
 
@@ -138,7 +138,7 @@ type Sel<Dim extends string> =
   Dim extends `${infer Z}${infer X}${infer A}${infer B}${infer C}` // eslint-disable-line @typescript-eslint/no-unused-vars
     ? [C, B, A]
     : never;
-export function getLabels(dimOrder: OMEXML[0]['Pixels']['DimensionOrder']) {
+export function getLabels(dimOrder: OmeXml[0]['Pixels']['DimensionOrder']) {
   return dimOrder.toLowerCase().split('').reverse() as Labels<
     Sel<Lowercase<typeof dimOrder>>
   >;

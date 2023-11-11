@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 import { GeoTIFFImage, GeoTIFF } from 'geotiff';
 import type { OmeTiffSelection } from './utils';
-import type { OMEXML } from '../../omexml';
+import type { OmeXml } from '../../omexml';
 import type { MultiTiffImage } from '../multi-tiff';
 
 export type OmeTiffIndexer = (
@@ -30,7 +30,7 @@ export type OmeTiffIndexer = (
  */
 export function getOmeLegacyIndexer(
   tiff: GeoTIFF,
-  rootMeta: OMEXML
+  rootMeta: OmeXml
 ): OmeTiffIndexer {
   const { SizeT, SizeC, SizeZ } = rootMeta[0].Pixels;
   const ifdIndexer = getOmeIFDIndexer(rootMeta, 0);
@@ -61,7 +61,7 @@ export function getOmeLegacyIndexer(
  */
 export function getOmeSubIFDIndexer(
   tiff: GeoTIFF,
-  rootMeta: OMEXML,
+  rootMeta: OmeXml,
   image = 0
 ): OmeTiffIndexer {
   const ifdIndexer = getOmeIFDIndexer(rootMeta, image);
@@ -110,7 +110,7 @@ export function getOmeSubIFDIndexer(
  * order and dimension sizes.
  */
 function getOmeIFDIndexer(
-  rootMeta: OMEXML,
+  rootMeta: OmeXml,
   image = 0
 ): (sel: OmeTiffSelection) => number {
   const { SizeC, SizeZ, SizeT, DimensionOrder } = rootMeta[image].Pixels;
