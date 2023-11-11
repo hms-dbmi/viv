@@ -190,6 +190,9 @@ importers:
       zarr:
         specifier: ^0.6.2
         version: 0.6.2
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
     devDependencies:
       xmldom:
         specifier: ^0.6.0
@@ -11370,6 +11373,10 @@ packages:
     dependencies:
       numcodecs: 0.2.2
       p-queue: 7.3.0
+    dev: false
+
+  /zod@3.22.4:
+    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
   /zustand@3.7.2(react@17.0.2):

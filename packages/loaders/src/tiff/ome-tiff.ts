@@ -7,11 +7,11 @@ import { getOmePixelSourceMeta, type OmeTiffSelection } from './lib/utils';
 import { guessTiffTileSize } from '../utils';
 import type Pool from './lib/Pool';
 import type { OmeTiffIndexer } from './lib/indexers';
-import type { OMEXML } from '../omexml';
+import type { OmeXml } from '../omexml';
 
 function getIndexer(
   tiff: GeoTIFF,
-  omexml: OMEXML,
+  omexml: OmeXml,
   SubIFDs: number[] | undefined,
   image: number
 ) {
@@ -49,7 +49,7 @@ export async function load(tiff: GeoTIFF, pool?: Pool) {
   const getSource = (
     resolution: number,
     pyramidIndexer: OmeTiffIndexer,
-    imgMeta: OMEXML[0]
+    imgMeta: OmeXml[0]
   ) => {
     const { labels, getShape, physicalSizes, dtype } =
       getOmePixelSourceMeta(imgMeta);
