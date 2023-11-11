@@ -6,6 +6,7 @@ import LZWDecoder from './lib/lzw-decoder';
 import { parseFilename, type OmeTiffSelection } from './lib/utils';
 
 import { load as loadOme } from './ome-tiff';
+import { load as loadMultifileOme } from './ome-multifile';
 import { load as loadMulti, type MultiTiffImage } from './multi-tiff';
 
 addDecoder(5, () => LZWDecoder);

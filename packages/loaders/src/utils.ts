@@ -93,9 +93,6 @@ export function getChannelStats(arr: TypedArray) {
   };
 }
 
-export function ensureArray<T>(x: T | T[]) {
-  return Array.isArray(x) ? x : [x];
-}
 
 /*
  * Converts 32-bit integer color representation to RGBA tuple.
