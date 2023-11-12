@@ -93,7 +93,6 @@ export function getChannelStats(arr: TypedArray) {
   };
 }
 
-
 /*
  * Converts 32-bit integer color representation to RGBA tuple.
  * Used to serialize colors from OME-XML metadata.
