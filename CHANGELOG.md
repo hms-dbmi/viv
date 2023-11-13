@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Trim trailing `\u0000` from OME-XML string for Firefox parsing compatibility.
 
 ## 0.14.0
 
