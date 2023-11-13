@@ -252,7 +252,7 @@ function xmlToJson(
 export function parseXML(xmlString: string) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(
-    xmlString.replace(/\u0000$/, ''),
+    xmlString.replace(/\u0000$/, ''), // eslint-disable-line no-control-regex
     'application/xml'
   );
   return xmlToJson(doc.documentElement, { attrtibutesKey: 'attr' });
