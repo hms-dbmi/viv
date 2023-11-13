@@ -10,6 +10,7 @@
 - Update dev dependencies
 - Drop `fast-xml-parser` dependency in `@vivjs/loaders`
 - Validate expected OME-XML data-types
+- Set default `extensions` in `OverviewLayer`
 
 ## 0.13.8
 
