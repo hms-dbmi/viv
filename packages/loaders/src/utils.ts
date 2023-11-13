@@ -249,19 +249,10 @@ function xmlToJson(
   return xmlObj;
 }
 
-// https://github.com/MylesBorins/xml-sanitizer/blob/main/index.js
-const UNSAFE_XML_1_0_CHARS =
-  // eslint-disable-next-line no-control-regex
-  /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007f-\u0084\u0086-\u009f\uD800-\uDFFF\uFDD0-\uFDFF\uFFFF\uC008]/g;
-
-function sanitizeXmlString(xmlString: string) {
-  return xmlString.replace(UNSAFE_XML_1_0_CHARS, '');
-}
-
 export function parseXML(xmlString: string) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(
-    sanitizeXmlString(xmlString),
+    xmlString.replace(/\u0000$/, ''),
     'application/xml'
   );
   return xmlToJson(doc.documentElement, { attrtibutesKey: 'attr' });
