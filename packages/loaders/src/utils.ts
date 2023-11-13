@@ -258,7 +258,6 @@ function sanitizeXmlString(xmlString: string) {
   return xmlString.replace(UNSAFE_XML_1_0_CHARS, '');
 }
 
-
 export function parseXML(xmlString: string) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(
