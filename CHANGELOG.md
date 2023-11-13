@@ -5,7 +5,7 @@
 ### Added
 
 ### Changed
-- Sanitize XML string for Firefox to remove unsupported characters
+- Trim trailing `\u0000` from OME-XML string for Firefox parsing compatibility.
 
 ## 0.14.0
 
