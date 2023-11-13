@@ -249,8 +249,14 @@ function xmlToJson(
   return xmlObj;
 }
 
-export function parseXML(xmlStr: string) {
+// https://github.com/MylesBorins/xml-sanitizer/blob/main/index.js
+const BAD_CHARACTERS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007f-\u0084\u0086-\u009f\uD800-\uDFFF\uFDD0-\uFDFF\uFFFF\uC008]/g;
+function sanitizeXmlString(xmlString: string) {
+  return xmlString.replace(BAD_CHARACTERS, '');
+}
+
+export function parseXML(xmlString: string) {
   const parser = new DOMParser();
-  const doc = parser.parseFromString(xmlStr, 'application/xml');
+  const doc = parser.parseFromString(sanitizeXmlString(xmlString), 'application/xml');
   return xmlToJson(doc.documentElement, { attrtibutesKey: 'attr' });
 }
