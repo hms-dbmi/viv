@@ -93,7 +93,7 @@ const UuidSchema = z
   .object({})
   .extend({
     attr: z.object({
-      UUID: z.string()
+      FileName: z.string()
     })
   })
   .transform(flattenAttributes);

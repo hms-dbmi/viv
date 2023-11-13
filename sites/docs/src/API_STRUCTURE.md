@@ -35,6 +35,8 @@ which accept `PixelSource` arguments for data fetching. These layers handle the 
 and setting up the rendering by wrapping the `XRLayer`, `XR3DLayer` and `BitmapLayer`, which are the lower level rendering layers.  
 The `XRLayer` (eXtended Range Layer) and `XR3DLayer` enable multi-channel additive blending of `Uint32`, `Uint16`, `Uint8` and `Float32` data on the GPU.
 
+A crucial part of the layer is the `extensions` prop - these control the per-fragment (pixel) rendering. The default on all layers is `ColorPaletteExtension` and it will provide a default `colors` prop - thus all that is necessary for controlling rendering is the `contrastLimits`. But if you wish to do something different, for example to use a "colormap" like `viridis`, you will need to pass in `extensions: [new AdditiveColormapExtension()]` and `colormap: viridis`. Please see deck.gl's [documentation](https://deck.gl/docs/api-reference/extensions/overview) for more information.
+
 #### Loader (Pixel Sources)
 
 Viv wraps both Tiff- and Zarr-based data sources in a unified `PixelSource` interface. A pixel

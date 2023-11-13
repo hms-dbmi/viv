@@ -80,6 +80,8 @@ function App() {
     <PictureInPictureViewer
       loader={loader.data}
       contrastLimits={autoProps.contrastLimits}
+      // Default extension is ColorPaletteExtension so no need to specify it if
+      // that is the desired rendering, using the `colors` prop.
       colors={autoProps.colors}
       channelsVisible={autoProps.channelsVisible}
       selections={autoProps.selections}
