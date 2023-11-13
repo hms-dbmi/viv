@@ -9,6 +9,12 @@
 ## 0.14.0
 
 ### Added
+
+### Changed
+
+## 0.14.0
+
+### Added
 - Validate expected OME-XML data-types
 - Set default `extensions` in `OverviewLayer`
 
