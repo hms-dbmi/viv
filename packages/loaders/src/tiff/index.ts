@@ -1,9 +1,13 @@
-import { fromUrl, fromBlob, fromFile, addDecoder } from 'geotiff';
-import type { GeoTIFF, Pool } from 'geotiff';
+import { fromBlob, addDecoder } from 'geotiff';
+import type { Pool } from 'geotiff';
 
-import { createOffsetsProxy, checkProxies } from './lib/proxies';
+import { checkProxies } from './lib/proxies';
 import LZWDecoder from './lib/lzw-decoder';
-import { parseFilename, type OmeTiffSelection } from './lib/utils';
+import {
+  parseFilename,
+  type OmeTiffSelection,
+  createTiffReader
+} from './lib/utils';
 
 import { load as loadOme } from './ome-tiff';
 import { load as loadMultifileOme } from './ome-multifile';
@@ -15,7 +19,6 @@ interface TiffOptions {
   headers?: Headers | Record<string, string>;
   offsets?: number[];
   pool?: Pool;
-  images?: 'first' | 'all';
 }
 
 interface OmeTiffOptions extends TiffOptions {
@@ -32,6 +35,23 @@ interface MultiTiffOptions {
 type MultiImage = Awaited<ReturnType<typeof loadOme>>; // get return-type from `load`
 
 export const FILE_PREFIX = 'file://';
+
+async function loadMultiFileOmeTiff(source: string, opts: TiffOptions) {
+  return loadMultifileOme(source, opts.pool);
+}
+
+async function loadSingleFileOmeTiff(
+  source: string | File,
+  options: TiffOptions
+) {
+  const tiff = await createTiffReader(source, options);
+  /*
+   * Inspect tiff source for our performance enhancing proxies.
+   * Prints warnings to console if `offsets` or `pool` are missing.
+   */
+  checkProxies(tiff);
+  return loadOme(tiff, options.pool);
+}
 
 /** @ignore */
 export async function loadOmeTiff(
@@ -69,40 +89,8 @@ export async function loadOmeTiff(
   source: string | File,
   opts: OmeTiffOptions = {}
 ) {
-  const { headers = {}, offsets, pool, images = 'first' } = opts;
-
-  let tiff: GeoTIFF;
-
-  // Create tiff source
-  if (typeof source === 'string') {
-    if (source.startsWith(FILE_PREFIX)) {
-      tiff = await fromFile(source.slice(FILE_PREFIX.length));
-    } else {
-      // https://github.com/ilan-gold/geotiff.js/tree/viv#abortcontroller-support
-      // https://www.npmjs.com/package/lru-cache#options
-      // Cache size needs to be infinite due to consistency issues.
-      tiff = await fromUrl(source, { headers, cacheSize: Infinity });
-    }
-  } else {
-    tiff = await fromBlob(source);
-  }
-
-  if (offsets) {
-    /*
-     * Performance enhancement. If offsets are provided, we
-     * create a proxy that intercepts calls to `tiff.getImage`
-     * and injects the pre-computed offsets.
-     */
-    tiff = createOffsetsProxy(tiff, offsets);
-  }
-  /*
-   * Inspect tiff source for our performance enhancing proxies.
-   * Prints warnings to console if `offsets` or `pool` are missing.
-   */
-  checkProxies(tiff);
-
-  const loaders = await loadOme(tiff, pool);
-  return images === 'all' ? loaders : loaders[0];
+  const loaders = await loadSingleFileOmeTiff(source, opts);
+  return opts.images === 'all' ? loaders : loaders[0];
 }
 
 function getImageSelectionName(
@@ -162,12 +150,9 @@ export async function loadMultiTiff(
       if (extension === 'tif' || extension === 'tiff') {
         const tiffImageName = parsedFilename.name;
         if (tiffImageName) {
-          let curImage: GeoTIFF;
-          if (file.startsWith(FILE_PREFIX)) {
-            curImage = await fromFile(file.slice(FILE_PREFIX.length));
-          } else {
-            curImage = await fromUrl(file, { headers, cacheSize: Infinity });
-          }
+          const curImage = await createTiffReader(file, {
+            headers
+          });
           for (let i = 0; i < imageSelections.length; i++) {
             const curSelection = imageSelections[i];
 

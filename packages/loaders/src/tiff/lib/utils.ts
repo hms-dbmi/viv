@@ -1,7 +1,13 @@
-import type { GeoTIFFImage } from 'geotiff';
+import GeoTIFF, {
+  fromFile,
+  type GeoTIFFImage,
+  fromUrl,
+  fromBlob
+} from 'geotiff';
 import { getDims, getLabels, DTYPE_LOOKUP } from '../../utils';
 import type { OmeXml, UnitsLength, DimensionOrder } from '../../omexml';
 import type { MultiTiffImage } from '../multi-tiff';
+import { createOffsetsProxy } from './proxies';
 
 export interface OmeTiffSelection {
   t: number;
@@ -9,30 +15,37 @@ export interface OmeTiffSelection {
   z: number;
 }
 
-function findPhysicalSizes({
-  PhysicalSizeX,
-  PhysicalSizeY,
-  PhysicalSizeZ,
-  PhysicalSizeXUnit,
-  PhysicalSizeYUnit,
-  PhysicalSizeZUnit
-}: OmeXml[number]['Pixels']):
-  | undefined
-  | Record<string, { size: number; unit: UnitsLength }> {
+type PhysicalSizeValue = {
+  size: number;
+  unit: UnitsLength;
+};
+
+type PhysicalSizes = {
+  x: PhysicalSizeValue;
+  y: PhysicalSizeValue;
+  z?: PhysicalSizeValue;
+};
+
+function findPhysicalSizes(
+  d: OmeXml[number]['Pixels']
+): undefined | PhysicalSizes {
   if (
-    !PhysicalSizeX ||
-    !PhysicalSizeY ||
-    !PhysicalSizeXUnit ||
-    !PhysicalSizeYUnit
+    !d['PhysicalSizeX'] ||
+    !d['PhysicalSizeY'] ||
+    !d['PhysicalSizeXUnit'] ||
+    !d['PhysicalSizeYUnit']
   ) {
     return undefined;
   }
-  const physicalSizes: Record<string, { size: number; unit: UnitsLength }> = {
-    x: { size: PhysicalSizeX, unit: PhysicalSizeXUnit },
-    y: { size: PhysicalSizeY, unit: PhysicalSizeYUnit }
+  const physicalSizes: PhysicalSizes = {
+    x: { size: d['PhysicalSizeX'], unit: d['PhysicalSizeXUnit'] },
+    y: { size: d['PhysicalSizeY'], unit: d['PhysicalSizeYUnit'] }
   };
-  if (PhysicalSizeZ && PhysicalSizeZUnit) {
-    physicalSizes.z = { size: PhysicalSizeZ, unit: PhysicalSizeZUnit };
+  if (d['PhysicalSizeZ'] && d['PhysicalSizeZUnit']) {
+    physicalSizes.z = {
+      size: d['PhysicalSizeZ'],
+      unit: d['PhysicalSizeZUnit']
+    };
   }
   return physicalSizes;
 }
@@ -276,4 +289,55 @@ export function parseFilename(path: string) {
     [, parsedFilename.extension] = splitFilename;
   }
   return parsedFilename;
+}
+
+/**
+ * Creates a GeoTIFF object from a URL, File, or Blob.
+ *
+ * @param source - URL, File, or Blob
+ * @param options
+ * @param options.headers - HTTP headers to use when fetching a URL
+ */
+function createGeoTiffObject(
+  source: string | URL | File,
+  { headers }: { headers?: Headers | Record<string, string> }
+): Promise<GeoTIFF> {
+  if (source instanceof Blob) {
+    return fromBlob(source);
+  }
+  const url = typeof source === 'string' ? new URL(source) : source;
+  if (url.protocol === 'file:') {
+    return fromFile(url.pathname);
+  }
+  // https://github.com/ilan-gold/geotiff.js/tree/viv#abortcontroller-support
+  // https://www.npmjs.com/package/lru-cache#options
+  // Cache size needs to be infinite due to consistency issues.
+  return fromUrl(url.href, { headers, cacheSize: Infinity });
+}
+
+/**
+ * Creates a GeoTIFF object from a URL, File, or Blob.
+ *
+ * If `offsets` are provided, a proxy is returned that
+ * intercepts calls to `tiff.getImage` and injects the
+ * pre-computed offsets. This is a performance enhancement.
+ *
+ * @param source - URL, File, or Blob
+ * @param options
+ * @param options.headers - HTTP headers to use when fetching a URL
+ */
+export async function createGeoTiff(
+  source: string | URL | File,
+  options: {
+    headers?: Headers | Record<string, string>;
+    offsets?: number[];
+  } = {}
+): Promise<GeoTIFF> {
+  const tiff = await createGeoTiffObject(source, options);
+  /*
+   * Performance enhancement. If offsets are provided, we
+   * create a proxy that intercepts calls to `tiff.getImage`
+   * and injects the pre-computed offsets.
+   */
+  return options.offsets ? createOffsetsProxy(tiff, options.offsets) : tiff;
 }
