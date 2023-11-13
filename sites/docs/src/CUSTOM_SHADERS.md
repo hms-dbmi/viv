@@ -1,6 +1,6 @@
 ### 2D
 
-Viv's shaders in 2D can be modified via [deck.gl shader hooks](https://deck.gl/docs/developer-guide/custom-layers/writing-shaders#standard-shader-hooks). The `LensExtension`, `AdditiveColormapExtension`, and `ColorPaletteExtesnion` (default) in Viv [implement shader hooks](https://github.com/hms-dbmi/viv/tree/master/src/extensions). Implementing your own shader hook requires extending the [standard layer extension](https://deck.gl/docs/api-reference/extensions/overview) with a `getShaders` method that returns an `inject` function for one of the following supported hooks:
+Viv's shaders in 2D can be modified via [deck.gl shader hooks](https://deck.gl/docs/developer-guide/custom-layers/writing-shaders#standard-shader-hooks). The `LensExtension`, `AdditiveColormapExtension`, and `ColorPaletteExtesnion` (default) in Viv [implement shader hooks](https://github.com/hms-dbmi/viv/tree/main/src/extensions). Implementing your own shader hook requires extending the [standard layer extension](https://deck.gl/docs/api-reference/extensions/overview) with a `getShaders` method that returns an `inject` function for one of the following supported hooks:
 
 #### `DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)`
 

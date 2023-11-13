@@ -16,4 +16,4 @@ exchange_mat = np.array(
 viv_transform[:3,:3] = exchange_mat @ viv_transform[:3,:3] @ exchange_mat
 ```
 
-If you would like more information, please visit our [github page](https://github.com/hms-dbmi/viv/blob/master/sites/docs/src/3D_RENDERING_IN_DEPTH.md).
+If you would like more information, please visit our [github page](https://github.com/hms-dbmi/viv/blob/main/sites/docs/src/3D_RENDERING_IN_DEPTH.md).

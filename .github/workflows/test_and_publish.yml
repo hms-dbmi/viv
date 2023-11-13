@@ -3,13 +3,13 @@ name: Node.js CI
 on:
   push:
     branches:
-      - master
+      - main
     tags:
       - "v*"
 
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   check-changelog:
@@ -20,10 +20,10 @@ jobs:
       - name: Updated CHANGELOG.md
         env:
           REF: ${{ github.ref }}
-        if: github.ref != 'refs/heads/master' && !contains(github.ref, 'dependabot') && !contains(github.ref, 'tags')
+        if: github.ref != 'refs/heads/main' && !contains(github.ref, 'dependabot') && !contains(github.ref, 'tags')
         run: |
           echo '${{ env.REF }}'
-          ! diff CHANGELOG.md <(curl -s "https://raw.githubusercontent.com/hms-dbmi/viv/master/CHANGELOG.md")
+          ! diff CHANGELOG.md <(curl -s "https://raw.githubusercontent.com/hms-dbmi/viv/main/CHANGELOG.md")
 
   build-windows:
     runs-on: windows-latest
