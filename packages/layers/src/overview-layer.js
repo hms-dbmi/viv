@@ -1,6 +1,7 @@
 import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
 import { PolygonLayer } from '@deck.gl/layers';
 import { getImageSize } from '@vivjs/loaders';
+import { ColorPaletteExtension } from '@vivjs/extensions';
 import { Matrix4 } from '@math.gl/core';
 
 import ImageLayer from './image-layer';
@@ -32,7 +33,12 @@ const defaultProps = {
   viewportOutlineColor: { type: 'array', value: [255, 190, 0], compare: true },
   viewportOutlineWidth: { type: 'number', value: 2, compare: true },
   overviewScale: { type: 'number', value: 1, compare: true },
-  zoom: { type: 'number', value: 1, compare: true }
+  zoom: { type: 'number', value: 1, compare: true },
+  extensions: {
+    type: 'array',
+    value: [new ColorPaletteExtension()],
+    compare: true
+  }
 };
 
 /**
