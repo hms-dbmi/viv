@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Sanitize XML string for Firefox to remove unsupported characters
 
 ## 0.14.0
 
