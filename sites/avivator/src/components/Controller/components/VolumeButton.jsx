@@ -12,7 +12,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import { shallow } from 'zustand/shallow';
 
 import {
-  useImageSettingsStore,
   useViewerStore,
   useChannelsStore,
   useLoader,
