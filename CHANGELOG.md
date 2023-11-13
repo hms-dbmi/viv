@@ -5,12 +5,18 @@
 ### Added
 
 ### Changed
+
+## 0.14.0
+
+### Added
+- Validate expected OME-XML data-types
+- Set default `extensions` in `OverviewLayer`
+
+### Changed
 - Bump `gl` to v6 and move to Node.js 18 in CI.
 - Narrow required interface for `ZarrPixelSource`.
 - Update dev dependencies
 - Drop `fast-xml-parser` dependency in `@vivjs/loaders`
-- Validate expected OME-XML data-types
-- Set default `extensions` in `OverviewLayer`
 
 ## 0.13.8
 
