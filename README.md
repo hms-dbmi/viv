@@ -3,7 +3,7 @@
 A WebGL-powered toolkit for interactive visualization of high-resolution, multiplexed bioimaging datasets.
 
 <p align="center">
-<img src="https://github.com/hms-dbmi/viv/raw/master/sites/docs/src/3d-slicing.gif" alt="Interactive volumetric view in web browser; sliders control visible planes." width="400"/> <img src="https://github.com/hms-dbmi/viv/raw/master/sites/docs/src/glomerular-lens.png" alt="Multi-channel rendering of high-resolution microscopy dataset" width="400"/>
+<img src="https://github.com/hms-dbmi/viv/raw/main/sites/docs/src/3d-slicing.gif" alt="Interactive volumetric view in web browser; sliders control visible planes." width="400"/> <img src="https://github.com/hms-dbmi/viv/raw/main/sites/docs/src/glomerular-lens.png" alt="Multi-channel rendering of high-resolution microscopy dataset" width="400"/>
 </p>
 
 ## About
@@ -23,8 +23,8 @@ More details and related work can be found in our paper and original [preprint](
 
 | Screenshot   |     Description    |
 :-------------------------:|:-------------------------:
-<img src="https://github.com/hms-dbmi/viv/raw/master/sites/docs/src/avivator-browser.png" alt="Avivator viewer running in Chrome"/> | [**Avivator**](http://avivator.gehlenborglab.org) <br> A lightweight viewer for local and remote datasets. The source code is include in this repository under `avivator/`. See our [🎥 video tutorial](https://www.youtube.com/watch?v=_GES8BTzyWc) to learn more.
-<img src="https://github.com/hms-dbmi/viv/raw/master/sites/docs/src/vizarr-browser.png" alt="Vizarr viewer running in Jupyter Notebook"/> | [**Vizarr**](https://github.com/hms-dbmi/vizarr) <br> A minimal, purely client-side program for viewing OME-NGFF and other Zarr-based images. Vizarr supports a Python backend using the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc), allowing it to not only function as a standalone application but also directly embed in Jupyter or Google Colab Notebooks.
+<img src="https://github.com/hms-dbmi/viv/raw/main/sites/docs/src/avivator-browser.png" alt="Avivator viewer running in Chrome"/> | [**Avivator**](http://avivator.gehlenborglab.org) <br> A lightweight viewer for local and remote datasets. The source code is include in this repository under `avivator/`. See our [🎥 video tutorial](https://www.youtube.com/watch?v=_GES8BTzyWc) to learn more.
+<img src="https://github.com/hms-dbmi/viv/raw/main/sites/docs/src/vizarr-browser.png" alt="Vizarr viewer running in Jupyter Notebook"/> | [**Vizarr**](https://github.com/hms-dbmi/vizarr) <br> A minimal, purely client-side program for viewing OME-NGFF and other Zarr-based images. Vizarr supports a Python backend using the [imjoy-rpc](https://github.com/imjoy-team/imjoy-rpc), allowing it to not only function as a standalone application but also directly embed in Jupyter or Google Colab Notebooks.
 
 ## 💥 In Action
 
@@ -65,7 +65,7 @@ $ npm install deck.gl @luma.gl/core
 ```
 
 Breaking changes may happen on the minor version update.
-Please see the [changelog](https://github.com/hms-dbmi/viv/blob/master/CHANGELOG.md) for information.
+Please see the [changelog](https://github.com/hms-dbmi/viv/blob/main/CHANGELOG.md) for information.
 
 ## 📖 Documentation
 
@@ -92,21 +92,13 @@ pnpm build # all packages, avivator, and documentation
 pnpm -r build --filter=avivator # build a specific package or site
 ```
 
-## 📄 Publish
+## 📄 Sending PRs and making releases
 
-Checkout latest `master` branch, run:
+For changes to be reflected in package changelogs, run `npx changeset` and follow the prompts.
 
-```sh
-# checkout a new release branch
-git checkout <branch name>
-# commit and tag a new version
-pnpm version [major | minor | patch]
-# push commit and tag simultaneously
-git push --atomic origin <branch name> <tag>
-```
+> Note not every PR requires a changeset. Since changesets are focused on releases and changelogs, changes to the repository that don't effect these won't need a changeset (e.g., documentation, tests).
 
-Open a PR for `<branch name>`. Our CI will run a release workflow for tagged commits starting
-with `v*` automatically. Inspect the GitHub Actions to ensure the workflow was successful.
+The [Changesets GitHub Action](https://github.com/changesets/action) will create and update a PR that applies changesets versions of `@vivjs/` packages to NPM.
 
 ## 🌎 Browser Support
 

@@ -59,6 +59,7 @@ function RoutedAvivator(props) {
     </ThemeProvider>
   );
 }
+// eslint-disable-next-line react/no-deprecated
 ReactDOM.render(
   <Router>
     <Switch>

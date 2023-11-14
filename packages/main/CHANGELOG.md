@@ -5,26 +5,60 @@
 ### Added
 
 ### Changed
+
+## 0.14.2
+
+### Added
+
+### Changed
+
+- Fix Avivator demo for OME-Zarr with only spatial axes
+- Allow OME-XML to omit `TiffData` tags
+
+## 0.14.1
+
+### Added
+
+### Changed
+
+- Trim trailing `\u0000` from OME-XML string for Firefox parsing compatibility.
+
+## 0.14.0
+
+### Added
+
+- Validate expected OME-XML data-types
+- Set default `extensions` in `OverviewLayer`
+
+### Changed
+
 - Bump `gl` to v6 and move to Node.js 18 in CI.
 - Bump `deck.gl` to v8.8.27 and `luma.gl` to v8.5.21.
 - Narrow required interface for `ZarrPixelSource`.
+- Update dev dependencies
+- Drop `fast-xml-parser` dependency in `@vivjs/loaders`
 
 ## 0.13.8
 
 ### Added
+
 - Added ScaleBarLayer snapping feature. Will convert scale value to one of `[1, 2, 3, 4, 5, 10, 20, 25, 50, 100, 200, 250, 500]` and adjust units accordingly, rescaling the length of the bar in pixels to match. Use `snap: true` prop to enable.
 
 ### Changed
+
 - Fixed typo in `sites/docs/src/IMAGE_RENDERING.md`
 
 ## 0.13.7
 
 ### Changed
+
 - Fixed `click` event not firing on Overview panel
 - Fixed `zoom` in `getDefaultInitialViewState`
+
 ### Added
 
 ### Changed
+
 - Fix `Float64` reversion from the fix in 0.12.8
 
 ## 0.13.6

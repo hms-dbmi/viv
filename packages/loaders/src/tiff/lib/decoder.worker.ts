@@ -3,9 +3,11 @@ import LZWDecoder from './lzw-decoder';
 
 addDecoder(5, () => LZWDecoder);
 
-const worker: Worker = self as any;
+// @ts-expect-error - We are in a worker context
+const worker: ServiceWorker = self;
 
 worker.addEventListener('message', async e => {
+  // @ts-expect-error - FIXME: we should have strict types
   const { id, fileDirectory, buffer } = e.data;
   const decoder = await getDecoder(fileDirectory);
   const decoded = await decoder.decode(fileDirectory, buffer);

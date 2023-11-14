@@ -1,188 +1,202 @@
-import * as parser from 'fast-xml-parser';
-import { ensureArray, intToRgba } from './utils';
+import { ensureArray, intToRgba, parseXML } from './utils';
+import * as z from 'zod';
 
-// WARNING: Changes to the parser options _will_ effect the types in types/omexml.d.ts.
-const PARSER_OPTIONS = {
-  // Nests attributes withtout prefix under 'attr' key for each node
-  attributeNamePrefix: '',
-  attrNodeName: 'attr',
+export type OmeXml = ReturnType<typeof fromString>;
 
-  // Parses numbers for both attributes and nodes
-  parseNodeValue: true,
-  parseAttributeValue: true,
+type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {}; // eslint-disable-line
 
-  // Forces attributes to be parsed
-  ignoreAttributes: false
-};
+function flattenAttributes<T extends { attr: Record<string, unknown> }>({
+  attr,
+  ...rest
+}: T): Prettify<Pick<T, Exclude<keyof T, 'attr'>> & T['attr']> {
+  // @ts-expect-error - TS doesn't like the prettify type
+  return { ...attr, ...rest };
+}
 
-const parse = (str: string): Root => parser.parse(str, PARSER_OPTIONS);
+export type DimensionOrder = z.infer<typeof DimensionOrderSchema>;
+const DimensionOrderSchema = z.enum([
+  'XYZCT',
+  'XYZTC',
+  'XYCTZ',
+  'XYCZT',
+  'XYTCZ',
+  'XYTZC'
+]);
+
+const PixelTypeSchema = z.enum([
+  'int8',
+  'int16',
+  'int32',
+  'uint8',
+  'uint16',
+  'uint32',
+  'float',
+  'bit',
+  'double',
+  'complex',
+  'double-complex'
+]);
+
+export type UnitsLength = z.infer<typeof UnitsLengthSchema>;
+const UnitsLengthSchema = z.enum([
+  'Ym',
+  'Zm',
+  'Em',
+  'Pm',
+  'Tm',
+  'Gm',
+  'Mm',
+  'km',
+  'hm',
+  'dam',
+  'm',
+  'dm',
+  'cm',
+  'mm',
+  'µm',
+  'nm',
+  'pm',
+  'fm',
+  'am',
+  'zm',
+  'ym',
+  'Å',
+  'thou',
+  'li',
+  'in',
+  'ft',
+  'yd',
+  'mi',
+  'ua',
+  'ly',
+  'pc',
+  'pt',
+  'pixel',
+  'reference frame'
+]);
+
+const ChannelSchema = z
+  .object({})
+  .extend({
+    attr: z.object({
+      ID: z.string(),
+      SamplesPerPixel: z.coerce.number().optional(),
+      Name: z.string().optional(),
+      Color: z.coerce.number().transform(intToRgba).optional()
+    })
+  })
+  .transform(flattenAttributes);
+
+const UuidSchema = z
+  .object({})
+  .extend({
+    attr: z.object({
+      FileName: z.string()
+    })
+  })
+  .transform(flattenAttributes);
+
+const TiffDataSchema = z
+  .object({ UUID: UuidSchema.optional() })
+  .extend({
+    attr: z.object({
+      IFD: z.coerce.number(),
+      PlaneCount: z.coerce.number(),
+      FirstT: z.coerce.number().optional(),
+      FirstC: z.coerce.number().optional(),
+      FirstZ: z.coerce.number().optional()
+    })
+  })
+  .transform(flattenAttributes);
+
+const PixelsSchema = z
+  .object({
+    Channel: z.preprocess(ensureArray, ChannelSchema.array()),
+    TiffData: z.preprocess(ensureArray, TiffDataSchema.array()).optional()
+  })
+  .extend({
+    attr: z.object({
+      ID: z.string(),
+      DimensionOrder: DimensionOrderSchema,
+      Type: PixelTypeSchema,
+      SizeT: z.coerce.number(),
+      SizeC: z.coerce.number(),
+      SizeZ: z.coerce.number(),
+      SizeY: z.coerce.number(),
+      SizeX: z.coerce.number(),
+      PhysicalSizeX: z.coerce.number().optional(),
+      PhysicalSizeY: z.coerce.number().optional(),
+      PhysicalSizeZ: z.coerce.number().optional(),
+      SignificantBits: z.coerce.number().optional(),
+      PhysicalSizeXUnit: UnitsLengthSchema.optional(),
+      PhysicalSizeYUnit: UnitsLengthSchema.optional(),
+      PhysicalSizeZUnit: UnitsLengthSchema.optional(),
+      BigEndian: z
+        .string()
+        .transform(v => v.toLowerCase() === 'true')
+        .optional(),
+      Interleaved: z
+        .string()
+        .transform(v => v.toLowerCase() === 'true')
+        .optional()
+    })
+  })
+  .transform(flattenAttributes)
+  // Rename the `Channel` key to `Channels` for backwards compatibility
+  .transform(({ Channel, ...rest }) => ({ Channels: Channel, ...rest }));
+
+const ImageSchema = z
+  .object({
+    AquisitionDate: z.string().optional().default(''),
+    Description: z.string().optional().default(''),
+    Pixels: PixelsSchema
+  })
+  .extend({
+    attr: z.object({
+      ID: z.string(),
+      Name: z.string().optional()
+    })
+  })
+  .transform(flattenAttributes);
+
+const OmeSchema = z
+  .object({
+    Image: z.preprocess(ensureArray, ImageSchema.array())
+  })
+  .extend({
+    attr: z.object({
+      xmlns: z.string(),
+      'xmlns:xsi': z.string(),
+      'xsi:schemaLocation': z.string()
+    })
+  })
+  .transform(flattenAttributes);
 
 export function fromString(str: string) {
-  const res = parse(str);
-  if (!res.OME) {
-    throw Error('Failed to parse OME-XML metadata.');
-  }
-  return ensureArray(res.OME.Image).map(img => {
-    const Channels = ensureArray(img.Pixels.Channel).map(c => {
-      if ('Color' in c.attr) {
-        return { ...c.attr, Color: intToRgba(c.attr.Color) };
-      }
-      return { ...c.attr };
-    });
-    const { AquisitionDate = '', Description = '' } = img;
-    const image = {
-      ...img.attr,
-      AquisitionDate,
-      Description,
-      Pixels: {
-        ...img.Pixels.attr,
-        Channels
-      }
-    };
+  const raw = parseXML(str);
+  return OmeSchema.parse(raw).Image.map(img => {
     return {
-      ...image,
+      ...img,
       format() {
-        const { Pixels } = image;
-
         const sizes = (['X', 'Y', 'Z'] as const)
           .map(name => {
-            const size = Pixels[`PhysicalSize${name}` as const];
-            const unit = Pixels[`PhysicalSize${name}Unit` as const];
+            const size = img.Pixels[`PhysicalSize${name}` as const];
+            const unit = img.Pixels[`PhysicalSize${name}Unit` as const];
             return size && unit ? `${size} ${unit}` : '-';
           })
           .join(' x ');
 
         return {
-          'Acquisition Date': image.AquisitionDate,
-          'Dimensions (XY)': `${Pixels.SizeX} x ${Pixels.SizeY}`,
-          'Pixels Type': Pixels.Type,
+          'Acquisition Date': img.AquisitionDate,
+          'Dimensions (XY)': `${img.Pixels['SizeX']} x ${img.Pixels['SizeY']}`,
+          'Pixels Type': img.Pixels['Type'],
           'Pixels Size (XYZ)': sizes,
-          'Z-sections/Timepoints': `${Pixels.SizeZ} x ${Pixels.SizeT}`,
-          Channels: Pixels.SizeC
+          'Z-sections/Timepoints': `${img.Pixels['SizeZ']} x ${img.Pixels['SizeT']}`,
+          Channels: img.Pixels['SizeC']
         };
       }
     };
   });
 }
-
-export type OMEXML = ReturnType<typeof fromString>;
-export type DimensionOrder =
-  | 'XYZCT'
-  | 'XYZTC'
-  | 'XYCTZ'
-  | 'XYCZT'
-  | 'XYTCZ'
-  | 'XYTZC';
-
-// Structure of node is determined by the PARSER_OPTIONS.
-type Node<T, A> = T & { attr: A };
-type Attrs<Fields extends string, T = string> = { [K in Fields]: T };
-type AttrsOnlyNode<A> = Node<unknown, A>;
-
-type OMEAttrs = Attrs<'xmlns' | 'xmlns:xsi' | 'xsi:schemaLocation'>;
-type OME = Node<{ Insturment: Insturment; Image: Image | Image[] }, OMEAttrs>;
-
-type Insturment = Node<
-  { Objective: AttrsOnlyNode<Attrs<'ID' | 'Model' | 'NominalMagnification'>> },
-  Attrs<'ID'>
->;
-
-interface ImageNodes {
-  AquisitionDate?: string;
-  Description?: string;
-  Pixels: Pixels;
-  InstrumentRef: AttrsOnlyNode<{ ID: string }>;
-  ObjectiveSettings: AttrsOnlyNode<{ ID: string }>;
-}
-type Image = Node<ImageNodes, Attrs<'ID' | 'Name'>>;
-
-type PixelType =
-  | 'int8'
-  | 'int16'
-  | 'int32'
-  | 'uint8'
-  | 'uint16'
-  | 'uint32'
-  | 'float'
-  | 'bit'
-  | 'double'
-  | 'complex'
-  | 'double-complex';
-
-export type UnitsLength =
-  | 'Ym'
-  | 'Zm'
-  | 'Em'
-  | 'Pm'
-  | 'Tm'
-  | 'Gm'
-  | 'Mm'
-  | 'km'
-  | 'hm'
-  | 'dam'
-  | 'm'
-  | 'dm'
-  | 'cm'
-  | 'mm'
-  | 'µm'
-  | 'nm'
-  | 'pm'
-  | 'fm'
-  | 'am'
-  | 'zm'
-  | 'ym'
-  | 'Å'
-  | 'thou'
-  | 'li'
-  | 'in'
-  | 'ft'
-  | 'yd'
-  | 'mi'
-  | 'ua'
-  | 'ly'
-  | 'pc'
-  | 'pt'
-  | 'pixel'
-  | 'reference frame';
-
-type PhysicalSize<Name extends string> = `PhysicalSize${Name}`;
-type PhysicalSizeUnit<Name extends string> = `PhysicalSize${Name}Unit`;
-type Size<Names extends string> = `Size${Names}`;
-
-type PixelAttrs = Attrs<
-  | PhysicalSize<'X' | 'Y' | 'Z'>
-  | 'SignificantBits'
-  | Size<'T' | 'C' | 'Z' | 'Y' | 'X'>,
-  number
-> &
-  Attrs<PhysicalSizeUnit<'X' | 'Y' | 'Z'>, UnitsLength> &
-  Attrs<'BigEndian' | 'Interleaved', boolean> & {
-    ID: string;
-    DimensionOrder: DimensionOrder;
-    Type: PixelType;
-  };
-
-type Pixels = Node<
-  {
-    Channel: Channel | Channel[];
-    TiffData: AttrsOnlyNode<Attrs<'IFD' | 'PlaneCount'>>;
-  },
-  PixelAttrs
->;
-
-type ChannelAttrs =
-  | {
-      ID: string;
-      SamplesPerPixel: number;
-      Name?: string;
-    }
-  | {
-      ID: string;
-      SamplesPerPixel: number;
-      Name?: string;
-      Color: number;
-    };
-
-type Channel = AttrsOnlyNode<ChannelAttrs>;
-
-type Root = { OME: OME };

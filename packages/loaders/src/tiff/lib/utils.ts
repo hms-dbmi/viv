@@ -1,6 +1,6 @@
 import type { GeoTIFFImage } from 'geotiff';
 import { getDims, getLabels, DTYPE_LOOKUP } from '../../utils';
-import type { OMEXML, UnitsLength, DimensionOrder } from '../../omexml';
+import type { OmeXml, UnitsLength, DimensionOrder } from '../../omexml';
 import type { MultiTiffImage } from '../multi-tiff';
 
 export interface OmeTiffSelection {
@@ -9,7 +9,35 @@ export interface OmeTiffSelection {
   z: number;
 }
 
-export function getOmePixelSourceMeta({ Pixels }: OMEXML[0]) {
+function findPhysicalSizes({
+  PhysicalSizeX,
+  PhysicalSizeY,
+  PhysicalSizeZ,
+  PhysicalSizeXUnit,
+  PhysicalSizeYUnit,
+  PhysicalSizeZUnit
+}: OmeXml[number]['Pixels']):
+  | undefined
+  | Record<string, { size: number; unit: UnitsLength }> {
+  if (
+    !PhysicalSizeX ||
+    !PhysicalSizeY ||
+    !PhysicalSizeXUnit ||
+    !PhysicalSizeYUnit
+  ) {
+    return undefined;
+  }
+  const physicalSizes: Record<string, { size: number; unit: UnitsLength }> = {
+    x: { size: PhysicalSizeX, unit: PhysicalSizeXUnit },
+    y: { size: PhysicalSizeY, unit: PhysicalSizeYUnit }
+  };
+  if (PhysicalSizeZ && PhysicalSizeZUnit) {
+    physicalSizes.z = { size: PhysicalSizeZ, unit: PhysicalSizeZUnit };
+  }
+  return physicalSizes;
+}
+
+export function getOmePixelSourceMeta({ Pixels }: OmeXml[0]) {
   // e.g. 'XYZCT' -> ['t', 'c', 'z', 'y', 'x']
   const labels = getLabels(Pixels.DimensionOrder);
 
@@ -41,28 +69,10 @@ export function getOmePixelSourceMeta({ Pixels }: OMEXML[0]) {
   }
 
   const dtype = DTYPE_LOOKUP[Pixels.Type as keyof typeof DTYPE_LOOKUP];
-  if (Pixels.PhysicalSizeX && Pixels.PhysicalSizeY) {
-    const physicalSizes: {
-      [k: string]: { size: number; unit: UnitsLength };
-    } = {
-      x: {
-        size: Pixels.PhysicalSizeX,
-        unit: Pixels.PhysicalSizeXUnit
-      },
-      y: {
-        size: Pixels.PhysicalSizeY,
-        unit: Pixels.PhysicalSizeYUnit
-      }
-    };
-    if (Pixels.PhysicalSizeZ) {
-      physicalSizes.z = {
-        size: Pixels.PhysicalSizeZ,
-        unit: Pixels.PhysicalSizeZUnit
-      };
-    }
-    return { labels, getShape, physicalSizes, dtype };
+  const physicalSizes = findPhysicalSizes(Pixels);
+  if (physicalSizes) {
+    return { labels, getShape, dtype, physicalSizes };
   }
-
   return { labels, getShape, dtype };
 }
 

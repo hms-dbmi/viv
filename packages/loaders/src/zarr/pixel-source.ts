@@ -120,7 +120,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
 
   private async _getRaw(
     selection: (null | Slice | number)[],
-    getOptions?: { storeOptions?: any }
+    getOptions?: { storeOptions?: any } // eslint-disable-line @typescript-eslint/no-explicit-any
   ) {
     const result = await this._data.getRaw(selection, getOptions);
     if (typeof result !== 'object') {

@@ -1,8 +1,5 @@
-import * as fs from 'node:fs';
-import * as path from 'node:path';
-
-const DECK_VERSION = '8.8.27';
-const LUMAGL_VERSION = '8.5.21';
+const DECK_VERSION = '~8.8.27';
+const LUMAGL_VERSION = '~8.5.21';
 const MATHGL_VERSION = '^3.5.7';
 const REACT_VERSION = '^16.8.0 || ^17.0.0';
 
@@ -31,22 +28,20 @@ function pinVersions(manifest) {
         deps[name] = REACT_VERSION;
       }
     }
-
   }
 }
 
-export default (/** @type {string} */ workspaceDir) => {
-  let root = path.resolve(workspaceDir, 'package.json');
-  /** @type {PackageManifest} */
-  let meta = JSON.parse(fs.readFileSync(root, { encoding: 'utf-8' }));
+export default (/** @type {string} */ _workspaceDir) => {
   return {
     'package.json': (
       /** @type {PackageManifest} */ manifest,
       /** @type {string} */ _dir
     ) => {
       // Only pin deps in @vivjs/*. Avivator should manually update.
-      manifest.name?.includes('@vivjs') && pinVersions(manifest);
-      return { ...manifest, version: meta.version };
+      if (manifest.name?.includes('@vivjs')) {
+        pinVersions(manifest);
+      }
+      return manifest;
     }
   };
 };

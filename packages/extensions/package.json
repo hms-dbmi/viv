@@ -1,6 +1,6 @@
 {
   "name": "@vivjs/extensions",
-  "version": "0.13.8",
+  "version": "0.14.2",
   "author": "Ilan Gold",
   "repository": {
     "type": "git",
@@ -23,7 +23,7 @@
     "prepare": "node prepare.mjs"
   },
   "peerDependencies": {
-    "@deck.gl/core": "8.8.27"
+    "@deck.gl/core": "~8.8.27"
   },
   "dependencies": {
     "@vivjs/constants": "workspace:*"

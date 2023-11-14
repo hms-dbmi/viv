@@ -1,6 +1,6 @@
 import { openGroup } from 'zarr';
 import type { ZarrArray } from 'zarr';
-import type { OMEXML } from '../../omexml';
+import type { OmeXml } from '../../omexml';
 import { getLabels, isInterleaved, prevPowerOf2 } from '../../utils';
 
 import type { Labels } from '@vivjs/types';
@@ -9,7 +9,7 @@ import type { RootAttrs, Axis } from '../ome-zarr';
 /*
  * Returns true if data shape is that expected for OME-Zarr.
  */
-function isOmeZarr(dataShape: number[], Pixels: OMEXML[0]['Pixels']) {
+function isOmeZarr(dataShape: number[], Pixels: OmeXml[0]['Pixels']) {
   const { SizeT, SizeC, SizeZ, SizeY, SizeX } = Pixels;
   // OME-Zarr dim order is always ['t', 'c', 'z', 'y', 'x']
   const omeZarrShape = [SizeT, SizeC, SizeZ, SizeY, SizeX];
@@ -27,7 +27,7 @@ function isOmeZarr(dataShape: number[], Pixels: OMEXML[0]['Pixels']) {
  */
 export function guessBioformatsLabels(
   { shape }: ZarrArray,
-  { Pixels }: OMEXML[0]
+  { Pixels }: OmeXml[0]
 ) {
   if (isOmeZarr(shape, Pixels)) {
     // It's an OME-Zarr Image,
@@ -38,7 +38,8 @@ export function guessBioformatsLabels(
   const labels = getLabels(Pixels.DimensionOrder);
   labels.forEach((lower, i) => {
     const label = lower.toUpperCase();
-    const xmlSize = (Pixels as any)[`Size${label}`] as number;
+    // @ts-expect-error - FIXME: safer type access
+    const xmlSize: number = Pixels[`Size${label}`];
     if (!xmlSize) {
       throw Error(`Dimension ${label} is invalid for OME-XML.`);
     }

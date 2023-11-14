@@ -28,7 +28,7 @@ import {
   useMetadata
 } from '../../state';
 import { guessRgb, useWindowSize, getSingleSelectionStats } from '../../utils';
-import { COLOR_PALLETE, GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
+import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

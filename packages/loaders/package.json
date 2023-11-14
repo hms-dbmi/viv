@@ -1,6 +1,6 @@
 {
   "name": "@vivjs/loaders",
-  "version": "0.13.8",
+  "version": "0.14.2",
   "author": "Ilan Gold",
   "repository": {
     "type": "git",
@@ -26,16 +26,19 @@
   },
   "dependencies": {
     "@vivjs/types": "workspace:*",
-    "fast-xml-parser": "^3.16.0",
     "geotiff": "^2.0.5",
     "lzw-tiff-decoder": "^0.1.1",
     "quickselect": "^2.0.0",
-    "zarr": "^0.6.2"
+    "zarr": "^0.6.2",
+    "zod": "^3.22.4"
   },
   "unbuild": {
     "entries": [
       "src/index"
     ],
     "declaration": true
+  },
+  "devDependencies": {
+    "xmldom": "^0.6.0"
   }
 }

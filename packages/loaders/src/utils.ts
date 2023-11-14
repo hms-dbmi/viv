@@ -1,6 +1,6 @@
 import type { GeoTIFFImage } from 'geotiff';
 import quickselect from 'quickselect';
-import type { OMEXML } from './omexml';
+import type { OmeXml } from './omexml';
 import type { TypedArray } from 'zarr';
 import type { Labels, PixelSource } from '@vivjs/types';
 
@@ -135,10 +135,10 @@ export function isInterleaved(shape: number[]) {
  * > getLabels(imgMeta.Pixels) === ['t', 'z', 'c', 'y', 'x']
  */
 type Sel<Dim extends string> =
-  Dim extends `${infer Z}${infer X}${infer A}${infer B}${infer C}`
+  Dim extends `${infer Z}${infer X}${infer A}${infer B}${infer C}` // eslint-disable-line @typescript-eslint/no-unused-vars
     ? [C, B, A]
-    : 'error';
-export function getLabels(dimOrder: OMEXML[0]['Pixels']['DimensionOrder']) {
+    : never;
+export function getLabels(dimOrder: OmeXml[0]['Pixels']['DimensionOrder']) {
   return dimOrder.toLowerCase().split('').reverse() as Labels<
     Sel<Lowercase<typeof dimOrder>>
   >;
@@ -185,4 +185,75 @@ export function guessTiffTileSize(image: GeoTIFFImage) {
   const size = Math.min(tileWidth, tileHeight);
   // deck.gl requirement for power-of-two tile size.
   return prevPowerOf2(size);
+}
+
+function isElement(node: Node): node is HTMLElement {
+  return node.nodeType === 1;
+}
+
+function isText(node: Node): node is Text {
+  return node.nodeType === 3;
+}
+
+type XmlNode = string | { [x: string]: XmlNode } | Array<XmlNode>;
+
+function xmlToJson(
+  xmlNode: HTMLElement,
+  options: { attrtibutesKey: string }
+): XmlNode {
+  if (isText(xmlNode)) {
+    // If the node is a text node
+    return xmlNode.nodeValue?.trim() ?? '';
+  }
+
+  // If the node has no attributes and no children, return an empty string
+  if (
+    xmlNode.childNodes.length === 0 &&
+    (!xmlNode.attributes || xmlNode.attributes.length === 0)
+  ) {
+    return '';
+  }
+
+  const xmlObj: XmlNode = {};
+
+  if (xmlNode.attributes && xmlNode.attributes.length > 0) {
+    const attrsObj: Record<string, string> = {};
+    for (let i = 0; i < xmlNode.attributes.length; i++) {
+      const attr = xmlNode.attributes[i];
+      attrsObj[attr.name] = attr.value;
+    }
+    xmlObj[options.attrtibutesKey] = attrsObj;
+  }
+
+  for (let i = 0; i < xmlNode.childNodes.length; i++) {
+    const childNode = xmlNode.childNodes[i];
+    if (!isElement(childNode)) {
+      continue;
+    }
+    const childXmlObj = xmlToJson(childNode, options);
+    if (childXmlObj !== undefined && childXmlObj !== '') {
+      if (childNode.nodeName === '#text' && xmlNode.childNodes.length === 1) {
+        return childXmlObj;
+      }
+      if (xmlObj[childNode.nodeName]) {
+        if (!Array.isArray(xmlObj[childNode.nodeName])) {
+          xmlObj[childNode.nodeName] = [xmlObj[childNode.nodeName]];
+        }
+        (xmlObj[childNode.nodeName] as XmlNode[]).push(childXmlObj);
+      } else {
+        xmlObj[childNode.nodeName] = childXmlObj;
+      }
+    }
+  }
+
+  return xmlObj;
+}
+
+export function parseXML(xmlString: string) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(
+    xmlString.replace(/\u0000$/, ''), // eslint-disable-line no-control-regex
+    'application/xml'
+  );
+  return xmlToJson(doc.documentElement, { attrtibutesKey: 'attr' });
 }
