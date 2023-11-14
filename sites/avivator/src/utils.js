@@ -246,22 +246,31 @@ export function getNameFromUrl(url) {
 /**
  * Return the midpoint of the global dimensions as a default selection.
  *
- * @param { import('../../src/types').PixelSource<['t', 'z', 'c']> } pixelSource
+ * @param {{ name: string, size: number }[]} dimensions
+ * @returns {{ [Key in typeof GLOBAL_SLIDER_DIMENSION_FIELDS[number]]?: number }
  */
-function getDefaultGlobalSelection({ labels, shape }) {
-  const dims = labels
-    .map((name, i) => [name, i])
-    .filter(d => GLOBAL_SLIDER_DIMENSION_FIELDS.includes(d[0]));
+function getDefaultGlobalSelection(dimensions) {
+  const globalSelectableDimensions = dimensions.filter(d =>
+    GLOBAL_SLIDER_DIMENSION_FIELDS.includes(d.name.toLowerCase())
+  );
 
-  /**
-   * @type { { t: number, z: number, c: number  } }
-   */
+  /** @type {{ [Key in typeof GLOBAL_SLIDER_DIMENSION_FIELDS[number]]?: number } */
   const selection = {};
-  dims.forEach(([name, index]) => {
-    selection[name] = Math.floor((shape[index] || 0) / 2);
-  });
+  for (const dim of globalSelectableDimensions) {
+    selection[dim.name] = Math.floor(dim.size / 2);
+  }
 
   return selection;
+}
+
+function isGlobalOrXYDimension(name) {
+  // normalize name to lowercase
+  name = name.toLowerCase();
+  return (
+    name === 'x' ||
+    name === 'y' ||
+    GLOBAL_SLIDER_DIMENSION_FIELDS.includes(name)
+  );
 }
 
 /**
@@ -272,31 +281,58 @@ export function isInterleaved(shape) {
   return lastDimSize === 3 || lastDimSize === 4;
 }
 
+/**
+ * @template A
+ * @template B
+ * @param {Array<A>} a
+ * @param {Array<B>} b
+ * @returns {Array<[A, B]>}
+ */
+function zip(a, b) {
+  if (a.length !== b.length) {
+    throw new Error('Array lengths must be equal');
+  }
+  return a.map((val, i) => [val, b[i]]);
+}
+
 // Create a default selection using the midpoint of the available global dimensions,
 // and then the first four available selections from the first selectable channel.
 /**
  *
- * @param { import('../../src/types').PixelSource<['t', 'z', 'c']> } pixelSource
+ * @param {{ labels: string[], shape: number[] }} pixelSource
  */
-export function buildDefaultSelection(pixelSource) {
+export function buildDefaultSelection({ labels, shape }) {
   let selection = [];
-  const globalSelection = getDefaultGlobalSelection(pixelSource);
+
+  const dimensions = zip(labels, shape).map(([name, size]) => ({ name, size }));
+
+  const globalSelection = getDefaultGlobalSelection(dimensions);
+
   // First non-global dimension with some sort of selectable values.
+  const firstNonGlobalSelectableDimension = dimensions.find(
+    dim => !isGlobalOrXYDimension(dim.name)
+  );
 
-  const firstNonGlobalDimension = pixelSource.labels
-    .map((name, i) => ({ name, size: pixelSource.shape[i] }))
-    .find(d => !GLOBAL_SLIDER_DIMENSION_FIELDS.includes(d.name) && d.size);
+  // If there are no additional selectable dimensions, return the global selection.
+  if (!firstNonGlobalSelectableDimension) {
+    return [globalSelection];
+  }
 
-  for (let i = 0; i < Math.min(4, firstNonGlobalDimension.size); i += 1) {
+  for (
+    let i = 0;
+    i < Math.min(4, firstNonGlobalSelectableDimension.size);
+    i += 1
+  ) {
     selection.push({
-      [firstNonGlobalDimension.name]: i,
+      [firstNonGlobalSelectableDimension.name]: i,
       ...globalSelection
     });
   }
 
-  selection = isInterleaved(pixelSource.shape)
-    ? [{ ...selection[0], c: 0 }]
-    : selection;
+  if (isInterleaved(shape)) {
+    return [{ ...selection[0], c: 0 }];
+  }
+
   return selection;
 }
 
