@@ -92,21 +92,13 @@ pnpm build # all packages, avivator, and documentation
 pnpm -r build --filter=avivator # build a specific package or site
 ```
 
-## 📄 Publish
+## 📄 Sending PRs and making releases
 
-Checkout latest `main` branch, run:
+For changes to be reflected in package changelogs, run `npx changeset` and follow the prompts.
 
-```sh
-# checkout a new release branch
-git checkout <branch name>
-# commit and tag a new version
-pnpm version [major | minor | patch]
-# push commit and tag simultaneously
-git push --atomic origin <branch name> <tag>
-```
+> Note not every PR requires a changeset. Since changesets are focused on releases and changelogs, changes to the repository that don't effect these won't need a changeset (e.g., documentation, tests).
 
-Open a PR for `<branch name>`. Our CI will run a release workflow for tagged commits starting
-with `v*` automatically. Inspect the GitHub Actions to ensure the workflow was successful.
+The [Changesets GitHub Action](https://github.com/changesets/action) will create and update a PR that applies changesets versions of `@vivjs/` packages to NPM.
 
 ## 🌎 Browser Support
 
