@@ -5,8 +5,6 @@ import * as esbuild from "esbuild";
 import { NodeGlobalsPolyfillPlugin as globals } from '@esbuild-plugins/node-globals-polyfill';
 import { NodeModulesPolyfillPlugin as builtins } from '@esbuild-plugins/node-modules-polyfill';
 
-console.log(process.argv[2])
-
 esbuild.build({
   entryPoints: [process.argv[2]],
   bundle: true,
