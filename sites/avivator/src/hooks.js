@@ -136,7 +136,7 @@ export const useImage = (source, history) => {
             ? [[255, 255, 255]]
             : newDomains.map(
                 (_, i) =>
-                  (Channels[i].Color && Channels[i].Color.slice(0, -1)) ??
+                  (Channels[i]?.Color && Channels[i].Color.slice(0, -1)) ??
                   COLOR_PALLETE[i]
               );
         useViewerStore.setState({

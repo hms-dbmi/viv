@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Fix Avivator demo for OME-Zarr with only spatial axes
 
 ## 0.14.1
 
