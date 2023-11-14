@@ -49,6 +49,17 @@ jobs:
     env:
       DISPLAY: :0
     steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - run: |
+          pnpm install
+
       # Necessary for to run electron tests
       - name: Setup xvf (Linux)
         if: runner.os == 'Linux'
@@ -57,13 +68,4 @@ jobs:
           # start xvfb in the background
           sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 7
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: |
-          pnpm install
-          pnpm test
+      - run: pnpm test
