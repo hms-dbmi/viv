@@ -18,13 +18,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
       - uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: 'pnpm'
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 7
       - run: |
           pnpm install
           pnpm --filter=avivator build
@@ -33,13 +33,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
       - uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: 'pnpm'
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 7
       - run: |
           pnpm install
           pnpm lint
@@ -58,13 +58,13 @@ jobs:
           sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
       - uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: 'pnpm'
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 7
       - run: |
           pnpm install
           pnpm test
