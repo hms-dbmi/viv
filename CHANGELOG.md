@@ -5,6 +5,12 @@
 ### Added
 
 ### Changed
+
+## 0.14.2
+
+### Added
+
+### Changed
 - Fix Avivator demo for OME-Zarr with only spatial axes
 - Allow OME-XML to omit `TiffData` tags
 
