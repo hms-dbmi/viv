@@ -28,7 +28,6 @@ function pinVersions(manifest) {
         deps[name] = REACT_VERSION;
       }
     }
-
   }
 }
 
