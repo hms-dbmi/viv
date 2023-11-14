@@ -30,7 +30,7 @@
     "@math.gl/core": "^3.5.7",
     "@vivjs/layers": "workspace:*",
     "@vivjs/loaders": "workspace:*",
-    "math.gl": "^3.5.7"
+    "math.gl": "^4.0.0"
   },
   "unbuild": {
     "entries": [
