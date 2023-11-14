@@ -34,7 +34,7 @@
     "@changesets/cli": "^2.26.2",
     "@deck.gl/extensions": "~8.8.6",
     "@deck.gl/mesh-layers": "~8.8.6",
-    "@deck.gl/test-utils": "~8.8.6",
+    "@deck.gl/test-utils": "~8.9.32",
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@luma.gl/test-utils": "~8.5.16",
