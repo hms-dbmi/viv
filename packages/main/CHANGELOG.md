@@ -33,7 +33,6 @@
 ### Changed
 
 - Bump `gl` to v6 and move to Node.js 18 in CI.
-- Bump `deck.gl` to v8.8.27 and `luma.gl` to v8.5.21.
 - Narrow required interface for `ZarrPixelSource`.
 - Update dev dependencies
 - Drop `fast-xml-parser` dependency in `@vivjs/loaders`
