@@ -114,7 +114,7 @@ const TiffDataSchema = z
 const PixelsSchema = z
   .object({
     Channel: z.preprocess(ensureArray, ChannelSchema.array()),
-    TiffData: z.preprocess(ensureArray, TiffDataSchema.array())
+    TiffData: z.preprocess(ensureArray, TiffDataSchema.array()).optional()
   })
   .extend({
     attr: z.object({

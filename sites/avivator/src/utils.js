@@ -136,6 +136,14 @@ async function getTotalImageCount(src, rootMeta, data) {
 }
 
 /**
+ * @param {unknown} e
+ * @returns {e is Error & { issues: unknown }}
+ */
+function isZodError(e) {
+  return e instanceof Error && 'issues' in e;
+}
+
+/**
  * Given an image source, creates a PixelSource[] and returns XML-meta
  *
  * @param {string | File | File[]} urlOrFile
@@ -211,7 +219,13 @@ export async function createLoader(
     let source;
     try {
       source = await loadBioformatsZarr(urlOrFile);
-    } catch {
+    } catch (e) {
+      if (isZodError(e)) {
+        // If the error is a ZodError, it means there was an OME-XML file
+        // but it was invalid. We shouldn't try to load the file as a OME-Zarr.
+        throw e;
+      }
+
       // try ome-zarr
       const res = await loadOmeZarr(urlOrFile, { type: 'multiscales' });
       // extract metadata into OME-XML-like form
