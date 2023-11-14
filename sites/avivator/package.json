@@ -1,5 +1,4 @@
 {
-  "version": "0.14.2",
   "name": "avivator",
   "private": true,
   "scripts": {
@@ -25,6 +24,5 @@
     "@vitejs/plugin-react": "^4.1.1",
     "serve-static": "^1.15.0",
     "vite": "^4.5.0"
-  },
-  "sideEffects": false
+  }
 }

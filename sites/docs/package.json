@@ -1,5 +1,6 @@
 {
-  "version": "0.14.2",
+  "name": "docs",
+  "private": true,
   "scripts": {
     "build": "npm run bundle && documentation build -o dist -f html --document-exported --config documentation.yml dist/index.js",
     "bundle": "rollup -c"
@@ -12,6 +13,5 @@
     "@rollup/plugin-node-resolve": "^13.3.0",
     "documentation": "^13.2.5",
     "rollup": "^2.75.7"
-  },
-  "sideEffects": false
+  }
 }

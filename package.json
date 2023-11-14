@@ -18,8 +18,7 @@
     "test": "pnpm -r --parallel test",
     "check-format": "prettier --check --ignore-path .gitignore tsconfig.json sites/avivator packages/",
     "lint": "npm run check-format && eslint \"packages/*/src/**/*\" \"sites/avivator/src/**/*\"",
-    "format": "npm run check-format -- --write",
-    "version": "pnpm meta-updater && ./version.sh && git add ."
+    "format": "npm run check-format -- --write"
   },
   "dependencies": {
     "@deck.gl/core": "~8.8.6",
@@ -32,6 +31,7 @@
     "@luma.gl/webgl": "~8.5.16"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.26.2",
     "@deck.gl/extensions": "~8.8.6",
     "@deck.gl/mesh-layers": "~8.8.6",
     "@deck.gl/test-utils": "~8.8.6",
