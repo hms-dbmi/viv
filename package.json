@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
+    "@changesets/get-github-info": "^0.5.2",
     "@deck.gl/extensions": "~8.8.6",
     "@deck.gl/mesh-layers": "~8.8.6",
     "@deck.gl/test-utils": "~8.8.6",
@@ -49,6 +50,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "esno": "^0.16.3",
     "gl": "^6.0.2",
+    "gray-matter": "^4.0.3",
     "prettier": "^2.6.2",
     "tap-spec": "^5.0.0",
     "tape": "^5.5.3",
