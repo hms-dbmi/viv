@@ -34,11 +34,13 @@ generateViewTests(OverviewView, overviewViewArguments, linkedViewIds);
 
 test(`OverviewView layer type check.`, t => {
   const view = new OverviewView(overviewViewArguments);
+
+  const viewState = view.filterViewState({ viewState: overviewViewState });
   const layers = view.getLayers({
     props: { loader },
     viewStates: {
-      [id]: overviewViewState,
-      [DETAIL_VIEW_ID]: overviewViewState
+      [id]: viewState,
+      [DETAIL_VIEW_ID]: viewState
     }
   });
   t.ok(
