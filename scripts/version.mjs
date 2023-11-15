@@ -54,12 +54,10 @@ async function postChangesetsVersion() {
   const lines = contents.split('\n');
   lines.splice(0, 1);
   const newChangelog = lines.join('\n');
-
   const rootChangeLog = fs.readFileSync(
     path.resolve(__dirname, '..', 'CHANGELOG.md'),
     { encoding: 'utf-8' }
   );
-
   fs.writeFileSync(
     path.resolve(__dirname, '..', 'CHANGELOG.md'),
     `${newChangelog}\n${rootChangeLog}`
@@ -69,9 +67,9 @@ async function postChangesetsVersion() {
 await preChangesetsVersion();
 childProcess.execSync('pnpm changeset version');
 await postChangesetsVersion();
-for (const pkg in path.resolve(__dirname, "../packages")) {
+for (const pkg of fs.readdirSync(path.resolve(__dirname, "../packages"))) {
   fs.unlinkSync(path.resolve(__dirname, "../packages", pkg, "CHANGELOG.md"));
 }
-for (const pkg in path.resolve(__dirname, "../sites")) {
-  fs.unlinkSync(path.resolve(__dirname, "../packages", pkg, "CHANGELOG.md"));
+for (const pkg of fs.readdirSync(path.resolve(__dirname, "../sites"))) {
+  fs.unlinkSync(path.resolve(__dirname, "../sites", pkg, "CHANGELOG.md"));
 }
