@@ -31,12 +31,16 @@ function updateContentsWithAffectedPackages(changeset) {
   return contentLines.join('\n');
 }
 
-const entries = fs.readdirSync(path.resolve(__dirname, '../.changeset'));
-for (const file of entries) {
-  if (!file.endsWith(".md")) continue;
-  const filePath = path.resolve(__dirname, '../.changeset', file);
-  const changeset = matter.read(filePath);
-  changeset.data = { [mainPackage]: getGreatestBumpType(changeset) };
-  changeset.content = updateContentsWithAffectedPackages(changeset);
-  fs.writeFileSync(filePath, matter.stringify(changeset.content, changeset.data));
+function preChanglog(){
+  const entries = fs.readdirSync(path.resolve(__dirname, '../.changeset'));
+  for (const file of entries) {
+    if (!file.endsWith(".md")) {
+      continue;
+    }
+    const filePath = path.resolve(__dirname, '../.changeset', file);
+    const changeset = matter.read(filePath);
+    changeset.data = { [mainPackage]: getGreatestBumpType(changeset) };
+    changeset.content = updateContentsWithAffectedPackages(changeset);
+    fs.writeFileSync(filePath, matter.stringify(changeset.content, changeset.data));
+  }
 }
