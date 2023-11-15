@@ -130,9 +130,9 @@ const PixelsSchema = z
       PhysicalSizeY: z.coerce.number().optional(),
       PhysicalSizeZ: z.coerce.number().optional(),
       SignificantBits: z.coerce.number().optional(),
-      PhysicalSizeXUnit: UnitsLengthSchema.optional(),
-      PhysicalSizeYUnit: UnitsLengthSchema.optional(),
-      PhysicalSizeZUnit: UnitsLengthSchema.optional(),
+      PhysicalSizeXUnit: UnitsLengthSchema.optional().default('µm'),
+      PhysicalSizeYUnit: UnitsLengthSchema.optional().default('µm'),
+      PhysicalSizeZUnit: UnitsLengthSchema.optional().default('µm'),
       BigEndian: z
         .string()
         .transform(v => v.toLowerCase() === 'true')
@@ -184,7 +184,7 @@ export function fromString(str: string) {
           .map(name => {
             const size = img.Pixels[`PhysicalSize${name}` as const];
             const unit = img.Pixels[`PhysicalSize${name}Unit` as const];
-            return size && unit ? `${size} ${unit}` : '-';
+            return size ? `${size} ${unit}` : '-';
           })
           .join(' x ');
 
