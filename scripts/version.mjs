@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as url from 'node:url';
+import * as childProcess from 'node:child_process';
 
 import matter from 'gray-matter';
 
@@ -31,7 +32,7 @@ function updateContentsWithAffectedPackages(changeset) {
   return contentLines.join('\n');
 }
 
-function preChanglog(){
+async function preChangesetsVersion(){
   const entries = fs.readdirSync(path.resolve(__dirname, '../.changeset'));
   for (const file of entries) {
     if (!file.endsWith(".md")) {
@@ -44,3 +45,35 @@ function preChanglog(){
     fs.writeFileSync(filePath, matter.stringify(changeset.content, changeset.data));
   }
 }
+
+async function changesetsVersion() {
+  return new Promise((resolve, reject) => {
+    const child = childProcess.spawn('pnpm', ['changeset', 'version'], { stdio: 'inherit' });
+    child.on('error', reject);
+    child.on('exit', resolve);
+  });
+}
+
+async function postChangesetsVersion() {
+  const contents = fs.readFileSync(
+    path.resolve(__dirname, '..', 'packages', 'main', 'CHANGELOG.md'),
+    { encoding: 'utf-8' }
+  );
+  const lines = contents.split('\n');
+  lines.splice(0, 1);
+  const newChangelog = lines.join('\n');
+
+  const rootChangeLog = fs.readFileSync(
+    path.resolve(__dirname, '..', 'CHANGELOG.md'),
+    { encoding: 'utf-8' }
+  );
+
+  fs.writeFileSync(
+    path.resolve(__dirname, '..', 'CHANGELOG.md'),
+    `${newChangelog}\n${rootChangeLog}`
+  );
+}
+
+await preChangesetsVersion();
+await changesetsVersion();
+await postChangesetsVersion();
