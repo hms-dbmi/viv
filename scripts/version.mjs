@@ -8,6 +8,19 @@ import matter from 'gray-matter';
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const mainPackage = "@hms-dbmi/viv";
 
+
+/**
+ * @param {string} cmd
+ * @param {string[]} args
+ */
+function exec(cmd, args) {
+  return new Promise((resolve, reject) => {
+    const child = childProcess.spawn(cmd, args, { stdio: 'inherit' });
+    child.on('error', reject);
+    child.on('exit', resolve);
+  });
+}
+
 /**
  * @param {matter.GrayMatterFile<string>} changeset
  */
@@ -46,14 +59,6 @@ async function preChangesetsVersion(){
   }
 }
 
-async function changesetsVersion() {
-  return new Promise((resolve, reject) => {
-    const child = childProcess.spawn('pnpm', ['changeset', 'version'], { stdio: 'inherit' });
-    child.on('error', reject);
-    child.on('exit', resolve);
-  });
-}
-
 async function postChangesetsVersion() {
   const contents = fs.readFileSync(
     path.resolve(__dirname, '..', 'packages', 'main', 'CHANGELOG.md'),
@@ -75,5 +80,6 @@ async function postChangesetsVersion() {
 }
 
 await preChangesetsVersion();
-await changesetsVersion();
+await exec('pnpm', ['changeset', 'version']);
 await postChangesetsVersion();
+await exec('pnpm', ['--recursive', '--filter="./packages/**"', 'exec', 'rm', 'CHANGELOG.md']);
