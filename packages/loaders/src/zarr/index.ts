@@ -28,6 +28,9 @@ export async function loadBioformatsZarr(
     const url = source.endsWith('/') ? source.slice(0, -1) : source;
     const store = new HTTPStore(url + '/' + ZARR_DIR, options);
     const xmlSource = await fetch(url + '/' + METADATA, options.fetchOptions);
+    if (!xmlSource.ok) {
+      throw Error('No OME-XML metadata found for store.');
+    }
     return loadBioformats(store, xmlSource);
   }
 
