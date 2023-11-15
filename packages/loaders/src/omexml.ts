@@ -150,7 +150,7 @@ const PixelsSchema = z
 const ImageSchema = z
   .object({
     AquisitionDate: z.string().optional().default(''),
-    Description: z.string().optional().default(''),
+    Description: z.unknown().optional().default(''),
     Pixels: PixelsSchema
   })
   .extend({
