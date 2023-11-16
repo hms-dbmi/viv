@@ -1,6 +1,6 @@
 import { OrthographicView } from '@deck.gl/core';
 import { Matrix4 } from '@math.gl/core';
-import { MAX_CHANNELS, DTYPE_VALUES } from '@vivjs/constants';
+import { DTYPE_VALUES, MAX_CHANNELS } from '@vivjs/constants';
 
 export function range(len) {
   return [...Array(len).keys()];
@@ -127,7 +127,7 @@ export function getPhysicalSizeScalingMatrix(loader) {
 }
 
 /**
- * Create a boudning box from a viewport based on passed-in viewState.
+ * Create a bounding box from a viewport based on passed-in viewState.
  * @param {Object} viewState The viewState for a certain viewport.
  * @returns {View} The DeckGL View for this viewport.
  */
