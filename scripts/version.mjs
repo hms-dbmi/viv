@@ -32,6 +32,31 @@ function updateContentsWithAffectedPackages(changeset) {
   return contentLines.join('\n');
 }
 
+/**
+ * Collects all the changesets (for all packages) and collects
+ * them into a single changeset for the main package.
+ *
+ * For example:
+ *
+ * ```md
+ * ---
+ *  "@vivjs/loaders": minor
+ *  "@vivjs/constants": patch
+ * ---
+ *
+ *  Fixes a bug in loaders.
+ * ```
+ *
+ * becomes:
+ *
+ * ```md
+ * ---
+ *  "@hms-dbmi/viv": minor
+ * ---
+ *  Fixes a bug in loaders. (`@vivjs/loaders`, `@vivjs/constants`)
+ * ```
+ *
+ */
 async function preChangesetsVersion(){
   const entries = fs.readdirSync(path.resolve(__dirname, '../.changeset'));
   for (const file of entries) {
@@ -46,6 +71,12 @@ async function preChangesetsVersion(){
   }
 }
 
+/**
+ * Reads the main package's changelog and removes all the dependency
+ * updates for individual packages.
+ *
+ * Deletes all the other changelogs.
+ */
 async function postChangesetsVersion() {
   const contents = fs.readFileSync(
     path.resolve(__dirname, '..', 'packages', 'main', 'CHANGELOG.md'),
