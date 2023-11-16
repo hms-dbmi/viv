@@ -18,8 +18,7 @@
     "test": "pnpm -r --parallel test",
     "check-format": "prettier --check --ignore-path .gitignore tsconfig.json sites/avivator packages/",
     "lint": "npm run check-format && eslint \"packages/*/src/**/*\" \"sites/avivator/src/**/*\"",
-    "format": "npm run check-format -- --write",
-    "version": "node scripts/version.mjs"
+    "format": "npm run check-format -- --write"
   },
   "dependencies": {
     "@deck.gl/core": "~8.8.27",
