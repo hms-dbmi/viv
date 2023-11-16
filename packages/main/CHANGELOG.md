@@ -1,10 +1,16 @@
 # Changelog
 
-## In Progress
+## 0.15.0
 
-### Added
+### Minor Changes
 
-### Changed
+- 53e6014: Bump `deck.gl` to v8.8.27 and `luma.gl` to v8.5.21 (`@vivjs/extensions`, `@vivjs/constants`, `@vivjs/viewers`, `@vivjs/layers`, `@vivjs/views`)
+
+### Patch Changes
+
+- 51aca92: fix: Throw error for missing OME-XML in `loadBioformatsZarr` (`@vivjs/loaders`)
+- a1a8007: feat: Set default PhysicalSizeUnit to µm (`@vivjs/loaders`)
+- 43f659a: fix: Allow `unknown` OME-XML Description by default (`@vivjs/loaders`)
 
 ## 0.14.2
 
