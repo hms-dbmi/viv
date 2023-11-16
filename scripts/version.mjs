@@ -101,6 +101,10 @@ function postChangesetsVersion() {
   clearChangelogs(path.resolve(__dirname, '..', 'sites'));
 }
 
-preChangesetsVersion();
-childProcess.execSync('pnpm changeset version');
-postChangesetsVersion();
+try {
+  preChangesetsVersion();
+  childProcess.execSync('pnpm changeset version');
+  postChangesetsVersion();
+} catch (e) {
+  console.error(e);
+}
