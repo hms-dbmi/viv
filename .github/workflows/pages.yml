@@ -28,7 +28,9 @@ jobs:
           version: 7
       - run: |
           pnpm install
-          pnpm --filter=avivator build
+          pnpm build --base /viv/
+        working-directory: sites/avivator
+
       - uses: actions/upload-pages-artifact@v2
         with:
           path: sites/avivator/dist
