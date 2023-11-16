@@ -25,11 +25,13 @@ function isCompleteTiffDataItem(
   );
 }
 
-type MultifileImageDataLookup = ReturnType<typeof createMultifileImageDataLookup>;
+type MultifileImageDataLookup = ReturnType<
+  typeof createMultifileImageDataLookup
+>;
 
 function createMultifileImageDataLookup(omexml: OmeXml[number]) {
   type ImageDataPointer = { ifd: number; filename: string };
-  const lookup: Map<string, ImageDataPointer> = new Map;
+  const lookup: Map<string, ImageDataPointer> = new Map();
 
   function keyFor({ t, c, z }: OmeTiffSelection) {
     return `t${t}.c${c}.z${z}`;
@@ -41,7 +43,7 @@ function createMultifileImageDataLookup(omexml: OmeXml[number]) {
     const key = keyFor({
       t: imageData['FirstT'],
       c: imageData['FirstC'],
-      z: imageData['FirstZ'],
+      z: imageData['FirstZ']
     });
     const imageDataPointer: ImageDataPointer = {
       ifd: imageData['IFD'],
@@ -63,7 +65,10 @@ interface TiffResolver {
   resolve(identifier: string | URL): Promise<GeoTIFF>;
 }
 
-function createMultifileOmeTiffIndexer(imgMeta: OmeXml[number], tiffResolver: TiffResolver) {
+function createMultifileOmeTiffIndexer(
+  imgMeta: OmeXml[number],
+  tiffResolver: TiffResolver
+) {
   const lookup = createMultifileImageDataLookup(imgMeta);
   return async (selection: OmeTiffSelection): Promise<GeoTIFFImage> => {
     const entry = lookup.getImageDataPointer(selection);
@@ -92,14 +97,17 @@ function multifileTiffResolver(options: {
 }
 
 export async function loadMultifileOmeTiff(
-  source: string | URL | File,
+  source: string | File,
   options: {
     pool?: Pool;
     headers?: Headers | Record<string, string>;
   }
 ) {
-  assert(!(source instanceof File), 'File or Blob not supported for multifile OME-TIFF');
-  const url = source instanceof URL ? source : new URL(source);
+  assert(
+    !(source instanceof File),
+    'File or Blob not supported for multifile OME-TIFF'
+  );
+  const url = new URL(source);
   const text = await fetch(url).then(res => res.text());
   const rootMeta = fromString(text);
   // Share resources between images

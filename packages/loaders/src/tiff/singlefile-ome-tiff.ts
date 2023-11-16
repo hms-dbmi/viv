@@ -3,7 +3,11 @@ import { fromString } from '../omexml';
 
 import TiffPixelSource from './pixel-source';
 import { getOmeLegacyIndexer, getOmeSubIFDIndexer } from './lib/indexers';
-import { createGeoTiff, getOmePixelSourceMeta, type OmeTiffSelection } from './lib/utils';
+import {
+  createGeoTiff,
+  getOmePixelSourceMeta,
+  type OmeTiffSelection
+} from './lib/utils';
 import { guessTiffTileSize } from '../utils';
 import type Pool from './lib/Pool';
 import type { OmeTiffIndexer } from './lib/indexers';
@@ -71,7 +75,7 @@ export async function loadSingleFileOmeTiff(
       shape,
       labels,
       meta,
-      options.pool,
+      options.pool
     );
     return source;
   };

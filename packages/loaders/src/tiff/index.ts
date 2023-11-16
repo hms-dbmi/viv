@@ -5,10 +5,11 @@ import LZWDecoder from './lib/lzw-decoder';
 import {
   parseFilename,
   type OmeTiffSelection,
+  createGeoTiff
 } from './lib/utils';
 
 import { loadSingleFileOmeTiff } from './singlefile-ome-tiff';
-import { load as loadMultifileOme } from './ome-multifile';
+import { loadMultifileOmeTiff } from './multifile-ome-tiff';
 import { load as loadMulti, type MultiTiffImage } from './multi-tiff';
 
 addDecoder(5, () => LZWDecoder);
@@ -30,9 +31,7 @@ interface MultiTiffOptions {
   headers?: Headers | Record<string, string>;
 }
 
-type MultiImage = Awaited<ReturnType<typeof loadMultifileOme>>; // get return-type from `load`
-
-export const FILE_PREFIX = 'file://';
+type MultiImage = Awaited<ReturnType<typeof loadSingleFileOmeTiff>>; // get return-type from `load`
 
 /** @ignore */
 export async function loadOmeTiff(
@@ -43,16 +42,16 @@ export async function loadOmeTiff(
 export async function loadOmeTiff(
   source: string | File,
   opts: TiffOptions & { images: 'first' }
-): Promise<MultiImage[0]>;
+): Promise<MultiImage[number]>;
 /** @ignore */
 export async function loadOmeTiff(
   source: string | File,
   opts: TiffOptions
-): Promise<MultiImage[0]>;
+): Promise<MultiImage[number]>;
 /** @ignore */
 export async function loadOmeTiff(
   source: string | File
-): Promise<MultiImage[0]>;
+): Promise<MultiImage[number]>;
 /**
  * Opens an OME-TIFF via URL and returns data source and associated metadata for first or all images in files.
  *
@@ -70,7 +69,12 @@ export async function loadOmeTiff(
   source: string | File,
   opts: OmeTiffOptions = {}
 ) {
-  const loaders = await loadSingleFileOmeTiff(source, opts);
+  let loaders: MultiImage;
+  try {
+    loaders = await loadSingleFileOmeTiff(source, opts);
+  } catch {
+    loaders = await loadMultifileOmeTiff(source, opts);
+  }
   return opts.images === 'all' ? loaders : loaders[0];
 }
 
@@ -131,7 +135,7 @@ export async function loadMultiTiff(
       if (extension === 'tif' || extension === 'tiff') {
         const tiffImageName = parsedFilename.name;
         if (tiffImageName) {
-          const curImage = await createTiffReader(file, {
+          const curImage = await createGeoTiff(file, {
             headers
           });
           for (let i = 0; i < imageSelections.length; i++) {
