@@ -65,7 +65,7 @@ $ npm install deck.gl @luma.gl/core
 ```
 
 Breaking changes may happen on the minor version update.
-Please see the [changelog](https://github.com/hms-dbmi/viv/blob/main/CHANGELOG.md) for information.
+Please see the [changelog](https://github.com/hms-dbmi/viv/blob/main/packages/main/CHANGELOG.md) for information.
 
 ## 📖 Documentation
 
