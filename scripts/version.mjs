@@ -78,28 +78,27 @@ async function preChangesetsVersion(){
  * Deletes all the other changelogs.
  */
 async function postChangesetsVersion() {
-  const contents = fs.readFileSync(
-    path.resolve(__dirname, '..', 'packages', 'main', 'CHANGELOG.md'),
-    { encoding: 'utf-8' }
-  );
+  // remove dependency updates from main changelog
+  const mainChangelogPath = path.resolve(__dirname, '..', 'packages', 'main', 'CHANGELOG.md');
+  const contents = fs.readFileSync(mainChangelogPath, { encoding: 'utf-8' });
   const lines = contents.split('\n');
   const newChangelog = lines
     .filter(line => !line.startsWith('  - @vivjs/')) // remove dependency updates
     .join('\n');
-  fs.writeFileSync(
-    path.resolve(__dirname, '..', 'packages', 'main', 'CHANGELOG.md'),
-    newChangelog,
-  );
+  fs.writeFileSync(mainChangelogPath, newChangelog);
 
+  // clean up all the other changelogs
   for (const pkg of fs.readdirSync(path.resolve(__dirname, "../packages"))) {
     if (pkg === "main") {
       continue;
     }
-    fs.unlinkSync(path.resolve(__dirname, "../packages", pkg, "CHANGELOG.md"));
+    const filePath = path.resolve(__dirname, "../packages", pkg, "CHANGELOG.md");
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
   }
 
   for (const pkg of fs.readdirSync(path.resolve(__dirname, "../sites"))) {
-    fs.unlinkSync(path.resolve(__dirname, "../sites", pkg, "CHANGELOG.md"));
+    const filePath = path.resolve(__dirname, "../sites", pkg, "CHANGELOG.md");
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
   }
 }
 
