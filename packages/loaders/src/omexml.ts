@@ -43,8 +43,8 @@ const PixelTypeSchema = z.enum([
   'double-complex'
 ]);
 
-export type UnitsLength = z.infer<typeof UnitsLengthSchema>;
-const UnitsLengthSchema = z.enum([
+export type PhysicalUnit = z.infer<typeof PhysicalUnitSchema>;
+const PhysicalUnitSchema = z.enum([
   'Ym',
   'Zm',
   'Em',
@@ -134,9 +134,9 @@ const PixelsSchema = z
       PhysicalSizeY: z.coerce.number().optional(),
       PhysicalSizeZ: z.coerce.number().optional(),
       SignificantBits: z.coerce.number().optional(),
-      PhysicalSizeXUnit: UnitsLengthSchema.optional().default('µm'),
-      PhysicalSizeYUnit: UnitsLengthSchema.optional().default('µm'),
-      PhysicalSizeZUnit: UnitsLengthSchema.optional().default('µm'),
+      PhysicalSizeXUnit: PhysicalUnitSchema.optional().default('µm'),
+      PhysicalSizeYUnit: PhysicalUnitSchema.optional().default('µm'),
+      PhysicalSizeZUnit: PhysicalUnitSchema.optional().default('µm'),
       BigEndian: z
         .string()
         .transform(v => v.toLowerCase() === 'true')

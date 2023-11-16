@@ -1,11 +1,12 @@
-import GeoTIFF, {
-  fromFile,
+import {
+  type GeoTIFF,
   type GeoTIFFImage,
+  fromFile,
   fromUrl,
   fromBlob
 } from 'geotiff';
 import { getLabels, DTYPE_LOOKUP } from '../../utils';
-import type { OmeXml, UnitsLength, DimensionOrder } from '../../omexml';
+import type { OmeXml, PhysicalUnit, DimensionOrder } from '../../omexml';
 import type { MultiTiffImage } from '../multi-tiff';
 import { createOffsetsProxy } from './proxies';
 
@@ -15,18 +16,18 @@ export interface OmeTiffSelection {
   z: number;
 }
 
-type PhysicalSizeValue = {
+type PhysicalSize = {
   size: number;
-  unit: UnitsLength;
+  unit: PhysicalUnit;
 };
 
 type PhysicalSizes = {
-  x: PhysicalSizeValue;
-  y: PhysicalSizeValue;
-  z?: PhysicalSizeValue;
+  x: PhysicalSize;
+  y: PhysicalSize;
+  z?: PhysicalSize;
 };
 
-function findPhysicalSizes(
+function extractPhysicalSizesfromOmeXml(
   d: OmeXml[number]['Pixels']
 ): undefined | PhysicalSizes {
   if (
@@ -81,9 +82,9 @@ export function getOmePixelSourceMeta({ Pixels }: OmeXml[0]) {
   }
 
   const dtype = DTYPE_LOOKUP[Pixels.Type as keyof typeof DTYPE_LOOKUP];
-  const physicalSizes = findPhysicalSizes(Pixels);
-  if (physicalSizes) {
-    return { labels, getShape, dtype, physicalSizes };
+  const maybePhysicalSizes = extractPhysicalSizesfromOmeXml(Pixels);
+  if (maybePhysicalSizes) {
+    return { labels, getShape, dtype, physicalSizes: maybePhysicalSizes };
   }
   return { labels, getShape, dtype };
 }
