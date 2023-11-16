@@ -8,6 +8,7 @@ import * as url from 'url';
 
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 const FIXTURE = path.resolve(__dirname, './fixtures/bioformats-zarr');
+
 test('Loads zarr-multiscales', async t => {
   t.plan(1);
   try {

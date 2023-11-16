@@ -175,7 +175,6 @@ export async function createLoader(
   try {
     // OME-TIFF
     if (isOmeTiff(urlOrFile)) {
-
       if (urlOrFile instanceof File) {
         // TODO(2021-05-09): temporarily disable `pool` until inline worker module is fixed.
         const source = await loadOmeTiff(urlOrFile, {

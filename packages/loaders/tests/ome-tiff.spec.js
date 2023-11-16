@@ -1,14 +1,12 @@
 import test from 'tape';
-import { fromFile } from 'geotiff';
-import { load } from '../src/tiff/ome-tiff';
-import { loadOmeTiff, FILE_PREFIX } from '../src/tiff';
+import { loadSingleFileOmeTiff } from '../src/tiff/singlefile-ome-tiff';
+import { loadOmeTiff } from '../src/tiff';
 
 import * as path from 'path';
 import * as url from 'url';
 
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 const FIXTURE = path.resolve(__dirname, './fixtures/multi-channel.ome.tif');
-const LOCAL_FIXTURE = `${FILE_PREFIX}${FIXTURE}`;
 
 function testPixelSource(t, data) {
   t.equal(data.length, 1, 'image should not be pyramidal.');
@@ -34,8 +32,7 @@ function testPixelSource(t, data) {
 test('Creates correct TiffPixelSource for OME-TIFF.', async t => {
   t.plan(5);
   try {
-    const tiff = await fromFile(FIXTURE);
-    const [{ data }] = await load(tiff);
+    const [{ data }] = await loadSingleFileOmeTiff('file://' + FIXTURE);
     testPixelSource(t, data);
   } catch (e) {
     t.fail(e);
@@ -45,7 +42,7 @@ test('Creates correct TiffPixelSource for OME-TIFF.', async t => {
 test('Is able to load OME-TIFF from a local file.', async t => {
   t.plan(5);
   try {
-    const { data } = await loadOmeTiff(LOCAL_FIXTURE);
+    const { data } = await loadOmeTiff('file://' + FIXTURE);
     testPixelSource(t, data);
   } catch (e) {
     t.fail(e);
@@ -55,8 +52,7 @@ test('Is able to load OME-TIFF from a local file.', async t => {
 test('Get raster data.', async t => {
   t.plan(13);
   try {
-    const tiff = await fromFile(FIXTURE);
-    const [{ data }] = await load(tiff);
+    const [{ data }] = await loadSingleFileOmeTiff('file://' + FIXTURE);
     const [base] = data;
 
     for (let c = 0; c < 3; c += 1) {
@@ -81,8 +77,7 @@ test('Get raster data.', async t => {
 test('Correct OME-XML.', async t => {
   t.plan(9);
   try {
-    const tiff = await fromFile(FIXTURE);
-    const [{ metadata }] = await load(tiff);
+    const [{ metadata }] = await loadSingleFileOmeTiff('file://' + FIXTURE);
     const { Name, Pixels } = metadata;
     t.equal(
       Name,

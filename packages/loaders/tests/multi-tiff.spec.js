@@ -1,7 +1,7 @@
 import test from 'tape';
 import { fromFile } from 'geotiff';
 import { load } from '../src/tiff/multi-tiff';
-import { loadMultiTiff, FILE_PREFIX } from '../src/tiff';
+import { loadMultiTiff } from '../src/tiff';
 
 import * as path from 'path';
 import * as url from 'url';
@@ -19,9 +19,9 @@ const CHANNEL_2_FIXTURE = path.resolve(
   __dirname,
   './fixtures/multi-tiff/Channel_2.tif'
 );
-const CHANNEL_0_LOCAL_FIXTURE = `${FILE_PREFIX}${CHANNEL_0_FIXTURE}`;
-const CHANNEL_1_LOCAL_FIXTURE = `${FILE_PREFIX}${CHANNEL_1_FIXTURE}`;
-const CHANNEL_2_LOCAL_FIXTURE = `${FILE_PREFIX}${CHANNEL_2_FIXTURE}`;
+const CHANNEL_0_LOCAL_FIXTURE = `file://${CHANNEL_0_FIXTURE}`;
+const CHANNEL_1_LOCAL_FIXTURE = `file://${CHANNEL_1_FIXTURE}`;
+const CHANNEL_2_LOCAL_FIXTURE = `file://${CHANNEL_2_FIXTURE}`;
 
 async function loadImage() {
   return {
