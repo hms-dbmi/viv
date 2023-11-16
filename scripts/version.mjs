@@ -52,28 +52,26 @@ async function postChangesetsVersion() {
     { encoding: 'utf-8' }
   );
   const lines = contents.split('\n');
-  lines.splice(0, 1);
-
   const newChangelog = lines
     .filter(line => !line.startsWith('  - @vivjs/')) // remove dependency updates
     .join('\n');
-
-  const rootChangeLog = fs.readFileSync(
-    path.resolve(__dirname, '..', 'CHANGELOG.md'),
-    { encoding: 'utf-8' }
-  );
   fs.writeFileSync(
-    path.resolve(__dirname, '..', 'CHANGELOG.md'),
-    `${newChangelog}\n${rootChangeLog}`
+    path.resolve(__dirname, '..', 'packages', 'main', 'CHANGELOG.md'),
+    newChangelog,
   );
+
+  for (const pkg of fs.readdirSync(path.resolve(__dirname, "../packages"))) {
+    if (pkg === "main") {
+      continue;
+    }
+    fs.unlinkSync(path.resolve(__dirname, "../packages", pkg, "CHANGELOG.md"));
+  }
+
+  for (const pkg of fs.readdirSync(path.resolve(__dirname, "../sites"))) {
+    fs.unlinkSync(path.resolve(__dirname, "../sites", pkg, "CHANGELOG.md"));
+  }
 }
 
 await preChangesetsVersion();
 childProcess.execSync('pnpm changeset version');
 await postChangesetsVersion();
-for (const pkg of fs.readdirSync(path.resolve(__dirname, "../packages"))) {
-  fs.unlinkSync(path.resolve(__dirname, "../packages", pkg, "CHANGELOG.md"));
-}
-for (const pkg of fs.readdirSync(path.resolve(__dirname, "../sites"))) {
-  fs.unlinkSync(path.resolve(__dirname, "../sites", pkg, "CHANGELOG.md"));
-}
