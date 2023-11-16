@@ -93,10 +93,6 @@ export function getChannelStats(arr: TypedArray) {
   };
 }
 
-export function ensureArray<T>(x: T | T[]) {
-  return Array.isArray(x) ? x : [x];
-}
-
 /*
  * Converts 32-bit integer color representation to RGBA tuple.
  * Used to serialize colors from OME-XML metadata.
@@ -142,29 +138,6 @@ export function getLabels(dimOrder: OmeXml[0]['Pixels']['DimensionOrder']) {
   return dimOrder.toLowerCase().split('').reverse() as Labels<
     Sel<Lowercase<typeof dimOrder>>
   >;
-}
-
-/*
- * Creates an ES6 map of 'label' -> index
- * > const labels = ['a', 'b', 'c', 'd'];
- * > const dims = getDims(labels);
- * > dims('a') === 0;
- * > dims('b') === 1;
- * > dims('c') === 2;
- * > dims('hi!'); // throws
- */
-export function getDims<S extends string>(labels: S[]) {
-  const lookup = new Map(labels.map((name, i) => [name, i]));
-  if (lookup.size !== labels.length) {
-    throw Error('Labels must be unique, found duplicated label.');
-  }
-  return (name: S) => {
-    const index = lookup.get(name);
-    if (index === undefined) {
-      throw Error('Invalid dimension.');
-    }
-    return index;
-  };
 }
 
 export function getImageSize<T extends string[]>(source: PixelSource<T>) {
@@ -256,4 +229,14 @@ export function parseXML(xmlString: string) {
     'application/xml'
   );
   return xmlToJson(doc.documentElement, { attrtibutesKey: 'attr' });
+}
+
+/** Asserts the condition. */
+export function assert(
+  condition: unknown,
+  message?: string
+): asserts condition {
+  if (!condition) {
+    throw new Error(`Assert failed${message ? `: ${message}` : ''}`);
+  }
 }

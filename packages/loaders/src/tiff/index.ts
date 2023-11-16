@@ -1,12 +1,19 @@
-import { fromUrl, fromBlob, fromFile, addDecoder } from 'geotiff';
-import type { GeoTIFF, Pool } from 'geotiff';
+import { fromBlob, addDecoder } from 'geotiff';
+import type { Pool } from 'geotiff';
 
-import { createOffsetsProxy, checkProxies } from './lib/proxies';
 import LZWDecoder from './lib/lzw-decoder';
-import { parseFilename, type OmeTiffSelection } from './lib/utils';
+import {
+  parseFilename,
+  type OmeTiffSelection,
+  createGeoTiff,
+  type OmeTiffDims
+} from './lib/utils';
 
-import { load as loadOme } from './ome-tiff';
+import { loadSingleFileOmeTiff } from './singlefile-ome-tiff';
+import { loadMultifileOmeTiff } from './multifile-ome-tiff';
 import { load as loadMulti, type MultiTiffImage } from './multi-tiff';
+import type TiffPixelSource from './pixel-source';
+import type { OmeXml } from '../omexml';
 
 addDecoder(5, () => LZWDecoder);
 
@@ -14,7 +21,6 @@ interface TiffOptions {
   headers?: Headers | Record<string, string>;
   offsets?: number[];
   pool?: Pool;
-  images?: 'first' | 'all';
 }
 
 interface OmeTiffOptions extends TiffOptions {
@@ -28,29 +34,32 @@ interface MultiTiffOptions {
   headers?: Headers | Record<string, string>;
 }
 
-type MultiImage = Awaited<ReturnType<typeof loadOme>>; // get return-type from `load`
+type OmeTiffImage = {
+  data: TiffPixelSource<OmeTiffDims>[];
+  metadata: OmeXml[number];
+};
 
-export const FILE_PREFIX = 'file://';
+function isSupportedCompanionOmeTiffFile(source: string | File) {
+  return typeof source === 'string' && source.endsWith('.companion.ome');
+}
 
 /** @ignore */
 export async function loadOmeTiff(
   source: string | File,
   opts: TiffOptions & { images: 'all' }
-): Promise<MultiImage>;
+): Promise<OmeTiffImage[]>;
 /** @ignore */
 export async function loadOmeTiff(
   source: string | File,
   opts: TiffOptions & { images: 'first' }
-): Promise<MultiImage[0]>;
+): Promise<OmeTiffImage>;
 /** @ignore */
 export async function loadOmeTiff(
   source: string | File,
   opts: TiffOptions
-): Promise<MultiImage[0]>;
+): Promise<OmeTiffImage>;
 /** @ignore */
-export async function loadOmeTiff(
-  source: string | File
-): Promise<MultiImage[0]>;
+export async function loadOmeTiff(source: string | File): Promise<OmeTiffImage>;
 /**
  * Opens an OME-TIFF via URL and returns data source and associated metadata for first or all images in files.
  *
@@ -68,40 +77,11 @@ export async function loadOmeTiff(
   source: string | File,
   opts: OmeTiffOptions = {}
 ) {
-  const { headers = {}, offsets, pool, images = 'first' } = opts;
-
-  let tiff: GeoTIFF;
-
-  // Create tiff source
-  if (typeof source === 'string') {
-    if (source.startsWith(FILE_PREFIX)) {
-      tiff = await fromFile(source.slice(FILE_PREFIX.length));
-    } else {
-      // https://github.com/ilan-gold/geotiff.js/tree/viv#abortcontroller-support
-      // https://www.npmjs.com/package/lru-cache#options
-      // Cache size needs to be infinite due to consistency issues.
-      tiff = await fromUrl(source, { headers, cacheSize: Infinity });
-    }
-  } else {
-    tiff = await fromBlob(source);
-  }
-
-  if (offsets) {
-    /*
-     * Performance enhancement. If offsets are provided, we
-     * create a proxy that intercepts calls to `tiff.getImage`
-     * and injects the pre-computed offsets.
-     */
-    tiff = createOffsetsProxy(tiff, offsets);
-  }
-  /*
-   * Inspect tiff source for our performance enhancing proxies.
-   * Prints warnings to console if `offsets` or `pool` are missing.
-   */
-  checkProxies(tiff);
-
-  const loaders = await loadOme(tiff, pool);
-  return images === 'all' ? loaders : loaders[0];
+  const load = isSupportedCompanionOmeTiffFile(source)
+    ? loadMultifileOmeTiff
+    : loadSingleFileOmeTiff;
+  const loaders = await load(source, opts);
+  return opts.images === 'all' ? loaders : loaders[0];
 }
 
 function getImageSelectionName(
@@ -161,12 +141,9 @@ export async function loadMultiTiff(
       if (extension === 'tif' || extension === 'tiff') {
         const tiffImageName = parsedFilename.name;
         if (tiffImageName) {
-          let curImage: GeoTIFF;
-          if (file.startsWith(FILE_PREFIX)) {
-            curImage = await fromFile(file.slice(FILE_PREFIX.length));
-          } else {
-            curImage = await fromUrl(file, { headers, cacheSize: Infinity });
-          }
+          const curImage = await createGeoTiff(file, {
+            headers
+          });
           for (let i = 0; i < imageSelections.length; i++) {
             const curSelection = imageSelections[i];
 

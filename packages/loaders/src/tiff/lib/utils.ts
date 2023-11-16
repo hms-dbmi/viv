@@ -1,7 +1,23 @@
-import type { GeoTIFFImage } from 'geotiff';
-import { getDims, getLabels, DTYPE_LOOKUP } from '../../utils';
-import type { OmeXml, UnitsLength, DimensionOrder } from '../../omexml';
+import {
+  type GeoTIFF,
+  type GeoTIFFImage,
+  fromFile,
+  fromUrl,
+  fromBlob
+} from 'geotiff';
+import { getLabels, DTYPE_LOOKUP } from '../../utils';
+import type { OmeXml, PhysicalUnit, DimensionOrder } from '../../omexml';
 import type { MultiTiffImage } from '../multi-tiff';
+import { createOffsetsProxy } from './proxies';
+
+// TODO: Remove the fancy label stuff
+export type OmeTiffDims =
+  | ['t', 'c', 'z']
+  | ['z', 't', 'c']
+  | ['t', 'z', 'c']
+  | ['c', 'z', 't']
+  | ['z', 'c', 't']
+  | ['c', 't', 'z'];
 
 export interface OmeTiffSelection {
   t: number;
@@ -9,30 +25,37 @@ export interface OmeTiffSelection {
   z: number;
 }
 
-function findPhysicalSizes({
-  PhysicalSizeX,
-  PhysicalSizeY,
-  PhysicalSizeZ,
-  PhysicalSizeXUnit,
-  PhysicalSizeYUnit,
-  PhysicalSizeZUnit
-}: OmeXml[number]['Pixels']):
-  | undefined
-  | Record<string, { size: number; unit: UnitsLength }> {
+type PhysicalSize = {
+  size: number;
+  unit: PhysicalUnit;
+};
+
+type PhysicalSizes = {
+  x: PhysicalSize;
+  y: PhysicalSize;
+  z?: PhysicalSize;
+};
+
+function extractPhysicalSizesfromOmeXml(
+  d: OmeXml[number]['Pixels']
+): undefined | PhysicalSizes {
   if (
-    !PhysicalSizeX ||
-    !PhysicalSizeY ||
-    !PhysicalSizeXUnit ||
-    !PhysicalSizeYUnit
+    !d['PhysicalSizeX'] ||
+    !d['PhysicalSizeY'] ||
+    !d['PhysicalSizeXUnit'] ||
+    !d['PhysicalSizeYUnit']
   ) {
     return undefined;
   }
-  const physicalSizes: Record<string, { size: number; unit: UnitsLength }> = {
-    x: { size: PhysicalSizeX, unit: PhysicalSizeXUnit },
-    y: { size: PhysicalSizeY, unit: PhysicalSizeYUnit }
+  const physicalSizes: PhysicalSizes = {
+    x: { size: d['PhysicalSizeX'], unit: d['PhysicalSizeXUnit'] },
+    y: { size: d['PhysicalSizeY'], unit: d['PhysicalSizeYUnit'] }
   };
-  if (PhysicalSizeZ && PhysicalSizeZUnit) {
-    physicalSizes.z = { size: PhysicalSizeZ, unit: PhysicalSizeZUnit };
+  if (d['PhysicalSizeZ'] && d['PhysicalSizeZUnit']) {
+    physicalSizes.z = {
+      size: d['PhysicalSizeZ'],
+      unit: d['PhysicalSizeZUnit']
+    };
   }
   return physicalSizes;
 }
@@ -42,11 +65,10 @@ export function getOmePixelSourceMeta({ Pixels }: OmeXml[0]) {
   const labels = getLabels(Pixels.DimensionOrder);
 
   // Compute "shape" of image
-  const dims = getDims(labels);
   const shape: number[] = Array(labels.length).fill(0);
-  shape[dims('t')] = Pixels.SizeT;
-  shape[dims('c')] = Pixels.SizeC;
-  shape[dims('z')] = Pixels.SizeZ;
+  shape[labels.indexOf('t')] = Pixels.SizeT;
+  shape[labels.indexOf('c')] = Pixels.SizeC;
+  shape[labels.indexOf('z')] = Pixels.SizeZ;
 
   // Push extra dimension if data are interleaved.
   if (Pixels.Interleaved) {
@@ -57,10 +79,10 @@ export function getOmePixelSourceMeta({ Pixels }: OmeXml[0]) {
 
   // Creates a new shape for different level of pyramid.
   // Assumes factor-of-two downsampling.
-  const getShape = (level: number) => {
+  const getShape = (level: number = 0) => {
     const s = [...shape];
-    s[dims('x')] = Pixels.SizeX >> level;
-    s[dims('y')] = Pixels.SizeY >> level;
+    s[labels.indexOf('x')] = Pixels.SizeX >> level;
+    s[labels.indexOf('y')] = Pixels.SizeY >> level;
     return s;
   };
 
@@ -69,9 +91,9 @@ export function getOmePixelSourceMeta({ Pixels }: OmeXml[0]) {
   }
 
   const dtype = DTYPE_LOOKUP[Pixels.Type as keyof typeof DTYPE_LOOKUP];
-  const physicalSizes = findPhysicalSizes(Pixels);
-  if (physicalSizes) {
-    return { labels, getShape, dtype, physicalSizes };
+  const maybePhysicalSizes = extractPhysicalSizesfromOmeXml(Pixels);
+  if (maybePhysicalSizes) {
+    return { labels, getShape, dtype, physicalSizes: maybePhysicalSizes };
   }
   return { labels, getShape, dtype };
 }
@@ -276,4 +298,55 @@ export function parseFilename(path: string) {
     [, parsedFilename.extension] = splitFilename;
   }
   return parsedFilename;
+}
+
+/**
+ * Creates a GeoTIFF object from a URL, File, or Blob.
+ *
+ * @param source - URL, File, or Blob
+ * @param options
+ * @param options.headers - HTTP headers to use when fetching a URL
+ */
+function createGeoTiffObject(
+  source: string | URL | File,
+  { headers }: { headers?: Headers | Record<string, string> }
+): Promise<GeoTIFF> {
+  if (source instanceof Blob) {
+    return fromBlob(source);
+  }
+  const url = typeof source === 'string' ? new URL(source) : source;
+  if (url.protocol === 'file:') {
+    return fromFile(url.pathname);
+  }
+  // https://github.com/ilan-gold/geotiff.js/tree/viv#abortcontroller-support
+  // https://www.npmjs.com/package/lru-cache#options
+  // Cache size needs to be infinite due to consistency issues.
+  return fromUrl(url.href, { headers, cacheSize: Infinity });
+}
+
+/**
+ * Creates a GeoTIFF object from a URL, File, or Blob.
+ *
+ * If `offsets` are provided, a proxy is returned that
+ * intercepts calls to `tiff.getImage` and injects the
+ * pre-computed offsets. This is a performance enhancement.
+ *
+ * @param source - URL, File, or Blob
+ * @param options
+ * @param options.headers - HTTP headers to use when fetching a URL
+ */
+export async function createGeoTiff(
+  source: string | URL | File,
+  options: {
+    headers?: Headers | Record<string, string>;
+    offsets?: number[];
+  } = {}
+): Promise<GeoTIFF> {
+  const tiff = await createGeoTiffObject(source, options);
+  /*
+   * Performance enhancement. If offsets are provided, we
+   * create a proxy that intercepts calls to `tiff.getImage`
+   * and injects the pre-computed offsets.
+   */
+  return options.offsets ? createOffsetsProxy(tiff, options.offsets) : tiff;
 }

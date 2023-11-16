@@ -1,4 +1,4 @@
-import { ensureArray, intToRgba, parseXML } from './utils';
+import { intToRgba, parseXML } from './utils';
 import * as z from 'zod';
 
 export type OmeXml = ReturnType<typeof fromString>;
@@ -13,6 +13,10 @@ function flattenAttributes<T extends { attr: Record<string, unknown> }>({
 }: T): Prettify<Pick<T, Exclude<keyof T, 'attr'>> & T['attr']> {
   // @ts-expect-error - TS doesn't like the prettify type
   return { ...attr, ...rest };
+}
+
+function ensureArray<T>(x: T | T[]) {
+  return Array.isArray(x) ? x : [x];
 }
 
 export type DimensionOrder = z.infer<typeof DimensionOrderSchema>;
@@ -39,8 +43,8 @@ const PixelTypeSchema = z.enum([
   'double-complex'
 ]);
 
-export type UnitsLength = z.infer<typeof UnitsLengthSchema>;
-const UnitsLengthSchema = z.enum([
+export type PhysicalUnit = z.infer<typeof PhysicalUnitSchema>;
+const PhysicalUnitSchema = z.enum([
   'Ym',
   'Zm',
   'Em',
@@ -130,9 +134,9 @@ const PixelsSchema = z
       PhysicalSizeY: z.coerce.number().optional(),
       PhysicalSizeZ: z.coerce.number().optional(),
       SignificantBits: z.coerce.number().optional(),
-      PhysicalSizeXUnit: UnitsLengthSchema.optional().default('µm'),
-      PhysicalSizeYUnit: UnitsLengthSchema.optional().default('µm'),
-      PhysicalSizeZUnit: UnitsLengthSchema.optional().default('µm'),
+      PhysicalSizeXUnit: PhysicalUnitSchema.optional().default('µm'),
+      PhysicalSizeYUnit: PhysicalUnitSchema.optional().default('µm'),
+      PhysicalSizeZUnit: PhysicalUnitSchema.optional().default('µm'),
       BigEndian: z
         .string()
         .transform(v => v.toLowerCase() === 'true')
@@ -176,7 +180,8 @@ const OmeSchema = z
 
 export function fromString(str: string) {
   const raw = parseXML(str);
-  return OmeSchema.parse(raw).Image.map(img => {
+  const omeXml = OmeSchema.parse(raw);
+  return omeXml['Image'].map(img => {
     return {
       ...img,
       format() {

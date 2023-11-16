@@ -21,10 +21,14 @@ const MAX_CHANNELS_FOR_SNACKBAR_WARNING = 40;
  * Guesses whether string URL or File is for an OME-TIFF image.
  * @param {string | File} urlOrFile
  */
-function isOMETIFF(urlOrFile) {
+function isOmeTiff(urlOrFile) {
   if (Array.isArray(urlOrFile)) return false; // local Zarr is array of File Objects
   const name = typeof urlOrFile === 'string' ? urlOrFile : urlOrFile.name;
-  return name.includes('ome.tiff') || name.includes('ome.tif');
+  return (
+    name.includes('ome.tiff') ||
+    name.includes('ome.tif') ||
+    name.includes('.companion.ome')
+  );
 }
 
 /**
@@ -106,31 +110,31 @@ class UnsupportedBrowserError extends Error {
   }
 }
 
-/**
- *
- * @param {string | File} src
- * @param {import('../../src/loaders/omexml').OMEXML} rootMeta
- * @param {number} levels
- * @param {import('../../src/loaders/tiff/pixel-source').TiffPixelSource[]} data
- */
-async function getTotalImageCount(src, rootMeta, data) {
-  const from = typeof src === 'string' ? fromUrl : fromBlob;
-  const tiff = await from(src);
-  const firstImage = await tiff.getImage(0);
-  const hasSubIFDs = Boolean(firstImage?.fileDirectory?.SubIFDs);
+async function getTotalImageCount(sources) {
+  const firstOmeTiffImage = sources[0];
+  const firstPixelSource = firstOmeTiffImage.data[0];
+  const representativeGeoTiffImage = await firstPixelSource._indexer({
+    c: 0,
+    z: 0,
+    t: 0
+  });
+  const hasSubIFDs = Boolean(
+    representativeGeoTiffImage?.fileDirectory?.SubIFDs
+  );
+
+  // Non-Bioformats6 pyramids use Image tags for pyramid levels and do not have offsets
+  // built in to the format for them, hence the ternary.
+
   if (hasSubIFDs) {
-    return rootMeta.reduce((sum, imgMeta) => {
-      const {
-        Pixels: { SizeC, SizeT, SizeZ }
-      } = imgMeta;
+    return sources.reduce((sum, { metadata }) => {
+      const { SizeC, SizeT, SizeZ } = metadata.Pixels;
       const numImagesPerResolution = SizeC * SizeT * SizeZ;
       return numImagesPerResolution + sum;
     }, 1);
   }
-  const levels = data[0].length;
-  const {
-    Pixels: { SizeC, SizeT, SizeZ }
-  } = rootMeta[0];
+
+  const levels = firstOmeTiffImage.data.length;
+  const { SizeC, SizeT, SizeZ } = firstOmeTiffImage.metadata.Pixels;
   const numImagesPerResolution = SizeC * SizeT * SizeZ;
   return numImagesPerResolution * levels;
 }
@@ -141,6 +145,17 @@ async function getTotalImageCount(src, rootMeta, data) {
  */
 function isZodError(e) {
   return e instanceof Error && 'issues' in e;
+}
+
+/** @param {string} url */
+async function fetchSingleFileOmeTiffOffsets(url) {
+  // No offsets for multifile OME-TIFFs
+  if (url.includes('companion.ome')) {
+    return undefined;
+  }
+  const offsetsUrl = url.replace(/ome\.tif(f?)/gi, 'offsets.json');
+  const res = await fetch(offsetsUrl);
+  return res.status === 200 ? await res.json() : undefined;
 }
 
 /**
@@ -159,7 +174,7 @@ export async function createLoader(
   // Otherwise load.
   try {
     // OME-TIFF
-    if (isOMETIFF(urlOrFile)) {
+    if (isOmeTiff(urlOrFile)) {
       if (urlOrFile instanceof File) {
         // TODO(2021-05-09): temporarily disable `pool` until inline worker module is fixed.
         const source = await loadOmeTiff(urlOrFile, {
@@ -168,27 +183,20 @@ export async function createLoader(
         });
         return source;
       }
-      const url = urlOrFile;
-      const res = await fetch(url.replace(/ome\.tif(f?)/gi, 'offsets.json'));
-      const isOffsetsNot200 = res.status !== 200;
-      const offsets = !isOffsetsNot200 ? await res.json() : undefined;
+
+      const maybeOffsets = await fetchSingleFileOmeTiffOffsets(urlOrFile);
+
       // TODO(2021-05-06): temporarily disable `pool` until inline worker module is fixed.
       const source = await loadOmeTiff(urlOrFile, {
-        offsets,
+        offsets: maybeOffsets,
         images: 'all',
         pool: false
       });
 
       // Show a warning if the total number of channels/images exceeds a fixed amount.
-      // Non-Bioformats6 pyramids use Image tags for pyramid levels and do not have offsets
-      // built in to the format for them, hence the ternary.
-      const totalImageCount = await getTotalImageCount(
-        urlOrFile,
-        source.map(s => s.metadata),
-        source.map(s => s.data)
-      );
+      const totalImageCount = await getTotalImageCount(source);
       if (
-        isOffsetsNot200 &&
+        !maybeOffsets &&
         totalImageCount > MAX_CHANNELS_FOR_SNACKBAR_WARNING
       ) {
         handleOffsetsNotFound(true);
@@ -385,6 +393,11 @@ export async function getSingleSelectionStats2D({ loader, selection }) {
   const raster = await data.getRaster({ selection });
   const selectionStats = getChannelStats(raster.data);
   const { domain, contrastLimits } = selectionStats;
+  // Edge case: if the contrast limits are the same, set them to the domain.
+  if (contrastLimits[0] === contrastLimits[1]) {
+    contrastLimits[0] = domain[0];
+    contrastLimits[1] = domain[1];
+  }
   return { domain, contrastLimits };
 }
 
