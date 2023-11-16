@@ -1,15 +1,13 @@
 import { fromBlob, addDecoder } from 'geotiff';
 import type { Pool } from 'geotiff';
 
-import { checkProxies } from './lib/proxies';
 import LZWDecoder from './lib/lzw-decoder';
 import {
   parseFilename,
   type OmeTiffSelection,
-  createTiffReader
 } from './lib/utils';
 
-import { load as loadOme } from './ome-tiff';
+import { loadSingleFileOmeTiff } from './singlefile-ome-tiff';
 import { load as loadMultifileOme } from './ome-multifile';
 import { load as loadMulti, type MultiTiffImage } from './multi-tiff';
 
@@ -32,26 +30,9 @@ interface MultiTiffOptions {
   headers?: Headers | Record<string, string>;
 }
 
-type MultiImage = Awaited<ReturnType<typeof loadOme>>; // get return-type from `load`
+type MultiImage = Awaited<ReturnType<typeof loadMultifileOme>>; // get return-type from `load`
 
 export const FILE_PREFIX = 'file://';
-
-async function loadMultiFileOmeTiff(source: string, opts: TiffOptions) {
-  return loadMultifileOme(source, opts.pool);
-}
-
-async function loadSingleFileOmeTiff(
-  source: string | File,
-  options: TiffOptions
-) {
-  const tiff = await createTiffReader(source, options);
-  /*
-   * Inspect tiff source for our performance enhancing proxies.
-   * Prints warnings to console if `offsets` or `pool` are missing.
-   */
-  checkProxies(tiff);
-  return loadOme(tiff, options.pool);
-}
 
 /** @ignore */
 export async function loadOmeTiff(

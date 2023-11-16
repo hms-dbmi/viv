@@ -3,7 +3,7 @@ import { fromString } from '../omexml';
 
 import TiffPixelSource from './pixel-source';
 import { getOmeLegacyIndexer, getOmeSubIFDIndexer } from './lib/indexers';
-import { getOmePixelSourceMeta, type OmeTiffSelection } from './lib/utils';
+import { createGeoTiff, getOmePixelSourceMeta, type OmeTiffSelection } from './lib/utils';
 import { guessTiffTileSize } from '../utils';
 import type Pool from './lib/Pool';
 import type { OmeTiffIndexer } from './lib/indexers';
@@ -27,7 +27,14 @@ function getIndexer(
   return getOmeLegacyIndexer(tiff, omexml);
 }
 
-export async function load(tiff: GeoTIFF, pool?: Pool) {
+export async function loadSingleFileOmeTiff(
+  source: string | URL | File,
+  options: {
+    pool?: Pool;
+    headers?: Headers | Record<string, string>;
+  }
+) {
+  const tiff = await createGeoTiff(source, options);
   const firstImage = await tiff.getImage(0);
   const {
     ImageDescription,
@@ -49,7 +56,7 @@ export async function load(tiff: GeoTIFF, pool?: Pool) {
   const getSource = (
     resolution: number,
     pyramidIndexer: OmeTiffIndexer,
-    imgMeta: OmeXml[0]
+    imgMeta: OmeXml[number]
   ) => {
     const { labels, getShape, physicalSizes, dtype } =
       getOmePixelSourceMeta(imgMeta);
@@ -64,7 +71,7 @@ export async function load(tiff: GeoTIFF, pool?: Pool) {
       shape,
       labels,
       meta,
-      pool
+      options.pool,
     );
     return source;
   };

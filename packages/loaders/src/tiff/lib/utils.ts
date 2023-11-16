@@ -4,7 +4,7 @@ import GeoTIFF, {
   fromUrl,
   fromBlob
 } from 'geotiff';
-import { getDims, getLabels, DTYPE_LOOKUP } from '../../utils';
+import { getLabels, DTYPE_LOOKUP } from '../../utils';
 import type { OmeXml, UnitsLength, DimensionOrder } from '../../omexml';
 import type { MultiTiffImage } from '../multi-tiff';
 import { createOffsetsProxy } from './proxies';
@@ -55,11 +55,10 @@ export function getOmePixelSourceMeta({ Pixels }: OmeXml[0]) {
   const labels = getLabels(Pixels.DimensionOrder);
 
   // Compute "shape" of image
-  const dims = getDims(labels);
   const shape: number[] = Array(labels.length).fill(0);
-  shape[dims('t')] = Pixels.SizeT;
-  shape[dims('c')] = Pixels.SizeC;
-  shape[dims('z')] = Pixels.SizeZ;
+  shape[labels.indexOf('t')] = Pixels.SizeT;
+  shape[labels.indexOf('c')] = Pixels.SizeC;
+  shape[labels.indexOf('z')] = Pixels.SizeZ;
 
   // Push extra dimension if data are interleaved.
   if (Pixels.Interleaved) {
@@ -70,10 +69,10 @@ export function getOmePixelSourceMeta({ Pixels }: OmeXml[0]) {
 
   // Creates a new shape for different level of pyramid.
   // Assumes factor-of-two downsampling.
-  const getShape = (level: number) => {
+  const getShape = (level: number = 0) => {
     const s = [...shape];
-    s[dims('x')] = Pixels.SizeX >> level;
-    s[dims('y')] = Pixels.SizeY >> level;
+    s[labels.indexOf('x')] = Pixels.SizeX >> level;
+    s[labels.indexOf('y')] = Pixels.SizeY >> level;
     return s;
   };
 
