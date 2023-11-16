@@ -13,5 +13,6 @@
     "@rollup/plugin-node-resolve": "^13.3.0",
     "documentation": "^13.2.5",
     "rollup": "^2.75.7"
-  }
+  },
+  "version": null
 }
