@@ -5,12 +5,15 @@ import LZWDecoder from './lib/lzw-decoder';
 import {
   parseFilename,
   type OmeTiffSelection,
-  createGeoTiff
+  createGeoTiff,
+  type OmeTiffDims
 } from './lib/utils';
 
 import { loadSingleFileOmeTiff } from './singlefile-ome-tiff';
 import { loadMultifileOmeTiff } from './multifile-ome-tiff';
 import { load as loadMulti, type MultiTiffImage } from './multi-tiff';
+import type TiffPixelSource from './pixel-source';
+import type { OmeXml } from '../omexml';
 
 addDecoder(5, () => LZWDecoder);
 
@@ -31,27 +34,32 @@ interface MultiTiffOptions {
   headers?: Headers | Record<string, string>;
 }
 
-type MultiImage = Awaited<ReturnType<typeof loadSingleFileOmeTiff>>; // get return-type from `load`
+type OmeTiffImage = {
+  data: TiffPixelSource<OmeTiffDims>[];
+  metadata: OmeXml[number];
+};
+
+function isSupportedCompanionOmeTiffFile(source: string | File) {
+  return typeof source === 'string' && source.endsWith('.companion.ome');
+}
 
 /** @ignore */
 export async function loadOmeTiff(
   source: string | File,
   opts: TiffOptions & { images: 'all' }
-): Promise<MultiImage>;
+): Promise<OmeTiffImage[]>;
 /** @ignore */
 export async function loadOmeTiff(
   source: string | File,
   opts: TiffOptions & { images: 'first' }
-): Promise<MultiImage[number]>;
+): Promise<OmeTiffImage>;
 /** @ignore */
 export async function loadOmeTiff(
   source: string | File,
   opts: TiffOptions
-): Promise<MultiImage[number]>;
+): Promise<OmeTiffImage>;
 /** @ignore */
-export async function loadOmeTiff(
-  source: string | File
-): Promise<MultiImage[number]>;
+export async function loadOmeTiff(source: string | File): Promise<OmeTiffImage>;
 /**
  * Opens an OME-TIFF via URL and returns data source and associated metadata for first or all images in files.
  *
@@ -69,12 +77,10 @@ export async function loadOmeTiff(
   source: string | File,
   opts: OmeTiffOptions = {}
 ) {
-  let loaders: MultiImage;
-  try {
-    loaders = await loadSingleFileOmeTiff(source, opts);
-  } catch {
-    loaders = await loadMultifileOmeTiff(source, opts);
-  }
+  const load = isSupportedCompanionOmeTiffFile(source)
+    ? loadMultifileOmeTiff
+    : loadSingleFileOmeTiff;
+  const loaders = await load(source, opts);
   return opts.images === 'all' ? loaders : loaders[0];
 }
 

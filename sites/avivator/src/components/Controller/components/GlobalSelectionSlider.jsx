@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 // eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 import Grid from '@material-ui/core/Grid';
@@ -22,53 +22,51 @@ export default function GlobalSelectionSlider(props) {
   );
   const loader = useLoader();
   const globalSelection = useViewerStore(store => store.globalSelection);
-  const changeSelection = useCallback(
-    debounce(
-      (event, newValue) => {
-        useViewerStore.setState({
-          isChannelLoading: selections.map(() => true)
+  const changeSelection = debounce(
+    (_event, newValue) => {
+      useViewerStore.setState({
+        isChannelLoading: selections.map(() => true)
+      });
+      const newSelections = [...selections].map(sel => ({
+        ...sel,
+        [label]: newValue
+      }));
+      getMultiSelectionStats({
+        loader,
+        selections: newSelections,
+        use3d: false
+      }).then(({ domains, contrastLimits }) => {
+        unstable_batchedUpdates(() => {
+          range(newSelections.length).forEach((channel, j) =>
+            setPropertiesForChannel(channel, {
+              domains: domains[j],
+              contrastLimits: contrastLimits[j]
+            })
+          );
         });
-        const newSelections = [...selections].map(sel => ({
-          ...sel,
-          [label]: newValue
-        }));
-        getMultiSelectionStats({
-          loader,
-          selections: newSelections,
-          use3d: false
-        }).then(({ domains, contrastLimits }) => {
-          unstable_batchedUpdates(() => {
-            range(newSelections.length).forEach((channel, j) =>
-              setPropertiesForChannel(channel, {
-                domains: domains[j],
-                contrastLimits: contrastLimits[j]
-              })
-            );
+        unstable_batchedUpdates(() => {
+          useImageSettingsStore.setState({
+            onViewportLoad: () => {
+              useImageSettingsStore.setState({
+                onViewportLoad: () => {}
+              });
+              useViewerStore.setState({
+                isChannelLoading: selections.map(() => false)
+              });
+            }
           });
-          unstable_batchedUpdates(() => {
-            useImageSettingsStore.setState({
-              onViewportLoad: () => {
-                useImageSettingsStore.setState({
-                  onViewportLoad: () => {}
-                });
-                useViewerStore.setState({
-                  isChannelLoading: selections.map(() => false)
-                });
-              }
-            });
-            range(newSelections.length).forEach((channel, j) =>
-              setPropertiesForChannel(channel, {
-                selections: newSelections[j]
-              })
-            );
-          });
+          range(newSelections.length).forEach((channel, j) =>
+            setPropertiesForChannel(channel, {
+              selections: newSelections[j]
+            })
+          );
         });
-      },
-      50,
-      { trailing: true }
-    ),
-    [loader, selections]
+      });
+    },
+    50,
+    { leading: true }
   );
+
   return (
     <Grid
       container
@@ -96,12 +94,12 @@ export default function GlobalSelectionSlider(props) {
           onChangeCommitted={changeSelection}
           valueLabelDisplay="auto"
           getAriaLabel={() => `${label} slider`}
-          marks={range(size).map(val => ({ value: val }))}
+          marks={true}
           min={0}
-          max={size}
+          max={size - 1}
           orientation="horizontal"
           style={{ marginTop: '7px' }}
-          step={null}
+          step={1}
         />
       </Grid>
     </Grid>

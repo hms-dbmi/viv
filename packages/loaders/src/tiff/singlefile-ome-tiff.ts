@@ -36,10 +36,14 @@ export async function loadSingleFileOmeTiff(
   options: {
     pool?: Pool;
     headers?: Headers | Record<string, string>;
+    offsets?: number[];
   } = {}
 ) {
-  const tiff = await createGeoTiff(source, options);
-  const firstImage = await tiff.getImage(0);
+  const tiff = await createGeoTiff(source, {
+    headers: options.headers,
+    offsets: options.offsets
+  });
+  const firstImage = await tiff.getImage();
   const {
     ImageDescription,
     SubIFDs,

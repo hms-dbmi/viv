@@ -10,6 +10,15 @@ import type { OmeXml, PhysicalUnit, DimensionOrder } from '../../omexml';
 import type { MultiTiffImage } from '../multi-tiff';
 import { createOffsetsProxy } from './proxies';
 
+// TODO: Remove the fancy label stuff
+export type OmeTiffDims =
+  | ['t', 'c', 'z']
+  | ['z', 't', 'c']
+  | ['t', 'z', 'c']
+  | ['c', 'z', 't']
+  | ['z', 'c', 't']
+  | ['c', 't', 'z'];
+
 export interface OmeTiffSelection {
   t: number;
   c: number;

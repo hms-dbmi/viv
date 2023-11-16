@@ -25,10 +25,6 @@ function isCompleteTiffDataItem(
   );
 }
 
-type MultifileImageDataLookup = ReturnType<
-  typeof createMultifileImageDataLookup
->;
-
 function createMultifileImageDataLookup(omexml: OmeXml[number]) {
   type ImageDataPointer = { ifd: number; filename: string };
   const lookup: Map<string, ImageDataPointer> = new Map();

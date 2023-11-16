@@ -110,31 +110,31 @@ class UnsupportedBrowserError extends Error {
   }
 }
 
-/**
- *
- * @param {string | File} src
- * @param {import('../../src/loaders/omexml').OMEXML} rootMeta
- * @param {number} levels
- * @param {import('../../src/loaders/tiff/pixel-source').TiffPixelSource[]} data
- */
-async function getTotalImageCount(src, rootMeta, data) {
-  const from = typeof src === 'string' ? fromUrl : fromBlob;
-  const tiff = await from(src);
-  const firstImage = await tiff.getImage(0);
-  const hasSubIFDs = Boolean(firstImage?.fileDirectory?.SubIFDs);
+async function getTotalImageCount(sources) {
+  const firstOmeTiffImage = sources[0];
+  const firstPixelSource = firstOmeTiffImage.data[0];
+  const representativeGeoTiffImage = await firstPixelSource._indexer({
+    c: 0,
+    z: 0,
+    t: 0
+  });
+  const hasSubIFDs = Boolean(
+    representativeGeoTiffImage?.fileDirectory?.SubIFDs
+  );
+
+  // Non-Bioformats6 pyramids use Image tags for pyramid levels and do not have offsets
+  // built in to the format for them, hence the ternary.
+
   if (hasSubIFDs) {
-    return rootMeta.reduce((sum, imgMeta) => {
-      const {
-        Pixels: { SizeC, SizeT, SizeZ }
-      } = imgMeta;
+    return sources.reduce((sum, { metadata }) => {
+      const { SizeC, SizeT, SizeZ } = metadata.Pixels;
       const numImagesPerResolution = SizeC * SizeT * SizeZ;
       return numImagesPerResolution + sum;
     }, 1);
   }
-  const levels = data[0].length;
-  const {
-    Pixels: { SizeC, SizeT, SizeZ }
-  } = rootMeta[0];
+
+  const levels = firstOmeTiffImage.data.length;
+  const { SizeC, SizeT, SizeZ } = firstOmeTiffImage.metadata.Pixels;
   const numImagesPerResolution = SizeC * SizeT * SizeZ;
   return numImagesPerResolution * levels;
 }
@@ -194,13 +194,7 @@ export async function createLoader(
       });
 
       // Show a warning if the total number of channels/images exceeds a fixed amount.
-      // Non-Bioformats6 pyramids use Image tags for pyramid levels and do not have offsets
-      // built in to the format for them, hence the ternary.
-      const totalImageCount = await getTotalImageCount(
-        urlOrFile,
-        source.map(s => s.metadata),
-        source.map(s => s.data)
-      );
+      const totalImageCount = await getTotalImageCount(source);
       if (
         !maybeOffsets &&
         totalImageCount > MAX_CHANNELS_FOR_SNACKBAR_WARNING
@@ -399,6 +393,11 @@ export async function getSingleSelectionStats2D({ loader, selection }) {
   const raster = await data.getRaster({ selection });
   const selectionStats = getChannelStats(raster.data);
   const { domain, contrastLimits } = selectionStats;
+  // Edge case: if the contrast limits are the same, set them to the domain.
+  if (contrastLimits[0] === contrastLimits[1]) {
+    contrastLimits[0] = domain[0];
+    contrastLimits[1] = domain[1];
+  }
   return { domain, contrastLimits };
 }
 
