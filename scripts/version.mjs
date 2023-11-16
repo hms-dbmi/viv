@@ -40,8 +40,8 @@ async function preChangesetsVersion(){
     }
     const filePath = path.resolve(__dirname, '../.changeset', file);
     const changeset = matter.read(filePath);
-    changeset.data = { [mainPackage]: getGreatestBumpType(changeset) };
     changeset.content = updateContentsWithAffectedPackages(changeset);
+    changeset.data = { [mainPackage]: getGreatestBumpType(changeset) };
     fs.writeFileSync(filePath, matter.stringify(changeset.content, changeset.data));
   }
 }
@@ -53,7 +53,11 @@ async function postChangesetsVersion() {
   );
   const lines = contents.split('\n');
   lines.splice(0, 1);
-  const newChangelog = lines.join('\n');
+
+  const newChangelog = lines
+    .filter(line => !line.startsWith('  - @vivjs/')) // remove dependency updates
+    .join('\n');
+
   const rootChangeLog = fs.readFileSync(
     path.resolve(__dirname, '..', 'CHANGELOG.md'),
     { encoding: 'utf-8' }
