@@ -7,6 +7,61 @@ import ImageLayer from '../image-layer';
 import { getImageSize, isInterleaved, SIGNAL_ABORTED } from '@vivjs/loaders';
 import { ColorPaletteExtension } from '@vivjs/extensions';
 
+/**
+ * Here we process the clipping of the black border of incoming tiles
+ * at low resolutions i.e for zarr tiles which are padded by zarr.
+ * We need to check a few things before trimming:
+ *  1. The height/width of the full image at the current resolution
+ *  produces an image smaller than the current tileSize
+ *  2. The incoming image is padded to the tile size i.e one of its dimensions matches the tile size
+ * Once these have been confirmed, we trim the tile by going over it in row major order,
+ * keeping only the data that is not out of the clipped bounds.
+ * @param {{
+ *   loader: PixelSource[],
+ *   resolution: number,
+ *   tileSize: number,
+ * }}
+ * @return {{ data: TypedArray, height: number, width: number }}
+ */
+const clipTiles = ({ loader, resolution, tiles }) => {
+  const { tileSize } = loader[0];
+  const planarSize = getImageSize(loader[0]);
+  const [clippedHeight, clippedWidth] = [
+    planarSize.height,
+    planarSize.width
+  ].map(size => Math.floor(size / 2 ** resolution));
+  const isUnderTileSize = dimSize => dimSize < tileSize;
+  const shouldClip = ({ clippedDimSize, dataDimSize }) =>
+    isUnderTileSize(clippedDimSize) && dataDimSize === tileSize;
+  const getDimSize = ({ clippedDimSize, dataDimSize }) =>
+    shouldClip({ clippedDimSize, dataDimSize }) ? clippedDimSize : dataDimSize;
+
+  return tiles.map(({ data, height, width }) => {
+    let clippedData = data;
+    if (
+      shouldClip({ clippedDimSize: clippedHeight, dataDimSize: height }) ||
+      shouldClip({ clippedDimSize: clippedWidth, dataDimSize: width })
+    ) {
+      const isHeightUnderTileSize = isUnderTileSize(clippedHeight);
+      const isWidthUnderTileSize = isUnderTileSize(clippedWidth);
+      clippedData = data.filter((d, ind) => {
+        return !(
+          (ind % tileSize >= clippedWidth && isWidthUnderTileSize) ||
+          (isHeightUnderTileSize && Math.floor(ind / tileSize) >= clippedHeight)
+        );
+      });
+    }
+    return {
+      data: clippedData,
+      height: getDimSize({
+        clippedDimSize: clippedHeight,
+        dataDimSize: height
+      }),
+      width: getDimSize({ clippedDimSize: clippedWidth, dataDimSize: width })
+    };
+  });
+};
+
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   onHover: { type: 'function', value: null, compare: false },
@@ -87,7 +142,6 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         const config = { x, y, selection, signal };
         return loader[resolution].getTile(config);
       };
-
       try {
         /*
          * Try to request the tile data. The pixels sources can throw
@@ -97,8 +151,8 @@ const MultiscaleImageLayer = class extends CompositeLayer {
          * This means that our pixels sources _always_ have the same
          * return type, and optional throw for performance.
          */
-        const tiles = await Promise.all(selections.map(getTile));
-
+        let tiles = await Promise.all(selections.map(getTile));
+        tiles = clipTiles({ loader, resolution, tiles });
         const tile = {
           data: tiles.map(d => d.data),
           width: tiles[0].width,

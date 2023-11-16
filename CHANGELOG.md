@@ -59,6 +59,7 @@
 ### Changed
 
 - Fix `Float64` reversion from the fix in 0.12.8
+- Clip low resolution tiles that might be padded by a loader.
 
 ## 0.13.6
 
