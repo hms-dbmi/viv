@@ -180,7 +180,8 @@ const OmeSchema = z
 
 export function fromString(str: string) {
   const raw = parseXML(str);
-  return OmeSchema.parse(raw).Image.map(img => {
+  const omeXml = OmeSchema.parse(raw);
+  return omeXml['Image'].map(img => {
     return {
       ...img,
       format() {

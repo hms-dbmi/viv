@@ -21,10 +21,14 @@ const MAX_CHANNELS_FOR_SNACKBAR_WARNING = 40;
  * Guesses whether string URL or File is for an OME-TIFF image.
  * @param {string | File} urlOrFile
  */
-function isOMETIFF(urlOrFile) {
+function isOmeTiff(urlOrFile) {
   if (Array.isArray(urlOrFile)) return false; // local Zarr is array of File Objects
   const name = typeof urlOrFile === 'string' ? urlOrFile : urlOrFile.name;
-  return name.includes('ome.tiff') || name.includes('ome.tif');
+  return (
+    name.includes('ome.tiff') ||
+    name.includes('ome.tif') ||
+    name.includes('.companion.ome')
+  );
 }
 
 /**
@@ -143,6 +147,17 @@ function isZodError(e) {
   return e instanceof Error && 'issues' in e;
 }
 
+/** @param {string} url */
+async function fetchSingleFileOmeTiffOffsets(url) {
+  // No offsets for multifile OME-TIFFs
+  if (url.includes('companion.ome')) {
+    return undefined;
+  }
+  const offsetsUrl = url.replace(/ome\.tif(f?)/gi, 'offsets.json');
+  const res = await fetch(offsetsUrl);
+  return res.status === 200 ? await res.json() : undefined;
+}
+
 /**
  * Given an image source, creates a PixelSource[] and returns XML-meta
  *
@@ -159,7 +174,8 @@ export async function createLoader(
   // Otherwise load.
   try {
     // OME-TIFF
-    if (isOMETIFF(urlOrFile)) {
+    if (isOmeTiff(urlOrFile)) {
+
       if (urlOrFile instanceof File) {
         // TODO(2021-05-09): temporarily disable `pool` until inline worker module is fixed.
         const source = await loadOmeTiff(urlOrFile, {
@@ -168,13 +184,12 @@ export async function createLoader(
         });
         return source;
       }
-      const url = urlOrFile;
-      const res = await fetch(url.replace(/ome\.tif(f?)/gi, 'offsets.json'));
-      const isOffsetsNot200 = res.status !== 200;
-      const offsets = !isOffsetsNot200 ? await res.json() : undefined;
+
+      const maybeOffsets = await fetchSingleFileOmeTiffOffsets(urlOrFile);
+
       // TODO(2021-05-06): temporarily disable `pool` until inline worker module is fixed.
       const source = await loadOmeTiff(urlOrFile, {
-        offsets,
+        offsets: maybeOffsets,
         images: 'all',
         pool: false
       });
@@ -188,7 +203,7 @@ export async function createLoader(
         source.map(s => s.data)
       );
       if (
-        isOffsetsNot200 &&
+        !maybeOffsets &&
         totalImageCount > MAX_CHANNELS_FOR_SNACKBAR_WARNING
       ) {
         handleOffsetsNotFound(true);
