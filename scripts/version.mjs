@@ -57,7 +57,7 @@ function updateContentsWithAffectedPackages(changeset) {
  * ```
  *
  */
-async function preChangesetsVersion(){
+function preChangesetsVersion(){
   const entries = fs.readdirSync(path.resolve(__dirname, '../.changeset'));
   for (const file of entries) {
     if (!file.endsWith(".md")) {
@@ -71,13 +71,24 @@ async function preChangesetsVersion(){
   }
 }
 
+function clearChangelogs(pkgDir) {
+  for (const pkg of fs.readdirSync(pkgDir)) {
+    if (pkg === "main") continue;
+    try {
+      fs.unlinkSync(path.resolve(pkgDir, pkg, "CHANGELOG.md"));
+    } catch {
+      // ignore
+    }
+  }
+}
+
 /**
  * Reads the main package's changelog and removes all the dependency
  * updates for individual packages.
  *
  * Deletes all the other changelogs.
  */
-async function postChangesetsVersion() {
+function postChangesetsVersion() {
   // remove dependency updates from main changelog
   const mainChangelogPath = path.resolve(__dirname, '..', 'packages', 'main', 'CHANGELOG.md');
   const contents = fs.readFileSync(mainChangelogPath, { encoding: 'utf-8' });
@@ -86,22 +97,10 @@ async function postChangesetsVersion() {
     .filter(line => !line.startsWith('  - @vivjs/')) // remove dependency updates
     .join('\n');
   fs.writeFileSync(mainChangelogPath, newChangelog);
-
-  // clean up all the other changelogs
-  for (const pkg of fs.readdirSync(path.resolve(__dirname, "../packages"))) {
-    if (pkg === "main") {
-      continue;
-    }
-    const filePath = path.resolve(__dirname, "../packages", pkg, "CHANGELOG.md");
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  }
-
-  for (const pkg of fs.readdirSync(path.resolve(__dirname, "../sites"))) {
-    const filePath = path.resolve(__dirname, "../sites", pkg, "CHANGELOG.md");
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  }
+  clearChangelogs(path.resolve(__dirname, '..', 'packages'));
+  clearChangelogs(path.resolve(__dirname, '..', 'sites'));
 }
 
-await preChangesetsVersion();
+preChangesetsVersion();
 childProcess.execSync('pnpm changeset version');
-await postChangesetsVersion();
+postChangesetsVersion();
