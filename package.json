@@ -18,7 +18,9 @@
     "test": "pnpm -r --parallel test",
     "check-format": "prettier --check --ignore-path .gitignore tsconfig.json sites/avivator packages/",
     "lint": "npm run check-format && eslint \"packages/*/src/**/*\" \"sites/avivator/src/**/*\"",
-    "format": "npm run check-format -- --write"
+    "format": "npm run check-format -- --write",
+    "version": "node ./scripts/version.mjs",
+    "publish": "pnpm build && pnpm changeset publish"
   },
   "dependencies": {
     "@deck.gl/core": "~8.8.27",
@@ -41,6 +43,7 @@
     "@pnpm/meta-updater": "^0.0.6",
     "@pnpm/types": "^8.4.0",
     "@probe.gl/test-utils": "^3.5.0",
+    "@svitejs/changesets-changelog-github-compact": "^1.1.0",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.10.0",
     "esbuild": "^0.19.5",

@@ -1,4 +1,4 @@
-# Changelog
+# @hms-dbmi/viv
 
 ## 0.15.0
 

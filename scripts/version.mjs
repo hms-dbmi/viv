@@ -89,16 +89,19 @@ function clearChangelogs(pkgDir) {
  * Deletes all the other changelogs.
  */
 function postChangesetsVersion() {
+  const mainPkg = path.resolve(__dirname, '..', 'packages', 'main');
   // remove dependency updates from main changelog
-  const mainChangelogPath = path.resolve(__dirname, '..', 'packages', 'main', 'CHANGELOG.md');
+  const mainChangelogPath = path.resolve(mainPkg, 'CHANGELOG.md');
   const contents = fs.readFileSync(mainChangelogPath, { encoding: 'utf-8' });
-  const lines = contents.split('\n');
-  const newChangelog = lines
-    .filter(line => !line.startsWith('  - @vivjs/')) // remove dependency updates
+  const newChangelog = contents
+    .split('\n')
+    .filter(line => !line.startsWith('- Updated dependencies'))
+    .filter(line => !line.startsWith('  - @vivjs/'))
     .join('\n');
   fs.writeFileSync(mainChangelogPath, newChangelog);
-  clearChangelogs(path.resolve(__dirname, '..', 'packages'));
-  clearChangelogs(path.resolve(__dirname, '..', 'sites'));
+
+  // clearChangelogs(path.resolve(__dirname, '..', 'packages'));
+  // clearChangelogs(path.resolve(__dirname, '..', 'sites'));
 }
 
 preChangesetsVersion();

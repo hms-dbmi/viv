@@ -19,15 +19,14 @@ jobs:
           version: 7
           run_install: true
 
-      - run: pnpm build
-
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
           title: Create Release
-          version: node scripts/version.mjs
-          publish: pnpm changeset publish
+          version: pnpm run version
+          publish: pnpm run publish
+          createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
