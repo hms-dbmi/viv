@@ -1,6 +1,7 @@
 name: Release
 
 on:
+  pull_request:
   push:
     branches:
       - main
@@ -14,12 +15,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
-        id: pnpm-install
         with:
           version: 7
           run_install: true
 
-      - run: pnpm build
+      - run: |
+          pnpm build
+          node scripts/version.mjs
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
