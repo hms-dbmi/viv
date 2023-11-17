@@ -1,5 +1,12 @@
 # @hms-dbmi/viv
 
+## 0.15.1
+
+### Patch Changes
+
+- Support multifile OME-TIFF in `loadOmeTiff` (`@vivjs/loaders`) ([#740](https://github.com/hms-dbmi/viv/pull/740))
+
+
 ## 0.15.0
 
 ### Minor Changes
