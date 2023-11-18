@@ -41,4 +41,29 @@ jobs:
         run: |
           aws s3 cp --recursive sites/avivator/dist s3://avivator.gehlenborglab.org
           aws s3 cp --recursive sites/docs/dist s3://viv.gehlenborglab.org
-          aws cloudfront create-invalidation --distribution-id  E204VEQ9XF37EF --paths "/*"
+          aws cloudfront create-invalidation --distribution-id E204VEQ9XF37EF --paths "/*"
+
+      - name: "Delete redundant @vivjs/* tags and releases"
+        # We have "fixed" the versioning for all @vivjs packages,
+        # meaning all packages get the same changes. This creates
+        # a lot of noise when making releases since every package
+        # gets a separate tag and release from changesets.
+        #
+        # We could maybe write our own action rather than use actions/changesets
+        # but this way is easier.
+        if: steps.changesets.outputs.published == 'true'
+        run: |
+          # Delete @vivjs releases
+          gh release list --repo hms-dbmi/viv \
+            | grep '^@vivjs' \
+            | awk '{print $1}' \
+            | xargs -I {} gh release delete {} --repo hms-dbmi/viv -y
+
+          # Delete @vivjs tags
+          gh api /repos/hms-dbmi/viv/git/refs/tags \
+            | jq -r '.[].ref' \
+            | grep '^refs/tags/@vivjs' \
+            | sed 's#refs/tags/##' \
+            | xargs -I {} gh api -X DELETE /repos/hms-dbmi/viv/git/refs/tags/{}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
