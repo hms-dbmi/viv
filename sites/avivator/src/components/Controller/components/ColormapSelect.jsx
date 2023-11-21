@@ -4,12 +4,12 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 
 import { COLORMAP_OPTIONS } from '../../../constants';
-import { useChannelsStoreApi, useImageSettingsStore, useViewerStore } from '../../../state';
+import { useImageSettingsStoreApi, useImageSettingsStore, useViewerStore } from '../../../state';
 
 function ColormapSelect() {
   const colormap = useImageSettingsStore(store => store.colormap);
   const isViewerLoading = useViewerStore(store => store.isViewerLoading);
-  const imageSettingsStore = useChannelsStoreApi();
+  const imageSettingsStore = useImageSettingsStoreApi();
   return (
     <FormControl fullWidth>
       <InputLabel htmlFor="colormap-select">
