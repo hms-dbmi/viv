@@ -5,25 +5,27 @@ import TiffPixelSource from './pixel-source';
 import { getOmeLegacyIndexer, getOmeSubIFDIndexer } from './lib/indexers';
 import {
   createGeoTiff,
-  getOmePixelSourceMeta,
+  extractDtypeFromPixels,
+  extractPhysicalSizesfromPixels,
+  extractShapeAndLabelsFromPixels,
+  getShapeForResolutionLevel,
   type OmeTiffSelection
 } from './lib/utils';
 import { guessTiffTileSize } from '../utils';
 import type Pool from './lib/Pool';
-import type { OmeTiffIndexer } from './lib/indexers';
 import type { OmeXml } from '../omexml';
 
 function getIndexer(
   tiff: GeoTIFF,
   omexml: OmeXml,
-  SubIFDs: number[] | undefined,
+  hasSubIFDs: boolean,
   image: number
 ) {
   /*
    * Image pyramids are stored differently between versions of Bioformats.
    * Thus we need a different indexer depending on which format we have.
    */
-  if (SubIFDs) {
+  if (hasSubIFDs) {
     // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.
     return getOmeSubIFDIndexer(tiff, omexml, image);
   }
@@ -52,36 +54,37 @@ export async function loadSingleFileOmeTiff(
     offsets?: number[];
   } = {}
 ) {
-  const tiff = await createGeoTiff(source, {
-    headers: options.headers,
-    offsets: options.offsets
-  });
+  const { offsets, headers, pool } = options;
+  const tiff = await createGeoTiff(source, { headers, offsets });
   const firstImage = await tiff.getImage();
-  const fd = firstImage.fileDirectory;
-  const omexml = fromString(fd.ImageDescription);
-  const { levels, rootMeta } = resolveMetadata(omexml, fd.SubIFDs);
-  return rootMeta.map((imgMeta, image) => {
-    const pyramidIndexer = getIndexer(tiff, omexml, fd.SubIFDs, image);
-    const { labels, getShape, physicalSizes, dtype } = getOmePixelSourceMeta(imgMeta);
+  const omexml = fromString(firstImage.fileDirectory.ImageDescription);
+  const { levels, rootMeta } = resolveMetadata(omexml, firstImage.fileDirectory.SubIFDs);
+  const hasSubIFDs = !!firstImage.fileDirectory.SubIFDs;
+  return rootMeta.map((imgMeta, imageIdx) => {
+    const pyramidIndexer = getIndexer(tiff, omexml, hasSubIFDs, imageIdx);
+    const { baseShape, labels } = extractShapeAndLabelsFromPixels(imgMeta["Pixels"]);
+    const physicalSizes = extractPhysicalSizesfromPixels(imgMeta["Pixels"]);
+    const dtype = extractDtypeFromPixels(imgMeta["Pixels"]);
     return {
       data: Array
         .from({ length: levels })
-        .map((_, resolution) => {
-          const indexer = (sel: OmeTiffSelection) => pyramidIndexer(sel, resolution);
-          const tilesize = guessTiffTileSize(firstImage);
-          const shape = getShape(resolution);
+        .map((_, resolutionLevel) => {
           const meta = {
-            photometricInterpretation: fd.PhotometricInterpretation,
-            physicalSizes
+            photometricInterpretation: firstImage.fileDirectory.PhotometricInterpretation,
+            ...(physicalSizes ? { physicalSizes }: {})
           };
           return new TiffPixelSource(
-            indexer,
+            (sel: OmeTiffSelection) => pyramidIndexer(sel, resolutionLevel),
             dtype,
-            tilesize,
-            shape,
+            guessTiffTileSize(firstImage),
+            getShapeForResolutionLevel({
+              baseShape,
+              labels,
+              resolutionLevel,
+            }),
             labels,
             meta,
-            options.pool
+            pool,
           );
         }),
       metadata: imgMeta

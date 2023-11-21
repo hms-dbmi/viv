@@ -45,6 +45,8 @@ export function getOmeLegacyIndexer(
   };
 }
 
+type ImageFileDirectory = Awaited<ReturnType<GeoTIFF['parseFileDirectoryAt']>>;
+
 /*
  * Returns an indexer for modern Bioforamts images that store multiscale
  * resolutions using SubIFDs.
@@ -59,16 +61,9 @@ export function getOmeLegacyIndexer(
  * an ES6 Map that maps a string key that identifies the selection uniquely
  * to the corresponding IFD.
  */
-export function getOmeSubIFDIndexer(
-  tiff: GeoTIFF,
-  rootMeta: OmeXml,
-  image = 0
-): OmeTiffIndexer {
-  const ifdIndexer = getOmeIFDIndexer(rootMeta, image);
-  const ifdCache: Map<
-    string,
-    ReturnType<GeoTIFF['parseFileDirectoryAt']>
-  > = new Map();
+export function getOmeSubIFDIndexer(tiff: GeoTIFF, rootMeta: OmeXml, image: number): OmeTiffIndexer {
+  const ifdIndexer = getIfdIndexer(rootMeta, image);
+  const ifdCache: Map<string, Promise<ImageFileDirectory>> = new Map();
 
   return async (sel: OmeTiffSelection, pyramidLevel: number) => {
     const index = ifdIndexer(sel);
@@ -105,6 +100,14 @@ export function getOmeSubIFDIndexer(
   };
 }
 
+function getIfdIndexer(rootMeta: OmeXml, image: number) {
+  const offset = getImageIfdOffset(rootMeta, image);
+  return (sel: OmeTiffSelection) => {
+    const index = getRelativeSelectionIfd(sel, rootMeta[image]);
+    return index + offset;
+  };
+}
+
 function getImageIfdOffset(rootMeta: OmeXml, image: number) {
   // For multi-image OME-TIFF files, we need to offset by the full dimensions
   // of the previous images dimensions i.e Z * C * T of image - 1 + that of image - 2 etc.
@@ -120,31 +123,16 @@ function getImageIfdOffset(rootMeta: OmeXml, image: number) {
  * Returns a function that computes the image index based on the dimension
  * order and dimension sizes.
  */
-function getOmeIFDIndexer(
-  rootMeta: OmeXml,
-  image = 0
-): (sel: OmeTiffSelection) => number {
-  const { SizeC, SizeZ, SizeT, DimensionOrder } = rootMeta[image].Pixels;
-  const imageOffset = getImageIfdOffset(rootMeta, image);
+function getRelativeSelectionIfd(sel: OmeTiffSelection, imageMeta: OmeXml[number]): number {
+  const { t, c, z } = sel;
+  const { SizeC, SizeZ, SizeT, DimensionOrder } = imageMeta['Pixels'];
   switch (DimensionOrder) {
-    case 'XYZCT': {
-      return ({ t, c, z }) => imageOffset + t * SizeZ * SizeC + c * SizeZ + z;
-    }
-    case 'XYZTC': {
-      return ({ t, c, z }) => imageOffset + c * SizeZ * SizeT + t * SizeZ + z;
-    }
-    case 'XYCTZ': {
-      return ({ t, c, z }) => imageOffset + z * SizeC * SizeT + t * SizeC + c;
-    }
-    case 'XYCZT': {
-      return ({ t, c, z }) => imageOffset + t * SizeC * SizeZ + z * SizeC + c;
-    }
-    case 'XYTCZ': {
-      return ({ t, c, z }) => imageOffset + z * SizeT * SizeC + c * SizeT + t;
-    }
-    case 'XYTZC': {
-      return ({ t, c, z }) => imageOffset + c * SizeT * SizeZ + z * SizeT + t;
-    }
+    case 'XYZCT': return t * SizeZ * SizeC + c * SizeZ + z;
+    case 'XYZTC': return c * SizeZ * SizeT + t * SizeZ + z;
+    case 'XYCTZ': return z * SizeC * SizeT + t * SizeC + c;
+    case 'XYCZT': return t * SizeC * SizeZ + z * SizeC + c;
+    case 'XYTCZ': return z * SizeT * SizeC + c * SizeT + t;
+    case 'XYTZC': return c * SizeT * SizeZ + z * SizeT + t;
     default: {
       throw new Error(`Invalid OME-XML DimensionOrder, got ${DimensionOrder}.`);
     }

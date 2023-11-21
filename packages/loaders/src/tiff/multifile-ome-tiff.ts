@@ -2,12 +2,15 @@
 import type { GeoTIFF, GeoTIFFImage } from 'geotiff';
 import {
   createGeoTiff,
+  extractDtypeFromPixels,
+  extractPhysicalSizesfromPixels as extractPhysicalSizesfromPixels,
+  extractOmeAxes,
   getOmePixelSourceMeta,
   type OmeTiffSelection
 } from './lib/utils';
 import { fromString, type OmeXml } from '../omexml';
 import TiffPixelSource from './pixel-source';
-import { guessTiffTileSize, assert } from '../utils';
+import { guessTiffTileSize, assert, getLabels } from '../utils';
 import type Pool from './lib/Pool';
 
 type TiffDataTags = NonNullable<OmeXml[number]['Pixels']['TiffData']>;
@@ -108,18 +111,20 @@ export async function loadMultifileOmeTiff(
   const rootMeta = fromString(text);
   // Share resources between images
   const resolver = multifileTiffResolver({ baseUrl: url });
-  const promises = rootMeta.map(async imgMeta => {
+  const promises = rootMeta.map(async (imgMeta, imageIdx) => {
     const indexer = createMultifileOmeTiffIndexer(imgMeta, resolver);
-    const { labels, getShape, physicalSizes, dtype } =
-      getOmePixelSourceMeta(imgMeta);
+    const physicalSizes = extractPhysicalSizesfromPixels(imgMeta["Pixels"]);
+    const { labels, shape } = extractOmeAxes(imgMeta["Pixels"]);
+    const dtype = extractDtypeFromPixels(imgMeta["Pixels"]);
     const firstImage = await indexer({ c: 0, t: 0, z: 0 });
+    const meta = physicalSizes ? { physicalSizes }: {};
     const source = new TiffPixelSource(
       indexer,
       dtype,
       guessTiffTileSize(firstImage),
-      getShape(0),
+      shape,
       labels,
-      { physicalSizes },
+      meta,
       options.pool
     );
     return {
@@ -129,3 +134,4 @@ export async function loadMultifileOmeTiff(
   });
   return Promise.all(promises);
 }
+

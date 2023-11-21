@@ -36,66 +36,68 @@ type PhysicalSizes = {
   z?: PhysicalSize;
 };
 
-function extractPhysicalSizesfromOmeXml(
-  d: OmeXml[number]['Pixels']
+export function extractPhysicalSizesfromPixels(
+  p: OmeXml[number]['Pixels']
 ): undefined | PhysicalSizes {
   if (
-    !d['PhysicalSizeX'] ||
-    !d['PhysicalSizeY'] ||
-    !d['PhysicalSizeXUnit'] ||
-    !d['PhysicalSizeYUnit']
+    !p['PhysicalSizeX'] ||
+    !p['PhysicalSizeY'] ||
+    !p['PhysicalSizeXUnit'] ||
+    !p['PhysicalSizeYUnit']
   ) {
     return undefined;
   }
   const physicalSizes: PhysicalSizes = {
-    x: { size: d['PhysicalSizeX'], unit: d['PhysicalSizeXUnit'] },
-    y: { size: d['PhysicalSizeY'], unit: d['PhysicalSizeYUnit'] }
+    x: { size: p['PhysicalSizeX'], unit: p['PhysicalSizeXUnit'] },
+    y: { size: p['PhysicalSizeY'], unit: p['PhysicalSizeYUnit'] }
   };
-  if (d['PhysicalSizeZ'] && d['PhysicalSizeZUnit']) {
+  if (p['PhysicalSizeZ'] && p['PhysicalSizeZUnit']) {
     physicalSizes.z = {
-      size: d['PhysicalSizeZ'],
-      unit: d['PhysicalSizeZUnit']
+      size: p['PhysicalSizeZ'],
+      unit: p['PhysicalSizeZUnit']
     };
   }
   return physicalSizes;
 }
 
-export function getOmePixelSourceMeta({ Pixels }: OmeXml[0]) {
+export function extractDtypeFromPixels(p: OmeXml[number]['Pixels']) {
+  if (!(p.Type in DTYPE_LOOKUP)) {
+    throw Error(`Pixel type ${p.Type} not supported.`);
+  }
+  return DTYPE_LOOKUP[p.Type as keyof typeof DTYPE_LOOKUP];
+}
+
+export function extractShapeAndLabelsFromPixels(
+  d: OmeXml[number]['Pixels']
+) {
   // e.g. 'XYZCT' -> ['t', 'c', 'z', 'y', 'x']
-  const labels = getLabels(Pixels.DimensionOrder);
+  const labels = getLabels(d['DimensionOrder']);
 
   // Compute "shape" of image
-  const shape: number[] = Array(labels.length).fill(0);
-  shape[labels.indexOf('t')] = Pixels.SizeT;
-  shape[labels.indexOf('c')] = Pixels.SizeC;
-  shape[labels.indexOf('z')] = Pixels.SizeZ;
+  const baseShape: number[] = Array(labels.length).fill(0);
+  baseShape[labels.indexOf('t')] = d['SizeT'];
+  baseShape[labels.indexOf('c')] = d['SizeC'];
+  baseShape[labels.indexOf('z')] = d['SizeZ'];
 
   // Push extra dimension if data are interleaved.
-  if (Pixels.Interleaved) {
+  if (d['Interleaved']) {
     // @ts-expect-error private, unused dim name for selection
     labels.push('_c');
-    shape.push(3);
+    baseShape.push(3);
   }
 
-  // Creates a new shape for different level of pyramid.
-  // Assumes factor-of-two downsampling.
-  const getShape = (level: number = 0) => {
-    const s = [...shape];
-    s[labels.indexOf('x')] = Pixels.SizeX >> level;
-    s[labels.indexOf('y')] = Pixels.SizeY >> level;
-    return s;
-  };
+  return { labels, baseShape };
+}
 
-  if (!(Pixels.Type in DTYPE_LOOKUP)) {
-    throw Error(`Pixel type ${Pixels.Type} not supported.`);
-  }
-
-  const dtype = DTYPE_LOOKUP[Pixels.Type as keyof typeof DTYPE_LOOKUP];
-  const maybePhysicalSizes = extractPhysicalSizesfromOmeXml(Pixels);
-  if (maybePhysicalSizes) {
-    return { labels, getShape, dtype, physicalSizes: maybePhysicalSizes };
-  }
-  return { labels, getShape, dtype };
+export function getShapeForResolutionLevel({ baseShape, labels, resolutionLevel: level }: {
+  baseShape: number[],
+  labels: string[],
+  resolutionLevel: number,
+}) {
+  const s = [...baseShape];
+  s[labels.indexOf('x')] = baseShape[labels.indexOf('x')] >> level;
+  s[labels.indexOf('y')] = baseShape[labels.indexOf('y')] >> level;
+  return s;
 }
 
 // Inspired by/borrowed from https://geotiffjs.github.io/geotiff.js/geotiffimage.js.html#line297

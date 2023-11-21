@@ -224,6 +224,7 @@ function xmlToJson(
 
 export function parseXML(xmlString: string) {
   const parser = new DOMParser();
+  // Remove trailing null character, which can break XML parsing in Firefox
   const doc = parser.parseFromString(
     xmlString.replace(/\u0000$/, ''), // eslint-disable-line no-control-regex
     'application/xml'
