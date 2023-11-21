@@ -31,6 +31,19 @@ function getIndexer(
   return getOmeLegacyIndexer(tiff, omexml);
 }
 
+function resolveMetadata(
+  omexml: OmeXml,
+  SubIFDs: number[] | undefined,
+) {
+  if (SubIFDs) {
+    // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.
+    return { levels: SubIFDs.length + 1, rootMeta: omexml };
+  }
+  // Image is legacy format; resolutions are stored as separate images.
+  // We do not allow multi-images for legacy format.
+  return { levels: omexml.length, rootMeta: [omexml[0]] };
+}
+
 export async function loadSingleFileOmeTiff(
   source: string | URL | File,
   options: {
@@ -44,53 +57,33 @@ export async function loadSingleFileOmeTiff(
     offsets: options.offsets
   });
   const firstImage = await tiff.getImage();
-  const {
-    ImageDescription,
-    SubIFDs,
-    PhotometricInterpretation: photometricInterpretation
-  } = firstImage.fileDirectory;
-  const omexml = fromString(ImageDescription);
-  let rootMeta = omexml;
-  let levels: number;
-  if (SubIFDs) {
-    // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.
-    levels = SubIFDs.length + 1;
-  } else {
-    // Image is legacy format; resolutions are stored as separate images.
-    // We do not allow multi-images for legacy format.
-    levels = omexml.length;
-    rootMeta = [omexml[0]];
-  }
-  const getSource = (
-    resolution: number,
-    pyramidIndexer: OmeTiffIndexer,
-    imgMeta: OmeXml[number]
-  ) => {
-    const { labels, getShape, physicalSizes, dtype } =
-      getOmePixelSourceMeta(imgMeta);
-    const tileSize = guessTiffTileSize(firstImage);
-    const meta = { photometricInterpretation, physicalSizes };
-    const shape = getShape(resolution);
-    const indexer = (sel: OmeTiffSelection) => pyramidIndexer(sel, resolution);
-    const source = new TiffPixelSource(
-      indexer,
-      dtype,
-      tileSize,
-      shape,
-      labels,
-      meta,
-      options.pool
-    );
-    return source;
-  };
+  const fd = firstImage.fileDirectory;
+  const omexml = fromString(fd.ImageDescription);
+  const { levels, rootMeta } = resolveMetadata(omexml, fd.SubIFDs);
   return rootMeta.map((imgMeta, image) => {
-    const pyramidIndexer = getIndexer(tiff, omexml, SubIFDs, image);
-    const data = Array.from({ length: levels }).map((_, resolution) =>
-      getSource(resolution, pyramidIndexer, imgMeta)
-    );
-
+    const pyramidIndexer = getIndexer(tiff, omexml, fd.SubIFDs, image);
+    const { labels, getShape, physicalSizes, dtype } = getOmePixelSourceMeta(imgMeta);
     return {
-      data,
+      data: Array
+        .from({ length: levels })
+        .map((_, resolution) => {
+          const indexer = (sel: OmeTiffSelection) => pyramidIndexer(sel, resolution);
+          const tilesize = guessTiffTileSize(firstImage);
+          const shape = getShape(resolution);
+          const meta = {
+            photometricInterpretation: fd.PhotometricInterpretation,
+            physicalSizes
+          };
+          return new TiffPixelSource(
+            indexer,
+            dtype,
+            tilesize,
+            shape,
+            labels,
+            meta,
+            options.pool
+          );
+        }),
       metadata: imgMeta
     };
   });

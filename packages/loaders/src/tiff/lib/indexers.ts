@@ -105,6 +105,17 @@ export function getOmeSubIFDIndexer(
   };
 }
 
+function getImageIfdOffset(rootMeta: OmeXml, image: number) {
+  // For multi-image OME-TIFF files, we need to offset by the full dimensions
+  // of the previous images dimensions i.e Z * C * T of image - 1 + that of image - 2 etc.
+  let imageOffset = 0;
+  for (let i = 0; i < image; i += 1) {
+    const { SizeC: prevSizeC, SizeZ: prevSizeZ, SizeT: prevSizeT } = rootMeta[i].Pixels;
+    imageOffset += prevSizeC * prevSizeZ * prevSizeT;
+  }
+  return imageOffset;
+}
+
 /*
  * Returns a function that computes the image index based on the dimension
  * order and dimension sizes.
@@ -114,19 +125,7 @@ function getOmeIFDIndexer(
   image = 0
 ): (sel: OmeTiffSelection) => number {
   const { SizeC, SizeZ, SizeT, DimensionOrder } = rootMeta[image].Pixels;
-  // For multi-image OME-TIFF files, we need to offset by the full dimensions
-  // of the previous images dimensions i.e Z * C * T of image - 1 + that of image - 2 etc.
-  let imageOffset = 0;
-  if (image > 0) {
-    for (let i = 0; i < image; i += 1) {
-      const {
-        SizeC: prevSizeC,
-        SizeZ: prevSizeZ,
-        SizeT: prevSizeT
-      } = rootMeta[i].Pixels;
-      imageOffset += prevSizeC * prevSizeZ * prevSizeT;
-    }
-  }
+  const imageOffset = getImageIfdOffset(rootMeta, image);
   switch (DimensionOrder) {
     case 'XYZCT': {
       return ({ t, c, z }) => imageOffset + t * SizeZ * SizeC + c * SizeZ + z;
