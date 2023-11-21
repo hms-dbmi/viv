@@ -51,6 +51,9 @@ const ThreeJsVolumeViewer = props => {
     useFixedAxis = true,
     extensions = [new ColorPalette3DExtensions.AdditiveBlendExtension()]
   } = props;
+  console.log(colors);
+  console.log(channelsVisible);
+  console.log(contrastLimits);
   const volumeViewState = viewStatesProp?.find(state => state?.id === '3d');
   const initialViewState = React.useMemo(() => {
     if (volumeViewState) {
