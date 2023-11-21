@@ -5,7 +5,11 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { shallow } from 'zustand/shallow';
 
 import { RENDERING_MODES } from '@hms-dbmi/viv';
-import { useImageSettingsStore, useImageSettingsStoreApi, useViewerStore } from '../../../state';
+import {
+  useImageSettingsStore,
+  useImageSettingsStoreApi,
+  useViewerStore
+} from '../../../state';
 
 const renderingOptions = Object.values(RENDERING_MODES);
 

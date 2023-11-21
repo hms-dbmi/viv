@@ -39,51 +39,52 @@ const DEFAUlT_CHANNEL_VALUES = {
   ids: ''
 };
 
-const createChannelsStore = () => createStore(set => ({
-  ...DEFAUlT_CHANNEL_STATE,
-  ...generateToggles(DEFAUlT_CHANNEL_VALUES, set),
-  toggleIsOn: index =>
-    set(state => {
-      const channelsVisible = [...state.channelsVisible];
-      channelsVisible[index] = !channelsVisible[index];
-      return { ...state, channelsVisible };
-    }),
-  setPropertiesForChannel: (channel, newProperties) =>
-    set(state => {
-      const entries = Object.entries(newProperties);
-      const newState = {};
-      entries.forEach(([property, value]) => {
-        newState[property] = [...state[property]];
-        newState[property][channel] = value;
-      });
-      return { ...state, ...newState };
-    }),
-  removeChannel: channel =>
-    set(state => {
-      const newState = {};
-      const channelKeys = Object.keys(DEFAUlT_CHANNEL_VALUES);
-      Object.keys(state).forEach(key => {
-        if (channelKeys.includes(key)) {
-          newState[key] = state[key].filter((_, j) => j !== channel);
-        }
-      });
-      return { ...state, ...newState };
-    }),
-  addChannel: newProperties =>
-    set(state => {
-      const entries = Object.entries(newProperties);
-      const newState = { ...state };
-      entries.forEach(([property, value]) => {
-        newState[property] = [...state[property], value];
-      });
-      Object.entries(DEFAUlT_CHANNEL_VALUES).forEach(([k, v]) => {
-        if (newState[k].length < newState[entries[0][0]].length) {
-          newState[k] = [...state[k], v];
-        }
-      });
-      return newState;
-    })
-}));
+const createChannelsStore = () =>
+  createStore(set => ({
+    ...DEFAUlT_CHANNEL_STATE,
+    ...generateToggles(DEFAUlT_CHANNEL_VALUES, set),
+    toggleIsOn: index =>
+      set(state => {
+        const channelsVisible = [...state.channelsVisible];
+        channelsVisible[index] = !channelsVisible[index];
+        return { ...state, channelsVisible };
+      }),
+    setPropertiesForChannel: (channel, newProperties) =>
+      set(state => {
+        const entries = Object.entries(newProperties);
+        const newState = {};
+        entries.forEach(([property, value]) => {
+          newState[property] = [...state[property]];
+          newState[property][channel] = value;
+        });
+        return { ...state, ...newState };
+      }),
+    removeChannel: channel =>
+      set(state => {
+        const newState = {};
+        const channelKeys = Object.keys(DEFAUlT_CHANNEL_VALUES);
+        Object.keys(state).forEach(key => {
+          if (channelKeys.includes(key)) {
+            newState[key] = state[key].filter((_, j) => j !== channel);
+          }
+        });
+        return { ...state, ...newState };
+      }),
+    addChannel: newProperties =>
+      set(state => {
+        const entries = Object.entries(newProperties);
+        const newState = { ...state };
+        entries.forEach(([property, value]) => {
+          newState[property] = [...state[property], value];
+        });
+        Object.entries(DEFAUlT_CHANNEL_VALUES).forEach(([k, v]) => {
+          if (newState[k].length < newState[entries[0][0]].length) {
+            newState[k] = [...state[k], v];
+          }
+        });
+        return newState;
+      })
+  }));
 
 const DEFAULT_IMAGE_STATE = {
   lensSelection: 0,
@@ -101,10 +102,11 @@ const DEFAULT_IMAGE_STATE = {
   onViewportLoad: () => {}
 };
 
-const createImageSettingsStore = () => createStore(set => ({
-  ...DEFAULT_IMAGE_STATE,
-  ...generateToggles(DEFAULT_IMAGE_STATE, set)
-}));
+const createImageSettingsStore = () =>
+  createStore(set => ({
+    ...DEFAULT_IMAGE_STATE,
+    ...generateToggles(DEFAULT_IMAGE_STATE, set)
+  }));
 
 const DEFAULT_VIEWER_STATE = {
   isChannelLoading: [],
@@ -130,27 +132,28 @@ const DEFAULT_VIEWER_STATE = {
   pyramidResolution: 0
 };
 
-const createViewerStore = () => createStore(set => ({
-  ...DEFAULT_VIEWER_STATE,
-  ...generateToggles(DEFAULT_VIEWER_STATE, set),
-  setIsChannelLoading: (index, val) =>
-    set(state => {
-      const newIsChannelLoading = [...state.isChannelLoading];
-      newIsChannelLoading[index] = val;
-      return { ...state, isChannelLoading: newIsChannelLoading };
-    }),
-  addIsChannelLoading: val =>
-    set(state => {
-      const newIsChannelLoading = [...state.isChannelLoading, val];
-      return { ...state, isChannelLoading: newIsChannelLoading };
-    }),
-  removeIsChannelLoading: index =>
-    set(state => {
-      const newIsChannelLoading = [...state.isChannelLoading];
-      newIsChannelLoading.splice(index, 1);
-      return { ...state, isChannelLoading: newIsChannelLoading };
-    })
-}));
+const createViewerStore = () =>
+  createStore(set => ({
+    ...DEFAULT_VIEWER_STATE,
+    ...generateToggles(DEFAULT_VIEWER_STATE, set),
+    setIsChannelLoading: (index, val) =>
+      set(state => {
+        const newIsChannelLoading = [...state.isChannelLoading];
+        newIsChannelLoading[index] = val;
+        return { ...state, isChannelLoading: newIsChannelLoading };
+      }),
+    addIsChannelLoading: val =>
+      set(state => {
+        const newIsChannelLoading = [...state.isChannelLoading, val];
+        return { ...state, isChannelLoading: newIsChannelLoading };
+      }),
+    removeIsChannelLoading: index =>
+      set(state => {
+        const newIsChannelLoading = [...state.isChannelLoading];
+        newIsChannelLoading.splice(index, 1);
+        return { ...state, isChannelLoading: newIsChannelLoading };
+      })
+  }));
 
 export const AvivatorContext = createContext(null);
 
@@ -163,7 +166,11 @@ export const AvivatorProvider = ({ children }) => {
       viewer: createViewerStore()
     };
   }
-  return createElement(AvivatorContext.Provider, {value: storesRef.current}, children);
+  return createElement(
+    AvivatorContext.Provider,
+    { value: storesRef.current },
+    children
+  );
 };
 
 function useStoreApi(storeName) {
@@ -178,9 +185,12 @@ function useAviStore(storeName, selector, eqFn) {
   const store = useStoreApi(storeName);
   return useStoreWithEqualityFn(store, selector, eqFn);
 }
-export const useChannelsStore = (selector, eqFn) => useAviStore('channels', selector, eqFn);
-export const useImageSettingsStore = (selector, eqFn) => useAviStore('imageSettings', selector, eqFn);
-export const useViewerStore = (selector, eqFn) => useAviStore('viewer', selector, eqFn);
+export const useChannelsStore = (selector, eqFn) =>
+  useAviStore('channels', selector, eqFn);
+export const useImageSettingsStore = (selector, eqFn) =>
+  useAviStore('imageSettings', selector, eqFn);
+export const useViewerStore = (selector, eqFn) =>
+  useAviStore('viewer', selector, eqFn);
 
 export const useLoader = () => {
   const [fullLoader, image] = useChannelsStore(store => [

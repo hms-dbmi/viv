@@ -11,7 +11,7 @@ import {
   useViewerStore,
   useViewerStoreApi,
   useChannelsStoreApi,
-  useImageSettingsStoreApi,
+  useImageSettingsStoreApi
 } from './state';
 import {
   createLoader,

@@ -4,7 +4,11 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 
 import { COLORMAP_OPTIONS } from '../../../constants';
-import { useImageSettingsStoreApi, useImageSettingsStore, useViewerStore } from '../../../state';
+import {
+  useImageSettingsStoreApi,
+  useImageSettingsStore,
+  useViewerStore
+} from '../../../state';
 
 function ColormapSelect() {
   const colormap = useImageSettingsStore(store => store.colormap);

@@ -18,7 +18,12 @@ import { Select } from '@material-ui/core';
 import MenuTitle from './MenuTitle';
 import DropzoneButton from './DropzoneButton';
 import { isMobileOrTablet, getNameFromUrl } from '../../../utils';
-import { useChannelsStore, useChannelsStoreApi, useViewerStore, useViewerStoreApi } from '../../../state';
+import {
+  useChannelsStore,
+  useChannelsStoreApi,
+  useViewerStore,
+  useViewerStoreApi
+} from '../../../state';
 
 const useStyles = makeStyles(theme => ({
   root: {
