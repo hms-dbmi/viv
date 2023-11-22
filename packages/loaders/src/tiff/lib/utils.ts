@@ -76,6 +76,8 @@ export function extractShapeAndLabelsFromPixels(d: OmeXml[number]['Pixels']) {
   baseShape[labels.indexOf('t')] = d['SizeT'];
   baseShape[labels.indexOf('c')] = d['SizeC'];
   baseShape[labels.indexOf('z')] = d['SizeZ'];
+  baseShape[labels.indexOf('y')] = d['SizeY'];
+  baseShape[labels.indexOf('x')] = d['SizeX'];
 
   // Push extra dimension if data are interleaved.
   if (d['Interleaved']) {
@@ -87,6 +89,12 @@ export function extractShapeAndLabelsFromPixels(d: OmeXml[number]['Pixels']) {
   return { labels, baseShape };
 }
 
+/**
+ * Compute the shape of the image at a given resolution level.
+ *
+ * Assumes that the image is downsampled by a factor of 2 for each
+ * pyramid level.
+ */
 export function getShapeForResolutionLevel({
   baseShape,
   labels,
@@ -96,19 +104,17 @@ export function getShapeForResolutionLevel({
   labels: string[];
   resolutionLevel: number;
 }) {
-  const s = [...baseShape];
-  s[labels.indexOf('x')] = baseShape[labels.indexOf('x')] >> level;
-  s[labels.indexOf('y')] = baseShape[labels.indexOf('y')] >> level;
-  return s;
+  const shape = [...baseShape];
+  shape[labels.indexOf('x')] = baseShape[labels.indexOf('x')] >> level;
+  shape[labels.indexOf('y')] = baseShape[labels.indexOf('y')] >> level;
+  return shape;
 }
 
 // Inspired by/borrowed from https://geotiffjs.github.io/geotiff.js/geotiffimage.js.html#line297
 function guessImageDataType(image: GeoTIFFImage) {
   // Assuming these are flat TIFFs, just grab the info for the first image/sample.
   const sampleIndex = 0;
-  const format = image.fileDirectory.SampleFormat
-    ? image.fileDirectory.SampleFormat[sampleIndex]
-    : 1;
+  const format = image.fileDirectory?.SampleFormat?.[sampleIndex] ?? 1;
   const bitsPerSample = image.fileDirectory.BitsPerSample[sampleIndex];
   switch (format) {
     case 1: // unsigned integer data

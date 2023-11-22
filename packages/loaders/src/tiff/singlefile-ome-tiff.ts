@@ -54,14 +54,18 @@ export async function loadSingleFileOmeTiff(
   const { offsets, headers, pool } = options;
   const tiff = await createGeoTiff(source, { headers, offsets });
   const firstImage = await tiff.getImage();
-  const omexml = fromString(firstImage.fileDirectory.ImageDescription);
+  const {
+    ImageDescription,
+    SubIFDs,
+    PhotometricInterpretation: photometricInterpretation
+  } = firstImage.fileDirectory;
+  const omexml = fromString(ImageDescription);
   const { levels, rootMeta } = resolveMetadata(
     omexml,
     firstImage.fileDirectory.SubIFDs
   );
-  const hasSubIFDs = !!firstImage.fileDirectory.SubIFDs;
   return rootMeta.map((imgMeta, imageIdx) => {
-    const pyramidIndexer = getIndexer(tiff, omexml, hasSubIFDs, imageIdx);
+    const pyramidIndexer = getIndexer(tiff, omexml, !!SubIFDs, imageIdx);
     const { baseShape, labels } = extractShapeAndLabelsFromPixels(
       imgMeta['Pixels']
     );
@@ -69,13 +73,11 @@ export async function loadSingleFileOmeTiff(
     const dtype = extractDtypeFromPixels(imgMeta['Pixels']);
     return {
       data: Array.from({ length: levels }).map((_, resolutionLevel) => {
-        const meta = {
-          photometricInterpretation:
-            firstImage.fileDirectory.PhotometricInterpretation,
-          ...(physicalSizes ? { physicalSizes } : {})
-        };
+        const indexer = (sel: OmeTiffSelection) =>
+          pyramidIndexer(sel, resolutionLevel);
+        const meta = { photometricInterpretation, physicalSizes };
         return new TiffPixelSource(
-          (sel: OmeTiffSelection) => pyramidIndexer(sel, resolutionLevel),
+          indexer,
           dtype,
           guessTiffTileSize(firstImage),
           getShapeForResolutionLevel({
