@@ -23,74 +23,35 @@ export type OmeTiffIndexer = (
  * our indexers. There can be multiple images in an OME-TIFF, so supporting these
  * images will require extending these indexers or creating new methods.
  */
-
-/*
- * Returns an indexer for legacy Bioformats images. This assumes that
- * downsampled resolutions are stored sequentially in the OME-TIFF.
- */
-export function getOmeLegacyIndexer(
+export function getOmeTiffIndexer(
   tiff: GeoTIFF,
-  rootMeta: OmeXml
-): OmeTiffIndexer {
-  const imageMeta = rootMeta[0];
+  imageMeta: OmeXml[number],
+  imageIfdOffset = 0
+) {
+  const ifds: ImageFileDirectory[] = [];
   const { SizeT, SizeC, SizeZ } = imageMeta.Pixels;
 
-  return (sel: OmeTiffSelection, pyramidLevel: number) => {
-    // Get IFD index at base pyramid level
-    const index = getRelativeSelectionIfd(sel, imageMeta);
-    // Get index of first image at pyramidal level
-    const pyramidIndex = pyramidLevel * SizeZ * SizeT * SizeC;
-    // Return image at IFD index for pyramidal level
-    return tiff.getImage(index + pyramidIndex);
-  };
-}
-
-type ImageFileDirectory = Awaited<ReturnType<GeoTIFF['parseFileDirectoryAt']>>;
-
-/*
- * Returns an indexer for modern Bioforamts images that store multiscale
- * resolutions using SubIFDs.
- *
- * The ifdIndexer returns the 'index' to the base resolution for a
- * particular 'selection'. The SubIFDs to the downsampled resolutions
- * of the 'selection' are stored within the `baseImage.fileDirectory`.
- * We use the SubIFDs to get the IFD for the corresponding sub-resolution.
- *
- * NOTE: This function create a custom IFD cache rather than mutating
- * `GeoTIFF.ifdRequests` with a random offset. The IFDs are cached in
- * an ES6 Map that maps a string key that identifies the selection uniquely
- * to the corresponding IFD.
- */
-export function getOmeSubIFDIndexer(
-  tiff: GeoTIFF,
-  rootMeta: OmeXml,
-  image: number
-): OmeTiffIndexer {
-  const ifdCache: Map<string, Promise<ImageFileDirectory>> = new Map();
-  const offset = getImageIfdOffset(rootMeta, image);
-
   return async (sel: OmeTiffSelection, pyramidLevel: number) => {
-    const index = getRelativeSelectionIfd(sel, rootMeta[image]) + offset;
-    const baseImage = await tiff.getImage(index);
+    const baseIndex = getRelativeSelectionIfd(sel, imageMeta) + imageIfdOffset;
+    const baseImage = await tiff.getImage(baseIndex);
 
     // It's the highest resolution, no need to look up SubIFDs.
     if (pyramidLevel === 0) {
       return baseImage;
     }
 
-    const { SubIFDs } = baseImage.fileDirectory;
-    if (!SubIFDs) {
-      throw Error('Indexing Error: OME-TIFF is missing SubIFDs.');
+    let index: number;
+    if (!baseImage.fileDirectory.SubIFDs) {
+      index = baseIndex + pyramidLevel * SizeZ * SizeT * SizeC;
+    } else {
+      index = baseImage.fileDirectory.SubIFDs[pyramidLevel - 1];
     }
 
-    // Get IFD for the selection at the pyramidal level
-    const key = `${sel.t}-${sel.c}-${sel.z}-${pyramidLevel}`;
-    if (!ifdCache.has(key)) {
-      // Only create a new request if we don't have the key.
-      const subIfdOffset = SubIFDs[pyramidLevel - 1];
-      ifdCache.set(key, tiff.parseFileDirectoryAt(subIfdOffset));
+    if (!ifds[index]) {
+      ifds[index] = await tiff.parseFileDirectoryAt(index);
     }
-    const ifd = await ifdCache.get(key)!;
+
+    const ifd = ifds[index];
 
     // Create a new image object manually from IFD
     return new GeoTIFFImage(
@@ -104,20 +65,7 @@ export function getOmeSubIFDIndexer(
   };
 }
 
-function getImageIfdOffset(rootMeta: OmeXml, imageIndex: number) {
-  // For multi-image OME-TIFF files, we need to offset by the full dimensions
-  // of the previous images dimensions i.e Z * C * T of image - 1 + that of image - 2 etc.
-  let imageOffset = 0;
-  for (let i = 0; i < imageIndex; i += 1) {
-    const {
-      SizeC: prevSizeC,
-      SizeZ: prevSizeZ,
-      SizeT: prevSizeT
-    } = rootMeta[i].Pixels;
-    imageOffset += prevSizeC * prevSizeZ * prevSizeT;
-  }
-  return imageOffset;
-}
+type ImageFileDirectory = Awaited<ReturnType<GeoTIFF['parseFileDirectoryAt']>>;
 
 /*
  * Returns a function that computes the image index based on the dimension

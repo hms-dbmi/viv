@@ -5,11 +5,11 @@ import {
   extractDtypeFromPixels,
   extractPhysicalSizesfromPixels as extractPhysicalSizesfromPixels,
   type OmeTiffSelection,
-  extractShapeAndLabelsFromPixels
+  extractAxesFromPixels
 } from './lib/utils';
 import { fromString, type OmeXml } from '../omexml';
 import TiffPixelSource from './pixel-source';
-import { guessTiffTileSize, assert } from '../utils';
+import { getTiffTileSize, assert } from '../utils';
 import type Pool from './lib/Pool';
 
 type TiffDataTags = NonNullable<OmeXml[number]['Pixels']['TiffData']>;
@@ -113,16 +113,14 @@ export async function loadMultifileOmeTiff(
   const promises = rootMeta.map(async imgMeta => {
     const indexer = createMultifileOmeTiffIndexer(imgMeta, resolver);
     const physicalSizes = extractPhysicalSizesfromPixels(imgMeta['Pixels']);
-    const { labels, baseShape } = extractShapeAndLabelsFromPixels(
-      imgMeta['Pixels']
-    );
+    const { labels, baseShape } = extractAxesFromPixels(imgMeta['Pixels']);
     const dtype = extractDtypeFromPixels(imgMeta['Pixels']);
     const firstImage = await indexer({ c: 0, t: 0, z: 0 });
     const meta = physicalSizes ? { physicalSizes } : {};
     const source = new TiffPixelSource(
       indexer,
       dtype,
-      guessTiffTileSize(firstImage),
+      getTiffTileSize(firstImage),
       baseShape,
       labels,
       meta,

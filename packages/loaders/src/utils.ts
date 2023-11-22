@@ -1,4 +1,3 @@
-import type { GeoTIFFImage } from 'geotiff';
 import quickselect from 'quickselect';
 import type { OmeXml } from './omexml';
 import type { TypedArray } from 'zarr';
@@ -151,14 +150,6 @@ export function prevPowerOf2(x: number) {
 }
 
 export const SIGNAL_ABORTED = '__vivSignalAborted';
-
-export function guessTiffTileSize(image: GeoTIFFImage) {
-  const tileWidth = image.getTileWidth();
-  const tileHeight = image.getTileHeight();
-  const size = Math.min(tileWidth, tileHeight);
-  // deck.gl requirement for power-of-two tile size.
-  return prevPowerOf2(size);
-}
 
 function isElement(node: Node): node is HTMLElement {
   return node.nodeType === 1;

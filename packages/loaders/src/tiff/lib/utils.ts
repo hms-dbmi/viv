@@ -1,14 +1,9 @@
-import {
-  type GeoTIFF,
-  type GeoTIFFImage,
-  fromFile,
-  fromUrl,
-  fromBlob
-} from 'geotiff';
-import { getLabels, DTYPE_LOOKUP } from '../../utils';
+import { fromFile, fromUrl, fromBlob } from 'geotiff';
+import { getLabels, DTYPE_LOOKUP, prevPowerOf2 } from '../../utils';
+import { createOffsetsProxy } from './proxies';
+import type { GeoTIFF, GeoTIFFImage } from 'geotiff';
 import type { OmeXml, PhysicalUnit, DimensionOrder } from '../../omexml';
 import type { MultiTiffImage } from '../multi-tiff';
-import { createOffsetsProxy } from './proxies';
 
 // TODO: Remove the fancy label stuff
 export type OmeTiffDims =
@@ -67,26 +62,26 @@ export function extractDtypeFromPixels(p: OmeXml[number]['Pixels']) {
   return DTYPE_LOOKUP[p.Type as keyof typeof DTYPE_LOOKUP];
 }
 
-export function extractShapeAndLabelsFromPixels(d: OmeXml[number]['Pixels']) {
+export function extractAxesFromPixels(d: OmeXml[number]['Pixels']) {
   // e.g. 'XYZCT' -> ['t', 'c', 'z', 'y', 'x']
   const labels = getLabels(d['DimensionOrder']);
 
   // Compute "shape" of image
-  const baseShape: number[] = Array(labels.length).fill(0);
-  baseShape[labels.indexOf('t')] = d['SizeT'];
-  baseShape[labels.indexOf('c')] = d['SizeC'];
-  baseShape[labels.indexOf('z')] = d['SizeZ'];
-  baseShape[labels.indexOf('y')] = d['SizeY'];
-  baseShape[labels.indexOf('x')] = d['SizeX'];
+  const shape: number[] = Array(labels.length).fill(0);
+  shape[labels.indexOf('t')] = d['SizeT'];
+  shape[labels.indexOf('c')] = d['SizeC'];
+  shape[labels.indexOf('z')] = d['SizeZ'];
+  shape[labels.indexOf('y')] = d['SizeY'];
+  shape[labels.indexOf('x')] = d['SizeX'];
 
   // Push extra dimension if data are interleaved.
   if (d['Interleaved']) {
     // @ts-expect-error private, unused dim name for selection
     labels.push('_c');
-    baseShape.push(3);
+    shape.push(3);
   }
 
-  return { labels, baseShape };
+  return { labels, shape };
 }
 
 /**
@@ -96,18 +91,25 @@ export function extractShapeAndLabelsFromPixels(d: OmeXml[number]['Pixels']) {
  * pyramid level.
  */
 export function getShapeForResolutionLevel({
-  baseShape,
-  labels,
+  axes,
   resolutionLevel: level
 }: {
-  baseShape: number[];
-  labels: string[];
+  axes: { shape: number[]; labels: string[] };
   resolutionLevel: number;
 }) {
-  const shape = [...baseShape];
-  shape[labels.indexOf('x')] = baseShape[labels.indexOf('x')] >> level;
-  shape[labels.indexOf('y')] = baseShape[labels.indexOf('y')] >> level;
-  return shape;
+  const { shape, labels } = axes;
+  const out = [...shape];
+  out[labels.indexOf('x')] = shape[labels.indexOf('x')] >> level;
+  out[labels.indexOf('y')] = shape[labels.indexOf('y')] >> level;
+  return out;
+}
+
+export function getTiffTileSize(image: GeoTIFFImage) {
+  const tileWidth = image.getTileWidth();
+  const tileHeight = image.getTileHeight();
+  const size = Math.min(tileWidth, tileHeight);
+  // deck.gl requirement for power-of-two tile size.
+  return prevPowerOf2(size);
 }
 
 // Inspired by/borrowed from https://geotiffjs.github.io/geotiff.js/geotiffimage.js.html#line297

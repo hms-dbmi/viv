@@ -1,7 +1,7 @@
 import type { GeoTIFFImage } from 'geotiff';
 
 import TiffPixelSource from './pixel-source';
-import { guessTiffTileSize } from '../utils';
+import { getTiffTileSize } from '../utils';
 import {
   getMultiTiffMetadata,
   getMultiTiffMeta,
@@ -56,7 +56,7 @@ export async function load(
     firstImage.fileDirectory;
   // Not sure if we need this or if the order matters for this use case.
   const dimensionOrder = 'XYZCT';
-  const tileSize = guessTiffTileSize(firstImage);
+  const tileSize = getTiffTileSize(firstImage);
   const meta = { photometricInterpretation };
   const indexer = getMultiTiffIndexer(images);
   const { shape, labels, dtype } = getMultiTiffMeta(dimensionOrder, images);
