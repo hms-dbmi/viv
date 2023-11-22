@@ -67,9 +67,7 @@ export function extractDtypeFromPixels(p: OmeXml[number]['Pixels']) {
   return DTYPE_LOOKUP[p.Type as keyof typeof DTYPE_LOOKUP];
 }
 
-export function extractShapeAndLabelsFromPixels(
-  d: OmeXml[number]['Pixels']
-) {
+export function extractShapeAndLabelsFromPixels(d: OmeXml[number]['Pixels']) {
   // e.g. 'XYZCT' -> ['t', 'c', 'z', 'y', 'x']
   const labels = getLabels(d['DimensionOrder']);
 
@@ -89,10 +87,14 @@ export function extractShapeAndLabelsFromPixels(
   return { labels, baseShape };
 }
 
-export function getShapeForResolutionLevel({ baseShape, labels, resolutionLevel: level }: {
-  baseShape: number[],
-  labels: string[],
-  resolutionLevel: number,
+export function getShapeForResolutionLevel({
+  baseShape,
+  labels,
+  resolutionLevel: level
+}: {
+  baseShape: number[];
+  labels: string[];
+  resolutionLevel: number;
 }) {
   const s = [...baseShape];
   s[labels.indexOf('x')] = baseShape[labels.indexOf('x')] >> level;

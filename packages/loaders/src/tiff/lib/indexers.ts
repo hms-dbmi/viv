@@ -6,7 +6,7 @@ import type { MultiTiffImage } from '../multi-tiff';
 
 export type OmeTiffIndexer = (
   sel: OmeTiffSelection,
-  z: number
+  resolutionLevel: number
 ) => Promise<GeoTIFFImage>;
 
 /*
@@ -32,12 +32,12 @@ export function getOmeLegacyIndexer(
   tiff: GeoTIFF,
   rootMeta: OmeXml
 ): OmeTiffIndexer {
-  const { SizeT, SizeC, SizeZ } = rootMeta[0].Pixels;
-  const ifdIndexer = getOmeIFDIndexer(rootMeta, 0);
+  const imageMeta = rootMeta[0];
+  const { SizeT, SizeC, SizeZ } = imageMeta.Pixels;
 
   return (sel: OmeTiffSelection, pyramidLevel: number) => {
     // Get IFD index at base pyramid level
-    const index = ifdIndexer(sel);
+    const index = getRelativeSelectionIfd(sel, imageMeta);
     // Get index of first image at pyramidal level
     const pyramidIndex = pyramidLevel * SizeZ * SizeT * SizeC;
     // Return image at IFD index for pyramidal level
@@ -61,12 +61,16 @@ type ImageFileDirectory = Awaited<ReturnType<GeoTIFF['parseFileDirectoryAt']>>;
  * an ES6 Map that maps a string key that identifies the selection uniquely
  * to the corresponding IFD.
  */
-export function getOmeSubIFDIndexer(tiff: GeoTIFF, rootMeta: OmeXml, image: number): OmeTiffIndexer {
-  const ifdIndexer = getIfdIndexer(rootMeta, image);
+export function getOmeSubIFDIndexer(
+  tiff: GeoTIFF,
+  rootMeta: OmeXml,
+  image: number
+): OmeTiffIndexer {
   const ifdCache: Map<string, Promise<ImageFileDirectory>> = new Map();
+  const offset = getImageIfdOffset(rootMeta, image);
 
   return async (sel: OmeTiffSelection, pyramidLevel: number) => {
-    const index = ifdIndexer(sel);
+    const index = getRelativeSelectionIfd(sel, rootMeta[image]) + offset;
     const baseImage = await tiff.getImage(index);
 
     // It's the highest resolution, no need to look up SubIFDs.
@@ -100,20 +104,16 @@ export function getOmeSubIFDIndexer(tiff: GeoTIFF, rootMeta: OmeXml, image: numb
   };
 }
 
-function getIfdIndexer(rootMeta: OmeXml, image: number) {
-  const offset = getImageIfdOffset(rootMeta, image);
-  return (sel: OmeTiffSelection) => {
-    const index = getRelativeSelectionIfd(sel, rootMeta[image]);
-    return index + offset;
-  };
-}
-
-function getImageIfdOffset(rootMeta: OmeXml, image: number) {
+function getImageIfdOffset(rootMeta: OmeXml, imageIndex: number) {
   // For multi-image OME-TIFF files, we need to offset by the full dimensions
   // of the previous images dimensions i.e Z * C * T of image - 1 + that of image - 2 etc.
   let imageOffset = 0;
-  for (let i = 0; i < image; i += 1) {
-    const { SizeC: prevSizeC, SizeZ: prevSizeZ, SizeT: prevSizeT } = rootMeta[i].Pixels;
+  for (let i = 0; i < imageIndex; i += 1) {
+    const {
+      SizeC: prevSizeC,
+      SizeZ: prevSizeZ,
+      SizeT: prevSizeT
+    } = rootMeta[i].Pixels;
     imageOffset += prevSizeC * prevSizeZ * prevSizeT;
   }
   return imageOffset;
@@ -123,16 +123,25 @@ function getImageIfdOffset(rootMeta: OmeXml, image: number) {
  * Returns a function that computes the image index based on the dimension
  * order and dimension sizes.
  */
-function getRelativeSelectionIfd(sel: OmeTiffSelection, imageMeta: OmeXml[number]): number {
+function getRelativeSelectionIfd(
+  sel: OmeTiffSelection,
+  imageMeta: OmeXml[number]
+): number {
   const { t, c, z } = sel;
   const { SizeC, SizeZ, SizeT, DimensionOrder } = imageMeta['Pixels'];
   switch (DimensionOrder) {
-    case 'XYZCT': return t * SizeZ * SizeC + c * SizeZ + z;
-    case 'XYZTC': return c * SizeZ * SizeT + t * SizeZ + z;
-    case 'XYCTZ': return z * SizeC * SizeT + t * SizeC + c;
-    case 'XYCZT': return t * SizeC * SizeZ + z * SizeC + c;
-    case 'XYTCZ': return z * SizeT * SizeC + c * SizeT + t;
-    case 'XYTZC': return c * SizeT * SizeZ + z * SizeT + t;
+    case 'XYZCT':
+      return t * SizeZ * SizeC + c * SizeZ + z;
+    case 'XYZTC':
+      return c * SizeZ * SizeT + t * SizeZ + z;
+    case 'XYCTZ':
+      return z * SizeC * SizeT + t * SizeC + c;
+    case 'XYCZT':
+      return t * SizeC * SizeZ + z * SizeC + c;
+    case 'XYTCZ':
+      return z * SizeT * SizeC + c * SizeT + t;
+    case 'XYTZC':
+      return c * SizeT * SizeZ + z * SizeT + t;
     default: {
       throw new Error(`Invalid OME-XML DimensionOrder, got ${DimensionOrder}.`);
     }

@@ -33,10 +33,7 @@ function getIndexer(
   return getOmeLegacyIndexer(tiff, omexml);
 }
 
-function resolveMetadata(
-  omexml: OmeXml,
-  SubIFDs: number[] | undefined,
-) {
+function resolveMetadata(omexml: OmeXml, SubIFDs: number[] | undefined) {
   if (SubIFDs) {
     // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.
     return { levels: SubIFDs.length + 1, rootMeta: omexml };
@@ -58,35 +55,39 @@ export async function loadSingleFileOmeTiff(
   const tiff = await createGeoTiff(source, { headers, offsets });
   const firstImage = await tiff.getImage();
   const omexml = fromString(firstImage.fileDirectory.ImageDescription);
-  const { levels, rootMeta } = resolveMetadata(omexml, firstImage.fileDirectory.SubIFDs);
+  const { levels, rootMeta } = resolveMetadata(
+    omexml,
+    firstImage.fileDirectory.SubIFDs
+  );
   const hasSubIFDs = !!firstImage.fileDirectory.SubIFDs;
   return rootMeta.map((imgMeta, imageIdx) => {
     const pyramidIndexer = getIndexer(tiff, omexml, hasSubIFDs, imageIdx);
-    const { baseShape, labels } = extractShapeAndLabelsFromPixels(imgMeta["Pixels"]);
-    const physicalSizes = extractPhysicalSizesfromPixels(imgMeta["Pixels"]);
-    const dtype = extractDtypeFromPixels(imgMeta["Pixels"]);
+    const { baseShape, labels } = extractShapeAndLabelsFromPixels(
+      imgMeta['Pixels']
+    );
+    const physicalSizes = extractPhysicalSizesfromPixels(imgMeta['Pixels']);
+    const dtype = extractDtypeFromPixels(imgMeta['Pixels']);
     return {
-      data: Array
-        .from({ length: levels })
-        .map((_, resolutionLevel) => {
-          const meta = {
-            photometricInterpretation: firstImage.fileDirectory.PhotometricInterpretation,
-            ...(physicalSizes ? { physicalSizes }: {})
-          };
-          return new TiffPixelSource(
-            (sel: OmeTiffSelection) => pyramidIndexer(sel, resolutionLevel),
-            dtype,
-            guessTiffTileSize(firstImage),
-            getShapeForResolutionLevel({
-              baseShape,
-              labels,
-              resolutionLevel,
-            }),
+      data: Array.from({ length: levels }).map((_, resolutionLevel) => {
+        const meta = {
+          photometricInterpretation:
+            firstImage.fileDirectory.PhotometricInterpretation,
+          ...(physicalSizes ? { physicalSizes } : {})
+        };
+        return new TiffPixelSource(
+          (sel: OmeTiffSelection) => pyramidIndexer(sel, resolutionLevel),
+          dtype,
+          guessTiffTileSize(firstImage),
+          getShapeForResolutionLevel({
+            baseShape,
             labels,
-            meta,
-            pool,
-          );
-        }),
+            resolutionLevel
+          }),
+          labels,
+          meta,
+          pool
+        );
+      }),
       metadata: imgMeta
     };
   });
