@@ -51,7 +51,7 @@ export default function GlobalSelectionSlider(props) {
           imageSettingsStore.setState({
             onViewportLoad: () => {
               imageSettingsStore.setState({
-                onViewportLoad: () => { }
+                onViewportLoad: () => {}
               });
               viewerStore.setState({
                 isChannelLoading: selections.map(() => false)
