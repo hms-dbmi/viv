@@ -4,6 +4,8 @@ import type { OmeTiffSelection } from './utils';
 import type { DimensionOrder } from '../../omexml';
 import type { MultiTiffImage } from '../multi-tiff';
 
+type ImageFileDirectory = Awaited<ReturnType<GeoTIFF['parseFileDirectoryAt']>>;
+
 export type OmeTiffIndexer = (
   sel: OmeTiffSelection,
   resolutionLevel: number
@@ -23,39 +25,34 @@ export type OmeTiffIndexer = (
  * our indexers. There can be multiple images in an OME-TIFF, so supporting these
  * images will require extending these indexers or creating new methods.
  */
-export function getOmeTiffIndexer(
-  tiff: GeoTIFF,
-  options: {
-    size: { t: number; z: number; c: number };
-    dimensionOrder: DimensionOrder;
-    imageIfdOffset: number;
-  }
+export function extendResolverWithBaseIndexer(
+  resolveImageLocation: (sel: OmeTiffSelection) =>
+    | Promise<{
+        tiff: GeoTIFF;
+        ifdIndex: number;
+      }>
+    | {
+        tiff: GeoTIFF;
+        ifdIndex: number;
+      }
 ) {
-  const { size, dimensionOrder, imageIfdOffset } = options;
-  const ifds: ImageFileDirectory[] = [];
-  const getRelativeIfdIndex = getRelativeIfdIndexer(size, dimensionOrder);
-
+  const ifdCache: ImageFileDirectory[] = [];
   return async (sel: OmeTiffSelection, pyramidLevel: number) => {
-    const baseIndex = getRelativeIfdIndex(sel) + imageIfdOffset;
-    const baseImage = await tiff.getImage(baseIndex);
+    const { tiff, ifdIndex } = await resolveImageLocation(sel);
+    const baseImage = await tiff.getImage(ifdIndex);
 
     // It's the highest resolution, no need to look up SubIFDs.
     if (pyramidLevel === 0) {
       return baseImage;
     }
 
-    let index: number;
-    if (!baseImage.fileDirectory.SubIFDs) {
-      index = baseIndex + pyramidLevel * size.z * size.t * size.c;
-    } else {
-      index = baseImage.fileDirectory.SubIFDs[pyramidLevel - 1];
+    const index = baseImage.fileDirectory.SubIFDs[pyramidLevel - 1];
+
+    if (!ifdCache[index]) {
+      ifdCache[index] = await tiff.parseFileDirectoryAt(index);
     }
 
-    if (!ifds[index]) {
-      ifds[index] = await tiff.parseFileDirectoryAt(index);
-    }
-
-    const ifd = ifds[index];
+    const ifd = ifdCache[index];
 
     // Create a new image object manually from IFD
     return new GeoTIFFImage(
@@ -69,13 +66,11 @@ export function getOmeTiffIndexer(
   };
 }
 
-type ImageFileDirectory = Awaited<ReturnType<GeoTIFF['parseFileDirectoryAt']>>;
-
 /*
  * Returns a function that computes the image index based on the dimension
  * order and dimension sizes.
  */
-function getRelativeIfdIndexer(
+export function getRelativeIfdIndexer(
   size: { z: number; t: number; c: number },
   dimensionOrder: DimensionOrder
 ): (sel: OmeTiffSelection) => number {
