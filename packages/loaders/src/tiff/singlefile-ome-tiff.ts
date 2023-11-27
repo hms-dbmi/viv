@@ -4,14 +4,13 @@ import TiffPixelSource from './pixel-source';
 import { getOmeTiffIndexer } from './lib/indexers';
 import {
   createGeoTiff,
-  extractDtypeFromPixels,
+  parsePixelDataType,
   extractPhysicalSizesfromPixels,
   extractAxesFromPixels,
-  getShapeForResolutionLevel,
-  type OmeTiffDims,
-  type OmeTiffSelection
+  getShapeForBinaryDownsampleLevel,
+  getTiffTileSize,
+  type OmeTiffDims
 } from './lib/utils';
-import { getTiffTileSize } from '../utils';
 import type Pool from './lib/Pool';
 import type { OmeXml } from '../omexml';
 
@@ -48,41 +47,44 @@ export async function loadSingleFileOmeTiff(
   );
 
   const images: OmeTiffImage[] = [];
-  let imageOffset = 0;
+  let imageIfdOffset = 0;
 
-  for (const imgMeta of rootMeta) {
-    const pyramidIndexer = getOmeTiffIndexer(tiff, imgMeta, imageOffset);
-    const axes = extractAxesFromPixels(imgMeta['Pixels']);
-    const dtype = extractDtypeFromPixels(imgMeta['Pixels']);
-    const baseImage = await pyramidIndexer({ c: 0, t: 0, z: 0 }, 0);
-    const meta = {
-      photometricInterpretation:
-        firstImage.fileDirectory.PhotometricInterpretation,
-      physicalSizes: extractPhysicalSizesfromPixels(imgMeta['Pixels'])
+  for (const metadata of rootMeta) {
+    const size = {
+      z: metadata['Pixels']['SizeZ'],
+      c: metadata['Pixels']['SizeC'],
+      t: metadata['Pixels']['SizeT']
     };
-
-    const data: TiffPixelSource<OmeTiffDims>[] = [];
-    for (
-      let resolutionLevel = 0;
-      resolutionLevel <= levels;
-      resolutionLevel++
-    ) {
-      const pixelSource = new TiffPixelSource(
-        (sel: OmeTiffSelection) => pyramidIndexer(sel, resolutionLevel),
-        dtype,
-        getTiffTileSize(baseImage),
-        getShapeForResolutionLevel({ axes, resolutionLevel }),
-        axes.labels,
-        meta,
-        pool
-      );
-      data.push(pixelSource);
-    }
-
-    images.push({ data, metadata: imgMeta });
-    imageOffset +=
-      imgMeta['Pixels']['SizeT'] *
-      imgMeta['Pixels']['SizeZ'] *
-      imgMeta['Pixels']['SizeC'];
+    const axes = extractAxesFromPixels(metadata['Pixels']);
+    const pyramidIndexer = getOmeTiffIndexer(tiff, {
+      size,
+      imageIfdOffset,
+      dimensionOrder: metadata['Pixels']['DimensionOrder']
+    });
+    const dtype = parsePixelDataType(metadata['Pixels']['Type']);
+    const tileSize = getTiffTileSize(
+      await pyramidIndexer({ c: 0, t: 0, z: 0 }, 0)
+    );
+    const meta = {
+      physicalSizes: extractPhysicalSizesfromPixels(metadata['Pixels']),
+      photometricInterpretation:
+        firstImage.fileDirectory.PhotometricInterpretation
+    };
+    const data = Array.from(
+      { length: levels },
+      (_, level) =>
+        new TiffPixelSource(
+          sel => pyramidIndexer(sel, level),
+          dtype,
+          tileSize,
+          getShapeForBinaryDownsampleLevel({ axes, level }),
+          axes.labels,
+          meta,
+          pool
+        )
+    );
+    images.push({ data, metadata });
+    imageIfdOffset += size.t * size.z * size.c;
   }
+  return images;
 }

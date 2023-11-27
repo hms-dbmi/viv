@@ -1,5 +1,5 @@
 import { fromFile, fromUrl, fromBlob } from 'geotiff';
-import { getLabels, DTYPE_LOOKUP, prevPowerOf2 } from '../../utils';
+import { getLabels, DTYPE_LOOKUP, prevPowerOf2, assert } from '../../utils';
 import { createOffsetsProxy } from './proxies';
 import type { GeoTIFF, GeoTIFFImage } from 'geotiff';
 import type { OmeXml, PhysicalUnit, DimensionOrder } from '../../omexml';
@@ -55,11 +55,9 @@ export function extractPhysicalSizesfromPixels(
   return physicalSizes;
 }
 
-export function extractDtypeFromPixels(p: OmeXml[number]['Pixels']) {
-  if (!(p.Type in DTYPE_LOOKUP)) {
-    throw Error(`Pixel type ${p.Type} not supported.`);
-  }
-  return DTYPE_LOOKUP[p.Type as keyof typeof DTYPE_LOOKUP];
+export function parsePixelDataType(dtype: string) {
+  assert(dtype in DTYPE_LOOKUP, `Pixel type ${dtype} not supported.`);
+  return DTYPE_LOOKUP[dtype as keyof typeof DTYPE_LOOKUP];
 }
 
 export function extractAxesFromPixels(d: OmeXml[number]['Pixels']) {
@@ -90,18 +88,19 @@ export function extractAxesFromPixels(d: OmeXml[number]['Pixels']) {
  * Assumes that the image is downsampled by a factor of 2 for each
  * pyramid level.
  */
-export function getShapeForResolutionLevel({
-  axes,
-  resolutionLevel: level
-}: {
+export function getShapeForBinaryDownsampleLevel(options: {
   axes: { shape: number[]; labels: string[] };
-  resolutionLevel: number;
+  level: number;
 }) {
-  const { shape, labels } = axes;
-  const out = [...shape];
-  out[labels.indexOf('x')] = shape[labels.indexOf('x')] >> level;
-  out[labels.indexOf('y')] = shape[labels.indexOf('y')] >> level;
-  return out;
+  const { axes, level } = options;
+  const xIndex = axes.labels.indexOf('x');
+  assert(xIndex !== -1, 'x dimension not found');
+  const yIndex = axes.labels.indexOf('y');
+  assert(yIndex !== -1, 'y dimension not found');
+  const resolutionShape = axes.shape.slice();
+  resolutionShape[xIndex] = axes.shape[xIndex] >> level;
+  resolutionShape[yIndex] = axes.shape[yIndex] >> level;
+  return resolutionShape;
 }
 
 export function getTiffTileSize(image: GeoTIFFImage) {

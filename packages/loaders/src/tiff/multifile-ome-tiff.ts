@@ -2,18 +2,25 @@
 import type { GeoTIFF, GeoTIFFImage } from 'geotiff';
 import {
   createGeoTiff,
-  extractDtypeFromPixels,
+  parsePixelDataType,
   extractPhysicalSizesfromPixels as extractPhysicalSizesfromPixels,
+  getTiffTileSize,
   type OmeTiffSelection,
-  extractAxesFromPixels
+  extractAxesFromPixels,
+  type OmeTiffDims,
+  getShapeForBinaryDownsampleLevel
 } from './lib/utils';
 import { fromString, type OmeXml } from '../omexml';
 import TiffPixelSource from './pixel-source';
-import { getTiffTileSize, assert } from '../utils';
+import { assert } from '../utils';
 import type Pool from './lib/Pool';
 
 type TiffDataTags = NonNullable<OmeXml[number]['Pixels']['TiffData']>;
 type TIffDataItem = TiffDataTags[number];
+type OmeTiffImage = {
+  data: TiffPixelSource<OmeTiffDims>[];
+  metadata: OmeXml[number];
+};
 
 function isCompleteTiffDataItem(
   item: TIffDataItem
@@ -110,26 +117,32 @@ export async function loadMultifileOmeTiff(
   const rootMeta = fromString(text);
   // Share resources between images
   const resolver = multifileTiffResolver({ baseUrl: url });
-  const promises = rootMeta.map(async imgMeta => {
-    const indexer = createMultifileOmeTiffIndexer(imgMeta, resolver);
-    const physicalSizes = extractPhysicalSizesfromPixels(imgMeta['Pixels']);
-    const { labels, baseShape } = extractAxesFromPixels(imgMeta['Pixels']);
-    const dtype = extractDtypeFromPixels(imgMeta['Pixels']);
-    const firstImage = await indexer({ c: 0, t: 0, z: 0 });
-    const meta = physicalSizes ? { physicalSizes } : {};
-    const source = new TiffPixelSource(
-      indexer,
-      dtype,
-      getTiffTileSize(firstImage),
-      baseShape,
-      labels,
-      meta,
-      options.pool
-    );
-    return {
-      data: [source],
-      metadata: imgMeta
+  const images: OmeTiffImage[] = [];
+  for (const metadata of rootMeta) {
+    const indexer = createMultifileOmeTiffIndexer(metadata, resolver);
+    const axes = extractAxesFromPixels(metadata['Pixels']);
+    const dtype = parsePixelDataType(metadata['Pixels']['Type']);
+    const baseImage = await indexer({ c: 0, t: 0, z: 0 });
+    const tileSize = getTiffTileSize(baseImage);
+    const meta = {
+      physicalSizes: extractPhysicalSizesfromPixels(metadata['Pixels']),
+      photometricInterpretation:
+        baseImage.fileDirectory.PhotometricInterpretation
     };
-  });
-  return Promise.all(promises);
+    const data = Array.from(
+      { length: 1 },
+      (_, level) =>
+        new TiffPixelSource(
+          indexer,
+          dtype,
+          tileSize,
+          getShapeForBinaryDownsampleLevel({ axes, level }),
+          axes.labels,
+          meta,
+          options.pool
+        )
+    );
+    images.push({ data, metadata });
+  }
+  return images;
 }

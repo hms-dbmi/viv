@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 import { GeoTIFFImage, GeoTIFF } from 'geotiff';
 import type { OmeTiffSelection } from './utils';
-import type { OmeXml } from '../../omexml';
+import type { DimensionOrder } from '../../omexml';
 import type { MultiTiffImage } from '../multi-tiff';
 
 export type OmeTiffIndexer = (
@@ -25,14 +25,18 @@ export type OmeTiffIndexer = (
  */
 export function getOmeTiffIndexer(
   tiff: GeoTIFF,
-  imageMeta: OmeXml[number],
-  imageIfdOffset = 0
+  options: {
+    size: { t: number; z: number; c: number };
+    dimensionOrder: DimensionOrder;
+    imageIfdOffset: number;
+  }
 ) {
+  const { size, dimensionOrder, imageIfdOffset } = options;
   const ifds: ImageFileDirectory[] = [];
-  const { SizeT, SizeC, SizeZ } = imageMeta.Pixels;
+  const getRelativeIfdIndex = getRelativeIfdIndexer(size, dimensionOrder);
 
   return async (sel: OmeTiffSelection, pyramidLevel: number) => {
-    const baseIndex = getRelativeSelectionIfd(sel, imageMeta) + imageIfdOffset;
+    const baseIndex = getRelativeIfdIndex(sel) + imageIfdOffset;
     const baseImage = await tiff.getImage(baseIndex);
 
     // It's the highest resolution, no need to look up SubIFDs.
@@ -42,7 +46,7 @@ export function getOmeTiffIndexer(
 
     let index: number;
     if (!baseImage.fileDirectory.SubIFDs) {
-      index = baseIndex + pyramidLevel * SizeZ * SizeT * SizeC;
+      index = baseIndex + pyramidLevel * size.z * size.t * size.c;
     } else {
       index = baseImage.fileDirectory.SubIFDs[pyramidLevel - 1];
     }
@@ -71,27 +75,25 @@ type ImageFileDirectory = Awaited<ReturnType<GeoTIFF['parseFileDirectoryAt']>>;
  * Returns a function that computes the image index based on the dimension
  * order and dimension sizes.
  */
-function getRelativeSelectionIfd(
-  sel: OmeTiffSelection,
-  imageMeta: OmeXml[number]
-): number {
-  const { t, c, z } = sel;
-  const { SizeC, SizeZ, SizeT, DimensionOrder } = imageMeta['Pixels'];
-  switch (DimensionOrder) {
+function getRelativeIfdIndexer(
+  size: { z: number; t: number; c: number },
+  dimensionOrder: DimensionOrder
+): (sel: OmeTiffSelection) => number {
+  switch (dimensionOrder) {
     case 'XYZCT':
-      return t * SizeZ * SizeC + c * SizeZ + z;
+      return ({ t, c, z }) => t * size.z * size.c + c * size.z + z;
     case 'XYZTC':
-      return c * SizeZ * SizeT + t * SizeZ + z;
+      return ({ t, c, z }) => c * size.z * size.t + t * size.z + z;
     case 'XYCTZ':
-      return z * SizeC * SizeT + t * SizeC + c;
+      return ({ t, c, z }) => z * size.c * size.t + t * size.c + c;
     case 'XYCZT':
-      return t * SizeC * SizeZ + z * SizeC + c;
+      return ({ t, c, z }) => t * size.c * size.z + z * size.c + c;
     case 'XYTCZ':
-      return z * SizeT * SizeC + c * SizeT + t;
+      return ({ t, c, z }) => z * size.t * size.c + c * size.t + t;
     case 'XYTZC':
-      return c * SizeT * SizeZ + z * SizeT + t;
+      return ({ t, c, z }) => c * size.t * size.z + z * size.t + t;
     default: {
-      throw new Error(`Invalid OME-XML DimensionOrder, got ${DimensionOrder}.`);
+      throw new Error(`Invalid OME-XML DimensionOrder, got ${dimensionOrder}.`);
     }
   }
 }
