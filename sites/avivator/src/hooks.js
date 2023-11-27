@@ -38,9 +38,9 @@ export const useImage = (source, history) => {
       useViewerStore.setState({ isChannelLoading: [true] });
       useViewerStore.setState({ isViewerLoading: true });
       if (use3d) toggleUse3d();
-      const { urlOrFile } = source;
+      const { urlOrFile, offsetUrlOrFile } = source;
       const newLoader = await createLoader(
-        urlOrFile,
+        urlOrFile,offsetUrlOrFile,
         toggleIsOffsetsSnackbarOn,
         message =>
           useViewerStore.setState({
@@ -75,8 +75,8 @@ export const useImage = (source, history) => {
         if (use3d) toggleUse3d();
         // eslint-disable-next-line no-unused-expressions
         history?.push(
-          typeof urlOrFile === 'string' ? `?image_url=${urlOrFile}` : ''
-        );
+          typeof urlOrFile === 'string' && typeof offsetUrlOrFile === 'string' ? `?image_url=${encodeURIComponent(urlOrFile)}&offset_url=${encodeURIComponent(offsetUrlOrFile)}` :
+            typeof urlOrFile === 'string' ? `?image_url=${encodeURIComponent(urlOrFile)}`:  '');
       }
     }
     if (source) changeLoader();

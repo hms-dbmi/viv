@@ -158,15 +158,25 @@ async function fetchSingleFileOmeTiffOffsets(url) {
   return res.status === 200 ? await res.json() : undefined;
 }
 
+async function fetchSingleFileOmeTiffOffsetsByUrl(offsetsUrl) {
+  // No offsets for multifile OME-TIFFs
+  if (offsetsUrl.includes('companion.ome')) {
+    return undefined;
+  }
+  const res = await fetch(offsetsUrl);
+  return res.status === 200 ? await res.json() : undefined;
+}
+
 /**
  * Given an image source, creates a PixelSource[] and returns XML-meta
  *
  * @param {string | File | File[]} urlOrFile
+ * @param {string | File | File[]} offsetUrlOrFile
  * @param {} handleOffsetsNotFound
  * @param {*} handleLoaderError
  */
 export async function createLoader(
-  urlOrFile,
+  urlOrFile,offsetUrlOrFile,
   handleOffsetsNotFound,
   handleLoaderError
 ) {
@@ -184,7 +194,16 @@ export async function createLoader(
         return source;
       }
 
-      const maybeOffsets = await fetchSingleFileOmeTiffOffsets(urlOrFile);
+      // eslint-disable-next-line no-console
+      console.info(offsetUrlOrFile);
+
+      //Handle the OffsetUrl if given
+      // eslint-disable-next-line no-console
+      const maybeOffsets = (offsetUrlOrFile !== undefined && offsetUrlOrFile !== null)
+        ? await fetchSingleFileOmeTiffOffsetsByUrl(offsetUrlOrFile) : await fetchSingleFileOmeTiffOffsets(urlOrFile);
+
+      // eslint-disable-next-line no-console
+      console.info(maybeOffsets);
 
       // TODO(2021-05-06): temporarily disable `pool` until inline worker module is fixed.
       const source = await loadOmeTiff(urlOrFile, {

@@ -38,12 +38,14 @@ function useQuery() {
 function RoutedAvivator(props) {
   const query = useQuery();
   const url = query.get('image_url');
+  const offset_url = query.get('offset_url');
   const {
     routeProps: { history }
   } = props;
   if (url) {
     const urlSrouce = {
       urlOrFile: url,
+      offsetUrlOrFile: offset_url,
       description: getNameFromUrl(url)
     };
     return (
