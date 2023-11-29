@@ -14,7 +14,7 @@ import { fromString, type OmeXml } from '../omexml';
 import TiffPixelSource from './pixel-source';
 import { assert } from '../utils';
 import type Pool from './lib/Pool';
-import { extendResolverWithBaseIndexer } from './lib/indexers';
+import { createOmeImageIndexerFromResolver } from './lib/indexers';
 
 type TiffDataTags = NonNullable<OmeXml[number]['Pixels']['TiffData']>;
 type TIffDataItem = TiffDataTags[number];
@@ -66,16 +66,14 @@ function createMultifileImageDataLookup(
   };
 }
 
-function createMultifileOmeTiffResolver(
-  meta: OmeXml[number]['Pixels']['TiffData'],
-  options: {
-    baseUrl: URL;
-    headers: Headers | Record<string, string>;
-  }
-) {
+function createMultifileOmeTiffResolver(options: {
+  tiffData: OmeXml[number]['Pixels']['TiffData'];
+  baseUrl: URL;
+  headers: Headers | Record<string, string>;
+}) {
   // Mapping of filename -> GeoTIFF
   const tiffs = new Map<string, GeoTIFF>();
-  const lookup = createMultifileImageDataLookup(meta);
+  const lookup = createMultifileImageDataLookup(options.tiffData);
   return async (selection: OmeTiffSelection) => {
     const entry = lookup.getImageDataPointer(selection);
     if (!tiffs.has(entry.filename)) {
@@ -88,25 +86,52 @@ function createMultifileOmeTiffResolver(
   };
 }
 
-async function buildIndexer(
-  resolveOmeTiffSelection: ReturnType<typeof createMultifileOmeTiffResolver>
-) {
-  const { tiff, ifdIndex } = await resolveOmeTiffSelection({
-    c: 0,
-    t: 0,
-    z: 0
-  });
-  const baseImage = await tiff.getImage(ifdIndex);
-  if (!baseImage.fileDirectory.SubIFDs) {
-    const pyramidIndexer = async (sel: OmeTiffSelection, level: number) => {
-      const { tiff, ifdIndex } = await resolveOmeTiffSelection(sel);
-      return tiff.getImage(ifdIndex + level);
-    };
-    return { pyramidIndexer, levels: 1 };
+/**
+ * Load a multifile OME-TIFF from a URL
+ *
+ * Creates pyramidal indexer from the companion OME-XML and
+ * determines the number of levels based on the SubIFDs of
+ * the first image.
+ *
+ * Extracts other TiffPixelSource options.
+ */
+async function getPixelSourceOptionsForImage(
+  metadata: OmeXml[number],
+  config: {
+    baseUrl: URL;
+    headers: Headers | Record<string, string>;
   }
+) {
+  const resolveOmeSelection = createMultifileOmeTiffResolver({
+    tiffData: metadata['Pixels']['TiffData'],
+    baseUrl: config.baseUrl,
+    headers: config.headers
+  });
+  const { tiff, ifdIndex } = await resolveOmeSelection({ c: 0, t: 0, z: 0 });
+  const baseImage = await tiff.getImage(ifdIndex);
+  const pyramidIndexer = createOmeImageIndexerFromResolver(
+    resolveOmeSelection,
+    {
+      size: {
+        z: metadata['Pixels']['SizeZ'],
+        t: metadata['Pixels']['SizeT'],
+        c: metadata['Pixels']['SizeC']
+      }
+    }
+  );
   return {
-    pyramidIndexer: extendResolverWithBaseIndexer(resolveOmeTiffSelection),
-    levels: (baseImage.fileDirectory.SubIFDs.length + 1) as number
+    pyramidIndexer,
+    levels: baseImage.fileDirectory.SubIFDs
+      ? baseImage.fileDirectory.SubIFDs.length + 1
+      : 1,
+    tileSize: getTiffTileSize(baseImage),
+    axes: extractAxesFromPixels(metadata['Pixels']),
+    dtype: parsePixelDataType(metadata['Pixels']['Type']),
+    meta: {
+      physicalSizes: extractPhysicalSizesfromPixels(metadata['Pixels']),
+      photometricInterpretation:
+        baseImage.fileDirectory.PhotometricInterpretation
+    }
   };
 }
 
@@ -127,35 +152,20 @@ export async function loadMultifileOmeTiff(
   const images: OmeTiffImage[] = [];
 
   for (const metadata of rootMeta) {
-    const resolveOmeTiffSelection = createMultifileOmeTiffResolver(
-      metadata['Pixels']['TiffData'],
-      {
-        baseUrl: url,
-        headers: options.headers ?? {}
-      }
-    );
-    const { pyramidIndexer, levels } = await buildIndexer(
-      resolveOmeTiffSelection
-    );
-    const baseImage = await pyramidIndexer({ c: 0, t: 0, z: 0 }, 0);
-    const axes = extractAxesFromPixels(metadata['Pixels']);
-    const dtype = parsePixelDataType(metadata['Pixels']['Type']);
-    const tileSize = getTiffTileSize(baseImage);
-    const meta = {
-      physicalSizes: extractPhysicalSizesfromPixels(metadata['Pixels']),
-      photometricInterpretation:
-        baseImage.fileDirectory.PhotometricInterpretation
-    };
+    const opts = await getPixelSourceOptionsForImage(metadata, {
+      baseUrl: url,
+      headers: options.headers || {}
+    });
     const data = Array.from(
-      { length: levels },
+      { length: opts.levels },
       (_, level) =>
         new TiffPixelSource(
-          sel => pyramidIndexer(sel, level),
-          dtype,
-          tileSize,
-          getShapeForBinaryDownsampleLevel({ axes, level }),
-          axes.labels,
-          meta,
+          sel => opts.pyramidIndexer(sel, level),
+          opts.dtype,
+          opts.tileSize,
+          getShapeForBinaryDownsampleLevel({ axes: opts.axes, level }),
+          opts.axes.labels,
+          opts.meta,
           options.pool
         )
     );

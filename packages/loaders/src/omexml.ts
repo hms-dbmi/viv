@@ -165,18 +165,18 @@ const ImageSchema = z
   })
   .transform(flattenAttributes);
 
-const OmeSchema = z
-  .object({
-    Image: z.preprocess(ensureArray, ImageSchema.array())
-  })
-  .extend({
-    attr: z.object({
-      xmlns: z.string(),
-      'xmlns:xsi': z.string(),
-      'xsi:schemaLocation': z.string()
-    })
-  })
-  .transform(flattenAttributes);
+const OmeSchema = z.object({
+  Image: z.preprocess(ensureArray, ImageSchema.array())
+});
+// TODO: Verify that these attributes are always present
+// .extend({
+//   attr: z.object({
+//     'xmlns': z.string(),
+//     'xmlns:xsi': z.string(),
+//     'xsi:schemaLocation': z.string()
+//   })
+// })
+// .transform(flattenAttributes);
 
 export function fromString(str: string) {
   const raw = parseXML(str);

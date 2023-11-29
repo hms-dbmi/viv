@@ -32,24 +32,24 @@ type PhysicalSizes = {
 };
 
 export function extractPhysicalSizesfromPixels(
-  p: OmeXml[number]['Pixels']
+  d: OmeXml[number]['Pixels']
 ): undefined | PhysicalSizes {
   if (
-    !p['PhysicalSizeX'] ||
-    !p['PhysicalSizeY'] ||
-    !p['PhysicalSizeXUnit'] ||
-    !p['PhysicalSizeYUnit']
+    !d['PhysicalSizeX'] ||
+    !d['PhysicalSizeY'] ||
+    !d['PhysicalSizeXUnit'] ||
+    !d['PhysicalSizeYUnit']
   ) {
     return undefined;
   }
   const physicalSizes: PhysicalSizes = {
-    x: { size: p['PhysicalSizeX'], unit: p['PhysicalSizeXUnit'] },
-    y: { size: p['PhysicalSizeY'], unit: p['PhysicalSizeYUnit'] }
+    x: { size: d['PhysicalSizeX'], unit: d['PhysicalSizeXUnit'] },
+    y: { size: d['PhysicalSizeY'], unit: d['PhysicalSizeYUnit'] }
   };
-  if (p['PhysicalSizeZ'] && p['PhysicalSizeZUnit']) {
+  if (d['PhysicalSizeZ'] && d['PhysicalSizeZUnit']) {
     physicalSizes.z = {
-      size: p['PhysicalSizeZ'],
-      unit: p['PhysicalSizeZUnit']
+      size: d['PhysicalSizeZ'],
+      unit: d['PhysicalSizeZUnit']
     };
   }
   return physicalSizes;

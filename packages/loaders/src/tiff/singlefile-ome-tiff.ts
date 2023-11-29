@@ -1,10 +1,7 @@
 import { fromString } from '../omexml';
 
 import TiffPixelSource from './pixel-source';
-import {
-  extendResolverWithBaseIndexer,
-  getRelativeIfdIndexer
-} from './lib/indexers';
+import { createOmeImageIndexerFromResolver } from './lib/indexers';
 import {
   createGeoTiff,
   parsePixelDataType,
@@ -30,19 +27,64 @@ function resolveMetadata(omexml: OmeXml, SubIFDs: number[] | undefined) {
   return { levels: omexml.length, rootMeta: [firstImageMetadata] };
 }
 
-function createSingleFileResolver(
-  tiff: GeoTIFF,
-  options: {
-    size: { t: number; z: number; c: number };
+/*
+ * Returns the relative IFD index given the selection and the size of the image.
+ *
+ * This is is necessary because the IFD ordering is implicitly defined by the
+ * dimension order.
+ *
+ * @param sel - The desired plane selection.
+ * @param size - The size of each (z, t, c) dimension from the OME-XML.
+ * @param dimensionOrder - The dimension order of the image from the OME-XML.
+ */
+function getRelativeOmeIfdIndex(
+  { z, t, c }: OmeTiffSelection,
+  image: {
+    size: OmeTiffSelection;
     dimensionOrder: DimensionOrder;
-    imageIfdOffset: number;
   }
 ) {
-  const { size, dimensionOrder, imageIfdOffset } = options;
-  const getRelativeIfdIndex = getRelativeIfdIndexer(size, dimensionOrder);
-  return (sel: OmeTiffSelection) => {
-    return { tiff, ifdIndex: getRelativeIfdIndex(sel) + imageIfdOffset };
-  };
+  const { size, dimensionOrder } = image;
+  switch (image.dimensionOrder) {
+    case 'XYZCT':
+      return z + size.z * c + size.z * size.c * t;
+    case 'XYZTC':
+      return z + size.z * t + size.z * size.t * c;
+    case 'XYCTZ':
+      return c + size.c * t + size.c * size.t * z;
+    case 'XYCZT':
+      return c + size.c * z + size.c * size.z * t;
+    case 'XYTCZ':
+      return t + size.t * c + size.t * size.c * z;
+    case 'XYTZC':
+      return t + size.t * z + size.t * size.z * c;
+    default:
+      throw new Error(`Invalid dimension order: ${dimensionOrder}`);
+  }
+}
+
+/**
+ * Creates an OmeTiffResolver for a single-file OME-TIFF.
+ *
+ * The tiff always resolves to the same file. The IFD index is calculated
+ * based on the selection and.
+ */
+function createSingleFileOmeTiffPyramidalIndexer(
+  tiff: GeoTIFF,
+  image: {
+    // The offset of the first IFD for this multi-dim image.
+    ifdOffset: number;
+    // The size of each (z, t, c) dimension from the OME-XML.
+    size: { t: number; z: number; c: number };
+    // The dimension order of the image from the OME-XML.
+    dimensionOrder: DimensionOrder;
+  }
+) {
+  return createOmeImageIndexerFromResolver(sel => {
+    const withinImageIndex = getRelativeOmeIfdIndex(sel, image);
+    const ifdIndex = withinImageIndex + image.ifdOffset;
+    return { tiff, ifdIndex };
+  });
 }
 
 type OmeTiffImage = {
@@ -70,20 +112,17 @@ export async function loadSingleFileOmeTiff(
   let imageIfdOffset = 0;
 
   for (const metadata of rootMeta) {
-    const size = {
+    const imageSize = {
       z: metadata['Pixels']['SizeZ'],
       c: metadata['Pixels']['SizeC'],
       t: metadata['Pixels']['SizeT']
     };
     const axes = extractAxesFromPixels(metadata['Pixels']);
-    const resolveOmeTiffSelection = createSingleFileResolver(tiff, {
-      size,
-      imageIfdOffset,
+    const pyramidIndexer = createSingleFileOmeTiffPyramidalIndexer(tiff, {
+      size: imageSize,
+      ifdOffset: imageIfdOffset,
       dimensionOrder: metadata['Pixels']['DimensionOrder']
     });
-    const pyramidIndexer = extendResolverWithBaseIndexer(
-      resolveOmeTiffSelection
-    );
     const dtype = parsePixelDataType(metadata['Pixels']['Type']);
     const tileSize = getTiffTileSize(
       await pyramidIndexer({ c: 0, t: 0, z: 0 }, 0)
@@ -107,7 +146,7 @@ export async function loadSingleFileOmeTiff(
         )
     );
     images.push({ data, metadata });
-    imageIfdOffset += size.t * size.z * size.c;
+    imageIfdOffset += imageSize.t * imageSize.z * imageSize.c;
   }
   return images;
 }
