@@ -84,7 +84,7 @@ function createSingleFileOmeTiffPyramidalIndexer(
     const withinImageIndex = getRelativeOmeIfdIndex(sel, image);
     const ifdIndex = withinImageIndex + image.ifdOffset;
     return { tiff, ifdIndex };
-  });
+  }, image);
 }
 
 type OmeTiffImage = {
