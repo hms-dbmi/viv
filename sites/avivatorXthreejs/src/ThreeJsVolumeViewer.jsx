@@ -6,6 +6,7 @@ import { getImageSize } from '@hms-dbmi/viv';
 
 import * as THREE from "three";
 import { VRButton } from 'three/examples/jsm/webxr/VRButton';
+import { ARButton } from 'three/examples/jsm/webxr/ARButton';
 import {VolumeRenderShaderPerspective} from '../jsm/shaders/VolumeShaderPerspective.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
@@ -287,7 +288,7 @@ class ThreeJsViewWrapper extends React.PureComponent {
 
     this.controls = new OrbitControls( this.camera, this.renderer.domElement );
     this.controls.update();
-    document.body.appendChild(VRButton.createButton( this.renderer ) );
+    document.body.appendChild(ARButton.createButton( this.renderer ) );
     this.renderer.xr.enabled = true;
     this.renderer.setAnimationLoop(() => this.animate());
 
