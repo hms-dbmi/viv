@@ -12,7 +12,7 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.3.0",
     "documentation": "^14.0.2",
-    "rollup": "^2.75.7"
+    "rollup": "^4.9.2"
   },
   "version": null
 }
