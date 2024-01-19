@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 import React from 'react';
 import debounce from 'lodash/debounce';
 import {
@@ -13,7 +13,8 @@ import {
   useImageSettingsStore,
   useViewerStore,
   useChannelsStore,
-  useLoader
+  useLoader,
+  useViewerStoreApi
 } from '../state';
 import { useWindowSize, get3DExtension } from '../utils';
 import { DEFAULT_OVERVIEW } from '../constants';
@@ -67,10 +68,10 @@ const Viewer = () => {
     ],
     shallow
   );
-
+  const viewerStore = useViewerStoreApi();
   const onViewStateChange = ({ viewState: { zoom } }) => {
     const z = Math.min(Math.max(Math.round(-zoom), 0), loader.length - 1);
-    useViewerStore.setState({ pyramidResolution: z });
+    viewerStore.setState({ pyramidResolution: z });
   };
 
   return use3d ? (
@@ -93,7 +94,7 @@ const Viewer = () => {
       viewStates={[viewState]}
       onViewStateChange={debounce(
         ({ viewState: newViewState, viewId }) =>
-          useViewerStore.setState({
+          viewerStore.setState({
             viewState: { ...newViewState, id: viewId }
           }),
         250,
@@ -112,7 +113,7 @@ const Viewer = () => {
       zoomLock={zoomLock}
       panLock={panLock}
       hoverHooks={{
-        handleValue: v => useViewerStore.setState({ pixelValues: v })
+        handleValue: v => viewerStore.setState({ pixelValues: v })
       }}
       lensSelection={lensSelection}
       lensEnabled={lensEnabled}
@@ -135,7 +136,7 @@ const Viewer = () => {
       overview={DEFAULT_OVERVIEW}
       overviewOn={isOverviewOn}
       hoverHooks={{
-        handleValue: v => useViewerStore.setState({ pixelValues: v })
+        handleValue: v => viewerStore.setState({ pixelValues: v })
       }}
       lensSelection={lensSelection}
       lensEnabled={lensEnabled}

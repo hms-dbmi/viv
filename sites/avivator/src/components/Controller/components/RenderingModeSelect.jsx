@@ -2,10 +2,14 @@ import React from 'react';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 
 import { RENDERING_MODES } from '@hms-dbmi/viv';
-import { useImageSettingsStore, useViewerStore } from '../../../state';
+import {
+  useImageSettingsStore,
+  useImageSettingsStoreApi,
+  useViewerStore
+} from '../../../state';
 
 const renderingOptions = Object.values(RENDERING_MODES);
 
@@ -17,13 +21,14 @@ function RenderingModeSelect() {
   );
   // Empty option allows for displaying the title of the dropdown fully in the UI.
   const options = !use3d ? [...renderingOptions, ''] : renderingOptions;
+  const imageSettingsStore = useImageSettingsStoreApi();
   return (
     <FormControl fullWidth>
       <InputLabel htmlFor="rendering-mode-select">Rendering Mode</InputLabel>
       <Select
         native
         onChange={e =>
-          useImageSettingsStore.setState({ renderingMode: e.target.value })
+          imageSettingsStore.setState({ renderingMode: e.target.value })
         }
         value={use3d ? renderingMode : ''}
         inputProps={{

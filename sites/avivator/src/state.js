@@ -1,6 +1,7 @@
-import create from 'zustand';
-
+import { createContext, useContext, useRef, createElement } from 'react';
 import { RENDERING_MODES } from '@hms-dbmi/viv';
+import { createStore } from 'zustand';
+import { useStoreWithEqualityFn } from 'zustand/traditional';
 
 const captialize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -38,51 +39,52 @@ const DEFAUlT_CHANNEL_VALUES = {
   ids: ''
 };
 
-export const useChannelsStore = create(set => ({
-  ...DEFAUlT_CHANNEL_STATE,
-  ...generateToggles(DEFAUlT_CHANNEL_VALUES, set),
-  toggleIsOn: index =>
-    set(state => {
-      const channelsVisible = [...state.channelsVisible];
-      channelsVisible[index] = !channelsVisible[index];
-      return { ...state, channelsVisible };
-    }),
-  setPropertiesForChannel: (channel, newProperties) =>
-    set(state => {
-      const entries = Object.entries(newProperties);
-      const newState = {};
-      entries.forEach(([property, value]) => {
-        newState[property] = [...state[property]];
-        newState[property][channel] = value;
-      });
-      return { ...state, ...newState };
-    }),
-  removeChannel: channel =>
-    set(state => {
-      const newState = {};
-      const channelKeys = Object.keys(DEFAUlT_CHANNEL_VALUES);
-      Object.keys(state).forEach(key => {
-        if (channelKeys.includes(key)) {
-          newState[key] = state[key].filter((_, j) => j !== channel);
-        }
-      });
-      return { ...state, ...newState };
-    }),
-  addChannel: newProperties =>
-    set(state => {
-      const entries = Object.entries(newProperties);
-      const newState = { ...state };
-      entries.forEach(([property, value]) => {
-        newState[property] = [...state[property], value];
-      });
-      Object.entries(DEFAUlT_CHANNEL_VALUES).forEach(([k, v]) => {
-        if (newState[k].length < newState[entries[0][0]].length) {
-          newState[k] = [...state[k], v];
-        }
-      });
-      return newState;
-    })
-}));
+const createChannelsStore = () =>
+  createStore(set => ({
+    ...DEFAUlT_CHANNEL_STATE,
+    ...generateToggles(DEFAUlT_CHANNEL_VALUES, set),
+    toggleIsOn: index =>
+      set(state => {
+        const channelsVisible = [...state.channelsVisible];
+        channelsVisible[index] = !channelsVisible[index];
+        return { ...state, channelsVisible };
+      }),
+    setPropertiesForChannel: (channel, newProperties) =>
+      set(state => {
+        const entries = Object.entries(newProperties);
+        const newState = {};
+        entries.forEach(([property, value]) => {
+          newState[property] = [...state[property]];
+          newState[property][channel] = value;
+        });
+        return { ...state, ...newState };
+      }),
+    removeChannel: channel =>
+      set(state => {
+        const newState = {};
+        const channelKeys = Object.keys(DEFAUlT_CHANNEL_VALUES);
+        Object.keys(state).forEach(key => {
+          if (channelKeys.includes(key)) {
+            newState[key] = state[key].filter((_, j) => j !== channel);
+          }
+        });
+        return { ...state, ...newState };
+      }),
+    addChannel: newProperties =>
+      set(state => {
+        const entries = Object.entries(newProperties);
+        const newState = { ...state };
+        entries.forEach(([property, value]) => {
+          newState[property] = [...state[property], value];
+        });
+        Object.entries(DEFAUlT_CHANNEL_VALUES).forEach(([k, v]) => {
+          if (newState[k].length < newState[entries[0][0]].length) {
+            newState[k] = [...state[k], v];
+          }
+        });
+        return newState;
+      })
+  }));
 
 const DEFAULT_IMAGE_STATE = {
   lensSelection: 0,
@@ -100,10 +102,11 @@ const DEFAULT_IMAGE_STATE = {
   onViewportLoad: () => {}
 };
 
-export const useImageSettingsStore = create(set => ({
-  ...DEFAULT_IMAGE_STATE,
-  ...generateToggles(DEFAULT_IMAGE_STATE, set)
-}));
+const createImageSettingsStore = () =>
+  createStore(set => ({
+    ...DEFAULT_IMAGE_STATE,
+    ...generateToggles(DEFAULT_IMAGE_STATE, set)
+  }));
 
 const DEFAULT_VIEWER_STATE = {
   isChannelLoading: [],
@@ -129,27 +132,93 @@ const DEFAULT_VIEWER_STATE = {
   pyramidResolution: 0
 };
 
-export const useViewerStore = create(set => ({
-  ...DEFAULT_VIEWER_STATE,
-  ...generateToggles(DEFAULT_VIEWER_STATE, set),
-  setIsChannelLoading: (index, val) =>
-    set(state => {
-      const newIsChannelLoading = [...state.isChannelLoading];
-      newIsChannelLoading[index] = val;
-      return { ...state, isChannelLoading: newIsChannelLoading };
-    }),
-  addIsChannelLoading: val =>
-    set(state => {
-      const newIsChannelLoading = [...state.isChannelLoading, val];
-      return { ...state, isChannelLoading: newIsChannelLoading };
-    }),
-  removeIsChannelLoading: index =>
-    set(state => {
-      const newIsChannelLoading = [...state.isChannelLoading];
-      newIsChannelLoading.splice(index, 1);
-      return { ...state, isChannelLoading: newIsChannelLoading };
-    })
-}));
+const createViewerStore = () =>
+  createStore(set => ({
+    ...DEFAULT_VIEWER_STATE,
+    ...generateToggles(DEFAULT_VIEWER_STATE, set),
+    setIsChannelLoading: (index, val) =>
+      set(state => {
+        const newIsChannelLoading = [...state.isChannelLoading];
+        newIsChannelLoading[index] = val;
+        return { ...state, isChannelLoading: newIsChannelLoading };
+      }),
+    addIsChannelLoading: val =>
+      set(state => {
+        const newIsChannelLoading = [...state.isChannelLoading, val];
+        return { ...state, isChannelLoading: newIsChannelLoading };
+      }),
+    removeIsChannelLoading: index =>
+      set(state => {
+        const newIsChannelLoading = [...state.isChannelLoading];
+        newIsChannelLoading.splice(index, 1);
+        return { ...state, isChannelLoading: newIsChannelLoading };
+      })
+  }));
+
+const AvivatorContext = createContext(null);
+
+/**
+ * AvivatorProvider is used to provide `channels`, `imageSettings`, and `viewer` stores to the rest of the app.
+ * In the case of Avivator itself, there is one of these at the root, in `index.jsx`.
+ *
+ * You can have multiple independent viewers, using different images and/or other settings,
+ * by creating an AvivatorProvider for each viewer.
+ */
+export const AvivatorProvider = ({ children }) => {
+  const storesRef = useRef(null);
+  if (!storesRef.current) {
+    storesRef.current = {
+      channels: createChannelsStore(),
+      imageSettings: createImageSettingsStore(),
+      viewer: createViewerStore()
+    };
+  }
+  return createElement(
+    AvivatorContext.Provider,
+    { value: storesRef.current },
+    children
+  );
+};
+
+/**
+ * useStoreApi is a basic wrapper function used to get a specific store from the AvivatorProvider.
+ *
+ * The `use<X>Store` functions are used to get state from the store, with a selector and optional equality function.
+ * These are used in Avivator components primarily to get state from the store and subscribe to changes.
+ * They cannot be used outside of the React render cycle, or anywhere where there is not an active {@link AvivatorContext}.
+ * In these cases, it is necessary to use the `use<X>StoreApi` functions instead.
+ *
+ * The `use<X>StoreApi` functions are used to obtain a reference to the store object itself, which can be later used
+ * outside of the React render cycle - for example, with `setState()` in an event handler - where the {@link AvivatorContext}
+ * would otherwise be ambiguous.
+ */
+function useStoreApi(storeName) {
+  const store = useContext(AvivatorContext);
+  if (!store) throw 'useStore must be used within an AvivatorProvider';
+  return store[storeName];
+}
+export const useChannelsStoreApi = () => useStoreApi('channels');
+export const useImageSettingsStoreApi = () => useStoreApi('imageSettings');
+export const useViewerStoreApi = () => useStoreApi('viewer');
+/**
+ * For use of stores with `selector` and optional `equalityFn` within React rendering.
+ * Equivalent API to `use<X>Store` functions that were used before adding support for React Context,
+ * but only for invoking as a function, not `useXStore.setState(...)` etc.
+ *
+ * @param {'channels' | 'imageSettings' | 'viewer'} storeName
+ * @param {function} selector - selector function, see Zustand docs
+ * @param {function?} equalityFn - equality function, see Zustand docs
+ */
+function useAvivatorStore(storeName, selector, equalityFn) {
+  const store = useStoreApi(storeName);
+  return useStoreWithEqualityFn(store, selector, equalityFn);
+}
+export const useChannelsStore = (selector, equalityFn) =>
+  useAvivatorStore('channels', selector, equalityFn);
+export const useImageSettingsStore = (selector, equalityFn) =>
+  useAvivatorStore('imageSettings', selector, equalityFn);
+export const useViewerStore = (selector, equalityFn) =>
+  useAvivatorStore('viewer', selector, equalityFn);
 
 export const useLoader = () => {
   const [fullLoader, image] = useChannelsStore(store => [

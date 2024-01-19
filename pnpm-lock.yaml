@@ -318,8 +318,8 @@ importers:
         specifier: ^5.2.0
         version: 5.3.3(react@17.0.2)
       zustand:
-        specifier: ^3.4.1
-        version: 3.7.2(react@17.0.2)
+        specifier: ^4.4.6
+        version: 4.4.6(@types/react@18.0.17)(react@17.0.2)
     devDependencies:
       '@vitejs/plugin-react':
         specifier: ^4.1.1
@@ -10975,6 +10975,14 @@ packages:
       prepend-http: 2.0.0
     dev: true
 
+  /use-sync-external-store@1.2.0(react@17.0.2):
+    resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 17.0.2
+    dev: false
+
   /use@3.1.1:
     resolution: {integrity: sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ==}
     engines: {node: '>=0.10.0'}
@@ -11505,16 +11513,24 @@ packages:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
-  /zustand@3.7.2(react@17.0.2):
-    resolution: {integrity: sha512-PIJDIZKtokhof+9+60cpockVOq05sJzHCriyvaLBmEJixseQ1a5Kdov6fWZfWOu5SK9c+FhH1jU0tntLxRJYMA==}
+  /zustand@4.4.6(@types/react@18.0.17)(react@17.0.2):
+    resolution: {integrity: sha512-Rb16eW55gqL4W2XZpJh0fnrATxYEG3Apl2gfHTyDSE965x/zxslTikpNch0JgNjJA9zK6gEFW8Fl6d1rTZaqgg==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
+      '@types/react': '>=16.8'
+      immer: '>=9.0'
       react: '>=16.8'
     peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
       react:
         optional: true
     dependencies:
+      '@types/react': 18.0.17
       react: 17.0.2
+      use-sync-external-store: 1.2.0(react@17.0.2)
     dev: false
 
   /zwitch@1.0.5:
