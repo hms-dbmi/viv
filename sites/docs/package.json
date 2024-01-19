@@ -1,6 +1,7 @@
 {
   "name": "docs",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "npm run bundle && documentation build -o dist -f html --document-exported --config documentation.yml dist/index.js",
     "bundle": "rollup -c"
