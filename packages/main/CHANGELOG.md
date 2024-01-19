@@ -1,5 +1,22 @@
 # @hms-dbmi/viv
 
+## 0.16.0
+
+### Minor Changes
+
+- feat: Support multiscale multifile-OME-TIFFs (`@vivjs/loaders`) ([#748](https://github.com/hms-dbmi/viv/pull/748))
+
+  This release extends Viv's multifile OME-TIFF data-loading capabilities to multiscale TIFFs as well. The `loadOmeTiff` utility now recognizes and loads multiresolution images described in a `companion.ome` metadata file.
+
+  ```js
+  import { loadOmeTiff } from '@vivjs/loaders';
+
+  let loader = await loadOmeTiff('http://localhost:8080/data.companion.ome');
+  ```
+
+### Patch Changes
+
+
 ## 0.15.1
 
 ### Patch Changes
