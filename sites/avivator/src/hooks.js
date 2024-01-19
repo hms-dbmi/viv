@@ -77,7 +77,7 @@ export const useImage = source => {
         let url = new URL(window.location.href);
         url.search =
           typeof urlOrFile === 'string' ? '?image_url=' + urlOrFile : '';
-        globalThis.history.pushState({}, '', url);
+        window.history.pushState({}, '', url);
       }
     }
     if (source) changeLoader();

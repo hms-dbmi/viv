@@ -15,8 +15,8 @@
     "@math.gl/core": "^3.5.7",
     "geotiff": "^2.0.5",
     "lodash": "^4.17.21",
-    "react": "^16.8.0 || ^17.0.0",
-    "react-dom": "^16.8.0 || ^17.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-dropzone": "^11.2.3",
     "zustand": "^3.4.1"
   },
