@@ -12,16 +12,16 @@ import {
   useViewerStore
 } from './state';
 import {
-  createLoader,
   buildDefaultSelection,
-  guessRgb,
-  getMultiSelectionStats,
+  createLoader,
   getBoundingCube,
+  getMultiSelectionStats,
+  guessRgb,
   isInterleaved
 } from './utils';
 import { COLOR_PALLETE, FILL_PIXEL_VALUE } from './constants';
 
-export const useImage = (source, history) => {
+export const useImage = source => {
   const [use3d, toggleUse3d, toggleIsOffsetsSnackbarOn] = useViewerStore(
     store => [store.use3d, store.toggleUse3d, store.toggleIsOffsetsSnackbarOn],
     shallow
@@ -73,10 +73,11 @@ export const useImage = (source, history) => {
           });
         });
         if (use3d) toggleUse3d();
-        // eslint-disable-next-line no-unused-expressions
-        history?.push(
-          typeof urlOrFile === 'string' ? `?image_url=${urlOrFile}` : ''
-        );
+
+        let url = new URL(window.location.href);
+        url.search =
+          typeof urlOrFile === 'string' ? '?image_url=' + urlOrFile : '';
+        globalThis.history.pushState({}, '', url);
       }
     }
     if (source) changeLoader();

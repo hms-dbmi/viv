@@ -1,19 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
-  useLocation,
-  BrowserRouter as Router,
-  Switch,
-  Route
-} from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@material-ui/core/styles';
+import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import { grey } from '@material-ui/core/colors';
 
 import sources from './source-info';
 import Avivator from './Avivator';
 import { getNameFromUrl } from './utils';
 
-const darkTheme = createTheme({
+const theme = createTheme({
   palette: {
     type: 'dark',
     primary: grey,
@@ -26,48 +20,30 @@ const darkTheme = createTheme({
   }
 });
 
-function getRandomSource() {
-  return sources[Math.floor(Math.random() * sources.length)];
-}
-
-// https://reactrouter.com/web/example/query-parameters
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
-
-function RoutedAvivator(props) {
-  const query = useQuery();
-  const url = query.get('image_url');
-  const {
-    routeProps: { history }
-  } = props;
+/** @param {string | null} url */
+function resolveSource(url) {
   if (url) {
-    const urlSrouce = {
+    return {
       urlOrFile: url,
-      description: getNameFromUrl(url)
+      description: getNameFromUrl(url),
+      isDemoImage: false
     };
-    return (
-      <ThemeProvider theme={darkTheme}>
-        <Avivator source={urlSrouce} history={history} />
-      </ThemeProvider>
-    );
   }
-  const source = getRandomSource();
+  // Pick a random source if none is specified.
+  return {
+    ...sources[Math.floor(Math.random() * sources.length)],
+    isDemoImage: true
+  };
+}
+
+function App() {
+  const query = new URLSearchParams(window.location.search);
+  const source = resolveSource(query.get('image_url'));
   return (
-    <ThemeProvider theme={darkTheme}>
-      <Avivator source={source} history={history} isDemoImage />
+    <ThemeProvider theme={theme}>
+      <Avivator source={source} isDemoImage={source.isDemoImage} />
     </ThemeProvider>
   );
 }
-// eslint-disable-next-line react/no-deprecated
-ReactDOM.render(
-  <Router>
-    <Switch>
-      <Route
-        path="/"
-        render={routeProps => <RoutedAvivator routeProps={routeProps} />}
-      />
-    </Switch>
-  </Router>,
-  document.getElementById('root')
-);
+
+ReactDOM.render(<App />, document.getElementById('root'));

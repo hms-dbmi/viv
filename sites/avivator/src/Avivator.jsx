@@ -18,7 +18,7 @@ import './index.css';
  * @param {Object} args.sources A list of sources for a dropdown menu, like [{ url, description }]
  * */
 export default function Avivator(props) {
-  const { history, source: initSource, isDemoImage } = props;
+  const { source: initSource, isDemoImage } = props;
   const isViewerLoading = useViewerStore(store => store.isViewerLoading);
   const source = useViewerStore(store => store.source);
   const useLinkedView = useViewerStore(store => store.useLinkedView);
@@ -29,7 +29,7 @@ export default function Avivator(props) {
       isNoImageUrlSnackbarOn: isDemoImage
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  useImage(source, history);
+  useImage(source);
   return (
     <>
       <DropzoneWrapper>{!isViewerLoading && <Viewer />}</DropzoneWrapper>
