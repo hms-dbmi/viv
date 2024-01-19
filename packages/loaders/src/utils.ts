@@ -1,4 +1,3 @@
-import type { GeoTIFFImage } from 'geotiff';
 import quickselect from 'quickselect';
 import type { OmeXml } from './omexml';
 import type { TypedArray } from 'zarr';
@@ -152,14 +151,6 @@ export function prevPowerOf2(x: number) {
 
 export const SIGNAL_ABORTED = '__vivSignalAborted';
 
-export function guessTiffTileSize(image: GeoTIFFImage) {
-  const tileWidth = image.getTileWidth();
-  const tileHeight = image.getTileHeight();
-  const size = Math.min(tileWidth, tileHeight);
-  // deck.gl requirement for power-of-two tile size.
-  return prevPowerOf2(size);
-}
-
 function isElement(node: Node): node is HTMLElement {
   return node.nodeType === 1;
 }
@@ -224,6 +215,7 @@ function xmlToJson(
 
 export function parseXML(xmlString: string) {
   const parser = new DOMParser();
+  // Remove trailing null character, which can break XML parsing in Firefox
   const doc = parser.parseFromString(
     xmlString.replace(/\u0000$/, ''), // eslint-disable-line no-control-regex
     'application/xml'
