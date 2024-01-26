@@ -41,7 +41,7 @@ export async function load(
   const { PhotometricInterpretation: photometricInterpretation } =
     image.fileDirectory;
   // Not sure if we need this or if the order matters for this use case.
-  const dimensionOrder = 'XYZCT';
+  const dimensionOrder = 'XYCZT';
   const tileSize = guessTiffTileSize(image);
   const meta = { photometricInterpretation };
   const indexer = async () => image;

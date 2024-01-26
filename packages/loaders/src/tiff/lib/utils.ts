@@ -143,8 +143,8 @@ function getSingleTiffShapeMap(tiff: GeoTIFFImage): {
   return {
     x: tiff.getWidth(),
     y: tiff.getHeight(),
-    z: 1,
     c: 3, // RGB?
+    z: 1,
     t: 1
   };
 }
