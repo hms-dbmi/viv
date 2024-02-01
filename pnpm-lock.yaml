@@ -19,7 +19,7 @@ importers:
         version: 8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.14)(@luma.gl/core@8.5.21)
       '@deck.gl/react':
         specifier: ~8.8.27
-        version: 8.8.27(@deck.gl/core@8.8.27)(@types/react@18.0.17)(react-dom@17.0.2)(react@17.0.2)
+        version: 8.8.27(@deck.gl/core@8.8.27)(@types/react@18.0.17)(react-dom@18.2.0)(react@18.2.0)
       '@luma.gl/constants':
         specifier: ~8.5.21
         version: 8.5.21
@@ -94,8 +94,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3
       prettier:
-        specifier: ^2.6.2
-        version: 2.7.1
+        specifier: ^3.2.4
+        version: 3.2.4
       tap-spec:
         specifier: ^5.0.0
         version: 5.0.0
@@ -244,7 +244,7 @@ importers:
     dependencies:
       '@deck.gl/react':
         specifier: ~8.8.27
-        version: 8.8.27(@deck.gl/core@8.8.27)(@types/react@18.0.17)(react-dom@17.0.2)(react@17.0.2)
+        version: 8.8.27(@deck.gl/core@8.8.27)(@types/react@18.0.17)(react-dom@18.2.0)(react@17.0.2)
       '@vivjs/constants':
         specifier: workspace:*
         version: link:../constants
@@ -894,7 +894,7 @@ packages:
       - '@luma.gl/gltools'
       - '@luma.gl/webgl'
 
-  /@deck.gl/react@8.8.27(@deck.gl/core@8.8.27)(@types/react@18.0.17)(react-dom@17.0.2)(react@17.0.2):
+  /@deck.gl/react@8.8.27(@deck.gl/core@8.8.27)(@types/react@18.0.17)(react-dom@18.2.0)(react@17.0.2):
     resolution: {integrity: sha512-rb8Py6gpy9VeORUhLKXl0wrb7RqfQ6RGyP98X8Ydosv/rFPsOwqHAvzZudQH8lWkv8YJ4VF+G4ZvH0/YnirIMg==}
     peerDependencies:
       '@deck.gl/core': ^8.0.0
@@ -905,7 +905,21 @@ packages:
       '@deck.gl/core': 8.8.27
       '@types/react': 18.0.17
       react: 17.0.2
-      react-dom: 17.0.2(react@17.0.2)
+      react-dom: 18.2.0(react@17.0.2)
+    dev: false
+
+  /@deck.gl/react@8.8.27(@deck.gl/core@8.8.27)(@types/react@18.0.17)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-rb8Py6gpy9VeORUhLKXl0wrb7RqfQ6RGyP98X8Ydosv/rFPsOwqHAvzZudQH8lWkv8YJ4VF+G4ZvH0/YnirIMg==}
+    peerDependencies:
+      '@deck.gl/core': ^8.0.0
+      '@types/react': '>= 16.3'
+      react: '>=16.3'
+      react-dom: '>=16.3'
+    dependencies:
+      '@deck.gl/core': 8.8.27
+      '@types/react': 18.0.17
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /@deck.gl/test-utils@8.8.27(@deck.gl/core@8.8.27)(@luma.gl/test-utils@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/test-utils@3.5.2):
@@ -7737,6 +7751,12 @@ packages:
     hasBin: true
     dev: true
 
+  /prettier@3.2.4:
+    resolution: {integrity: sha512-FWu1oLHKCrtpO1ypU6J0SbK2d9Ckwysq6bHj/uaCP26DxrPpppCLQRGVuqAxSTvhF00AcvDRyYrLNW7ocBhFFQ==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: true
+
   /pretty-bytes@5.6.0:
     resolution: {integrity: sha512-FFw039TmrBqFK8ma/7OL3sDz/VytdtJr044/QUJtH0wK9lb9jLq9tJyIxUwtQJHwar2BqtiA4iCWSwo9JLkzFg==}
     engines: {node: '>=6'}
@@ -7907,15 +7927,14 @@ packages:
     resolution: {integrity: sha1-+p4xn/3u6zWycpbvDz03TawvUqc=}
     dev: true
 
-  /react-dom@17.0.2(react@17.0.2):
-    resolution: {integrity: sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA==}
+  /react-dom@18.2.0(react@17.0.2):
+    resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}
     peerDependencies:
-      react: 17.0.2
+      react: ^18.2.0
     dependencies:
       loose-envify: 1.4.0
-      object-assign: 4.1.1
       react: 17.0.2
-      scheduler: 0.20.2
+      scheduler: 0.23.0
     dev: false
 
   /react-dom@18.2.0(react@18.2.0):
@@ -8464,13 +8483,6 @@ packages:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
     requiresBuild: true
     dev: true
-
-  /scheduler@0.20.2:
-    resolution: {integrity: sha512-2eWfGgAqqWFGqtdMmcL5zCMK1U8KlXv8SQFGglL3CEtd0aDVDWgeF/YoCmvln55m5zSk3J/20hTaSBeSObsQDQ==}
-    dependencies:
-      loose-envify: 1.4.0
-      object-assign: 4.1.1
-    dev: false
 
   /scheduler@0.23.0:
     resolution: {integrity: sha512-CtuThmgHNg7zIZWAXi3AsyIzA3n4xx7aNyjwC2VJldO2LMVDhFK+63xGqq6CsJH4rTAt6/M+N4GhZiDYPx9eUw==}
