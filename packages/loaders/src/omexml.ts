@@ -107,7 +107,7 @@ const TiffDataSchema = z
   .extend({
     attr: z.object({
       IFD: z.coerce.number().default(0),
-      PlaneCount: z.coerce.number().optional(),
+      PlaneCount: z.coerce.number().default(1),
       FirstT: z.coerce.number().optional(),
       FirstC: z.coerce.number().optional(),
       FirstZ: z.coerce.number().optional()
