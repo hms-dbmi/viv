@@ -404,7 +404,6 @@ export async function getSingleSelectionStats2D({ loader, selection }) {
 export async function getSingleSelectionStats3D({ loader, selection }) {
   const lowResSource = loader[loader.length - 1];
   const { shape, labels } = lowResSource;
-  // eslint-disable-next-line no-bitwise
   const sizeZ = shape[labels.indexOf('z')];
   const raster0 = await lowResSource.getRaster({
     selection: { ...selection, z: 0 }
