@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v3
         with:
           version: 7
       - uses: actions/setup-node@v4
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v3
         with:
           version: 7
       - uses: actions/setup-node@v4
@@ -51,7 +51,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v3
         id: pnpm-install
         with:
           version: 7
