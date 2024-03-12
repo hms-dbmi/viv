@@ -106,7 +106,7 @@ const TiffDataSchema = z
   .object({ UUID: UuidSchema.optional() })
   .extend({
     attr: z.object({
-      IFD: z.coerce.number().optional(),
+      IFD: z.coerce.number().optional().default(0),
       PlaneCount: z.coerce.number(),
       FirstT: z.coerce.number().optional(),
       FirstC: z.coerce.number().optional(),
