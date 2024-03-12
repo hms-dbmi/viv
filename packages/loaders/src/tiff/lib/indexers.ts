@@ -17,7 +17,9 @@ export type OmeTiffIndexer = (
  * bioformats case we need to return the GeoTIFF object and the IFD index.
  */
 export type OmeTiffResolver = {
-  (sel: OmeTiffSelection):
+  (
+    sel: OmeTiffSelection
+  ):
     | { tiff: GeoTIFF; ifdIndex: number }
     | Promise<{ tiff: GeoTIFF; ifdIndex: number }>;
 };

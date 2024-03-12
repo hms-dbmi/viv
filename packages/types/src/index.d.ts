@@ -3,7 +3,7 @@ import type { Matrix4 } from 'math.gl';
 
 export type SupportedDtype = keyof typeof DTYPE_VALUES;
 export type SupportedTypedArray = InstanceType<
-  typeof globalThis[`${SupportedDtype}Array`]
+  (typeof globalThis)[`${SupportedDtype}Array`]
 >;
 
 export interface PixelData {
@@ -63,7 +63,7 @@ type ColorPaletteExtensionProps = {
 };
 
 type AdditiveColormapExtensionProps = {
-  colormap: typeof COLORMAPS[number];
+  colormap: (typeof COLORMAPS)[number];
   opacity: number;
   useTransparentColor: boolean;
 };
@@ -82,7 +82,7 @@ type ColorPalette3DExtensionProps = {
 };
 
 type AdditiveColormap3DExtensionProps = {
-  colormap: typeof COLORMAPS[number];
+  colormap: (typeof COLORMAPS)[number];
 };
 
 // types to be refined _if_ on LayerProps
@@ -101,8 +101,8 @@ type ExtractLoader<LayerProps, S extends string[]> = LayerProps extends {
 }
   ? { loader: PixelSource<S>[] }
   : LayerProps extends { loader: object }
-  ? { loader: PixelSource<S> }
-  : unknown;
+    ? { loader: PixelSource<S> }
+    : unknown;
 
 // Add optional extention props to layer if 'extensions' is defined on LayerProps.
 type WithExtensionProps<LayerProps> = LayerProps extends { extensions: unknown }
