@@ -1,5 +1,11 @@
 # @hms-dbmi/viv
 
+## 0.16.1
+
+### Patch Changes
+
+- Relax `IFD` and `PlaneCount` strictness in OME-XML validation (`@vivjs/loaders`) ([#783](https://github.com/hms-dbmi/viv/pull/783))
+
 ## 0.16.0
 
 ### Minor Changes

@@ -4,6 +4,13 @@
 
 ### Patch Changes
 
+- Updated dependencies [[`08815cb076ce5280ded8ced7b55dd505fb363edf`](https://github.com/hms-dbmi/viv/commit/08815cb076ce5280ded8ced7b55dd505fb363edf)]:
+  - @hms-dbmi/viv@0.16.1
+
+## null
+
+### Patch Changes
+
 - Updated dependencies [[`3f2171333510b31991080ff9292dd11011c8b30e`](https://github.com/hms-dbmi/viv/commit/3f2171333510b31991080ff9292dd11011c8b30e)]:
   - @hms-dbmi/viv@0.16.0
 
