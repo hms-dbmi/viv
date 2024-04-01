@@ -48,7 +48,7 @@
     "@typescript-eslint/parser": "^6.13.1",
     "esbuild": "^0.19.5",
     "eslint": "^8.53.0",
-    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "esno": "^4.0.0",
     "gl": "^6.0.2",
