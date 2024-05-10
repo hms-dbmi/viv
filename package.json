@@ -41,7 +41,7 @@
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@luma.gl/test-utils": "~8.5.21",
     "@pnpm/meta-updater": "^1.0.0",
-    "@pnpm/types": "^8.4.0",
+    "@pnpm/types": "^10.0.0",
     "@probe.gl/test-utils": "^3.5.0",
     "@svitejs/changesets-changelog-github-compact": "^1.1.0",
     "@typescript-eslint/eslint-plugin": "^6.20.0",

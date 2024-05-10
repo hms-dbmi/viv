@@ -58,8 +58,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       '@pnpm/types':
-        specifier: ^8.4.0
-        version: 8.5.0
+        specifier: ^10.0.0
+        version: 10.0.0
       '@probe.gl/test-utils':
         specifier: ^3.5.0
         version: 3.5.2
@@ -2428,9 +2428,9 @@ packages:
       strip-comments-strings: 1.2.0
     dev: true
 
-  /@pnpm/types@8.5.0:
-    resolution: {integrity: sha512-PSKnhkwgiZtp9dcWZR9mPz2W9UopmADr9o8FTqazo5kjUSh2xQmDUSJOJ/ZWcfNziO64Ix/VbcxKIZeplhog1Q==}
-    engines: {node: '>=14.6'}
+  /@pnpm/types@10.0.0:
+    resolution: {integrity: sha512-P608MRTOExt5BkIN2hsrb/ycEchwaPW/x80ujJUAqxKZSXNVAOrlEu3KJ+2+jTCunyWmo/EcE01ZdwCw8jgVrQ==}
+    engines: {node: '>=18.12'}
     dev: true
 
   /@pnpm/types@9.1.0:
