@@ -32,15 +32,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
+      - uses: biomejs/setup-biome@v2
         with:
-          version: 7
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - run: |
-          pnpm install
-          pnpm lint
+          version: latest
+      - run: biome ci .
 
   Test:
     runs-on: ubuntu-20.04
