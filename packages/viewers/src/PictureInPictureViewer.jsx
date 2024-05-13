@@ -76,12 +76,12 @@ const PictureInPictureViewer = props => {
     deckProps
   } = props;
   const detailViewState = viewStatesProp?.find(v => v.id === DETAIL_VIEW_ID);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Carried over from eslint, without explanation.
   const baseViewState = React.useMemo(() => {
     return (
       detailViewState ||
       getDefaultInitialViewState(loader, { height, width }, 0.5)
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loader, detailViewState]);
 
   const detailView = new DetailView({

@@ -106,7 +106,6 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         };
 
         if (isInterleaved(loader[resolution].shape)) {
-          // eslint-disable-next-line prefer-destructuring
           tile.data = tile.data[0];
           if (tile.data.length === tile.width * tile.height * 3) {
             tile.format = GL.RGB;

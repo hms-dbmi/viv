@@ -193,7 +193,7 @@ function getChannelSamplesPerPixel(
     const existingSamplesPerPixel = channelSamplesPerPixel[curChannel];
     if (
       existingSamplesPerPixel &&
-      existingSamplesPerPixel != curSamplesPerPixel
+      existingSamplesPerPixel !== curSamplesPerPixel
     ) {
       throw Error('Channel samples per pixel mismatch');
     }
@@ -332,7 +332,7 @@ function createGeoTiffObject(
   // https://github.com/ilan-gold/geotiff.js/tree/viv#abortcontroller-support
   // https://www.npmjs.com/package/lru-cache#options
   // Cache size needs to be infinite due to consistency issues.
-  return fromUrl(url.href, { headers, cacheSize: Infinity });
+  return fromUrl(url.href, { headers, cacheSize: Number.POSITIVE_INFINITY });
 }
 
 /**

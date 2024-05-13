@@ -52,6 +52,8 @@ const VolumeViewer = props => {
     extensions = [new ColorPalette3DExtensions.AdditiveBlendExtension()]
   } = props;
   const volumeViewState = viewStatesProp?.find(state => state?.id === '3d');
+  // FIXME: This ignore is carried over from eslint, without description. Why ignore deps?
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Carried over from eslint, without description.
   const initialViewState = React.useMemo(() => {
     if (volumeViewState) {
       return volumeViewState;
@@ -68,7 +70,6 @@ const VolumeViewer = props => {
       rotationX: 0,
       rotationOrbit: 0
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loader, resolution, modelMatrix]);
   const viewStates = [volumeViewState || { ...initialViewState, id: '3d' }];
   const volumeView = new VolumeView({

@@ -3,8 +3,8 @@ import { fromFile } from 'geotiff';
 import { load } from '../src/tiff/multi-tiff';
 import { loadMultiTiff } from '../src/tiff';
 
-import * as path from 'path';
-import * as url from 'url';
+import * as path from 'node:path';
+import * as url from 'node:url';
 
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 const CHANNEL_0_FIXTURE = path.resolve(
@@ -99,7 +99,7 @@ test('Get raster data for MultiTIFF.', async t => {
 
     for (let c = 0; c < 3; c += 1) {
       const selection = { c, z: 0, t: 0 };
-      const pixelData = await base.getRaster({ selection }); // eslint-disable-line no-await-in-loop
+      const pixelData = await base.getRaster({ selection });
       t.equal(pixelData.width, 439, 'Should have width of 439.');
       t.equal(pixelData.height, 167, 'Should have height of 167.');
       t.equal(

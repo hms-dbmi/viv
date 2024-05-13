@@ -110,18 +110,18 @@ test('getRenderingAttrs WebGL1', t => {
         t.equal(
           attrs.sampler,
           'sampler2D',
-          `always return sampler2D as sampler`
+          "always return sampler2D as sampler"
         );
-        t.equal(attrs.type, GL.FLOAT, `always return FLOAT as dtype`);
+        t.equal(attrs.type, GL.FLOAT, "always return FLOAT as dtype");
         t.equal(
           attrs.dataFormat,
           GL.LUMINANCE,
-          `always return LUMINANCE as dataFormat`
+          "always return LUMINANCE as dataFormat"
         );
         t.equal(
           attrs.format,
           GL.LUMINANCE,
-          `always return LUMINANCE as format`
+          "always return LUMINANCE as format"
         );
         t.equal(
           attrs.filter,
@@ -145,7 +145,7 @@ test('getRenderingAttrs WebGL2', t => {
     interpolations.forEach(interpolation => {
       dtypes.forEach(dtype => {
         const attrs = getRenderingAttrs(dtype, gl, interpolation);
-        if (interpolation == GL.LINEAR || dtype == 'Float64') {
+        if (interpolation === GL.LINEAR || dtype === 'Float64') {
           t.deepEqual(
             attrs.cast(new Uint16Array([1, 2, 3])),
             new Float32Array([1, 2, 3]),

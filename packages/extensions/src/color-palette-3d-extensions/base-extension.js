@@ -27,7 +27,6 @@ const BaseExtension = class extends LayerExtension {
     const uniforms = {
       colors: paddedColors
     };
-    // eslint-disable-next-line no-unused-expressions
     this.state.model?.setUniforms(uniforms);
   }
 };

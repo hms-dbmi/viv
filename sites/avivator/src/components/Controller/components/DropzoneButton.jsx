@@ -15,10 +15,8 @@ export default function DropzoneButton() {
         height: '2rem'
       }}
       size="small"
-      /* eslint-disable-next-line react/jsx-props-no-spreading */
       {...getRootProps()}
     >
-      {/* eslint-disable-next-line react/jsx-props-no-spreading */}
       <input {...getInputProps({ accept: '.tif, .tiff' })} />
       Choose a file
     </Button>

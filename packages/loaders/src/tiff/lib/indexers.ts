@@ -1,5 +1,4 @@
-/* eslint-disable no-use-before-define */
-import { GeoTIFFImage, GeoTIFF } from 'geotiff';
+import { GeoTIFFImage, type GeoTIFF } from 'geotiff';
 import type { OmeTiffSelection } from './utils';
 import type { MultiTiffImage } from '../multi-tiff';
 
@@ -16,13 +15,10 @@ export type OmeTiffIndexer = (
  * Ideally we could just return the GeoTIFFImage, but for the legacy
  * bioformats case we need to return the GeoTIFF object and the IFD index.
  */
-export type OmeTiffResolver = {
-  (
-    sel: OmeTiffSelection
-  ):
+export type OmeTiffResolver = (
+    sel: OmeTiffSelection) =>
     | { tiff: GeoTIFF; ifdIndex: number }
     | Promise<{ tiff: GeoTIFF; ifdIndex: number }>;
-};
 
 /*
  * An "indexer" for a GeoTIFF-based source is a function that takes a
@@ -50,7 +46,7 @@ export function createOmeImageIndexerFromResolver(
       return baseImage;
     }
 
-    let index;
+    let index: number;
     if (baseImage.fileDirectory.SubIFDs) {
       index = baseImage.fileDirectory.SubIFDs[pyramidLevel - 1];
     } else {

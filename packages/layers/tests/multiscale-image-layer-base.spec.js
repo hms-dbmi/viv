@@ -73,7 +73,6 @@ test('MultiscaleImageLayerBaseBitmapLayer', async t => {
     Layer: MultiscaleImageLayerBase,
     assert: t.ok,
     sampleProps: {
-      // eslint-disable-next-line no-unused-vars
       getTileData,
       loader: [
         {

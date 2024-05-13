@@ -1,9 +1,8 @@
-/* eslint-disable */
 import type { GeoTIFF } from 'geotiff';
 import {
   createGeoTiff,
   parsePixelDataType,
-  extractPhysicalSizesfromPixels as extractPhysicalSizesfromPixels,
+  extractPhysicalSizesfromPixels,
   getTiffTileSize,
   type OmeTiffSelection,
   extractAxesFromPixels,
@@ -81,7 +80,8 @@ function createMultifileOmeTiffResolver(options: {
       const tiff = await createGeoTiff(url, options);
       tiffs.set(entry.filename, tiff);
     }
-    const tiff = tiffs.get(entry.filename)!;
+    const tiff = tiffs.get(entry.filename);
+    assert(tiff, `No GeoTIFF for ${entry.filename}`);
     return { tiff, ifdIndex: entry.ifd };
   };
 }

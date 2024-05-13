@@ -70,8 +70,7 @@ export function generateViewTests(ViewType, args, linkedViewIds = []) {
       },
       viewStates
     });
-    layers &&
-      layers.forEach(layer => {
+    layers?.forEach(layer => {
         layer &&
           t.ok(
             layer.id.includes(getVivId(view.id)),

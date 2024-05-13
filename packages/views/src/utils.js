@@ -25,8 +25,8 @@ export function getVivId(id) {
 export function getDefaultInitialViewState(
   loader,
   viewSize,
-  zoomBackOff = 0,
-  use3d = false,
+  zoomBackOff,
+  use3d,
   modelMatrix
 ) {
   const source = Array.isArray(loader) ? loader[0] : loader;

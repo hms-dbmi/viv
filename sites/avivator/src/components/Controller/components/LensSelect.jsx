@@ -52,7 +52,6 @@ function LensSelect() {
           }
         >
           {currChannelIndices.map((channelIndex, relativeIndex) => (
-            // eslint-disable-next-line react/no-array-index-key
             <option
               key={channelOptions[channelIndex] + String(relativeIndex)}
               value={relativeIndex}

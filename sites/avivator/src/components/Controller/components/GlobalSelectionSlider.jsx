@@ -1,5 +1,4 @@
 import React from 'react';
-// eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';

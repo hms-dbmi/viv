@@ -82,7 +82,6 @@ class VivViewerWrapper extends React.PureComponent {
    * @param {object} args.viewport Viewport being updated.
    * @returns {boolean} Whether or not this layer should be drawn in this viewport.
    */
-  // eslint-disable-next-line class-methods-use-this
   layerFilter({ layer, viewport }) {
     return layer.id.includes(getVivId(viewport.id));
   }
@@ -94,10 +93,8 @@ class VivViewerWrapper extends React.PureComponent {
   _onViewStateChange({ viewId, viewState, interactionState, oldViewState }) {
     // Save the view state and trigger rerender.
     const { views, onViewStateChange } = this.props;
-    // eslint-disable-next-line no-param-reassign
     viewState =
-      (onViewStateChange &&
-        onViewStateChange({
+      (onViewStateChange?.({
           viewId,
           viewState,
           interactionState,
@@ -124,7 +121,6 @@ class VivViewerWrapper extends React.PureComponent {
     const { views } = props;
     // Only update state if the previous viewState prop does not match the current one
     // so that people can update viewState
-    // eslint-disable-next-line react/destructuring-assignment
     const viewStates = { ...this.state.viewStates };
     let anyChanged = false;
     views.forEach(view => {
@@ -152,7 +148,6 @@ class VivViewerWrapper extends React.PureComponent {
       });
     });
     if (anyChanged) {
-      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({ viewStates });
     }
   }
@@ -193,7 +188,6 @@ class VivViewerWrapper extends React.PureComponent {
     return prevState;
   }
 
-  // eslint-disable-next-line consistent-return
   onHover(info, event) {
     const { tile, coordinate, sourceLayer: layer } = info;
     const { onHover, hoverHooks } = this.props;
@@ -280,7 +274,6 @@ class VivViewerWrapper extends React.PureComponent {
   }
 
   render() {
-    /* eslint-disable react/destructuring-assignment */
     const { views, randomize, useDevicePixels = true, deckProps } = this.props;
     const { viewStates } = this.state;
     const deckGLViews = views.map(view => view.getDeckGlView());
@@ -303,7 +296,6 @@ class VivViewerWrapper extends React.PureComponent {
     }
     return (
       <DeckGL
-        // eslint-disable-next-line react/jsx-props-no-spreading
         {...(deckProps ?? {})}
         layerFilter={this.layerFilter}
         layers={
@@ -337,6 +329,5 @@ class VivViewerWrapper extends React.PureComponent {
  * has the pixel values for the image under the hover location and coordinate is the coordinate in the image from which the values are picked.
  * @param {Object} [props.deckProps] Additional options used when creating the DeckGL component.  See [the deck.gl docs.](https://deck.gl/docs/api-reference/core/deck#initialization-settings).  `layerFilter`, `layers`, `onViewStateChange`, `views`, `viewState`, `useDevicePixels`, and `getCursor` are already set.
  */
-// eslint-disable-next-line react/jsx-props-no-spreading
 const VivViewer = props => <VivViewerWrapper {...props} />;
 export default VivViewer;

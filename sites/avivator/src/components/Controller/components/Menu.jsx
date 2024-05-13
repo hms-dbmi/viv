@@ -174,7 +174,7 @@ function Menu({ children, ...props }) {
         >
           {children.map((child, i) => {
             return (
-              // eslint-disable-next-line react/no-array-index-key
+              // biome-ignore lint/suspicious/noArrayIndexKey: Ignore carried over from eslint without description.
               <Grid item key={i} className={classes.item}>
                 {child}
               </Grid>

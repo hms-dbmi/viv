@@ -104,7 +104,6 @@ const VolumeLayer = class extends CompositeLayer {
       const source = loader[resolution];
       let progress = 0;
       const totalRequests =
-        // eslint-disable-next-line no-bitwise
         (source.shape[source.labels.indexOf('z')] >> resolution) *
         selections.length;
       const onUpdate = () => {

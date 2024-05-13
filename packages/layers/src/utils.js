@@ -46,7 +46,7 @@ export function padContrastLimits({
   domain,
   dtype
 }) {
-  const maxSliderValue = (domain && domain[1]) || getDtypeValues(dtype).max;
+  const maxSliderValue = (domain?.[1]) || getDtypeValues(dtype).max;
   const newContrastLimits = contrastLimits.map((slider, i) =>
     channelsVisible[i]
       ? slider

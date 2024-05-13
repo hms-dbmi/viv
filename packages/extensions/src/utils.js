@@ -22,7 +22,7 @@ export function padWithDefault(arr, defaultValue, padWidth) {
 }
 
 /** @type {Color[]} */
-// prettier-ignore
+// biome-ignore format: Nicely formatted color palette
 const COLOR_PALETTE = [
   [  0,   0, 255], // blue
   [  0, 255,   0], // green

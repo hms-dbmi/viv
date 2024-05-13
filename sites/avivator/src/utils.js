@@ -38,11 +38,10 @@ function isOmeTiff(urlOrFile) {
 function getMultiTiffFilenames(urlOrFiles) {
   if (Array.isArray(urlOrFiles)) {
     return urlOrFiles.map(f => f.name);
-  } else if (urlOrFiles instanceof File) {
+  }if (urlOrFiles instanceof File) {
     return [urlOrFiles.name];
-  } else {
-    return urlOrFiles.split(',');
   }
+    return urlOrFiles.split(',');
 }
 
 /**
@@ -66,11 +65,10 @@ function isMultiTiff(urlOrFiles) {
 async function generateMultiTiffFileArray(urlOrFiles) {
   if (Array.isArray(urlOrFiles)) {
     return urlOrFiles;
-  } else if (urlOrFiles instanceof File) {
+  }if (urlOrFiles instanceof File) {
     return [urlOrFiles];
-  } else {
-    return urlOrFiles.split(',');
   }
+    return urlOrFiles.split(',');
 }
 
 /**
@@ -252,7 +250,7 @@ export async function createLoader(
     if (e instanceof UnsupportedBrowserError) {
       handleLoaderError(e.message);
     } else {
-      console.error(e); // eslint-disable-line
+      console.error(e);
       handleLoaderError(null);
     }
     return { data: null };
@@ -287,6 +285,7 @@ function getDefaultGlobalSelection(dimensions) {
 
 function isGlobalOrXYDimension(name) {
   // normalize name to lowercase
+  // biome-ignore lint/style/noParameterAssign: Simple normalization, this is fine.
   name = name.toLowerCase();
   return (
     name === 'x' ||
@@ -324,7 +323,7 @@ function zip(a, b) {
  * @param {{ labels: string[], shape: number[] }} pixelSource
  */
 export function buildDefaultSelection({ labels, shape }) {
-  let selection = [];
+  const selection = [];
 
   const dimensions = zip(labels, shape).map(([name, size]) => ({ name, size }));
 
@@ -361,7 +360,7 @@ export function buildDefaultSelection({ labels, shape }) {
 export function hexToRgb(hex) {
   // https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result.map(d => parseInt(d, 16)).slice(1);
+  return result.map(d => Number.parseInt(d, 16)).slice(1);
 }
 
 export function range(length) {
@@ -455,12 +454,10 @@ export const getMultiSelectionStats = async ({ loader, selections, use3d }) => {
   return { domains, contrastLimits };
 };
 
-/* eslint-disable no-useless-escape */
 // https://stackoverflow.com/a/11381730
 export function isMobileOrTablet() {
   let check = false;
-  // eslint-disable-next-line func-names
-  (function (a) {
+  ((a) => {
     if (
       /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(
         a
@@ -473,7 +470,6 @@ export function isMobileOrTablet() {
   })(navigator.userAgent || navigator.vendor || window.opera);
   return check;
 }
-/* eslint-disable no-useless-escape */
 
 /**
  * @param { import('../../src/loaders/omexml').OMEXML[0] } imgMeta

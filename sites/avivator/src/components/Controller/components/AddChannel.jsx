@@ -71,7 +71,7 @@ const AddChannel = () => {
         ids: String(Math.random()),
         channelsVisible: false,
         colors:
-          (Channels[c].Color && Channels[c].Color.slice(0, -1)) ??
+          (Channels[c].Color?.slice(0, -1)) ??
           (COLOR_PALLETE[c] || [255, 255, 255])
       });
     });

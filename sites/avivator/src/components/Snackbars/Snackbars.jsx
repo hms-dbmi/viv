@@ -55,7 +55,7 @@ const SnackBars = () => {
             useViewerStore.setState({
               loaderErrorSnackbar: { on: false, message: null }
             })
-          } // eslint-disable-line react/jsx-curly-newline
+          }
           severity="error"
         >
           <LoaderError message={loaderErrorSnackbar.message} />
