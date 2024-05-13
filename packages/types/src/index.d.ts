@@ -112,7 +112,7 @@ type WithExtensionProps<LayerProps> = LayerProps extends { extensions: unknown }
         LensExtensionProps &
         ColorPalette3DExtensionProps &
         AdditiveColormap3DExtensionProps
-        // biome-ignore lint/suspicious/noExplicitAny: This is a catch-all for any other extension props
+      // biome-ignore lint/suspicious/noExplicitAny: This is a catch-all for any other extension props
     > & { [extensionProp: string]: any }
   : unknown;
 

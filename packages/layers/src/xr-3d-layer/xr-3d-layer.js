@@ -138,7 +138,8 @@ const XR3DLayer = class extends Layer {
     gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
     gl.pixelStorei(GL.PACK_ALIGNMENT, 1);
     const programManager = ProgramManager.getDefaultProgramManager(gl);
-    const processStr = "fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)";
+    const processStr =
+      'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
     if (!programManager._hookFunctions.includes(processStr)) {
       programManager.addShaderHook(processStr);
     }
@@ -151,9 +152,7 @@ const XR3DLayer = class extends Layer {
       if (shaders) {
         const { inject = {}, modules = [] } = shaders;
         const definesInjection = inject[hookName];
-        const moduleDefinesInjection = modules.some(
-          m => m?.inject?.[hookName]
-        );
+        const moduleDefinesInjection = modules.some(m => m?.inject?.[hookName]);
         return definesInjection || moduleDefinesInjection;
       }
       return false;

@@ -38,10 +38,11 @@ function isOmeTiff(urlOrFile) {
 function getMultiTiffFilenames(urlOrFiles) {
   if (Array.isArray(urlOrFiles)) {
     return urlOrFiles.map(f => f.name);
-  }if (urlOrFiles instanceof File) {
+  }
+  if (urlOrFiles instanceof File) {
     return [urlOrFiles.name];
   }
-    return urlOrFiles.split(',');
+  return urlOrFiles.split(',');
 }
 
 /**
@@ -65,10 +66,11 @@ function isMultiTiff(urlOrFiles) {
 async function generateMultiTiffFileArray(urlOrFiles) {
   if (Array.isArray(urlOrFiles)) {
     return urlOrFiles;
-  }if (urlOrFiles instanceof File) {
+  }
+  if (urlOrFiles instanceof File) {
     return [urlOrFiles];
   }
-    return urlOrFiles.split(',');
+  return urlOrFiles.split(',');
 }
 
 /**
@@ -457,7 +459,7 @@ export const getMultiSelectionStats = async ({ loader, selections, use3d }) => {
 // https://stackoverflow.com/a/11381730
 export function isMobileOrTablet() {
   let check = false;
-  ((a) => {
+  (a => {
     if (
       /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(
         a

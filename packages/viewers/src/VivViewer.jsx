@@ -94,13 +94,12 @@ class VivViewerWrapper extends React.PureComponent {
     // Save the view state and trigger rerender.
     const { views, onViewStateChange } = this.props;
     viewState =
-      (onViewStateChange?.({
-          viewId,
-          viewState,
-          interactionState,
-          oldViewState
-        })) ||
-      viewState;
+      onViewStateChange?.({
+        viewId,
+        viewState,
+        interactionState,
+        oldViewState
+      }) || viewState;
     this.setState(prevState => {
       const viewStates = {};
       views.forEach(view => {

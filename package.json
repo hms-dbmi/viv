@@ -16,9 +16,7 @@
     "build": "pnpm -r --parallel build",
     "clean": "pnpm -r exec -- rm -rf node_modules",
     "test": "pnpm -r --parallel test",
-    "check-format": "prettier --check --ignore-path .gitignore tsconfig.json sites/avivator packages/",
-    "lint": "npm run check-format && eslint \"packages/*/src/**/*\" \"sites/avivator/src/**/*\"",
-    "format": "npm run check-format -- --write",
+    "fix": "biome check --apply .",
     "version": "node ./scripts/version.mjs",
     "publish": "pnpm build && pnpm changeset publish"
   },

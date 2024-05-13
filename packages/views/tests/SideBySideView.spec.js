@@ -7,7 +7,7 @@ import { MultiscaleImageLayer, ImageLayer, ScaleBarLayer } from '@vivjs/layers';
 
 generateViewTests(SideBySideView, defaultArguments);
 
-test("SideBySideView layer type and props check", t => {
+test('SideBySideView layer type and props check', t => {
   const view = new SideBySideView(defaultArguments);
   const loader = { type: 'loads' };
   const layers = view.getLayers({
@@ -43,7 +43,7 @@ test("SideBySideView layer type and props check", t => {
   t.end();
 });
 
-test("SideBySideView layer with multiscale", t => {
+test('SideBySideView layer with multiscale', t => {
   const view = new SideBySideView(defaultArguments);
   const loader = { type: 'loads' };
   const layers = view.getLayers({
@@ -80,7 +80,7 @@ test("SideBySideView layer with multiscale", t => {
   t.end();
 });
 
-test("SideBySideView layer does not render scale bar without physical size", t => {
+test('SideBySideView layer does not render scale bar without physical size', t => {
   const view = new SideBySideView(defaultArguments);
   const loader = { type: 'loads' };
   const layers = view.getLayers({

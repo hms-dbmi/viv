@@ -110,18 +110,18 @@ test('getRenderingAttrs WebGL1', t => {
         t.equal(
           attrs.sampler,
           'sampler2D',
-          "always return sampler2D as sampler"
+          'always return sampler2D as sampler'
         );
-        t.equal(attrs.type, GL.FLOAT, "always return FLOAT as dtype");
+        t.equal(attrs.type, GL.FLOAT, 'always return FLOAT as dtype');
         t.equal(
           attrs.dataFormat,
           GL.LUMINANCE,
-          "always return LUMINANCE as dataFormat"
+          'always return LUMINANCE as dataFormat'
         );
         t.equal(
           attrs.format,
           GL.LUMINANCE,
-          "always return LUMINANCE as format"
+          'always return LUMINANCE as format'
         );
         t.equal(
           attrs.filter,
