@@ -44,7 +44,7 @@ importers:
         version: 8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/images@3.4.14)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)
       '@deck.gl/test-utils':
         specifier: ~8.8.27
-        version: 8.8.27(@deck.gl/core@8.8.27)(@luma.gl/test-utils@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/test-utils@3.5.2)
+        version: 8.8.27(@deck.gl/core@8.8.27)(@luma.gl/test-utils@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/test-utils@3.6.0)
       '@esbuild-plugins/node-globals-polyfill':
         specifier: ^0.2.3
         version: 0.2.3(esbuild@0.19.5)
@@ -53,7 +53,7 @@ importers:
         version: 0.2.2(esbuild@0.19.5)
       '@luma.gl/test-utils':
         specifier: ~8.5.21
-        version: 8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.16)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@3.5.2)(@probe.gl/test-utils@3.5.2)
+        version: 8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.16)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@3.5.2)(@probe.gl/test-utils@3.6.0)
       '@pnpm/meta-updater':
         specifier: ^1.0.0
         version: 1.0.0
@@ -61,8 +61,8 @@ importers:
         specifier: ^10.0.0
         version: 10.0.0
       '@probe.gl/test-utils':
-        specifier: ^3.5.0
-        version: 3.5.2
+        specifier: ^3.6.0
+        version: 3.6.0
       '@svitejs/changesets-changelog-github-compact':
         specifier: ^1.1.0
         version: 1.1.0
@@ -1003,7 +1003,7 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@deck.gl/test-utils@8.8.27(@deck.gl/core@8.8.27)(@luma.gl/test-utils@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/test-utils@3.5.2):
+  /@deck.gl/test-utils@8.8.27(@deck.gl/core@8.8.27)(@luma.gl/test-utils@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/test-utils@3.6.0):
     resolution: {integrity: sha512-1LBOaprQcMijZ/szQVEbGUE2qIHHeEU+RTKzho2U4NjRdV/JQ0VxCgz9oucaJG4GVAcyAZVQkGzGVw/PZenCtw==}
     peerDependencies:
       '@deck.gl/core': ^8.0.0
@@ -1012,9 +1012,9 @@ packages:
       '@probe.gl/test-utils': ^3.5.0
     dependencies:
       '@deck.gl/core': 8.8.27
-      '@luma.gl/test-utils': 8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.16)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@3.5.2)(@probe.gl/test-utils@3.5.2)
+      '@luma.gl/test-utils': 8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.16)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@3.5.2)(@probe.gl/test-utils@3.6.0)
       '@luma.gl/webgl': 8.5.21
-      '@probe.gl/test-utils': 3.5.2
+      '@probe.gl/test-utils': 3.6.0
     dev: true
 
   /@electron/get@2.0.3:
@@ -1983,7 +1983,7 @@ packages:
       '@babel/runtime': 7.23.2
       '@math.gl/core': 3.6.3
 
-  /@luma.gl/test-utils@8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.16)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@3.5.2)(@probe.gl/test-utils@3.5.2):
+  /@luma.gl/test-utils@8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.16)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@3.5.2)(@probe.gl/test-utils@3.6.0):
     resolution: {integrity: sha512-i4tGsGHHqMCIcZQ9hsotL/y6DwJ3cohTDNwyhx0vsVT7VipAd3h3YZ+kGDQq4BwpkN34pLkXIsyEktTbrBXSNA==}
     peerDependencies:
       '@luma.gl/core': ^8.4.0
@@ -1999,7 +1999,7 @@ packages:
       '@luma.gl/webgl': 8.5.21
       '@probe.gl/env': 3.5.2
       '@probe.gl/stats': 3.5.2
-      '@probe.gl/test-utils': 3.5.2
+      '@probe.gl/test-utils': 3.6.0
     dev: true
 
   /@luma.gl/webgl@8.5.21:
@@ -2671,6 +2671,12 @@ packages:
     dependencies:
       '@babel/runtime': 7.23.2
 
+  /@probe.gl/env@3.6.0:
+    resolution: {integrity: sha512-4tTZYUg/8BICC3Yyb9rOeoKeijKbZHRXBEKObrfPmX4sQmYB15ZOUpoVBhAyJkOYVAM8EkPci6Uw5dLCwx2BEQ==}
+    dependencies:
+      '@babel/runtime': 7.23.2
+    dev: true
+
   /@probe.gl/env@4.0.4:
     resolution: {integrity: sha512-sYNGqesDfWD6dFP5oNZtTeFA4Z6ak5T4a8BNPdNhoqy7PK9w70JHrb6mv+RKWqKXq33KiwCDWL7fYxx2HuEH2w==}
     dependencies:
@@ -2681,6 +2687,13 @@ packages:
     dependencies:
       '@babel/runtime': 7.23.2
       '@probe.gl/env': 3.5.2
+
+  /@probe.gl/log@3.6.0:
+    resolution: {integrity: sha512-hjpyenpEvOdowgZ1qMeCJxfRD4JkKdlXz0RC14m42Un62NtOT+GpWyKA4LssT0+xyLULCByRAtG2fzZorpIAcA==}
+    dependencies:
+      '@babel/runtime': 7.23.2
+      '@probe.gl/env': 3.6.0
+    dev: true
 
   /@probe.gl/log@4.0.4:
     resolution: {integrity: sha512-WpmXl6njlBMwrm8HBh/b4kSp/xnY1VVmeT4PWUKF+RkVbFuKQbsU11dA1IxoMd7gSY+5DGIwxGfAv1H5OMzA4A==}
@@ -2698,11 +2711,11 @@ packages:
     dependencies:
       '@babel/runtime': 7.23.2
 
-  /@probe.gl/test-utils@3.5.2:
-    resolution: {integrity: sha512-h82sbwQuhUKcXFZQIm+CzvxJ3QveOSd/ogH9DyLukbSnu6mFsFCE5Y6snrJ/eN/sz8TEwDrPJ0DtjjdOpiJVVA==}
+  /@probe.gl/test-utils@3.6.0:
+    resolution: {integrity: sha512-BK6NkeNVN9CVC9Dbp7+Unvu8bAwWOLm3TV/WcyLd1ysI23xkrnPgUeN/PGNOqIqHkq32ijZwew7gX4Euc3Du3g==}
     dependencies:
-      '@babel/runtime': 7.18.9
-      '@probe.gl/log': 3.5.2
+      '@babel/runtime': 7.23.2
+      '@probe.gl/log': 3.6.0
       pixelmatch: 4.0.2
       puppeteer: 16.2.0
     transitivePeerDependencies:
@@ -3202,11 +3215,6 @@ packages:
       undici-types: 5.26.5
     dev: true
 
-  /@types/node@18.7.13:
-    resolution: {integrity: sha512-46yIhxSe5xEaJZXWdIBP7GU4HDTG8/eo0qd9atdiL+lFpA03y8KS+lkTN834TWJj5767GbWv4n/P6efyTFt1Dw==}
-    requiresBuild: true
-    dev: true
-
   /@types/normalize-package-data@2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
     dev: true
@@ -3257,7 +3265,7 @@ packages:
   /@types/ssri@7.1.5:
     resolution: {integrity: sha512-odD/56S3B51liILSk5aXJlnYt99S6Rt9EFDDqGtJM26rKHApHcwyU/UoYHrzKkdkHMAIquGWCuHtQTbes+FRQw==}
     dependencies:
-      '@types/node': 18.7.13
+      '@types/node': 18.19.28
     dev: true
 
   /@types/supports-color@8.1.3:
@@ -5667,6 +5675,7 @@ packages:
 
   /glob@7.1.6:
     resolution: {integrity: sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==}
+    deprecated: Glob versions prior to v9 are no longer supported
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -5678,6 +5687,7 @@ packages:
 
   /glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
+    deprecated: Glob versions prior to v9 are no longer supported
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -5690,6 +5700,7 @@ packages:
   /glob@8.1.0:
     resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==}
     engines: {node: '>=12'}
+    deprecated: Glob versions prior to v9 are no longer supported
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -6208,6 +6219,7 @@ packages:
 
   /inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
+    deprecated: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
     dependencies:
       once: 1.4.0
       wrappy: 1.0.2
@@ -8385,6 +8397,7 @@ packages:
   /puppeteer@16.2.0:
     resolution: {integrity: sha512-7Au6iC98rS6WEAD110V4Bxd0iIbqoFtzz9XzkG1BSofidS1VAJ881E1+GFR7Xn2Yea0hbj8n0ErzRyseMp1Ctg==}
     engines: {node: '>=14.1.0'}
+    deprecated: < 22.5.0 is no longer supported
     requiresBuild: true
     dependencies:
       cross-fetch: 3.1.5
@@ -8879,6 +8892,7 @@ packages:
 
   /rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
     dependencies:
       glob: 7.2.3
