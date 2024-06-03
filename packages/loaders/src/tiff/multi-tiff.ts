@@ -1,14 +1,14 @@
 import type { GeoTIFFImage } from 'geotiff';
 
-import TiffPixelSource from './pixel-source';
-import {
-  getMultiTiffMetadata,
-  getMultiTiffMeta,
-  getTiffTileSize,
-  type OmeTiffSelection
-} from './lib/utils';
 import type Pool from './lib/Pool';
 import { getMultiTiffIndexer } from './lib/indexers';
+import {
+  type OmeTiffSelection,
+  getMultiTiffMeta,
+  getMultiTiffMetadata,
+  getTiffTileSize
+} from './lib/utils';
+import TiffPixelSource from './pixel-source';
 
 export interface MultiTiffImage {
   selection: OmeTiffSelection;

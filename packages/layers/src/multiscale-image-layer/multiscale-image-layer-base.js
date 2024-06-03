@@ -1,5 +1,5 @@
-import { TileLayer } from '@deck.gl/geo-layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
+import { TileLayer } from '@deck.gl/geo-layers';
 import { renderSubLayers } from './utils';
 
 const defaultProps = {

@@ -1,6 +1,6 @@
 import test from 'tape';
 
-import { intToRgba, getChannelStats, isInterleaved } from '../src/utils';
+import { getChannelStats, intToRgba, isInterleaved } from '../src/utils';
 
 test('getChannelStats: All zeros', t => {
   t.plan(7);

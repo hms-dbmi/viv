@@ -1,7 +1,7 @@
-import test from 'tape-catch';
-import { DetailView, DETAIL_VIEW_ID } from '../src';
-import { generateViewTests, defaultArguments } from './VivView.spec';
 import { MultiscaleImageLayer, ScaleBarLayer } from '@vivjs/layers';
+import test from 'tape-catch';
+import { DETAIL_VIEW_ID, DetailView } from '../src';
+import { defaultArguments, generateViewTests } from './VivView.spec';
 
 const id = DETAIL_VIEW_ID;
 const detailViewArguments = { ...defaultArguments };

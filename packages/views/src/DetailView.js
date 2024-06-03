@@ -1,7 +1,7 @@
 import { ScaleBarLayer } from '@vivjs/layers';
+import { OVERVIEW_VIEW_ID } from './OverviewView';
 import VivView from './VivView';
 import { getImageLayer, getVivId } from './utils';
-import { OVERVIEW_VIEW_ID } from './OverviewView';
 
 export const DETAIL_VIEW_ID = 'detail';
 

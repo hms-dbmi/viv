@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react';
-import { fromBlob, fromUrl } from 'geotiff';
 import { Matrix4 } from '@math.gl/core';
+import { fromBlob, fromUrl } from 'geotiff';
+import { useEffect, useState } from 'react';
 
 import {
-  loadOmeTiff,
-  loadBioformatsZarr,
-  loadOmeZarr,
-  loadMultiTiff,
-  getChannelStats,
-  RENDERING_MODES,
+  AdditiveColormap3DExtensions,
   ColorPalette3DExtensions,
-  AdditiveColormap3DExtensions
+  RENDERING_MODES,
+  getChannelStats,
+  loadBioformatsZarr,
+  loadMultiTiff,
+  loadOmeTiff,
+  loadOmeZarr
 } from '@hms-dbmi/viv';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';

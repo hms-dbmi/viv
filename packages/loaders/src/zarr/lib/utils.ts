@@ -4,7 +4,7 @@ import type { OmeXml } from '../../omexml';
 import { getLabels, isInterleaved, prevPowerOf2 } from '../../utils';
 
 import type { Labels } from '@vivjs/types';
-import type { RootAttrs, Axis } from '../ome-zarr';
+import type { Axis, RootAttrs } from '../ome-zarr';
 
 /*
  * Returns true if data shape is that expected for OME-Zarr.

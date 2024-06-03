@@ -1,7 +1,7 @@
-import test from 'tape';
 import { fromFile } from 'geotiff';
-import { load } from '../src/tiff/multi-tiff';
+import test from 'tape';
 import { loadMultiTiff } from '../src/tiff';
+import { load } from '../src/tiff/multi-tiff';
 
 import * as path from 'node:path';
 import * as url from 'node:url';

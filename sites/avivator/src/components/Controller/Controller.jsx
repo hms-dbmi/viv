@@ -1,34 +1,34 @@
-import React, { useState } from 'react';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Grid from '@material-ui/core/Grid';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
 import Divider from '@material-ui/core/Divider';
+import Grid from '@material-ui/core/Grid';
+import Tab from '@material-ui/core/Tab';
+import Tabs from '@material-ui/core/Tabs';
+import React, { useState } from 'react';
 import shallow from 'zustand/shallow';
 
+import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
+import {
+  useChannelsStore,
+  useImageSettingsStore,
+  useLoader,
+  useMetadata,
+  useViewerStore
+} from '../../state';
+import { getSingleSelectionStats, guessRgb, useWindowSize } from '../../utils';
+import AddChannel from './components/AddChannel';
+import CameraOptions from './components/CameraOptions';
 import ChannelController from './components/ChannelController';
-import Menu from './components/Menu';
 import ColormapSelect from './components/ColormapSelect';
 import GlobalSelectionSlider from './components/GlobalSelectionSlider';
 import LensSelect from './components/LensSelect';
-import VolumeButton from './components/VolumeButton';
-import RenderingModeSelect from './components/RenderingModeSelect';
-import Slicer from './components/Slicer';
-import AddChannel from './components/AddChannel';
+import Menu from './components/Menu';
 import PanLockToggle from './components/PanLockToggle';
-import ZoomLockToggle from './components/ZoomLockToggle';
-import SideBySideToggle from './components/SideBySideToggle';
 import PictureInPictureToggle from './components/PictureInPictureToggle';
-import CameraOptions from './components/CameraOptions';
-import {
-  useChannelsStore,
-  useViewerStore,
-  useImageSettingsStore,
-  useLoader,
-  useMetadata
-} from '../../state';
-import { guessRgb, useWindowSize, getSingleSelectionStats } from '../../utils';
-import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
+import RenderingModeSelect from './components/RenderingModeSelect';
+import SideBySideToggle from './components/SideBySideToggle';
+import Slicer from './components/Slicer';
+import VolumeButton from './components/VolumeButton';
+import ZoomLockToggle from './components/ZoomLockToggle';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

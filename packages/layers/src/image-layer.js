@@ -1,10 +1,10 @@
-import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
+import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
 import GL from '@luma.gl/constants';
 
-import XRLayer from './xr-layer/xr-layer';
-import BitmapLayer from './bitmap-layer';
-import { isInterleaved, SIGNAL_ABORTED } from '@vivjs/loaders';
 import { ColorPaletteExtension } from '@vivjs/extensions';
+import { SIGNAL_ABORTED, isInterleaved } from '@vivjs/loaders';
+import BitmapLayer from './bitmap-layer';
+import XRLayer from './xr-layer/xr-layer';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },

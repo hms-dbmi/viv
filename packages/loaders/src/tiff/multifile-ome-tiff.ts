@@ -1,19 +1,19 @@
 import type { GeoTIFF } from 'geotiff';
-import {
-  createGeoTiff,
-  parsePixelDataType,
-  extractPhysicalSizesfromPixels,
-  getTiffTileSize,
-  type OmeTiffSelection,
-  extractAxesFromPixels,
-  type OmeTiffDims,
-  getShapeForBinaryDownsampleLevel
-} from './lib/utils';
-import { fromString, type OmeXml } from '../omexml';
-import TiffPixelSource from './pixel-source';
+import { type OmeXml, fromString } from '../omexml';
 import { assert } from '../utils';
 import type Pool from './lib/Pool';
 import { createOmeImageIndexerFromResolver } from './lib/indexers';
+import {
+  type OmeTiffDims,
+  type OmeTiffSelection,
+  createGeoTiff,
+  extractAxesFromPixels,
+  extractPhysicalSizesfromPixels,
+  getShapeForBinaryDownsampleLevel,
+  getTiffTileSize,
+  parsePixelDataType
+} from './lib/utils';
+import TiffPixelSource from './pixel-source';
 
 type TiffDataTags = NonNullable<OmeXml[number]['Pixels']['TiffData']>;
 type TIffDataItem = TiffDataTags[number];

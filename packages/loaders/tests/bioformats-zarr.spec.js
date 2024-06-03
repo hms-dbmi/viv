@@ -1,6 +1,6 @@
 import { test } from 'tape';
-import { FileSystemStore } from './common';
 import { load } from '../src/zarr/bioformats-zarr';
+import { FileSystemStore } from './common';
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';

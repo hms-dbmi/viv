@@ -1,16 +1,16 @@
-import React from 'react';
-import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
+import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
+import React from 'react';
 import shallow from 'zustand/shallow';
 
 import { getDefaultInitialViewState } from '@hms-dbmi/viv';
 import {
   useImageSettingsStore,
-  useViewerStore,
-  useLoader
+  useLoader,
+  useViewerStore
 } from '../../../state';
 import { useWindowSize } from '../../../utils';
 

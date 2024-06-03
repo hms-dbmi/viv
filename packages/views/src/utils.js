@@ -2,8 +2,8 @@ import { Matrix4 } from '@math.gl/core';
 import { getImageSize } from '@vivjs/loaders';
 
 import {
-  MultiscaleImageLayer,
   ImageLayer,
+  MultiscaleImageLayer,
   getPhysicalSizeScalingMatrix
 } from '@vivjs/layers';
 

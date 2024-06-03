@@ -1,7 +1,7 @@
 import AdditiveBlendExtension from './additive-blend-extension';
+import BaseExtension from './base-extension';
 import MaximumIntensityProjectionExtension from './maximum-intensity-projection-extension';
 import MinimumIntensityProjectionExtension from './minimum-intensity-projection-extension';
-import BaseExtension from './base-extension';
 
 /**
  * This object contains the BaseExtension, which can be extended for other additive colormap-style (i.e viridis, jet etc.) rendering, as well

@@ -1,8 +1,8 @@
-import test from 'tape-catch';
-import { generateLayerTests, testLayerAsync } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
-import MultiscaleImageLayerBase from '../src/multiscale-image-layer/multiscale-image-layer-base';
+import { generateLayerTests, testLayerAsync } from '@deck.gl/test-utils';
+import test from 'tape-catch';
 import BitmapLayer from '../src/bitmap-layer';
+import MultiscaleImageLayerBase from '../src/multiscale-image-layer/multiscale-image-layer-base';
 
 test('MultiscaleImageLayerBase', async t => {
   const view = new OrthographicView({

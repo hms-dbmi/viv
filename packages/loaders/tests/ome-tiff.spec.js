@@ -1,6 +1,6 @@
 import test from 'tape';
-import { loadSingleFileOmeTiff } from '../src/tiff/singlefile-ome-tiff';
 import { loadOmeTiff } from '../src/tiff';
+import { loadSingleFileOmeTiff } from '../src/tiff/singlefile-ome-tiff';
 
 import * as path from 'node:path';
 import * as url from 'node:url';

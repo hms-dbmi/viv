@@ -2,22 +2,22 @@ import React, { useRef, useReducer } from 'react';
 
 import Button from '@material-ui/core/Button';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Paper from '@material-ui/core/Paper';
-import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
+import Paper from '@material-ui/core/Paper';
+import Popper from '@material-ui/core/Popper';
 
 import { makeStyles } from '@material-ui/core/styles';
 
 import shallow from 'zustand/shallow';
 
 import {
-  useImageSettingsStore,
-  useViewerStore,
   useChannelsStore,
-  useLoader
+  useImageSettingsStore,
+  useLoader,
+  useViewerStore
 } from '../../../state';
-import { range, getMultiSelectionStats, getBoundingCube } from '../../../utils';
+import { getBoundingCube, getMultiSelectionStats, range } from '../../../utils';
 
 function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
