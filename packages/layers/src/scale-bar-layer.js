@@ -1,6 +1,6 @@
-import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
+import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
 import { LineLayer, TextLayer } from '@deck.gl/layers';
-import { range, makeBoundingBox, snapValue, sizeToMeters } from './utils';
+import { makeBoundingBox, range, sizeToMeters, snapValue } from './utils';
 
 import { DEFAULT_FONT_FAMILY } from '@vivjs/constants';
 

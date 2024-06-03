@@ -1,6 +1,6 @@
 import GL from '@luma.gl/constants';
 import { isWebGL2 } from '@luma.gl/core';
-import { hasFeature, FEATURES } from '@luma.gl/webgl';
+import { FEATURES, hasFeature } from '@luma.gl/webgl';
 import { getDtypeValues } from '../utils';
 
 import fs from './xr-layer-fragment.glsl';

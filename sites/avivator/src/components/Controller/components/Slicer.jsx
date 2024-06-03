@@ -1,14 +1,14 @@
-import React from 'react';
+import { createStyles, makeStyles } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles, createStyles } from '@material-ui/core';
+import React from 'react';
 import shallow from 'zustand/shallow';
 
 import {
   useImageSettingsStore,
-  useViewerStore,
-  useLoader
+  useLoader,
+  useViewerStore
 } from '../../../state';
 import { getBoundingCube, truncateDecimalNumber } from '../../../utils';
 

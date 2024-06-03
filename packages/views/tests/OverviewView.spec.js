@@ -1,11 +1,11 @@
-import test from 'tape-catch';
-import { OverviewView, DETAIL_VIEW_ID, OVERVIEW_VIEW_ID } from '../src';
-import {
-  generateViewTests,
-  defaultArguments,
-  defaultViewState
-} from './VivView.spec';
 import { OverviewLayer } from '@vivjs/layers';
+import test from 'tape-catch';
+import { DETAIL_VIEW_ID, OVERVIEW_VIEW_ID, OverviewView } from '../src';
+import {
+  defaultArguments,
+  defaultViewState,
+  generateViewTests
+} from './VivView.spec';
 
 const id = OVERVIEW_VIEW_ID;
 const loader = [

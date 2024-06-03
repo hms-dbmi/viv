@@ -1,23 +1,23 @@
 import * as React from 'react';
 
-import Checkbox from '@material-ui/core/Checkbox';
-import Grid from '@material-ui/core/Grid';
-import Slider from '@material-ui/core/Slider';
-import Select from '@material-ui/core/Select';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import IconButton from '@material-ui/core/IconButton';
-import shallow from 'zustand/shallow';
 import { DTYPE_VALUES } from '@hms-dbmi/viv';
+import Checkbox from '@material-ui/core/Checkbox';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import Select from '@material-ui/core/Select';
+import Slider from '@material-ui/core/Slider';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import shallow from 'zustand/shallow';
 
-import ChannelOptions from './ChannelOptions';
 import { FILL_PIXEL_VALUE } from '../../../constants';
 import {
-  useLoader,
   useImageSettingsStore,
+  useLoader,
   useViewerStore
 } from '../../../state';
 import { truncateDecimalNumber } from '../../../utils';
+import ChannelOptions from './ChannelOptions';
 
 export const COLORMAP_SLIDER_CHECKBOX_COLOR = [220, 220, 220];
 

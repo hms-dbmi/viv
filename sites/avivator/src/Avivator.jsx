@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 
-import { useViewerStore } from './state';
-import { useImage } from './hooks';
-import SnackBars from './components/Snackbars';
-import Viewer from './components/Viewer';
 import Controller from './components/Controller';
 import DropzoneWrapper from './components/DropzoneWrapper';
 import Footer from './components/Footer';
+import SnackBars from './components/Snackbars';
+import Viewer from './components/Viewer';
+import { useImage } from './hooks';
+import { useViewerStore } from './state';
 
 import './index.css';
 

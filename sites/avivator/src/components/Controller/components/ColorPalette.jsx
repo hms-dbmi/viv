@@ -1,6 +1,6 @@
-import React from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import LensIcon from '@material-ui/icons/Lens';
+import React from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 

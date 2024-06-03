@@ -1,7 +1,7 @@
-import { BitmapLayer as BaseBitmapLayer } from '@deck.gl/layers';
 import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
-import { Model, Geometry } from '@luma.gl/core';
+import { BitmapLayer as BaseBitmapLayer } from '@deck.gl/layers';
 import GL from '@luma.gl/constants';
+import { Geometry, Model } from '@luma.gl/core';
 
 const PHOTOMETRIC_INTERPRETATIONS = {
   WhiteIsZero: 0,

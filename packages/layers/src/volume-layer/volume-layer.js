@@ -1,12 +1,12 @@
-import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
+import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
 import GL from '@luma.gl/constants';
 import { isWebGL2 } from '@luma.gl/core';
-import { ColorPalette3DExtensions } from '@vivjs/extensions';
 import { Matrix4 } from '@math.gl/core';
+import { ColorPalette3DExtensions } from '@vivjs/extensions';
 
-import XR3DLayer from '../xr-3d-layer/xr-3d-layer';
 import { getPhysicalSizeScalingMatrix } from '../utils';
-import { getVolume, getTextLayer } from './utils';
+import XR3DLayer from '../xr-3d-layer/xr-3d-layer';
+import { getTextLayer, getVolume } from './utils';
 
 const defaultProps = {
   pickable: false,

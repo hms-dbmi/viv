@@ -1,18 +1,18 @@
 import type { GeoTIFFImage } from 'geotiff';
 import type { TypedArray } from 'zarr';
-import { getImageSize, isInterleaved, SIGNAL_ABORTED } from '../utils';
+import { SIGNAL_ABORTED, getImageSize, isInterleaved } from '../utils';
 
-import type Pool from './lib/Pool';
 import type {
-  PixelSource,
-  PixelSourceSelection,
-  PixelSourceMeta,
-  SupportedDtype,
   Labels,
+  PixelData,
+  PixelSource,
+  PixelSourceMeta,
+  PixelSourceSelection,
   RasterSelection,
-  TileSelection,
-  PixelData
+  SupportedDtype,
+  TileSelection
 } from '@vivjs/types';
+import type Pool from './lib/Pool';
 
 type ReadRastersOptions = NonNullable<
   Parameters<GeoTIFFImage['readRasters']>[0]

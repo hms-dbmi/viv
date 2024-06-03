@@ -1,4 +1,4 @@
-import { getDecoder, addDecoder } from 'geotiff';
+import { addDecoder, getDecoder } from 'geotiff';
 import LZWDecoder from './lzw-decoder';
 
 addDecoder(5, () => LZWDecoder);

@@ -1,5 +1,5 @@
-import { intToRgba, parseXML } from './utils';
 import * as z from 'zod';
+import { intToRgba, parseXML } from './utils';
 
 export type OmeXml = ReturnType<typeof fromString>;
 

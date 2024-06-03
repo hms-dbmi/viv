@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
+import { unstable_batchedUpdates } from 'react-dom';
 import { useDropzone as useReactDropzone } from 'react-dropzone';
 import shallow from 'zustand/shallow';
-import { unstable_batchedUpdates } from 'react-dom';
 
+import { COLOR_PALLETE, FILL_PIXEL_VALUE } from './constants';
 import {
   useChannelsStore,
   useImageSettingsStore,
@@ -18,7 +19,6 @@ import {
   guessRgb,
   isInterleaved
 } from './utils';
-import { COLOR_PALLETE, FILL_PIXEL_VALUE } from './constants';
 
 export const useImage = source => {
   const [use3d, toggleUse3d, toggleIsOffsetsSnackbarOn] = useViewerStore(

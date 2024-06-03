@@ -1,9 +1,9 @@
-import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
-import GitHubIcon from '@material-ui/icons/GitHub';
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
+import GitHubIcon from '@material-ui/icons/GitHub';
+import React from 'react';
 import { useViewerStore } from '../../../state';
 
 const hideButtonStyle = {

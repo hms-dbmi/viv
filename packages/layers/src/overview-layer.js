@@ -1,8 +1,8 @@
-import { CompositeLayer, COORDINATE_SYSTEM } from '@deck.gl/core';
+import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
 import { PolygonLayer } from '@deck.gl/layers';
-import { getImageSize } from '@vivjs/loaders';
-import { ColorPaletteExtension } from '@vivjs/extensions';
 import { Matrix4 } from '@math.gl/core';
+import { ColorPaletteExtension } from '@vivjs/extensions';
+import { getImageSize } from '@vivjs/loaders';
 
 import ImageLayer from './image-layer';
 

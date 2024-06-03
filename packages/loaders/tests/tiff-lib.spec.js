@@ -1,5 +1,5 @@
-import { test } from 'tape';
 import { fromFile } from 'geotiff';
+import { test } from 'tape';
 
 import { createOffsetsProxy } from '../src/tiff/lib/proxies';
 

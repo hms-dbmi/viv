@@ -1,6 +1,6 @@
-import test from 'tape-catch';
-import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrthographicView } from '@deck.gl/core';
+import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
+import test from 'tape-catch';
 import XRLayer from '../src/xr-layer/xr-layer';
 
 test('XRLayer', t => {

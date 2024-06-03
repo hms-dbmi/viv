@@ -1,7 +1,7 @@
 import { OrbitView } from '@deck.gl/core';
 import { VolumeLayer } from '@vivjs/layers';
-import { getVivId } from './utils';
 import VivView from './VivView';
+import { getVivId } from './utils';
 
 /**
  * This class generates a VolumeLayer and a view for use in the VivViewer as volumetric rendering.

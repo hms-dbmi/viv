@@ -1,19 +1,19 @@
-import { fromBlob, addDecoder } from 'geotiff';
+import { addDecoder, fromBlob } from 'geotiff';
 import type { Pool } from 'geotiff';
 
 import LZWDecoder from './lib/lzw-decoder';
 import {
-  parseFilename,
+  type OmeTiffDims,
   type OmeTiffSelection,
   createGeoTiff,
-  type OmeTiffDims
+  parseFilename
 } from './lib/utils';
 
-import { loadSingleFileOmeTiff } from './singlefile-ome-tiff';
-import { loadMultifileOmeTiff } from './multifile-ome-tiff';
-import { load as loadMulti, type MultiTiffImage } from './multi-tiff';
-import type TiffPixelSource from './pixel-source';
 import type { OmeXml } from '../omexml';
+import { type MultiTiffImage, load as loadMulti } from './multi-tiff';
+import { loadMultifileOmeTiff } from './multifile-ome-tiff';
+import type TiffPixelSource from './pixel-source';
+import { loadSingleFileOmeTiff } from './singlefile-ome-tiff';
 
 addDecoder(5, () => LZWDecoder);
 

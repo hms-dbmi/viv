@@ -1,5 +1,5 @@
 import type { ZarrArray } from 'zarr';
-import { loadMultiscales, guessTileSize } from './lib/utils';
+import { guessTileSize, loadMultiscales } from './lib/utils';
 import ZarrPixelSource from './pixel-source';
 
 interface Channel {

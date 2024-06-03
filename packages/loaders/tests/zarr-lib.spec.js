@@ -1,7 +1,7 @@
 import { test } from 'tape';
-import { FileSystemStore } from './common';
-import { loadMultiscales } from '../src/zarr/lib/utils';
 import { getIndexer } from '../src/zarr/lib/indexer';
+import { loadMultiscales } from '../src/zarr/lib/utils';
+import { FileSystemStore } from './common';
 
 import * as path from 'node:path';
 import * as url from 'node:url';

@@ -1,15 +1,15 @@
-import React from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
+import React from 'react';
 import shallow from 'zustand/shallow';
 
+import { useViewerStore } from '../../state';
 import {
   LoaderError,
-  OffsetsWarning,
   NoImageUrlInfo,
+  OffsetsWarning,
   VolumeRenderingWarning
 } from './SnackbarAlerts';
-import { useViewerStore } from '../../state';
 
 const SnackBars = () => {
   const [

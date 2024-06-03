@@ -1,15 +1,15 @@
-import React, { useCallback } from 'react';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
+import React, { useCallback } from 'react';
 import shallow from 'zustand/shallow';
 
-import { MAX_CHANNELS, COLOR_PALLETE } from '../../../constants';
+import { COLOR_PALLETE, MAX_CHANNELS } from '../../../constants';
 import {
   useChannelsStore,
-  useViewerStore,
   useImageSettingsStore,
   useLoader,
-  useMetadata
+  useMetadata,
+  useViewerStore
 } from '../../../state';
 import { getSingleSelectionStats } from '../../../utils';
 

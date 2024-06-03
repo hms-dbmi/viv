@@ -1,24 +1,24 @@
-import React, { useState, useReducer, useRef, useEffect } from 'react';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import Paper from '@material-ui/core/Paper';
-import Divider from '@material-ui/core/Divider';
-import TextField from '@material-ui/core/TextField';
-import InfoIcon from '@material-ui/icons/Info';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Typography from '@material-ui/core/Typography';
-import Popper from '@material-ui/core/Popper';
-import Link from '@material-ui/core/Link';
-import Button from '@material-ui/core/Button';
-import SettingsIcon from '@material-ui/icons/Settings';
-import { makeStyles } from '@material-ui/core/styles';
-import shallow from 'zustand/shallow';
 import { Select } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Divider from '@material-ui/core/Divider';
+import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
+import Paper from '@material-ui/core/Paper';
+import Popper from '@material-ui/core/Popper';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import InfoIcon from '@material-ui/icons/Info';
+import SettingsIcon from '@material-ui/icons/Settings';
+import React, { useState, useReducer, useRef, useEffect } from 'react';
+import shallow from 'zustand/shallow';
 
-import MenuTitle from './MenuTitle';
-import DropzoneButton from './DropzoneButton';
-import { isMobileOrTablet, getNameFromUrl } from '../../../utils';
 import { useChannelsStore, useViewerStore } from '../../../state';
+import { getNameFromUrl, isMobileOrTablet } from '../../../utils';
+import DropzoneButton from './DropzoneButton';
+import MenuTitle from './MenuTitle';
 
 const useStyles = makeStyles(theme => ({
   root: {

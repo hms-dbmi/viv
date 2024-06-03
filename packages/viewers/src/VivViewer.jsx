@@ -1,8 +1,8 @@
-import * as React from 'react';
 import DeckGL from '@deck.gl/react';
 import { getVivId } from '@vivjs/views';
 // No need to use the ES6 or React variants.
 import equal from 'fast-deep-equal';
+import * as React from 'react';
 
 const areViewStatesEqual = (viewState, otherViewState) => {
   return (

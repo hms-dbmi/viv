@@ -1,9 +1,9 @@
-import { fromFile, fromUrl, fromBlob } from 'geotiff';
-import { getLabels, DTYPE_LOOKUP, prevPowerOf2, assert } from '../../utils';
-import { createOffsetsProxy } from './proxies';
+import { fromBlob, fromFile, fromUrl } from 'geotiff';
 import type { GeoTIFF, GeoTIFFImage } from 'geotiff';
-import type { OmeXml, PhysicalUnit, DimensionOrder } from '../../omexml';
+import type { DimensionOrder, OmeXml, PhysicalUnit } from '../../omexml';
+import { assert, DTYPE_LOOKUP, getLabels, prevPowerOf2 } from '../../utils';
 import type { MultiTiffImage } from '../multi-tiff';
+import { createOffsetsProxy } from './proxies';
 
 // TODO: Remove the fancy label stuff
 export type OmeTiffDims =

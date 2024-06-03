@@ -1,3 +1,4 @@
+import { COORDINATE_SYSTEM, Layer } from '@deck.gl/core';
 /* This is largely an adaptation of Will Usher's excellent blog post/code:
 https://github.com/Twinklebear/webgl-volume-raycaster
 Without his app, this would have been exponentially more difficult to do, so we thank him dearly.
@@ -26,17 +27,16 @@ https://github.com/visgl/luma.gl/issues/1415
 More information about that is detailed in the comments there.
 */
 import GL from '@luma.gl/constants';
-import { COORDINATE_SYSTEM, Layer } from '@deck.gl/core';
-import { Model, Geometry, Texture3D } from '@luma.gl/core';
+import { Geometry, Model, Texture3D } from '@luma.gl/core';
 import { ProgramManager } from '@luma.gl/engine';
 import { Matrix4 } from '@math.gl/core';
 import { Plane } from '@math.gl/culling';
 
-import vs from './xr-3d-layer-vertex.glsl';
 import fs from './xr-3d-layer-fragment.glsl';
+import vs from './xr-3d-layer-vertex.glsl';
 
-import { padContrastLimits, padWithDefault, getDtypeValues } from '../utils';
 import { ColorPalette3DExtensions } from '@vivjs/extensions';
+import { getDtypeValues, padContrastLimits, padWithDefault } from '../utils';
 
 const channelsModule = {
   name: 'channel-intensity-module',

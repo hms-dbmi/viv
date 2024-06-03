@@ -1,4 +1,4 @@
-import type { DTYPE_VALUES, COLORMAPS } from '@vivjs/constants';
+import type { COLORMAPS, DTYPE_VALUES } from '@vivjs/constants';
 import type { Matrix4 } from 'math.gl';
 
 export type SupportedDtype = keyof typeof DTYPE_VALUES;

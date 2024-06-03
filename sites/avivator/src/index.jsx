@@ -1,10 +1,10 @@
+import { grey } from '@material-ui/core/colors';
+import { ThemeProvider, createTheme } from '@material-ui/core/styles';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createTheme, ThemeProvider } from '@material-ui/core/styles';
-import { grey } from '@material-ui/core/colors';
 
-import sources from './source-info';
 import Avivator from './Avivator';
+import sources from './source-info';
 import { getNameFromUrl } from './utils';
 
 const theme = createTheme({

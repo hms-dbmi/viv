@@ -1,6 +1,6 @@
-import test from 'tape-catch';
-import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
 import { OrbitView } from '@deck.gl/core';
+import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
+import test from 'tape-catch';
 import VolumeLayer from '../src/volume-layer/volume-layer';
 
 test('VolumeLayer', t => {

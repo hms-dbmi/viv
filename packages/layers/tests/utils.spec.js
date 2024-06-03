@@ -1,18 +1,18 @@
+import GL from '@luma.gl/constants';
+import { createTestContext } from '@luma.gl/test-utils';
+import { FEATURES } from '@luma.gl/webgl';
 import test from 'tape-catch';
 import { range } from '../src/multiscale-image-layer/utils';
 import {
-  padWithDefault,
   padContrastLimits,
-  snapValue,
-  sizeToMeters
+  padWithDefault,
+  sizeToMeters,
+  snapValue
 } from '../src/utils';
-import { createTestContext } from '@luma.gl/test-utils';
-import GL from '@luma.gl/constants';
-import { FEATURES } from '@luma.gl/webgl';
 
-import { getRenderingAttrs } from '../src/xr-layer/utils';
-import { DTYPE_VALUES } from '../../constants';
 import { hasFeature } from '@luma.gl/webgl';
+import { DTYPE_VALUES } from '../../constants';
+import { getRenderingAttrs } from '../src/xr-layer/utils';
 
 const dtypes = Object.keys(DTYPE_VALUES);
 const interpolations = [GL.NEAREST, GL.LINEAR];

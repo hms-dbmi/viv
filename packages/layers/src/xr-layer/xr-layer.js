@@ -1,11 +1,11 @@
+import { COORDINATE_SYSTEM, Layer, picking, project32 } from '@deck.gl/core';
 // A lot of this codes inherits paradigms form DeckGL that
 // we live in place for now, hence some of the not-destructuring
 import GL from '@luma.gl/constants';
-import { COORDINATE_SYSTEM, Layer, project32, picking } from '@deck.gl/core';
-import { Model, Geometry, Texture2D } from '@luma.gl/core';
+import { Geometry, Model, Texture2D } from '@luma.gl/core';
 import { ProgramManager } from '@luma.gl/engine';
-import channels from './shader-modules/channel-intensity';
 import { padContrastLimits } from '../utils';
+import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
 
 const defaultProps = {

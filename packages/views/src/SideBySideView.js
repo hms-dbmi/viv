@@ -1,5 +1,5 @@
-import { PolygonLayer } from '@deck.gl/layers';
 import { COORDINATE_SYSTEM } from '@deck.gl/core';
+import { PolygonLayer } from '@deck.gl/layers';
 import { ScaleBarLayer, makeBoundingBox } from '@vivjs/layers';
 
 import VivView from './VivView';

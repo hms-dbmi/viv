@@ -1,21 +1,21 @@
-import shallow from 'zustand/shallow';
-import React from 'react';
-import debounce from 'lodash/debounce';
 import {
-  SideBySideViewer,
-  PictureInPictureViewer,
-  VolumeViewer,
   AdditiveColormapExtension,
-  LensExtension
+  LensExtension,
+  PictureInPictureViewer,
+  SideBySideViewer,
+  VolumeViewer
 } from '@hms-dbmi/viv';
-import {
-  useImageSettingsStore,
-  useViewerStore,
-  useChannelsStore,
-  useLoader
-} from '../state';
-import { useWindowSize, get3DExtension } from '../utils';
+import debounce from 'lodash/debounce';
+import React from 'react';
+import shallow from 'zustand/shallow';
 import { DEFAULT_OVERVIEW } from '../constants';
+import {
+  useChannelsStore,
+  useImageSettingsStore,
+  useLoader,
+  useViewerStore
+} from '../state';
+import { get3DExtension, useWindowSize } from '../utils';
 
 const Viewer = () => {
   const [useLinkedView, use3d, viewState] = useViewerStore(

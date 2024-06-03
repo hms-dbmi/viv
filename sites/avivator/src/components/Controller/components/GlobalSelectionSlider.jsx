@@ -1,17 +1,17 @@
-import React from 'react';
-import { unstable_batchedUpdates } from 'react-dom';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import debounce from 'lodash/debounce';
+import React from 'react';
+import { unstable_batchedUpdates } from 'react-dom';
 import shallow from 'zustand/shallow';
 
-import { range, getMultiSelectionStats } from '../../../utils';
 import {
   useChannelsStore,
-  useViewerStore,
   useImageSettingsStore,
-  useLoader
+  useLoader,
+  useViewerStore
 } from '../../../state';
+import { getMultiSelectionStats, range } from '../../../utils';
 
 export default function GlobalSelectionSlider(props) {
   const { size, label } = props;

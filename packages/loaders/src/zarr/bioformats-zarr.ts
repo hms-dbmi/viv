@@ -3,8 +3,8 @@ import type { ZarrArray } from 'zarr';
 import { fromString } from '../omexml';
 import {
   guessBioformatsLabels,
-  loadMultiscales,
-  guessTileSize
+  guessTileSize,
+  loadMultiscales
 } from './lib/utils';
 import ZarrPixelSource from './pixel-source';
 

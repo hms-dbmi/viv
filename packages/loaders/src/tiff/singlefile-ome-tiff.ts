@@ -1,20 +1,20 @@
 import { fromString } from '../omexml';
 
-import TiffPixelSource from './pixel-source';
+import type GeoTIFF from 'geotiff';
+import type { DimensionOrder, OmeXml } from '../omexml';
+import type Pool from './lib/Pool';
 import { createOmeImageIndexerFromResolver } from './lib/indexers';
 import {
+  type OmeTiffDims,
+  type OmeTiffSelection,
   createGeoTiff,
-  parsePixelDataType,
-  extractPhysicalSizesfromPixels,
   extractAxesFromPixels,
+  extractPhysicalSizesfromPixels,
   getShapeForBinaryDownsampleLevel,
   getTiffTileSize,
-  type OmeTiffDims,
-  type OmeTiffSelection
+  parsePixelDataType
 } from './lib/utils';
-import type Pool from './lib/Pool';
-import type { DimensionOrder, OmeXml } from '../omexml';
-import type GeoTIFF from 'geotiff';
+import TiffPixelSource from './pixel-source';
 
 function resolveMetadata(omexml: OmeXml, SubIFDs: number[] | undefined) {
   if (SubIFDs) {

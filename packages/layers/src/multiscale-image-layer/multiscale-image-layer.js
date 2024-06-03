@@ -1,11 +1,11 @@
 import { CompositeLayer } from '@deck.gl/core';
-import { Matrix4 } from '@math.gl/core';
 import GL from '@luma.gl/constants';
+import { Matrix4 } from '@math.gl/core';
 
-import MultiscaleImageLayerBase from './multiscale-image-layer-base';
-import ImageLayer from '../image-layer';
-import { getImageSize, isInterleaved, SIGNAL_ABORTED } from '@vivjs/loaders';
 import { ColorPaletteExtension } from '@vivjs/extensions';
+import { SIGNAL_ABORTED, getImageSize, isInterleaved } from '@vivjs/loaders';
+import ImageLayer from '../image-layer';
+import MultiscaleImageLayerBase from './multiscale-image-layer-base';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },

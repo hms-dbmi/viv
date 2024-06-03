@@ -1,7 +1,7 @@
-import React from 'react';
 import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
+import Select from '@material-ui/core/Select';
+import React from 'react';
 
 import { RENDERING_MODES } from '@hms-dbmi/viv';
 
