@@ -2,8 +2,8 @@ import test from 'tape';
 import { loadSingleFileOmeTiff } from '../src/tiff/singlefile-ome-tiff';
 import { loadOmeTiff } from '../src/tiff';
 
-import * as path from 'path';
-import * as url from 'url';
+import * as path from 'node:path';
+import * as url from 'node:url';
 
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 const FIXTURE = path.resolve(__dirname, './fixtures/multi-channel.ome.tif');
@@ -32,7 +32,7 @@ function testPixelSource(t, data) {
 test('Creates correct TiffPixelSource for OME-TIFF.', async t => {
   t.plan(5);
   try {
-    const [{ data }] = await loadSingleFileOmeTiff('file://' + FIXTURE);
+    const [{ data }] = await loadSingleFileOmeTiff(`file://${FIXTURE}`);
     testPixelSource(t, data);
   } catch (e) {
     t.fail(e);
@@ -42,7 +42,7 @@ test('Creates correct TiffPixelSource for OME-TIFF.', async t => {
 test('Is able to load OME-TIFF from a local file.', async t => {
   t.plan(5);
   try {
-    const { data } = await loadOmeTiff('file://' + FIXTURE);
+    const { data } = await loadOmeTiff(`file://${FIXTURE}`);
     testPixelSource(t, data);
   } catch (e) {
     t.fail(e);
@@ -52,12 +52,12 @@ test('Is able to load OME-TIFF from a local file.', async t => {
 test('Get raster data.', async t => {
   t.plan(13);
   try {
-    const [{ data }] = await loadSingleFileOmeTiff('file://' + FIXTURE);
+    const [{ data }] = await loadSingleFileOmeTiff(`file://${FIXTURE}`);
     const [base] = data;
 
     for (let c = 0; c < 3; c += 1) {
       const selection = { c, z: 0, t: 0 };
-      const pixelData = await base.getRaster({ selection }); // eslint-disable-line no-await-in-loop
+      const pixelData = await base.getRaster({ selection });
       t.equal(pixelData.width, 439);
       t.equal(pixelData.height, 167);
       t.equal(pixelData.data.length, 439 * 167);
@@ -77,7 +77,7 @@ test('Get raster data.', async t => {
 test('Correct OME-XML.', async t => {
   t.plan(9);
   try {
-    const [{ metadata }] = await loadSingleFileOmeTiff('file://' + FIXTURE);
+    const [{ metadata }] = await loadSingleFileOmeTiff(`file://${FIXTURE}`);
     const { Name, Pixels } = metadata;
     t.equal(
       Name,

@@ -32,7 +32,7 @@ const linkedViewIds = [DETAIL_VIEW_ID];
 
 generateViewTests(OverviewView, overviewViewArguments, linkedViewIds);
 
-test(`OverviewView layer type check.`, t => {
+test('OverviewView layer type check.', t => {
   const view = new OverviewView(overviewViewArguments);
 
   const viewState = view.filterViewState({ viewState: overviewViewState });
@@ -50,7 +50,7 @@ test(`OverviewView layer type check.`, t => {
   t.end();
 });
 
-test(`OverviewView respects maximumHeight and minimumHeight when height > width.`, t => {
+test('OverviewView respects maximumHeight and minimumHeight when height > width.', t => {
   const minimumHeight = 350;
   let view = new OverviewView({ ...overviewViewArguments, minimumHeight });
   t.equal(
@@ -68,7 +68,7 @@ test(`OverviewView respects maximumHeight and minimumHeight when height > width.
   t.end();
 });
 
-test(`OverviewView respects maximumWidth and minimumWidth when width > height.`, t => {
+test('OverviewView respects maximumWidth and minimumWidth when width > height.', t => {
   const minimumWidth = 350;
   const loaderWidth = [
     { type: 'loads', shape: [10000, 20000] },
@@ -99,7 +99,7 @@ test(`OverviewView respects maximumWidth and minimumWidth when width > height.`,
   t.end();
 });
 
-test(`OverviewView maintains viewState.`, t => {
+test('OverviewView maintains viewState.', t => {
   const view = new OverviewView(overviewViewArguments);
   const viewState1 = view.filterViewState({
     height: 10,

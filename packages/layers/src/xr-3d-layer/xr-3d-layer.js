@@ -48,7 +48,7 @@ const channelsModule = {
   `
 };
 
-// prettier-ignore
+// biome-ignore format: Avoid reformatting to keep the rows clear
 const CUBE_STRIP = [
 	1, 1, 0,
 	0, 1, 0,
@@ -138,7 +138,8 @@ const XR3DLayer = class extends Layer {
     gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
     gl.pixelStorei(GL.PACK_ALIGNMENT, 1);
     const programManager = ProgramManager.getDefaultProgramManager(gl);
-    const processStr = `fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)`;
+    const processStr =
+      'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
     if (!programManager._hookFunctions.includes(processStr)) {
       programManager.addShaderHook(processStr);
     }
@@ -151,9 +152,7 @@ const XR3DLayer = class extends Layer {
       if (shaders) {
         const { inject = {}, modules = [] } = shaders;
         const definesInjection = inject[hookName];
-        const moduleDefinesInjection = modules.some(
-          m => m.inject && m?.inject[hookName]
-        );
+        const moduleDefinesInjection = modules.some(m => m?.inject?.[hookName]);
         return definesInjection || moduleDefinesInjection;
       }
       return false;
@@ -197,7 +196,7 @@ const XR3DLayer = class extends Layer {
     super.finalizeState();
 
     if (this.state.textures) {
-      Object.values(this.state.textures).forEach(tex => tex && tex.delete());
+      Object.values(this.state.textures).forEach(tex => tex?.delete());
     }
   }
 
@@ -284,7 +283,7 @@ const XR3DLayer = class extends Layer {
         clippingPlanes.length || NUM_PLANES_DEFAULT
       );
       // Need to flatten for shaders.
-      const normals = paddedClippingPlanes.map(plane => plane.normal).flat();
+      const normals = paddedClippingPlanes.flatMap(plane => plane.normal);
       const distances = paddedClippingPlanes.map(plane => plane.distance);
       model
         .setUniforms({
@@ -336,7 +335,7 @@ const XR3DLayer = class extends Layer {
       volume5: null
     };
     if (this.state.textures) {
-      Object.values(this.state.textures).forEach(tex => tex && tex.delete());
+      Object.values(this.state.textures).forEach(tex => tex?.delete());
     }
     if (
       channelData &&

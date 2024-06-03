@@ -3,7 +3,6 @@ const LUMAGL_VERSION = '~8.5.21';
 const MATHGL_VERSION = '^3.5.7';
 const REACT_VERSION = '^16.8.0 || ^17.0.0';
 
-
 /** @typedef {import('@pnpm/types').PackageManifest} PackageManifest */
 
 /**
@@ -12,9 +11,13 @@ const REACT_VERSION = '^16.8.0 || ^17.0.0';
  * @param {PackageManifest} manifest
  */
 function pinVersions(manifest) {
-  for (let key of /** @type {const} */ (['dependencies', 'devDependencies', 'peerDependencies'])) {
-    let deps = manifest[key] ?? {};
-    for (let name of Object.keys(deps)) {
+  for (const key of /** @type {const} */ ([
+    'dependencies',
+    'devDependencies',
+    'peerDependencies'
+  ])) {
+    const deps = manifest[key] ?? {};
+    for (const name of Object.keys(deps)) {
       if (name.startsWith('@deck.gl/') || name === 'deck.gl') {
         deps[name] = DECK_VERSION;
       }

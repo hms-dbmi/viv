@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useDropzone as useReactDropzone } from 'react-dropzone';
 import shallow from 'zustand/shallow';
-// eslint-disable-next-line camelcase
 import { unstable_batchedUpdates } from 'react-dom';
 
 import {
@@ -32,6 +31,7 @@ export const useImage = source => {
   );
   const loader = useLoader();
   const metadata = useMetadata();
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Carried over from eslint, without explanation.
   useEffect(() => {
     async function changeLoader() {
       // Placeholder
@@ -74,14 +74,16 @@ export const useImage = source => {
         });
         if (use3d) toggleUse3d();
 
-        let url = new URL(window.location.href);
+        const url = new URL(window.location.href);
         url.search =
-          typeof urlOrFile === 'string' ? '?image_url=' + urlOrFile : '';
+          typeof urlOrFile === 'string' ? `?image_url=${urlOrFile}` : '';
         window.history.pushState({}, '', url);
       }
     }
     if (source) changeLoader();
-  }, [source, history]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [source, history]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Carried over from eslint, without explanation.
   useEffect(() => {
     const changeSettings = async () => {
       // Placeholder
@@ -136,9 +138,7 @@ export const useImage = source => {
           newDomains.length === 1
             ? [[255, 255, 255]]
             : newDomains.map(
-                (_, i) =>
-                  (Channels[i]?.Color && Channels[i].Color.slice(0, -1)) ??
-                  COLOR_PALLETE[i]
+                (_, i) => Channels[i]?.Color?.slice(0, -1) ?? COLOR_PALLETE[i]
               );
         useViewerStore.setState({
           useLens: channelOptions.length !== 1,
@@ -169,7 +169,7 @@ export const useImage = source => {
       });
     };
     if (metadata) changeSettings();
-  }, [loader, metadata]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [loader, metadata]);
 };
 
 export const useDropzone = () => {

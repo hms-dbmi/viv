@@ -63,6 +63,7 @@ const SideBySideViewer = props => {
   } = props;
   const leftViewState = viewStatesProp?.find(v => v.id === 'left');
   const rightViewState = viewStatesProp?.find(v => v.id === 'right');
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Ignore carried over from eslint, without explanation.
   const viewStates = React.useMemo(() => {
     if (leftViewState && rightViewState) {
       return viewStatesProp;
@@ -76,7 +77,6 @@ const SideBySideViewer = props => {
       leftViewState || { ...defaultViewState, id: 'left' },
       rightViewState || { ...defaultViewState, id: 'right' }
     ];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loader, leftViewState, rightViewState]);
 
   const detailViewLeft = new SideBySideView({

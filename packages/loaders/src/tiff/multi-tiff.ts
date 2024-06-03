@@ -20,7 +20,7 @@ function assertSameResolution(images: MultiTiffImage[]) {
   const height = images[0].tiff.getHeight();
   for (const image of images) {
     if (image.tiff.getWidth() !== width || image.tiff.getHeight() !== height) {
-      throw new Error(`All images must have the same width and height`);
+      throw new Error('All images must have the same width and height');
     }
   }
 }

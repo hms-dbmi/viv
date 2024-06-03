@@ -3,8 +3,8 @@ import { FileSystemStore } from './common';
 import { loadMultiscales } from '../src/zarr/lib/utils';
 import { getIndexer } from '../src/zarr/lib/indexer';
 
-import * as path from 'path';
-import * as url from 'url';
+import * as path from 'node:path';
+import * as url from 'node:url';
 
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 const FIXTURE = path.resolve(__dirname, './fixtures/bioformats-zarr');

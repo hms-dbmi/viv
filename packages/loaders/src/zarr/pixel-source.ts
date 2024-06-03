@@ -111,7 +111,8 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     // and ignored by deck.gl.
     if (xStart === xStop || yStart === yStop) {
       throw new BoundsCheckError('Tile slice is zero-sized.');
-    } else if (xStart < 0 || yStart < 0 || xStop > width || yStop > height) {
+    }
+    if (xStart < 0 || yStart < 0 || xStop > width || yStop > height) {
       throw new BoundsCheckError('Tile slice is out of bounds.');
     }
 
@@ -120,7 +121,8 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
 
   private async _getRaw(
     selection: (null | Slice | number)[],
-    getOptions?: { storeOptions?: any } // eslint-disable-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: any is used to pass through storeOptions
+    getOptions?: { storeOptions?: any }
   ) {
     const result = await this._data.getRaw(selection, getOptions);
     if (typeof result !== 'object') {

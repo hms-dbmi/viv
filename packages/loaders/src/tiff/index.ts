@@ -91,7 +91,7 @@ function getImageSelectionName(
 ) {
   return imageSelections.length === 1
     ? imageName
-    : imageName + `_${imageNumber.toString()}`;
+    : `${imageName}_${imageNumber.toString()}`;
 }
 
 /**

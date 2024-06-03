@@ -23,12 +23,13 @@ export default function Avivator(props) {
   const source = useViewerStore(store => store.source);
   const useLinkedView = useViewerStore(store => store.useLinkedView);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Ignore carried over from eslint, without explanation.
   useEffect(() => {
     useViewerStore.setState({
       source: initSource,
       isNoImageUrlSnackbarOn: isDemoImage
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
   useImage(source);
   return (
     <>

@@ -26,11 +26,10 @@ export const DTYPE_LOOKUP = {
  */
 export function getChannelStats(arr: TypedArray) {
   let len = arr.length;
-  let min = Infinity;
-  let max = -Infinity;
+  let min = Number.POSITIVE_INFINITY;
+  let max = Number.NEGATIVE_INFINITY;
   let total = 0;
   // Range (min/max).
-  // eslint-disable-next-line no-plusplus
   while (len--) {
     if (arr[len] < min) {
       min = arr[len];
@@ -47,7 +46,6 @@ export function getChannelStats(arr: TypedArray) {
   // Standard Deviation.
   len = arr.length;
   let sumSquared = 0;
-  // eslint-disable-next-line no-plusplus
   while (len--) {
     sumSquared += (arr[len] - mean) ** 2;
   }
@@ -130,7 +128,7 @@ export function isInterleaved(shape: number[]) {
  * > getLabels(imgMeta.Pixels) === ['t', 'z', 'c', 'y', 'x']
  */
 type Sel<Dim extends string> =
-  Dim extends `${infer Z}${infer X}${infer A}${infer B}${infer C}` // eslint-disable-line @typescript-eslint/no-unused-vars
+  Dim extends `${infer Z}${infer X}${infer A}${infer B}${infer C}`
     ? [C, B, A]
     : never;
 export function getLabels(dimOrder: OmeXml[0]['Pixels']['DimensionOrder']) {
@@ -217,7 +215,8 @@ export function parseXML(xmlString: string) {
   const parser = new DOMParser();
   // Remove trailing null character, which can break XML parsing in Firefox
   const doc = parser.parseFromString(
-    xmlString.replace(/\u0000$/, ''), // eslint-disable-line no-control-regex
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: Necessary for parsing XML
+    xmlString.replace(/\u0000$/, ''),
     'application/xml'
   );
   return xmlToJson(doc.documentElement, { attrtibutesKey: 'attr' });

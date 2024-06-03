@@ -23,13 +23,13 @@ const files = (await fsp.readdir(dir)).filter(fname => fname.endsWith('.glsl'));
 console.log(`Writing each ${YELLOW}\`glsl-colormap\`${RESET} to ${outfile}\n`);
 
 for (const file of files) {
-  let contents = await fsp.readFile(path.resolve(dir, file), {
+  const contents = await fsp.readFile(path.resolve(dir, file), {
     encoding: 'utf-8'
   });
   // find colormap name
   const name = contents.match(/^vec4 (.*) \(.*\{$/m)[1];
   const impl = contents
-    .replace(`vec4 ${name}`, `vec4 apply_cmap`) // replace colormap fn name
+    .replace(`vec4 ${name}`, 'vec4 apply_cmap') // replace colormap fn name
     .replace(/^#pragma glslify.*\n/gm, ''); // strip off glslify export
 
   await fh.write(`export const ${name} = \`\\\n${impl}\`;\n`);

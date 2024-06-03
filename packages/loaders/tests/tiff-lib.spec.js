@@ -3,8 +3,8 @@ import { fromFile } from 'geotiff';
 
 import { createOffsetsProxy } from '../src/tiff/lib/proxies';
 
-import * as path from 'path';
-import * as url from 'url';
+import * as path from 'node:path';
+import * as url from 'node:url';
 
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 const FIXTURE = path.resolve(__dirname, './fixtures/multi-channel.ome.tif');

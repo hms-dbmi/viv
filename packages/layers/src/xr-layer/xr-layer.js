@@ -1,4 +1,3 @@
-/* eslint-disable prefer-destructuring */
 // A lot of this codes inherits paradigms form DeckGL that
 // we live in place for now, hence some of the not-destructuring
 import GL from '@luma.gl/constants';
@@ -111,7 +110,8 @@ const XRLayer = class extends Layer {
 
     const mutateStr =
       'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)';
-    const processStr = `fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)`;
+    const processStr =
+      'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
     // Only initialize shader hook functions _once globally_
     // Since the program manager is shared across all layers, but many layers
     // might be created, this solves the performance issue of always adding new
@@ -132,7 +132,7 @@ const XRLayer = class extends Layer {
     super.finalizeState();
 
     if (this.state.textures) {
-      Object.values(this.state.textures).forEach(tex => tex && tex.delete());
+      Object.values(this.state.textures).forEach(tex => tex?.delete());
     }
   }
 
@@ -225,7 +225,6 @@ const XRLayer = class extends Layer {
     positions[10] = bounds[1];
     positions[11] = 0;
 
-    // eslint-disable-next-line  no-param-reassign
     attributes.value = positions;
   }
 
@@ -269,7 +268,7 @@ const XRLayer = class extends Layer {
       channel5: null
     };
     if (this.state.textures) {
-      Object.values(this.state.textures).forEach(tex => tex && tex.delete());
+      Object.values(this.state.textures).forEach(tex => tex?.delete());
     }
     if (
       channelData &&

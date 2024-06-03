@@ -2,9 +2,9 @@ import { test } from 'tape';
 import { FileSystemStore } from './common';
 import { load } from '../src/zarr/bioformats-zarr';
 
-import * as fs from 'fs';
-import * as path from 'path';
-import * as url from 'url';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import * as url from 'node:url';
 
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 const FIXTURE = path.resolve(__dirname, './fixtures/bioformats-zarr');
@@ -43,7 +43,7 @@ test('Get raster data.', async t => {
 
     for (let c = 0; c < 3; c += 1) {
       const selection = { c, z: 0, t: 0 };
-      const pixelData = await base.getRaster({ selection }); // eslint-disable-line no-await-in-loop
+      const pixelData = await base.getRaster({ selection });
       t.equal(pixelData.width, 439);
       t.equal(pixelData.height, 167);
       t.equal(pixelData.data.length, 439 * 167);

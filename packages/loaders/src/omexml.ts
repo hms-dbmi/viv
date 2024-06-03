@@ -5,7 +5,7 @@ export type OmeXml = ReturnType<typeof fromString>;
 
 type Prettify<T> = {
   [K in keyof T]: T[K];
-} & {}; // eslint-disable-line
+} & {};
 
 function flattenAttributes<T extends { attr: Record<string, unknown> }>({
   attr,

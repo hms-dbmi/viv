@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import shallow from 'zustand/shallow';
 import React from 'react';
 import debounce from 'lodash/debounce';

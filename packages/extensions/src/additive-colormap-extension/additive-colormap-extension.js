@@ -90,7 +90,6 @@ const AdditiveColormapExtension = class extends LayerExtension {
       opacity,
       useTransparentColor
     };
-    // eslint-disable-next-line no-unused-expressions
     this.state.model?.setUniforms(uniforms);
   }
 };

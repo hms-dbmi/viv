@@ -127,7 +127,6 @@ const LensExtension = class extends LayerExtension {
       lensBorderRadius,
       colors: paddedColors
     };
-    // eslint-disable-next-line no-unused-expressions
     this.state.model?.setUniforms(uniforms);
   }
 

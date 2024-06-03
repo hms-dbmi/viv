@@ -12,13 +12,16 @@ export async function load(
   root: ZarrArray['store'],
   xmlSource: string | File | Response
 ) {
+  let xmlSourceText: string;
   // If 'File' or 'Response', read as text.
   if (typeof xmlSource !== 'string') {
-    xmlSource = await xmlSource.text();
+    xmlSourceText = await xmlSource.text();
+  } else {
+    xmlSourceText = xmlSource;
   }
 
   // Get metadata and multiscale data for _first_ image.
-  const imgMeta = fromString(xmlSource)[0];
+  const imgMeta = fromString(xmlSourceText)[0];
   const { data } = await loadMultiscales(root, '0');
 
   const labels = guessBioformatsLabels(data[0], imgMeta);

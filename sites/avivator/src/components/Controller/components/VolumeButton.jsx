@@ -28,8 +28,7 @@ function formatBytes(bytes, decimals = 2) {
 
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  // eslint-disable-next-line no-restricted-properties
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  return `${Number.parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
 }
 
 const getStatsForResolution = (loader, resolution) => {
@@ -37,7 +36,6 @@ const getStatsForResolution = (loader, resolution) => {
   const height = shape[labels.indexOf('y')];
   const width = shape[labels.indexOf('x')];
   const depth = shape[labels.indexOf('z')];
-  // eslint-disable-next-line no-bitwise
   const depthDownsampled = Math.max(1, depth >> resolution);
   // Check memory allocation limits for Float32Array (used in XR3DLayer for rendering)
   const totalBytes = 4 * height * width * depthDownsampled;
@@ -124,7 +122,6 @@ function VolumeButton() {
         }
         onClick={() => {
           toggle();
-          // eslint-disable-next-line no-unused-expressions
           if (use3d) {
             toggleUse3d();
             useViewerStore.setState({
@@ -155,7 +152,6 @@ function VolumeButton() {
             <MenuList id="resolution-options">
               {Array.from({ length: loader.length })
                 .fill(0)
-                // eslint-disable-next-line no-unused-vars
                 .map((_, resolution) => {
                   if (loader) {
                     if (canLoadResolution(loader, resolution)) {

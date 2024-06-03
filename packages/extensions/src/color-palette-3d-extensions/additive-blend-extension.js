@@ -1,6 +1,6 @@
 import BaseExtension from './base-extension';
 
-const _BEFORE_RENDER = ``;
+const _BEFORE_RENDER = '';
 
 const _RENDER = `\
   vec3 rgbCombo = vec3(0.0);
@@ -24,7 +24,7 @@ const _RENDER = `\
   }
 `;
 
-const _AFTER_RENDER = ``;
+const _AFTER_RENDER = '';
 
 /**
  * This deck.gl extension allows for a color palette to be used for rendering in 3D with additive blending.

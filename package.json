@@ -16,9 +16,7 @@
     "build": "pnpm -r --parallel build",
     "clean": "pnpm -r exec -- rm -rf node_modules",
     "test": "pnpm -r --parallel test",
-    "check-format": "prettier --check --ignore-path .gitignore tsconfig.json sites/avivator packages/",
-    "lint": "npm run check-format && eslint \"packages/*/src/**/*\" \"sites/avivator/src/**/*\"",
-    "format": "npm run check-format -- --write",
+    "fix": "biome check --apply .",
     "version": "node ./scripts/version.mjs",
     "publish": "pnpm build && pnpm changeset publish"
   },
@@ -33,6 +31,7 @@
     "@luma.gl/webgl": "~8.5.21"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.7.3",
     "@changesets/cli": "^2.27.1",
     "@deck.gl/extensions": "~8.8.27",
     "@deck.gl/mesh-layers": "~8.8.27",
@@ -44,16 +43,10 @@
     "@pnpm/types": "^10.0.0",
     "@probe.gl/test-utils": "^3.5.0",
     "@svitejs/changesets-changelog-github-compact": "^1.1.0",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.13.1",
     "esbuild": "^0.19.5",
-    "eslint": "^8.53.0",
-    "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
     "esno": "^4.0.0",
     "gl": "^6.0.2",
     "gray-matter": "^4.0.3",
-    "prettier": "^3.2.5",
     "tap-spec": "^5.0.0",
     "tape": "^5.5.3",
     "tape-catch": "^1.0.6",
@@ -73,11 +66,5 @@
         "@loaders.gl/core": "3.2"
       }
     }
-  },
-  "prettier": {
-    "singleQuote": true,
-    "trailingComma": "none",
-    "arrowParens": "avoid"
-  },
-  "sideEffects": false
+  }
 }

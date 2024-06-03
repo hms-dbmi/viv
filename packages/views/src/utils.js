@@ -25,7 +25,9 @@ export function getVivId(id) {
 export function getDefaultInitialViewState(
   loader,
   viewSize,
+  // biome-ignore lint/style/useDefaultParameterLast: Public API requires zoomBackOff to be the third parameter
   zoomBackOff = 0,
+  // biome-ignore lint/style/useDefaultParameterLast: Public API requires use3d to be the fourth parameter
   use3d = false,
   modelMatrix
 ) {

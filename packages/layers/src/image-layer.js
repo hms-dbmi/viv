@@ -86,7 +86,6 @@ const ImageLayer = class extends CompositeLayer {
 
           if (isInterleaved(loader.shape)) {
             // data is for BitmapLayer and needs to be of form { data: Uint8Array, width, height };
-            // eslint-disable-next-line prefer-destructuring
             raster.data = raster.data[0];
             if (raster.data.length === raster.width * raster.height * 3) {
               // data is RGB (not RGBA) and need to update texture formats
@@ -108,11 +107,8 @@ const ImageLayer = class extends CompositeLayer {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
   getPickingInfo({ info, sourceLayer }) {
-    // eslint-disable-next-line no-param-reassign
     info.sourceLayer = sourceLayer;
-    // eslint-disable-next-line no-param-reassign
     info.tile = sourceLayer.props.tile;
     return info;
   }
