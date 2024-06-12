@@ -1,9 +1,12 @@
 import { COORDINATE_SYSTEM, Layer, picking, project32 } from '@deck.gl/core';
 // A lot of this codes inherits paradigms form DeckGL that
 // we live in place for now, hence some of the not-destructuring
-import GL from '@luma.gl/constants';
-import { Geometry, Model, Texture2D } from '@luma.gl/core';
-import { ProgramManager } from '@luma.gl/engine';
+// ... needed to destructure for it to build with luma.gl 9, but we probably need to change these anyway
+import {GL} from '@luma.gl/constants';
+import { Geometry, Model } from '@luma.gl/engine';
+// import { ProgramManager } from '@luma.gl/engine';
+// import { PipelineFactory } from '@luma.gl/engine';
+import { ShaderAssembler } from '@luma.gl/shadertools';
 import { padContrastLimits } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
@@ -50,7 +53,7 @@ const XRLayer = class extends Layer {
     const { dtype, interpolation } = this.props;
     const { shaderModule, sampler } = getRenderingAttrs(
       dtype,
-      this.context.gl,
+      this.context.device,
       interpolation
     );
     const extensionDefinesDeckglProcessIntensity =
@@ -85,13 +88,13 @@ const XRLayer = class extends Layer {
    * This function initializes the internal state.
    */
   initializeState() {
-    const { gl } = this.context;
+    const { device } = this.context;
     // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
     // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
     // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
-    gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
-    gl.pixelStorei(GL.PACK_ALIGNMENT, 1);
+    device.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
+    device.pixelStorei(GL.PACK_ALIGNMENT, 1);
     const attributeManager = this.getAttributeManager();
     attributeManager.add({
       positions: {
@@ -106,7 +109,9 @@ const XRLayer = class extends Layer {
       numInstances: 1,
       positions: new Float64Array(12)
     });
-    const programManager = ProgramManager.getDefaultProgramManager(gl);
+    // const programManager = ProgramManager.getDefaultProgramManager(device);
+    // const programManager = new PipelineFactory(device);
+    const programManager = ShaderAssembler.getDefaultShaderAssembler();
 
     const mutateStr =
       'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)';
@@ -147,11 +152,11 @@ const XRLayer = class extends Layer {
       changeFlags.extensionsChanged ||
       props.interpolation !== oldProps.interpolation
     ) {
-      const { gl } = this.context;
+      const { device } = this.context;
       if (this.state.model) {
         this.state.model.delete();
       }
-      this.setState({ model: this._getModel(gl) });
+      this.setState({ model: this._getModel(device) });
 
       this.getAttributeManager().invalidateAll();
     }
@@ -188,7 +193,10 @@ const XRLayer = class extends Layer {
         drawMode: GL.TRIANGLE_FAN,
         vertexCount: 4,
         attributes: {
-          texCoords: new Float32Array([0, 1, 0, 0, 1, 0, 1, 1])
+          texCoords: {
+            value: new Float32Array([0, 1, 0, 0, 1, 0, 1, 1]),
+            size: 4 //ffs
+          }
         }
       }),
       isInstanced: false
@@ -296,9 +304,10 @@ const XRLayer = class extends Layer {
       this.context.gl,
       interpolation
     );
-    return new Texture2D(this.context.gl, {
+    return this.context.device.createTexture({
       width,
       height,
+      dimension: '2d',
       data: attrs.cast?.(data) ?? data,
       // we don't want or need mimaps
       mipmaps: false,

@@ -1,6 +1,6 @@
 import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
-import GL from '@luma.gl/constants';
-import { isWebGL2 } from '@luma.gl/core';
+import { GL } from '@luma.gl/constants';
+// import { isWebGL2 } from '@luma.gl/core';
 import { Matrix4 } from '@math.gl/core';
 import { ColorPalette3DExtensions } from '@vivjs/extensions';
 
@@ -150,7 +150,7 @@ const VolumeLayer = class extends CompositeLayer {
   }
 
   renderLayers() {
-    const { loader, id, resolution, useProgressIndicator, useWebGL1Warning } =
+    const { loader, id, resolution, useProgressIndicator } =
       this.props;
     const { dtype } = loader[resolution];
     const {
@@ -162,20 +162,6 @@ const VolumeLayer = class extends CompositeLayer {
       physicalSizeScalingMatrix,
       resolutionMatrix
     } = this.state;
-    const { gl } = this.context;
-    if (!isWebGL2(gl) && useWebGL1Warning) {
-      const { viewport } = this.context;
-      return getTextLayer(
-        [
-          'Volume rendering is only available on browsers that support WebGL2. If you',
-          'are using Safari, you can turn on WebGL2 by navigating in the top menubar',
-          'to check Develop > Experimental Features > WebGL 2.0 and then refreshing',
-          'the page.'
-        ].join('\n'),
-        viewport,
-        id
-      );
-    }
     if (!(width && height) && useProgressIndicator) {
       const { viewport } = this.context;
       return getTextLayer(

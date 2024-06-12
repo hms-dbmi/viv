@@ -1,4 +1,4 @@
-import GL from '@luma.gl/constants';
+import {GL} from '@luma.gl/constants';
 
 export const MAX_COLOR_INTENSITY = 255;
 

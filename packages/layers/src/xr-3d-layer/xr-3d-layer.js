@@ -26,9 +26,10 @@ https://github.com/visgl/luma.gl/issues/1415
 - We allow for arbtirary affine transformations via deck.gl's modelMatrix prop and have updated the vertex shader accordingly.
 More information about that is detailed in the comments there.
 */
-import GL from '@luma.gl/constants';
-import { Geometry, Model, Texture3D } from '@luma.gl/core';
-import { ProgramManager } from '@luma.gl/engine';
+import {GL} from '@luma.gl/constants';
+import { Geometry, Model } from '@luma.gl/engine';
+// import { ProgramManager } from '@luma.gl/engine';
+import { ShaderAssembler } from '@luma.gl/shadertools';
 import { Matrix4 } from '@math.gl/core';
 import { Plane } from '@math.gl/culling';
 
@@ -130,14 +131,14 @@ function getRenderingFromExtensions(extensions) {
  */
 const XR3DLayer = class extends Layer {
   initializeState() {
-    const { gl } = this.context;
+    const { device } = this.context;
     // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
     // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
     // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
-    gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
-    gl.pixelStorei(GL.PACK_ALIGNMENT, 1);
-    const programManager = ProgramManager.getDefaultProgramManager(gl);
+    device.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
+    device.pixelStorei(GL.PACK_ALIGNMENT, 1);
+    const programManager = ShaderAssembler.getDefaultShaderAssembler(); //ProgramManager.getDefaultProgramManager(device);
     const processStr =
       'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
     if (!programManager._hookFunctions.includes(processStr)) {
@@ -212,11 +213,11 @@ const XR3DLayer = class extends Layer {
       props.renderingMode !== oldProps.renderingMode ||
       props.clippingPlanes.length !== oldProps.clippingPlanes.length
     ) {
-      const { gl } = this.context;
+      const { device } = this.context;
       if (this.state.model) {
         this.state.model.delete();
       }
-      this.setState({ model: this._getModel(gl) });
+      this.setState({ model: this._getModel(device) });
     }
     if (
       props.channelData &&
@@ -364,10 +365,11 @@ const XR3DLayer = class extends Layer {
    */
   dataToTexture(data, width, height, depth) {
     const attrs = getRenderingAttrs();
-    const texture = new Texture3D(this.context.gl, {
+    const texture = this.context.device.createTexture({
       width,
       height,
       depth,
+      dimension: '3d',
       data: attrs.cast?.(data) ?? data,
       // ? Seems to be a luma.gl bug.  Looks like Texture2D is wrong or this is but these are flipped somewhere.
       format: attrs.dataFormat,
@@ -375,6 +377,7 @@ const XR3DLayer = class extends Layer {
       type: attrs.type,
       mipmaps: false,
       parameters: {
+        // todo: adapt to new lumagl...
         [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
         [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
         [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,

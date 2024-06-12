@@ -1,5 +1,5 @@
 import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
-import GL from '@luma.gl/constants';
+import {GL} from '@luma.gl/constants';
 
 import { ColorPaletteExtension } from '@vivjs/extensions';
 import { SIGNAL_ABORTED, isInterleaved } from '@vivjs/loaders';

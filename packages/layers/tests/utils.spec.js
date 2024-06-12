@@ -1,6 +1,5 @@
-import GL from '@luma.gl/constants';
+import {GL} from '@luma.gl/constants';
 import { createTestContext } from '@luma.gl/test-utils';
-import { FEATURES } from '@luma.gl/webgl';
 import test from 'tape-catch';
 import { range } from '../src/multiscale-image-layer/utils';
 import {
@@ -10,7 +9,6 @@ import {
   snapValue
 } from '../src/utils';
 
-import { hasFeature } from '@luma.gl/webgl';
 import { DTYPE_VALUES } from '../../constants';
 import { getRenderingAttrs } from '../src/xr-layer/utils';
 
@@ -95,48 +93,6 @@ test('padContrastLimits test', t => {
   t.end();
 });
 
-test('getRenderingAttrs WebGL1', t => {
-  t.plan(dtypes.length * interpolations * 6);
-  try {
-    const gl = createTestContext({ webgl1: true, webgl2: false });
-    interpolations.forEach(interpolation => {
-      dtypes.forEach(dtype => {
-        const attrs = getRenderingAttrs(dtype, gl, interpolation);
-        t.deepEqual(
-          attrs.cast(new Uint16Array([1, 2, 3])),
-          new Float32Array([1, 2, 3]),
-          `always cast ${dtype} to Float32`
-        );
-        t.equal(
-          attrs.sampler,
-          'sampler2D',
-          'always return sampler2D as sampler'
-        );
-        t.equal(attrs.type, GL.FLOAT, 'always return FLOAT as dtype');
-        t.equal(
-          attrs.dataFormat,
-          GL.LUMINANCE,
-          'always return LUMINANCE as dataFormat'
-        );
-        t.equal(
-          attrs.format,
-          GL.LUMINANCE,
-          'always return LUMINANCE as format'
-        );
-        t.equal(
-          attrs.filter,
-          hasFeature(gl, FEATURES.TEXTURE_FILTER_LINEAR_FLOAT)
-            ? interpolation
-            : GL.NEAREST,
-          `use interpolation ${interpolation} if gl context supports LINEAR - otherwise return NEAREST`
-        );
-      });
-    });
-  } catch (e) {
-    t.fail(e);
-  }
-  t.end();
-});
 
 test('getRenderingAttrs WebGL2', t => {
   t.plan(dtypes.length * interpolations.length * 2);
