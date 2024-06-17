@@ -190,8 +190,9 @@ const XRLayer = class extends Layer {
       ...this.getShaders(),
       id: this.props.id,
       geometry: new Geometry({
-        topology: 'triangle-fan-webgl', //updated from drawMode to topology, but this option is also deprecated
+        topology: 'triangle-list',
         vertexCount: 4,
+        indices: new Uint16Array([0, 1, 2, 3, 2, 1]), // not sure if this is correct winding etc.
         attributes: {
           texCoords: {
             value: new Float32Array([0, 1, 0, 0, 1, 0, 1, 1]),
