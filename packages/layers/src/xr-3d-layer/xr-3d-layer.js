@@ -237,7 +237,7 @@ const XR3DLayer = class extends Layer {
     return new Model(gl, {
       ...this.getShaders(),
       geometry: new Geometry({
-        drawMode: gl.TRIANGLE_STRIP,
+        topology: 'triangle-strip',
         attributes: {
           positions: new Float32Array(CUBE_STRIP)
         }

@@ -101,7 +101,7 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
       ...this.getShaders(),
       id: this.props.id,
       geometry: new Geometry({
-        drawMode: GL.TRIANGLES,
+        topology: 'triangle-list',
         vertexCount: 6
       }),
       isInstanced: false,

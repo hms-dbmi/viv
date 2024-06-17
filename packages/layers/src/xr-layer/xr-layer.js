@@ -190,7 +190,7 @@ const XRLayer = class extends Layer {
       ...this.getShaders(),
       id: this.props.id,
       geometry: new Geometry({
-        drawMode: GL.TRIANGLE_FAN,
+        topology: 'triangle-fan-webgl', //updated from drawMode to topology, but this option is also deprecated
         vertexCount: 4,
         attributes: {
           texCoords: {
