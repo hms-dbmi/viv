@@ -376,13 +376,12 @@ const XR3DLayer = class extends Layer {
       dataFormat: attrs.format,
       type: attrs.type,
       mipmaps: false,
-      parameters: {
-        // todo: adapt to new lumagl...
-        [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
-        [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
-        [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-        [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
-        [GL.TEXTURE_WRAP_R]: GL.CLAMP_TO_EDGE
+      sampler: {
+        minFilter: 'linear',
+        magFilterFilter: 'linear',
+        addressModeU: 'clamp-to-edge',
+        addressModeV: 'clamp-to-edge',
+        addressModeW: 'clamp-to-edge'
       }
     });
     return texture;

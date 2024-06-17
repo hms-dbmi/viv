@@ -21,7 +21,7 @@ const defaultProps = {
   dtype: { type: 'string', value: 'Uint16', compare: true },
   interpolation: {
     type: 'number',
-    value: GL.NEAREST,
+    value: 'nearest',
     compare: true
   }
 };
@@ -38,7 +38,7 @@ const defaultProps = {
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
- * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
+ * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is 'nearest'
  */
 /**
  * @type {{ new (...props: import('@vivjs/types').Viv<LayerProps>[]) }}
@@ -311,13 +311,13 @@ const XRLayer = class extends Layer {
       data: attrs.cast?.(data) ?? data,
       // we don't want or need mimaps
       mipmaps: false,
-      parameters: {
+      sampler: {
         // NEAREST for integer data
-        [GL.TEXTURE_MIN_FILTER]: attrs.filter,
-        [GL.TEXTURE_MAG_FILTER]: attrs.filter,
+        minFilter: attrs.filter,
+        magFilter: attrs.filter,
         // CLAMP_TO_EDGE to remove tile artifacts
-        [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-        [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
+        addressModeU: 'clamp-to-edge',
+        addressModeV: 'clamp-to-edge'
       },
       format: attrs.format,
       dataFormat: attrs.dataFormat,

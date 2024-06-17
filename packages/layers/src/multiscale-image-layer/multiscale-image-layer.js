@@ -179,7 +179,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         onHover,
         onClick,
         // Background image is nicest when LINEAR in my opinion.
-        interpolation: GL.LINEAR,
+        interpolation: 'linear',
         onViewportLoad: null
       });
     const layers = [baseLayer, tiledLayer];

@@ -50,6 +50,6 @@ export function renderSubLayers(props) {
     id: `tile-sub-layer-${bounds}-${id}`,
     tileId: { x, y, z },
     // The auto setting is NEAREST at the highest resolution but LINEAR otherwise.
-    interpolation: z === maxZoom ? GL.NEAREST : GL.LINEAR
+    interpolation: z === maxZoom ? 'nearest' : 'linear'
   });
 }

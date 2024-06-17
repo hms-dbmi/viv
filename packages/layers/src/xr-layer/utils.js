@@ -18,11 +18,11 @@ const coreShaderModule = { fs, vs };
 //     );
 //   }
 
-//   if (!canShowLinear && interpolation === GL.LINEAR) {
+//   if (!canShowLinear && interpolation === 'linear') {
 //     console.warn(
 //       'LINEAR filtering not supported in WebGL1 context.  Falling back to NEAREST.'
 //     );
-//     return GL.NEAREST;
+//     return 'nearest';
 //   }
 
 //   return interpolation;
@@ -42,7 +42,7 @@ export function getRenderingAttrs(dtype, gl, interpolation) {
   //   };
   // }
   // Linear filtering only works when the data type is cast to Float32.
-  const isLinear = interpolation === GL.LINEAR;
+  const isLinear = interpolation === 'linear';
   // Need to add es version tag so that shaders work in WebGL2 since the tag is needed for using usampler2d with WebGL2.
   // Very cursed!
   const upgradedShaderModule = { ...coreShaderModule };

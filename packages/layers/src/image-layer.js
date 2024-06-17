@@ -27,7 +27,7 @@ const defaultProps = {
   onViewportLoad: { type: 'function', value: null, compare: true },
   interpolation: {
     type: 'number',
-    value: GL.NEAREST,
+    value: 'nearest',
     compare: true
   },
   extensions: {

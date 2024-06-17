@@ -13,7 +13,7 @@ import { DTYPE_VALUES } from '../../constants';
 import { getRenderingAttrs } from '../src/xr-layer/utils';
 
 const dtypes = Object.keys(DTYPE_VALUES);
-const interpolations = [GL.NEAREST, GL.LINEAR];
+const interpolations = ['nearest', 'linear'];
 
 test('range test', t => {
   t.plan(2);
@@ -101,7 +101,7 @@ test('getRenderingAttrs WebGL2', t => {
     interpolations.forEach(interpolation => {
       dtypes.forEach(dtype => {
         const attrs = getRenderingAttrs(dtype, gl, interpolation);
-        if (interpolation === GL.LINEAR || dtype === 'Float64') {
+        if (interpolation === 'linear' || dtype === 'Float64') {
           t.deepEqual(
             attrs.cast(new Uint16Array([1, 2, 3])),
             new Float32Array([1, 2, 3]),
