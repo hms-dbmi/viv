@@ -103,15 +103,21 @@ const XRLayer = class extends Layer {
         fp64: this.use64bitPositions(),
         update: this.calculatePositions,
         noAlloc: true
-      }
+      },
+      //not sure if this is correct
+      texCoords: {
+        size: 2,
+        type: 'float32',
+        accessor: i => [i % 2, Math.floor(i / 2)],
+      },
     });
     this.setState({
       numInstances: 1,
       positions: new Float64Array(12)
     });
     // const programManager = ProgramManager.getDefaultProgramManager(device);
-    // const programManager = new PipelineFactory(device);
-    const programManager = ShaderAssembler.getDefaultShaderAssembler();
+    // const pipelineFactory = new PipelineFactory(device);
+    const shaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
 
     const mutateStr =
       'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)';
@@ -122,11 +128,13 @@ const XRLayer = class extends Layer {
     // might be created, this solves the performance issue of always adding new
     // hook functions.
     // See https://github.com/kylebarron/deck.gl-raster/blob/2eb91626f0836558f0be4cd201ea18980d7f7f2d/src/deckgl/raster-layer/raster-layer.js#L21-L40
-    if (!programManager._hookFunctions.includes(mutateStr)) {
-      programManager.addShaderHook(mutateStr);
+    // Note: _hookFunctions is private, not sure if there's an appropriate way to check if a hook function is already added.
+    // it may be better to add these hooks somewhere else rather than in initializeState of a layer?
+    if (!shaderAssembler._hookFunctions.includes(mutateStr)) {
+      shaderAssembler.addShaderHook(mutateStr);
     }
-    if (!programManager._hookFunctions.includes(processStr)) {
-      programManager.addShaderHook(processStr);
+    if (!shaderAssembler._hookFunctions.includes(processStr)) {
+      shaderAssembler.addShaderHook(processStr);
     }
   }
 
@@ -200,6 +208,7 @@ const XRLayer = class extends Layer {
           }
         }
       }),
+      bufferLayout: this.getAttributeManager().getBufferLayouts(),
       isInstanced: false
     });
   }
