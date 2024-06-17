@@ -138,8 +138,8 @@ const BitmapLayer = class extends CompositeLayer {
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
     // This needs to be called here and not in the BitmapLayerWrapper because the `image` prop is converted to a texture outside of the layer, as controlled by the `image` type.
     // See: https://github.com/visgl/deck.gl/pull/5197
-    device.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
-    device.pixelStorei(GL.PACK_ALIGNMENT, 1);
+    device.setParametersWebGL(GL.UNPACK_ALIGNMENT, 1);
+    device.setParametersWebGL(GL.PACK_ALIGNMENT, 1);
     super.initializeState(args);
   }
 

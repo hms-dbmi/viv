@@ -136,8 +136,8 @@ const XR3DLayer = class extends Layer {
     // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
     // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
-    device.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
-    device.pixelStorei(GL.PACK_ALIGNMENT, 1);
+    device.setParametersWebGL(GL.UNPACK_ALIGNMENT, 1);
+    device.setParametersWebGL(GL.PACK_ALIGNMENT, 1);
     const programManager = ShaderAssembler.getDefaultShaderAssembler(); //ProgramManager.getDefaultProgramManager(device);
     const processStr =
       'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
