@@ -99,7 +99,7 @@ const XRLayer = class extends Layer {
     attributeManager.add({
       positions: {
         size: 3,
-        type: GL.DOUBLE,
+        type: 'float64',
         fp64: this.use64bitPositions(),
         update: this.calculatePositions,
         noAlloc: true
