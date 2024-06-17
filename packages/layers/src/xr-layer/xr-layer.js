@@ -196,7 +196,7 @@ const XRLayer = class extends Layer {
         attributes: {
           texCoords: {
             value: new Float32Array([0, 1, 0, 0, 1, 0, 1, 1]),
-            size: 4 //ffs
+            size: 2
           }
         }
       }),
