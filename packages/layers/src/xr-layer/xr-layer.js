@@ -255,12 +255,14 @@ const XRLayer = class extends Layer {
         dtype
       });
       model
-        .setUniforms({
+        // .setUniforms({ // not sure if this change is exactly correct...
+        // it seems to avert some errors, but I'm not sure if this is a correct way for uniform buffer to be defined.
+        .setBindings({uniforms: {
           ...uniforms,
           contrastLimits: paddedContrastLimits,
           ...textures
-        })
-        .draw();
+        }});
+      model.draw();
     }
   }
 
