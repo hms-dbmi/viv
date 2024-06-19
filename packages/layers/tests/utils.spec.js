@@ -95,10 +95,10 @@ test('padContrastLimits test', t => {
 test('getRenderingAttrs WebGL2', t => {
   t.plan(dtypes.length * interpolations.length * 2);
   try {
-    const gl = createTestContext({ webgl2: true, webgl1: false });
+    const device = createTestContext({ webgl2: true, webgl1: false }); //not really used ATM
     interpolations.forEach(interpolation => {
       dtypes.forEach(dtype => {
-        const attrs = getRenderingAttrs(dtype, gl, interpolation);
+        const attrs = getRenderingAttrs(dtype, device, interpolation);
         if (interpolation === 'linear' || dtype === 'Float64') {
           t.deepEqual(
             attrs.cast(new Uint16Array([1, 2, 3])),
