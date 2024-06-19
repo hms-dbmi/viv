@@ -1,4 +1,3 @@
-import {GL} from '@luma.gl/constants';
 import { createTestContext } from '@luma.gl/test-utils';
 import test from 'tape-catch';
 import { range } from '../src/multiscale-image-layer/utils';
@@ -92,7 +91,6 @@ test('padContrastLimits test', t => {
   }
   t.end();
 });
-
 
 test('getRenderingAttrs WebGL2', t => {
   t.plan(dtypes.length * interpolations.length * 2);

@@ -1,5 +1,5 @@
 import { CompositeLayer } from '@deck.gl/core';
-import {GL} from '@luma.gl/constants';
+import { GL } from '@luma.gl/constants';
 import { Matrix4 } from '@math.gl/core';
 
 import { ColorPaletteExtension } from '@vivjs/extensions';

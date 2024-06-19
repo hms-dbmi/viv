@@ -1,6 +1,6 @@
 import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
 import { BitmapLayer as BaseBitmapLayer } from '@deck.gl/layers';
-import {GL} from '@luma.gl/constants';
+import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
 
 const PHOTOMETRIC_INTERPRETATIONS = {

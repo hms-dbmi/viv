@@ -26,7 +26,7 @@ https://github.com/visgl/luma.gl/issues/1415
 - We allow for arbtirary affine transformations via deck.gl's modelMatrix prop and have updated the vertex shader accordingly.
 More information about that is detailed in the comments there.
 */
-import {GL} from '@luma.gl/constants';
+import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
 // import { ProgramManager } from '@luma.gl/engine';
 import { ShaderAssembler } from '@luma.gl/shadertools';

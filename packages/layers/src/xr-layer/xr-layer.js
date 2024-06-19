@@ -2,7 +2,7 @@ import { COORDINATE_SYSTEM, Layer, picking, project32 } from '@deck.gl/core';
 // A lot of this codes inherits paradigms form DeckGL that
 // we live in place for now, hence some of the not-destructuring
 // ... needed to destructure for it to build with luma.gl 9, but we probably need to change these anyway
-import {GL} from '@luma.gl/constants';
+import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
 // import { ProgramManager } from '@luma.gl/engine';
 // import { PipelineFactory } from '@luma.gl/engine';
@@ -108,8 +108,8 @@ const XRLayer = class extends Layer {
       texCoords: {
         size: 2,
         type: 'float32',
-        accessor: i => [i % 2, Math.floor(i / 2)],
-      },
+        accessor: i => [i % 2, Math.floor(i / 2)]
+      }
     });
     this.setState({
       numInstances: 1,
@@ -266,11 +266,13 @@ const XRLayer = class extends Layer {
       model
         // .setUniforms({ // not sure if this change is exactly correct...
         // it seems to avert some errors, but I'm not sure if this is a correct way for uniform buffer to be defined.
-        .setBindings({uniforms: {
-          ...uniforms,
-          contrastLimits: paddedContrastLimits,
-          ...textures
-        }});
+        .setBindings({
+          uniforms: {
+            ...uniforms,
+            contrastLimits: paddedContrastLimits,
+            ...textures
+          }
+        });
       model.draw();
     }
   }

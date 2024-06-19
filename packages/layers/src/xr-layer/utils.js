@@ -1,4 +1,4 @@
-import {GL} from '@luma.gl/constants';
+// import { GL } from '@luma.gl/constants';
 // import { isWebGL2 } from '@luma.gl/core';
 // import { FEATURES, hasFeature } from '@luma.gl/engine';
 import { getDtypeValues } from '../utils';
