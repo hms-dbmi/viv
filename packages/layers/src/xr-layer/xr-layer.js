@@ -251,7 +251,8 @@ const XRLayer = class extends Layer {
   /**
    * This function runs the shaders and draws to the canvas
    */
-  draw({ uniforms }) {
+  draw(opts) {
+    const { uniforms } = opts;
     const { textures, model } = this.state;
     if (textures && model) {
       const { contrastLimits, domain, dtype, channelsVisible } = this.props;
@@ -265,17 +266,22 @@ const XRLayer = class extends Layer {
         domain,
         dtype
       });
+      //HACK: null textures will throw errors, so we just set them all to the first texture FOR THE VERY SHORT TERM!
+      textures['channel5'] = textures['channel4'] = textures['channel0'];
       model
         // .setUniforms({ // not sure if this change is exactly correct...
         // it seems to avert some errors, but I'm not sure if this is a correct way for uniform buffer to be defined.
+        // now that the shader compiles etc, it goes through setBindings() ok,
+        // but then when we call draw(), we don't have the right bindings set up.
         .setBindings({
-          uniforms: {
-            ...uniforms,
-            contrastLimits: paddedContrastLimits,
-            ...textures
-          }
-        });
-      model.draw();
+          ...uniforms,
+          contrastLimits: paddedContrastLimits,
+          ...textures
+        }, 
+        { disableWarnings: false }
+        );
+      // opts.uniforms = { ...uniforms, contrastLimits: paddedContrastLimits, ...textures }; //doesn't seem to help
+      model.draw(opts);
     }
   }
 
