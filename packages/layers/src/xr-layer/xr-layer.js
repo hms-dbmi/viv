@@ -12,7 +12,7 @@ import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
 import { log } from '@luma.gl/core';
 // force lumagl webgl-shader to take a code-path that actually compiles shaders & gives us an error...
-log.setLevel(1);
+// log.setLevel(1);
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
@@ -106,12 +106,6 @@ const XRLayer = class extends Layer {
         update: this.calculatePositions,
         noAlloc: true
       },
-      //not sure if this is correct
-      texCoords: {
-        size: 2,
-        type: 'float32',
-        accessor: i => [i % 2, Math.floor(i / 2)]
-      }
     });
     this.setState({
       numInstances: 1,
@@ -201,8 +195,8 @@ const XRLayer = class extends Layer {
       id: this.props.id,
       geometry: new Geometry({
         topology: 'triangle-list',
-        vertexCount: 4,
-        indices: new Uint16Array([0, 1, 2, 3, 2, 1]), // not sure if this is correct winding etc.
+        vertexCount: 6,
+        indices: new Uint16Array([0, 1, 3, 1, 2, 3]), // seems ok
         attributes: {
           texCoords: {
             value: new Float32Array([0, 1, 0, 0, 1, 0, 1, 1]),
