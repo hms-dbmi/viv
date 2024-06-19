@@ -10,7 +10,9 @@ import { ShaderAssembler } from '@luma.gl/shadertools';
 import { padContrastLimits } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
-
+import { log } from '@luma.gl/core';
+// force lumagl webgl-shader to take a code-path that actually compiles shaders & gives us an error...
+log.setLevel(1);
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
