@@ -270,14 +270,15 @@ const XRLayer = class extends Layer {
         // it seems to avert some errors, but I'm not sure if this is a correct way for uniform buffer to be defined.
         // now that the shader compiles etc, it goes through setBindings() ok,
         // but then when we call draw(), we don't have the right bindings set up.
-        .setBindings({
+        .setUniforms({
           ...uniforms,
           contrastLimits: paddedContrastLimits,
-          ...textures
+          // ...textures
         }, 
         { disableWarnings: false }
         );
-      // opts.uniforms = { ...uniforms, contrastLimits: paddedContrastLimits, ...textures }; //doesn't seem to help
+      model.setBindings(textures);
+      opts.uniforms = { ...uniforms, contrastLimits: paddedContrastLimits, ...textures }; //doesn't seem to help
       model.draw(opts);
     }
   }
