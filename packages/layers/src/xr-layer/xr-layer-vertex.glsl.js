@@ -1,4 +1,5 @@
 export default `\
+#version 300 es
 #define SHADER_NAME xr-layer-vertex-shader
 
 in vec2 texCoords;
