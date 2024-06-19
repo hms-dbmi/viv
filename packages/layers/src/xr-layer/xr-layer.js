@@ -320,9 +320,15 @@ const XRLayer = class extends Layer {
     const { interpolation } = this.props;
     const attrs = getRenderingAttrs(
       this.props.dtype,
-      this.context.gl,
+      this.context.device,
       interpolation
     );
+    //this could be moved into getRenderingAttrs and have more logic there
+    //(don't warn if we're not attempting to interpolate)
+    if (!this.context.device.isTextureFormatFilterable(attrs.format)) {
+      attrs.filter = 'nearest';
+      console.warn(`Texture format ${attrs.format} is not filterable. Falling back to 'nearest' interpolation.`);
+    }
     return this.context.device.createTexture({
       width,
       height,
@@ -339,8 +345,8 @@ const XRLayer = class extends Layer {
         addressModeV: 'clamp-to-edge'
       },
       format: attrs.format,
-      dataFormat: attrs.dataFormat,
-      type: attrs.type
+      // dataFormat: attrs.dataFormat, //not used
+      type: attrs.type //number - doesn't seem to make a difference just now
     });
   }
 };
