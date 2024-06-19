@@ -1,6 +1,3 @@
-// import { GL } from '@luma.gl/constants';
-// import { isWebGL2 } from '@luma.gl/core';
-// import { FEATURES, hasFeature } from '@luma.gl/engine';
 import { getDtypeValues } from '../utils';
 
 import fs from './xr-layer-fragment.glsl';
@@ -8,43 +5,14 @@ import vs from './xr-layer-vertex.glsl';
 
 const coreShaderModule = { fs, vs };
 
-// function validateWebGL2Filter(gl, interpolation) {
-//   const canShowFloat = true; //hasFeature(gl, FEATURES.TEXTURE_FLOAT);
-//   const canShowLinear = true; //hasFeature(gl, FEATURES.TEXTURE_FILTER_LINEAR_FLOAT);
 
-//   if (!canShowFloat) {
-//     throw new Error(
-//       'WebGL1 context does not support floating point textures.  Unable to display raster data.'
-//     );
-//   }
-
-//   if (!canShowLinear && interpolation === 'linear') {
-//     console.warn(
-//       'LINEAR filtering not supported in WebGL1 context.  Falling back to NEAREST.'
-//     );
-//     return 'nearest';
-//   }
-
-//   return interpolation;
-// }
-
-export function getRenderingAttrs(dtype, gl, interpolation) {
+export function getRenderingAttrs(dtype, device, interpolation) {
   /// - WebGL1 is no longer supported by lumagl etc.
-  // if (!isWebGL2(gl)) {
-  //   return {
-  //     format: GL.LUMINANCE,
-  //     dataFormat: GL.LUMINANCE,
-  //     type: GL.FLOAT,
-  //     sampler: 'sampler2D',
-  //     shaderModule: coreShaderModule,
-  //     filter: validateWebGL2Filter(gl, interpolation),
-  //     cast: data => new Float32Array(data)
-  //   };
-  // }
+  /// 'device' is no longer used, possible in future we want to distinguish between WebGL and WebGPU?
   // Linear filtering only works when the data type is cast to Float32.
   const isLinear = interpolation === 'linear';
   // Need to add es version tag so that shaders work in WebGL2 since the tag is needed for using usampler2d with WebGL2.
-  // Very cursed!
+  // Very cursed! << can probably be removed with deck.gl >9
   const upgradedShaderModule = { ...coreShaderModule };
   const version300str = '#version 300 es\n';
   upgradedShaderModule.fs = version300str.concat(upgradedShaderModule.fs);
