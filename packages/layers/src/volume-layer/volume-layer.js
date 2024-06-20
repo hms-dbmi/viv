@@ -34,7 +34,6 @@ const defaultProps = {
   clippingPlanes: { type: 'array', value: [], compare: true },
   onUpdate: { type: 'function', value: () => {}, compare: true },
   useProgressIndicator: { type: 'boolean', value: true, compare: true },
-  useWebGL1Warning: { type: 'boolean', value: true, compare: true },
   extensions: {
     type: 'array',
     value: [new ColorPalette3DExtensions.AdditiveBlendExtension()],
@@ -58,7 +57,6 @@ const defaultProps = {
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
  * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  * @property {boolean=} useProgressIndicator Whether or not to use the default progress text + indicator (default is true)
- * @property {boolean=} useWebGL1Warning Whether or not to use the default WebGL1 warning (default is true)
  * @property {function=} onUpdate A callback to be used for getting updates of the progress, ({ progress }) => {}
  * @property {Array=} extensions [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers - default is AdditiveBlendExtension from ColorPalette3DExtensions.
  */
