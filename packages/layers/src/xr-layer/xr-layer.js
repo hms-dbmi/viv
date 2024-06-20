@@ -264,7 +264,10 @@ const XRLayer = class extends Layer {
         dtype
       });
       //HACK: null textures will throw errors, so we just set them all to the first texture FOR THE VERY SHORT TERM!
-      textures['channel5'] = textures['channel4'] = textures['channel0'];
+      for (const key in textures) {
+        if (!textures.channel0) throw new Error('Bad texture state!');
+        if (!textures[key]) textures[key] = textures.channel0;
+      }
       model
         // .setUniforms({ // not sure if this change is exactly correct...
         // it seems to avert some errors, but I'm not sure if this is a correct way for uniform buffer to be defined.
