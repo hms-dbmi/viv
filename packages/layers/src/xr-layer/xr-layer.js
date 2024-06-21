@@ -327,12 +327,7 @@ const XRLayer = class extends Layer {
       this.context.device,
       interpolation
     );
-    //this could be moved into getRenderingAttrs and have more logic there
-    //(don't warn if we're not attempting to interpolate)
-    if (!this.context.device.isTextureFormatFilterable(attrs.format)) {
-      attrs.filter = 'nearest';
-      console.warn(`Texture format ${attrs.format} is not filterable. Falling back to 'nearest' interpolation.`);
-    }
+
     return this.context.device.createTexture({
       width,
       height,
