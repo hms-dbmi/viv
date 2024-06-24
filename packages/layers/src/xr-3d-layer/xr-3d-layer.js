@@ -136,8 +136,10 @@ const XR3DLayer = class extends Layer {
     // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
     // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
-    device.setParametersWebGL(GL.UNPACK_ALIGNMENT, 1);
-    device.setParametersWebGL(GL.PACK_ALIGNMENT, 1);
+    device.setParametersWebGL({
+      [GL.UNPACK_ALIGNMENT]: 1,
+      [GL.PACK_ALIGNMENT]: 1,
+    });
     const programManager = ShaderAssembler.getDefaultShaderAssembler(); //ProgramManager.getDefaultProgramManager(device);
     const processStr =
       'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
@@ -248,7 +250,8 @@ const XR3DLayer = class extends Layer {
   /**
    * This function runs the shaders and draws to the canvas
    */
-  draw({ uniforms }) {
+  draw(opts) {
+    const { uniforms } = opts;
     const { textures, model, scaleMatrix } = this.state;
     const {
       contrastLimits,
@@ -286,40 +289,39 @@ const XR3DLayer = class extends Layer {
       // Need to flatten for shaders.
       const normals = paddedClippingPlanes.flatMap(plane => plane.normal);
       const distances = paddedClippingPlanes.map(plane => plane.distance);
-      model
-        .setUniforms({
-          ...uniforms,
-          ...textures,
-          contrastLimits: paddedContrastLimits,
-          xSlice: new Float32Array(
-            xSlice
-              ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])
-              : [0, 1]
-          ),
-          ySlice: new Float32Array(
-            ySlice
-              ? ySlice.map(i => i / scaleMatrix[5] / resolutionMatrix[5])
-              : [0, 1]
-          ),
-          zSlice: new Float32Array(
-            zSlice
-              ? zSlice.map(i => i / scaleMatrix[10] / resolutionMatrix[10])
-              : [0, 1]
-          ),
-          eye_pos: new Float32Array([
-            viewMatrixInverse[12],
-            viewMatrixInverse[13],
-            viewMatrixInverse[14]
-          ]),
-          view: viewMatrix,
-          proj: projectionMatrix,
-          scale: scaleMatrix,
-          resolution: resolutionMatrix,
-          model: modelMatrix || new Matrix4(),
-          normals,
-          distances
-        })
-        .draw();
+      model.setUniforms({
+        ...uniforms,
+        contrastLimits: paddedContrastLimits,
+        xSlice: new Float32Array(
+          xSlice
+            ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])
+            : [0, 1]
+        ),
+        ySlice: new Float32Array(
+          ySlice
+            ? ySlice.map(i => i / scaleMatrix[5] / resolutionMatrix[5])
+            : [0, 1]
+        ),
+        zSlice: new Float32Array(
+          zSlice
+            ? zSlice.map(i => i / scaleMatrix[10] / resolutionMatrix[10])
+            : [0, 1]
+        ),
+        eye_pos: new Float32Array([
+          viewMatrixInverse[12],
+          viewMatrixInverse[13],
+          viewMatrixInverse[14]
+        ]),
+        view: viewMatrix,
+        proj: projectionMatrix,
+        scale: scaleMatrix,
+        resolution: resolutionMatrix,
+        model: modelMatrix || new Matrix4(),
+        normals,
+        distances
+      }, {disableWanings: false});
+      model.setBindings(textures);
+      model.draw(opts);
     }
   }
 
@@ -371,10 +373,11 @@ const XR3DLayer = class extends Layer {
       depth,
       dimension: '3d',
       data: attrs.cast?.(data) ?? data,
-      // ? Seems to be a luma.gl bug.  Looks like Texture2D is wrong or this is but these are flipped somewhere.
-      format: attrs.dataFormat,
-      dataFormat: attrs.format,
-      type: attrs.type,
+      // ? Seems to be a luma.gl bug. It converts format string to GL constant, then tries to do the same again with the result...
+      /// ^^ there's a new version of luma, maybe it'll be ok??
+      format: attrs.format,
+      // dataFormat: attrs.format,
+      // type: attrs.type,
       mipmaps: false,
       sampler: {
         minFilter: 'linear',

@@ -268,20 +268,15 @@ const XRLayer = class extends Layer {
         if (!textures.channel0) throw new Error('Bad texture state!');
         if (!textures[key]) textures[key] = textures.channel0;
       }
-      model
-        // .setUniforms({ // not sure if this change is exactly correct...
-        // it seems to avert some errors, but I'm not sure if this is a correct way for uniform buffer to be defined.
-        // now that the shader compiles etc, it goes through setBindings() ok,
-        // but then when we call draw(), we don't have the right bindings set up.
-        .setUniforms({
-          ...uniforms,
-          contrastLimits: paddedContrastLimits,
-          // ...textures
-        }, 
-        { disableWarnings: false }
-        );
+      model.setUniforms({
+        ...uniforms,
+        contrastLimits: paddedContrastLimits,
+      }, 
+      { disableWarnings: false }
+      );
       model.setBindings(textures);
-      opts.uniforms = { ...uniforms, contrastLimits: paddedContrastLimits, ...textures }; //doesn't seem to help
+      // is `opts.uniforms` still the same as what was passed in?
+      // seems to get the right result, but I'm unclear on the implications of this
       model.draw(opts);
     }
   }
@@ -345,7 +340,7 @@ const XRLayer = class extends Layer {
       },
       format: attrs.format,
       // dataFormat: attrs.dataFormat, //not used
-      type: attrs.type //number - doesn't seem to make a difference just now
+      // type: attrs.type //number - doesn't seem to make a difference just now
     });
   }
 };
