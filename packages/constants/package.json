@@ -23,7 +23,7 @@
     "build": "unbuild"
   },
   "dependencies": {
-    "@luma.gl/constants": "~9.0.14"
+    "@luma.gl/constants": "~9.0.15"
   },
   "unbuild": {
     "entries": [

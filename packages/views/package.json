@@ -23,8 +23,8 @@
     "test": "esno tests/index.spec.js | tap-spec"
   },
   "peerDependencies": {
-    "@deck.gl/core": "~9.0.17",
-    "@deck.gl/layers": "~9.0.17"
+    "@deck.gl/core": "~9.0.20",
+    "@deck.gl/layers": "~9.0.20"
   },
   "dependencies": {
     "@math.gl/core": "^4.0.1",
