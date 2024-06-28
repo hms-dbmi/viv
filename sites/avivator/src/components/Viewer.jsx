@@ -7,7 +7,7 @@ import {
 } from '@hms-dbmi/viv';
 import debounce from 'lodash/debounce';
 import React from 'react';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 import { DEFAULT_OVERVIEW } from '../constants';
 import {
   useChannelsStore,

@@ -1,8 +1,8 @@
 // const DECK_VERSION = '~8.8.27';
 // const LUMAGL_VERSION = '~8.5.21';
 // const MATHGL_VERSION = '^3.5.7';
-const DECK_VERSION = '~9.0.17';
-const LUMAGL_VERSION = '~9.0.14';
+const DECK_VERSION = '~9.0.20';
+const LUMAGL_VERSION = '~9.0.15';
 const MATHGL_VERSION = '^4.0.1';
 const REACT_VERSION = '^16.8.0 || ^17.0.0';
 
