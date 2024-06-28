@@ -215,7 +215,7 @@ const XR3DLayer = class extends Layer {
     ) {
       const { device } = this.context;
       if (this.state.model) {
-        this.state.model.delete();
+        this.state.model.destroy();
       }
       this.setState({ model: this._getModel(device) });
     }

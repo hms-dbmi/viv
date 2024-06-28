@@ -60,7 +60,7 @@ const BaseExtension = class extends LayerExtension {
     if (props.colormap !== oldProps.colormap) {
       const { device } = this.context;
       if (this.state.model) {
-        this.state.model.delete();
+        this.state.model.destroy();
         this.setState({ model: this._getModel(device) });
       }
     }
