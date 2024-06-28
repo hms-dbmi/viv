@@ -1,11 +1,12 @@
 export default `\
+#version 300 es
 #define SHADER_NAME xr-layer-vertex-shader
 
-attribute vec2 texCoords;
-attribute vec3 positions;
-attribute vec3 positions64Low;
-attribute vec3 instancePickingColors;
-varying vec2 vTexCoord;
+in vec2 texCoords;
+in vec3 positions;
+in vec3 positions64Low;
+in vec3 instancePickingColors;
+out vec2 vTexCoord;
 
 void main(void) {
   geometry.worldPosition = positions;
