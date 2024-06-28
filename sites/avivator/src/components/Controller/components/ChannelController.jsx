@@ -8,7 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Select from '@material-ui/core/Select';
 import Slider from '@material-ui/core/Slider';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 
 import { FILL_PIXEL_VALUE } from '../../../constants';
 import {

@@ -2,7 +2,7 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import React from 'react';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 
 import { RENDERING_MODES } from '@hms-dbmi/viv';
 import { useImageSettingsStore, useViewerStore } from '../../../state';

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
 import { useDropzone as useReactDropzone } from 'react-dropzone';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 
 import { COLOR_PALLETE, FILL_PIXEL_VALUE } from './constants';
 import {
