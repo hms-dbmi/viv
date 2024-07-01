@@ -21,7 +21,7 @@
     "zustand": "^3.4.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.2.1",
+    "@vitejs/plugin-react": "^4.3.1",
     "vite": "^5.2.11"
   },
   "version": null
