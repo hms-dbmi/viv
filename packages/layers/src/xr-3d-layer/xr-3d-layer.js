@@ -381,7 +381,7 @@ const XR3DLayer = class extends Layer {
       mipmaps: false,
       sampler: {
         minFilter: 'linear',
-        magFilterFilter: 'linear',
+        magFilter: 'linear',
         addressModeU: 'clamp-to-edge',
         addressModeV: 'clamp-to-edge',
         addressModeW: 'clamp-to-edge'
