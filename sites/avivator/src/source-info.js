@@ -26,19 +26,19 @@ const sources = [
   },
   {
     // Generated using bioformats2raw and raw2ometiff.
-    // channels: 8, type: uint16
+    // channels: 8, type: uint16, SizeZ: 259
     path: '2018-12-18_ASY_H2B_bud_05_3D_8_angles.ome.tif',
     description: 'idr0077'
   },
   {
     // Generated using bioformats2raw and raw2ometiff.
-    // channels: 2, type: uint16
+    // channels: 2, type: uint16, SizeZ: 1955
     path: 'brain.pyramid.ome.tif',
     description: 'idr0085'
   },
   {
     // Generated using bioformats2raw and raw2ometiff.
-    // channels: 3, type: uint16
+    // channels: 3, type: uint16, SizeZ: 401
     path: 'idr0106.pyramid.ome.tif',
     description: 'idr0106'
   }
