@@ -31,7 +31,7 @@
     "@luma.gl/webgl": "~8.5.21"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.7.3",
+    "@biomejs/biome": "^1.8.3",
     "@changesets/cli": "^2.27.1",
     "@deck.gl/extensions": "~8.8.27",
     "@deck.gl/mesh-layers": "~8.8.27",
