@@ -20,25 +20,15 @@
     "version": "node ./scripts/version.mjs",
     "publish": "pnpm build && pnpm changeset publish"
   },
-  "dependencies": {
-    "@deck.gl/core": "~8.8.27",
-    "@deck.gl/geo-layers": "~8.8.27",
-    "@deck.gl/layers": "~8.8.27",
-    "@deck.gl/react": "~8.8.27",
-    "@luma.gl/constants": "~8.5.21",
-    "@luma.gl/core": "~8.5.21",
-    "@luma.gl/shadertools": "~8.5.21",
-    "@luma.gl/webgl": "~8.5.21"
-  },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
     "@changesets/cli": "^2.27.1",
-    "@deck.gl/extensions": "~8.8.27",
-    "@deck.gl/mesh-layers": "~8.8.27",
-    "@deck.gl/test-utils": "~8.8.27",
+    "@deck.gl/extensions": "catalog:",
+    "@deck.gl/mesh-layers": "catalog:",
+    "@deck.gl/test-utils": "catalog:",
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
-    "@luma.gl/test-utils": "~8.5.21",
+    "@luma.gl/test-utils": "catalog:",
     "@pnpm/meta-updater": "^1.0.0",
     "@pnpm/types": "^10.0.0",
     "@probe.gl/test-utils": "^3.5.0",
@@ -66,5 +56,6 @@
         "@loaders.gl/core": "3.2"
       }
     }
-  }
+  },
+  "packageManager": "pnpm@9.5.0"
 }

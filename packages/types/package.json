@@ -13,6 +13,6 @@
   "types": "src/index.d.ts",
   "dependencies": {
     "@vivjs/constants": "workspace:*",
-    "math.gl": "^3.5.7"
+    "math.gl": "catalog:"
   }
 }
