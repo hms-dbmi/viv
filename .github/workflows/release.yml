@@ -14,9 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-        id: pnpm-install
         with:
-          version: 7
           run_install: true
 
       - name: Create Release Pull Request or Publish to npm
