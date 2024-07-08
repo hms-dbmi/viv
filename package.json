@@ -34,7 +34,7 @@
     "@svitejs/changesets-changelog-github-compact": "^1.1.0",
     "esbuild": "^0.19.5",
     "esno": "^4.0.0",
-    "gl": "^6.0.2",
+    "gl": "^8.0.2",
     "gray-matter": "^4.0.3",
     "tap-spec": "^5.0.0",
     "tape": "^5.5.3",
