@@ -20,6 +20,9 @@ import {
   isInterleaved
 } from './utils';
 
+/** @typedef {{ urlOrFile: string | File; description: string; isDemoImage: boolean; }} ImageSource */
+
+/** @param {ImageSource} source */
 export const useImage = source => {
   const [use3d, toggleUse3d, toggleIsOffsetsSnackbarOn] = useViewerStore(
     store => [store.use3d, store.toggleUse3d, store.toggleIsOffsetsSnackbarOn],
@@ -81,6 +84,15 @@ export const useImage = source => {
       }
     }
     if (source) changeLoader();
+
+    // FIXME: biome warns that source shouldn't be a dep because it changes every render,
+    // but it's necessary to trigger the effect (and make avivator functional).
+    //
+    // The overall implementation of this "hook" is very strange. It is all async side effects
+    // that eventually update global state and is very tricky to reason about. There is probably
+    // a more ideomatic way to do this with zustand.
+    //
+    // biome-ignore lint/correctness/useExhaustiveDependencies: see above
   }, [source, history]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: Carried over from eslint, without explanation.

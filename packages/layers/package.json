@@ -23,17 +23,18 @@
     "test": "node ../../scripts/bundle-test.mjs tests/index.spec.js | tape-run | tap-spec"
   },
   "peerDependencies": {
-    "@deck.gl/core": "~9.0.20",
-    "@deck.gl/geo-layers": "~9.0.20",
-    "@deck.gl/layers": "~9.0.20",
-    "@luma.gl/constants": "~9.0.15",
-    "@luma.gl/core": "~9.0.15",
-    "@luma.gl/engine": "~9.0.15",
-    "@luma.gl/webgl": "~9.0.15"
+    "@deck.gl/core": "catalog:",
+    "@deck.gl/geo-layers": "catalog:",
+    "@deck.gl/layers": "catalog:",
+    "@luma.gl/constants": "catalog:",
+    "@luma.gl/shadertools": "catalog:",
+    "@luma.gl/core": "catalog:",
+    "@luma.gl/engine": "catalog:",
+    "@luma.gl/webgl": "catalog:"
   },
   "dependencies": {
-    "@math.gl/core": "^4.0.1",
-    "@math.gl/culling": "^4.0.1",
+    "@math.gl/core": "catalog:",
+    "@math.gl/culling": "catalog:",
     "@vivjs/constants": "workspace:*",
     "@vivjs/extensions": "workspace:*",
     "@vivjs/loaders": "workspace:*",

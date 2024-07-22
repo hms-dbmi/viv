@@ -23,14 +23,14 @@
     "test": "esno tests/index.spec.js | tap-spec"
   },
   "peerDependencies": {
-    "@deck.gl/core": "~9.0.20",
-    "@deck.gl/layers": "~9.0.20"
+    "@deck.gl/core": "catalog:",
+    "@deck.gl/layers": "catalog:"
   },
   "dependencies": {
-    "@math.gl/core": "^4.0.1",
+    "@math.gl/core": "catalog:",
     "@vivjs/layers": "workspace:*",
     "@vivjs/loaders": "workspace:*",
-    "math.gl": "^3.5.7"
+    "math.gl": "catalog:"
   },
   "unbuild": {
     "entries": [
