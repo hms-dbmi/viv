@@ -1,5 +1,5 @@
 import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
-import GL from '@luma.gl/constants';
+import { GL } from '@luma.gl/constants';
 
 import { ColorPaletteExtension } from '@vivjs/extensions';
 import { SIGNAL_ABORTED, isInterleaved } from '@vivjs/loaders';
@@ -27,7 +27,7 @@ const defaultProps = {
   onViewportLoad: { type: 'function', value: null, compare: true },
   interpolation: {
     type: 'number',
-    value: GL.NEAREST,
+    value: 'nearest',
     compare: true
   },
   extensions: {

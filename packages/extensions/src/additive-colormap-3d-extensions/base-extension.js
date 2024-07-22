@@ -58,10 +58,10 @@ const BaseExtension = class extends LayerExtension {
   updateState({ props, oldProps, changeFlags, ...rest }) {
     super.updateState({ props, oldProps, changeFlags, ...rest });
     if (props.colormap !== oldProps.colormap) {
-      const { gl } = this.context;
+      const { device } = this.context;
       if (this.state.model) {
-        this.state.model.delete();
-        this.setState({ model: this._getModel(gl) });
+        this.state.model.destroy();
+        this.setState({ model: this._getModel(device) });
       }
     }
   }

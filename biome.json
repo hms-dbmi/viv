@@ -23,7 +23,7 @@
   },
   "javascript": {
     "formatter": {
-      "trailingCommas": "none",
+      "trailingComma": "none",
       "arrowParentheses": "asNeeded",
       "quoteStyle": "single"
     }
