@@ -5,7 +5,6 @@ import vs from './xr-layer-vertex.glsl';
 
 const coreShaderModule = { fs, vs };
 
-
 export function getRenderingAttrs(dtype, device, interpolation) {
   /// - WebGL1 is no longer supported by lumagl etc.
   /// 'device' is no longer used, possible in future we want to distinguish between WebGL and WebGPU?

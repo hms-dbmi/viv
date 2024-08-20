@@ -3,6 +3,7 @@ import { COORDINATE_SYSTEM, Layer, picking, project32 } from '@deck.gl/core';
 // we live in place for now, hence some of the not-destructuring
 // ... needed to destructure for it to build with luma.gl 9, but we probably need to change these anyway
 import { GL } from '@luma.gl/constants';
+import { log } from '@luma.gl/core';
 import { Geometry, Model } from '@luma.gl/engine';
 // import { ProgramManager } from '@luma.gl/engine';
 // import { PipelineFactory } from '@luma.gl/engine';
@@ -10,7 +11,6 @@ import { ShaderAssembler } from '@luma.gl/shadertools';
 import { padContrastLimits } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
-import { log } from '@luma.gl/core';
 // force lumagl webgl-shader to take a code-path that actually compiles shaders & gives us an error...
 // log.setLevel(1);
 const defaultProps = {
@@ -98,7 +98,7 @@ const XRLayer = class extends Layer {
     // -- this is now applying relevant parameters, but not helping with the rendering...
     device.setParametersWebGL({
       [GL.UNPACK_ALIGNMENT]: 1,
-      [GL.PACK_ALIGNMENT]: 1,
+      [GL.PACK_ALIGNMENT]: 1
     });
     const attributeManager = this.getAttributeManager();
     attributeManager.add({
@@ -108,7 +108,7 @@ const XRLayer = class extends Layer {
         fp64: this.use64bitPositions(),
         update: this.calculatePositions,
         noAlloc: true
-      },
+      }
     });
     this.setState({
       numInstances: 1,
@@ -161,7 +161,6 @@ const XRLayer = class extends Layer {
     ) {
       const { device } = this.context;
       if (this.state.model) {
-        
         this.state.model.destroy();
       }
       this.setState({ model: this._getModel(device) });
@@ -269,11 +268,12 @@ const XRLayer = class extends Layer {
         if (!textures.channel0) throw new Error('Bad texture state!');
         if (!textures[key]) textures[key] = textures.channel0;
       }
-      model.setUniforms({
-        ...uniforms,
-        contrastLimits: paddedContrastLimits,
-      }, 
-      { disableWarnings: false }
+      model.setUniforms(
+        {
+          ...uniforms,
+          contrastLimits: paddedContrastLimits
+        },
+        { disableWarnings: false }
       );
       model.setBindings(textures);
       // is `opts.uniforms` still the same as what was passed in?
@@ -339,7 +339,7 @@ const XRLayer = class extends Layer {
         addressModeU: 'clamp-to-edge',
         addressModeV: 'clamp-to-edge'
       },
-      format: attrs.format,
+      format: attrs.format
       // dataFormat: attrs.dataFormat, //not used
       // type: attrs.type //number - doesn't seem to make a difference just now
     });

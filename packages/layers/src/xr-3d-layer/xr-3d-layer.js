@@ -138,7 +138,7 @@ const XR3DLayer = class extends Layer {
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
     device.setParametersWebGL({
       [GL.UNPACK_ALIGNMENT]: 1,
-      [GL.PACK_ALIGNMENT]: 1,
+      [GL.PACK_ALIGNMENT]: 1
     });
     const programManager = ShaderAssembler.getDefaultShaderAssembler(); //ProgramManager.getDefaultProgramManager(device);
     const processStr =
@@ -295,37 +295,40 @@ const XR3DLayer = class extends Layer {
         if (!textures[key]) textures[key] = textures.volume0;
       }
 
-      model.setUniforms({
-        ...uniforms,
-        contrastLimits: paddedContrastLimits,
-        xSlice: new Float32Array(
-          xSlice
-            ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])
-            : [0, 1]
-        ),
-        ySlice: new Float32Array(
-          ySlice
-            ? ySlice.map(i => i / scaleMatrix[5] / resolutionMatrix[5])
-            : [0, 1]
-        ),
-        zSlice: new Float32Array(
-          zSlice
-            ? zSlice.map(i => i / scaleMatrix[10] / resolutionMatrix[10])
-            : [0, 1]
-        ),
-        eye_pos: new Float32Array([
-          viewMatrixInverse[12],
-          viewMatrixInverse[13],
-          viewMatrixInverse[14]
-        ]),
-        view: viewMatrix,
-        proj: projectionMatrix,
-        scale: scaleMatrix,
-        resolution: resolutionMatrix,
-        model: modelMatrix || new Matrix4(),
-        normals,
-        distances
-      }, {disableWanings: false});
+      model.setUniforms(
+        {
+          ...uniforms,
+          contrastLimits: paddedContrastLimits,
+          xSlice: new Float32Array(
+            xSlice
+              ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])
+              : [0, 1]
+          ),
+          ySlice: new Float32Array(
+            ySlice
+              ? ySlice.map(i => i / scaleMatrix[5] / resolutionMatrix[5])
+              : [0, 1]
+          ),
+          zSlice: new Float32Array(
+            zSlice
+              ? zSlice.map(i => i / scaleMatrix[10] / resolutionMatrix[10])
+              : [0, 1]
+          ),
+          eye_pos: new Float32Array([
+            viewMatrixInverse[12],
+            viewMatrixInverse[13],
+            viewMatrixInverse[14]
+          ]),
+          view: viewMatrix,
+          proj: projectionMatrix,
+          scale: scaleMatrix,
+          resolution: resolutionMatrix,
+          model: modelMatrix || new Matrix4(),
+          normals,
+          distances
+        },
+        { disableWanings: false }
+      );
       model.setBindings(textures);
       model.draw(opts);
     }

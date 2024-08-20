@@ -89,8 +89,7 @@ const ImageLayer = class extends CompositeLayer {
             raster.data = raster.data[0];
             if (raster.data.length === raster.width * raster.height * 3) {
               // data is RGB (not RGBA) and need to update texture formats
-              raster.format = GL.RGB;
-              raster.dataFormat = GL.RGB;
+              raster.format = 'rgba8unorm';
             }
           }
 

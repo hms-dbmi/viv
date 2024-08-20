@@ -108,8 +108,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         if (isInterleaved(loader[resolution].shape)) {
           tile.data = tile.data[0];
           if (tile.data.length === tile.width * tile.height * 3) {
-            tile.format = GL.RGB;
-            tile.dataFormat = GL.RGB; // is this not properly inferred?
+            tile.format = 'rgba8unorm';
           }
           // can just return early, no need  to check for webgl2
           return tile;

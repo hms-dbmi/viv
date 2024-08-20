@@ -258,3 +258,17 @@ export function snapValue(value) {
 
   return [targetOrigUnits, targetNewUnits, snappedUnit.symbol];
 }
+
+export function addAlpha(array) {
+  if (!(array instanceof Uint8Array)) {
+    throw new Error('Expected Uint8Array');
+  }
+  const alphaArray = new Uint8Array(array.length + array.length / 3);
+  for (let i = 0; i < array.length / 3; i += 1) {
+    alphaArray[i * 4] = array[i * 3];
+    alphaArray[i * 4 + 1] = array[i * 3 + 1];
+    alphaArray[i * 4 + 2] = array[i * 3 + 2];
+    alphaArray[i * 4 + 3] = 255;
+  }
+  return alphaArray;
+}
