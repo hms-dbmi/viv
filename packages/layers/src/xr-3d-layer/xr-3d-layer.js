@@ -289,6 +289,12 @@ const XR3DLayer = class extends Layer {
       // Need to flatten for shaders.
       const normals = paddedClippingPlanes.flatMap(plane => plane.normal);
       const distances = paddedClippingPlanes.map(plane => plane.distance);
+      //HACK: null textures will throw errors, so we just set them all to the first texture FOR THE VERY SHORT TERM!
+      for (const key in textures) {
+        if (!textures.volume0) throw new Error('Bad texture state!');
+        if (!textures[key]) textures[key] = textures.volume0;
+      }
+
       model.setUniforms({
         ...uniforms,
         contrastLimits: paddedContrastLimits,
