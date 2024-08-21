@@ -48,7 +48,7 @@ function LensSelect() {
           native
           value={lensSelection}
           onChange={e =>
-            useImageSettingsStore.setState({ lensSelection: e.target.value })
+            useImageSettingsStore.setState({ lensSelection: Number.parseInt(e.target.value) })
           }
         >
           {currChannelIndices.map((channelIndex, relativeIndex) => (
