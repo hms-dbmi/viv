@@ -73,7 +73,7 @@ importers:
         version: 8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/images@3.4.15)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)
       '@deck.gl/test-utils':
         specifier: 'catalog:'
-        version: 8.8.27(@deck.gl/core@8.8.27)(@luma.gl/test-utils@8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.21(@luma.gl/core@8.5.21))(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@3.6.0)(@probe.gl/test-utils@3.6.0(typescript@5.5.3)))(@luma.gl/webgl@8.5.21)(@probe.gl/test-utils@3.6.0(typescript@5.5.3))
+        version: 8.8.27(@deck.gl/core@8.8.27)(@luma.gl/test-utils@8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.21(@luma.gl/core@8.5.21))(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@4.0.9)(@probe.gl/test-utils@3.6.0(typescript@5.5.3)))(@luma.gl/webgl@8.5.21)(@probe.gl/test-utils@3.6.0(typescript@5.5.3))
       '@esbuild-plugins/node-globals-polyfill':
         specifier: ^0.2.3
         version: 0.2.3(esbuild@0.19.12)
@@ -82,7 +82,7 @@ importers:
         version: 0.2.2(esbuild@0.19.12)
       '@luma.gl/test-utils':
         specifier: 'catalog:'
-        version: 8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.21(@luma.gl/core@8.5.21))(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@3.6.0)(@probe.gl/test-utils@3.6.0(typescript@5.5.3))
+        version: 8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.21(@luma.gl/core@8.5.21))(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@4.0.9)(@probe.gl/test-utils@3.6.0(typescript@5.5.3))
       '@pnpm/types':
         specifier: ^11.1.0
         version: 11.1.0
@@ -1196,6 +1196,9 @@ packages:
 
   '@probe.gl/env@3.6.0':
     resolution: {integrity: sha512-4tTZYUg/8BICC3Yyb9rOeoKeijKbZHRXBEKObrfPmX4sQmYB15ZOUpoVBhAyJkOYVAM8EkPci6Uw5dLCwx2BEQ==}
+
+  '@probe.gl/env@4.0.9':
+    resolution: {integrity: sha512-AOmVMD0/j78mX+k4+qX7ZhE0sY9H+EaJgIO6trik0BwV6VcrwxTGCGFAeuRsIGhETDnye06tkLXccYatYxAYwQ==}
 
   '@probe.gl/log@3.6.0':
     resolution: {integrity: sha512-hjpyenpEvOdowgZ1qMeCJxfRD4JkKdlXz0RC14m42Un62NtOT+GpWyKA4LssT0+xyLULCByRAtG2fzZorpIAcA==}
@@ -5401,10 +5404,10 @@ snapshots:
       react: 17.0.2
       react-dom: 18.3.1(react@17.0.2)
 
-  '@deck.gl/test-utils@8.8.27(@deck.gl/core@8.8.27)(@luma.gl/test-utils@8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.21(@luma.gl/core@8.5.21))(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@3.6.0)(@probe.gl/test-utils@3.6.0(typescript@5.5.3)))(@luma.gl/webgl@8.5.21)(@probe.gl/test-utils@3.6.0(typescript@5.5.3))':
+  '@deck.gl/test-utils@8.8.27(@deck.gl/core@8.8.27)(@luma.gl/test-utils@8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.21(@luma.gl/core@8.5.21))(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@4.0.9)(@probe.gl/test-utils@3.6.0(typescript@5.5.3)))(@luma.gl/webgl@8.5.21)(@probe.gl/test-utils@3.6.0(typescript@5.5.3))':
     dependencies:
       '@deck.gl/core': 8.8.27
-      '@luma.gl/test-utils': 8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.21(@luma.gl/core@8.5.21))(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@3.6.0)(@probe.gl/test-utils@3.6.0(typescript@5.5.3))
+      '@luma.gl/test-utils': 8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.21(@luma.gl/core@8.5.21))(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@4.0.9)(@probe.gl/test-utils@3.6.0(typescript@5.5.3))
       '@luma.gl/webgl': 8.5.21
       '@probe.gl/test-utils': 3.6.0(typescript@5.5.3)
 
@@ -5774,13 +5777,13 @@ snapshots:
       '@babel/runtime': 7.24.7
       '@math.gl/core': 3.6.3
 
-  '@luma.gl/test-utils@8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.21(@luma.gl/core@8.5.21))(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@3.6.0)(@probe.gl/test-utils@3.6.0(typescript@5.5.3))':
+  '@luma.gl/test-utils@8.5.21(@luma.gl/core@8.5.21)(@luma.gl/debug@8.5.21(@luma.gl/core@8.5.21))(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21)(@probe.gl/env@4.0.9)(@probe.gl/test-utils@3.6.0(typescript@5.5.3))':
     dependencies:
       '@luma.gl/core': 8.5.21
       '@luma.gl/debug': 8.5.21(@luma.gl/core@8.5.21)
       '@luma.gl/gltools': 8.5.21
       '@luma.gl/webgl': 8.5.21
-      '@probe.gl/env': 3.6.0
+      '@probe.gl/env': 4.0.9
       '@probe.gl/stats': 3.6.0
       '@probe.gl/test-utils': 3.6.0(typescript@5.5.3)
 
@@ -5958,6 +5961,8 @@ snapshots:
   '@probe.gl/env@3.6.0':
     dependencies:
       '@babel/runtime': 7.24.7
+
+  '@probe.gl/env@4.0.9': {}
 
   '@probe.gl/log@3.6.0':
     dependencies:
