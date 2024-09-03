@@ -10,12 +10,12 @@ catalog:
   "@deck.gl/mesh-layers": ~9.0.27
   "@deck.gl/react": ~9.0.27
   "@deck.gl/test-utils": ~9.0.27
-  "@luma.gl/constants": ~9.0.24
-  "@luma.gl/core": ~9.0.24
-  "@luma.gl/engine": ~9.0.24
-  "@luma.gl/shadertools": ~9.0.24
-  "@luma.gl/test-utils": ~9.0.24
-  "@luma.gl/webgl": ~9.0.24
+  "@luma.gl/constants": ~9.0.27
+  "@luma.gl/core": ~9.0.27
+  "@luma.gl/engine": ~9.0.27
+  "@luma.gl/shadertools": ~9.0.27
+  "@luma.gl/test-utils": ~9.0.27
+  "@luma.gl/webgl": ~9.0.27
   "@math.gl/core": ^4.0.1
   "@math.gl/culling": ^4.0.1
   "math.gl": ^4.0.1
