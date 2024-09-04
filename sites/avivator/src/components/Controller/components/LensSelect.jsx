@@ -3,7 +3,7 @@ import React from 'react';
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 
 import {
   useChannelsStore,
@@ -48,7 +48,7 @@ function LensSelect() {
           native
           value={lensSelection}
           onChange={e =>
-            useImageSettingsStore.setState({ lensSelection: e.target.value })
+            useImageSettingsStore.setState({ lensSelection: Number.parseInt(e.target.value) })
           }
         >
           {currChannelIndices.map((channelIndex, relativeIndex) => (

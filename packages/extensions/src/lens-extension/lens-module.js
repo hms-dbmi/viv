@@ -71,7 +71,7 @@ export default {
   `,
     'fs:#main-end': `
       bool isFragOnLensBounds = frag_on_lens_bounds(vTexCoord);
-     gl_FragColor = (lensEnabled && isFragOnLensBounds) ? vec4(lensBorderColor, 1.) : gl_FragColor;
+      fragColor = (lensEnabled && isFragOnLensBounds) ? vec4(lensBorderColor, 1.) : fragColor;
   `
   }
 };
