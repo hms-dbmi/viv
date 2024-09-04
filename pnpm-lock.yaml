@@ -55,8 +55,8 @@ catalogs:
       specifier: ^4.0.1
       version: 4.0.1
     react:
-      specifier: ^16.8.0 || ^17.0.0
-      version: 17.0.2
+      specifier: ^16.8.0 || ^17.0.0 || ^18.0.0
+      version: 18.3.1
 
 importers:
 
@@ -258,7 +258,7 @@ importers:
     dependencies:
       '@deck.gl/react':
         specifier: 'catalog:'
-        version: 9.0.28(@deck.gl/core@9.0.28)(react-dom@18.3.1(react@17.0.2))(react@17.0.2)
+        version: 9.0.28(@deck.gl/core@9.0.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@vivjs/constants':
         specifier: workspace:*
         version: link:../constants
@@ -273,7 +273,7 @@ importers:
         version: 3.1.3
       react:
         specifier: 'catalog:'
-        version: 17.0.2
+        version: 18.3.1
 
   packages/views:
     dependencies:
@@ -4200,10 +4200,6 @@ packages:
       react: '>=16.6.0'
       react-dom: '>=16.6.0'
 
-  react@17.0.2:
-    resolution: {integrity: sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==}
-    engines: {node: '>=0.10.0'}
-
   react@18.3.1:
     resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
     engines: {node: '>=0.10.0'}
@@ -5563,11 +5559,11 @@ snapshots:
     transitivePeerDependencies:
       - '@loaders.gl/core'
 
-  '@deck.gl/react@9.0.28(@deck.gl/core@9.0.28)(react-dom@18.3.1(react@17.0.2))(react@17.0.2)':
+  '@deck.gl/react@9.0.28(@deck.gl/core@9.0.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@deck.gl/core': 9.0.28
-      react: 17.0.2
-      react-dom: 18.3.1(react@17.0.2)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   '@deck.gl/test-utils@9.0.28(@deck.gl/core@9.0.28)(@luma.gl/core@9.0.27)(@luma.gl/engine@9.0.27(@luma.gl/core@9.0.27))(@luma.gl/shadertools@9.0.27(@luma.gl/core@9.0.27))(@luma.gl/webgl@9.0.27(@luma.gl/core@9.0.27))(@luma.gl/webgpu@9.0.16(@luma.gl/core@9.0.27))(@probe.gl/test-utils@3.6.0(typescript@5.5.3))':
     dependencies:
@@ -9538,12 +9534,6 @@ snapshots:
 
   re-emitter@1.1.3: {}
 
-  react-dom@18.3.1(react@17.0.2):
-    dependencies:
-      loose-envify: 1.4.0
-      react: 17.0.2
-      scheduler: 0.23.2
-
   react-dom@18.3.1(react@18.3.1):
     dependencies:
       loose-envify: 1.4.0
@@ -9571,11 +9561,6 @@ snapshots:
       prop-types: 15.8.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-
-  react@17.0.2:
-    dependencies:
-      loose-envify: 1.4.0
-      object-assign: 4.1.1
 
   react@18.3.1:
     dependencies:
