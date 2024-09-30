@@ -90,16 +90,6 @@ const XRLayer = class extends Layer {
    * This function initializes the internal state.
    */
   initializeState() {
-    const { device } = this.context;
-    // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
-    // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
-    // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
-    // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
-    // -- this is now applying relevant parameters, but not helping with the rendering...
-    device.setParametersWebGL({
-      [GL.UNPACK_ALIGNMENT]: 1,
-      [GL.PACK_ALIGNMENT]: 1
-    });
     const attributeManager = this.getAttributeManager();
     attributeManager.add({
       positions: {
