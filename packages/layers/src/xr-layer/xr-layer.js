@@ -245,11 +245,6 @@ const XRLayer = class extends Layer {
         domain,
         dtype
       });
-      //HACK: null textures will throw errors, so we just set them all to the first texture FOR THE VERY SHORT TERM!
-      for (const key in textures) {
-        if (!textures.channel0) throw new Error('Bad texture state!');
-        if (!textures[key]) textures[key] = textures.channel0;
-      }
       model.setUniforms(
         {
           ...uniforms,
@@ -289,6 +284,11 @@ const XRLayer = class extends Layer {
           channelData.height
         );
       }, this);
+      // null textures will throw errors, so we just set unused channels to the first texture for now.
+      for (const key in textures) {
+        if (!textures.channel0) throw new Error('Bad texture state!');
+        if (!textures[key]) textures[key] = textures.channel0;
+      }
       this.setState({ textures });
     }
   }
