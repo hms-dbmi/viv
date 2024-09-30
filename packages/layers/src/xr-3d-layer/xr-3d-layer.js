@@ -382,11 +382,7 @@ const XR3DLayer = class extends Layer {
       depth,
       dimension: '3d',
       data: attrs.cast?.(data) ?? data,
-      // ? Seems to be a luma.gl bug. It converts format string to GL constant, then tries to do the same again with the result...
-      /// ^^ there's a new version of luma, maybe it'll be ok??
       format: attrs.format,
-      // dataFormat: attrs.format,
-      // type: attrs.type,
       mipmaps: false,
       sampler: {
         minFilter: 'linear',

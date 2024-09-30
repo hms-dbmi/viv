@@ -1,6 +1,5 @@
 import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
 import { GL } from '@luma.gl/constants';
-// import { isWebGL2 } from '@luma.gl/core';
 import { Matrix4 } from '@math.gl/core';
 import { ColorPalette3DExtensions } from '@vivjs/extensions';
 

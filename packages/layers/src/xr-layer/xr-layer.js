@@ -96,8 +96,6 @@ const XRLayer = class extends Layer {
       numInstances: 1,
       positions: new Float64Array(12)
     });
-    // const programManager = ProgramManager.getDefaultProgramManager(device);
-    // const pipelineFactory = new PipelineFactory(device);
     const shaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
 
     const mutateStr =
@@ -320,8 +318,6 @@ const XRLayer = class extends Layer {
         addressModeV: 'clamp-to-edge'
       },
       format: attrs.format
-      // dataFormat: attrs.dataFormat, //not used
-      // type: attrs.type //number - doesn't seem to make a difference just now
     });
   }
 };
