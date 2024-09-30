@@ -179,7 +179,7 @@ const XRLayer = class extends Layer {
       geometry: new Geometry({
         topology: 'triangle-list',
         vertexCount: 6,
-        indices: new Uint16Array([0, 1, 3, 1, 2, 3]), // seems ok
+        indices: new Uint16Array([0, 1, 3, 1, 2, 3]),
         attributes: {
           texCoords: {
             value: new Float32Array([0, 1, 0, 0, 1, 0, 1, 1]),

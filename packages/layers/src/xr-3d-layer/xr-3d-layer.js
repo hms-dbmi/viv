@@ -28,7 +28,6 @@ More information about that is detailed in the comments there.
 */
 import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
-// import { ProgramManager } from '@luma.gl/engine';
 import { ShaderAssembler } from '@luma.gl/shadertools';
 import { Matrix4 } from '@math.gl/core';
 import { Plane } from '@math.gl/culling';
