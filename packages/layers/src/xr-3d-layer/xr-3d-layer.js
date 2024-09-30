@@ -140,7 +140,7 @@ const XR3DLayer = class extends Layer {
       [GL.UNPACK_ALIGNMENT]: 1,
       [GL.PACK_ALIGNMENT]: 1
     });
-    const programManager = ShaderAssembler.getDefaultShaderAssembler(); //ProgramManager.getDefaultProgramManager(device);
+    const programManager = ShaderAssembler.getDefaultShaderAssembler();
     const processStr =
       'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
     if (!programManager._hookFunctions.includes(processStr)) {
