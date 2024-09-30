@@ -1,18 +1,10 @@
 import { COORDINATE_SYSTEM, Layer, picking, project32 } from '@deck.gl/core';
-// A lot of this codes inherits paradigms form DeckGL that
-// we live in place for now, hence some of the not-destructuring
-// ... needed to destructure for it to build with luma.gl 9, but we probably need to change these anyway
-import { GL } from '@luma.gl/constants';
-import { log } from '@luma.gl/core';
 import { Geometry, Model } from '@luma.gl/engine';
-// import { ProgramManager } from '@luma.gl/engine';
-// import { PipelineFactory } from '@luma.gl/engine';
 import { ShaderAssembler } from '@luma.gl/shadertools';
 import { padContrastLimits } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
-// force lumagl webgl-shader to take a code-path that actually compiles shaders & gives us an error...
-// log.setLevel(1);
+
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
@@ -266,8 +258,6 @@ const XRLayer = class extends Layer {
         { disableWarnings: false }
       );
       model.setBindings(textures);
-      // is `opts.uniforms` still the same as what was passed in?
-      // seems to get the right result, but I'm unclear on the implications of this
       model.draw(opts);
     }
   }
