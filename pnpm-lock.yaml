@@ -143,13 +143,13 @@ importers:
       '@vivjs/constants':
         specifier: workspace:*
         version: link:../constants
+      glsl-colormap:
+        specifier: ^1.0.1
+        version: 1.0.1
     devDependencies:
       '@vivjs/types':
         specifier: workspace:*
         version: link:../types
-      glsl-colormap:
-        specifier: ^1.0.1
-        version: 1.0.1
 
   packages/layers:
     dependencies:
