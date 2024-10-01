@@ -13,7 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import InfoIcon from '@material-ui/icons/Info';
 import SettingsIcon from '@material-ui/icons/Settings';
 import React, { useState, useReducer, useRef, useEffect } from 'react';
-import { shallow } from 'zustand/shallow';
+import shallow from 'zustand/shallow';
 
 import { useChannelsStore, useViewerStore } from '../../../state';
 import { getNameFromUrl, isMobileOrTablet } from '../../../utils';

@@ -3,7 +3,7 @@ import Slider from '@material-ui/core/Slider';
 import debounce from 'lodash/debounce';
 import React from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
-import { shallow } from 'zustand/shallow';
+import shallow from 'zustand/shallow';
 
 import {
   useChannelsStore,

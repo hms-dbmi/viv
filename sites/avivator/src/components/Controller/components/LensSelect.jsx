@@ -3,7 +3,7 @@ import React from 'react';
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
-import { shallow } from 'zustand/shallow';
+import shallow from 'zustand/shallow';
 
 import {
   useChannelsStore,
