@@ -18,10 +18,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
       - uses: pnpm/action-setup@v4
-      - run: |
-          pnpm install
-          pnpm --filter=avivator build
+        with:
+          run_install: true
+      - run: pnpm --filter=avivator build
 
   Lint:
     runs-on: ubuntu-latest
@@ -36,10 +39,12 @@ jobs:
       DISPLAY: :0
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
       - uses: pnpm/action-setup@v4
         with:
           run_install: true
-
       - name: Setup xvf (Linux)
         if: runner.os == 'Linux'
         run: |

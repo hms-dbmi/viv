@@ -23,10 +23,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+
       - uses: pnpm/action-setup@v4
-      - run: |
-          pnpm install
-          pnpm build --base /viv/
+        with:
+          run_install: true
+
+      - run: pnpm build --base /viv/
         working-directory: sites/avivator
 
       - uses: actions/upload-pages-artifact@v3
