@@ -1,4 +1,8 @@
 import { COORDINATE_SYSTEM, Layer, picking, project32 } from '@deck.gl/core';
+// A lot of this codes inherits paradigms form DeckGL that
+// we live in place for now, hence some of the not-destructuring
+// ... needed to destructure for it to build with luma.gl 9, but we probably need to change these anyway
+import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
 import { ShaderAssembler } from '@luma.gl/shadertools';
 import { padContrastLimits } from '../utils';
