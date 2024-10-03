@@ -36,7 +36,7 @@ const defaultProps = {
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
- * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is 'nearest'
+ * @property {'nearest'|'linear'=} interpolation The `minFilter` and `magFilter` for luma.gl rendering (see https://luma.gl/docs/api-reference/core/resources/sampler#texture-magnification-filter) - default is 'nearest'
  */
 /**
  * @type {{ new (...props: import('@vivjs/types').Viv<LayerProps>[]) }}
