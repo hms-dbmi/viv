@@ -346,7 +346,7 @@ importers:
         specifier: ^14.0.2
         version: 14.0.3
       rollup:
-        specifier: ^4.12.0
+        specifier: ^4.23.0
         version: 4.23.0
 
 packages:
