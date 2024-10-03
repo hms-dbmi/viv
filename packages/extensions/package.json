@@ -26,11 +26,11 @@
     "@deck.gl/core": "catalog:"
   },
   "dependencies": {
-    "@vivjs/constants": "workspace:*",
-    "glsl-colormap": "^1.0.1"
+    "@vivjs/constants": "workspace:*"
   },
   "devDependencies": {
-    "@vivjs/types": "workspace:*"
+    "@vivjs/types": "workspace:*",
+    "glsl-colormap": "^1.0.1"
   },
   "unbuild": {
     "entries": [
