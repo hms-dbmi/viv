@@ -18,7 +18,7 @@ const defaultProps = {
   channelsVisible: { type: 'array', value: [], compare: true },
   dtype: { type: 'string', value: 'Uint16', compare: true },
   interpolation: {
-    type: 'number',
+    type: 'string',
     value: 'nearest',
     compare: true
   }
