@@ -88,7 +88,7 @@ const ImageLayer = class extends CompositeLayer {
             // data is for BitmapLayer and needs to be of form { data: Uint8Array, width, height };
             raster.data = raster.data[0];
             if (raster.data.length === raster.width * raster.height * 3) {
-              // data is RGB (not RGBA) and need to update texture formats
+              // Previously there was a rgb format, but now we only convert to rgba in BitmapLater
               raster.format = 'rgba8unorm';
             }
           }

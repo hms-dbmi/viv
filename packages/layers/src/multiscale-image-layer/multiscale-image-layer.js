@@ -108,6 +108,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         if (isInterleaved(loader[resolution].shape)) {
           tile.data = tile.data[0];
           if (tile.data.length === tile.width * tile.height * 3) {
+            // This indicates the data is RGB but it will be converted to RGBA
             tile.format = 'rgba8unorm';
           }
           // can just return early, no need  to check for webgl2
