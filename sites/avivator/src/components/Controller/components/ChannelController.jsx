@@ -60,7 +60,11 @@ function ChannelController({
   const loader = useLoader();
   const colormap = useImageSettingsStore(store => store.colormap);
   const [channelOptions, useLinkedView, use3d] = useViewerStore(
-    useShallow(store => [store.channelOptions, store.useLinkedView, store.use3d])
+    useShallow(store => [
+      store.channelOptions,
+      store.useLinkedView,
+      store.use3d
+    ])
   );
   const rgbColor = toRgb(colormap, color);
   const getMinMax = ({ domain: d, mode, loader: l }) => {

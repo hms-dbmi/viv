@@ -31,10 +31,9 @@ const CameraOptions = () => {
   const [useFixedAxis, toggleUseFixedAxis] = useImageSettingsStore(
     useShallow(store => [store.useFixedAxis, store.toggleUseFixedAxis])
   );
-  const [viewState, use3d] = useViewerStore(useShallow(store => [
-    store.viewState,
-    store.use3d
-  ]));
+  const [viewState, use3d] = useViewerStore(
+    useShallow(store => [store.viewState, store.use3d])
+  );
   const { height, width } = useWindowSize();
   const classes = useStyles();
   const toggleFixedAxisButton = (

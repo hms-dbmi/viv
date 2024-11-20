@@ -14,7 +14,11 @@ import {
 function LensSelect() {
   const selections = useChannelsStore(store => store.selections);
   const [lensEnabled, toggleLensEnabled, lensSelection] = useImageSettingsStore(
-    useShallow(store => [store.lensEnabled, store.toggleLensEnabled, store.lensSelection])
+    useShallow(store => [
+      store.lensEnabled,
+      store.toggleLensEnabled,
+      store.lensSelection
+    ])
   );
   const channelOptions = useViewerStore(store => store.channelOptions);
   const currChannelIndices = selections.map(sel => sel.c);

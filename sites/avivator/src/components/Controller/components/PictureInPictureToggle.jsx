@@ -9,7 +9,11 @@ const PictureInPictureToggle = () => {
     useShallow(store => [store.isOverviewOn, store.toggleIsOverviewOn])
   );
   const [isViewerLoading, useLinkedView, use3d] = useViewerStore(
-    useShallow(store => [store.isViewerLoading, store.useLinkedView, store.use3d])
+    useShallow(store => [
+      store.isViewerLoading,
+      store.useLinkedView,
+      store.use3d
+    ])
   );
   return (
     <Button

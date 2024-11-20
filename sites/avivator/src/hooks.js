@@ -25,7 +25,11 @@ import {
 /** @param {ImageSource} source */
 export const useImage = source => {
   const [use3d, toggleUse3d, toggleIsOffsetsSnackbarOn] = useViewerStore(
-    useShallow(store => [store.use3d, store.toggleUse3d, store.toggleIsOffsetsSnackbarOn])
+    useShallow(store => [
+      store.use3d,
+      store.toggleUse3d,
+      store.toggleIsOffsetsSnackbarOn
+    ])
   );
   const [lensEnabled, toggleLensEnabled] = useImageSettingsStore(
     useShallow(store => [store.lensEnabled, store.toggleLensEnabled])
