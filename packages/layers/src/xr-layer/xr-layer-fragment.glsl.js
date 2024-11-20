@@ -1,4 +1,5 @@
 export default `\
+#version 300 es
 #define SHADER_NAME xr-layer-fragment-shader
 
 precision highp float;
@@ -18,6 +19,8 @@ in vec2 vTexCoord;
 // range
 uniform vec2 contrastLimits[6];
 
+out vec4 fragColor;
+
 void main() {
 
   float intensity0 = float(texture(channel0, vTexCoord).r);
@@ -33,10 +36,10 @@ void main() {
   float intensity5 = float(texture(channel5, vTexCoord).r);
   DECKGL_PROCESS_INTENSITY(intensity5, contrastLimits[5], 5);
 
-  DECKGL_MUTATE_COLOR(gl_FragColor, intensity0, intensity1, intensity2, intensity3, intensity4, intensity5, vTexCoord);
+  DECKGL_MUTATE_COLOR(fragColor, intensity0, intensity1, intensity2, intensity3, intensity4, intensity5, vTexCoord);
 
 
   geometry.uv = vTexCoord;
-  DECKGL_FILTER_COLOR(gl_FragColor, geometry);
+  DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;

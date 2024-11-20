@@ -102,7 +102,4 @@ The [Changesets GitHub Action](https://github.com/changesets/action) will create
 
 ## 🌎 Browser Support
 
-Viv supports both [WebGL1](https://caniuse.com/?search=webgl) and [WebGL2](https://caniuse.com/?search=webgl2) 
-contexts, to provides coverage across Safari, Firefox, Chrome, and Edge. Please
-[file an issue](https://github.com/hms-dbmi/viv/issues/new) if you find a browser
-in which Viv does not work.
+Viv supports coverage across Safari, Firefox, Chrome, and Edge. Please [file an issue](https://github.com/hms-dbmi/viv/issues/new) if you find a browser in which Viv does not work.

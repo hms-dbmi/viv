@@ -27,6 +27,7 @@
     "@deck.gl/geo-layers": "catalog:",
     "@deck.gl/layers": "catalog:",
     "@luma.gl/constants": "catalog:",
+    "@luma.gl/shadertools": "catalog:",
     "@luma.gl/core": "catalog:",
     "@luma.gl/engine": "catalog:",
     "@luma.gl/webgl": "catalog:"

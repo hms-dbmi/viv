@@ -1,9 +1,10 @@
 import { COORDINATE_SYSTEM, Layer, picking, project32 } from '@deck.gl/core';
 // A lot of this codes inherits paradigms form DeckGL that
 // we live in place for now, hence some of the not-destructuring
-import GL from '@luma.gl/constants';
-import { Geometry, Model, Texture2D } from '@luma.gl/core';
-import { ProgramManager } from '@luma.gl/engine';
+// ... needed to destructure for it to build with luma.gl 9, but we probably need to change these anyway
+import { GL } from '@luma.gl/constants';
+import { Geometry, Model } from '@luma.gl/engine';
+import { ShaderAssembler } from '@luma.gl/shadertools';
 import { padContrastLimits } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
@@ -17,8 +18,8 @@ const defaultProps = {
   channelsVisible: { type: 'array', value: [], compare: true },
   dtype: { type: 'string', value: 'Uint16', compare: true },
   interpolation: {
-    type: 'number',
-    value: GL.NEAREST,
+    type: 'string',
+    value: 'nearest',
     compare: true
   }
 };
@@ -35,7 +36,7 @@ const defaultProps = {
  * @property {function=} onClick Hook function from deck.gl to handle clicked-on objects.
  * @property {Object=} modelMatrix Math.gl Matrix4 object containing an affine transformation to be applied to the image.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
- * @property {number=} interpolation The TEXTURE_MIN_FILTER and TEXTURE_MAG_FILTER for WebGL rendering (see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter) - default is GL.NEAREST
+ * @property {'nearest'|'linear'=} interpolation The `minFilter` and `magFilter` for luma.gl rendering (see https://luma.gl/docs/api-reference/core/resources/sampler#texture-magnification-filter) - default is 'nearest'
  */
 /**
  * @type {{ new (...props: import('@vivjs/types').Viv<LayerProps>[]) }}
@@ -50,7 +51,7 @@ const XRLayer = class extends Layer {
     const { dtype, interpolation } = this.props;
     const { shaderModule, sampler } = getRenderingAttrs(
       dtype,
-      this.context.gl,
+      this.context.device,
       interpolation
     );
     const extensionDefinesDeckglProcessIntensity =
@@ -85,18 +86,21 @@ const XRLayer = class extends Layer {
    * This function initializes the internal state.
    */
   initializeState() {
-    const { gl } = this.context;
+    const { device } = this.context;
     // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
     // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
     // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
-    gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
-    gl.pixelStorei(GL.PACK_ALIGNMENT, 1);
+    // -- this way of setting parameters is now deprecated and will be subject to further changes moving towards later luma.gl versions & WebGPU.
+    device.setParametersWebGL({
+      [GL.UNPACK_ALIGNMENT]: 1,
+      [GL.PACK_ALIGNMENT]: 1
+    });
     const attributeManager = this.getAttributeManager();
     attributeManager.add({
       positions: {
         size: 3,
-        type: GL.DOUBLE,
+        type: 'float64',
         fp64: this.use64bitPositions(),
         update: this.calculatePositions,
         noAlloc: true
@@ -106,7 +110,7 @@ const XRLayer = class extends Layer {
       numInstances: 1,
       positions: new Float64Array(12)
     });
-    const programManager = ProgramManager.getDefaultProgramManager(gl);
+    const shaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
 
     const mutateStr =
       'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)';
@@ -117,11 +121,13 @@ const XRLayer = class extends Layer {
     // might be created, this solves the performance issue of always adding new
     // hook functions.
     // See https://github.com/kylebarron/deck.gl-raster/blob/2eb91626f0836558f0be4cd201ea18980d7f7f2d/src/deckgl/raster-layer/raster-layer.js#L21-L40
-    if (!programManager._hookFunctions.includes(mutateStr)) {
-      programManager.addShaderHook(mutateStr);
+    // Note: _hookFunctions is private, not sure if there's an appropriate way to check if a hook function is already added.
+    // it may be better to add these hooks somewhere else rather than in initializeState of a layer?
+    if (!shaderAssembler._hookFunctions.includes(mutateStr)) {
+      shaderAssembler.addShaderHook(mutateStr);
     }
-    if (!programManager._hookFunctions.includes(processStr)) {
-      programManager.addShaderHook(processStr);
+    if (!shaderAssembler._hookFunctions.includes(processStr)) {
+      shaderAssembler.addShaderHook(processStr);
     }
   }
 
@@ -147,11 +153,11 @@ const XRLayer = class extends Layer {
       changeFlags.extensionsChanged ||
       props.interpolation !== oldProps.interpolation
     ) {
-      const { gl } = this.context;
+      const { device } = this.context;
       if (this.state.model) {
-        this.state.model.delete();
+        this.state.model.destroy();
       }
-      this.setState({ model: this._getModel(gl) });
+      this.setState({ model: this._getModel(device) });
 
       this.getAttributeManager().invalidateAll();
     }
@@ -185,12 +191,17 @@ const XRLayer = class extends Layer {
       ...this.getShaders(),
       id: this.props.id,
       geometry: new Geometry({
-        drawMode: GL.TRIANGLE_FAN,
-        vertexCount: 4,
+        topology: 'triangle-list',
+        vertexCount: 6,
+        indices: new Uint16Array([0, 1, 3, 1, 2, 3]),
         attributes: {
-          texCoords: new Float32Array([0, 1, 0, 0, 1, 0, 1, 1])
+          texCoords: {
+            value: new Float32Array([0, 1, 0, 0, 1, 0, 1, 1]),
+            size: 2
+          }
         }
       }),
+      bufferLayout: this.getAttributeManager().getBufferLayouts(),
       isInstanced: false
     });
   }
@@ -231,7 +242,8 @@ const XRLayer = class extends Layer {
   /**
    * This function runs the shaders and draws to the canvas
    */
-  draw({ uniforms }) {
+  draw(opts) {
+    const { uniforms } = opts;
     const { textures, model } = this.state;
     if (textures && model) {
       const { contrastLimits, domain, dtype, channelsVisible } = this.props;
@@ -245,13 +257,15 @@ const XRLayer = class extends Layer {
         domain,
         dtype
       });
-      model
-        .setUniforms({
+      model.setUniforms(
+        {
           ...uniforms,
-          contrastLimits: paddedContrastLimits,
-          ...textures
-        })
-        .draw();
+          contrastLimits: paddedContrastLimits
+        },
+        { disableWarnings: false }
+      );
+      model.setBindings(textures);
+      model.draw(opts);
     }
   }
 
@@ -282,6 +296,11 @@ const XRLayer = class extends Layer {
           channelData.height
         );
       }, this);
+      // null textures will throw errors, so we just set unused channels to the first texture for now.
+      for (const key in textures) {
+        if (!textures.channel0) throw new Error('Bad texture state!');
+        if (!textures[key]) textures[key] = textures.channel0;
+      }
       this.setState({ textures });
     }
   }
@@ -293,26 +312,26 @@ const XRLayer = class extends Layer {
     const { interpolation } = this.props;
     const attrs = getRenderingAttrs(
       this.props.dtype,
-      this.context.gl,
+      this.context.device,
       interpolation
     );
-    return new Texture2D(this.context.gl, {
+
+    return this.context.device.createTexture({
       width,
       height,
+      dimension: '2d',
       data: attrs.cast?.(data) ?? data,
       // we don't want or need mimaps
       mipmaps: false,
-      parameters: {
+      sampler: {
         // NEAREST for integer data
-        [GL.TEXTURE_MIN_FILTER]: attrs.filter,
-        [GL.TEXTURE_MAG_FILTER]: attrs.filter,
+        minFilter: attrs.filter,
+        magFilter: attrs.filter,
         // CLAMP_TO_EDGE to remove tile artifacts
-        [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-        [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
+        addressModeU: 'clamp-to-edge',
+        addressModeV: 'clamp-to-edge'
       },
-      format: attrs.format,
-      dataFormat: attrs.dataFormat,
-      type: attrs.type
+      format: attrs.format
     });
   }
 };

@@ -1,6 +1,5 @@
 import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
-import GL from '@luma.gl/constants';
-import { isWebGL2 } from '@luma.gl/core';
+import { GL } from '@luma.gl/constants';
 import { Matrix4 } from '@math.gl/core';
 import { ColorPalette3DExtensions } from '@vivjs/extensions';
 
@@ -34,7 +33,6 @@ const defaultProps = {
   clippingPlanes: { type: 'array', value: [], compare: true },
   onUpdate: { type: 'function', value: () => {}, compare: true },
   useProgressIndicator: { type: 'boolean', value: true, compare: true },
-  useWebGL1Warning: { type: 'boolean', value: true, compare: true },
   extensions: {
     type: 'array',
     value: [new ColorPalette3DExtensions.AdditiveBlendExtension()],
@@ -58,7 +56,6 @@ const defaultProps = {
  * @property {function=} onViewportLoad Function that gets called when the data in the viewport loads.
  * @property {Array.<Object>=} clippingPlanes List of math.gl [Plane](https://math.gl/modules/culling/docs/api-reference/plane) objects.
  * @property {boolean=} useProgressIndicator Whether or not to use the default progress text + indicator (default is true)
- * @property {boolean=} useWebGL1Warning Whether or not to use the default WebGL1 warning (default is true)
  * @property {function=} onUpdate A callback to be used for getting updates of the progress, ({ progress }) => {}
  * @property {Array=} extensions [deck.gl extensions](https://deck.gl/docs/developer-guide/custom-layers/layer-extensions) to add to the layers - default is AdditiveBlendExtension from ColorPalette3DExtensions.
  */
@@ -150,8 +147,7 @@ const VolumeLayer = class extends CompositeLayer {
   }
 
   renderLayers() {
-    const { loader, id, resolution, useProgressIndicator, useWebGL1Warning } =
-      this.props;
+    const { loader, id, resolution, useProgressIndicator } = this.props;
     const { dtype } = loader[resolution];
     const {
       data,
@@ -162,20 +158,6 @@ const VolumeLayer = class extends CompositeLayer {
       physicalSizeScalingMatrix,
       resolutionMatrix
     } = this.state;
-    const { gl } = this.context;
-    if (!isWebGL2(gl) && useWebGL1Warning) {
-      const { viewport } = this.context;
-      return getTextLayer(
-        [
-          'Volume rendering is only available on browsers that support WebGL2. If you',
-          'are using Safari, you can turn on WebGL2 by navigating in the top menubar',
-          'to check Develop > Experimental Features > WebGL 2.0 and then refreshing',
-          'the page.'
-        ].join('\n'),
-        viewport,
-        id
-      );
-    }
     if (!(width && height) && useProgressIndicator) {
       const { viewport } = this.context;
       return getTextLayer(

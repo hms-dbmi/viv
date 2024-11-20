@@ -1,7 +1,8 @@
 import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
 import { BitmapLayer as BaseBitmapLayer } from '@deck.gl/layers';
-import GL from '@luma.gl/constants';
-import { Geometry, Model } from '@luma.gl/core';
+import { GL } from '@luma.gl/constants';
+import { Model } from '@luma.gl/engine';
+import { addAlpha } from './utils';
 
 const PHOTOMETRIC_INTERPRETATIONS = {
   WhiteIsZero: 0,
@@ -88,22 +89,11 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
       photometricInterpretation,
       transparentColorInHook
     );
-    if (!gl) {
-      return null;
-    }
-
-    /*
-      0,0 --- 1,0
-       |       |
-      0,1 --- 1,1
-    */
-    return new Model(gl, {
+    return new Model(this.context.device, {
       ...this.getShaders(),
       id: this.props.id,
-      geometry: new Geometry({
-        drawMode: GL.TRIANGLES,
-        vertexCount: 6
-      }),
+      bufferLayout: this.getAttributeManager().getBufferLayouts(),
+      topology: 'triangle-list',
       isInstanced: false,
       inject: {
         'fs:DECKGL_FILTER_COLOR': photometricInterpretationShader
@@ -131,15 +121,17 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
  */
 const BitmapLayer = class extends CompositeLayer {
   initializeState(args) {
-    const { gl } = this.context;
+    const { device } = this.context;
     // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
     // each row of data is expected to be a multiple of 4.  This setting (i.e 1) allows us to have non-multiple-of-4 row sizes.  For example, for 2 byte (16 bit data),
     // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
     // This needs to be called here and not in the BitmapLayerWrapper because the `image` prop is converted to a texture outside of the layer, as controlled by the `image` type.
     // See: https://github.com/visgl/deck.gl/pull/5197
-    gl.pixelStorei(GL.UNPACK_ALIGNMENT, 1);
-    gl.pixelStorei(GL.PACK_ALIGNMENT, 1);
+    device.setParametersWebGL({
+      [GL.UNPACK_ALIGNMENT]: 1,
+      [GL.PACK_ALIGNMENT]: 1
+    });
     super.initializeState(args);
   }
 
@@ -149,6 +141,7 @@ const BitmapLayer = class extends CompositeLayer {
       transparentColor: transparentColorInHook
     } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
+    this.props.image.data = addAlpha(this.props.image.data);
     return new BitmapLayerWrapper(this.props, {
       // transparentColor is a prop applied to the original image data by deck.gl's
       // BitmapLayer and needs to be in the original colorspace.  It is used to determine

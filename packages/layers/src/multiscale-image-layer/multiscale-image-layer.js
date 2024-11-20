@@ -1,5 +1,5 @@
 import { CompositeLayer } from '@deck.gl/core';
-import GL from '@luma.gl/constants';
+import { GL } from '@luma.gl/constants';
 import { Matrix4 } from '@math.gl/core';
 
 import { ColorPaletteExtension } from '@vivjs/extensions';
@@ -108,8 +108,8 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         if (isInterleaved(loader[resolution].shape)) {
           tile.data = tile.data[0];
           if (tile.data.length === tile.width * tile.height * 3) {
-            tile.format = GL.RGB;
-            tile.dataFormat = GL.RGB; // is this not properly inferred?
+            // This indicates the data is RGB but it will be converted to RGBA
+            tile.format = 'rgba8unorm';
           }
           // can just return early, no need  to check for webgl2
           return tile;
@@ -179,7 +179,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         onHover,
         onClick,
         // Background image is nicest when LINEAR in my opinion.
-        interpolation: GL.LINEAR,
+        interpolation: 'linear',
         onViewportLoad: null
       });
     const layers = [baseLayer, tiledLayer];

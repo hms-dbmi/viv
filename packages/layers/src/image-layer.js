@@ -1,5 +1,5 @@
 import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
-import GL from '@luma.gl/constants';
+import { GL } from '@luma.gl/constants';
 
 import { ColorPaletteExtension } from '@vivjs/extensions';
 import { SIGNAL_ABORTED, isInterleaved } from '@vivjs/loaders';
@@ -27,7 +27,7 @@ const defaultProps = {
   onViewportLoad: { type: 'function', value: null, compare: true },
   interpolation: {
     type: 'number',
-    value: GL.NEAREST,
+    value: 'nearest',
     compare: true
   },
   extensions: {
@@ -88,9 +88,8 @@ const ImageLayer = class extends CompositeLayer {
             // data is for BitmapLayer and needs to be of form { data: Uint8Array, width, height };
             raster.data = raster.data[0];
             if (raster.data.length === raster.width * raster.height * 3) {
-              // data is RGB (not RGBA) and need to update texture formats
-              raster.format = GL.RGB;
-              raster.dataFormat = GL.RGB;
+              // Previously there was a rgb format, but now we only convert to rgba in BitmapLater
+              raster.format = 'rgba8unorm';
             }
           }
 
