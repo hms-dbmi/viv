@@ -3,7 +3,7 @@ import Slider from '@material-ui/core/Slider';
 import debounce from 'lodash/debounce';
 import React from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import {
   useChannelsStore,
@@ -16,8 +16,7 @@ import { getMultiSelectionStats, range } from '../../../utils';
 export default function GlobalSelectionSlider(props) {
   const { size, label } = props;
   const [selections, setPropertiesForChannel] = useChannelsStore(
-    store => [store.selections, store.setPropertiesForChannel],
-    shallow
+    useShallow(store => [store.selections, store.setPropertiesForChannel])
   );
   const loader = useLoader();
   const globalSelection = useViewerStore(store => store.globalSelection);

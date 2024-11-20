@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import React from 'react';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import { getDefaultInitialViewState } from '@hms-dbmi/viv';
 import {
@@ -29,13 +29,12 @@ const useStyles = makeStyles(theme =>
 const CameraOptions = () => {
   const loader = useLoader();
   const [useFixedAxis, toggleUseFixedAxis] = useImageSettingsStore(
-    store => [store.useFixedAxis, store.toggleUseFixedAxis],
-    shallow
+    useShallow(store => [store.useFixedAxis, store.toggleUseFixedAxis])
   );
-  const [viewState, use3d] = useViewerStore(store => [
+  const [viewState, use3d] = useViewerStore(useShallow(store => [
     store.viewState,
     store.use3d
-  ]);
+  ]));
   const { height, width } = useWindowSize();
   const classes = useStyles();
   const toggleFixedAxisButton = (

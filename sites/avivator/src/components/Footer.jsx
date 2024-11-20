@@ -2,7 +2,7 @@ import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -27,8 +27,7 @@ function formatResolutionStatus(current, total, shape) {
 export default function Footer() {
   const classes = useStyles();
   const [use3d, pyramidResolution] = useViewerStore(
-    store => [store.use3d, store.pyramidResolution],
-    shallow
+    useShallow(store => [store.use3d, store.pyramidResolution])
   );
   const loader = useLoader();
   const volumeResolution = useImageSettingsStore(store => store.resolution);
