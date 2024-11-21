@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
 import { useDropzone as useReactDropzone } from 'react-dropzone';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import { COLOR_PALLETE, FILL_PIXEL_VALUE } from './constants';
 import {
@@ -25,12 +25,14 @@ import {
 /** @param {ImageSource} source */
 export const useImage = source => {
   const [use3d, toggleUse3d, toggleIsOffsetsSnackbarOn] = useViewerStore(
-    store => [store.use3d, store.toggleUse3d, store.toggleIsOffsetsSnackbarOn],
-    shallow
+    useShallow(store => [
+      store.use3d,
+      store.toggleUse3d,
+      store.toggleIsOffsetsSnackbarOn
+    ])
   );
   const [lensEnabled, toggleLensEnabled] = useImageSettingsStore(
-    store => [store.lensEnabled, store.toggleLensEnabled],
-    shallow
+    useShallow(store => [store.lensEnabled, store.toggleLensEnabled])
   );
   const loader = useLoader();
   const metadata = useMetadata();

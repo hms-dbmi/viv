@@ -3,7 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import {
   useImageSettingsStore,
@@ -32,8 +32,7 @@ const useStyles = makeStyles(theme =>
 
 const Slicer = () => {
   const [xSlice, ySlice, zSlice] = useImageSettingsStore(
-    store => [store.xSlice, store.ySlice, store.zSlice],
-    shallow
+    useShallow(store => [store.xSlice, store.ySlice, store.zSlice])
   );
   const loader = useLoader();
   const use3d = useViewerStore(store => store.use3d);

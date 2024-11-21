@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import React, { useState } from 'react';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from '../../constants';
 import {
@@ -58,7 +58,7 @@ const Controller = () => {
     toggleIsOnSetter,
     removeChannel
   ] = useChannelsStore(
-    store => [
+    useShallow(store => [
       store.channelsVisible,
       store.contrastLimits,
       store.colors,
@@ -68,8 +68,7 @@ const Controller = () => {
       store.setPropertiesForChannel,
       store.toggleIsOn,
       store.removeChannel
-    ],
-    shallow
+    ])
   );
   const loader = useLoader();
 
@@ -86,7 +85,7 @@ const Controller = () => {
     pixelValues,
     isViewerLoading
   ] = useViewerStore(
-    store => [
+    useShallow(store => [
       store.channelOptions,
       store.useLinkedView,
       store.use3d,
@@ -97,8 +96,7 @@ const Controller = () => {
       store.removeIsChannelLoading,
       store.pixelValues,
       store.isViewerLoading
-    ],
-    shallow
+    ])
   );
   const metadata = useMetadata();
   const viewSize = useWindowSize();

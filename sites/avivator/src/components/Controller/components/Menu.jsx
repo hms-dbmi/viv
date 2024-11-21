@@ -13,7 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import InfoIcon from '@material-ui/icons/Info';
 import SettingsIcon from '@material-ui/icons/Settings';
 import React, { useState, useReducer, useRef, useEffect } from 'react';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import { useChannelsStore, useViewerStore } from '../../../state';
 import { getNameFromUrl, isMobileOrTablet } from '../../../utils';
@@ -53,10 +53,9 @@ const useStyles = makeStyles(theme => ({
 
 function Header(props) {
   const image = useChannelsStore(store => store.image);
-  const [source, metadata] = useViewerStore(store => [
-    store.source,
-    store.metadata
-  ]);
+  const [source, metadata] = useViewerStore(
+    useShallow(store => [store.source, store.metadata])
+  );
   const handleSubmitNewUrl = (event, newUrl) => {
     event.preventDefault();
     const newSource = {
@@ -159,8 +158,7 @@ function Header(props) {
 function Menu({ children, ...props }) {
   const classes = useStyles(props);
   const [isControllerOn, toggleIsControllerOn] = useViewerStore(
-    store => [store.isControllerOn, store.toggleIsControllerOn],
-    shallow
+    useShallow(store => [store.isControllerOn, store.toggleIsControllerOn])
   );
   return isControllerOn ? (
     <Box position="absolute" right={0} top={0} m={1} className={classes.root}>

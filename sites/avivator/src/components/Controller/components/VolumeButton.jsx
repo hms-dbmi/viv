@@ -9,7 +9,7 @@ import Popper from '@material-ui/core/Popper';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import {
   useChannelsStore,
@@ -82,8 +82,7 @@ const useStyles = makeStyles(() => ({
 
 function VolumeButton() {
   const [selections, setPropertiesForChannel] = useChannelsStore(
-    store => [store.selections, store.setPropertiesForChannel],
-    shallow
+    useShallow(store => [store.selections, store.setPropertiesForChannel])
   );
   const loader = useLoader();
   const [
@@ -92,13 +91,12 @@ function VolumeButton() {
     toggleIsVolumeRenderingWarningOn,
     isViewerLoading
   ] = useViewerStore(
-    store => [
+    useShallow(store => [
       store.use3d,
       store.toggleUse3d,
       store.toggleIsVolumeRenderingWarningOn,
       store.isViewerLoading
-    ],
-    shallow
+    ])
   );
 
   const [open, toggle] = useReducer(v => !v, false);

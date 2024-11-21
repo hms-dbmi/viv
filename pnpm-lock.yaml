@@ -326,8 +326,8 @@ importers:
         specifier: ^14.2.3
         version: 14.2.3(react@18.3.1)
       zustand:
-        specifier: ^3.4.1
-        version: 3.7.2(react@18.3.1)
+        specifier: ^5.0.1
+        version: 5.0.1(react@18.3.1)(use-sync-external-store@1.2.2(react@18.3.1))
     devDependencies:
       '@vitejs/plugin-react':
         specifier: ^4.2.1
@@ -4734,6 +4734,11 @@ packages:
   urlpattern-polyfill@10.0.0:
     resolution: {integrity: sha512-H/A06tKD7sS1O1X2SshBVeA5FLycRpjqiBeqGKmBwBDBy28EnRjORxTNe269KSSr5un5qyWi1iL61wLxpd+ZOg==}
 
+  use-sync-external-store@1.2.2:
+    resolution: {integrity: sha512-PElTlVMwpblvbNqQ82d2n6RjStvdSoNe9FG28kNfz3WiXilJm4DdNkEzRhCZuIDwY8U08WVihhGR5iRqAwfDiw==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+
   utf8-stream@0.0.0:
     resolution: {integrity: sha512-X92xJPYQcFbRH4IaCH7zUEc8JLgGlIum7JFvo3AVTCaxMrJKEMrpoEkmE3P2NV0nALyM/rDHqIW628jt+BCO+w==}
 
@@ -4938,13 +4943,22 @@ packages:
   zstddec@0.1.0:
     resolution: {integrity: sha512-w2NTI8+3l3eeltKAdK8QpiLo/flRAr2p8AGeakfMZOXBxOg9HIu4LVDxBi81sYgVhFhdJjv1OrB5ssI8uFPoLg==}
 
-  zustand@3.7.2:
-    resolution: {integrity: sha512-PIJDIZKtokhof+9+60cpockVOq05sJzHCriyvaLBmEJixseQ1a5Kdov6fWZfWOu5SK9c+FhH1jU0tntLxRJYMA==}
-    engines: {node: '>=12.7.0'}
+  zustand@5.0.1:
+    resolution: {integrity: sha512-pRET7Lao2z+n5R/HduXMio35TncTlSW68WsYBq2Lg1ASspsNGjpwLAsij3RpouyV6+kHMwwwzP0bZPD70/Jx/w==}
+    engines: {node: '>=12.20.0'}
     peerDependencies:
-      react: '>=16.8'
+      '@types/react': '>=18.0.0'
+      immer: '>=9.0.6'
+      react: '>=18.0.0'
+      use-sync-external-store: '>=1.2.0'
     peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
       react:
+        optional: true
+      use-sync-external-store:
         optional: true
 
   zwitch@2.0.4:
@@ -10092,6 +10106,11 @@ snapshots:
 
   urlpattern-polyfill@10.0.0: {}
 
+  use-sync-external-store@1.2.2(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+    optional: true
+
   utf8-stream@0.0.0:
     dependencies:
       readable-stream: 1.0.34
@@ -10300,8 +10319,9 @@ snapshots:
 
   zstddec@0.1.0: {}
 
-  zustand@3.7.2(react@18.3.1):
+  zustand@5.0.1(react@18.3.1)(use-sync-external-store@1.2.2(react@18.3.1)):
     optionalDependencies:
       react: 18.3.1
+      use-sync-external-store: 1.2.2(react@18.3.1)
 
   zwitch@2.0.4: {}

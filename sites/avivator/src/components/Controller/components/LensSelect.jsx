@@ -3,7 +3,7 @@ import React from 'react';
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import {
   useChannelsStore,
@@ -14,8 +14,11 @@ import {
 function LensSelect() {
   const selections = useChannelsStore(store => store.selections);
   const [lensEnabled, toggleLensEnabled, lensSelection] = useImageSettingsStore(
-    store => [store.lensEnabled, store.toggleLensEnabled, store.lensSelection],
-    shallow
+    useShallow(store => [
+      store.lensEnabled,
+      store.toggleLensEnabled,
+      store.lensSelection
+    ])
   );
   const channelOptions = useViewerStore(store => store.channelOptions);
   const currChannelIndices = selections.map(sel => sel.c);
