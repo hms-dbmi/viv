@@ -9,7 +9,7 @@
 "@vivjs/views": minor
 ---
 
-This release potentially includes backward-incompatible changes. To avoid automatically adopting such releases, ensure you are either pinning the exact version of @hms-dbmi/viv in your package.json file or using a version range syntax that only accepts patch updates, such as ~0.16.1. Refer to npm's semver documentation for details.
+**This release includes backward-incompatible changes**. To avoid automatically adopting such releases, ensure you are either pinning the exact version of `@hms-dbmi/viv` in your `package.json` file or using a version range syntax that only accepts patch updates, such as `~0.16.1`. Refer to npm's [semver documentation](https://docs.npmjs.com/cli/v6/using-npm/semver/) for details.
 
     Migrate to deck.gl v9
 
