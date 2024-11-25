@@ -17,7 +17,7 @@ This update modifies our code internally to support deck.gl v9, dropping compati
 
 Impact:
 
-We have not made any public API changes from this except the version bump, and what these new versions require "internally" to your GL related code:
+We haven’t changed Viv's public API, but the upgrade to deck.gl 9.0 is considered **breaking** due to changes in its dependencies, which may require updates to WebGL-related code (e.g., shaders, injections, constants). Here are potential issues users may face in migrating:
 
     - deprecating WebGL1
     - changing any public-facing GL-specific variables to use the new luma.gl backend-agnostic variables (such as `interpolation` on the `ImageLayer`)
