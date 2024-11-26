@@ -3,6 +3,8 @@ import React from 'react';
 import Checkbox from '@mui/material/Checkbox';
 import Grid from '@mui/material/Grid';
 import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
 import { useShallow } from 'zustand/shallow';
 
 import {
@@ -46,26 +48,28 @@ function LensSelect() {
           }}
         />
       </Grid>
-      <Grid item xs={7}>
-        <Select
-          size="small"
-          native
-          value={lensSelection}
-          onChange={e =>
-            useImageSettingsStore.setState({
-              lensSelection: Number.parseInt(e.target.value)
-            })
-          }
-        >
-          {currChannelIndices.map((channelIndex, relativeIndex) => (
-            <option
-              key={channelOptions[channelIndex] + String(relativeIndex)}
-              value={relativeIndex}
-            >
-              {channelOptions[channelIndex]}
-            </option>
-          ))}
-        </Select>
+      <Grid item xs={8}>
+        <FormControl variant="standard">
+          <Select
+            size="small"
+            value={lensSelection}
+            onChange={e =>
+              useImageSettingsStore.setState({
+                lensSelection: Number.parseInt(e.target.value)
+              })
+            }
+          >
+            {currChannelIndices.map((channelIndex, relativeIndex) => (
+              <MenuItem
+                key={channelOptions[channelIndex] + String(relativeIndex)}
+                value={relativeIndex}
+              >
+                {channelOptions[channelIndex]}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        
       </Grid>
     </Grid>
   );

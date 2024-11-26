@@ -17,7 +17,7 @@ function RenderingModeSelect() {
   // Empty option allows for displaying the title of the dropdown fully in the UI.
   const options = !use3d ? [...renderingOptions, ''] : renderingOptions;
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth variant="standard">
       <InputLabel htmlFor="rendering-mode-select" size="small">Rendering Mode</InputLabel>
       <Select
         native

@@ -10,7 +10,7 @@ function ColormapSelect() {
   const colormap = useImageSettingsStore(store => store.colormap);
   const isViewerLoading = useViewerStore(store => store.isViewerLoading);
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth variant="standard">
       <InputLabel htmlFor="colormap-select" size="small" >
         Additive {colormap === '' ? ' Blending' : 'Color Mapping'}
       </InputLabel>

@@ -1,13 +1,14 @@
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import React from 'react';
 
 import { RENDERING_MODES } from '@hms-dbmi/viv';
 
 function RenderingModeSelect({ value, handleChange, disabled }) {
   return (
-    <FormControl fullWidth>
+    <FormControl variant="standard">
       <InputLabel htmlFor="rendering-mode-select">Rendering Mode</InputLabel>
       <Select
         native
@@ -20,9 +21,9 @@ function RenderingModeSelect({ value, handleChange, disabled }) {
         disabled={disabled}
       >
         {Object.values(RENDERING_MODES).map(name => (
-          <option key={name} value={name}>
+          <MenuItem key={name} value={name}>
             {name}
-          </option>
+          </MenuItem>
         ))}
       </Select>
     </FormControl>

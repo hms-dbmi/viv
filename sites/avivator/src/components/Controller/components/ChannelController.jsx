@@ -7,6 +7,8 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Select from '@mui/material/Select';
 import Slider from '@mui/material/Slider';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { useShallow } from 'zustand/shallow';
 
@@ -95,13 +97,15 @@ function ChannelController({
     <Grid container direction="column" m={2} justifyContent="center">
       <Grid container direction="row" justifyContent="space-between">
         <Grid item xs={10} >
-          <Select size="small" native value={name} onChange={onSelectionChange}>
-            {channelOptions.map(opt => (
-              <option disabled={isLoading} key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </Select>
+          <FormControl variant="standard">
+            <Select size="small" value={name} onChange={onSelectionChange}>
+              {channelOptions.map(opt => (
+                <MenuItem disabled={isLoading} key={opt} value={opt}>
+                  {opt}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
         <Grid item xs={1}>
           <ChannelOptions
