@@ -1,15 +1,15 @@
 import * as React from 'react';
 
 import { DTYPE_VALUES } from '@hms-dbmi/viv';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Checkbox from '@mui/material/Checkbox';
 import CircularProgress from '@mui/material/CircularProgress';
+import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
+import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Slider from '@mui/material/Slider';
-import FormControl from '@mui/material/FormControl';
-import MenuItem from '@mui/material/MenuItem';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { useShallow } from 'zustand/shallow';
 
 import { FILL_PIXEL_VALUE } from '../../../constants';
@@ -96,7 +96,7 @@ function ChannelController({
   return (
     <Grid container direction="column" justifyContent="center">
       <Grid container direction="row" justifyContent="space-between">
-        <Grid item xs={10} >
+        <Grid item xs={10}>
           <FormControl variant="standard">
             <Select size="small" value={name} onChange={onSelectionChange}>
               {channelOptions.map(opt => (

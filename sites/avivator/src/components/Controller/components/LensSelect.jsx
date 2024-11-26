@@ -1,10 +1,10 @@
 import React from 'react';
 
 import Checkbox from '@mui/material/Checkbox';
-import Grid from '@mui/material/Grid';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
+import Grid from '@mui/material/Grid';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import { useShallow } from 'zustand/shallow';
 
 import {
@@ -69,7 +69,6 @@ function LensSelect() {
             ))}
           </Select>
         </FormControl>
-        
       </Grid>
     </Grid>
   );

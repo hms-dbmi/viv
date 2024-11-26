@@ -1,3 +1,5 @@
+import InfoIcon from '@mui/icons-material/Info';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { Select } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -10,8 +12,6 @@ import Popper from '@mui/material/Popper';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import makeStyles from '@mui/styles/makeStyles';
-import InfoIcon from '@mui/icons-material/Info';
-import SettingsIcon from '@mui/icons-material/Settings';
 import React, { useState, useReducer, useRef, useEffect } from 'react';
 import { useShallow } from 'zustand/shallow';
 
@@ -173,9 +173,9 @@ function Menu({ children, ...props }) {
           {children.map((child, i) => {
             return (
               // biome-ignore lint/suspicious/noArrayIndexKey: Ignore carried over from eslint without description.
-              (<Grid item key={i} className={classes.item}>
+              <Grid item key={i} className={classes.item}>
                 {child}
-              </Grid>)
+              </Grid>
             );
           })}
         </Grid>
@@ -188,7 +188,8 @@ function Menu({ children, ...props }) {
         size="small"
         endIcon={<SettingsIcon />}
         onClick={toggleIsControllerOn}
-        aria-label="show-menu">
+        aria-label="show-menu"
+      >
         AVIVATOR
       </Button>
     </Box>

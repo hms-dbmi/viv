@@ -1,8 +1,8 @@
+import CloseIcon from '@mui/icons-material/Close';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import CloseIcon from '@mui/icons-material/Close';
-import GitHubIcon from '@mui/icons-material/GitHub';
 import React from 'react';
 import { useViewerStore } from '../../../state';
 
@@ -15,7 +15,7 @@ function MenuTitle() {
     store => store.toggleIsControllerOn
   );
   return (
-    (<Grid
+    <Grid
       container
       direction="row"
       justifyContent="flex-end"
@@ -31,7 +31,8 @@ function MenuTitle() {
           href="https://github.com/hms-dbmi/viv"
           aria-label="GitHub Repository"
           disableRipple
-          size="large">
+          size="large"
+        >
           <GitHubIcon />
         </IconButton>
       </Grid>
@@ -46,7 +47,7 @@ function MenuTitle() {
           <CloseIcon fontSize="small" />
         </IconButton>
       </Grid>
-    </Grid>)
+    </Grid>
   );
 }
 

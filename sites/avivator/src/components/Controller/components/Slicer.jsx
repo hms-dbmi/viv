@@ -1,7 +1,7 @@
-import { createStyles, makeStyles } from '@mui/styles';
 import Grid from '@mui/material/Grid';
 import Slider from '@mui/material/Slider';
 import Typography from '@mui/material/Typography';
+import { createStyles, makeStyles } from '@mui/styles';
 import React from 'react';
 import { useShallow } from 'zustand/shallow';
 

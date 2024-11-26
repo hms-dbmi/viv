@@ -1,3 +1,4 @@
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
@@ -5,7 +6,6 @@ import MenuList from '@mui/material/MenuList';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import makeStyles from '@mui/styles/makeStyles';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import React, { useReducer, useRef } from 'react';
 
 import ColorPalette from './ColorPalette';

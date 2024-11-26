@@ -11,11 +11,11 @@ function ColormapSelect() {
   const isViewerLoading = useViewerStore(store => store.isViewerLoading);
   return (
     <FormControl fullWidth variant="standard">
-      <InputLabel htmlFor="colormap-select" size="small" >
+      <InputLabel htmlFor="colormap-select" size="small">
         Additive {colormap === '' ? ' Blending' : 'Color Mapping'}
       </InputLabel>
       <Select
-        size="small" 
+        size="small"
         native
         onChange={e =>
           useImageSettingsStore.setState({ colormap: e.target.value })

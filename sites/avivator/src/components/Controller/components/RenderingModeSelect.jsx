@@ -18,7 +18,9 @@ function RenderingModeSelect() {
   const options = !use3d ? [...renderingOptions, ''] : renderingOptions;
   return (
     <FormControl fullWidth variant="standard">
-      <InputLabel htmlFor="rendering-mode-select" size="small">Rendering Mode</InputLabel>
+      <InputLabel htmlFor="rendering-mode-select" size="small">
+        Rendering Mode
+      </InputLabel>
       <Select
         native
         size="small"

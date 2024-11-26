@@ -1,5 +1,10 @@
 import { grey } from '@mui/material/colors';
-import { ThemeProvider, StyledEngineProvider, createTheme, adaptV4Theme } from '@mui/material/styles';
+import {
+  StyledEngineProvider,
+  ThemeProvider,
+  adaptV4Theme,
+  createTheme
+} from '@mui/material/styles';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
@@ -7,18 +12,20 @@ import Avivator from './Avivator';
 import sources from './source-info';
 import { getNameFromUrl } from './utils';
 
-const theme = createTheme(adaptV4Theme({
-  palette: {
-    mode: 'dark',
-    primary: grey,
-    secondary: grey
-  },
-  props: {
-    MuiButtonBase: {
-      disableRipple: true
+const theme = createTheme(
+  adaptV4Theme({
+    palette: {
+      mode: 'dark',
+      primary: grey,
+      secondary: grey
+    },
+    props: {
+      MuiButtonBase: {
+        disableRipple: true
+      }
     }
-  }
-}));
+  })
+);
 
 /** @param {string | null} url */
 function resolveSource(url) {
@@ -41,9 +48,11 @@ function App() {
   const source = resolveSource(query.get('image_url'));
   return (
     <StyledEngineProvider injectFirst>
-      (<ThemeProvider theme={theme}>
+      (
+      <ThemeProvider theme={theme}>
         <Avivator source={source} isDemoImage={source.isDemoImage} />
-      </ThemeProvider>)
+      </ThemeProvider>
+      )
     </StyledEngineProvider>
   );
 }

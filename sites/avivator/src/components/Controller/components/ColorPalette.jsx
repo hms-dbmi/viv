@@ -1,5 +1,5 @@
-import IconButton from '@mui/material/IconButton';
 import LensIcon from '@mui/icons-material/Lens';
+import IconButton from '@mui/material/IconButton';
 import React from 'react';
 
 import makeStyles from '@mui/styles/makeStyles';
@@ -29,23 +29,24 @@ const useStyles = makeStyles(() => ({
 const ColorPalette = ({ handleColorSelect }) => {
   const classes = useStyles();
   return (
-    (<div className={classes.container} aria-label="color-swatch">
+    <div className={classes.container} aria-label="color-swatch">
       {COLOR_PALLETE.map(color => {
         return (
-          (<IconButton
+          <IconButton
             className={classes.button}
             key={color}
             onClick={() => handleColorSelect(color)}
-            size="large">
+            size="large"
+          >
             <LensIcon
               fontSize="small"
               style={{ color: `rgb(${color})` }}
               className={classes.icon}
             />
-          </IconButton>)
+          </IconButton>
         );
       })}
-    </div>)
+    </div>
   );
 };
 
