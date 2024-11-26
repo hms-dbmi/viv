@@ -189,7 +189,8 @@ const Controller = () => {
       <Tabs
         value={tab}
         onChange={handleTabChange}
-        aria-label="simple tabs example"
+        aria-label="tabs"
+        variant="fullWidth"
         style={{ height: '24px', minHeight: '24px' }}
       >
         <Tab label="Channels" style={{ fontSize: '.75rem', bottom: 12 }} />
