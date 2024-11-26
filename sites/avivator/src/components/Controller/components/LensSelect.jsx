@@ -1,8 +1,8 @@
 import React from 'react';
 
-import Checkbox from '@material-ui/core/Checkbox';
-import Grid from '@material-ui/core/Grid';
-import Select from '@material-ui/core/Select';
+import Checkbox from '@mui/material/Checkbox';
+import Grid from '@mui/material/Grid';
+import Select from '@mui/material/Select';
 import { useShallow } from 'zustand/shallow';
 
 import {
@@ -48,6 +48,7 @@ function LensSelect() {
       </Grid>
       <Grid item xs={7}>
         <Select
+          size="small"
           native
           value={lensSelection}
           onChange={e =>

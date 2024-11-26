@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Link from '@material-ui/core/Link';
+import Link from '@mui/material/Link';
 
 export function OffsetsWarning() {
   return (

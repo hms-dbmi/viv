@@ -1,17 +1,17 @@
-import { Select } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Divider from '@material-ui/core/Divider';
-import Grid from '@material-ui/core/Grid';
-import Link from '@material-ui/core/Link';
-import Paper from '@material-ui/core/Paper';
-import Popper from '@material-ui/core/Popper';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import InfoIcon from '@material-ui/icons/Info';
-import SettingsIcon from '@material-ui/icons/Settings';
+import { Select } from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
+import Link from '@mui/material/Link';
+import Paper from '@mui/material/Paper';
+import Popper from '@mui/material/Popper';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
+import InfoIcon from '@mui/icons-material/Info';
+import SettingsIcon from '@mui/icons-material/Settings';
 import React, { useState, useReducer, useRef, useEffect } from 'react';
 import { useShallow } from 'zustand/shallow';
 
@@ -22,7 +22,7 @@ import MenuTitle from './MenuTitle';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    maxHeight: props => `${props.maxHeight - theme.spacing(4)}px`,
+    maxHeight: props => `${props.maxHeight - theme.spacing(4)}`,
     width: '365px',
     overflowX: 'hidden',
     overflowY: 'scroll',
@@ -173,9 +173,9 @@ function Menu({ children, ...props }) {
           {children.map((child, i) => {
             return (
               // biome-ignore lint/suspicious/noArrayIndexKey: Ignore carried over from eslint without description.
-              <Grid item key={i} className={classes.item}>
+              (<Grid item key={i} className={classes.item}>
                 {child}
-              </Grid>
+              </Grid>)
             );
           })}
         </Grid>
@@ -185,12 +185,10 @@ function Menu({ children, ...props }) {
     <Box position="absolute" right={-8} top={-8} m={2}>
       <Button
         variant="outlined"
-        color="default"
         size="small"
         endIcon={<SettingsIcon />}
         onClick={toggleIsControllerOn}
-        aria-label="show-menu"
-      >
+        aria-label="show-menu">
         AVIVATOR
       </Button>
     </Box>

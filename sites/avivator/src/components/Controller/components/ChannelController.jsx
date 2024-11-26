@@ -1,13 +1,13 @@
 import * as React from 'react';
 
 import { DTYPE_VALUES } from '@hms-dbmi/viv';
-import Checkbox from '@material-ui/core/Checkbox';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import Select from '@material-ui/core/Select';
-import Slider from '@material-ui/core/Slider';
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import Checkbox from '@mui/material/Checkbox';
+import CircularProgress from '@mui/material/CircularProgress';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import Select from '@mui/material/Select';
+import Slider from '@mui/material/Slider';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { useShallow } from 'zustand/shallow';
 
 import { FILL_PIXEL_VALUE } from '../../../constants';
@@ -94,8 +94,8 @@ function ChannelController({
   return (
     <Grid container direction="column" m={2} justifyContent="center">
       <Grid container direction="row" justifyContent="space-between">
-        <Grid item xs={10}>
-          <Select native value={name} onChange={onSelectionChange}>
+        <Grid item xs={10} >
+          <Select size="small" native value={name} onChange={onSelectionChange}>
             {channelOptions.map(opt => (
               <option disabled={isLoading} key={opt} value={opt}>
                 {opt}
@@ -145,6 +145,7 @@ function ChannelController({
         </Grid>
         <Grid item xs={7}>
           <Slider
+            size="small"
             disabled={isLoading}
             value={slider}
             onChange={handleSliderChange}

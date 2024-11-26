@@ -1,6 +1,6 @@
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
 import React from 'react';
 import { useShallow } from 'zustand/shallow';
 
@@ -18,9 +18,10 @@ function RenderingModeSelect() {
   const options = !use3d ? [...renderingOptions, ''] : renderingOptions;
   return (
     <FormControl fullWidth>
-      <InputLabel htmlFor="rendering-mode-select">Rendering Mode</InputLabel>
+      <InputLabel htmlFor="rendering-mode-select" size="small">Rendering Mode</InputLabel>
       <Select
         native
+        size="small"
         onChange={e =>
           useImageSettingsStore.setState({ renderingMode: e.target.value })
         }
