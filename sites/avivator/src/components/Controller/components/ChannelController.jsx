@@ -94,7 +94,7 @@ function ChannelController({
   const step = right - left < 500 && isFloat ? (right - left) / 500 : 1;
   const shouldShowPixelValue = !useLinkedView && !use3d;
   return (
-    <Grid container direction="column" m={2} justifyContent="center">
+    <Grid container direction="column" justifyContent="center">
       <Grid container direction="row" justifyContent="space-between">
         <Grid item xs={10} >
           <FormControl variant="standard">
