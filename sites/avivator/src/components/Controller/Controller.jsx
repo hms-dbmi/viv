@@ -185,7 +185,7 @@ const Controller = () => {
     setTab(newTab);
   };
   return (
-    (<Menu maxHeight={viewSize.height}>
+    <Menu maxHeight={viewSize.height}>
       <Tabs
         value={tab}
         onChange={handleTabChange}
@@ -208,9 +208,12 @@ const Controller = () => {
         {!isViewerLoading && !isRgb ? (
           <Grid container>{channelControllers}</Grid>
         ) : (
-          <Grid container sx={{
-            justifyContent: "center"
-          }}>
+          <Grid
+            container
+            sx={{
+              justifyContent: 'center'
+            }}
+          >
             {!isRgb && <CircularProgress />}
           </Grid>
         )}
@@ -236,7 +239,7 @@ const Controller = () => {
           <PanLockToggle />
         </>
       )}
-    </Menu>)
+    </Menu>
   );
 };
 export default Controller;

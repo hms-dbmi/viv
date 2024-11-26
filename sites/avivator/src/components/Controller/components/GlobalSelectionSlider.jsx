@@ -66,13 +66,14 @@ export default function GlobalSelectionSlider(props) {
   );
 
   return (
-    (<Grid
+    <Grid
       container
       direction="row"
       sx={{
-        justifyContent: "space-between",
-        alignItems: "stretch"
-      }}>
+        justifyContent: 'space-between',
+        alignItems: 'stretch'
+      }}
+    >
       <Grid item size={1}>
         {label}:
       </Grid>
@@ -102,6 +103,6 @@ export default function GlobalSelectionSlider(props) {
           step={1}
         />
       </Grid>
-    </Grid>)
+    </Grid>
   );
 }

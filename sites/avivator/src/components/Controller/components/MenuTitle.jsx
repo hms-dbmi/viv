@@ -15,13 +15,14 @@ function MenuTitle() {
     store => store.toggleIsControllerOn
   );
   return (
-    (<Grid
+    <Grid
       container
       direction="row"
       sx={{
-        justifyContent: "flex-end",
-        alignItems: "center"
-      }}>
+        justifyContent: 'flex-end',
+        alignItems: 'center'
+      }}
+    >
       <Grid style={{ marginRight: 'auto' }} item>
         <Typography variant="body1">
           <strong>AVIVATOR</strong>
@@ -48,7 +49,7 @@ function MenuTitle() {
           <CloseIcon fontSize="small" />
         </IconButton>
       </Grid>
-    </Grid>)
+    </Grid>
   );
 }
 

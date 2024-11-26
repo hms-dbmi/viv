@@ -14,15 +14,16 @@ import { getNameFromUrl } from './utils';
 
 const theme = createTheme({
   palette: {
-      mode: 'dark',
-      primary: grey,
-      secondary: grey
-    },
-    props: {
-      MuiButtonBase: {
-        disableRipple: true
-      }
-    }});
+    mode: 'dark',
+    primary: grey,
+    secondary: grey
+  },
+  props: {
+    MuiButtonBase: {
+      disableRipple: true
+    }
+  }
+});
 
 /** @param {string | null} url */
 function resolveSource(url) {

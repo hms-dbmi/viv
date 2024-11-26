@@ -27,13 +27,14 @@ function LensSelect() {
 
   const checkboxColor = `rgb(${[255, 255, 255]})`;
   return (
-    (<Grid
+    <Grid
       container
       direction="row"
       sx={{
-        justifyContent: "flex-start",
-        alignItems: "center"
-      }}>
+        justifyContent: 'flex-start',
+        alignItems: 'center'
+      }}
+    >
       <Grid item size={2}>
         Lens:
       </Grid>
@@ -71,7 +72,7 @@ function LensSelect() {
           </Select>
         </FormControl>
       </Grid>
-    </Grid>)
+    </Grid>
   );
 }
 

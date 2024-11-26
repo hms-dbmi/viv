@@ -65,9 +65,10 @@ const Slicer = () => {
         direction="row"
         key={label}
         sx={{
-          justifyContent: "flex-start",
-          alignItems: "center"
-        }}>
+          justifyContent: 'flex-start',
+          alignItems: 'center'
+        }}
+      >
         <Grid item size={1} style={{ marginBottom: 8 }}>
           <Typography
             className={!use3d ? classes.disabled : classes.enabled}

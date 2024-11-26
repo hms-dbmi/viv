@@ -78,7 +78,7 @@ function Header(props) {
   useEffect(() => setText(url), [url]);
 
   return (
-    (<Grid container direction="column" spacing={0}>
+    <Grid container direction="column" spacing={0}>
       <Grid item size={12}>
         <MenuTitle />
       </Grid>
@@ -86,9 +86,10 @@ function Header(props) {
         container
         direction="row"
         sx={{
-          justifyContent: "space-between",
-          alignItems: "center"
-        }}>
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
         <Grid item size={1}>
           <InfoIcon onClick={toggle} ref={anchorRef} />
           <Popper
@@ -152,7 +153,7 @@ function Header(props) {
       <Grid item size={12} className={classes.divider}>
         <Divider />
       </Grid>
-    </Grid>)
+    </Grid>
   );
 }
 
@@ -165,26 +166,28 @@ function Menu({ children, ...props }) {
     <Box
       className={classes.root}
       sx={{
-        position: "absolute",
+        position: 'absolute',
         right: 0,
         top: 0,
         m: 1
-      }}>
+      }}
+    >
       <Paper className={classes.paper}>
         <Header />
         <Grid
           container
           direction="column"
           sx={{
-            justifyContent: "center",
-            alignItems: "center"
-          }}>
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
           {children.map((child, i) => {
             return (
               // biome-ignore lint/suspicious/noArrayIndexKey: Ignore carried over from eslint without description.
-              (<Grid item key={i} className={classes.item}>
+              <Grid item key={i} className={classes.item}>
                 {child}
-              </Grid>)
+              </Grid>
             );
           })}
         </Grid>
@@ -193,11 +196,12 @@ function Menu({ children, ...props }) {
   ) : (
     <Box
       sx={{
-        position: "absolute",
+        position: 'absolute',
         right: -8,
         top: -8,
         m: 2
-      }}>
+      }}
+    >
       <Button
         variant="outlined"
         size="small"

@@ -94,12 +94,20 @@ function ChannelController({
   const step = right - left < 500 && isFloat ? (right - left) / 500 : 1;
   const shouldShowPixelValue = !useLinkedView && !use3d;
   return (
-    (<Grid container direction="column" sx={{
-      justifyContent: "center"
-    }}>
-      <Grid container direction="row" sx={{
-        justifyContent: "space-between"
-      }}>
+    <Grid
+      container
+      direction="column"
+      sx={{
+        justifyContent: 'center'
+      }}
+    >
+      <Grid
+        container
+        direction="row"
+        sx={{
+          justifyContent: 'space-between'
+        }}
+      >
         <Grid item size={10}>
           <FormControl variant="standard">
             <Select size="small" value={name} onChange={onSelectionChange}>
@@ -133,9 +141,10 @@ function ChannelController({
         container
         direction="row"
         sx={{
-          justifyContent: "flex-start",
-          alignItems: "center"
-        }}>
+          justifyContent: 'flex-start',
+          alignItems: 'center'
+        }}
+      >
         <Grid item size={2}>
           {getPixelValueDisplay(pixelValue, isLoading, shouldShowPixelValue)}
         </Grid>
@@ -172,7 +181,7 @@ function ChannelController({
           />
         </Grid>
       </Grid>
-    </Grid>)
+    </Grid>
   );
 }
 
