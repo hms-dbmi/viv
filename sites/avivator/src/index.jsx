@@ -12,9 +12,8 @@ import Avivator from './Avivator';
 import sources from './source-info';
 import { getNameFromUrl } from './utils';
 
-const theme = createTheme(
-  adaptV4Theme({
-    palette: {
+const theme = createTheme({
+  palette: {
       mode: 'dark',
       primary: grey,
       secondary: grey
@@ -23,9 +22,7 @@ const theme = createTheme(
       MuiButtonBase: {
         disableRipple: true
       }
-    }
-  })
-);
+    }});
 
 /** @param {string | null} url */
 function resolveSource(url) {

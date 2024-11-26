@@ -1,6 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import React from 'react';
@@ -15,12 +15,13 @@ function MenuTitle() {
     store => store.toggleIsControllerOn
   );
   return (
-    <Grid
+    (<Grid
       container
       direction="row"
-      justifyContent="flex-end"
-      alignItems="center"
-    >
+      sx={{
+        justifyContent: "flex-end",
+        alignItems: "center"
+      }}>
       <Grid style={{ marginRight: 'auto' }} item>
         <Typography variant="body1">
           <strong>AVIVATOR</strong>
@@ -47,7 +48,7 @@ function MenuTitle() {
           <CloseIcon fontSize="small" />
         </IconButton>
       </Grid>
-    </Grid>
+    </Grid>)
   );
 }
 

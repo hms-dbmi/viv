@@ -1,6 +1,6 @@
 import CircularProgress from '@mui/material/CircularProgress';
 import Divider from '@mui/material/Divider';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import React, { useState } from 'react';
@@ -185,7 +185,7 @@ const Controller = () => {
     setTab(newTab);
   };
   return (
-    <Menu maxHeight={viewSize.height}>
+    (<Menu maxHeight={viewSize.height}>
       <Tabs
         value={tab}
         onChange={handleTabChange}
@@ -208,7 +208,9 @@ const Controller = () => {
         {!isViewerLoading && !isRgb ? (
           <Grid container>{channelControllers}</Grid>
         ) : (
-          <Grid container justifyContent="center">
+          <Grid container sx={{
+            justifyContent: "center"
+          }}>
             {!isRgb && <CircularProgress />}
           </Grid>
         )}
@@ -234,7 +236,7 @@ const Controller = () => {
           <PanLockToggle />
         </>
       )}
-    </Menu>
+    </Menu>)
   );
 };
 export default Controller;

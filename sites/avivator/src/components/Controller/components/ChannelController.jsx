@@ -5,7 +5,7 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Checkbox from '@mui/material/Checkbox';
 import CircularProgress from '@mui/material/CircularProgress';
 import FormControl from '@mui/material/FormControl';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -94,9 +94,13 @@ function ChannelController({
   const step = right - left < 500 && isFloat ? (right - left) / 500 : 1;
   const shouldShowPixelValue = !useLinkedView && !use3d;
   return (
-    <Grid container direction="column" justifyContent="center">
-      <Grid container direction="row" justifyContent="space-between">
-        <Grid item xs={10}>
+    (<Grid container direction="column" sx={{
+      justifyContent: "center"
+    }}>
+      <Grid container direction="row" sx={{
+        justifyContent: "space-between"
+      }}>
+        <Grid item size={10}>
           <FormControl variant="standard">
             <Select size="small" value={name} onChange={onSelectionChange}>
               {channelOptions.map(opt => (
@@ -107,14 +111,14 @@ function ChannelController({
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={1}>
+        <Grid item size={1}>
           <ChannelOptions
             handleColorSelect={handleColorSelect}
             disabled={isLoading}
             handleModeSelect={setMode}
           />
         </Grid>
-        <Grid item xs={1}>
+        <Grid item size={1}>
           <IconButton
             aria-label="remove-channel"
             component="span"
@@ -128,13 +132,14 @@ function ChannelController({
       <Grid
         container
         direction="row"
-        justifyContent="flex-start"
-        alignItems="center"
-      >
-        <Grid item xs={2}>
+        sx={{
+          justifyContent: "flex-start",
+          alignItems: "center"
+        }}>
+        <Grid item size={2}>
           {getPixelValueDisplay(pixelValue, isLoading, shouldShowPixelValue)}
         </Grid>
-        <Grid item xs={2}>
+        <Grid item size={2}>
           <Checkbox
             onChange={toggleIsOn}
             disabled={isLoading}
@@ -147,7 +152,7 @@ function ChannelController({
             }}
           />
         </Grid>
-        <Grid item xs={7}>
+        <Grid item size={7}>
           <Slider
             size="small"
             disabled={isLoading}
@@ -167,7 +172,7 @@ function ChannelController({
           />
         </Grid>
       </Grid>
-    </Grid>
+    </Grid>)
   );
 }
 

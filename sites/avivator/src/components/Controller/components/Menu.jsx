@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Divider from '@mui/material/Divider';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
@@ -78,17 +78,18 @@ function Header(props) {
   useEffect(() => setText(url), [url]);
 
   return (
-    <Grid container direction="column" spacing={0}>
-      <Grid item xs={12}>
+    (<Grid container direction="column" spacing={0}>
+      <Grid item size={12}>
         <MenuTitle />
       </Grid>
       <Grid
         container
         direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <Grid item xs={1}>
+        sx={{
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}>
+        <Grid item size={1}>
           <InfoIcon onClick={toggle} ref={anchorRef} />
           <Popper
             open={open}
@@ -114,7 +115,7 @@ function Header(props) {
             </Paper>
           </Popper>
         </Grid>
-        <Grid item xs={11}>
+        <Grid item size={11}>
           <form
             onSubmit={event => {
               handleSubmitNewUrl(event, text);
@@ -133,12 +134,12 @@ function Header(props) {
         </Grid>
       </Grid>
       {!isMobileOrTablet() && (
-        <Grid item xs={12} style={{ paddingTop: 16 }}>
+        <Grid item size={12} style={{ paddingTop: 16 }}>
           <DropzoneButton />
         </Grid>
       )}
       {Array.isArray(metadata) && (
-        <Grid item xs={12}>
+        <Grid item size={12}>
           <Select native value={image} onChange={onImageSelectionChange}>
             {metadata.map((meta, i) => (
               <option key={meta.Name} value={i}>
@@ -148,10 +149,10 @@ function Header(props) {
           </Select>
         </Grid>
       )}
-      <Grid item xs={12} className={classes.divider}>
+      <Grid item size={12} className={classes.divider}>
         <Divider />
       </Grid>
-    </Grid>
+    </Grid>)
   );
 }
 
@@ -161,28 +162,42 @@ function Menu({ children, ...props }) {
     useShallow(store => [store.isControllerOn, store.toggleIsControllerOn])
   );
   return isControllerOn ? (
-    <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
+    <Box
+      className={classes.root}
+      sx={{
+        position: "absolute",
+        right: 0,
+        top: 0,
+        m: 1
+      }}>
       <Paper className={classes.paper}>
         <Header />
         <Grid
           container
           direction="column"
-          justifyContent="center"
-          alignItems="center"
-        >
+          sx={{
+            justifyContent: "center",
+            alignItems: "center"
+          }}>
           {children.map((child, i) => {
             return (
               // biome-ignore lint/suspicious/noArrayIndexKey: Ignore carried over from eslint without description.
-              <Grid item key={i} className={classes.item}>
+              (<Grid item key={i} className={classes.item}>
                 {child}
-              </Grid>
+              </Grid>)
             );
           })}
         </Grid>
       </Paper>
     </Box>
   ) : (
-    <Box position="absolute" right={-8} top={-8} m={2}>
+    <Box
+      sx={{
+        position: "absolute",
+        right: -8,
+        top: -8,
+        m: 2
+      }}>
       <Button
         variant="outlined"
         size="small"

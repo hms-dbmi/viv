@@ -1,4 +1,4 @@
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import Slider from '@mui/material/Slider';
 import debounce from 'lodash/debounce';
 import React from 'react';
@@ -66,16 +66,17 @@ export default function GlobalSelectionSlider(props) {
   );
 
   return (
-    <Grid
+    (<Grid
       container
       direction="row"
-      justifyContent="space-between"
-      alignItems="center"
-    >
-      <Grid item xs={1}>
+      sx={{
+        justifyContent: "space-between",
+        alignItems: "stretch"
+      }}>
+      <Grid item size={1}>
         {label}:
       </Grid>
-      <Grid item xs={11}>
+      <Grid item size={11}>
         <Slider
           size="small"
           value={globalSelection[label]}
@@ -101,6 +102,6 @@ export default function GlobalSelectionSlider(props) {
           step={1}
         />
       </Grid>
-    </Grid>
+    </Grid>)
   );
 }

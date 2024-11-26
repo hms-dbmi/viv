@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
 import createStyles from '@mui/styles/createStyles';
 import makeStyles from '@mui/styles/makeStyles';
@@ -38,7 +38,7 @@ const CameraOptions = () => {
   const { height, width } = useWindowSize();
   const classes = useStyles();
   const toggleFixedAxisButton = (
-    <Grid item xs="auto" key="toggle-fixed-axis">
+    <Grid item size="auto" key="toggle-fixed-axis">
       <Grid container direction="row">
         <Checkbox
           onClick={toggleUseFixedAxis}
@@ -53,7 +53,7 @@ const CameraOptions = () => {
     </Grid>
   );
   const reCenterButton = (
-    <Grid item xs="auto" key="recenter">
+    <Grid item size="auto" key="recenter">
       <Button
         onClick={() =>
           useViewerStore.setState({
@@ -73,15 +73,16 @@ const CameraOptions = () => {
     </Grid>
   );
   return (
-    <Grid
+    (<Grid
       container
       direction="row"
-      justifyContent="space-between"
-      alignItems="center"
       style={{ marginTop: 16 }}
-    >
+      sx={{
+        justifyContent: "space-between",
+        alignItems: "center"
+      }}>
       {[toggleFixedAxisButton, reCenterButton]}
-    </Grid>
+    </Grid>)
   );
 };
 

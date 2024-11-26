@@ -2,7 +2,7 @@ import React from 'react';
 
 import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { useShallow } from 'zustand/shallow';
@@ -27,16 +27,17 @@ function LensSelect() {
 
   const checkboxColor = `rgb(${[255, 255, 255]})`;
   return (
-    <Grid
+    (<Grid
       container
       direction="row"
-      justifyContent="flex-start"
-      alignItems="center"
-    >
-      <Grid item xs={2}>
+      sx={{
+        justifyContent: "flex-start",
+        alignItems: "center"
+      }}>
+      <Grid item size={2}>
         Lens:
       </Grid>
-      <Grid item xs={2}>
+      <Grid item size={2}>
         <Checkbox
           onChange={toggleLensEnabled}
           checked={lensEnabled}
@@ -48,7 +49,7 @@ function LensSelect() {
           }}
         />
       </Grid>
-      <Grid item xs={8}>
+      <Grid item size={8}>
         <FormControl variant="standard">
           <Select
             size="small"
@@ -70,7 +71,7 @@ function LensSelect() {
           </Select>
         </FormControl>
       </Grid>
-    </Grid>
+    </Grid>)
   );
 }
 
