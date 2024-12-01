@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
-    "vite": "^5.3.2"
+    "vite": "^6.0.1"
   },
   "version": null
 }
