@@ -9,9 +9,9 @@
   },
   "dependencies": {
     "@hms-dbmi/viv": "workspace:*",
-    "@material-ui/core": "^4.11.0",
-    "@material-ui/icons": "^4.9.1",
-    "@material-ui/lab": "^4.0.0-alpha.56",
+    "@mui/material": "^6.0.0",
+    "@mui/icons-material": "^6.0.0",
+    "@mui/styles": "^6.0.0",
     "@math.gl/core": "catalog:",
     "geotiff": "^2.0.5",
     "lodash": "^4.17.21",
@@ -23,6 +23,10 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
     "vite": "^5.3.2"
+  },
+  "peerDependencies": {
+    "@emotion/react": "^11.13.5",
+    "@emotion/styled": "^11.13.5"
   },
   "version": null
 }

@@ -1,8 +1,8 @@
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Divider from '@material-ui/core/Divider';
-import Grid from '@material-ui/core/Grid';
-import Tab from '@material-ui/core/Tab';
-import Tabs from '@material-ui/core/Tabs';
+import CircularProgress from '@mui/material/CircularProgress';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid2';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
 import React, { useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 
@@ -189,7 +189,8 @@ const Controller = () => {
       <Tabs
         value={tab}
         onChange={handleTabChange}
-        aria-label="simple tabs example"
+        aria-label="tabs"
+        variant="fullWidth"
         style={{ height: '24px', minHeight: '24px' }}
       >
         <Tab label="Channels" style={{ fontSize: '.75rem', bottom: 12 }} />
@@ -207,7 +208,12 @@ const Controller = () => {
         {!isViewerLoading && !isRgb ? (
           <Grid container>{channelControllers}</Grid>
         ) : (
-          <Grid container justifyContent="center">
+          <Grid
+            container
+            sx={{
+              justifyContent: 'center'
+            }}
+          >
             {!isRgb && <CircularProgress />}
           </Grid>
         )}

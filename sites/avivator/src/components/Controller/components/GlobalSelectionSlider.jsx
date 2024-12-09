@@ -1,5 +1,5 @@
-import Grid from '@material-ui/core/Grid';
-import Slider from '@material-ui/core/Slider';
+import Grid from '@mui/material/Grid2';
+import Slider from '@mui/material/Slider';
 import debounce from 'lodash/debounce';
 import React from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
@@ -69,14 +69,17 @@ export default function GlobalSelectionSlider(props) {
     <Grid
       container
       direction="row"
-      justifyContent="space-between"
-      alignItems="center"
+      sx={{
+        justifyContent: 'space-between',
+        alignItems: 'stretch'
+      }}
     >
-      <Grid item xs={1}>
+      <Grid item size={1}>
         {label}:
       </Grid>
-      <Grid item xs={11}>
+      <Grid item size={11}>
         <Slider
+          size="small"
           value={globalSelection[label]}
           onChange={(event, newValue) => {
             useViewerStore.setState({

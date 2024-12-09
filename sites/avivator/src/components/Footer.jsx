@@ -1,10 +1,10 @@
-import Box from '@material-ui/core/Box';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useShallow } from 'zustand/shallow';
 
-import { makeStyles } from '@material-ui/core/styles';
+import makeStyles from '@mui/styles/makeStyles';
 
 import { useImageSettingsStore, useLoader, useViewerStore } from '../state';
 

@@ -1,7 +1,7 @@
-import { createStyles, makeStyles } from '@material-ui/core';
-import Grid from '@material-ui/core/Grid';
-import Slider from '@material-ui/core/Slider';
-import Typography from '@material-ui/core/Typography';
+import Grid from '@mui/material/Grid2';
+import Slider from '@mui/material/Slider';
+import Typography from '@mui/material/Typography';
+import { createStyles, makeStyles } from '@mui/styles';
 import React from 'react';
 import { useShallow } from 'zustand/shallow';
 
@@ -63,11 +63,13 @@ const Slicer = () => {
       <Grid
         container
         direction="row"
-        justifyContent="flex-start"
-        alignItems="center"
         key={label}
+        sx={{
+          justifyContent: 'flex-start',
+          alignItems: 'center'
+        }}
       >
-        <Grid item xs={1} style={{ marginBottom: 8 }}>
+        <Grid item size={1} style={{ marginBottom: 8 }}>
           <Typography
             className={!use3d ? classes.disabled : classes.enabled}
             style={{ marginTop: 4 }}
@@ -75,8 +77,9 @@ const Slicer = () => {
             {label}:
           </Typography>
         </Grid>
-        <Grid item xs={11}>
+        <Grid item size={11}>
           <Slider
+            size="small"
             disabled={!use3d}
             className={!use3d ? classes.disabled : classes.enabled}
             value={val}

@@ -1,8 +1,9 @@
-import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import { createStyles, makeStyles } from '@material-ui/core/styles';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import Grid from '@mui/material/Grid2';
+import Typography from '@mui/material/Typography';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { useShallow } from 'zustand/shallow';
 
@@ -37,7 +38,7 @@ const CameraOptions = () => {
   const { height, width } = useWindowSize();
   const classes = useStyles();
   const toggleFixedAxisButton = (
-    <Grid item xs="auto" key="toggle-fixed-axis">
+    <Grid item size="auto" key="toggle-fixed-axis">
       <Grid container direction="row">
         <Checkbox
           onClick={toggleUseFixedAxis}
@@ -52,7 +53,7 @@ const CameraOptions = () => {
     </Grid>
   );
   const reCenterButton = (
-    <Grid item xs="auto" key="recenter">
+    <Grid item size="auto" key="recenter">
       <Button
         onClick={() =>
           useViewerStore.setState({
@@ -75,9 +76,11 @@ const CameraOptions = () => {
     <Grid
       container
       direction="row"
-      justifyContent="space-between"
-      alignItems="center"
       style={{ marginTop: 16 }}
+      sx={{
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}
     >
       {[toggleFixedAxisButton, reCenterButton]}
     </Grid>
