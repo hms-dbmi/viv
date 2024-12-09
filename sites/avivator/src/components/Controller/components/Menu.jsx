@@ -1,19 +1,19 @@
-import { Select } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Divider from '@material-ui/core/Divider';
-import Grid from '@material-ui/core/Grid';
-import Link from '@material-ui/core/Link';
-import Paper from '@material-ui/core/Paper';
-import Popper from '@material-ui/core/Popper';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import InfoIcon from '@material-ui/icons/Info';
-import SettingsIcon from '@material-ui/icons/Settings';
+import InfoIcon from '@mui/icons-material/Info';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { Select } from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid2';
+import Link from '@mui/material/Link';
+import Paper from '@mui/material/Paper';
+import Popper from '@mui/material/Popper';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useState, useReducer, useRef, useEffect } from 'react';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import { useChannelsStore, useViewerStore } from '../../../state';
 import { getNameFromUrl, isMobileOrTablet } from '../../../utils';
@@ -22,7 +22,7 @@ import MenuTitle from './MenuTitle';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    maxHeight: props => `${props.maxHeight - theme.spacing(4)}px`,
+    maxHeight: props => `${props.maxHeight - theme.spacing(4)}`,
     width: '365px',
     overflowX: 'hidden',
     overflowY: 'scroll',
@@ -53,10 +53,9 @@ const useStyles = makeStyles(theme => ({
 
 function Header(props) {
   const image = useChannelsStore(store => store.image);
-  const [source, metadata] = useViewerStore(store => [
-    store.source,
-    store.metadata
-  ]);
+  const [source, metadata] = useViewerStore(
+    useShallow(store => [store.source, store.metadata])
+  );
   const handleSubmitNewUrl = (event, newUrl) => {
     event.preventDefault();
     const newSource = {
@@ -80,16 +79,18 @@ function Header(props) {
 
   return (
     <Grid container direction="column" spacing={0}>
-      <Grid item xs={12}>
+      <Grid item size={12}>
         <MenuTitle />
       </Grid>
       <Grid
         container
         direction="row"
-        justifyContent="space-between"
-        alignItems="center"
+        sx={{
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
       >
-        <Grid item xs={1}>
+        <Grid item size={1}>
           <InfoIcon onClick={toggle} ref={anchorRef} />
           <Popper
             open={open}
@@ -115,7 +116,7 @@ function Header(props) {
             </Paper>
           </Popper>
         </Grid>
-        <Grid item xs={11}>
+        <Grid item size={11}>
           <form
             onSubmit={event => {
               handleSubmitNewUrl(event, text);
@@ -134,12 +135,12 @@ function Header(props) {
         </Grid>
       </Grid>
       {!isMobileOrTablet() && (
-        <Grid item xs={12} style={{ paddingTop: 16 }}>
+        <Grid item size={12} style={{ paddingTop: 16 }}>
           <DropzoneButton />
         </Grid>
       )}
       {Array.isArray(metadata) && (
-        <Grid item xs={12}>
+        <Grid item size={12}>
           <Select native value={image} onChange={onImageSelectionChange}>
             {metadata.map((meta, i) => (
               <option key={meta.Name} value={i}>
@@ -149,7 +150,7 @@ function Header(props) {
           </Select>
         </Grid>
       )}
-      <Grid item xs={12} className={classes.divider}>
+      <Grid item size={12} className={classes.divider}>
         <Divider />
       </Grid>
     </Grid>
@@ -159,18 +160,27 @@ function Header(props) {
 function Menu({ children, ...props }) {
   const classes = useStyles(props);
   const [isControllerOn, toggleIsControllerOn] = useViewerStore(
-    store => [store.isControllerOn, store.toggleIsControllerOn],
-    shallow
+    useShallow(store => [store.isControllerOn, store.toggleIsControllerOn])
   );
   return isControllerOn ? (
-    <Box position="absolute" right={0} top={0} m={1} className={classes.root}>
+    <Box
+      className={classes.root}
+      sx={{
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        m: 1
+      }}
+    >
       <Paper className={classes.paper}>
         <Header />
         <Grid
           container
           direction="column"
-          justifyContent="center"
-          alignItems="center"
+          sx={{
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
         >
           {children.map((child, i) => {
             return (
@@ -184,10 +194,16 @@ function Menu({ children, ...props }) {
       </Paper>
     </Box>
   ) : (
-    <Box position="absolute" right={-8} top={-8} m={2}>
+    <Box
+      sx={{
+        position: 'absolute',
+        right: -8,
+        top: -8,
+        m: 2
+      }}
+    >
       <Button
         variant="outlined"
-        color="default"
         size="small"
         endIcon={<SettingsIcon />}
         onClick={toggleIsControllerOn}

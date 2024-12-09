@@ -1,6 +1,6 @@
-import create from 'zustand';
-
 import { RENDERING_MODES } from '@hms-dbmi/viv';
+import { create } from 'zustand';
+import { useShallow } from 'zustand/shallow';
 
 const captialize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -152,10 +152,9 @@ export const useViewerStore = create(set => ({
 }));
 
 export const useLoader = () => {
-  const [fullLoader, image] = useChannelsStore(store => [
-    store.loader,
-    store.image
-  ]);
+  const [fullLoader, image] = useChannelsStore(
+    useShallow(store => [store.loader, store.image])
+  );
   return Array.isArray(fullLoader[0]) ? fullLoader[image] : fullLoader;
 };
 

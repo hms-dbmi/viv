@@ -1,9 +1,11 @@
 import React from 'react';
 
-import Checkbox from '@material-ui/core/Checkbox';
-import Grid from '@material-ui/core/Grid';
-import Select from '@material-ui/core/Select';
-import shallow from 'zustand/shallow';
+import Checkbox from '@mui/material/Checkbox';
+import FormControl from '@mui/material/FormControl';
+import Grid from '@mui/material/Grid2';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import { useShallow } from 'zustand/shallow';
 
 import {
   useChannelsStore,
@@ -14,8 +16,11 @@ import {
 function LensSelect() {
   const selections = useChannelsStore(store => store.selections);
   const [lensEnabled, toggleLensEnabled, lensSelection] = useImageSettingsStore(
-    store => [store.lensEnabled, store.toggleLensEnabled, store.lensSelection],
-    shallow
+    useShallow(store => [
+      store.lensEnabled,
+      store.toggleLensEnabled,
+      store.lensSelection
+    ])
   );
   const channelOptions = useViewerStore(store => store.channelOptions);
   const currChannelIndices = selections.map(sel => sel.c);
@@ -25,13 +30,15 @@ function LensSelect() {
     <Grid
       container
       direction="row"
-      justifyContent="flex-start"
-      alignItems="center"
+      sx={{
+        justifyContent: 'flex-start',
+        alignItems: 'center'
+      }}
     >
-      <Grid item xs={2}>
+      <Grid item size={2}>
         Lens:
       </Grid>
-      <Grid item xs={2}>
+      <Grid item size={2}>
         <Checkbox
           onChange={toggleLensEnabled}
           checked={lensEnabled}
@@ -43,23 +50,27 @@ function LensSelect() {
           }}
         />
       </Grid>
-      <Grid item xs={7}>
-        <Select
-          native
-          value={lensSelection}
-          onChange={e =>
-            useImageSettingsStore.setState({ lensSelection: e.target.value })
-          }
-        >
-          {currChannelIndices.map((channelIndex, relativeIndex) => (
-            <option
-              key={channelOptions[channelIndex] + String(relativeIndex)}
-              value={relativeIndex}
-            >
-              {channelOptions[channelIndex]}
-            </option>
-          ))}
-        </Select>
+      <Grid item size={8}>
+        <FormControl variant="standard">
+          <Select
+            size="small"
+            value={lensSelection}
+            onChange={e =>
+              useImageSettingsStore.setState({
+                lensSelection: Number.parseInt(e.target.value)
+              })
+            }
+          >
+            {currChannelIndices.map((channelIndex, relativeIndex) => (
+              <MenuItem
+                key={channelOptions[channelIndex] + String(relativeIndex)}
+                value={relativeIndex}
+              >
+                {channelOptions[channelIndex]}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Grid>
     </Grid>
   );

@@ -1,6 +1,6 @@
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
 import React from 'react';
 
 import { COLORMAP_OPTIONS } from '../../../constants';
@@ -10,11 +10,12 @@ function ColormapSelect() {
   const colormap = useImageSettingsStore(store => store.colormap);
   const isViewerLoading = useViewerStore(store => store.isViewerLoading);
   return (
-    <FormControl fullWidth>
-      <InputLabel htmlFor="colormap-select">
+    <FormControl fullWidth variant="standard">
+      <InputLabel htmlFor="colormap-select" size="small">
         Additive {colormap === '' ? ' Blending' : 'Color Mapping'}
       </InputLabel>
       <Select
+        size="small"
         native
         onChange={e =>
           useImageSettingsStore.setState({ colormap: e.target.value })

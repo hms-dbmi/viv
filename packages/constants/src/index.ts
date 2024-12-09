@@ -1,4 +1,4 @@
-import GL from '@luma.gl/constants';
+import { GL } from '@luma.gl/constants';
 
 export const MAX_COLOR_INTENSITY = 255;
 
@@ -18,28 +18,28 @@ export const DEFAULT_FONT_FAMILY =
  */
 export const DTYPE_VALUES = {
   Uint8: {
-    format: GL.R8UI,
+    format: 'r8uint',
     dataFormat: GL.RED_INTEGER,
     type: GL.UNSIGNED_BYTE,
     max: 2 ** 8 - 1,
     sampler: 'usampler2D'
   },
   Uint16: {
-    format: GL.R16UI,
+    format: 'r16uint',
     dataFormat: GL.RED_INTEGER,
     type: GL.UNSIGNED_SHORT,
     max: 2 ** 16 - 1,
     sampler: 'usampler2D'
   },
   Uint32: {
-    format: GL.R32UI,
+    format: 'r32uint',
     dataFormat: GL.RED_INTEGER,
     type: GL.UNSIGNED_INT,
     max: 2 ** 32 - 1,
     sampler: 'usampler2D'
   },
   Float32: {
-    format: GL.R32F,
+    format: 'r32float',
     dataFormat: GL.RED,
     type: GL.FLOAT,
     // Not sure what to do about this one - a good use case for channel stats, I suppose:
@@ -48,21 +48,21 @@ export const DTYPE_VALUES = {
     sampler: 'sampler2D'
   },
   Int8: {
-    format: GL.R8I,
+    format: 'r8int',
     dataFormat: GL.RED_INTEGER,
     type: GL.BYTE,
     max: 2 ** (8 - 1) - 1,
     sampler: 'isampler2D'
   },
   Int16: {
-    format: GL.R16I,
+    format: 'r16int',
     dataFormat: GL.RED_INTEGER,
     type: GL.SHORT,
     max: 2 ** (16 - 1) - 1,
     sampler: 'isampler2D'
   },
   Int32: {
-    format: GL.R32I,
+    format: 'r32int',
     dataFormat: GL.RED_INTEGER,
     type: GL.INT,
     max: 2 ** (32 - 1) - 1,
@@ -70,7 +70,7 @@ export const DTYPE_VALUES = {
   },
   // Cast Float64 as 32 bit float point so it can be rendered.
   Float64: {
-    format: GL.R32F,
+    format: 'r32float',
     dataFormat: GL.RED,
     type: GL.FLOAT,
     // Not sure what to do about this one - a good use case for channel stats, I suppose:

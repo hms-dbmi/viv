@@ -38,7 +38,7 @@ const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   viewState: {
     type: 'object',
-    value: { zoom: 0, target: [0, 0, 0] },
+    value: { zoom: 0, target: [0, 0, 0], width: 1, height: 1 },
     compare: true
   },
   unit: { type: 'string', value: '', compare: true },

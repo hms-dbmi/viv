@@ -7,7 +7,7 @@ import {
 } from '@hms-dbmi/viv';
 import debounce from 'lodash/debounce';
 import React from 'react';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 import { DEFAULT_OVERVIEW } from '../constants';
 import {
   useChannelsStore,
@@ -19,18 +19,16 @@ import { get3DExtension, useWindowSize } from '../utils';
 
 const Viewer = () => {
   const [useLinkedView, use3d, viewState] = useViewerStore(
-    store => [store.useLinkedView, store.use3d, store.viewState],
-    shallow
+    useShallow(store => [store.useLinkedView, store.use3d, store.viewState])
   );
   const [colors, contrastLimits, channelsVisible, selections] =
     useChannelsStore(
-      store => [
+      useShallow(store => [
         store.colors,
         store.contrastLimits,
         store.channelsVisible,
         store.selections
-      ],
-      shallow
+      ])
     );
   const loader = useLoader();
   const viewSize = useWindowSize();
@@ -49,7 +47,7 @@ const Viewer = () => {
     onViewportLoad,
     useFixedAxis
   ] = useImageSettingsStore(
-    store => [
+    useShallow(store => [
       store.lensSelection,
       store.colormap,
       store.renderingMode,
@@ -63,8 +61,7 @@ const Viewer = () => {
       store.isOverviewOn,
       store.onViewportLoad,
       store.useFixedAxis
-    ],
-    shallow
+    ])
   );
 
   const onViewStateChange = ({ viewState: { zoom } }) => {

@@ -1,5 +1,10 @@
-import { grey } from '@material-ui/core/colors';
-import { ThemeProvider, createTheme } from '@material-ui/core/styles';
+import { grey } from '@mui/material/colors';
+import {
+  StyledEngineProvider,
+  ThemeProvider,
+  adaptV4Theme,
+  createTheme
+} from '@mui/material/styles';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
@@ -9,7 +14,7 @@ import { getNameFromUrl } from './utils';
 
 const theme = createTheme({
   palette: {
-    type: 'dark',
+    mode: 'dark',
     primary: grey,
     secondary: grey
   },
@@ -40,9 +45,13 @@ function App() {
   const query = new URLSearchParams(window.location.search);
   const source = resolveSource(query.get('image_url'));
   return (
-    <ThemeProvider theme={theme}>
-      <Avivator source={source} isDemoImage={source.isDemoImage} />
-    </ThemeProvider>
+    <StyledEngineProvider injectFirst>
+      (
+      <ThemeProvider theme={theme}>
+        <Avivator source={source} isDemoImage={source.isDemoImage} />
+      </ThemeProvider>
+      )
+    </StyledEngineProvider>
   );
 }
 

@@ -1,8 +1,8 @@
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import CloseIcon from '@material-ui/icons/Close';
-import GitHubIcon from '@material-ui/icons/GitHub';
+import CloseIcon from '@mui/icons-material/Close';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import Grid from '@mui/material/Grid2';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useViewerStore } from '../../../state';
 
@@ -18,8 +18,10 @@ function MenuTitle() {
     <Grid
       container
       direction="row"
-      justifyContent="flex-end"
-      alignItems="center"
+      sx={{
+        justifyContent: 'flex-end',
+        alignItems: 'center'
+      }}
     >
       <Grid style={{ marginRight: 'auto' }} item>
         <Typography variant="body1">
@@ -31,6 +33,7 @@ function MenuTitle() {
           href="https://github.com/hms-dbmi/viv"
           aria-label="GitHub Repository"
           disableRipple
+          size="large"
         >
           <GitHubIcon />
         </IconButton>

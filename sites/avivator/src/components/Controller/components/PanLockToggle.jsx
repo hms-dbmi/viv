@@ -1,13 +1,12 @@
-import Button from '@material-ui/core/Button';
+import Button from '@mui/material/Button';
 import React from 'react';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 const PanLockToggle = () => {
   const [togglePanLock, panLock] = useImageSettingsStore(
-    store => [store.togglePanLock, store.panLock],
-    shallow
+    useShallow(store => [store.togglePanLock, store.panLock])
   );
   const isViewerLoading = useViewerStore(store => store.isViewerLoading);
   return (

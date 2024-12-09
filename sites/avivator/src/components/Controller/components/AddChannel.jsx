@@ -1,7 +1,7 @@
-import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from '@mui/icons-material/Add';
+import Button from '@mui/material/Button';
 import React, { useCallback } from 'react';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import { COLOR_PALLETE, MAX_CHANNELS } from '../../../constants';
 import {
@@ -21,22 +21,20 @@ const AddChannel = () => {
     setIsChannelLoading,
     addIsChannelLoading
   ] = useViewerStore(
-    store => [
+    useShallow(store => [
       store.globalSelection,
       store.isViewerLoading,
       store.use3d,
       store.setIsChannelLoading,
       store.addIsChannelLoading
-    ],
-    shallow
+    ])
   );
   const [selections, addChannel, setPropertiesForChannel] = useChannelsStore(
-    store => [
+    useShallow(store => [
       store.selections,
       store.addChannel,
       store.setPropertiesForChannel
-    ],
-    shallow
+    ])
   );
   const loader = useLoader();
   const metadata = useMetadata();
