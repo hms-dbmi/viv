@@ -1,7 +1,7 @@
-import Snackbar from '@material-ui/core/Snackbar';
-import Alert from '@material-ui/lab/Alert';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import React from 'react';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import { useViewerStore } from '../../state';
 import {
@@ -21,7 +21,7 @@ const SnackBars = () => {
     isVolumeRenderingWarningOn,
     toggleIsVolumeRenderingWarningOn
   ] = useViewerStore(
-    store => [
+    useShallow(store => [
       store.isOffsetsSnackbarOn,
       store.loaderErrorSnackbar,
       store.isNoImageUrlSnackbarOn,
@@ -29,8 +29,7 @@ const SnackBars = () => {
       store.toggleIsNoImageUrlSnackbarOn,
       store.isVolumeRenderingWarningOn,
       store.toggleIsVolumeRenderingWarningOn
-    ],
-    shallow
+    ])
   );
   return (
     <>

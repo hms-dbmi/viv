@@ -1,14 +1,16 @@
 import * as React from 'react';
 
 import { DTYPE_VALUES } from '@hms-dbmi/viv';
-import Checkbox from '@material-ui/core/Checkbox';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import Select from '@material-ui/core/Select';
-import Slider from '@material-ui/core/Slider';
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import shallow from 'zustand/shallow';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import Checkbox from '@mui/material/Checkbox';
+import CircularProgress from '@mui/material/CircularProgress';
+import FormControl from '@mui/material/FormControl';
+import Grid from '@mui/material/Grid2';
+import IconButton from '@mui/material/IconButton';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import Slider from '@mui/material/Slider';
+import { useShallow } from 'zustand/shallow';
 
 import { FILL_PIXEL_VALUE } from '../../../constants';
 import {
@@ -60,8 +62,11 @@ function ChannelController({
   const loader = useLoader();
   const colormap = useImageSettingsStore(store => store.colormap);
   const [channelOptions, useLinkedView, use3d] = useViewerStore(
-    store => [store.channelOptions, store.useLinkedView, store.use3d],
-    shallow
+    useShallow(store => [
+      store.channelOptions,
+      store.useLinkedView,
+      store.use3d
+    ])
   );
   const rgbColor = toRgb(colormap, color);
   const getMinMax = ({ domain: d, mode, loader: l }) => {
@@ -89,25 +94,39 @@ function ChannelController({
   const step = right - left < 500 && isFloat ? (right - left) / 500 : 1;
   const shouldShowPixelValue = !useLinkedView && !use3d;
   return (
-    <Grid container direction="column" m={2} justifyContent="center">
-      <Grid container direction="row" justifyContent="space-between">
-        <Grid item xs={10}>
-          <Select native value={name} onChange={onSelectionChange}>
-            {channelOptions.map(opt => (
-              <option disabled={isLoading} key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </Select>
+    <Grid
+      container
+      direction="column"
+      sx={{
+        justifyContent: 'center'
+      }}
+    >
+      <Grid
+        container
+        direction="row"
+        sx={{
+          justifyContent: 'space-between'
+        }}
+      >
+        <Grid item size={10}>
+          <FormControl variant="standard">
+            <Select size="small" value={name} onChange={onSelectionChange}>
+              {channelOptions.map(opt => (
+                <MenuItem disabled={isLoading} key={opt} value={opt}>
+                  {opt}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
-        <Grid item xs={1}>
+        <Grid item size={1}>
           <ChannelOptions
             handleColorSelect={handleColorSelect}
             disabled={isLoading}
             handleModeSelect={setMode}
           />
         </Grid>
-        <Grid item xs={1}>
+        <Grid item size={1}>
           <IconButton
             aria-label="remove-channel"
             component="span"
@@ -121,13 +140,15 @@ function ChannelController({
       <Grid
         container
         direction="row"
-        justifyContent="flex-start"
-        alignItems="center"
+        sx={{
+          justifyContent: 'flex-start',
+          alignItems: 'center'
+        }}
       >
-        <Grid item xs={2}>
+        <Grid item size={2}>
           {getPixelValueDisplay(pixelValue, isLoading, shouldShowPixelValue)}
         </Grid>
-        <Grid item xs={2}>
+        <Grid item size={2}>
           <Checkbox
             onChange={toggleIsOn}
             disabled={isLoading}
@@ -140,8 +161,9 @@ function ChannelController({
             }}
           />
         </Grid>
-        <Grid item xs={7}>
+        <Grid item size={7}>
           <Slider
+            size="small"
             disabled={isLoading}
             value={slider}
             onChange={handleSliderChange}

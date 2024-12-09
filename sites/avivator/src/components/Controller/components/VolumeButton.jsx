@@ -1,15 +1,15 @@
 import React, { useRef, useReducer } from 'react';
 
-import Button from '@material-ui/core/Button';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
-import Paper from '@material-ui/core/Paper';
-import Popper from '@material-ui/core/Popper';
+import Button from '@mui/material/Button';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import MenuItem from '@mui/material/MenuItem';
+import MenuList from '@mui/material/MenuList';
+import Paper from '@mui/material/Paper';
+import Popper from '@mui/material/Popper';
 
-import { makeStyles } from '@material-ui/core/styles';
+import makeStyles from '@mui/styles/makeStyles';
 
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import {
   useChannelsStore,
@@ -82,8 +82,7 @@ const useStyles = makeStyles(() => ({
 
 function VolumeButton() {
   const [selections, setPropertiesForChannel] = useChannelsStore(
-    store => [store.selections, store.setPropertiesForChannel],
-    shallow
+    useShallow(store => [store.selections, store.setPropertiesForChannel])
   );
   const loader = useLoader();
   const [
@@ -92,13 +91,12 @@ function VolumeButton() {
     toggleIsVolumeRenderingWarningOn,
     isViewerLoading
   ] = useViewerStore(
-    store => [
+    useShallow(store => [
       store.use3d,
       store.toggleUse3d,
       store.toggleIsVolumeRenderingWarningOn,
       store.isViewerLoading
-    ],
-    shallow
+    ])
   );
 
   const [open, toggle] = useReducer(v => !v, false);

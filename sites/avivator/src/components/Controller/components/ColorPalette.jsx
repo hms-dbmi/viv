@@ -1,8 +1,8 @@
-import IconButton from '@material-ui/core/IconButton';
-import LensIcon from '@material-ui/icons/Lens';
+import LensIcon from '@mui/icons-material/Lens';
+import IconButton from '@mui/material/IconButton';
 import React from 'react';
 
-import { makeStyles } from '@material-ui/core/styles';
+import makeStyles from '@mui/styles/makeStyles';
 
 import { COLOR_PALLETE } from '../../../constants';
 
@@ -36,6 +36,7 @@ const ColorPalette = ({ handleColorSelect }) => {
             className={classes.button}
             key={color}
             onClick={() => handleColorSelect(color)}
+            size="large"
           >
             <LensIcon
               fontSize="small"

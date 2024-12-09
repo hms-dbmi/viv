@@ -1,13 +1,12 @@
-import Button from '@material-ui/core/Button';
+import Button from '@mui/material/Button';
 import React from 'react';
-import shallow from 'zustand/shallow';
+import { useShallow } from 'zustand/shallow';
 
 import { useImageSettingsStore, useViewerStore } from '../../../state';
 
 const ZoomLockToggle = () => {
   const [toggleZoomLock, zoomLock] = useImageSettingsStore(
-    store => [store.toggleZoomLock, store.zoomLock],
-    shallow
+    useShallow(store => [store.toggleZoomLock, store.zoomLock])
   );
   const isViewerLoading = useViewerStore(store => store.isViewerLoading);
   return (
