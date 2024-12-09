@@ -99,8 +99,8 @@ importers:
         specifier: ^0.19.5
         version: 0.19.12
       esno:
-        specifier: ^4.0.0
-        version: 4.7.0
+        specifier: ^4.8.0
+        version: 4.8.0
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
@@ -2654,8 +2654,8 @@ packages:
     engines: {node: '>=6.0'}
     hasBin: true
 
-  esno@4.7.0:
-    resolution: {integrity: sha512-81owrjxIxOwqcABt20U09Wn8lpBo9K6ttqbGvQcB3VYNLJyaV1fvKkDtpZd3Rj5BX3WXiGiJCjUevKQGNICzJg==}
+  esno@4.8.0:
+    resolution: {integrity: sha512-acMtooReAQGzLU0zcuEDHa8S62meh5aIyi8jboYxyvAePdmuWx2Mpwmt0xjwO0bs9/SXf+dvXJ0QJoDWw814Iw==}
     hasBin: true
 
   esprima@4.0.1:
@@ -4799,8 +4799,8 @@ packages:
   tslib@2.6.3:
     resolution: {integrity: sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==}
 
-  tsx@4.16.2:
-    resolution: {integrity: sha512-C1uWweJDgdtX2x600HjaFaucXTilT7tgUZHbOE4+ypskZ1OP8CRCSDkCxG6Vya9EwaFIVagWwpaVAn5wzypaqQ==}
+  tsx@4.19.2:
+    resolution: {integrity: sha512-pOUl6Vo2LUq/bSa8S5q7b91cgNSjctn9ugq/+Mvow99qW6x/UZYwzxy/3NmqoT66eHYfCVvFvACC58UBPFf28g==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -7772,9 +7772,9 @@ snapshots:
     optionalDependencies:
       source-map: 0.6.1
 
-  esno@4.7.0:
+  esno@4.8.0:
     dependencies:
-      tsx: 4.16.2
+      tsx: 4.19.2
 
   esprima@4.0.1: {}
 
@@ -10302,9 +10302,9 @@ snapshots:
 
   tslib@2.6.3: {}
 
-  tsx@4.16.2:
+  tsx@4.19.2:
     dependencies:
-      esbuild: 0.21.5
+      esbuild: 0.23.0
       get-tsconfig: 4.7.6
     optionalDependencies:
       fsevents: 2.3.3
