@@ -117,7 +117,7 @@ importers:
         specifier: ^11.0.0
         version: 11.0.0
       typescript:
-        specifier: ^5.5.4
+        specifier: ^5.6.2
         version: 5.6.2
       unbuild:
         specifier: ^2.0.0
