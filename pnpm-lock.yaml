@@ -6,22 +6,10 @@ settings:
 
 catalogs:
   default:
-    '@deck.gl/core':
-      specifier: ~9.0.33
-      version: 9.0.33
     '@deck.gl/extensions':
       specifier: ~9.0.33
       version: 9.0.33
-    '@deck.gl/geo-layers':
-      specifier: ~9.0.33
-      version: 9.0.33
-    '@deck.gl/layers':
-      specifier: ~9.0.33
-      version: 9.0.33
     '@deck.gl/mesh-layers':
-      specifier: ~9.0.33
-      version: 9.0.33
-    '@deck.gl/react':
       specifier: ~9.0.33
       version: 9.0.33
     '@deck.gl/test-utils':
@@ -30,19 +18,7 @@ catalogs:
     '@luma.gl/constants':
       specifier: ~9.0.27
       version: 9.0.27
-    '@luma.gl/core':
-      specifier: ~9.0.27
-      version: 9.0.27
-    '@luma.gl/engine':
-      specifier: ~9.0.27
-      version: 9.0.27
-    '@luma.gl/shadertools':
-      specifier: ~9.0.27
-      version: 9.0.27
     '@luma.gl/test-utils':
-      specifier: ~9.0.27
-      version: 9.0.27
-    '@luma.gl/webgl':
       specifier: ~9.0.27
       version: 9.0.27
     '@math.gl/core':
@@ -54,9 +30,6 @@ catalogs:
     math.gl:
       specifier: ^4.0.1
       version: 4.0.1
-    react:
-      specifier: ^16.8.0 || ^17.0.0 || ^18.0.0
-      version: 18.3.1
 
 importers:
 
