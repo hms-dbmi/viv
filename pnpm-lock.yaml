@@ -332,8 +332,8 @@ importers:
         specifier: ^14.2.3
         version: 14.2.3(react@18.3.1)
       zustand:
-        specifier: ^5.0.1
-        version: 5.0.1(@types/react@18.3.3)(react@18.3.1)
+        specifier: ^5.0.3
+        version: 5.0.3(@types/react@18.3.3)(react@18.3.1)
     devDependencies:
       '@vitejs/plugin-react':
         specifier: ^4.2.1
@@ -1856,8 +1856,8 @@ packages:
   '@types/extend@3.0.4':
     resolution: {integrity: sha512-ArMouDUTJEz1SQRpFsT2rIw7DeqICFv5aaVzLSIYMYQSLcwcGOfT3VyglQs/p7K3F7fT4zxr0NWxYZIdifD6dA==}
 
-  '@types/geojson@7946.0.15':
-    resolution: {integrity: sha512-9oSxFzDCT2Rj6DfcHF8G++jxBKS7mBqXl5xrRW+Kbvjry6Uduya2iiwqHPhVXpasAVMBYKkEPGgKhd3+/HZ6xA==}
+  '@types/geojson@7946.0.16':
+    resolution: {integrity: sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==}
 
   '@types/hammerjs@2.0.46':
     resolution: {integrity: sha512-ynRvcq6wvqexJ9brDMS4BnBLzmr0e14d6ZJTEShTBWKymQiHwlAyGu0ZPEFI2Fh1U53F7tN9ufClWM5KvqkKOw==}
@@ -1949,8 +1949,8 @@ packages:
   '@vue/shared@3.4.33':
     resolution: {integrity: sha512-aoRY0jQk3A/cuvdkodTrM4NMfxco8n55eG4H7ML/CRy7OryHfiqvug4xrCBBMbbN+dvXAetDDwZW9DXWWjBntA==}
 
-  '@webgpu/types@0.1.53':
-    resolution: {integrity: sha512-x+BLw/opaz9LiVyrMsP75nO1Rg0QfrACUYIbVSfGwY/w0DiWIPYYrpte6us//KZXinxFAOJl0+C17L1Vi2vmDw==}
+  '@webgpu/types@0.1.54':
+    resolution: {integrity: sha512-81oaalC8LFrXjhsczomEQ0u3jG+TqE6V9QHLA8GNZq/Rnot0KDugu3LhSYSlie8tSdooAN1Hov05asrUUp9qgg==}
 
   '@xmldom/xmldom@0.8.10':
     resolution: {integrity: sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==}
@@ -5082,8 +5082,8 @@ packages:
   zstddec@0.1.0:
     resolution: {integrity: sha512-w2NTI8+3l3eeltKAdK8QpiLo/flRAr2p8AGeakfMZOXBxOg9HIu4LVDxBi81sYgVhFhdJjv1OrB5ssI8uFPoLg==}
 
-  zustand@5.0.1:
-    resolution: {integrity: sha512-pRET7Lao2z+n5R/HduXMio35TncTlSW68WsYBq2Lg1ASspsNGjpwLAsij3RpouyV6+kHMwwwzP0bZPD70/Jx/w==}
+  zustand@5.0.3:
+    resolution: {integrity: sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
       '@types/react': '>=18.0.0'
@@ -5499,7 +5499,7 @@ snapshots:
       '@math.gl/core': 4.1.0
       '@math.gl/culling': 4.0.1
       '@math.gl/web-mercator': 4.1.0
-      '@types/geojson': 7946.0.15
+      '@types/geojson': 7946.0.16
       h3-js: 4.1.0
       long: 3.2.0
 
@@ -6030,12 +6030,12 @@ snapshots:
   '@loaders.gl/schema@4.2.2(@loaders.gl/core@4.2.2)':
     dependencies:
       '@loaders.gl/core': 4.2.2
-      '@types/geojson': 7946.0.15
+      '@types/geojson': 7946.0.16
 
   '@loaders.gl/schema@4.3.3(@loaders.gl/core@4.2.2)':
     dependencies:
       '@loaders.gl/core': 4.2.2
-      '@types/geojson': 7946.0.15
+      '@types/geojson': 7946.0.16
 
   '@loaders.gl/terrain@4.2.2(@loaders.gl/core@4.2.2)':
     dependencies:
@@ -6157,7 +6157,7 @@ snapshots:
     dependencies:
       '@luma.gl/core': 9.0.27
       '@probe.gl/env': 4.1.0
-      '@webgpu/types': 0.1.53
+      '@webgpu/types': 0.1.54
 
   '@manypkg/find-root@1.1.0':
     dependencies:
@@ -6665,7 +6665,7 @@ snapshots:
 
   '@types/extend@3.0.4': {}
 
-  '@types/geojson@7946.0.15': {}
+  '@types/geojson@7946.0.16': {}
 
   '@types/hammerjs@2.0.46': {}
 
@@ -6781,7 +6781,7 @@ snapshots:
   '@vue/shared@3.4.33':
     optional: true
 
-  '@webgpu/types@0.1.53': {}
+  '@webgpu/types@0.1.54': {}
 
   '@xmldom/xmldom@0.8.10': {}
 
@@ -10589,7 +10589,7 @@ snapshots:
 
   zstddec@0.1.0: {}
 
-  zustand@5.0.1(@types/react@18.3.3)(react@18.3.1):
+  zustand@5.0.3(@types/react@18.3.3)(react@18.3.1):
     optionalDependencies:
       '@types/react': 18.3.3
       react: 18.3.1
