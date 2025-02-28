@@ -236,13 +236,11 @@ export async function createLoader(
 
       // try ome-zarr
       const res = await loadOmeZarr(urlOrFile, { type: 'multiscales' });
+      const channels = res.metadata?.omero?.channels ?? [{ label: 'image' }];
       // extract metadata into OME-XML-like form
       const metadata = {
         Pixels: {
-          Channels: res.metadata.omero.channels.map(c => ({
-            Name: c.label,
-            SamplesPerPixel: 1
-          }))
+          Channels: channels.map(c => ({ Name: c.label, SamplesPerPixel: 1 }))
         }
       };
       source = { data: res.data, metadata };

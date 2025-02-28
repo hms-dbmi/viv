@@ -16,7 +16,7 @@
     "build": "pnpm -r --parallel build",
     "clean": "pnpm -r exec -- rm -rf node_modules",
     "test": "pnpm -r --parallel test",
-    "fix": "biome check --apply .",
+    "fix": "biome check --write .",
     "version": "node ./scripts/version.mjs",
     "publish": "pnpm build && pnpm changeset publish"
   },
