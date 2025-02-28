@@ -48,21 +48,21 @@ export const DTYPE_VALUES = {
     sampler: 'sampler2D'
   },
   Int8: {
-    format: 'r8int',
+    format: 'r8sint',
     dataFormat: GL.RED_INTEGER,
     type: GL.BYTE,
     max: 2 ** (8 - 1) - 1,
     sampler: 'isampler2D'
   },
   Int16: {
-    format: 'r16int',
+    format: 'r16sint',
     dataFormat: GL.RED_INTEGER,
     type: GL.SHORT,
     max: 2 ** (16 - 1) - 1,
     sampler: 'isampler2D'
   },
   Int32: {
-    format: 'r32int',
+    format: 'r32sint',
     dataFormat: GL.RED_INTEGER,
     type: GL.INT,
     max: 2 ** (32 - 1) - 1,
@@ -70,7 +70,7 @@ export const DTYPE_VALUES = {
   },
   // Cast Float64 as 32 bit float point so it can be rendered.
   Float64: {
-    format: 'r32float',
+    format: 'r32sfloat',
     dataFormat: GL.RED,
     type: GL.FLOAT,
     // Not sure what to do about this one - a good use case for channel stats, I suppose:
