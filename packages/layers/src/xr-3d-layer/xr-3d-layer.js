@@ -251,6 +251,11 @@ const XR3DLayer = class extends Layer {
    */
   draw(opts) {
     const { uniforms } = opts;
+    /** @type {{
+     *    textures: Record<string, import('@luma.gl/core').Binding>,
+     *    model: Model
+     *    scaleMatrix: Matrix4,
+     *  }} */
     const { textures, model, scaleMatrix } = this.state;
     const {
       contrastLimits,
@@ -324,7 +329,7 @@ const XR3DLayer = class extends Layer {
         { disableWanings: false }
       );
       model.setBindings(textures);
-      model.draw(opts);
+      model.draw(opts.renderPass);
     }
   }
 
