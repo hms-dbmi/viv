@@ -32,7 +32,7 @@
     "@pnpm/types": "^11.1.0",
     "@probe.gl/test-utils": "^3.5.0",
     "@svitejs/changesets-changelog-github-compact": "^1.1.0",
-    "esbuild": "^0.19.5",
+    "esbuild": "^0.25.0",
     "esno": "^4.8.0",
     "gray-matter": "^4.0.3",
     "tap-spec": "^5.0.0",
