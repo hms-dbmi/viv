@@ -1,5 +1,12 @@
 # @hms-dbmi/viv
 
+## 0.17.1
+
+### Patch Changes
+
+- Restore support for signed integer data formats (`Int8`, `Int16`, `Int32`) (`@vivjs/constants`) ([#865](https://github.com/hms-dbmi/viv/pull/865))
+
+
 ## 0.17.0
 
 ### Minor Changes
@@ -24,7 +31,6 @@
   - Pin a specific Viv version or semver range to prevent unintended updates.
 
 ### Patch Changes
-
 
 ## 0.16.1
 

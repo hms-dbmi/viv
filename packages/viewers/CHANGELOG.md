@@ -1,5 +1,14 @@
 # @vivjs/viewers
 
+## 0.17.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/constants@0.17.1
+  - @vivjs/extensions@0.17.1
+  - @vivjs/views@0.17.1
+
 ## 0.17.0
 
 ### Patch Changes
