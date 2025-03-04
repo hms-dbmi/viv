@@ -70,7 +70,7 @@ export const DTYPE_VALUES = {
   },
   // Cast Float64 as 32 bit float point so it can be rendered.
   Float64: {
-    format: 'r32sfloat',
+    format: 'r32float',
     dataFormat: GL.RED,
     type: GL.FLOAT,
     // Not sure what to do about this one - a good use case for channel stats, I suppose:
