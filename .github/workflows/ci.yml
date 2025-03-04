@@ -32,19 +32,12 @@ jobs:
 
   Test:
     runs-on: ubuntu-latest
-    env:
-      DISPLAY: :0
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
           run_install: true
-
-      - name: Setup xvf (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get install -y xvfb
-          # start xvfb in the background
-          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
-
-      - run: pnpm test
+      - name: Run headless test
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: pnpm test
