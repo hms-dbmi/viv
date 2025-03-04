@@ -31,13 +31,10 @@ jobs:
       - run: biome ci .
 
   Test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
           run_install: true
-      - name: Run headless test
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: pnpm test
+      - run: pnpm test
