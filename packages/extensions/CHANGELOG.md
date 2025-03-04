@@ -1,5 +1,12 @@
 # @vivjs/extensions
 
+## 0.17.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/constants@0.17.2
+
 ## 0.17.1
 
 ### Patch Changes

@@ -1,11 +1,17 @@
 # @hms-dbmi/viv
 
+## 0.17.2
+
+### Patch Changes
+
+- Fix typo in luma texture format for Float32Array (`r32float`) (`@vivjs/constants`) ([#868](https://github.com/hms-dbmi/viv/pull/868))
+
+
 ## 0.17.1
 
 ### Patch Changes
 
 - Restore support for signed integer data formats (`Int8`, `Int16`, `Int32`) (`@vivjs/constants`) ([#865](https://github.com/hms-dbmi/viv/pull/865))
-
 
 ## 0.17.0
 
