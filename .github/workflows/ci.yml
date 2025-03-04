@@ -31,7 +31,7 @@ jobs:
       - run: biome ci .
 
   Test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       DISPLAY: :0
     steps:
