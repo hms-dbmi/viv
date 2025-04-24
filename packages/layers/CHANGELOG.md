@@ -1,5 +1,15 @@
 # @vivjs/layers
 
+## 0.17.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/constants@0.17.3
+  - @vivjs/extensions@0.17.3
+  - @vivjs/loaders@0.17.3
+  - @vivjs/types@0.17.3
+
 ## 0.17.2
 
 ### Patch Changes

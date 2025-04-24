@@ -1,11 +1,17 @@
 # @hms-dbmi/viv
 
+## 0.17.3
+
+### Patch Changes
+
+- Disallow multiple samples-per-pixel in multi-file tiff loaders (`@vivjs/loaders`) ([#883](https://github.com/hms-dbmi/viv/pull/883))
+
+
 ## 0.17.2
 
 ### Patch Changes
 
 - Fix typo in luma texture format for Float32Array (`r32float`) (`@vivjs/constants`) ([#868](https://github.com/hms-dbmi/viv/pull/868))
-
 
 ## 0.17.1
 
