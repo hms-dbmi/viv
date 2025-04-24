@@ -1,5 +1,13 @@
 # @vivjs/views
 
+## 0.17.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/layers@0.17.3
+  - @vivjs/loaders@0.17.3
+
 ## 0.17.2
 
 ### Patch Changes
