@@ -168,6 +168,11 @@ export async function loadMultiTiff(
           const curSelection = imageSelections[i];
           if (curSelection) {
             const tiff = await curImage.getImage(i);
+            if (tiff.fileDirectory.SamplesPerPixel > 1) {
+              throw new Error(
+                `Multiple samples per pixel in tiff not supported as part of a multi-tiff, found ${tiff.fileDirectory.SamplesPerPixel} samples per pixel`
+              );
+            }
             tiffImage.push({ selection: curSelection, tiff });
             channelNames[curSelection.c] = getImageSelectionName(
               name,
