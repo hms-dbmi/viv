@@ -101,7 +101,11 @@ test('getRenderingAttrs WebGL2', t => {
     interpolations.forEach(interpolation => {
       dtypes.forEach(dtype => {
         // the device passed in is not used in the function, the signature should probably be changed
-        const attrs = getRenderingAttrs(dtype, "unused device arg", interpolation);
+        const attrs = getRenderingAttrs(
+          dtype,
+          'unused device arg',
+          interpolation
+        );
         if (interpolation === 'linear' || dtype === 'Float64') {
           t.deepEqual(
             attrs.cast(new Uint16Array([1, 2, 3])),
