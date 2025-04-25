@@ -244,6 +244,7 @@ const XRLayer = class extends Layer {
    */
   draw(opts) {
     const { uniforms } = opts;
+    /** @type {{ textures: Record<string, import('@luma.gl/core').Binding>, model: Model }} */
     const { textures, model } = this.state;
     if (textures && model) {
       const { contrastLimits, domain, dtype, channelsVisible } = this.props;
@@ -265,7 +266,7 @@ const XRLayer = class extends Layer {
         { disableWarnings: false }
       );
       model.setBindings(textures);
-      model.draw(opts);
+      model.draw(opts.renderPass);
     }
   }
 
