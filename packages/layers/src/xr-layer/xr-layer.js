@@ -265,7 +265,7 @@ const XRLayer = class extends Layer {
         { disableWarnings: false }
       );
       model.setBindings(textures);
-      model.draw(opts);
+      model.draw(opts.renderPass);
     }
   }
 
