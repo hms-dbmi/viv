@@ -43,7 +43,7 @@ We recommend converting proprietrary file formats to open standard formats via t
 `bioformats2raw` + `raw2ometiff` pipeline. Non-pyramidal datasets are also supported 
 provided the individual texture can be uploaded to the GPU (< `4096 x 4096` in pixel size).
 
-Please see the [tutorial](./tutorial/README.md) for more information.
+Please see the [tutorial](./sites/docs/tutorial/README.md) for more information.
 
 > \*We describe **Indexed OME-TIFF** in our paper as an optional enhancement to provide
 > efficient random chunk access for OME-TIFF. Our approach substantially improves chunk
