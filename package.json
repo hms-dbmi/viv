@@ -30,7 +30,7 @@
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@luma.gl/test-utils": "catalog:",
     "@pnpm/types": "^11.1.0",
-    "@probe.gl/test-utils": "^3.5.0",
+    "@probe.gl/test-utils": "^4.1.0-alpha.2",
     "@svitejs/changesets-changelog-github-compact": "^1.1.0",
     "esbuild": "^0.25.0",
     "esno": "^4.8.0",
@@ -51,7 +51,7 @@
     "peerDependencyRules": {
       "allowedVersions": {
         "esbuild": "*",
-        "@loaders.gl/core": "3.2"
+        "@loaders.gl/core": "4.3.0"
       }
     }
   },
