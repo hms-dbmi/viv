@@ -49,10 +49,7 @@ const XRLayer = class extends Layer {
    */
   getShaders() {
     const { dtype, interpolation } = this.props;
-    const { shaderModule, sampler } = getRenderingAttrs(
-      dtype,
-      interpolation
-    );
+    const { shaderModule, sampler } = getRenderingAttrs(dtype, interpolation);
     const extensionDefinesDeckglProcessIntensity =
       this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
     const newChannelsModule = { ...channels, inject: {} };
@@ -309,10 +306,7 @@ const XRLayer = class extends Layer {
    */
   dataToTexture(data, width, height) {
     const { interpolation } = this.props;
-    const attrs = getRenderingAttrs(
-      this.props.dtype,
-      interpolation
-    );
+    const attrs = getRenderingAttrs(this.props.dtype, interpolation);
 
     return this.context.device.createTexture({
       width,

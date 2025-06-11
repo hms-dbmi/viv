@@ -96,10 +96,7 @@ test('getRenderingAttrs WebGL2', t => {
   try {
     interpolations.forEach(interpolation => {
       dtypes.forEach(dtype => {
-        const attrs = getRenderingAttrs(
-          dtype,
-          interpolation
-        );
+        const attrs = getRenderingAttrs(dtype, interpolation);
         if (interpolation === 'linear' || dtype === 'Float64') {
           t.deepEqual(
             attrs.cast(new Uint16Array([1, 2, 3])),
