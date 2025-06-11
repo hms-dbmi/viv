@@ -51,7 +51,6 @@ const XRLayer = class extends Layer {
     const { dtype, interpolation } = this.props;
     const { shaderModule, sampler } = getRenderingAttrs(
       dtype,
-      this.context.device,
       interpolation
     );
     const extensionDefinesDeckglProcessIntensity =
@@ -312,7 +311,6 @@ const XRLayer = class extends Layer {
     const { interpolation } = this.props;
     const attrs = getRenderingAttrs(
       this.props.dtype,
-      this.context.device,
       interpolation
     );
 
