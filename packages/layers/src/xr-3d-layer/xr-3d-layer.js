@@ -324,7 +324,7 @@ const XR3DLayer = class extends Layer {
         { disableWanings: false }
       );
       model.setBindings(textures);
-      model.draw(opts.renderPass);
+      model.draw(this.context.renderPass);
     }
   }
 
