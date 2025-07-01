@@ -11,7 +11,7 @@
     "@hms-dbmi/viv": "workspace:*",
     "@mui/material": "^6.0.0",
     "@mui/icons-material": "^6.0.0",
-    "@mui/styles": "^6.0.0",
+    "@mui/styles": "^6.4.12",
     "@math.gl/core": "catalog:",
     "geotiff": "^2.0.5",
     "lodash": "^4.17.21",
