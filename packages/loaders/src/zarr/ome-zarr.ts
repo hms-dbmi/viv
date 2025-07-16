@@ -1,4 +1,4 @@
-import type { Array as ZarrArray, Readable } from 'zarrita';
+import type { Readable } from 'zarrita';
 import { guessTileSize, loadMultiscales } from './lib/utils';
 import ZarrPixelSource from './pixel-source';
 
@@ -35,12 +35,25 @@ interface Multiscale {
   datasets: { path: string }[];
   axes?: string[] | Axis[];
   version?: string;
+  coordinateTransformations?: object[]; // TODO: stricter type
 }
 
-export interface RootAttrs {
+type SpatialDataTempAttrs = {
+  channels_metadata?: {
+    channels: { label: number }[];
+  }
+  'image-label'?: { version: string };
+}
+
+export type RootAttrs = {
   omero: Omero;
   multiscales: Multiscale[];
-}
+} | SpatialDataTempAttrs;
+
+export type LoadOmeZarrReturnValue = {
+  data: ZarrPixelSource[];
+  metadata: RootAttrs;
+};
 
 export async function load(store: Readable) {
   const { data, rootAttrs, labels } = await loadMultiscales(store);

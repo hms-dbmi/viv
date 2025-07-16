@@ -39,6 +39,8 @@ type OmeTiffImage = {
   metadata: OmeXml[number];
 };
 
+export type LoadOmeTiffReturnValue = OmeTiffImage;
+
 function isSupportedCompanionOmeTiffFile(source: string | File) {
   return typeof source === 'string' && source.endsWith('.companion.ome');
 }
