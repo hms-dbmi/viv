@@ -1,11 +1,19 @@
 # @hms-dbmi/viv
 
+## 0.18.0
+
+### Minor Changes
+
+- update deck.gl (9.1.11), luma.gl (9.1.9) and related dependencies (`@vivjs/extensions`, `@vivjs/constants`, `@vivjs/loaders`, `@vivjs/viewers`, `@vivjs/layers`, `@vivjs/types`, `@vivjs/views`, `@hms-dbmi/viv`) ([#885](https://github.com/hms-dbmi/viv/pull/885))
+
+### Patch Changes
+
+
 ## 0.17.3
 
 ### Patch Changes
 
 - Disallow multiple samples-per-pixel in multi-file tiff loaders (`@vivjs/loaders`) ([#883](https://github.com/hms-dbmi/viv/pull/883))
-
 
 ## 0.17.2
 
