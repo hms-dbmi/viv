@@ -1,5 +1,5 @@
 import type { GeoTIFFImage } from 'geotiff';
-import type { TypedArray } from 'zarr';
+import type { TypedArray, NumberDataType, BigintDataType } from 'zarrita';
 import { SIGNAL_ABORTED, getImageSize, isInterleaved } from '../utils';
 
 import type {
@@ -64,11 +64,11 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
      * geotiff.js returns objects with different structure
      * depending on `interleave`. It's weird, but this seems to work.
      */
-    const data = (interleave ? raster : raster[0]) as TypedArray;
+    const data = (interleave ? raster : raster[0]) as TypedArray<NumberDataType | BigintDataType>;
     return {
       data,
-      width: (raster as TypedArray & { width: number }).width,
-      height: (raster as TypedArray & { height: number }).height
+      width: (raster as TypedArray<NumberDataType | BigintDataType> & { width: number }).width,
+      height: (raster as TypedArray<NumberDataType | BigintDataType> & { height: number }).height
     } as PixelData;
   }
 

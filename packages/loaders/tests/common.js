@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { KeyError } from 'zarr';
+import { KeyError } from 'zarrita';
 
 /*
  * Minimal store implementation to read zarr from file system in Node.
