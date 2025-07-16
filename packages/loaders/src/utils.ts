@@ -1,6 +1,6 @@
 import type { Labels, PixelSource } from '@vivjs/types';
 import quickselect from 'quickselect';
-import type { TypedArray } from 'zarr';
+import type { TypedArray, Array as ZarrArray, NumberDataType, BigintDataType } from 'zarrita';
 import type { OmeXml } from './omexml';
 
 export const DTYPE_LOOKUP = {
@@ -24,7 +24,7 @@ export const DTYPE_LOOKUP = {
  * @param {TypedArray} arr
  * @return {{ mean: number, sd: number, q1: number, q3: number, median: number, domain: number[], contrastLimits: number[] }}
  */
-export function getChannelStats(arr: TypedArray) {
+export function getChannelStats(arr: TypedArray<NumberDataType>) {
   let len = arr.length;
   let min = Number.POSITIVE_INFINITY;
   let max = Number.NEGATIVE_INFINITY;

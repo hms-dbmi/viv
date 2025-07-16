@@ -29,7 +29,7 @@
     "geotiff": "^2.0.5",
     "lzw-tiff-decoder": "^0.1.1",
     "quickselect": "^2.0.0",
-    "zarr": "^0.6.2",
+    "zarrita": "^0.5.2",
     "zod": "^3.22.4"
   },
   "unbuild": {

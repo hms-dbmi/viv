@@ -1,4 +1,4 @@
-import type { ZarrArray } from 'zarr';
+import type { Array as ZarrArray, NumberDataType, BigintDataType, Readable } from 'zarrita';
 
 import { fromString } from '../omexml';
 import {
@@ -9,7 +9,7 @@ import {
 import ZarrPixelSource from './pixel-source';
 
 export async function load(
-  root: ZarrArray['store'],
+  root: Readable,
   xmlSource: string | File | Response
 ) {
   let xmlSourceText: string;
@@ -26,7 +26,7 @@ export async function load(
 
   const labels = guessBioformatsLabels(data[0], imgMeta);
   const tileSize = guessTileSize(data[0]);
-  const pyramid = data.map(arr => new ZarrPixelSource(arr, labels, tileSize));
+  const pyramid = data.map(arr => new ZarrPixelSource(arr, { labels, tileSize }));
 
   return {
     data: pyramid,

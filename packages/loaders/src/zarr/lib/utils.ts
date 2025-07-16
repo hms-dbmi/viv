@@ -1,5 +1,5 @@
-import { openGroup } from 'zarr';
-import type { ZarrArray } from 'zarr';
+import { open as zarrOpen, root as zarrRoot, get as zarrGet } from 'zarrita';
+import type { Array as ZarrArray, Readable, AsyncReadable, NumberDataType, BigintDataType } from 'zarrita';
 import type { OmeXml } from '../../omexml';
 import { getLabels, isInterleaved, prevPowerOf2 } from '../../utils';
 
@@ -26,7 +26,7 @@ function isOmeZarr(dataShape: number[], Pixels: OmeXml[0]['Pixels']) {
  * tries to specify different dimension orders.
  */
 export function guessBioformatsLabels(
-  { shape }: ZarrArray,
+  { shape }: ZarrArray<NumberDataType | BigintDataType, Readable>,
   { Pixels }: OmeXml[0]
 ) {
   if (isOmeZarr(shape, Pixels)) {
@@ -79,9 +79,10 @@ function castLabels(dimnames: string[]) {
   return dimnames as Labels<string[]>;
 }
 
-export async function loadMultiscales(store: ZarrArray['store'], path = '') {
-  const grp = await openGroup(store, path);
-  const rootAttrs = (await grp.attrs.asObject()) as RootAttrs;
+export async function loadMultiscales(store: Readable, path = '') {
+  const storeRoot = zarrRoot(store);
+  const grp = await zarrOpen(storeRoot.resolve(path), { kind: 'group' });
+  const rootAttrs = (grp.attrs) as unknown as RootAttrs;
 
   let paths = ['0'];
   // Default axes used for v0.1 and v0.2.
@@ -98,15 +99,15 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
     }
   }
 
-  const data = paths.map(path => grp.getItem(path));
+  const data = paths.map(async path => await zarrOpen(storeRoot.resolve(path), { kind: 'array' }));
   return {
-    data: (await Promise.all(data)) as ZarrArray[],
+    data: (await Promise.all(data)) as ZarrArray<NumberDataType | BigintDataType, Readable>[],
     rootAttrs,
     labels
   };
 }
 
-export function guessTileSize(arr: ZarrArray) {
+export function guessTileSize(arr: ZarrArray<NumberDataType | BigintDataType, Readable>) {
   const interleaved = isInterleaved(arr.shape);
   const [yChunk, xChunk] = arr.chunks.slice(interleaved ? -3 : -2);
   const size = Math.min(yChunk, xChunk);
