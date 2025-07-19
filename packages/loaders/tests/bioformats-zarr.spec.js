@@ -22,7 +22,7 @@ test('Creates correct ZarrPixelSource.', async () => {
   expect(base.meta).toBeUndefined();
 });
 
-test.skip('Get raster data.', async () => {
+test('Get raster data.', async () => {
   const { data } = await load(store, meta);
   const [base] = data;
   for (let c = 0; c < 3; c += 1) {
