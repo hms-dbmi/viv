@@ -1,4 +1,4 @@
-import test from 'tape-catch';
+import { test, expect } from 'vitest';
 
 import { VivView } from '../src';
 import { getVivId } from '../src/utils';
@@ -17,45 +17,27 @@ export const defaultViewState = {
 };
 
 export function generateViewTests(ViewType, args, linkedViewIds = []) {
-  test(`${ViewType.name} constructor test`, t => {
+  test(`${ViewType.name} constructor test`, () => {
     const view = new ViewType(args);
     const { id, height, width, x, y } = view;
-    t.ok(id, `${ViewType.name} should have its id.`);
-    t.ok(height, `${ViewType.name} should have its height.`);
-    t.ok(width, `${ViewType.name} should  have its width.`);
-    t.ok(x, `${ViewType.name} should have its x position.`);
-    t.ok(y, `${ViewType.name} should have its y position.`);
-    t.end();
+    expect(id).toBeTruthy();
+    expect(height).toBeTruthy();
+    expect(width).toBeTruthy();
+    expect(x).toBeTruthy();
+    expect(y).toBeTruthy();
   });
 
-  test(`${ViewType.name} DeckGLView test`, t => {
+  test(`${ViewType.name} DeckGLView test`, () => {
     const view = new ViewType(args);
     const deckGLView = view.getDeckGlView();
     const { height, width, x, y } = view;
-    t.equal(
-      deckGLView._height.position,
-      height,
-      'deckGLView should have same height as instance.'
-    );
-    t.equal(
-      deckGLView._width.position,
-      width,
-      'deckGLView should have same width as instance.'
-    );
-    t.equal(
-      deckGLView._y.position,
-      y,
-      'deckGLView should have same y as instance.'
-    );
-    t.equal(
-      deckGLView._x.position,
-      x,
-      'deckGLView should have same x as instance.'
-    );
-    t.end();
+    expect(deckGLView._height.position).toBe(height);
+    expect(deckGLView._width.position).toBe(width);
+    expect(deckGLView._y.position).toBe(y);
+    expect(deckGLView._x.position).toBe(x);
   });
 
-  test(`${ViewType.name} layer test`, t => {
+  test(`${ViewType.name} layer test`, () => {
     const view = new ViewType(args);
     const viewStates = { [view.id]: defaultViewState };
     linkedViewIds.forEach(id => {
@@ -72,12 +54,8 @@ export function generateViewTests(ViewType, args, linkedViewIds = []) {
     });
     layers?.forEach(layer => {
       layer &&
-        t.ok(
-          layer.id.includes(getVivId(view.id)),
-          "Layer should include view's id as returned by getVivId."
-        );
+        expect(layer.id.includes(getVivId(view.id))).toBeTruthy();
     });
-    t.end();
   });
 }
 

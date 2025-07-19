@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "test": "node ../../scripts/bundle-test.mjs tests/index.spec.js | tape-run | tap-spec"
+    "test": "vitest --run"
   },
   "peerDependencies": {
     "@deck.gl/core": "catalog:",

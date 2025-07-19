@@ -1,5 +1,5 @@
 import { MultiscaleImageLayer, ScaleBarLayer } from '@vivjs/layers';
-import test from 'tape-catch';
+import { test, expect } from 'vitest';
 import { DETAIL_VIEW_ID, DetailView } from '../src';
 import { defaultArguments, generateViewTests } from './VivView.spec';
 
@@ -10,7 +10,7 @@ detailViewArguments.initialViewState.id = id;
 
 generateViewTests(DetailView, detailViewArguments);
 
-test('DetailView layer type and props check', t => {
+test('DetailView layer type and props check', () => {
   const view = new DetailView(detailViewArguments);
   const loader = { type: 'loads' };
   const layers = view.getLayers({
@@ -28,23 +28,12 @@ test('DetailView layer type and props check', t => {
       }
     }
   });
-  t.ok(
-    layers[0] instanceof MultiscaleImageLayer,
-    'DetailView layer should be MultiscaleImageLayer.'
-  );
-  t.ok(
-    layers[1] instanceof ScaleBarLayer,
-    'DetailView layer should be ScaleBarLayer.'
-  );
-  t.equal(
-    layers[0].props.viewportId,
-    view.id,
-    'DetailView id should be passed down to layer as ViewportId.'
-  );
-  t.end();
+  expect(layers[0] instanceof MultiscaleImageLayer).toBeTruthy();
+  expect(layers[1] instanceof ScaleBarLayer).toBeTruthy();
+  expect(layers[0].props.viewportId).toBe(view.id);
 });
 
-test('DetailView does not render scale bar without physical size', t => {
+test('DetailView does not render scale bar without physical size', () => {
   const view = new DetailView(detailViewArguments);
   const loader = { type: 'loads' };
   const layers = view.getLayers({
@@ -58,13 +47,6 @@ test('DetailView does not render scale bar without physical size', t => {
       }
     }
   });
-  t.ok(
-    layers[0] instanceof MultiscaleImageLayer,
-    'DetailView layer should be MultiscaleImageLayer.'
-  );
-  t.ok(
-    layers.length === 1,
-    'DetailView layer should not display ScaleBarLayer in without physical size.'
-  );
-  t.end();
+  expect(layers[0] instanceof MultiscaleImageLayer).toBeTruthy();
+  expect(layers.length === 1).toBeTruthy();
 });

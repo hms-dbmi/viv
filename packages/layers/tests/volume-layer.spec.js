@@ -1,9 +1,9 @@
 import { OrbitView } from '@deck.gl/core';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
-import test from 'tape-catch';
+import { test, expect } from 'vitest';
 import VolumeLayer from '../src/volume-layer/volume-layer';
 
-test('VolumeLayer', t => {
+test('VolumeLayer - generateLayerTests', () => {
   const view = new OrbitView({
     id: 'ortho',
     controller: true,
@@ -14,7 +14,7 @@ test('VolumeLayer', t => {
   });
   const testCases = generateLayerTests({
     Layer: VolumeLayer,
-    assert: t.ok,
+    assert: (value, msg) => expect(value).toBeTruthy(),
     sampleProps: {
       contrastLimits: [
         [0, 10],
@@ -49,22 +49,24 @@ test('VolumeLayer', t => {
       ],
       selections: [{}, {}]
     },
-    onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
+    onBeforeUpdate: ({ testCase }) => {
+      // Vitest does not have t.comment, so use console.log
+      console.log(testCase.title);
+    }
   });
   testLayer({
     Layer: VolumeLayer,
     testCases,
-    onError: t.notOkimport,
+    onError: (err) => expect(err).toBeFalsy(),
     viewport: view.makeViewport({
       height: 4,
       width: 4,
       viewState: { target: [2, 2, 0], zoom: 0, width: 4, height: 4 }
     })
   });
-  t.end();
 });
 
-test('VolumeLayer', t => {
+test('VolumeLayer - loader selection', () => {
   const view = new OrbitView({
     id: 'ortho',
     controller: true,
@@ -123,10 +125,7 @@ test('VolumeLayer', t => {
         selections: []
       },
       onAfterUpdate: () => {
-        t.ok(
-          state.data.length === 0,
-          'Empty loader selection produces no data.'
-        );
+        expect(state.data.length === 0).toBeTruthy();
       }
     },
     {
@@ -134,18 +133,17 @@ test('VolumeLayer', t => {
         selections: [1, 2]
       },
       onAfterUpdate: () =>
-        t.ok(state.data.length === 8, 'Updated loader selection requests data.')
+        expect(state.data.length === 8).toBeTruthy()
     }
   ];
   testLayer({
     Layer: VolumeLayer,
     testCases,
-    onError: t.notOkimport,
+    onError: (err) => expect(err).toBeFalsy(),
     viewport: view.makeViewport({
       height: 4,
       width: 4,
       viewState: { target: [2, 2, 0], zoom: 0, width: 4, height: 4 }
     })
   });
-  t.end();
 });

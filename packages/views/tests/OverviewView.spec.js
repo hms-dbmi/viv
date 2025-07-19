@@ -1,5 +1,5 @@
 import { OverviewLayer } from '@vivjs/layers';
-import test from 'tape-catch';
+import { test, expect, describe } from 'vitest';
 import { DETAIL_VIEW_ID, OVERVIEW_VIEW_ID, OverviewView } from '../src';
 import {
   defaultArguments,
@@ -32,9 +32,8 @@ const linkedViewIds = [DETAIL_VIEW_ID];
 
 generateViewTests(OverviewView, overviewViewArguments, linkedViewIds);
 
-test('OverviewView layer type check.', t => {
+test('OverviewView layer type check.', () => {
   const view = new OverviewView(overviewViewArguments);
-
   const viewState = view.filterViewState({ viewState: overviewViewState });
   const layers = view.getLayers({
     props: { loader },
@@ -43,32 +42,19 @@ test('OverviewView layer type check.', t => {
       [DETAIL_VIEW_ID]: viewState
     }
   });
-  t.ok(
-    layers[0] instanceof OverviewLayer,
-    'OverviewView layer should be OverviewLayer.'
-  );
-  t.end();
+  expect(layers[0] instanceof OverviewLayer).toBeTruthy();
 });
 
-test('OverviewView respects maximumHeight and minimumHeight when height > width.', t => {
+test('OverviewView respects maximumHeight and minimumHeight when height > width.', () => {
   const minimumHeight = 350;
   let view = new OverviewView({ ...overviewViewArguments, minimumHeight });
-  t.equal(
-    view.height,
-    350,
-    'OverviewView height should be minimumHeight when set and not calculated'
-  );
+  expect(view.height).toBe(350);
   const maximumHeight = 5;
   view = new OverviewView({ ...overviewViewArguments, maximumHeight });
-  t.equal(
-    view.height,
-    5,
-    'OverviewView height should be maximumHeight when set and not calculated'
-  );
-  t.end();
+  expect(view.height).toBe(5);
 });
 
-test('OverviewView respects maximumWidth and minimumWidth when width > height.', t => {
+test('OverviewView respects maximumWidth and minimumWidth when width > height.', () => {
   const minimumWidth = 350;
   const loaderWidth = [
     { type: 'loads', shape: [10000, 20000] },
@@ -80,26 +66,17 @@ test('OverviewView respects maximumWidth and minimumWidth when width > height.',
     loader: loaderWidth,
     minimumWidth
   });
-  t.equal(
-    view.width,
-    350,
-    'OverviewView width should be minimumWidth when set and not calculated'
-  );
+  expect(view.width).toBe(350);
   const maximumWidth = 5;
   view = new OverviewView({
     ...overviewViewArguments,
     loader: loaderWidth,
     maximumWidth
   });
-  t.equal(
-    view.width,
-    5,
-    'OverviewView width should be maximumWidth when set and not calculated'
-  );
-  t.end();
+  expect(view.width).toBe(5);
 });
 
-test('OverviewView maintains viewState.', t => {
+test('OverviewView maintains viewState.', () => {
   const view = new OverviewView(overviewViewArguments);
   const viewState1 = view.filterViewState({
     height: 10,
@@ -114,25 +91,8 @@ test('OverviewView maintains viewState.', t => {
     zoom: 0
   });
   const { height, width } = view;
-  t.equal(
-    viewState1.zoom,
-    -(loader.length - 1),
-    'Zoom level is the number of levels of the image pyramid minus one.'
-  );
-  t.equal(
-    viewState1.height,
-    height,
-    'Height is the same as the initialized value.'
-  );
-  t.equal(
-    viewState1.width,
-    width,
-    'Width is the same as the initialized value.'
-  );
-  t.deepEqual(
-    viewState1.target,
-    viewState2.target,
-    'Target is constant over multiple calls'
-  );
-  t.end();
+  expect(viewState1.zoom).toBe(-(loader.length - 1));
+  expect(viewState1.height).toBe(height);
+  expect(viewState1.width).toBe(width);
+  expect(viewState1.target).toEqual(viewState2.target);
 });
