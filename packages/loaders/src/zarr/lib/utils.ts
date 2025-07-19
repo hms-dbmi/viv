@@ -79,9 +79,9 @@ function castLabels(dimnames: string[]) {
   return dimnames as Labels<string[]>;
 }
 
-export async function loadMultiscales(store: Readable, path = '') {
-  const storeRoot = zarrRoot(store);
-  const grp = await zarrOpen(storeRoot.resolve(path), { kind: 'group' });
+export async function loadMultiscales(store: Readable, initialPath = '') {
+  const storeRoot = zarrRoot(store).resolve(initialPath);
+  const grp = await zarrOpen(storeRoot, { kind: 'group' });
   const rootAttrs = (grp.attrs) as unknown as RootAttrs;
 
   let paths = ['0'];
