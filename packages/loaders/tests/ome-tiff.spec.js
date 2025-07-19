@@ -1,4 +1,4 @@
-import { test, expect } from 'vitest';
+import { expect, test } from 'vitest';
 import { loadOmeTiff } from '../src/tiff';
 import { loadSingleFileOmeTiff } from '../src/tiff/singlefile-ome-tiff';
 
@@ -38,7 +38,9 @@ test('Get raster data.', async () => {
     expect(pixelData.data.length).toBe(439 * 167);
     expect(pixelData.data.constructor.name).toBe('Int8Array');
   }
-  await expect(base.getRaster({ selection: { c: 3, z: 0, t: 0 } })).rejects.toThrow();
+  await expect(
+    base.getRaster({ selection: { c: 3, z: 0, t: 0 } })
+  ).rejects.toThrow();
 });
 
 test('Correct OME-XML.', async () => {

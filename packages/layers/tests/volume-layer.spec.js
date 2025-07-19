@@ -1,6 +1,6 @@
 import { OrbitView } from '@deck.gl/core';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
-import { test, expect } from 'vitest';
+import { expect, test } from 'vitest';
 import VolumeLayer from '../src/volume-layer/volume-layer';
 
 test('VolumeLayer - generateLayerTests', () => {
@@ -57,7 +57,7 @@ test('VolumeLayer - generateLayerTests', () => {
   testLayer({
     Layer: VolumeLayer,
     testCases,
-    onError: (err) => expect(err).toBeFalsy(),
+    onError: err => expect(err).toBeFalsy(),
     viewport: view.makeViewport({
       height: 4,
       width: 4,
@@ -132,14 +132,13 @@ test('VolumeLayer - loader selection', () => {
       updateProps: {
         selections: [1, 2]
       },
-      onAfterUpdate: () =>
-        expect(state.data.length === 8).toBeTruthy()
+      onAfterUpdate: () => expect(state.data.length === 8).toBeTruthy()
     }
   ];
   testLayer({
     Layer: VolumeLayer,
     testCases,
-    onError: (err) => expect(err).toBeFalsy(),
+    onError: err => expect(err).toBeFalsy(),
     viewport: view.makeViewport({
       height: 4,
       width: 4,

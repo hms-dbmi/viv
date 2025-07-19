@@ -1,6 +1,6 @@
 import { OrthographicView } from '@deck.gl/core';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
-import { test, expect } from 'vitest';
+import { expect, test } from 'vitest';
 import ScaleBarLayer from '../src/scale-bar-layer';
 
 test('ScaleBarLayer', () => {
@@ -29,7 +29,7 @@ test('ScaleBarLayer', () => {
   testLayer({
     Layer: ScaleBarLayer,
     testCases,
-    onError: (err) => expect(err).toBeFalsy(),
+    onError: err => expect(err).toBeFalsy(),
     viewport: view.makeViewport({
       height: 4,
       width: 4,

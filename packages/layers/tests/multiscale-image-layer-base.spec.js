@@ -1,6 +1,6 @@
 import { OrthographicView } from '@deck.gl/core';
 import { generateLayerTests, testLayerAsync } from '@deck.gl/test-utils';
-import { test, expect } from 'vitest';
+import { expect, test } from 'vitest';
 import BitmapLayer from '../src/bitmap-layer';
 import MultiscaleImageLayerBase from '../src/multiscale-image-layer/multiscale-image-layer-base';
 
@@ -49,7 +49,7 @@ test('MultiscaleImageLayerBase', async () => {
   await testLayerAsync({
     Layer: MultiscaleImageLayerBase,
     testCases,
-    onError: (err) => expect(err).toBeFalsy(),
+    onError: err => expect(err).toBeFalsy(),
     viewport: view.makeViewport({
       height: 4,
       width: 4,
@@ -100,7 +100,7 @@ test('MultiscaleImageLayerBaseBitmapLayer', async () => {
   await testLayerAsync({
     Layer: MultiscaleImageLayerBase,
     testCases,
-    onError: (err) => expect(err).toBeFalsy(),
+    onError: err => expect(err).toBeFalsy(),
     viewport: view.makeViewport({
       height: 4,
       width: 4,

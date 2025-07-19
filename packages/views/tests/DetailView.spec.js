@@ -1,5 +1,5 @@
 import { MultiscaleImageLayer, ScaleBarLayer } from '@vivjs/layers';
-import { test, expect } from 'vitest';
+import { expect, test } from 'vitest';
 import { DETAIL_VIEW_ID, DetailView } from '../src';
 import { defaultArguments, generateViewTests } from './VivView.spec';
 

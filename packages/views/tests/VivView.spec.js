@@ -1,4 +1,4 @@
-import { test, expect } from 'vitest';
+import { expect, test } from 'vitest';
 
 import { VivView } from '../src';
 import { getVivId } from '../src/utils';
@@ -53,8 +53,7 @@ export function generateViewTests(ViewType, args, linkedViewIds = []) {
       viewStates
     });
     layers?.forEach(layer => {
-      layer &&
-        expect(layer.id.includes(getVivId(view.id))).toBeTruthy();
+      layer && expect(layer.id.includes(getVivId(view.id))).toBeTruthy();
     });
   });
 }

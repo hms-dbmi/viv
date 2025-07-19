@@ -1,5 +1,5 @@
 import { fromFile } from 'geotiff';
-import { test, expect } from 'vitest';
+import { expect, test } from 'vitest';
 
 import { createOffsetsProxy } from '../src/tiff/lib/proxies';
 

@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { range } from '../src/multiscale-image-layer/utils';
 import {
   padContrastLimits,
@@ -70,9 +70,13 @@ describe('utils', () => {
       for (const dtype of dtypes) {
         const attrs = getRenderingAttrs(dtype, interpolation);
         if (interpolation === 'linear' || dtype === 'Float64') {
-          expect(attrs.cast(new Uint16Array([1, 2, 3]))).toEqual(new Float32Array([1, 2, 3]));
+          expect(attrs.cast(new Uint16Array([1, 2, 3]))).toEqual(
+            new Float32Array([1, 2, 3])
+          );
         } else {
-          expect(attrs.cast(new Uint16Array([1, 2, 3]))).toEqual(new Uint16Array([1, 2, 3]));
+          expect(attrs.cast(new Uint16Array([1, 2, 3]))).toEqual(
+            new Uint16Array([1, 2, 3])
+          );
         }
         expect(attrs.filter).toBe(interpolation);
       }

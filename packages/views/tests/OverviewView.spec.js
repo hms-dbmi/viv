@@ -1,5 +1,5 @@
 import { OverviewLayer } from '@vivjs/layers';
-import { test, expect, describe } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { DETAIL_VIEW_ID, OVERVIEW_VIEW_ID, OverviewView } from '../src';
 import {
   defaultArguments,

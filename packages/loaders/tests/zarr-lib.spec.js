@@ -1,4 +1,4 @@
-import { test, expect } from 'vitest';
+import { expect, test } from 'vitest';
 import { getIndexer } from '../src/zarr/lib/indexer';
 import { loadMultiscales } from '../src/zarr/lib/utils';
 import { FileSystemStore } from './common';

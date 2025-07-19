@@ -1,5 +1,5 @@
 import { fromFile } from 'geotiff';
-import { test, expect } from 'vitest';
+import { expect, test } from 'vitest';
 import { loadMultiTiff } from '../src/tiff';
 import { load } from '../src/tiff/multi-tiff';
 
@@ -82,7 +82,9 @@ test('Get raster data for MultiTIFF.', async () => {
     expect(pixelData.data.length).toBe(439 * 167);
     expect(pixelData.data.constructor.name).toBe('Uint8Array');
   }
-  await expect(base.getRaster({ selection: { c: 3, z: 0, t: 0 } })).rejects.toThrow();
+  await expect(
+    base.getRaster({ selection: { c: 3, z: 0, t: 0 } })
+  ).rejects.toThrow();
 });
 
 test('Correct MultiTIFF metadata.', async () => {

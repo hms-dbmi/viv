@@ -1,6 +1,6 @@
 import { OrthographicView } from '@deck.gl/core';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import ImageLayer from '../src/image-layer';
 
 // First test suite
@@ -42,7 +42,7 @@ describe('ImageLayer', () => {
     testLayer({
       Layer: ImageLayer,
       testCases,
-      onError: (err) => expect(err).toBeUndefined(),
+      onError: err => expect(err).toBeUndefined(),
       viewport: view.makeViewport({
         height: 4,
         width: 4,
@@ -103,7 +103,7 @@ describe('ImageLayer', () => {
     testLayer({
       Layer: ImageLayer,
       testCases,
-      onError: (err) => expect(err).toBeUndefined(),
+      onError: err => expect(err).toBeUndefined(),
       viewport: view.makeViewport({
         height: 4,
         width: 4,
