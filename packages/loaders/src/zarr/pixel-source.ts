@@ -1,4 +1,4 @@
-import type { ZarrArray } from 'zarr';
+import * as zarr from "zarrita";
 import { getImageSize, isInterleaved } from '../utils';
 import { getIndexer } from './lib/indexer';
 
@@ -8,7 +8,8 @@ import type {
   PixelSource,
   PixelSourceSelection,
   RasterSelection,
-  TileSelection
+  TileSelection,
+  SupportedDtype,
 } from '@vivjs/types';
 
 const DTYPE_LOOKUP = {
@@ -22,146 +23,203 @@ const DTYPE_LOOKUP = {
   i4: 'Int32'
 } as const;
 
-type ZarrIndexer<S extends string[]> = (
-  sel: { [K in S[number]]: number } | number[]
-) => number[];
+const X_AXIS_NAME = "x";
+const Y_AXIS_NAME = "y";
+const RGBA_CHANNEL_AXIS_NAME = "_c";
 
-interface ZarrTileSelection {
-  x: number;
-  y: number;
-  selection: number[];
-  signal?: AbortSignal;
+type VivPixelData = {
+  data: zarr.TypedArray<Lowercase<SupportedDtype>>;
+  width: number;
+  height: number;
+};
+
+/**
+ * Error thrown when an assertion fails.
+ * Reference: https://github.com/hms-dbmi/vizarr/blob/862745c1c7c095748bbe97475da61807d5b49189/src/utils.ts#L399 
+ */
+export class AssertionError extends Error {
+  /** @param message The error message. */
+  constructor(message: string) {
+    super(message);
+    this.name = "AssertionError";
+  }
 }
 
-interface ZarrRasterSelection {
-  selection: number[];
-  signal?: AbortSignal;
+/**
+ * Make an assertion. An error is thrown if `expr` does not have truthy value.
+ * Reference: https://github.com/hms-dbmi/vizarr/blob/862745c1c7c095748bbe97475da61807d5b49189/src/utils.ts#L430
+ *
+ * @param expr The expression to test.
+ * @param msg The message to display if the assertion fails.
+ */
+export function assert(expr: unknown, msg = ""): asserts expr {
+  if (!expr) {
+    throw new AssertionError(msg);
+  }
 }
 
-interface Slice {
-  start: number;
-  stop: number;
-  step: number;
-  _slice: true;
-}
+// Reference: https://github.com/hms-dbmi/vizarr/blob/main/src/ZarrPixelSource.ts 
+export class ZarrPixelSource implements PixelSource<Array<string>> {
+  readonly labels: Labels<Array<string>>;
+  readonly tileSize: number;
+  readonly dtype: SupportedDtype;
+  readonly #arr: zarr.Array<zarr.NumberDataType | zarr.BigintDataType, zarr.Readable>;
+  readonly #transform: (
+    arr: zarr.TypedArray<zarr.NumberDataType | zarr.BigintDataType>,
+  ) => zarr.TypedArray<Lowercase<SupportedDtype>>;
 
-function slice(start: number, stop: number): Slice {
-  return { start, stop, step: 1, _slice: true };
-}
-
-type ZarrSource = Pick<ZarrArray, 'shape' | 'chunks' | 'dtype' | 'getRaw'>;
-
-class BoundsCheckError extends Error {}
-
-class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
-  private _data: ZarrSource;
-  private _indexer: ZarrIndexer<S>;
+  #pendingId: undefined | number = undefined;
+  #pending: Array<{
+    resolve: (data: VivPixelData) => void;
+    reject: (err: unknown) => void;
+    request: {
+      selection: Array<number | zarr.Slice>;
+      signal?: AbortSignal;
+    };
+  }> = [];
 
   constructor(
-    data: ZarrSource,
-    public labels: Labels<S>,
-    public tileSize: number
+    arr: zarr.Array<zarr.DataType, zarr.Readable>,
+    options: { labels: Labels<Array<string>>; tileSize: number },
   ) {
-    this._indexer = getIndexer(labels);
-    this._data = data;
+    assert(arr.is("number") || arr.is("bigint"), `Unsupported viv dtype: ${arr.dtype}`);
+    this.#arr = arr;
+    this.labels = options.labels;
+    this.tileSize = options.tileSize;
+    /**
+     * Some `zarrita` data types are not supported by Viv and require casting.
+     *
+     * Note how the casted type in the transform function is type-cast to `zarr.TypedArray<typeof arr.dtype>`.
+     * This ensures that the function body is correct based on whatever type narrowing we do in the if/else
+     * blocks based on dtype.
+     *
+     * TODO: Maybe we should add a console warning?
+     */
+    if (arr.dtype === "uint64" || arr.dtype === "int64") {
+      this.dtype = "Uint32";
+      this.#transform = (x) => Uint32Array.from(x as zarr.TypedArray<typeof arr.dtype>, (bint) => Number(bint));
+    } else if (arr.dtype === "float16") {
+      this.dtype = "Float32";
+      this.#transform = (x) => new Float32Array(x as zarr.TypedArray<typeof arr.dtype>);
+    } else {
+      this.dtype = capitalize(arr.dtype);
+      this.#transform = (x) => x as zarr.TypedArray<typeof arr.dtype>;
+    }
+  }
+
+  get #width() {
+    const lastIndex = this.shape.length - 1;
+    return this.shape[this.labels.indexOf("c") === lastIndex ? lastIndex - 1 : lastIndex];
+  }
+
+  get #height() {
+    const lastIndex = this.shape.length - 1;
+    return this.shape[this.labels.indexOf("c") === lastIndex ? lastIndex - 2 : lastIndex - 1];
   }
 
   get shape() {
-    return this._data.shape;
+    return this.#arr.shape;
   }
 
-  get dtype() {
-    const suffix = this._data.dtype.slice(1) as keyof typeof DTYPE_LOOKUP;
-    if (!(suffix in DTYPE_LOOKUP)) {
-      throw Error(`Zarr dtype not supported, got ${suffix}.`);
-    }
-    return DTYPE_LOOKUP[suffix];
+  async getRaster(options: {
+    selection: PixelSourceSelection<Array<string>> | Array<number>;
+    signal?: AbortSignal;
+  }): Promise<PixelData> {
+    const { selection, signal } = options;
+    return this.#fetchData({
+      selection: buildZarrSelection(selection, {
+        labels: this.labels,
+        slices: { x: zarr.slice(null), y: zarr.slice(null) },
+      }),
+      signal,
+    });
   }
 
-  private get _xIndex() {
-    const interleave = isInterleaved(this._data.shape);
-    return this._data.shape.length - (interleave ? 2 : 1);
+  onTileError(_err: unknown): void {
+    // no-op
   }
 
-  private _chunkIndex<T>(
-    selection: PixelSourceSelection<S> | number[],
-    { x, y }: { x: T; y: T }
-  ) {
-    const sel: (number | T)[] = this._indexer(selection);
-    sel[this._xIndex] = x;
-    sel[this._xIndex - 1] = y;
-    return sel;
+  async getTile(options: {
+    x: number;
+    y: number;
+    selection: PixelSourceSelection<Array<string>> | Array<number>;
+    signal?: AbortSignal;
+  }): Promise<PixelData> {
+    const { x, y, selection, signal } = options;
+    return this.#fetchData({
+      selection: buildZarrSelection(selection, {
+        labels: this.labels,
+        slices: {
+          x: zarr.slice(x * this.tileSize, Math.min((x + 1) * this.tileSize, this.#width)),
+          y: zarr.slice(y * this.tileSize, Math.min((y + 1) * this.tileSize, this.#height)),
+        },
+      }),
+      signal,
+    });
+  }
+
+  async #fetchData(request: { selection: Array<number | zarr.Slice>; signal?: AbortSignal }): Promise<PixelData> {
+    const { promise, resolve, reject } = Promise.withResolvers<VivPixelData>();
+    this.#pending.push({ request, resolve, reject });
+    this.#pendingId = this.#pendingId ?? requestAnimationFrame(() => this.#fetchPending());
+    // @ts-expect-error - The missing generic ArrayBuffer type from Viv makes VivPixelData and viv.PixelData incompatible, even though they are.
+    return promise;
   }
 
   /**
-   * Converts x, y tile indices to zarr dimension Slices within image bounds.
+   * Fetch a pending batch of requests together and resolve independently.
+   *
+   * TODO: There could be more optimizations (e.g., multi-get)
    */
-  private _getSlices(x: number, y: number): [Slice, Slice] {
-    const { height, width } = getImageSize(this);
-    const [xStart, xStop] = [
-      x * this.tileSize,
-      Math.min((x + 1) * this.tileSize, width)
-    ];
-    const [yStart, yStop] = [
-      y * this.tileSize,
-      Math.min((y + 1) * this.tileSize, height)
-    ];
-    // Deck.gl can sometimes request edge tiles that don't exist. We throw
-    // a BoundsCheckError which is picked up in `ZarrPixelSource.onTileError`
-    // and ignored by deck.gl.
-    if (xStart === xStop || yStart === yStop) {
-      throw new BoundsCheckError('Tile slice is zero-sized.');
+  async #fetchPending() {
+    for (const { request, resolve, reject } of this.#pending) {
+      zarr
+        .get(this.#arr, request.selection, { opts: { signal: request.signal } })
+        .then(({ data, shape }) => {
+          resolve({
+            data: this.#transform(data),
+            width: shape[1],
+            height: shape[0],
+          });
+        })
+        .catch((error) => reject(error));
     }
-    if (xStart < 0 || yStart < 0 || xStop > width || yStop > height) {
-      throw new BoundsCheckError('Tile slice is out of bounds.');
-    }
-
-    return [slice(xStart, xStop), slice(yStart, yStop)];
+    this.#pendingId = undefined;
+    this.#pending = [];
   }
+}
 
-  private async _getRaw(
-    selection: (null | Slice | number)[],
-    // biome-ignore lint/suspicious/noExplicitAny: any is used to pass through storeOptions
-    getOptions?: { storeOptions?: any }
-  ) {
-    const result = await this._data.getRaw(selection, getOptions);
-    if (typeof result !== 'object') {
-      throw new Error('Expected object from getRaw');
-    }
-    return result;
-  }
-
-  async getRaster({
-    selection,
-    signal
-  }: RasterSelection<S> | ZarrRasterSelection) {
-    const sel = this._chunkIndex(selection, { x: null, y: null });
-    const result = await this._getRaw(sel, { storeOptions: { signal } });
-    const {
-      data,
-      shape: [height, width]
-    } = result;
-    return { data, width, height } as PixelData;
-  }
-
-  async getTile(props: TileSelection<S> | ZarrTileSelection) {
-    const { x, y, selection, signal } = props;
-    const [xSlice, ySlice] = this._getSlices(x, y);
-    const sel = this._chunkIndex(selection, { x: xSlice, y: ySlice });
-    const tile = await this._getRaw(sel, { storeOptions: { signal } });
-    const {
-      data,
-      shape: [height, width]
-    } = tile;
-    return { data, height, width } as PixelData;
-  }
-
-  onTileError(err: Error) {
-    if (!(err instanceof BoundsCheckError)) {
-      // Rethrow error if something other than tile being requested is out of bounds.
-      throw err;
+function buildZarrSelection(
+  baseSelection: Record<string, number> | Array<number>,
+  options: {
+    labels: string[];
+    slices: { x: zarr.Slice; y: zarr.Slice };
+  },
+): Array<zarr.Slice | number> {
+  const { labels, slices } = options;
+  let selection: Array<zarr.Slice | number>;
+  if (Array.isArray(baseSelection)) {
+    // shallow copy
+    selection = [...baseSelection];
+  } else {
+    // initialize with zeros
+    selection = Array.from({ length: labels.length }, () => 0);
+    // fill in the selection
+    for (const [key, idx] of Object.entries(baseSelection)) {
+      selection[labels.indexOf(key)] = idx;
     }
   }
+  selection[labels.indexOf(X_AXIS_NAME)] = slices.x;
+  selection[labels.indexOf(Y_AXIS_NAME)] = slices.y;
+  if (RGBA_CHANNEL_AXIS_NAME in labels) {
+    selection[labels.indexOf(RGBA_CHANNEL_AXIS_NAME)] = zarr.slice(null);
+  }
+  return selection;
+}
+
+function capitalize<T extends string>(s: T): Capitalize<T> {
+  // @ts-expect-error - TypeScript can't verify that the return type is correct
+  return s[0].toUpperCase() + s.slice(1);
 }
 
 export default ZarrPixelSource;
