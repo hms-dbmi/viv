@@ -1,16 +1,12 @@
-import { BaseDecoder, type TypedArray, addDecoder } from "geotiff";
+import { BaseDecoder, type TypedArray } from 'geotiff';
 
 // @ts-ignore
-import openJpegFactory from "@cornerstonejs/codec-openjpeg/decodewasmjs";
-// - nb, comments from https://github.com/cornerstonejs/cornerstone3D/blob/014f4c4cc2b973b200ec9af2e16783464b9a2a0d/packages/dicomImageLoader/src/shared/decoders/decodeJPEG2000.ts#L5
-// Webpack asset/resource copies this to our output folder
+import openJpegFactory from '@cornerstonejs/codec-openjpeg/decodewasmjs';
 
-// TODO: At some point maybe we can use this instead.
-// This is closer to what Webpack 5 wants but it doesn't seem to work now
-// const wasm = new URL('./blah.wasm', import.meta.url)
-// @ts-ignore
-// import openjpegWasm from '@cornerstonejs/codec-openjpeg/decodewasm';
-const openjpegWasm = new URL("@cornerstonejs/codec-openjpeg/decodewasm", import.meta.url);
+const openjpegWasm = new URL(
+  '@cornerstonejs/codec-openjpeg/decodewasm',
+  import.meta.url
+);
 
 export interface Size {
   width: number;
@@ -64,10 +60,9 @@ export interface J2KDecoder {
 
 export interface OpenJpegModule {
   J2KDecoder: {
-    new(): J2KDecoder;
+    new (): J2KDecoder;
   };
 }
-
 
 export default class Jpeg2000Decoder extends BaseDecoder {
   private openjpeg: OpenJpegModule | null = null;
@@ -75,18 +70,21 @@ export default class Jpeg2000Decoder extends BaseDecoder {
   private async getOpenJPEG(): Promise<OpenJpegModule> {
     if (!this.openjpeg) {
       try {
-        this.openjpeg = (await openJpegFactory as any)({
+        // biome-ignore lint/suspicious/noExplicitAny: pending better typing
+        this.openjpeg = ((await openJpegFactory) as any)({
           locateFile: (file: string) => {
-            if (file.endsWith(".wasm")) {
+            if (file.endsWith('.wasm')) {
               return openjpegWasm.href;
-            } else {
-              return file;
             }
-          },
+            return file;
+          }
         }) as OpenJpegModule;
       } catch (error) {
-        console.warn("WASM version failed, JS version fallback not attempted:", error);
-        throw new Error("Failed to initialize OpenJPEG codec");
+        console.warn(
+          'WASM version failed, JS version fallback not attempted:',
+          error
+        );
+        throw new Error('Failed to initialize OpenJPEG codec');
       }
     }
     return this.openjpeg;
@@ -107,7 +105,7 @@ export default class Jpeg2000Decoder extends BaseDecoder {
       // we could probably look at the frameInfo to see if the decode method worked properly
       // it won't throw an error otherwise...
       if (frameInfo.width === 0 || frameInfo.height === 0) {
-        throw new Error("Failed to decode JPEG2000 image");
+        throw new Error('Failed to decode JPEG2000 image');
       }
       // get the decoded pixels
       const decodedBufferInWASM = decoder.getDecodedBuffer();
@@ -117,12 +115,15 @@ export default class Jpeg2000Decoder extends BaseDecoder {
 
       return pixelData;
     } catch (error) {
-      console.error("JPEG2000 decoding failed:", error);
+      console.error('JPEG2000 decoding failed:', error);
 
       // If the error is related to invalid field types, provide a more helpful message
-      if (error instanceof RangeError && error.message.includes("Invalid field type")) {
+      if (
+        error instanceof RangeError &&
+        error.message.includes('Invalid field type')
+      ) {
         throw new Error(
-          `TIFF file appears to be corrupted with invalid field type. This may be due to file corruption or an unsupported TIFF variant. Original error: ${error.message}`,
+          `TIFF file appears to be corrupted with invalid field type. This may be due to file corruption or an unsupported TIFF variant. Original error: ${error.message}`
         );
       }
 
@@ -134,16 +135,35 @@ function getPixelData(frameInfo: FrameInfo, decodedBuffer: TypedArray) {
   let pixelData: TypedArray;
   if (frameInfo.bitsPerSample > 8) {
     pixelData = frameInfo.isSigned
-      ? new Int16Array(decodedBuffer.buffer, decodedBuffer.byteOffset, decodedBuffer.byteLength / 2)
-      : new Uint16Array(decodedBuffer.buffer, decodedBuffer.byteOffset, decodedBuffer.byteLength / 2);
+      ? new Int16Array(
+          decodedBuffer.buffer,
+          decodedBuffer.byteOffset,
+          decodedBuffer.byteLength / 2
+        )
+      : new Uint16Array(
+          decodedBuffer.buffer,
+          decodedBuffer.byteOffset,
+          decodedBuffer.byteLength / 2
+        );
   } else {
     pixelData = frameInfo.isSigned
-      ? new Int8Array(decodedBuffer.buffer, decodedBuffer.byteOffset, decodedBuffer.byteLength)
-      : new Uint8Array(decodedBuffer.buffer, decodedBuffer.byteOffset, decodedBuffer.byteLength);
+      ? new Int8Array(
+          decodedBuffer.buffer,
+          decodedBuffer.byteOffset,
+          decodedBuffer.byteLength
+        )
+      : new Uint8Array(
+          decodedBuffer.buffer,
+          decodedBuffer.byteOffset,
+          decodedBuffer.byteLength
+        );
   }
 
   // Return a buffer containing only the pixel data
-  return pixelData.buffer.slice(pixelData.byteOffset, pixelData.byteOffset + pixelData.byteLength);
+  return pixelData.buffer.slice(
+    pixelData.byteOffset,
+    pixelData.byteOffset + pixelData.byteLength
+  );
 }
 
 // Register the decoder with geotiff

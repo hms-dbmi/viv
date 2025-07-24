@@ -1,8 +1,8 @@
 import { addDecoder, fromBlob } from 'geotiff';
 import type { Pool } from 'geotiff';
 
-import LZWDecoder from './lib/lzw-decoder';
 import Jpeg2000Decoder from './lib/jp2k-decoder';
+import LZWDecoder from './lib/lzw-decoder';
 import {
   type OmeTiffDims,
   type OmeTiffSelection,
