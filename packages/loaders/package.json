@@ -25,6 +25,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
+    "@cornerstonejs/codec-openjpeg": "^1.2.4",
     "@vivjs/types": "workspace:*",
     "geotiff": "^2.0.5",
     "lzw-tiff-decoder": "^0.1.1",
