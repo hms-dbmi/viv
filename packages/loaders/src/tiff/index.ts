@@ -2,6 +2,7 @@ import { addDecoder, fromBlob } from 'geotiff';
 import type { Pool } from 'geotiff';
 
 import LZWDecoder from './lib/lzw-decoder';
+import Jpeg2000Decoder from './lib/jp2k-decoder';
 import {
   type OmeTiffDims,
   type OmeTiffSelection,
@@ -16,6 +17,7 @@ import type TiffPixelSource from './pixel-source';
 import { loadSingleFileOmeTiff } from './singlefile-ome-tiff';
 
 addDecoder(5, () => LZWDecoder);
+addDecoder(34712, () => Jpeg2000Decoder);
 
 interface TiffOptions {
   headers?: Headers | Record<string, string>;
