@@ -10,6 +10,7 @@ export class FileSystemStore {
     this.root = fp;
   }
 
+  // TODO(zarrita): rename to get
   async getItem(key) {
     const fp = path.join(this.root, key);
     try {
@@ -17,12 +18,14 @@ export class FileSystemStore {
       return value;
     } catch (err) {
       if (err.code === 'ENOENT') {
+        // TODO(zarrita): Return undefined here instead
         throw new KeyError(key);
       }
       throw err;
     }
   }
 
+  // TODO(zarrita): remove
   containsItem(key) {
     return this.getItem(key)
       .then(() => true)

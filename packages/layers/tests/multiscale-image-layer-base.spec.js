@@ -1,10 +1,10 @@
 import { OrthographicView } from '@deck.gl/core';
 import { generateLayerTests, testLayerAsync } from '@deck.gl/test-utils';
-import test from 'tape-catch';
+import { expect, test } from 'vitest';
 import BitmapLayer from '../src/bitmap-layer';
 import MultiscaleImageLayerBase from '../src/multiscale-image-layer/multiscale-image-layer-base';
 
-test('MultiscaleImageLayerBase', async t => {
+test('MultiscaleImageLayerBase', async () => {
   const view = new OrthographicView({
     id: 'ortho',
     controller: true,
@@ -20,7 +20,7 @@ test('MultiscaleImageLayerBase', async t => {
   });
   const testCases = generateLayerTests({
     Layer: MultiscaleImageLayerBase,
-    assert: t.ok,
+    assert: (value, msg) => expect(value).toBeTruthy(),
     sampleProps: {
       contrastLimits: [[0, 10]],
       channelsVisible: [true],
@@ -34,28 +34,31 @@ test('MultiscaleImageLayerBase', async t => {
       dtype: 'Uint32',
       getTileData
     },
-    onBeforeUpdate: ({ testCase }) => t.comment(testCase.title),
-    onAfterUpdate: ({ subLayers }) =>
-      t.ok(
+    onBeforeUpdate: ({ testCase }) => {
+      // Vitest does not have t.comment, so use console.log
+      console.log(testCase.title);
+    },
+    onAfterUpdate: ({ subLayers }) => {
+      expect(
         subLayers.length > 0
           ? subLayers.every(layer => layer.constructor.name === 'XRLayer')
           : true
-      )
+      ).toBeTruthy();
+    }
   });
   await testLayerAsync({
     Layer: MultiscaleImageLayerBase,
     testCases,
-    onError: t.notOk,
+    onError: err => expect(err).toBeFalsy(),
     viewport: view.makeViewport({
       height: 4,
       width: 4,
       viewState: { target: [2, 2, 0], zoom: 0, width: 4, height: 4 }
     })
   });
-  t.end();
 });
 
-test('MultiscaleImageLayerBaseBitmapLayer', async t => {
+test('MultiscaleImageLayerBaseBitmapLayer', async () => {
   const view = new OrthographicView({
     id: 'ortho',
     controller: true,
@@ -71,7 +74,7 @@ test('MultiscaleImageLayerBaseBitmapLayer', async t => {
   });
   const testCases = generateLayerTests({
     Layer: MultiscaleImageLayerBase,
-    assert: t.ok,
+    assert: (value, msg) => expect(value).toBeTruthy(),
     sampleProps: {
       getTileData,
       loader: [
@@ -82,23 +85,26 @@ test('MultiscaleImageLayerBaseBitmapLayer', async t => {
         }
       ]
     },
-    onBeforeUpdate: ({ testCase }) => t.comment(testCase.title),
-    onAfterUpdate: ({ subLayers }) =>
-      t.ok(
+    onBeforeUpdate: ({ testCase }) => {
+      // Vitest does not have t.comment, so use console.log
+      console.log(testCase.title);
+    },
+    onAfterUpdate: ({ subLayers }) => {
+      expect(
         subLayers.length > 0
           ? subLayers.every(layer => layer instanceof BitmapLayer)
           : true
-      )
+      ).toBeTruthy();
+    }
   });
   await testLayerAsync({
     Layer: MultiscaleImageLayerBase,
     testCases,
-    onError: t.notOk,
+    onError: err => expect(err).toBeFalsy(),
     viewport: view.makeViewport({
       height: 4,
       width: 4,
       viewState: { target: [2, 2, 0], zoom: 0, width: 4, height: 4 }
     })
   });
-  t.end();
 });

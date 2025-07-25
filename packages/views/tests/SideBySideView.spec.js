@@ -1,13 +1,12 @@
 import { PolygonLayer } from '@deck.gl/layers';
-import test from 'tape-catch';
-
 import { ImageLayer, MultiscaleImageLayer, ScaleBarLayer } from '@vivjs/layers';
+import { describe, expect, test } from 'vitest';
 import { SideBySideView } from '../src';
 import { defaultArguments, generateViewTests } from './VivView.spec';
 
 generateViewTests(SideBySideView, defaultArguments);
 
-test('SideBySideView layer type and props check', t => {
+test('SideBySideView layer type and props check', () => {
   const view = new SideBySideView(defaultArguments);
   const loader = { type: 'loads' };
   const layers = view.getLayers({
@@ -23,27 +22,13 @@ test('SideBySideView layer type and props check', t => {
       }
     }
   });
-  t.ok(
-    layers[0] instanceof ImageLayer,
-    'SideBySideView layer should be MultiscaleImageLayer.'
-  );
-  t.ok(
-    layers[1] instanceof PolygonLayer,
-    'SideBySideView layer should be PolygonLayer.'
-  );
-  t.ok(
-    layers[2] instanceof ScaleBarLayer,
-    'DetailView layer should be ScaleBarLayer.'
-  );
-  t.equal(
-    layers[0].props.viewportId,
-    view.id,
-    'SideBySideView id should be passed down to layer as ViewportId.'
-  );
-  t.end();
+  expect(layers[0] instanceof ImageLayer).toBeTruthy();
+  expect(layers[1] instanceof PolygonLayer).toBeTruthy();
+  expect(layers[2] instanceof ScaleBarLayer).toBeTruthy();
+  expect(layers[0].props.viewportId).toBe(view.id);
 });
 
-test('SideBySideView layer with multiscale', t => {
+test('SideBySideView layer with multiscale', () => {
   const view = new SideBySideView(defaultArguments);
   const loader = { type: 'loads' };
   const layers = view.getLayers({
@@ -60,27 +45,13 @@ test('SideBySideView layer with multiscale', t => {
       }
     }
   });
-  t.ok(
-    layers[0] instanceof MultiscaleImageLayer,
-    'SideBySideView layer should be MultiscaleImageLayer.'
-  );
-  t.ok(
-    layers[1] instanceof PolygonLayer,
-    'SideBySideView layer should be PolygonLayer.'
-  );
-  t.ok(
-    layers[2] instanceof ScaleBarLayer,
-    'DetailView layer should be ScaleBarLayer.'
-  );
-  t.equal(
-    layers[0].props.viewportId,
-    view.id,
-    'SideBySideView id should be passed down to layer as ViewportId.'
-  );
-  t.end();
+  expect(layers[0] instanceof MultiscaleImageLayer).toBeTruthy();
+  expect(layers[1] instanceof PolygonLayer).toBeTruthy();
+  expect(layers[2] instanceof ScaleBarLayer).toBeTruthy();
+  expect(layers[0].props.viewportId).toBe(view.id);
 });
 
-test('SideBySideView layer does not render scale bar without physical size', t => {
+test('SideBySideView layer does not render scale bar without physical size', () => {
   const view = new SideBySideView(defaultArguments);
   const loader = { type: 'loads' };
   const layers = view.getLayers({
@@ -94,25 +65,15 @@ test('SideBySideView layer does not render scale bar without physical size', t =
       }
     }
   });
-  t.ok(
-    layers[0] instanceof MultiscaleImageLayer,
-    'SideBySideView layer should be MultiscaleImageLayer.'
-  );
-  t.ok(
-    layers[1] instanceof PolygonLayer,
-    'SideBySideView layer should be PolygonLayer.'
-  );
-  t.ok(
-    layers.length === 2,
-    'SideBySideView should not have more than PolygonLayer and MultiscaleImageLayer'
-  );
-  t.end();
+  expect(layers[0] instanceof MultiscaleImageLayer).toBeTruthy();
+  expect(layers[1] instanceof PolygonLayer).toBeTruthy();
+  expect(layers.length === 2).toBeTruthy();
 });
 
 const generateZoomLockTest = (panLock, zoomLock) => {
   test(`SideBySideView ${panLock ? 'with' : 'without'} pan and ${
     zoomLock ? 'with' : 'without'
-  } zoom lock.`, t => {
+  } zoom lock.`, () => {
     const linkedId = 'bar';
     const view = new SideBySideView({
       ...defaultArguments,
@@ -148,18 +109,9 @@ const generateZoomLockTest = (panLock, zoomLock) => {
       oldViewState,
       viewState
     });
-    t.equal(
-      newViewState.target[0],
-      panLock ? dx : 0,
-      'X coordinated should update.'
-    );
-    t.equal(
-      newViewState.target[1],
-      panLock ? dy : 0,
-      'Y coordinated should update.'
-    );
-    t.equal(newViewState.zoom, zoomLock ? dZoom : 0, 'Zoom should update.');
-    t.end();
+    expect(newViewState.target[0]).toBe(panLock ? dx : 0);
+    expect(newViewState.target[1]).toBe(panLock ? dy : 0);
+    expect(newViewState.zoom).toBe(zoomLock ? dZoom : 0);
   });
 };
 

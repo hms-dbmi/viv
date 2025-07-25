@@ -35,13 +35,13 @@
     "esbuild": "^0.25.0",
     "esno": "^4.8.0",
     "gray-matter": "^4.0.3",
-    "tap-spec": "^5.0.0",
-    "tape": "^5.5.3",
-    "tape-catch": "^1.0.6",
-    "tape-run": "^11.0.0",
     "typescript": "^5.6.2",
     "unbuild": "^2.0.0",
-    "vite": "^6.2.0"
+    "vite": "^6.2.0",
+    "vitest": "^3.2.4",
+    "jsdom": "^26.1.0",
+    "vitest-canvas-mock": "^0.3.3",
+    "puppeteer": "^24.14.0"
   },
   "devDependenciesMeta": {
     "@esbuild-plugins/node-globals-polyfill": "Necessary to run `tape` with browser-like `tape-run`.",

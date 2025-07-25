@@ -1,4 +1,4 @@
-import { test } from 'tape';
+import { expect, test } from 'vitest';
 import { getIndexer } from '../src/zarr/lib/indexer';
 import { loadMultiscales } from '../src/zarr/lib/utils';
 import { FileSystemStore } from './common';
@@ -9,37 +9,17 @@ import * as url from 'node:url';
 const __dirname = url.fileURLToPath(path.dirname(import.meta.url));
 const FIXTURE = path.resolve(__dirname, './fixtures/bioformats-zarr');
 
-test('Loads zarr-multiscales', async t => {
-  t.plan(1);
-  try {
-    const store = new FileSystemStore(`${FIXTURE}/data.zarr`);
-    const { data } = await loadMultiscales(store, '0');
-    t.equal(data.length, 2, 'Should have two multiscale images.');
-  } catch (e) {
-    t.fail(e);
-  }
+test('Loads zarr-multiscales', async () => {
+  const store = new FileSystemStore(`${FIXTURE}/data.zarr`);
+  const { data } = await loadMultiscales(store, '0');
+  expect(data.length).toBe(2);
 });
 
-test('Indexer creation and usage.', async t => {
-  t.plan(4);
+test('Indexer creation and usage.', () => {
   const labels = ['a', 'b', 'y', 'x'];
   const indexer = getIndexer(labels);
-  t.deepEqual(
-    indexer({ a: 10, b: 20 }),
-    [10, 20, 0, 0],
-    'should allow named indexing.'
-  );
-  t.deepEqual(
-    indexer([10, 20, 0, 0]),
-    [10, 20, 0, 0],
-    'allows array like indexing.'
-  );
-  t.throws(
-    () => indexer({ c: 0, b: 0 }),
-    'should throw with invalid dim name.'
-  );
-  t.throws(
-    () => getIndexer(['a', 'b', 'c', 'b', 'y', 'x']),
-    'no duplicated labels names.'
-  );
+  expect(indexer({ a: 10, b: 20 })).toEqual([10, 20, 0, 0]);
+  expect(indexer([10, 20, 0, 0])).toEqual([10, 20, 0, 0]);
+  expect(() => indexer({ c: 0, b: 0 })).toThrow();
+  expect(() => getIndexer(['a', 'b', 'c', 'b', 'y', 'x'])).toThrow();
 });

@@ -1,9 +1,9 @@
 import { OrthographicView } from '@deck.gl/core';
 import { generateLayerTests, testLayer } from '@deck.gl/test-utils';
-import test from 'tape-catch';
+import { expect, test } from 'vitest';
 import XRLayer from '../src/xr-layer/xr-layer';
 
-test('XRLayer', t => {
+test('XRLayer', () => {
   const view = new OrthographicView({
     id: 'ortho',
     controller: true,
@@ -14,7 +14,7 @@ test('XRLayer', t => {
   });
   const testCases = generateLayerTests({
     Layer: XRLayer,
-    assert: t.ok,
+    assert: (value, msg) => expect(value).toBeTruthy(),
     sampleProps: {
       bounds: [0, 0, 2, 2],
       contrastLimits: [[0, 10]],
@@ -27,17 +27,19 @@ test('XRLayer', t => {
       },
       dtype: 'Uint32'
     },
-    onBeforeUpdate: ({ testCase }) => t.comment(testCase.title)
+    onBeforeUpdate: ({ testCase }) => {
+      // Vitest does not have t.comment, so use console.log
+      console.log(testCase.title);
+    }
   });
   testLayer({
     Layer: XRLayer,
     testCases,
-    onError: t.notOk,
+    onError: err => expect(err).toBeFalsy(),
     viewport: view.makeViewport({
       height: 4,
       width: 4,
       viewState: { target: [2, 2, 0], zoom: 0, width: 4, height: 4 }
     })
   });
-  t.end();
 });

@@ -1,5 +1,5 @@
 import { fromFile } from 'geotiff';
-import test from 'tape';
+import { expect, test } from 'vitest';
 import { loadMultiTiff } from '../src/tiff';
 import { load } from '../src/tiff/multi-tiff';
 
@@ -44,132 +44,73 @@ async function loadImage() {
   };
 }
 
-function testPixelSource(t, data) {
-  t.equal(data.length, 1, 'image should not be pyramidal.');
+function testPixelSource(expect, data) {
+  expect(data.length).toBe(1);
   const [base] = data;
-  t.deepEqual(
-    base.labels,
-    ['t', 'c', 'z', 'y', 'x'],
-    'should have DimensionOrder "XYZCT".'
-  );
-  t.deepEqual(
-    base.shape,
-    [1, 3, 1, 167, 439],
-    'shape should match dimensions.'
-  );
-  t.equal(
-    base.meta.photometricInterpretation,
-    1,
-    'Photometric interpretation is 1.'
-  );
-  t.equal(base.meta.physicalSizes, undefined, 'No physical sizes.');
+  expect(base.labels).toEqual(['t', 'c', 'z', 'y', 'x']);
+  expect(base.shape).toEqual([1, 3, 1, 167, 439]);
+  expect(base.meta.photometricInterpretation).toBe(1);
+  expect(base.meta.physicalSizes).toBeUndefined();
 }
 
-test('Creates correct TiffPixelSource for MultiTIFF.', async t => {
-  t.plan(5);
-  try {
-    const { imageName, tiffs, channelNames } = await loadImage();
-    const { data } = await load(imageName, tiffs, channelNames);
-    testPixelSource(t, data);
-  } catch (e) {
-    t.fail(e);
-  }
+test('Creates correct TiffPixelSource for MultiTIFF.', async () => {
+  expect.assertions(5);
+  const { imageName, tiffs, channelNames } = await loadImage();
+  const { data } = await load(imageName, tiffs, channelNames);
+  testPixelSource(expect, data);
 });
 
-test('Is able to load MultiTIFF from local file.', async t => {
-  t.plan(5);
-  try {
-    const { data } = await loadMultiTiff([
-      [{ c: 0, t: 0, z: 0 }, CHANNEL_0_LOCAL_FIXTURE],
-      [{ c: 1, t: 0, z: 0 }, CHANNEL_1_LOCAL_FIXTURE],
-      [{ c: 2, t: 0, z: 0 }, CHANNEL_2_LOCAL_FIXTURE]
-    ]);
-    testPixelSource(t, data);
-  } catch (e) {
-    t.fail(e);
-  }
+test('Is able to load MultiTIFF from local file.', async () => {
+  expect.assertions(5);
+  const { data } = await loadMultiTiff([
+    [{ c: 0, t: 0, z: 0 }, CHANNEL_0_LOCAL_FIXTURE],
+    [{ c: 1, t: 0, z: 0 }, CHANNEL_1_LOCAL_FIXTURE],
+    [{ c: 2, t: 0, z: 0 }, CHANNEL_2_LOCAL_FIXTURE]
+  ]);
+  testPixelSource(expect, data);
 });
 
-test('Get raster data for MultiTIFF.', async t => {
-  t.plan(13);
-  try {
-    const { imageName, tiffs, channelNames } = await loadImage();
-    const { data } = await load(imageName, tiffs, channelNames);
-    const [base] = data;
+test('Get raster data for MultiTIFF.', async () => {
+  const { imageName, tiffs, channelNames } = await loadImage();
+  const { data } = await load(imageName, tiffs, channelNames);
+  const [base] = data;
+  for (let c = 0; c < 3; c += 1) {
+    const selection = { c, z: 0, t: 0 };
+    const pixelData = await base.getRaster({ selection });
+    expect(pixelData.width).toBe(439);
+    expect(pixelData.height).toBe(167);
+    expect(pixelData.data.length).toBe(439 * 167);
+    expect(pixelData.data.constructor.name).toBe('Uint8Array');
+  }
+  await expect(
+    base.getRaster({ selection: { c: 3, z: 0, t: 0 } })
+  ).rejects.toThrow();
+});
 
-    for (let c = 0; c < 3; c += 1) {
-      const selection = { c, z: 0, t: 0 };
-      const pixelData = await base.getRaster({ selection });
-      t.equal(pixelData.width, 439, 'Should have width of 439.');
-      t.equal(pixelData.height, 167, 'Should have height of 167.');
-      t.equal(
-        pixelData.data.length,
-        439 * 167,
-        'Data should be width * height long.'
-      );
-      t.equal(
-        pixelData.data.constructor.name,
-        'Uint8Array',
-        'Data constructor name should be Uint8Array.'
-      );
+test('Correct MultiTIFF metadata.', async () => {
+  const { imageName, tiffs, channelNames } = await loadImage();
+  const { metadata } = await load(imageName, tiffs, channelNames);
+  const { Name, Pixels } = metadata;
+  expect(Name).toBe('tiff-folder');
+  expect(Pixels.SizeC).toBe(3);
+  expect(Pixels.SizeT).toBe(1);
+  expect(Pixels.SizeX).toBe(439);
+  expect(Pixels.SizeY).toBe(167);
+  expect(Pixels.SizeZ).toBe(1);
+  expect(Pixels.Type).toBe('Uint8');
+  expect(Pixels.Channels.length).toBe(3);
+  expect(Pixels.Channels[0].SamplesPerPixel).toBe(1);
+  expect(Pixels.Channels[0].Name).toBe('Channel 0');
+});
+
+test('Check for comlete stack.', async () => {
+  const imageName = 'tiff-folder';
+  const tiffs = [
+    {
+      name: 'Channel 1',
+      selection: { c: 1, t: 0, z: 0 },
+      tiff: await (await fromFile(CHANNEL_1_FIXTURE)).getImage(0)
     }
-
-    try {
-      await base.getRaster({ selection: { c: 3, z: 0, t: 0 } });
-    } catch (e) {
-      t.ok(e instanceof Error, 'index should be out of bounds.');
-    }
-  } catch (e) {
-    t.fail(e);
-  }
-});
-
-test('Correct MultiTIFF metadata.', async t => {
-  t.plan(10);
-  try {
-    const { imageName, tiffs, channelNames } = await loadImage();
-    const { metadata } = await load(imageName, tiffs, channelNames);
-    const { Name, Pixels } = metadata;
-    t.equal(Name, 'tiff-folder', `Name should be 'tiff-folder'.`);
-    t.equal(Pixels.SizeC, 3, 'Should have three channels.');
-    t.equal(Pixels.SizeT, 1, 'Should have one time index.');
-    t.equal(Pixels.SizeX, 439, 'Should have SizeX of 429.');
-    t.equal(Pixels.SizeY, 167, 'Should have SizeY of 167.');
-    t.equal(Pixels.SizeZ, 1, 'Should have one z index.');
-    t.equal(Pixels.Type, 'Uint8', 'Should be Uint8 pixel type.');
-    t.equal(Pixels.Channels.length, 3, 'Should have 3 channels.');
-    t.equal(
-      Pixels.Channels[0].SamplesPerPixel,
-      1,
-      'Should have 1 sample per pixel.'
-    );
-    t.equal(
-      Pixels.Channels[0].Name,
-      'Channel 0',
-      'Should have name Channel 0.'
-    );
-  } catch (e) {
-    t.fail(e);
-  }
-});
-
-test('Check for comlete stack.', async t => {
-  t.plan(1);
-  try {
-    const imageName = 'tiff-folder';
-    const tiffs = [
-      {
-        name: 'Channel 1',
-        selection: { c: 1, t: 0, z: 0 },
-        tiff: await (await fromFile(CHANNEL_1_FIXTURE)).getImage(0)
-      }
-    ];
-    try {
-      await load(imageName, tiffs);
-    } catch (e) {
-      t.ok(e instanceof Error, 'stack should be incomplete.');
-    }
-  } catch (e) {
-    t.fail(e);
-  }
+  ];
+  await expect(load(imageName, tiffs)).rejects.toThrow();
 });

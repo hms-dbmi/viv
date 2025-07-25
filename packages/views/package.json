@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "test": "esno tests/index.spec.js | tap-spec"
+    "test": "vitest --run"
   },
   "peerDependencies": {
     "@deck.gl/core": "catalog:",
