@@ -1,10 +1,12 @@
 import { BaseDecoder, type TypedArray } from 'geotiff';
 
 // @ts-ignore
-import openJpegFactory from '@cornerstonejs/codec-openjpeg/decodewasmjs';
+// import openJpegFactory from '@cornerstonejs/codec-openjpeg/decodewasmjs';
+import openJpegFactory from './jpeg2000/openjpegjs.js';
 
 const openjpegWasm = new URL(
-  '@cornerstonejs/codec-openjpeg/decodewasm',
+  // '@cornerstonejs/codec-openjpeg/decodewasm',
+  './jpeg2000/openjpegjs.wasm',
   import.meta.url
 );
 
@@ -32,6 +34,15 @@ export interface FrameInfo {
   bitsPerSample: number;
   componentCount: number;
   isSigned: boolean;
+}
+
+interface FileDirectory {
+  TileWidth?: number;
+  TileLength?: number;
+  ImageWidth: number;
+  ImageLength: number;
+  BitsPerSample: number[];
+  SampleFormat?: number[];
 }
 
 export interface J2KDecoder {
@@ -66,6 +77,13 @@ export interface OpenJpegModule {
 
 export default class Jpeg2000Decoder extends BaseDecoder {
   private openjpeg: OpenJpegModule | null = null;
+  private fileDirectory: FileDirectory;
+
+  constructor(fileDirectory: FileDirectory) {
+    super();
+    this.fileDirectory = fileDirectory;
+    console.log('fileDirectory', fileDirectory);
+  }
 
   private async getOpenJPEG(): Promise<OpenJpegModule> {
     if (!this.openjpeg) {
@@ -109,9 +127,13 @@ export default class Jpeg2000Decoder extends BaseDecoder {
       }
       // get the decoded pixels
       const decodedBufferInWASM = decoder.getDecodedBuffer();
-      const imageFrame = new Uint8Array(decodedBufferInWASM.length);
-      imageFrame.set(decodedBufferInWASM);
-      const pixelData = getPixelData(frameInfo, decodedBufferInWASM);
+      // const imageFrame = new Uint8Array(decodedBufferInWASM.length);
+      // imageFrame.set(decodedBufferInWASM);
+      const pixelData = getPixelData(
+        frameInfo,
+        decodedBufferInWASM,
+        this.fileDirectory
+      );
 
       return pixelData;
     } catch (error) {
@@ -131,22 +153,48 @@ export default class Jpeg2000Decoder extends BaseDecoder {
     }
   }
 }
-function getPixelData(frameInfo: FrameInfo, decodedBuffer: TypedArray) {
+function getPixelData(
+  frameInfo: FrameInfo,
+  decodedBuffer: TypedArray,
+  fileDirectory?: FileDirectory
+) {
+  // Debug what the TIFF metadata says vs what the WASM module says
+  // console.log('JPEG2000 data type debug:', {
+  //   frameInfo,
+  //   fileDirectory: fileDirectory ? {
+  //     BitsPerSample: fileDirectory.BitsPerSample,
+  //     SampleFormat: fileDirectory.SampleFormat,
+  //     ImageWidth: fileDirectory.ImageWidth,
+  //     ImageLength: fileDirectory.ImageLength
+  //   } : null,
+  //   decodedBufferLength: decodedBuffer.length,
+  //   decodedBufferByteLength: decodedBuffer.byteLength,
+  //   decodedBufferByteOffset: decodedBuffer.byteOffset,
+  //   firstFewValues: Array.from(decodedBuffer.slice(0, 10))
+  // });
+
+  // Use TIFF metadata to determine if data is signed
+  const isSigned = fileDirectory?.SampleFormat?.[0] === 2 || frameInfo.isSigned;
+
   let pixelData: TypedArray;
   if (frameInfo.bitsPerSample > 8) {
-    pixelData = frameInfo.isSigned
-      ? new Int16Array(
-          decodedBuffer.buffer,
-          decodedBuffer.byteOffset,
-          decodedBuffer.byteLength / 2
-        )
-      : new Uint16Array(
-          decodedBuffer.buffer,
-          decodedBuffer.byteOffset,
-          decodedBuffer.byteLength / 2
-        );
+    // For 16-bit data, create the appropriate TypedArray directly
+    // The WASM module should return data in the correct byte order for the platform
+    if (isSigned) {
+      pixelData = new Int16Array(
+        decodedBuffer.buffer,
+        decodedBuffer.byteOffset,
+        decodedBuffer.byteLength / 2
+      );
+    } else {
+      pixelData = new Uint16Array(
+        decodedBuffer.buffer,
+        decodedBuffer.byteOffset,
+        decodedBuffer.byteLength / 2
+      );
+    }
   } else {
-    pixelData = frameInfo.isSigned
+    pixelData = isSigned
       ? new Int8Array(
           decodedBuffer.buffer,
           decodedBuffer.byteOffset,

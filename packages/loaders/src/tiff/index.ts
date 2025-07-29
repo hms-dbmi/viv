@@ -17,7 +17,8 @@ import type TiffPixelSource from './pixel-source';
 import { loadSingleFileOmeTiff } from './singlefile-ome-tiff';
 
 addDecoder(5, () => LZWDecoder);
-addDecoder(34712, () => Jpeg2000Decoder);
+// addDecoder(8, () => LZWDecoder); //AdobeDeflate...
+addDecoder([34712, 33004, 33003], () => Jpeg2000Decoder);
 
 interface TiffOptions {
   headers?: Headers | Record<string, string>;
