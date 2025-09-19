@@ -76,7 +76,7 @@ export interface OpenJpegModule {
 }
 
 export default class Jpeg2000Decoder extends BaseDecoder {
-  private openjpeg: OpenJpegModule | null = null;
+  private static openjpeg: OpenJpegModule | null = null;
   private fileDirectory: FileDirectory;
 
   constructor(fileDirectory: FileDirectory) {
@@ -86,10 +86,10 @@ export default class Jpeg2000Decoder extends BaseDecoder {
   }
 
   private async getOpenJPEG(): Promise<OpenJpegModule> {
-    if (!this.openjpeg) {
+    if (!Jpeg2000Decoder.openjpeg) {
       try {
         // biome-ignore lint/suspicious/noExplicitAny: pending better typing
-        this.openjpeg = ((await openJpegFactory) as any)({
+        Jpeg2000Decoder.openjpeg = ((await openJpegFactory) as any)({
           locateFile: (file: string) => {
             if (file.endsWith('.wasm')) {
               return openjpegWasm.href;
@@ -105,7 +105,7 @@ export default class Jpeg2000Decoder extends BaseDecoder {
         throw new Error('Failed to initialize OpenJPEG codec');
       }
     }
-    return this.openjpeg;
+    return Jpeg2000Decoder.openjpeg;
   }
 
   async decodeBlock(compressedImageFrame: ArrayBuffer) {
