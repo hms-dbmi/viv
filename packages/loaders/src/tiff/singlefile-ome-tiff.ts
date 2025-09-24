@@ -17,15 +17,15 @@ import {
 import TiffPixelSource from './pixel-source';
 
 function resolveMetadata(omexml: OmeXml, SubIFDs: number[] | undefined) {
+  const images = omexml.images || [];
   if (SubIFDs) {
     // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.
-    const rootMeta = Array.isArray(omexml) ? omexml : [omexml];
-    return { levels: SubIFDs.length + 1, rootMeta };
+    return { levels: SubIFDs.length + 1, rootMeta: images };
   }
   // Image is legacy format; resolutions are stored as separate images.
   // We do not allow multi-images for legacy format.
-  const firstImageMetadata = omexml[0];
-  return { levels: omexml.length, rootMeta: [firstImageMetadata] };
+  const firstImageMetadata = images[0];
+  return { levels: images.length, rootMeta: [firstImageMetadata] };
 }
 
 /*

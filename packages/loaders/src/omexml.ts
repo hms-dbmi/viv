@@ -1,13 +1,13 @@
 import * as z from 'zod';
 import { intToRgba, parseXML } from './utils';
 
-// Backwards-compatible type: previously fromString returned an array of images
-export type OmeXml = ReturnType<typeof fromString>;
+// Main API type: full metadata structure
 export type OmeXmlParsed = {
   images?: any[];
   rois?: any[];
   roiRefs?: any[];
 };
+export type OmeXml = OmeXmlParsed;
 
 type Prettify<T> = {
   [K in keyof T]: T[K];
@@ -404,20 +404,14 @@ const OmeSchema = z
 // })
 // .transform(flattenAttributes);
 
-export function parseOmeXml(str: string): OmeXmlParsed {
+// Main API: return full metadata structure
+export function fromString(str: string): OmeXmlParsed {
   const raw = parseXML(str);
   const omeXml = OmeSchema.parse(raw);
-  console.log('Parsed OME-XML', omeXml);
   // With schema-level normalization, parsing is a simple projection
   return {
     images: omeXml.Image ?? [],
     rois: omeXml.ROI ?? [],
     roiRefs: (omeXml as any).ROIRefCombined ?? []
   };
-}
-
-// Backwards-compatible API: return only the images array (prior behavior).
-export function fromString(str: string) {
-  const parsed = parseOmeXml(str);
-  return parsed.images ?? [];
 }

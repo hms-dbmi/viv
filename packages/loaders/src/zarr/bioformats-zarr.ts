@@ -21,7 +21,8 @@ export async function load(
   }
 
   // Get metadata and multiscale data for _first_ image.
-  const imgMeta = fromString(xmlSourceText)[0];
+  const parsed = fromString(xmlSourceText);
+  const imgMeta = parsed.images?.[0];
   const { data } = await loadMultiscales(root, '0');
 
   const labels = guessBioformatsLabels(data[0], imgMeta);
