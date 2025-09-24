@@ -19,7 +19,8 @@ import TiffPixelSource from './pixel-source';
 function resolveMetadata(omexml: OmeXml, SubIFDs: number[] | undefined) {
   if (SubIFDs) {
     // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.
-    return { levels: SubIFDs.length + 1, rootMeta: omexml };
+    const rootMeta = Array.isArray(omexml) ? omexml : [omexml];
+    return { levels: SubIFDs.length + 1, rootMeta };
   }
   // Image is legacy format; resolutions are stored as separate images.
   // We do not allow multi-images for legacy format.

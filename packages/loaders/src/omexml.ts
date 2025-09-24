@@ -1,7 +1,13 @@
 import * as z from 'zod';
 import { intToRgba, parseXML } from './utils';
 
+// Backwards-compatible type: previously fromString returned an array of images
 export type OmeXml = ReturnType<typeof fromString>;
+export type OmeXmlParsed = {
+  images?: any[];
+  rois?: any[];
+  roiRefs?: any[];
+};
 
 type Prettify<T> = {
   [K in keyof T]: T[K];
@@ -81,6 +87,214 @@ const PhysicalUnitSchema = z.enum([
   'reference frame'
 ]);
 
+// ROI Shape Types
+export type ShapeType = z.infer<typeof ShapeTypeSchema>;
+const ShapeTypeSchema = z.enum([
+  'Rectangle',
+  'Ellipse',
+  'Polygon',
+  'Line',
+  'Point',
+  'Label',
+  'Mask'
+]);
+
+// Rectangle shape schema
+const RectangleSchema = z
+  .object({})
+  .extend({
+    attr: z.object({
+      ID: z.string(),
+      Name: z.string().optional(),
+      FillColor: z.coerce.number().transform(intToRgba).optional(),
+      StrokeColor: z.coerce.number().transform(intToRgba).optional(),
+      StrokeWidth: z.coerce.number().optional(),
+      TheC: z.coerce.number().optional(),
+      TheT: z.coerce.number().optional(),
+      TheZ: z.coerce.number().optional(),
+      X: z.coerce.number(),
+      Y: z.coerce.number(),
+      Width: z.coerce.number(),
+      Height: z.coerce.number()
+    })
+  })
+  .transform(flattenAttributes)
+  .transform(data => ({ ...data, kind: 'rectangle' }));
+
+// Ellipse shape schema
+const EllipseSchema = z
+  .object({})
+  .extend({
+    attr: z.object({
+      ID: z.string(),
+      Name: z.string().optional(),
+      FillColor: z.coerce.number().transform(intToRgba).optional(),
+      StrokeColor: z.coerce.number().transform(intToRgba).optional(),
+      StrokeWidth: z.coerce.number().optional(),
+      TheC: z.coerce.number().optional(),
+      TheT: z.coerce.number().optional(),
+      TheZ: z.coerce.number().optional(),
+      X: z.coerce.number(),
+      Y: z.coerce.number(),
+      RadiusX: z.coerce.number(),
+      RadiusY: z.coerce.number()
+    })
+  })
+  .transform(flattenAttributes)
+  .transform(data => ({ ...data, kind: 'ellipse' }));
+
+// Line shape schema
+const LineSchema = z
+  .object({})
+  .extend({
+    attr: z.object({
+      ID: z.string(),
+      Name: z.string().optional(),
+      FillColor: z.coerce.number().transform(intToRgba).optional(),
+      StrokeColor: z.coerce.number().transform(intToRgba).optional(),
+      StrokeWidth: z.coerce.number().optional(),
+      TheC: z.coerce.number().optional(),
+      TheT: z.coerce.number().optional(),
+      TheZ: z.coerce.number().optional(),
+      X1: z.coerce.number(),
+      Y1: z.coerce.number(),
+      X2: z.coerce.number(),
+      Y2: z.coerce.number()
+    })
+  })
+  .transform(flattenAttributes)
+  .transform(data => ({ ...data, kind: 'line' }));
+
+// Point shape schema
+const PointSchema = z
+  .object({})
+  .extend({
+    attr: z.object({
+      ID: z.string(),
+      Name: z.string().optional(),
+      FillColor: z.coerce.number().transform(intToRgba).optional(),
+      StrokeColor: z.coerce.number().transform(intToRgba).optional(),
+      StrokeWidth: z.coerce.number().optional(),
+      TheC: z.coerce.number().optional(),
+      TheT: z.coerce.number().optional(),
+      TheZ: z.coerce.number().optional(),
+      X: z.coerce.number(),
+      Y: z.coerce.number()
+    })
+  })
+  .transform(flattenAttributes)
+  .transform(data => ({ ...data, kind: 'point' }));
+
+// Polygon shape schema
+const PolygonSchema = z
+  .object({})
+  .extend({
+    attr: z.object({
+      ID: z.string(),
+      Name: z.string().optional(),
+      FillColor: z.coerce.number().transform(intToRgba).optional(),
+      StrokeColor: z.coerce.number().transform(intToRgba).optional(),
+      StrokeWidth: z.coerce.number().optional(),
+      TheC: z.coerce.number().optional(),
+      TheT: z.coerce.number().optional(),
+      TheZ: z.coerce.number().optional(),
+      Points: z.string() // Format: "x1,y1 x2,y2 x3,y3 ..."
+    })
+  })
+  .transform(flattenAttributes)
+  .transform(data => ({ ...data, kind: 'polygon' }));
+
+// Label shape schema
+const LabelSchema = z
+  .object({})
+  .extend({
+    attr: z.object({
+      ID: z.string(),
+      Name: z.string().optional(),
+      FillColor: z.coerce.number().transform(intToRgba).optional(),
+      StrokeColor: z.coerce.number().transform(intToRgba).optional(),
+      StrokeWidth: z.coerce.number().optional(),
+      TheC: z.coerce.number().optional(),
+      TheT: z.coerce.number().optional(),
+      TheZ: z.coerce.number().optional(),
+      X: z.coerce.number(),
+      Y: z.coerce.number(),
+      Text: z.string().optional()
+    })
+  })
+  .transform(flattenAttributes)
+  .transform(data => ({ ...data, kind: 'label' }));
+
+// Union schema to contain shapes
+// Support BOTH standard OME-XML element names (capitalized singular)
+// and alternative lowercase plural keys observed in some generators
+const UnionSchema = z.object({
+  // Standard OME-XML element names
+  Rectangle: z.preprocess(ensureArray, RectangleSchema.array()).optional(),
+  Ellipse: z.preprocess(ensureArray, EllipseSchema.array()).optional(),
+  Line: z.preprocess(ensureArray, LineSchema.array()).optional(),
+  Point: z.preprocess(ensureArray, PointSchema.array()).optional(),
+  Polygon: z.preprocess(ensureArray, PolygonSchema.array()).optional(),
+  Label: z.preprocess(ensureArray, LabelSchema.array()).optional(),
+
+  // Lowercase plural variants
+  rectangles: z.preprocess(ensureArray, RectangleSchema.array()).optional(),
+  ellipses: z.preprocess(ensureArray, EllipseSchema.array()).optional(),
+  lines: z.preprocess(ensureArray, LineSchema.array()).optional(),
+  points: z.preprocess(ensureArray, PointSchema.array()).optional(),
+  polygons: z.preprocess(ensureArray, PolygonSchema.array()).optional(),
+  labels: z.preprocess(ensureArray, LabelSchema.array()).optional()
+});
+
+// ROI schema - transforms Union into a flat array of shapes
+const ROISchema = z
+  .object({
+    Union: UnionSchema.optional()
+  })
+  .extend({
+    attr: z.object({
+      ID: z.string(),
+      Name: z.string().optional(),
+      Description: z.string().optional()
+    })
+  })
+  .transform(flattenAttributes)
+  .transform(data => {
+    // Flatten Union into a simple array of shapes
+    const shapes: Array<{ type: string;[key: string]: any }> = [];
+    if (data.Union) {
+      // Capitalized singular (standard OME-XML)
+      if (data.Union.Rectangle) shapes.push(...data.Union.Rectangle.map((r: any) => ({ type: 'rectangle', ...r })));
+      if (data.Union.Ellipse) shapes.push(...data.Union.Ellipse.map((e: any) => ({ type: 'ellipse', ...e })));
+      if (data.Union.Line) shapes.push(...data.Union.Line.map((l: any) => ({ type: 'line', ...l })));
+      if (data.Union.Point) shapes.push(...data.Union.Point.map((p: any) => ({ type: 'point', ...p })));
+      if (data.Union.Polygon) shapes.push(...data.Union.Polygon.map((p: any) => ({ type: 'polygon', ...p })));
+      if (data.Union.Label) shapes.push(...data.Union.Label.map((l: any) => ({ type: 'label', ...l })));
+
+      // Lowercase plural variants
+      if (data.Union.rectangles) shapes.push(...data.Union.rectangles.map((r: any) => ({ type: 'rectangle', ...r })));
+      if (data.Union.ellipses) shapes.push(...data.Union.ellipses.map((e: any) => ({ type: 'ellipse', ...e })));
+      if (data.Union.lines) shapes.push(...data.Union.lines.map((l: any) => ({ type: 'line', ...l })));
+      if (data.Union.points) shapes.push(...data.Union.points.map((p: any) => ({ type: 'point', ...p })));
+      if (data.Union.polygons) shapes.push(...data.Union.polygons.map((p: any) => ({ type: 'polygon', ...p })));
+      if (data.Union.labels) shapes.push(...data.Union.labels.map((l: any) => ({ type: 'label', ...l })));
+    }
+
+    // Return ROI with shapes as a flat array instead of nested Union
+    const { Union, ...rest } = data;
+    return { ...rest, shapes };
+  });
+
+// ROIRef schema
+const ROIRefSchema = z
+  .object({})
+  .extend({
+    attr: z.object({
+      ID: z.string()
+    })
+  })
+  .transform(flattenAttributes);
+
 const ChannelSchema = z
   .object({})
   .extend({
@@ -155,7 +369,8 @@ const ImageSchema = z
   .object({
     AquisitionDate: z.string().optional().default(''),
     Description: z.unknown().optional().default(''),
-    Pixels: PixelsSchema
+    Pixels: PixelsSchema,
+    ROIRef: z.preprocess(ensureArray, ROIRefSchema.array()).optional()
   })
   .extend({
     attr: z.object({
@@ -166,7 +381,9 @@ const ImageSchema = z
   .transform(flattenAttributes);
 
 const OmeSchema = z.object({
-  Image: z.preprocess(ensureArray, ImageSchema.array())
+  Image: z.preprocess(ensureArray, ImageSchema.array()).optional(),
+  ROI: z.preprocess(ensureArray, ROISchema.array()).optional(),
+  ROIRef: z.preprocess(ensureArray, ROIRefSchema.array()).optional()
 });
 // TODO: Verify that these attributes are always present
 // .extend({
@@ -178,31 +395,96 @@ const OmeSchema = z.object({
 // })
 // .transform(flattenAttributes);
 
-export function fromString(str: string) {
+export function parseOmeXml(str: string): OmeXmlParsed {
   const raw = parseXML(str);
   const omeXml = OmeSchema.parse(raw);
-  console.log('Parsed OME-XML', omeXml);
-  return omeXml['Image'].map(img => {
-    return {
-      ...img,
-      format() {
-        const sizes = (['X', 'Y', 'Z'] as const)
-          .map(name => {
-            const size = img.Pixels[`PhysicalSize${name}` as const];
-            const unit = img.Pixels[`PhysicalSize${name}Unit` as const];
-            return size ? `${size} ${unit}` : '-';
-          })
-          .join(' x ');
+  const result: OmeXmlParsed = {};
 
-        return {
-          'Acquisition Date': img.AquisitionDate,
-          'Dimensions (XY)': `${img.Pixels['SizeX']} x ${img.Pixels['SizeY']}`,
-          'Pixels Type': img.Pixels['Type'],
-          'Pixels Size (XYZ)': sizes,
-          'Z-sections/Timepoints': `${img.Pixels['SizeZ']} x ${img.Pixels['SizeT']}`,
-          Channels: img.Pixels['SizeC']
-        };
+  // Process images
+  if (omeXml.Image) {
+    result.images = omeXml.Image.map(img => {
+      return {
+        ...img,
+        format() {
+          const sizes = (['X', 'Y', 'Z'] as const)
+            .map(name => {
+              const size = img.Pixels[`PhysicalSize${name}` as const];
+              const unit = img.Pixels[`PhysicalSize${name}Unit` as const];
+              return size ? `${size} ${unit}` : '-';
+            })
+            .join(' x ');
+
+          return {
+            'Acquisition Date': img.AquisitionDate,
+            'Dimensions (XY)': `${img.Pixels['SizeX']} x ${img.Pixels['SizeY']}`,
+            'Pixels Type': img.Pixels['Type'],
+            'Pixels Size (XYZ)': sizes,
+            'Z-sections/Timepoints': `${img.Pixels['SizeZ']} x ${img.Pixels['SizeT']}`,
+            Channels: img.Pixels['SizeC']
+          };
+        }
+      };
+    });
+  }
+
+  // Process ROIs
+  if (omeXml.ROI) {
+    result.rois = omeXml.ROI.map(roi => {
+      return {
+        ...roi,
+        // Helper method to get all shapes (now just returns the shapes array directly)
+        getAllShapes() {
+          return roi.shapes || [];
+        },
+        format() {
+          const shapes = roi.shapes || [];
+          return {
+            'ROI ID': roi.ID,
+            'Name': roi.Name || '-',
+            'Description': roi.Description || '-',
+            'Shapes': shapes.length,
+            'Shape Types': [...new Set(shapes.map(s => s.type))].join(', ')
+          };
+        }
+      };
+    });
+  }
+
+  // Process ROI References (from root level and from within Images)
+  const allROIRefs: any[] = [];
+  
+  // Collect ROIRefs from root level
+  if (omeXml.ROIRef) {
+    allROIRefs.push(...omeXml.ROIRef);
+  }
+  
+  // Collect ROIRefs from within Images
+  if (omeXml.Image) {
+    omeXml.Image.forEach(image => {
+      if (image.ROIRef) {
+        allROIRefs.push(...image.ROIRef);
       }
-    };
-  });
+    });
+  }
+  
+  if (allROIRefs.length > 0) {
+    result.roiRefs = allROIRefs.map(roiRef => {
+      return {
+        ...roiRef,
+        format() {
+          return {
+            'ROI Reference ID': roiRef.ID
+          };
+        }
+      };
+    });
+  }
+
+  return result;
+}
+
+// Backwards-compatible API: return only the images array (prior behavior).
+export function fromString(str: string) {
+  const parsed = parseOmeXml(str);
+  return parsed.images ?? [];
 }

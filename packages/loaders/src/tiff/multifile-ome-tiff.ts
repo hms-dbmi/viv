@@ -148,7 +148,9 @@ export async function loadMultifileOmeTiff(
   );
   const url = new URL(source);
   const text = await fetch(url).then(res => res.text());
-  const rootMeta = fromString(text);
+  const rootMeta = Array.isArray(fromString(text))
+    ? fromString(text)
+    : [fromString(text) as unknown as OmeXml[number]];
   const images: OmeTiffImage[] = [];
 
   for (const metadata of rootMeta) {
