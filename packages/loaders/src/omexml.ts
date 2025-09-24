@@ -380,11 +380,20 @@ const ImageSchema = z
   })
   .transform(flattenAttributes);
 
-const OmeSchema = z.object({
-  Image: z.preprocess(ensureArray, ImageSchema.array()).optional(),
-  ROI: z.preprocess(ensureArray, ROISchema.array()).optional(),
-  ROIRef: z.preprocess(ensureArray, ROIRefSchema.array()).optional()
-});
+const OmeSchema = z
+  .object({
+    Image: z.preprocess(ensureArray, ImageSchema.array()).optional(),
+    ROI: z.preprocess(ensureArray, ROISchema.array()).optional(),
+    ROIRef: z.preprocess(ensureArray, ROIRefSchema.array()).optional()
+  })
+  // Normalize/augment at the schema level to simplify parseOmeXml
+  .transform(raw => {
+    const images = raw.Image ?? [];
+    const rootRefs = raw.ROIRef ?? [];
+    const imageRefs = images.flatMap(img => img.ROIRef ?? []);
+    const ROIRefCombined = [...rootRefs, ...imageRefs];
+    return { ...raw, ROIRefCombined };
+  });
 // TODO: Verify that these attributes are always present
 // .extend({
 //   attr: z.object({
@@ -398,89 +407,13 @@ const OmeSchema = z.object({
 export function parseOmeXml(str: string): OmeXmlParsed {
   const raw = parseXML(str);
   const omeXml = OmeSchema.parse(raw);
-  const result: OmeXmlParsed = {};
-
-  // Process images
-  if (omeXml.Image) {
-    result.images = omeXml.Image.map(img => {
-      return {
-        ...img,
-        format() {
-          const sizes = (['X', 'Y', 'Z'] as const)
-            .map(name => {
-              const size = img.Pixels[`PhysicalSize${name}` as const];
-              const unit = img.Pixels[`PhysicalSize${name}Unit` as const];
-              return size ? `${size} ${unit}` : '-';
-            })
-            .join(' x ');
-
-          return {
-            'Acquisition Date': img.AquisitionDate,
-            'Dimensions (XY)': `${img.Pixels['SizeX']} x ${img.Pixels['SizeY']}`,
-            'Pixels Type': img.Pixels['Type'],
-            'Pixels Size (XYZ)': sizes,
-            'Z-sections/Timepoints': `${img.Pixels['SizeZ']} x ${img.Pixels['SizeT']}`,
-            Channels: img.Pixels['SizeC']
-          };
-        }
-      };
-    });
-  }
-
-  // Process ROIs
-  if (omeXml.ROI) {
-    result.rois = omeXml.ROI.map(roi => {
-      return {
-        ...roi,
-        // Helper method to get all shapes (now just returns the shapes array directly)
-        getAllShapes() {
-          return roi.shapes || [];
-        },
-        format() {
-          const shapes = roi.shapes || [];
-          return {
-            'ROI ID': roi.ID,
-            'Name': roi.Name || '-',
-            'Description': roi.Description || '-',
-            'Shapes': shapes.length,
-            'Shape Types': [...new Set(shapes.map(s => s.type))].join(', ')
-          };
-        }
-      };
-    });
-  }
-
-  // Process ROI References (from root level and from within Images)
-  const allROIRefs: any[] = [];
-  
-  // Collect ROIRefs from root level
-  if (omeXml.ROIRef) {
-    allROIRefs.push(...omeXml.ROIRef);
-  }
-  
-  // Collect ROIRefs from within Images
-  if (omeXml.Image) {
-    omeXml.Image.forEach(image => {
-      if (image.ROIRef) {
-        allROIRefs.push(...image.ROIRef);
-      }
-    });
-  }
-  
-  if (allROIRefs.length > 0) {
-    result.roiRefs = allROIRefs.map(roiRef => {
-      return {
-        ...roiRef,
-        format() {
-          return {
-            'ROI Reference ID': roiRef.ID
-          };
-        }
-      };
-    });
-  }
-
-  return result;
+  console.log('Parsed OME-XML', omeXml);
+  // With schema-level normalization, parsing is a simple projection
+  return {
+    images: omeXml.Image ?? [],
+    rois: omeXml.ROI ?? [],
+    roiRefs: (omeXml as any).ROIRefCombined ?? []
+  };
 }
 
 // Backwards-compatible API: return only the images array (prior behavior).

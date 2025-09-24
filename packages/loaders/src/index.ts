@@ -10,5 +10,3 @@ export {
   isInterleaved,
   SIGNAL_ABORTED
 } from './utils';
-
-export { fromString, parseOmeXml, type OmeXml, type OmeXmlParsed } from './omexml';
