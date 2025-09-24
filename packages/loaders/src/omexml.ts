@@ -181,6 +181,7 @@ const OmeSchema = z.object({
 export function fromString(str: string) {
   const raw = parseXML(str);
   const omeXml = OmeSchema.parse(raw);
+  console.log('Parsed OME-XML', omeXml);
   return omeXml['Image'].map(img => {
     return {
       ...img,
