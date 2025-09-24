@@ -95,8 +95,7 @@ const ShapeTypeSchema = z.enum([
   'Polygon',
   'Line',
   'Point',
-  'Label',
-  'Mask'
+  'Label'
 ]);
 
 // Rectangle shape schema
