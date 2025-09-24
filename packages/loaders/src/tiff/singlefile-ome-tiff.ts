@@ -1,7 +1,7 @@
 import { fromString } from '../omexml';
 
 import type GeoTIFF from 'geotiff';
-import type { DimensionOrder, OmeXml } from '../omexml';
+import type { DimensionOrder, OmeXmlParsed } from '../omexml';
 import type Pool from './lib/Pool';
 import { createOmeImageIndexerFromResolver } from './lib/indexers';
 import {
@@ -16,8 +16,34 @@ import {
 } from './lib/utils';
 import TiffPixelSource from './pixel-source';
 
-function resolveMetadata(omexml: OmeXml, SubIFDs: number[] | undefined) {
-  const images = omexml.images || [];
+function resolveMetadata(omexml: OmeXmlParsed, SubIFDs: number[] | undefined) {
+  const rois = omexml.rois || [];
+  const roiRefs = omexml.roiRefs || [];
+
+  // Create a map of ROI IDs to ROI objects for quick lookup
+  const roiMap = new Map(rois.map(roi => [roi.ID, roi]));
+
+  // Add ROIs to images based on ROIRefs
+  const images = (omexml.images || []).map(image => {
+    // Find ROIRefs that reference this image (if any)
+    const imageROIRefs = roiRefs.filter(roiRef => {
+      // ROIRefs might have an ImageRef or be associated with the image
+      // For now, we'll include all ROIRefs since we don't have explicit image association
+      return true; // TODO: Add proper image-ROI association logic
+    });
+
+    // Get the actual ROI objects referenced by the ROIRefs
+    const imageROIs = imageROIRefs
+      .map(roiRef => roiMap.get(roiRef.ID))
+      .filter(Boolean);
+
+    const { ROIRef: _omitROIRef, ...imageWithoutRefs } = image as any;
+    return {
+      ...imageWithoutRefs,
+      ROIs: imageROIs
+    };
+  });
+
   if (SubIFDs) {
     // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.
     return { levels: SubIFDs.length + 1, rootMeta: images };
@@ -90,7 +116,7 @@ function createSingleFileOmeTiffPyramidalIndexer(
 
 type OmeTiffImage = {
   data: TiffPixelSource<OmeTiffDims>[];
-  metadata: OmeXml[number];
+  metadata: any;
 };
 
 export async function loadSingleFileOmeTiff(

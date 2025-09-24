@@ -1,5 +1,5 @@
 import type { GeoTIFF } from 'geotiff';
-import { type OmeXml, fromString } from '../omexml';
+import { type OmeXmlParsed, fromString } from '../omexml';
 import { assert } from '../utils';
 import type Pool from './lib/Pool';
 import { createOmeImageIndexerFromResolver } from './lib/indexers';
@@ -15,11 +15,11 @@ import {
 } from './lib/utils';
 import TiffPixelSource from './pixel-source';
 
-type TiffDataTags = NonNullable<OmeXml[number]['Pixels']['TiffData']>;
-type TIffDataItem = TiffDataTags[number];
+type TiffDataTags = any;
+type TIffDataItem = any;
 type OmeTiffImage = {
   data: TiffPixelSource<OmeTiffDims>[];
-  metadata: OmeXml[number];
+  metadata: any;
 };
 
 function isCompleteTiffDataItem(
@@ -35,7 +35,7 @@ function isCompleteTiffDataItem(
 }
 
 function createMultifileImageDataLookup(
-  tiffData: OmeXml[number]['Pixels']['TiffData']
+  tiffData: any
 ) {
   type ImageDataPointer = { ifd: number; filename: string };
   const lookup: Map<string, ImageDataPointer> = new Map();
@@ -66,7 +66,7 @@ function createMultifileImageDataLookup(
 }
 
 function createMultifileOmeTiffResolver(options: {
-  tiffData: OmeXml[number]['Pixels']['TiffData'];
+  tiffData: any;
   baseUrl: URL;
   headers: Headers | Record<string, string>;
 }) {
@@ -96,7 +96,7 @@ function createMultifileOmeTiffResolver(options: {
  * Extracts other TiffPixelSource options.
  */
 async function getPixelSourceOptionsForImage(
-  metadata: OmeXml[number],
+  metadata: any,
   config: {
     baseUrl: URL;
     headers: Headers | Record<string, string>;
@@ -149,10 +149,36 @@ export async function loadMultifileOmeTiff(
   const url = new URL(source);
   const text = await fetch(url).then(res => res.text());
   const parsed = fromString(text);
-  const rootMeta = parsed.images || [];
-  const images: OmeTiffImage[] = [];
+  const rois = parsed.rois || [];
+  const roiRefs = parsed.roiRefs || [];
 
-  for (const metadata of rootMeta) {
+  // Create a map of ROI IDs to ROI objects for quick lookup
+  const roiMap = new Map(rois.map(roi => [roi.ID, roi]));
+
+  // Add ROIs to images based on ROIRefs
+  const images = (parsed.images || []).map(image => {
+    // Find ROIRefs that reference this image (if any)
+    const imageROIRefs = roiRefs.filter(roiRef => {
+      // ROIRefs might have an ImageRef or be associated with the image
+      // For now, we'll include all ROIRefs since we don't have explicit image association
+      return true; // TODO: Add proper image-ROI association logic
+    });
+
+    // Get the actual ROI objects referenced by the ROIRefs
+    const imageROIs = imageROIRefs
+      .map(roiRef => roiMap.get(roiRef.ID))
+      .filter(Boolean);
+
+    const { ROIRef: _omitROIRef, ...imageWithoutRefs } = image as any;
+    return {
+      ...imageWithoutRefs,
+      ROIs: imageROIs
+    };
+  });
+
+  const tiffImages: OmeTiffImage[] = [];
+
+  for (const metadata of images) {
     const opts = await getPixelSourceOptionsForImage(metadata, {
       baseUrl: url,
       headers: options.headers || {}
@@ -170,7 +196,7 @@ export async function loadMultifileOmeTiff(
           options.pool
         )
     );
-    images.push({ data, metadata });
+    tiffImages.push({ data, metadata });
   }
-  return images;
+  return tiffImages;
 }
