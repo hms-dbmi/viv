@@ -119,7 +119,7 @@ const RectangleSchema = z
     })
   })
   .transform(flattenAttributes)
-  .transform(data => ({ ...data, kind: 'rectangle' }));
+  .transform(data => ({ ...data, type: 'rectangle' }));
 
 // Ellipse shape schema
 const EllipseSchema = z
@@ -142,7 +142,7 @@ const EllipseSchema = z
     })
   })
   .transform(flattenAttributes)
-  .transform(data => ({ ...data, kind: 'ellipse' }));
+  .transform(data => ({ ...data, type: 'ellipse' }));
 
 // Line shape schema
 const LineSchema = z
@@ -165,7 +165,7 @@ const LineSchema = z
     })
   })
   .transform(flattenAttributes)
-  .transform(data => ({ ...data, kind: 'line' }));
+  .transform(data => ({ ...data, type: 'line' }));
 
 // Point shape schema
 const PointSchema = z
@@ -186,7 +186,7 @@ const PointSchema = z
     })
   })
   .transform(flattenAttributes)
-  .transform(data => ({ ...data, kind: 'point' }));
+  .transform(data => ({ ...data, type: 'point' }));
 
 // Polygon shape schema
 const PolygonSchema = z
@@ -206,7 +206,7 @@ const PolygonSchema = z
     })
   })
   .transform(flattenAttributes)
-  .transform(data => ({ ...data, kind: 'polygon' }));
+  .transform(data => ({ ...data, type: 'polygon' }));
 
 // Label shape schema
 const LabelSchema = z
@@ -227,7 +227,7 @@ const LabelSchema = z
     })
   })
   .transform(flattenAttributes)
-  .transform(data => ({ ...data, kind: 'label' }));
+  .transform(data => ({ ...data, type: 'label' }));
 
 // Union schema to contain shapes
 // Support BOTH standard OME-XML element names (capitalized singular)
@@ -268,20 +268,20 @@ const ROISchema = z
     const shapes: Array<{ type: string;[key: string]: any }> = [];
     if (data.Union) {
       // Capitalized singular (standard OME-XML)
-      if (data.Union.Rectangle) shapes.push(...data.Union.Rectangle.map((r: any) => ({ type: 'rectangle', ...r })));
-      if (data.Union.Ellipse) shapes.push(...data.Union.Ellipse.map((e: any) => ({ type: 'ellipse', ...e })));
-      if (data.Union.Line) shapes.push(...data.Union.Line.map((l: any) => ({ type: 'line', ...l })));
-      if (data.Union.Point) shapes.push(...data.Union.Point.map((p: any) => ({ type: 'point', ...p })));
-      if (data.Union.Polygon) shapes.push(...data.Union.Polygon.map((p: any) => ({ type: 'polygon', ...p })));
-      if (data.Union.Label) shapes.push(...data.Union.Label.map((l: any) => ({ type: 'label', ...l })));
+      if (data.Union.Rectangle) shapes.push(...data.Union.Rectangle);
+      if (data.Union.Ellipse) shapes.push(...data.Union.Ellipse);
+      if (data.Union.Line) shapes.push(...data.Union.Line);
+      if (data.Union.Point) shapes.push(...data.Union.Point);
+      if (data.Union.Polygon) shapes.push(...data.Union.Polygon);
+      if (data.Union.Label) shapes.push(...data.Union.Label);
 
       // Lowercase plural variants
-      if (data.Union.rectangles) shapes.push(...data.Union.rectangles.map((r: any) => ({ type: 'rectangle', ...r })));
-      if (data.Union.ellipses) shapes.push(...data.Union.ellipses.map((e: any) => ({ type: 'ellipse', ...e })));
-      if (data.Union.lines) shapes.push(...data.Union.lines.map((l: any) => ({ type: 'line', ...l })));
-      if (data.Union.points) shapes.push(...data.Union.points.map((p: any) => ({ type: 'point', ...p })));
-      if (data.Union.polygons) shapes.push(...data.Union.polygons.map((p: any) => ({ type: 'polygon', ...p })));
-      if (data.Union.labels) shapes.push(...data.Union.labels.map((l: any) => ({ type: 'label', ...l })));
+      if (data.Union.rectangles) shapes.push(...data.Union.rectangles);
+      if (data.Union.ellipses) shapes.push(...data.Union.ellipses);
+      if (data.Union.lines) shapes.push(...data.Union.lines);
+      if (data.Union.points) shapes.push(...data.Union.points);
+      if (data.Union.polygons) shapes.push(...data.Union.polygons);
+      if (data.Union.labels) shapes.push(...data.Union.labels);
     }
 
     // Return ROI with shapes as a flat array instead of nested Union
