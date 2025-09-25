@@ -169,7 +169,7 @@ export async function loadMultifileOmeTiff(
       .map(roiRef => roiMap.get(roiRef.ID))
       .filter(Boolean);
 
-    const { ROIRef: _omitROIRef, ...imageWithoutRefs } = image as any;
+    const { ROIRef, ...imageWithoutRefs } = image;
     return {
       ...imageWithoutRefs,
       ROIs: imageROIs
@@ -187,7 +187,7 @@ export async function loadMultifileOmeTiff(
       { length: opts.levels },
       (_, level) =>
         new TiffPixelSource(
-          sel => opts.pyramidIndexer(sel, level),
+          sel => opts.pyramidIndexer({ t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 }, level),
           opts.dtype,
           opts.tileSize,
           getShapeForBinaryDownsampleLevel({ axes: opts.axes, level }),
@@ -196,7 +196,7 @@ export async function loadMultifileOmeTiff(
           options.pool
         )
     );
-    tiffImages.push({ data, metadata });
+    tiffImages.push({ data: data as TiffPixelSource<OmeTiffDims>[], metadata });
   }
   return tiffImages;
 }

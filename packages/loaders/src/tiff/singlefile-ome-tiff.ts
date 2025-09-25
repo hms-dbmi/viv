@@ -37,7 +37,7 @@ function resolveMetadata(omexml: OmeXmlParsed, SubIFDs: number[] | undefined) {
       .map(roiRef => roiMap.get(roiRef.ID))
       .filter(Boolean);
 
-    const { ROIRef: _omitROIRef, ...imageWithoutRefs } = image as any;
+    const { ROIRef, ...imageWithoutRefs } = image;
     return {
       ...imageWithoutRefs,
       ROIs: imageROIs
@@ -161,18 +161,19 @@ export async function loadSingleFileOmeTiff(
     };
     const data = Array.from(
       { length: levels },
-      (_, level) =>
-        new TiffPixelSource(
-          sel => pyramidIndexer(sel, level),
+      (_, level) => {
+        return new TiffPixelSource(
+          sel => pyramidIndexer({ t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 }, level),
           dtype,
           tileSize,
           getShapeForBinaryDownsampleLevel({ axes, level }),
           axes.labels,
           meta,
           pool
-        )
+        );
+      }
     );
-    images.push({ data, metadata });
+    images.push({ data: data as TiffPixelSource<OmeTiffDims>[], metadata });
     imageIfdOffset += imageSize.t * imageSize.z * imageSize.c;
   }
   return images;

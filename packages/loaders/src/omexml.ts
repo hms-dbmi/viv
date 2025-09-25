@@ -114,7 +114,8 @@ const RectangleSchema = z
       X: z.coerce.number(),
       Y: z.coerce.number(),
       Width: z.coerce.number(),
-      Height: z.coerce.number()
+      Height: z.coerce.number(),
+      Text: z.string().optional()
     })
   })
   .transform(flattenAttributes)
@@ -136,7 +137,8 @@ const EllipseSchema = z
       X: z.coerce.number(),
       Y: z.coerce.number(),
       RadiusX: z.coerce.number(),
-      RadiusY: z.coerce.number()
+      RadiusY: z.coerce.number(),
+      Text: z.string().optional()
     })
   })
   .transform(flattenAttributes)
@@ -158,7 +160,8 @@ const LineSchema = z
       X1: z.coerce.number(),
       Y1: z.coerce.number(),
       X2: z.coerce.number(),
-      Y2: z.coerce.number()
+      Y2: z.coerce.number(),
+      Text: z.string().optional()
     })
   })
   .transform(flattenAttributes)
@@ -178,7 +181,8 @@ const PointSchema = z
       TheT: z.coerce.number().optional(),
       TheZ: z.coerce.number().optional(),
       X: z.coerce.number(),
-      Y: z.coerce.number()
+      Y: z.coerce.number(),
+      Text: z.string().optional()
     })
   })
   .transform(flattenAttributes)
@@ -197,7 +201,8 @@ const PolygonSchema = z
       TheC: z.coerce.number().optional(),
       TheT: z.coerce.number().optional(),
       TheZ: z.coerce.number().optional(),
-      Points: z.string() // Format: "x1,y1 x2,y2 x3,y3 ..."
+      Points: z.string(), // Format: "x1,y1 x2,y2 x3,y3 ..."
+      Text: z.string().optional()
     })
   })
   .transform(flattenAttributes)
