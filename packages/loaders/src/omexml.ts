@@ -93,141 +93,98 @@ const ShapeTypeSchema = z.enum([
   'Rectangle',
   'Ellipse',
   'Polygon',
+  'Polyline',
   'Line',
   'Point',
   'Label'
 ]);
 
-// Rectangle shape schema
-const RectangleSchema = z
+// Transform schema for affine transformations
+const TransformSchema = z
   .object({})
   .extend({
     attr: z.object({
-      ID: z.string(),
-      Name: z.string().optional(),
-      FillColor: z.coerce.number().transform(intToRgba).optional(),
-      StrokeColor: z.coerce.number().transform(intToRgba).optional(),
-      StrokeWidth: z.coerce.number().optional(),
-      TheC: z.coerce.number().optional(),
-      TheT: z.coerce.number().optional(),
-      TheZ: z.coerce.number().optional(),
-      X: z.coerce.number(),
-      Y: z.coerce.number(),
-      Width: z.coerce.number(),
-      Height: z.coerce.number(),
-      Text: z.string().optional()
+      A00: z.coerce.number(),
+      A01: z.coerce.number(),
+      A02: z.coerce.number(),
+      A10: z.coerce.number(),
+      A11: z.coerce.number(),
+      A12: z.coerce.number()
     })
   })
-  .transform(flattenAttributes)
-  .transform(data => ({ ...data, type: 'rectangle' }));
+  .transform(flattenAttributes);
+
+// Helper function to create shape schemas with common attributes
+function createShapeSchema(specificAttrs: z.ZodRawShape, shapeType: string) {
+  return z
+    .object({
+      Transform: TransformSchema.optional()
+    })
+    .extend({
+      attr: z.object({
+        // Common attributes
+        ID: z.string(),
+        Name: z.string().optional(),
+        FillColor: z.coerce.number().transform(intToRgba).optional(),
+        StrokeColor: z.coerce.number().transform(intToRgba).optional(),
+        StrokeWidth: z.coerce.number().optional(),
+        TheC: z.coerce.number().optional(),
+        TheT: z.coerce.number().optional(),
+        TheZ: z.coerce.number().optional(),
+        Text: z.string().optional(),
+        // Shape-specific attributes
+        ...specificAttrs
+      })
+    })
+    .transform(flattenAttributes)
+    .transform(data => ({ ...data, type: shapeType }));
+}
+
+// Rectangle shape schema
+const RectangleSchema = createShapeSchema({
+  X: z.coerce.number(),
+  Y: z.coerce.number(),
+  Width: z.coerce.number(),
+  Height: z.coerce.number()
+}, 'rectangle');
 
 // Ellipse shape schema
-const EllipseSchema = z
-  .object({})
-  .extend({
-    attr: z.object({
-      ID: z.string(),
-      Name: z.string().optional(),
-      FillColor: z.coerce.number().transform(intToRgba).optional(),
-      StrokeColor: z.coerce.number().transform(intToRgba).optional(),
-      StrokeWidth: z.coerce.number().optional(),
-      TheC: z.coerce.number().optional(),
-      TheT: z.coerce.number().optional(),
-      TheZ: z.coerce.number().optional(),
-      X: z.coerce.number(),
-      Y: z.coerce.number(),
-      RadiusX: z.coerce.number(),
-      RadiusY: z.coerce.number(),
-      Text: z.string().optional()
-    })
-  })
-  .transform(flattenAttributes)
-  .transform(data => ({ ...data, type: 'ellipse' }));
+const EllipseSchema = createShapeSchema({
+  X: z.coerce.number(),
+  Y: z.coerce.number(),
+  RadiusX: z.coerce.number(),
+  RadiusY: z.coerce.number()
+}, 'ellipse');
 
 // Line shape schema
-const LineSchema = z
-  .object({})
-  .extend({
-    attr: z.object({
-      ID: z.string(),
-      Name: z.string().optional(),
-      FillColor: z.coerce.number().transform(intToRgba).optional(),
-      StrokeColor: z.coerce.number().transform(intToRgba).optional(),
-      StrokeWidth: z.coerce.number().optional(),
-      TheC: z.coerce.number().optional(),
-      TheT: z.coerce.number().optional(),
-      TheZ: z.coerce.number().optional(),
-      X1: z.coerce.number(),
-      Y1: z.coerce.number(),
-      X2: z.coerce.number(),
-      Y2: z.coerce.number(),
-      Text: z.string().optional()
-    })
-  })
-  .transform(flattenAttributes)
-  .transform(data => ({ ...data, type: 'line' }));
+const LineSchema = createShapeSchema({
+  X1: z.coerce.number(),
+  Y1: z.coerce.number(),
+  X2: z.coerce.number(),
+  Y2: z.coerce.number()
+}, 'line');
 
 // Point shape schema
-const PointSchema = z
-  .object({})
-  .extend({
-    attr: z.object({
-      ID: z.string(),
-      Name: z.string().optional(),
-      FillColor: z.coerce.number().transform(intToRgba).optional(),
-      StrokeColor: z.coerce.number().transform(intToRgba).optional(),
-      StrokeWidth: z.coerce.number().optional(),
-      TheC: z.coerce.number().optional(),
-      TheT: z.coerce.number().optional(),
-      TheZ: z.coerce.number().optional(),
-      X: z.coerce.number(),
-      Y: z.coerce.number(),
-      Text: z.string().optional()
-    })
-  })
-  .transform(flattenAttributes)
-  .transform(data => ({ ...data, type: 'point' }));
+const PointSchema = createShapeSchema({
+  X: z.coerce.number(),
+  Y: z.coerce.number()
+}, 'point');
 
 // Polygon shape schema
-const PolygonSchema = z
-  .object({})
-  .extend({
-    attr: z.object({
-      ID: z.string(),
-      Name: z.string().optional(),
-      FillColor: z.coerce.number().transform(intToRgba).optional(),
-      StrokeColor: z.coerce.number().transform(intToRgba).optional(),
-      StrokeWidth: z.coerce.number().optional(),
-      TheC: z.coerce.number().optional(),
-      TheT: z.coerce.number().optional(),
-      TheZ: z.coerce.number().optional(),
-      Points: z.string(), // Format: "x1,y1 x2,y2 x3,y3 ..."
-      Text: z.string().optional()
-    })
-  })
-  .transform(flattenAttributes)
-  .transform(data => ({ ...data, type: 'polygon' }));
+const PolygonSchema = createShapeSchema({
+  Points: z.string() // Format: "x1,y1 x2,y2 x3,y3 ..."
+}, 'polygon');
+
+// Polyline shape schema
+const PolylineSchema = createShapeSchema({
+  Points: z.string() // Format: "x1,y1 x2,y2 x3,y3 ..."
+}, 'polyline');
 
 // Label shape schema
-const LabelSchema = z
-  .object({})
-  .extend({
-    attr: z.object({
-      ID: z.string(),
-      Name: z.string().optional(),
-      FillColor: z.coerce.number().transform(intToRgba).optional(),
-      StrokeColor: z.coerce.number().transform(intToRgba).optional(),
-      StrokeWidth: z.coerce.number().optional(),
-      TheC: z.coerce.number().optional(),
-      TheT: z.coerce.number().optional(),
-      TheZ: z.coerce.number().optional(),
-      X: z.coerce.number(),
-      Y: z.coerce.number(),
-      Text: z.string().optional()
-    })
-  })
-  .transform(flattenAttributes)
-  .transform(data => ({ ...data, type: 'label' }));
+const LabelSchema = createShapeSchema({
+  X: z.coerce.number(),
+  Y: z.coerce.number()
+}, 'label');
 
 // Union schema to contain shapes
 // Support BOTH standard OME-XML element names (capitalized singular)
@@ -239,6 +196,7 @@ const UnionSchema = z.object({
   Line: z.preprocess(ensureArray, LineSchema.array()).optional(),
   Point: z.preprocess(ensureArray, PointSchema.array()).optional(),
   Polygon: z.preprocess(ensureArray, PolygonSchema.array()).optional(),
+  Polyline: z.preprocess(ensureArray, PolylineSchema.array()).optional(),
   Label: z.preprocess(ensureArray, LabelSchema.array()).optional(),
 
   // Lowercase plural variants
@@ -247,6 +205,7 @@ const UnionSchema = z.object({
   lines: z.preprocess(ensureArray, LineSchema.array()).optional(),
   points: z.preprocess(ensureArray, PointSchema.array()).optional(),
   polygons: z.preprocess(ensureArray, PolygonSchema.array()).optional(),
+  polylines: z.preprocess(ensureArray, PolylineSchema.array()).optional(),
   labels: z.preprocess(ensureArray, LabelSchema.array()).optional()
 });
 
@@ -273,6 +232,7 @@ const ROISchema = z
       if (data.Union.Line) shapes.push(...data.Union.Line);
       if (data.Union.Point) shapes.push(...data.Union.Point);
       if (data.Union.Polygon) shapes.push(...data.Union.Polygon);
+      if (data.Union.Polyline) shapes.push(...data.Union.Polyline);
       if (data.Union.Label) shapes.push(...data.Union.Label);
 
       // Lowercase plural variants
@@ -281,6 +241,7 @@ const ROISchema = z
       if (data.Union.lines) shapes.push(...data.Union.lines);
       if (data.Union.points) shapes.push(...data.Union.points);
       if (data.Union.polygons) shapes.push(...data.Union.polygons);
+      if (data.Union.polylines) shapes.push(...data.Union.polylines);
       if (data.Union.labels) shapes.push(...data.Union.labels);
     }
 
