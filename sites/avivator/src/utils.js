@@ -240,7 +240,10 @@ export async function createLoader(
       // extract metadata into OME-XML-like form
       const metadata = {
         Pixels: {
-          Channels: channels.map(c => ({ Name: c.label, SamplesPerPixel: 1 }))
+          Channels: channels.map(c => ({ 
+            Name: c.label, 
+            SamplesPerPixel: 1,
+            Color: c.color ? [...hexToRgb(c.color), 255] : undefined }))
         }
       };
       source = { data: res.data, metadata };
