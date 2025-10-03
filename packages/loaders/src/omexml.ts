@@ -2,12 +2,11 @@ import * as z from 'zod';
 import { intToRgba, parseXML } from './utils';
 
 // Main API type: full metadata structure
-export type OmeXmlParsed = {
+export type OmeXml = {
   images?: any[];
   rois?: any[];
   roiRefs?: any[];
 };
-export type OmeXml = OmeXmlParsed;
 
 type Prettify<T> = {
   [K in keyof T]: T[K];
@@ -87,7 +86,30 @@ const PhysicalUnitSchema = z.enum([
   'reference frame'
 ]);
 
-// ROI Shape Types
+/**
+ * ROI Shape Types (OME-XML 2016-06 Schema Compliant)
+ * 
+ * All shapes inherit common attributes from the base Shape entity:
+ * - ID: Unique identifier (required)
+ * - Label: Optional label (OME-XML standard attribute)
+ * - Name: Optional name (alternative naming attribute)
+ * - FillColor, StrokeColor, StrokeWidth, StrokeDashArray, LineCap: Visual styling
+ * - TheC, TheT, TheZ: Channel/time/z-slice association
+ * - Text, FontFamily, FontSize, FontStyle: Text attributes
+ * - Locked, Visible: Interaction state
+ * - Transform: Optional affine transformation matrix
+ * 
+ * Each shape type adds its own specific attributes:
+ * - Rectangle: X, Y, Width, Height (top-left corner + dimensions)
+ * - Ellipse: X, Y, RadiusX, RadiusY (center + radii)
+ * - Point: X, Y (point coordinates)
+ * - Line: X1, Y1, X2, Y2 (start and end points)
+ * - Polyline: Points (space-separated coordinate pairs: "x1,y1 x2,y2 ...")
+ * - Polygon: Points (space-separated coordinate pairs: "x1,y1 x2,y2 ...")
+ * - Label: X, Y (label position)
+ * 
+ * @see https://www.openmicroscopy.org/Schemas/Documentation/Generated/OME-2016-06/ome.html
+ */
 export type ShapeType = z.infer<typeof ShapeTypeSchema>;
 const ShapeTypeSchema = z.enum([
   'Rectangle',
@@ -122,16 +144,39 @@ function createShapeSchema(specificAttrs: z.ZodRawShape, shapeType: string) {
     })
     .extend({
       attr: z.object({
-        // Common attributes
+        // Common Shape attributes (inherited by all shapes)
         ID: z.string(),
-        Name: z.string().optional(),
+        Label: z.string().optional(),      // OME-XML uses "Label" 
+        Name: z.string().optional(),       // Some implementations also use "Name"
+        
+        // Visual styling attributes
         FillColor: z.coerce.number().transform(intToRgba).optional(),
         StrokeColor: z.coerce.number().transform(intToRgba).optional(),
         StrokeWidth: z.coerce.number().optional(),
+        StrokeDashArray: z.string().optional(),
+        LineCap: z.enum(['Butt', 'Round', 'Square']).optional(),
+        
+        // Spatial/temporal context attributes
         TheC: z.coerce.number().optional(),
         TheT: z.coerce.number().optional(),
         TheZ: z.coerce.number().optional(),
+        
+        // Text and font attributes
         Text: z.string().optional(),
+        FontFamily: z.string().optional(),
+        FontSize: z.coerce.number().optional(),
+        FontStyle: z.enum(['Normal', 'Italic', 'Bold', 'BoldItalic']).optional(),
+        
+        // Interaction and state attributes
+        Locked: z
+          .string()
+          .transform(v => v.toLowerCase() === 'true')
+          .optional(),
+        Visible: z
+          .string()
+          .transform(v => v.toLowerCase() === 'true')
+          .optional(),
+        
         // Shape-specific attributes
         ...specificAttrs
       })
@@ -140,51 +185,61 @@ function createShapeSchema(specificAttrs: z.ZodRawShape, shapeType: string) {
     .transform(data => ({ ...data, type: shapeType }));
 }
 
-// Rectangle shape schema
+// Rectangle shape schema - defines a rectangular region
 const RectangleSchema = createShapeSchema({
-  X: z.coerce.number(),
-  Y: z.coerce.number(),
-  Width: z.coerce.number(),
-  Height: z.coerce.number()
+  X: z.coerce.number(),        // Top-left X coordinate
+  Y: z.coerce.number(),        // Top-left Y coordinate
+  Width: z.coerce.number(),    // Rectangle width
+  Height: z.coerce.number()    // Rectangle height
 }, 'rectangle');
+export type Rectangle = z.infer<typeof RectangleSchema>;
 
-// Ellipse shape schema
+// Ellipse shape schema - defines an elliptical region
 const EllipseSchema = createShapeSchema({
-  X: z.coerce.number(),
-  Y: z.coerce.number(),
-  RadiusX: z.coerce.number(),
-  RadiusY: z.coerce.number()
+  X: z.coerce.number(),        // Center X coordinate
+  Y: z.coerce.number(),        // Center Y coordinate
+  RadiusX: z.coerce.number(),  // Horizontal radius
+  RadiusY: z.coerce.number()   // Vertical radius
 }, 'ellipse');
+export type Ellipse = z.infer<typeof EllipseSchema>;
 
-// Line shape schema
+// Line shape schema - defines a line segment
 const LineSchema = createShapeSchema({
-  X1: z.coerce.number(),
-  Y1: z.coerce.number(),
-  X2: z.coerce.number(),
-  Y2: z.coerce.number()
+  X1: z.coerce.number(),       // Start point X coordinate
+  Y1: z.coerce.number(),       // Start point Y coordinate
+  X2: z.coerce.number(),       // End point X coordinate
+  Y2: z.coerce.number()        // End point Y coordinate
 }, 'line');
+export type Line = z.infer<typeof LineSchema>;
 
-// Point shape schema
+// Point shape schema - defines a single point
 const PointSchema = createShapeSchema({
-  X: z.coerce.number(),
-  Y: z.coerce.number()
+  X: z.coerce.number(),        // Point X coordinate
+  Y: z.coerce.number()         // Point Y coordinate
 }, 'point');
+export type Point = z.infer<typeof PointSchema>;
 
-// Polygon shape schema
+// Polygon shape schema - defines a closed polygonal region
 const PolygonSchema = createShapeSchema({
-  Points: z.string() // Format: "x1,y1 x2,y2 x3,y3 ..."
+  Points: z.string()           // Format: "x1,y1 x2,y2 x3,y3 ..." (space-separated coordinate pairs)
 }, 'polygon');
+export type Polygon = z.infer<typeof PolygonSchema>;
 
-// Polyline shape schema
+// Polyline shape schema - defines an open polygonal path
 const PolylineSchema = createShapeSchema({
-  Points: z.string() // Format: "x1,y1 x2,y2 x3,y3 ..."
+  Points: z.string()           // Format: "x1,y1 x2,y2 x3,y3 ..." (space-separated coordinate pairs)
 }, 'polyline');
+export type Polyline = z.infer<typeof PolylineSchema>;
 
-// Label shape schema
+// Label shape schema - defines a text label at a specific location
 const LabelSchema = createShapeSchema({
-  X: z.coerce.number(),
-  Y: z.coerce.number()
+  X: z.coerce.number(),        // Label X coordinate
+  Y: z.coerce.number()         // Label Y coordinate
 }, 'label');
+export type Label = z.infer<typeof LabelSchema>;
+
+// Union type of all shape types
+export type Shape = Rectangle | Ellipse | Line | Point | Polygon | Polyline | Label;
 
 // Union schema to contain shapes
 // Support BOTH standard OME-XML element names (capitalized singular)
@@ -249,6 +304,7 @@ const ROISchema = z
     const { Union, ...rest } = data;
     return { ...rest, shapes };
   });
+export type ROI = z.infer<typeof ROISchema>;
 
 // ROIRef schema
 const ROIRefSchema = z
@@ -370,7 +426,7 @@ const OmeSchema = z
 // .transform(flattenAttributes);
 
 // Main API: return full metadata structure
-export function fromString(str: string): OmeXmlParsed {
+export function fromString(str: string): OmeXml {
   const raw = parseXML(str);
   const omeXml = OmeSchema.parse(raw);
   // With schema-level normalization, parsing is a simple projection

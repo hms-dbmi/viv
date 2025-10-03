@@ -1,7 +1,7 @@
 import { fromString } from '../omexml';
 
 import type GeoTIFF from 'geotiff';
-import type { DimensionOrder, OmeXmlParsed } from '../omexml';
+import type { DimensionOrder, OmeXml } from '../omexml';
 import type Pool from './lib/Pool';
 import { createOmeImageIndexerFromResolver } from './lib/indexers';
 import {
@@ -16,7 +16,7 @@ import {
 } from './lib/utils';
 import TiffPixelSource from './pixel-source';
 
-function resolveMetadata(omexml: OmeXmlParsed, SubIFDs: number[] | undefined) {
+function resolveMetadata(omexml: OmeXml, SubIFDs: number[] | undefined) {
   const rois = omexml.rois || [];
   const roiRefs = omexml.roiRefs || [];
 

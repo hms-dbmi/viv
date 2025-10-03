@@ -30,8 +30,8 @@ export async function load(
   const roiMap = new Map(rois.map(roi => [roi.ID, roi]));
   
   // Add ROIs to the first image based on ROIRefs
-  const firstImage = images[0];
-  if (firstImage) {
+  let imgMeta = images[0];
+  if (imgMeta) {
     const imageROIRefs = roiRefs.filter(roiRef => {
       // ROIRefs might have an ImageRef or be associated with the image
       // For now, we'll include all ROIRefs since we don't have explicit image association
@@ -43,11 +43,9 @@ export async function load(
       .map(roiRef => roiMap.get(roiRef.ID))
       .filter(Boolean);
     
-    const { ROIRef: _omitROIRef, ...imgWithoutRefs } = firstImage as any;
-    (firstImage as any) = { ...imgWithoutRefs, ROIs: imageROIs };
+    const { ROIRef: _omitROIRef, ...imgWithoutRefs } = imgMeta as any;
+    imgMeta = { ...imgWithoutRefs, ROIs: imageROIs };
   }
-  
-  const imgMeta = firstImage;
   const { data } = await loadMultiscales(root, '0');
 
   const labels = guessBioformatsLabels(data[0], imgMeta);
