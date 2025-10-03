@@ -185,7 +185,6 @@ function createShapeSchema(specificAttrs: z.ZodRawShape, shapeType: string) {
     .transform(data => ({ ...data, type: shapeType }));
 }
 
-// Rectangle shape schema - defines a rectangular region
 const RectangleSchema = createShapeSchema({
   X: z.coerce.number(),        // Top-left X coordinate
   Y: z.coerce.number(),        // Top-left Y coordinate
@@ -194,7 +193,6 @@ const RectangleSchema = createShapeSchema({
 }, 'rectangle');
 export type Rectangle = z.infer<typeof RectangleSchema>;
 
-// Ellipse shape schema - defines an elliptical region
 const EllipseSchema = createShapeSchema({
   X: z.coerce.number(),        // Center X coordinate
   Y: z.coerce.number(),        // Center Y coordinate
@@ -203,7 +201,6 @@ const EllipseSchema = createShapeSchema({
 }, 'ellipse');
 export type Ellipse = z.infer<typeof EllipseSchema>;
 
-// Line shape schema - defines a line segment
 const LineSchema = createShapeSchema({
   X1: z.coerce.number(),       // Start point X coordinate
   Y1: z.coerce.number(),       // Start point Y coordinate
@@ -212,26 +209,22 @@ const LineSchema = createShapeSchema({
 }, 'line');
 export type Line = z.infer<typeof LineSchema>;
 
-// Point shape schema - defines a single point
 const PointSchema = createShapeSchema({
   X: z.coerce.number(),        // Point X coordinate
   Y: z.coerce.number()         // Point Y coordinate
 }, 'point');
 export type Point = z.infer<typeof PointSchema>;
 
-// Polygon shape schema - defines a closed polygonal region
 const PolygonSchema = createShapeSchema({
   Points: z.string()           // Format: "x1,y1 x2,y2 x3,y3 ..." (space-separated coordinate pairs)
 }, 'polygon');
 export type Polygon = z.infer<typeof PolygonSchema>;
 
-// Polyline shape schema - defines an open polygonal path
 const PolylineSchema = createShapeSchema({
   Points: z.string()           // Format: "x1,y1 x2,y2 x3,y3 ..." (space-separated coordinate pairs)
 }, 'polyline');
 export type Polyline = z.infer<typeof PolylineSchema>;
 
-// Label shape schema - defines a text label at a specific location
 const LabelSchema = createShapeSchema({
   X: z.coerce.number(),        // Label X coordinate
   Y: z.coerce.number()         // Label Y coordinate
