@@ -89,7 +89,7 @@ To build viv's documentation and the Avivator website (under `sites/`), run:
 
 ```sh
 pnpm build # all packages, avivator, and documentation
-pnpm -r build --filter=avivator # build a specific package or site
+pnpm --filter "avivator" build # build a specific package or site
 ```
 
 ## 📄 Sending PRs and making releases

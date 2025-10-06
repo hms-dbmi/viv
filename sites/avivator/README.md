@@ -22,15 +22,15 @@ Avivator has been tested with the following dependency versions:
 ## Development guide
 
 Avivator is developed alongside the Viv codebase. To develop Avivator, clone
-the Viv repository and run the following commands in a `zsh` or `bash` shell:
+the Viv repository and run the following commands in a `zsh` or `bash` shell. _Note_: This repo is a monorepo using pnpm workspaces. The package manager used to install and link dependencies _must_ be [`pnpm`](https://pnpm.io/).
 
 ```sh
 git clone https://github.com/hms-dbmi/viv.git && cd viv
-npm install # installs dependencies for both viv and avivator
-npm start
+pnpm install
+pnpm dev
 ```
 
-This command starts a live development server. Navigate to `http://localhost:3000`
+This command starts a live development server. Navigate to `http://localhost:5173/`
 in your web browser to view the site. You may edit the contents of `src/` (Viv codebase)
 or `avivator/`, and the changes should be applied automatically.
 
@@ -39,7 +39,7 @@ or `avivator/`, and the changes should be applied automatically.
 You may build a static production build of Avivator with the following:
 
 ```sh
-npm run build:avivator
+pnpm --filter "avivator" build
 ```
 
 which outputs the final build in `avivator/dist`. This directory can be deployed as
