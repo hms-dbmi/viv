@@ -148,25 +148,25 @@ function createShapeSchema(specificAttrs: z.ZodRawShape, shapeType: string) {
         ID: z.string(),
         Label: z.string().optional(),      // OME-XML uses "Label" 
         Name: z.string().optional(),       // Some implementations also use "Name"
-        
+
         // Visual styling attributes
         FillColor: z.coerce.number().transform(intToRgba).optional(),
         StrokeColor: z.coerce.number().transform(intToRgba).optional(),
         StrokeWidth: z.coerce.number().optional(),
         StrokeDashArray: z.string().optional(),
         LineCap: z.enum(['Butt', 'Round', 'Square']).optional(),
-        
+
         // Spatial/temporal context attributes
         TheC: z.coerce.number().optional(),
         TheT: z.coerce.number().optional(),
         TheZ: z.coerce.number().optional(),
-        
+
         // Text and font attributes
         Text: z.string().optional(),
         FontFamily: z.string().optional(),
         FontSize: z.coerce.number().optional(),
         FontStyle: z.enum(['Normal', 'Italic', 'Bold', 'BoldItalic']).optional(),
-        
+
         // Interaction and state attributes
         Locked: z
           .string()
@@ -176,7 +176,7 @@ function createShapeSchema(specificAttrs: z.ZodRawShape, shapeType: string) {
           .string()
           .transform(v => v.toLowerCase() === 'true')
           .optional(),
-        
+
         // Shape-specific attributes
         ...specificAttrs
       })
@@ -422,6 +422,7 @@ const OmeSchema = z
 export function fromString(str: string): OmeXml {
   const raw = parseXML(str);
   const omeXml = OmeSchema.parse(raw);
+  console.log('simon', omeXml);
   // With schema-level normalization, parsing is a simple projection
   return {
     images: omeXml.Image ?? [],
