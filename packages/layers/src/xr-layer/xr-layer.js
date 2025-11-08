@@ -8,6 +8,8 @@ import { ShaderAssembler } from '@luma.gl/shadertools';
 import { padContrastLimits } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
+import { MAX_CHANNELS } from '@vivjs/constants';
+import VivShaderAssembler from './viv-shader-assembler';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -61,7 +63,8 @@ const XRLayer = class extends Layer {
     return super.getShaders({
       ...shaderModule,
       defines: {
-        SAMPLER_TYPE: sampler
+        SAMPLER_TYPE: sampler,
+        NUM_CHANNELS: MAX_CHANNELS
       },
       modules: [project32, picking, newChannelsModule]
     });
@@ -107,12 +110,11 @@ const XRLayer = class extends Layer {
       numInstances: 1,
       positions: new Float64Array(12)
     });
-    const shaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
-    shaderAssembler.addDefaultModule({
-      name: 'num-channels',
-      fs: '#define NUM_CHANNELS 6'
-    });
-    
+    // we may want to make our own subclass of ShaderAssembler with some extra logic to handle varying NUM_CHANNELS...
+    // looks like a non-starter, goes against the grain somewhat... maybe if we make sure models will use it we might be ok?
+    const shaderAssembler = VivShaderAssembler.getVivAssembler(MAX_CHANNELS);
+    // const shaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
+
     const mutateStr =
       'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float[NUM_CHANNELS] intensity, vec2 vTexCoord)';
     const processStr =
@@ -203,7 +205,8 @@ const XRLayer = class extends Layer {
         }
       }),
       bufferLayout: this.getAttributeManager().getBufferLayouts(),
-      isInstanced: false
+      isInstanced: false,
+      shaderAssembler: VivShaderAssembler.getVivAssembler(MAX_CHANNELS)
     });
   }
 

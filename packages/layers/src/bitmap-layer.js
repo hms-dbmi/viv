@@ -3,6 +3,7 @@ import { BitmapLayer as BaseBitmapLayer } from '@deck.gl/layers';
 import { GL } from '@luma.gl/constants';
 import { Model } from '@luma.gl/engine';
 import { addAlpha } from './utils';
+import VivShaderAssembler from './xr-layer/viv-shader-assembler';
 
 const PHOTOMETRIC_INTERPRETATIONS = {
   WhiteIsZero: 0,
@@ -97,7 +98,8 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
       isInstanced: false,
       inject: {
         'fs:DECKGL_FILTER_COLOR': photometricInterpretationShader
-      }
+      },
+      shaderAssembler: VivShaderAssembler.getVivAssembler(MAX_CHANNELS)
     });
   }
 }

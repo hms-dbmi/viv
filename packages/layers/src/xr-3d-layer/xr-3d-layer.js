@@ -37,6 +37,8 @@ import vs from './xr-3d-layer-vertex.glsl';
 
 import { ColorPalette3DExtensions } from '@vivjs/extensions';
 import { getDtypeValues, padContrastLimits, padWithDefault } from '../utils';
+import VivShaderAssembler from '../xr-layer/viv-shader-assembler';
+import { MAX_CHANNELS } from '@vivjs/constants';
 
 const channelsModule = {
   name: 'channel-intensity-module',
@@ -185,7 +187,8 @@ const XR3DLayer = class extends Layer {
         .replace('_AFTER_RENDER', _AFTER_RENDER),
       defines: {
         SAMPLER_TYPE: sampler,
-        NUM_PLANES: String(clippingPlanes.length || NUM_PLANES_DEFAULT)
+        NUM_PLANES: String(clippingPlanes.length || NUM_PLANES_DEFAULT),
+        NUM_CHANNELS: MAX_CHANNELS
       },
       modules: [newChannelsModule]
     });
@@ -242,7 +245,8 @@ const XR3DLayer = class extends Layer {
         attributes: {
           positions: new Float32Array(CUBE_STRIP)
         }
-      })
+      }),
+      shaderAssembler: VivShaderAssembler.getVivAssembler(MAX_CHANNELS)
     });
   }
 
