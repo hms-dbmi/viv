@@ -6,12 +6,7 @@ precision highp int;
 precision highp SAMPLER_TYPE;
 
 // our texture
-uniform SAMPLER_TYPE channel0;
-uniform SAMPLER_TYPE channel1;
-uniform SAMPLER_TYPE channel2;
-uniform SAMPLER_TYPE channel3;
-uniform SAMPLER_TYPE channel4;
-uniform SAMPLER_TYPE channel5;
+uniform SAMPLER_TYPE channel<VIV_CHANNEL_INDEX>;
 
 in vec2 vTexCoord;
 
@@ -22,20 +17,12 @@ out vec4 fragColor;
 
 void main() {
 
-  float intensity0 = float(texture(channel0, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity0, contrastLimits[0], 0);
-  float intensity1 = float(texture(channel1, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity1, contrastLimits[1], 1);
-  float intensity2 = float(texture(channel2, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity2, contrastLimits[2], 2);
-  float intensity3 = float(texture(channel3, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity3, contrastLimits[3], 3);
-  float intensity4 = float(texture(channel4, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity4, contrastLimits[4], 4);
-  float intensity5 = float(texture(channel5, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity5, contrastLimits[5], 5);
+  float intensity<VIV_CHANNEL_INDEX> = float(texture(channel<VIV_CHANNEL_INDEX>, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensity<VIV_CHANNEL_INDEX>, contrastLimits[<VIV_CHANNEL_INDEX>], <VIV_CHANNEL_INDEX>);
 
-  float[] intensity = float[NUM_CHANNELS](intensity0, intensity1, intensity2, intensity3, intensity4, intensity5);
+  float[] intensity = float[NUM_CHANNELS](
+    intensity<VIV_CHANNEL_INDEX>,
+  );
   DECKGL_MUTATE_COLOR(fragColor, intensity, vTexCoord);
 
 

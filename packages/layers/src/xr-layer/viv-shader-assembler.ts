@@ -2,6 +2,23 @@ import { ShaderAssembler } from "@luma.gl/shadertools";
 import type { AssembleShaderProps } from "@luma.gl/shadertools/dist/lib/shader-assembly/assemble-shaders";
 import { MAX_CHANNELS } from "@vivjs/constants";
 
+export const VIV_CHANNEL_INDEX_PLACEHOLDER = '<VIV_CHANNEL_INDEX>';
+
+function processGLSLShaderLine(line: string, numChannels: number) {
+  if (!line.includes(VIV_CHANNEL_INDEX_PLACEHOLDER)) return line;
+  let str = "";
+  for (let i=0; i<numChannels; i++) {
+    str += `${line.replaceAll(VIV_CHANNEL_INDEX_PLACEHOLDER, i.toString())}\n`
+  }
+  // Remove the trailing comma if present
+  if (str.endsWith(',\n')) {
+    str = `${str.slice(0, -2)}\n`;
+  }
+  return str;
+}
+function processGLSLShader(shader: string, n: number) {
+  return shader.split('\n').map(line => processGLSLShaderLine(line, n)).join('\n')
+}
 export default class VivShaderAssembler extends ShaderAssembler {
   static defaultVivAssemblers: Record<number, VivShaderAssembler> = {};
   numChannels: number;
@@ -25,6 +42,7 @@ export default class VivShaderAssembler extends ShaderAssembler {
   assembleGLSLShaderPair(props: AssembleShaderProps) {
     console.log(`Assembling GLSL shader pair for ${this.numChannels} channels`);
     // do some preprocessing here to handle varying NUM_CHANNELS?
+    if (props.fs) props.fs = processGLSLShader(props.fs, 6);
     return super.assembleGLSLShaderPair(props);
   }
   static getVivAssembler(NUM_CHANNELS = MAX_CHANNELS) {
