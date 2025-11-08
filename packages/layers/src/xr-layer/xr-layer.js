@@ -108,8 +108,9 @@ const XRLayer = class extends Layer {
     });
     const shaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
 
+    //!!!! TODO - take care of `#define NUM_CHANNELS` here...
     const mutateStr =
-      'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)';
+      'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float[NUM_CHANNELS] intensity, vec2 vTexCoord)';
     const processStr =
       'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
     // Only initialize shader hook functions _once globally_

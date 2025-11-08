@@ -1,5 +1,7 @@
+import { define_num_channels } from '@vivjs/extensions/src/shader-utils';
 export default `\
 #version 300 es
+${define_num_channels}
 precision highp int;
 precision highp float;
 precision highp SAMPLER_TYPE;
@@ -19,7 +21,7 @@ uniform vec3 normals[NUM_PLANES];
 uniform float distances[NUM_PLANES];
 
 // color
-uniform vec3 colors[6];
+uniform vec3 colors[NUM_CHANNELS];
 
 // slices
 uniform vec2 xSlice;
@@ -27,7 +29,7 @@ uniform vec2 ySlice;
 uniform vec2 zSlice;
 
 // range
-uniform vec2 contrastLimits[6];
+uniform vec2 contrastLimits[NUM_CHANNELS];
 
 in vec3 vray_dir;
 flat in vec3 transformed_eye;

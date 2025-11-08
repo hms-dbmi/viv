@@ -1,5 +1,5 @@
 import { LayerExtension } from '@deck.gl/core';
-import { apply_transparent_color } from '../shader-utils';
+import { apply_transparent_color, define_num_channels } from '../shader-utils';
 
 // This file is generated via `packages/extensions/prepare.mjs`
 import * as cmaps from '../generated-colormaps';
@@ -28,6 +28,7 @@ function colormapModuleFactory(name, apply_cmap) {
       useTransparentColor: "u32",
     },
     fs: `\
+${define_num_channels}
 // uniform float opacity;
 // uniform bool useTransparentColor;
 uniform ${extensionName}Uniforms {
@@ -44,12 +45,9 @@ vec4 colormap(float intensity) {
     inject: {
       'fs:DECKGL_MUTATE_COLOR': `\
   float intensityCombo = 0.;
-  intensityCombo += max(0.,intensity0);
-  intensityCombo += max(0.,intensity1);
-  intensityCombo += max(0.,intensity2);
-  intensityCombo += max(0.,intensity3);
-  intensityCombo += max(0.,intensity4);
-  intensityCombo += max(0.,intensity5);
+  for (int i = 0; i < NUM_CHANNELS; i++) {
+    intensityCombo += max(0.,intensity[i]);
+  }
   rgba = colormap(intensityCombo);`
     }
   };

@@ -1,7 +1,8 @@
+import { define_num_channels } from '@vivjs/extensions/src/shader-utils';
 export default `\
 #version 300 es
 #define SHADER_NAME xr-layer-fragment-shader
-
+${define_num_channels}
 precision highp float;
 precision highp int;
 precision highp SAMPLER_TYPE;
@@ -17,7 +18,7 @@ uniform SAMPLER_TYPE channel5;
 in vec2 vTexCoord;
 
 // range
-uniform vec2 contrastLimits[6];
+uniform vec2 contrastLimits[NUM_CHANNELS];
 
 out vec4 fragColor;
 
@@ -36,7 +37,8 @@ void main() {
   float intensity5 = float(texture(channel5, vTexCoord).r);
   DECKGL_PROCESS_INTENSITY(intensity5, contrastLimits[5], 5);
 
-  DECKGL_MUTATE_COLOR(fragColor, intensity0, intensity1, intensity2, intensity3, intensity4, intensity5, vTexCoord);
+  float[] intensity = float[NUM_CHANNELS](intensity0, intensity1, intensity2, intensity3, intensity4, intensity5);
+  DECKGL_MUTATE_COLOR(fragColor, intensity, vTexCoord);
 
 
   geometry.uv = vTexCoord;
