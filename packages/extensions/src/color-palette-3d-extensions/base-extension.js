@@ -18,7 +18,8 @@ const BaseExtension = class extends LayerExtension {
     this.opts = this.opts || {};
   }
 
-  draw() {
+  updateState({props, oldProps, changeFlags, ...rest}) {
+    super.updateState({props, oldProps, changeFlags, ...rest});
     const { colors, channelsVisible } = this.props;
     const paddedColors = padColors({
       channelsVisible: channelsVisible || this.selections.map(() => true),
