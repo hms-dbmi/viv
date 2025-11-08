@@ -1,13 +1,13 @@
 import BaseExtension from './base-extension';
 
 const _BEFORE_RENDER = `\
-  float maxVals[6] = float[6](-1.0, -1.0, -1.0, -1.0, -1.0, -1.0);
+  float maxVals[NUM_CHANNELS] = float[NUM_CHANNELS](-1.0, -1.0, -1.0, -1.0, -1.0, -1.0);
 `;
 
 const _RENDER = `\
-  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
+  float intensityArray[NUM_CHANNELS] = float[NUM_CHANNELS](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
 
-  for(int i = 0; i < 6; i++) {
+  for(int i = 0; i < NUM_CHANNELS; i++) {
     if(intensityArray[i] > maxVals[i]) {
       maxVals[i] = intensityArray[i];
     }
@@ -16,7 +16,7 @@ const _RENDER = `\
 
 const _AFTER_RENDER = `\
   float total = 0.0;
-  for(int i = 0; i < 6; i++) {
+  for(int i = 0; i < NUM_CHANNELS; i++) {
     total += maxVals[i];
   }
   // Do not go past 1 in opacity/colormap value.
