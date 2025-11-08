@@ -24,6 +24,7 @@
   },
   "peerDependencies": {
     "@deck.gl/react": "catalog:",
+    "@deck.gl/widgets": "catalog:",
     "react": "catalog:"
   },
   "dependencies": {
