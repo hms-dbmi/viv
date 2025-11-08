@@ -30,8 +30,7 @@
     "@luma.gl/shadertools": "catalog:",
     "@luma.gl/core": "catalog:",
     "@luma.gl/engine": "catalog:",
-    "@luma.gl/webgl": "catalog:",
-    "@luma.gl/webgpu": "catalog:"
+    "@luma.gl/webgl": "catalog:"
   },
   "dependencies": {
     "@math.gl/core": "catalog:",
