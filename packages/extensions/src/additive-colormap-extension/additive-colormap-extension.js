@@ -20,16 +20,25 @@ import * as cmaps from '../generated-colormaps';
  *
  */
 function colormapModuleFactory(name, apply_cmap) {
+  const extensionName = `additive_colormap_${name}`;
   return {
-    name: `additive-colormap-${name}`,
+    name: extensionName,
+    uniformTypes: {
+      opacity: "f32",
+      useTransparentColor: "u32",
+    },
     fs: `\
-uniform float opacity;
-uniform bool useTransparentColor;
-
+// uniform float opacity;
+// uniform bool useTransparentColor;
+uniform ${extensionName}Uniforms {
+  float opacity;
+  uint useTransparentColor; //no bool-like type in decode-shader-types.ts
+} ${extensionName};
 ${apply_transparent_color}
 ${apply_cmap}
-
 vec4 colormap(float intensity) {
+  float opacity = ${extensionName}.opacity;
+  bool useTransparentColor = ${extensionName}.useTransparentColor != uint(0);
   return vec4(apply_transparent_color(apply_cmap(min(1.,intensity)).xyz, apply_cmap(0.).xyz, useTransparentColor, opacity));
 }`,
     inject: {
@@ -71,6 +80,8 @@ const AdditiveColormapExtension = class extends LayerExtension {
   }
 
   updateState({ props, oldProps, changeFlags, ...rest }) {
+    // does any of this existing logic need to change?
+    // (like, is there ever more than one model?)
     super.updateState({ props, oldProps, changeFlags, ...rest });
     if (props.colormap !== oldProps.colormap) {
       const { device } = this.context;
@@ -79,18 +90,16 @@ const AdditiveColormapExtension = class extends LayerExtension {
         this.setState({ model: this._getModel(device) });
       }
     }
-  }
-
-  draw() {
-    const {
-      useTransparentColor = defaultProps.useTransparentColor.value,
-      opacity = defaultProps.opacity.value
-    } = this.props;
-    const uniforms = {
-      opacity,
-      useTransparentColor
-    };
-    this.state.model?.setUniforms(uniforms);
+    const name = this?.props?.colormap || defaultProps.colormap.value;
+    const extensionName = `additive_colormap_${name}`;
+    for (const model of this.getModels()) {
+      model.shaderInputs.setProps({
+        [extensionName]: {
+          opacity: this.props.opacity,
+          useTransparentColor: this.props.useTransparentColor
+        }
+      })
+    }
   }
 };
 
