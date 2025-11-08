@@ -1,7 +1,6 @@
-import { apply_transparent_color, define_num_channels } from '../shader-utils';
+import { apply_transparent_color } from '../shader-utils';
 
 const fs = `\
-${define_num_channels}
 uniform vec3 transparentColor;
 uniform bool useTransparentColor;
 uniform float opacity;

@@ -1,7 +1,5 @@
-import { define_num_channels } from '@vivjs/extensions/src/shader-utils';
 export default `\
 #version 300 es
-${define_num_channels}
 precision highp int;
 precision highp float;
 precision highp SAMPLER_TYPE;

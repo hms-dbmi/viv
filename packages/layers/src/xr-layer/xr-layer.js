@@ -88,6 +88,7 @@ const XRLayer = class extends Layer {
     // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
     // -- this way of setting parameters is now deprecated and will be subject to further changes moving towards later luma.gl versions & WebGPU.
+    // TODO - review this before merging!
     device.setParametersWebGL({
       [GL.UNPACK_ALIGNMENT]: 1,
       [GL.PACK_ALIGNMENT]: 1
@@ -107,8 +108,11 @@ const XRLayer = class extends Layer {
       positions: new Float64Array(12)
     });
     const shaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
-
-    //!!!! TODO - take care of `#define NUM_CHANNELS` here...
+    shaderAssembler.addDefaultModule({
+      name: 'num-channels',
+      fs: '#define NUM_CHANNELS 6'
+    });
+    
     const mutateStr =
       'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float[NUM_CHANNELS] intensity, vec2 vTexCoord)';
     const processStr =

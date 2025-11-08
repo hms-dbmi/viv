@@ -1,8 +1,6 @@
-import { define_num_channels } from '@vivjs/extensions/src/shader-utils';
 export default `\
 #version 300 es
 #define SHADER_NAME xr-layer-fragment-shader
-${define_num_channels}
 precision highp float;
 precision highp int;
 precision highp SAMPLER_TYPE;

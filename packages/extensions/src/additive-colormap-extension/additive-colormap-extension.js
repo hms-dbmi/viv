@@ -1,5 +1,5 @@
 import { LayerExtension } from '@deck.gl/core';
-import { apply_transparent_color, define_num_channels } from '../shader-utils';
+import { apply_transparent_color } from '../shader-utils';
 
 // This file is generated via `packages/extensions/prepare.mjs`
 import * as cmaps from '../generated-colormaps';
@@ -28,7 +28,6 @@ function colormapModuleFactory(name, apply_cmap) {
       useTransparentColor: "u32",
     },
     fs: `\
-${define_num_channels}
 // uniform float opacity;
 // uniform bool useTransparentColor;
 uniform ${extensionName}Uniforms {

@@ -1,6 +1,4 @@
-import { define_num_channels } from '../shader-utils';
 const fs = `\
-${define_num_channels}
 // lens bounds for ellipse
 uniform float majorLensAxis;
 uniform float minorLensAxis;
@@ -13,7 +11,7 @@ uniform vec3 lensBorderColor;
 uniform float lensBorderRadius;
 
 // color palette
-uniform vec3 colors[6];
+uniform vec3 colors[NUM_CHANNELS];
 
 // uniform lensUniforms {
 //   uint lensEnabled;
