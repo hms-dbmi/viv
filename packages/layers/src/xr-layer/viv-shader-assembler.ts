@@ -1,6 +1,21 @@
 import { ShaderAssembler } from "@luma.gl/shadertools";
+// oops, this may cause problems for publishing... or maybe not if this is only internal.
 import type { AssembleShaderProps } from "@luma.gl/shadertools/dist/lib/shader-assembly/assemble-shaders";
 import { MAX_CHANNELS } from "@vivjs/constants";
+
+// open question - should VivShaderAssembler be exposed as public API?
+// I doubt many people would have a reason to want it... but I likely will.
+// The reason for wanting to do so would be if an application needs
+// to implement complex viv extensions, with more involved code-generation...
+// Users should probably be discouraged from managing their own ShaderAssemblers
+// especially until we are more confident in their use.
+// So in deciding the public form of viv extension API (which should be ergonic/well-typed & stable),
+// it should also allow where possible for somewhat arbitrary extensibility 
+// without getting too complex... i.e. some kind of shader generation pipeline thing.
+// Viv shouldn't be the place where any complex functionality along those lines
+// is maintained... but it should expose enough to allow other applications to experiment
+// with appropriate documentation on what is considered stable & supported,
+// vs what is there for experimental purposes.
 
 export const VIV_CHANNEL_INDEX_PLACEHOLDER = '<VIV_CHANNEL_INDEX>';
 
@@ -21,7 +36,7 @@ function processGLSLShader(shader: string, n: number) {
 }
 export default class VivShaderAssembler extends ShaderAssembler {
   static defaultVivAssemblers: Record<number, VivShaderAssembler> = {};
-  numChannels: number;
+  readonly numChannels: number;
   constructor(numChannels = MAX_CHANNELS) {
     super();
     console.log(`Creating VivShaderAssembler for ${numChannels} channels`);
@@ -40,9 +55,7 @@ export default class VivShaderAssembler extends ShaderAssembler {
     this.numChannels = numChannels;
   }
   assembleGLSLShaderPair(props: AssembleShaderProps) {
-    console.log(`Assembling GLSL shader pair for ${this.numChannels} channels`);
-    // do some preprocessing here to handle varying NUM_CHANNELS?
-    if (props.fs) props.fs = processGLSLShader(props.fs, 6);
+    if (props.fs) props.fs = processGLSLShader(props.fs, this.numChannels);
     return super.assembleGLSLShaderPair(props);
   }
   static getVivAssembler(NUM_CHANNELS = MAX_CHANNELS) {

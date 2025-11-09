@@ -6,6 +6,9 @@ float apply_contrast_limits(float intensity, vec2 contrastLimits) {
 
 export default {
   name: 'channel-intensity',
+  uniformTypes: {
+//it depends...
+  },
   defines: {
     SAMPLER_TYPE: 'usampler2D',
     COLORMAP_FUNCTION: ''

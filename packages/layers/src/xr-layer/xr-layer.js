@@ -51,7 +51,7 @@ const XRLayer = class extends Layer {
    */
   getShaders() {
     const { dtype, interpolation } = this.props;
-    const { shaderModule, sampler } = getRenderingAttrs(dtype, interpolation);
+    const { shaderModule, sampler } = getRenderingAttrs(dtype, interpolation, MAX_CHANNELS);
     const extensionDefinesDeckglProcessIntensity =
       this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
     const newChannelsModule = { ...channels, inject: {} };
@@ -175,6 +175,37 @@ const XRLayer = class extends Layer {
     if (props.bounds !== oldProps.bounds) {
       attributeManager.invalidate('positions');
     }
+    ///// this next section WIP attempt... not currently doing anything useful
+    /// but not actively detrimental to the working of the app as long as the old
+    /// uniforms are still being used and set as before.
+    const { textures, model } = this.state;
+    if (textures && model) {
+      const { contrastLimits, domain, dtype, channelsVisible } = this.props;
+      // Check number of textures not null.
+      const numTextures = Object.values(textures).filter(t => t).length;
+      // Slider values and color values can come in before textures since their data is async.
+      // Thus we pad based on the number of textures bound.
+      const paddedContrastLimits = padContrastLimits({
+        contrastLimits: contrastLimits.slice(0, numTextures),
+        channelsVisible: channelsVisible.slice(0, numTextures),
+        domain,
+        dtype
+      });
+      const xrLayer = {};
+      for (let i = 0; i < MAX_CHANNELS; i++) {
+        xrLayer[`contrastLimits${i}`] = [paddedContrastLimits[i*2], paddedContrastLimits[1 + i*2]];
+      }
+      //>>>> this is the problem I have currently, although it seems like what I pass here should be reasonable
+      //webgl-render-pipeline.ts:412 luma.gl: Binding xrLayerUniforms not found in image-sub-layer-0,240,240,0-Background-Image-TiffPixelSource-#detail#-cached
+
+      //it's expecting `const module = this.modules[moduleName];` (where moduleName is xrLayerUniforms)
+      //but that isn't the name of a module.
+      //>>> The best candidate in model.shaderInputs.modules is 'channel-intensity'.
+      model.shaderInputs.setProps({
+        xrLayerUniforms: xrLayer
+      });
+      model.setBindings(textures);
+    }
   }
 
   /**
@@ -261,6 +292,13 @@ const XRLayer = class extends Layer {
         domain,
         dtype
       });
+      // const xrLayer = {};
+      // for (let i=0; i<MAX_CHANNELS; i++) {
+      //   xrLayer[`contrastLimits${i}`] = paddedContrastLimits[i];
+      // }
+      // model.shaderInputs.setProps({
+      //   xrLayerUniforms: xrLayer
+      // });
       model.setUniforms(
         {
           ...uniforms,
@@ -277,6 +315,7 @@ const XRLayer = class extends Layer {
    * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadChannelTextures(channelData) {
+    // todo update for variable NUM_CHANNELS
     const textures = {
       channel0: null,
       channel1: null,
