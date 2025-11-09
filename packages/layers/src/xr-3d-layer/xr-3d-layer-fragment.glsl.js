@@ -1,3 +1,4 @@
+import { VIV_CHANNEL_INDEX_PLACEHOLDER as I } from "../xr-layer/viv-shader-assembler";
 export default `\
 #version 300 es
 precision highp int;
@@ -108,24 +109,10 @@ void main(void) {
 		float canShowZCoordinate = max(p.z - 0., 0.) * max(1. - p.z , 0.);
 		float canShowCoordinate = float(ceil(canShowXCoordinate * canShowYCoordinate * canShowZCoordinate));
 		canShow = canShowCoordinate * canShow;
-		float intensityValue0 = float(texture(volume0, p).r);
-		DECKGL_PROCESS_INTENSITY(intensityValue0, contrastLimits[0], 0);
-		intensityValue0 = canShow * intensityValue0;
-		float intensityValue1 = float(texture(volume1, p).r);
-		DECKGL_PROCESS_INTENSITY(intensityValue1, contrastLimits[1], 1);
-		intensityValue1 = canShow * intensityValue1;
-		float intensityValue2 = float(texture(volume2, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue2, contrastLimits[2], 2);
-		intensityValue2 = canShow * intensityValue2;
-		float intensityValue3 = float(texture(volume3, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue3, contrastLimits[3], 3);
-		intensityValue3 = canShow * intensityValue3;
-    	float intensityValue4 = float(texture(volume4, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue4, contrastLimits[4], 4);
-		intensityValue4 = canShow * intensityValue4;
-		float intensityValue5 = float(texture(volume5, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue5, contrastLimits[5], 5);
-		intensityValue5 = canShow * intensityValue5;
+		float intensityValue${I} = float(texture(volume${I}, p).r);
+		DECKGL_PROCESS_INTENSITY(intensityValue${I}, contrastLimits[${I}], ${I});
+		intensityValue${I} = canShow * intensityValue${I};
+
 
 		_RENDER
 
