@@ -1,4 +1,5 @@
-import { VIV_CHANNEL_INDEX_PLACEHOLDER as I } from "../xr-layer/viv-shader-assembler";
+import { VIV_CHANNEL_INDEX_PLACEHOLDER } from "../xr-layer/viv-shader-assembler";
+const I = VIV_CHANNEL_INDEX_PLACEHOLDER.toString();
 export default `\
 #version 300 es
 #define SHADER_NAME xr-layer-fragment-shader

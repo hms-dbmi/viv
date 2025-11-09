@@ -17,13 +17,55 @@ import { MAX_CHANNELS } from "@vivjs/constants";
 // with appropriate documentation on what is considered stable & supported,
 // vs what is there for experimental purposes.
 
-export const VIV_CHANNEL_INDEX_PLACEHOLDER = '<VIV_CHANNEL_INDEX>';
+export const VIV_CHANNEL_INDEX_PLACEHOLDER = Symbol('<VIV_CHANNEL_INDEX>');
+
+/**
+ * Tagged-template function that expands the VIV_CHANNEL_INDEX_PLACEHOLDER symbol to the given number of channels.
+ * 
+ * This is probably more appropriate for a public API once it's working.
+ */
+export function vivShader(numChannels: number) {
+  return (strings: TemplateStringsArray, ...expressions: (string | symbol)[]): string => {
+    let result = '';
+    for (let i = 0; i < strings.length; i++) {
+      const str = strings[i];
+      const expr = i < expressions.length ? expressions[i] : null;
+
+      // Check if this line contains the channel index placeholder
+      const hasPlaceholder = expr === VIV_CHANNEL_INDEX_PLACEHOLDER ||
+        (typeof expr === 'string' && expr.includes('<VIV_CHANNEL_INDEX>'));
+
+      if (hasPlaceholder) {
+        // Expand this line for each channel
+        for (let ch = 0; ch < numChannels; ch++) {
+          result += str;
+          if (expr === VIV_CHANNEL_INDEX_PLACEHOLDER) {
+            result += ch;
+          } else if (typeof expr === 'string') {
+            result += expr.replaceAll('<VIV_CHANNEL_INDEX>', ch.toString());
+          }
+        }
+      } else {
+        // Regular line, no expansion needed
+        result += str;
+        if (expr !== null) {
+          result += String(expr);
+        }
+      }
+    }
+
+    // Remove trailing comma if present (for array initializers)
+    result = result.replace(/,\n(\s*)\)/g, '\n$1)');
+
+    return result;
+  };
+}
 
 function processGLSLShaderLine(line: string, numChannels: number) {
-  if (!line.includes(VIV_CHANNEL_INDEX_PLACEHOLDER)) return line;
+  if (!line.includes(VIV_CHANNEL_INDEX_PLACEHOLDER.toString())) return line;
   let str = "";
   for (let i=0; i<numChannels; i++) {
-    str += `${line.replaceAll(VIV_CHANNEL_INDEX_PLACEHOLDER, i.toString())}\n`
+    str += `${line.replaceAll(VIV_CHANNEL_INDEX_PLACEHOLDER.toString(), i.toString())}\n`
   }
   // Remove the trailing comma if present
   if (str.endsWith(',\n')) {
