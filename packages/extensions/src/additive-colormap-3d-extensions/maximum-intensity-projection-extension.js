@@ -1,5 +1,5 @@
-import BaseExtension from './base-extension';
 import { VIV_CHANNEL_INDEX_PLACEHOLDER } from '@vivjs/constants';
+import BaseExtension from './base-extension';
 const I = String(VIV_CHANNEL_INDEX_PLACEHOLDER);
 const _BEFORE_RENDER = `\
   float maxVals[NUM_CHANNELS] = float[NUM_CHANNELS](
