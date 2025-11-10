@@ -1,5 +1,5 @@
 import {
-  VIV_CHANNEL_INDEX_PLACEHOLDER,
+  VIV_CHANNEL_INDEX_PLACEHOLDER
   // vivShader
 } from '../xr-layer/viv-shader-assembler';
 const I = String(VIV_CHANNEL_INDEX_PLACEHOLDER);
