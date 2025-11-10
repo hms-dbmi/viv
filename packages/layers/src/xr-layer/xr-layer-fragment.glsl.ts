@@ -1,7 +1,4 @@
-import {
-  VIV_CHANNEL_INDEX_PLACEHOLDER
-  // vivShader
-} from '../xr-layer/viv-shader-assembler';
+import { VIV_CHANNEL_INDEX_PLACEHOLDER } from '@vivjs/constants';
 const I = String(VIV_CHANNEL_INDEX_PLACEHOLDER);
 export default `\
 #version 300 es

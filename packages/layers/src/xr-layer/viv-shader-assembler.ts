@@ -1,7 +1,7 @@
 import { ShaderAssembler } from '@luma.gl/shadertools';
 // oops, this may cause problems for publishing... or maybe not if this is only internal.
 import type { AssembleShaderProps } from '@luma.gl/shadertools/dist/lib/shader-assembly/assemble-shaders';
-import { MAX_CHANNELS } from '@vivjs/constants';
+import { MAX_CHANNELS, VIV_CHANNEL_INDEX_PLACEHOLDER } from '@vivjs/constants';
 
 // open question - should VivShaderAssembler be exposed as public API?
 // I doubt many people would have a reason to want it... but I likely will.
@@ -17,10 +17,6 @@ import { MAX_CHANNELS } from '@vivjs/constants';
 // with appropriate documentation on what is considered stable & supported,
 // vs what is there for experimental purposes.
 
-//may want to keep this as something that wouldn't make unprocessed shader code invalid syntax
-//maybe we want to use a parser to process the shader code?
-//(probably viv is not the layer at which we introduce something like that)
-export const VIV_CHANNEL_INDEX_PLACEHOLDER = Symbol('VIV_CHANNEL_INDEX');
 const I = String(VIV_CHANNEL_INDEX_PLACEHOLDER);
 //not a practical example, but the line-duplication will not work if there's a multiline expression
 //with mutable state. Not clear how we'd handle that in a simple way.
