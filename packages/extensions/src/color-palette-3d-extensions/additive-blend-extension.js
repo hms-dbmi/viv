@@ -1,11 +1,14 @@
 import BaseExtension from './base-extension';
-
+import { VIV_CHANNEL_INDEX_PLACEHOLDER } from '@vivjs/constants';
+const I = String(VIV_CHANNEL_INDEX_PLACEHOLDER);
 const _BEFORE_RENDER = '';
 
 const _RENDER = `\
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
-  float intensityArray[NUM_CHANNELS] = float[NUM_CHANNELS](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
+  float intensityArray[NUM_CHANNELS] = float[NUM_CHANNELS](
+    intensityValue${I},
+  );
   float total = 0.0;
   for(int i = 0; i < NUM_CHANNELS; i++) {
     float intensityValue = intensityArray[i];

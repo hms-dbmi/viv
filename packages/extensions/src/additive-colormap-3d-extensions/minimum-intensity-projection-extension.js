@@ -1,11 +1,16 @@
 import BaseExtension from './base-extension';
-
+import { VIV_CHANNEL_INDEX_PLACEHOLDER } from '@vivjs/constants';
+const I = String(VIV_CHANNEL_INDEX_PLACEHOLDER);
 const _BEFORE_RENDER = `\
-  float minVals[NUM_CHANNELS] = float[NUM_CHANNELS](1. / 0., 1. / 0., 1. / 0., 1. / 0., 1. / 0., 1. / 0.);
+  float minVals[NUM_CHANNELS] = float[NUM_CHANNELS](
+      ${I}. / 0.,
+    );
 `;
 
 const _RENDER = `\
-  float intensityArray[NUM_CHANNELS] = float[NUM_CHANNELS](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
+  float intensityArray[NUM_CHANNELS] = float[NUM_CHANNELS](
+    intensityValue${I},
+  );
 
   for(int i = 0; i < NUM_CHANNELS; i++) {
     if(intensityArray[i] < minVals[i]) {

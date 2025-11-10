@@ -1,3 +1,5 @@
+import { VIV_CHANNEL_INDEX_PLACEHOLDER } from '@vivjs/constants';
+const I = String(VIV_CHANNEL_INDEX_PLACEHOLDER);
 const fs = `\
 // lens bounds for ellipse
 uniform float majorLensAxis;
@@ -18,12 +20,7 @@ uniform vec3 colors[NUM_CHANNELS];
 //   int lensSelection;
 //   vec3 lensBorderColor;
 //   float lensBorderRadius;
-//   vec3 colors0;
-//   vec3 colors1;
-//   vec3 colors2;
-//   vec3 colors3;
-//   vec3 colors4;
-//   vec3 colors5;
+//   vec3 colors${I};
 // } lens;
 
 bool frag_in_lens_bounds(vec2 vTexCoord) {

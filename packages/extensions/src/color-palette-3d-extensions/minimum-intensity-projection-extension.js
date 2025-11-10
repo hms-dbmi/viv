@@ -1,6 +1,6 @@
 import BaseExtension from './base-extension';
-//import { VIV_CHANNEL_INDEX_PLACEHOLDER } from '../xr-layer/viv-shader-assembler';
-const I = "VIV_CHANNEL_INDEX";
+import { VIV_CHANNEL_INDEX_PLACEHOLDER } from '@vivjs/constants';
+const I = String(VIV_CHANNEL_INDEX_PLACEHOLDER);
 const _BEFORE_RENDER = `\
   float minVals[NUM_CHANNELS] = float[NUM_CHANNELS](
       ${I}. / 0.,
