@@ -18,8 +18,8 @@ const BaseExtension = class extends LayerExtension {
     this.opts = this.opts || {};
   }
 
-  updateState({props, oldProps, changeFlags, ...rest}) {
-    super.updateState({props, oldProps, changeFlags, ...rest});
+  updateState({ props, oldProps, changeFlags, ...rest }) {
+    super.updateState({ props, oldProps, changeFlags, ...rest });
     const { colors, channelsVisible } = this.props;
     const paddedColors = padColors({
       // probably can't have these as booleans in the shader?

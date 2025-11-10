@@ -1,5 +1,5 @@
-import { VIV_CHANNEL_INDEX_PLACEHOLDER } from "../xr-layer/viv-shader-assembler";
-const I = VIV_CHANNEL_INDEX_PLACEHOLDER.toString();
+import { VIV_CHANNEL_INDEX_PLACEHOLDER } from '../xr-layer/viv-shader-assembler';
+const I = String(VIV_CHANNEL_INDEX_PLACEHOLDER);
 export default `\
 #version 300 es
 precision highp int;

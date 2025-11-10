@@ -35,10 +35,10 @@ import { Plane } from '@math.gl/culling';
 import fs from './xr-3d-layer-fragment.glsl';
 import vs from './xr-3d-layer-vertex.glsl';
 
+import { MAX_CHANNELS } from '@vivjs/constants';
 import { ColorPalette3DExtensions } from '@vivjs/extensions';
 import { getDtypeValues, padContrastLimits, padWithDefault } from '../utils';
 import VivShaderAssembler from '../xr-layer/viv-shader-assembler';
-import { MAX_CHANNELS } from '@vivjs/constants';
 
 const channelsModule = {
   name: 'channel-intensity-module',

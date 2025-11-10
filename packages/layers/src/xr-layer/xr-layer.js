@@ -4,11 +4,10 @@ import { COORDINATE_SYSTEM, Layer, picking, project32 } from '@deck.gl/core';
 // ... needed to destructure for it to build with luma.gl 9, but we probably need to change these anyway
 import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
-import { ShaderAssembler } from '@luma.gl/shadertools';
+import { MAX_CHANNELS } from '@vivjs/constants';
 import { padContrastLimits } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
-import { MAX_CHANNELS } from '@vivjs/constants';
 import VivShaderAssembler from './viv-shader-assembler';
 
 const defaultProps = {
@@ -51,7 +50,11 @@ const XRLayer = class extends Layer {
    */
   getShaders() {
     const { dtype, interpolation } = this.props;
-    const { shaderModule, sampler } = getRenderingAttrs(dtype, interpolation, MAX_CHANNELS);
+    const { shaderModule, sampler } = getRenderingAttrs(
+      dtype,
+      interpolation,
+      MAX_CHANNELS
+    );
     const extensionDefinesDeckglProcessIntensity =
       this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
     const newChannelsModule = { ...channels, inject: {} };
@@ -193,7 +196,10 @@ const XRLayer = class extends Layer {
       });
       const xrLayer = {};
       for (let i = 0; i < MAX_CHANNELS; i++) {
-        xrLayer[`contrastLimits${i}`] = [paddedContrastLimits[i*2], paddedContrastLimits[1 + i*2]];
+        xrLayer[`contrastLimits${i}`] = [
+          paddedContrastLimits[i * 2],
+          paddedContrastLimits[1 + i * 2]
+        ];
       }
       //>>>> this is the problem I have currently, although it seems like what I pass here should be reasonable
       //webgl-render-pipeline.ts:412 luma.gl: Binding xrLayerUniforms not found in image-sub-layer-0,240,240,0-Background-Image-TiffPixelSource-#detail#-cached

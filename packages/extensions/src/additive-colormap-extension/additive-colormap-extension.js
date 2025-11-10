@@ -24,8 +24,8 @@ function colormapModuleFactory(name, apply_cmap) {
   return {
     name: extensionName,
     uniformTypes: {
-      opacity: "f32",
-      useTransparentColor: "u32",
+      opacity: 'f32',
+      useTransparentColor: 'u32'
     },
     fs: `\
 // uniform float opacity;
@@ -95,7 +95,7 @@ const AdditiveColormapExtension = class extends LayerExtension {
           opacity: this.props.opacity,
           useTransparentColor: this.props.useTransparentColor
         }
-      })
+      });
     }
   }
 };
