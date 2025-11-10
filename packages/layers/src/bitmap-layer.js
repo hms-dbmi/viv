@@ -4,6 +4,7 @@ import { GL } from '@luma.gl/constants';
 import { Model } from '@luma.gl/engine';
 import { addAlpha } from './utils';
 import VivShaderAssembler from './xr-layer/viv-shader-assembler';
+import { MAX_CHANNELS } from '@vivjs/constants';
 
 const PHOTOMETRIC_INTERPRETATIONS = {
   WhiteIsZero: 0,
