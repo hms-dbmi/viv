@@ -4,7 +4,7 @@ export const MAX_COLOR_INTENSITY = 255;
 
 export const DEFAULT_COLOR_OFF = [0, 0, 0];
 
-export const MAX_CHANNELS = 6;
+export const MAX_CHANNELS = 10;
 
 export const VIV_CHANNEL_INDEX_PLACEHOLDER = Symbol('VIV_CHANNEL_INDEX');
 

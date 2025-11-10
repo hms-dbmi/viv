@@ -336,14 +336,10 @@ const XR3DLayer = class extends Layer {
    * This function loads all textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadTexture(channelData) {
-    const textures = {
-      volume0: null,
-      volume1: null,
-      volume2: null,
-      volume3: null,
-      volume4: null,
-      volume5: null
-    };
+    const textures = {};
+    for (let i = 0; i < MAX_CHANNELS; i++) {
+      textures[`volume${i}`] = null;
+    }
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex?.delete());
     }

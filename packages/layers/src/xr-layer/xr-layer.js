@@ -321,15 +321,10 @@ const XRLayer = class extends Layer {
    * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadChannelTextures(channelData) {
-    // todo update for variable NUM_CHANNELS
-    const textures = {
-      channel0: null,
-      channel1: null,
-      channel2: null,
-      channel3: null,
-      channel4: null,
-      channel5: null
-    };
+    const textures = {};
+    for (let i = 0; i < MAX_CHANNELS; i++) {
+      textures[`channel${i}`] = null;
+    }
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex?.delete());
     }

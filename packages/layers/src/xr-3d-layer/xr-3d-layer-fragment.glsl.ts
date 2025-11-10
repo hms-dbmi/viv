@@ -6,12 +6,7 @@ precision highp int;
 precision highp float;
 precision highp SAMPLER_TYPE;
 
-uniform highp SAMPLER_TYPE volume0;
-uniform highp SAMPLER_TYPE volume1;
-uniform highp SAMPLER_TYPE volume2;
-uniform highp SAMPLER_TYPE volume3;
-uniform highp SAMPLER_TYPE volume4;
-uniform highp SAMPLER_TYPE volume5;
+uniform highp SAMPLER_TYPE volume${I};
 
 uniform vec3 scaledDimensions;
 
