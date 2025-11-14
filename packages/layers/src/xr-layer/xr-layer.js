@@ -253,7 +253,7 @@ const XRLayer = class extends Layer {
         domain,
         dtype
       });
-      model.setUniforms(
+      model.shaderInputs.setProps(
         {
           ...uniforms,
           contrastLimits: paddedContrastLimits

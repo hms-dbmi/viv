@@ -127,7 +127,7 @@ const LensExtension = class extends LayerExtension {
       lensBorderRadius,
       colors: paddedColors
     };
-    this.state.model?.setUniforms(uniforms);
+    this.state.model?.shaderInputs.setProps(uniforms);
   }
 
   finalizeState() {

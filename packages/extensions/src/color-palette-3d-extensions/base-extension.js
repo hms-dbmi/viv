@@ -27,7 +27,7 @@ const BaseExtension = class extends LayerExtension {
     const uniforms = {
       colors: paddedColors
     };
-    this.state.model?.setUniforms(uniforms);
+    this.state.model?.shaderInputs.setProps(uniforms);
   }
 };
 

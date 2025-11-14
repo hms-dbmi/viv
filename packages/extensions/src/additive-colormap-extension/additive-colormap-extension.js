@@ -90,7 +90,7 @@ const AdditiveColormapExtension = class extends LayerExtension {
       opacity,
       useTransparentColor
     };
-    this.state.model?.setUniforms(uniforms);
+    this.state.model?.shaderInputs.setProps(uniforms);
   }
 };
 

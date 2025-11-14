@@ -44,7 +44,7 @@ const ColorPaletteExtension = class extends LayerExtension {
       transparentColor: (transparentColor || [0, 0, 0]).map(i => i / 255),
       useTransparentColor: Boolean(useTransparentColor)
     };
-    this.state.model?.setUniforms(uniforms);
+    this.state.model?.shaderInputs.setProps(uniforms);
   }
 };
 

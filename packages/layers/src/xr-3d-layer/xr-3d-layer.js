@@ -289,7 +289,7 @@ const XR3DLayer = class extends Layer {
       const normals = paddedClippingPlanes.flatMap(plane => plane.normal);
       const distances = paddedClippingPlanes.map(plane => plane.distance);
 
-      model.setUniforms(
+      model.shaderInput.setProps(
         {
           ...uniforms,
           contrastLimits: paddedContrastLimits,
