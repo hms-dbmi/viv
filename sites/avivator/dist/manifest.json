@@ -1,0 +1,9 @@
+{
+  "short_name": "Viv Demo",
+  "name": "Vitessce Image Viewer Demo",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
