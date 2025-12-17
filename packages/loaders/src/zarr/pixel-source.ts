@@ -1,4 +1,5 @@
-import type { ZarrArray } from 'zarr';
+import type { ZarrArray } from './lib/utils';
+import * as zarr from 'zarrita';
 import { getImageSize, isInterleaved } from '../utils';
 import { getIndexer } from './lib/indexer';
 
@@ -8,6 +9,7 @@ import type {
   PixelSource,
   PixelSourceSelection,
   RasterSelection,
+  SupportedDtype,
   TileSelection
 } from '@vivjs/types';
 
@@ -49,16 +51,16 @@ function slice(start: number, stop: number): Slice {
   return { start, stop, step: 1, _slice: true };
 }
 
-type ZarrSource = Pick<ZarrArray, 'shape' | 'chunks' | 'dtype' | 'getRaw'>;
+//type ZarrSource = Pick<ZarrArray, 'shape' | 'chunks' | 'dtype'>
 
 class BoundsCheckError extends Error {}
 
 class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
-  private _data: ZarrSource;
+  private _data: ZarrArray;
   private _indexer: ZarrIndexer<S>;
 
   constructor(
-    data: ZarrSource,
+    data: ZarrArray,
     public labels: Labels<S>,
     public tileSize: number
   ) {
@@ -70,12 +72,16 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     return this._data.shape;
   }
 
-  get dtype() {
-    const suffix = this._data.dtype.slice(1) as keyof typeof DTYPE_LOOKUP;
-    if (!(suffix in DTYPE_LOOKUP)) {
-      throw Error(`Zarr dtype not supported, got ${suffix}.`);
+  get dtype(): SupportedDtype {
+    const normalized = this._data.dtype.toLowerCase();
+    // If it's a two-character code (like 'f8', 'u1'), look it up in the mapping
+    if (normalized.length === 2 && normalized in DTYPE_LOOKUP) {
+      return DTYPE_LOOKUP[normalized as keyof typeof DTYPE_LOOKUP];
     }
-    return DTYPE_LOOKUP[suffix];
+    // Otherwise, assume it's already in the correct format (e.g., 'float64', 'float32', 'uint8')
+    // This handles newer zarr formats that use full names.
+    // Normalize to capitalized form to match SupportedDtype (e.g., 'Float64', 'Uint8')
+    return (normalized.charAt(0).toUpperCase() + normalized.slice(1)) as SupportedDtype;
   }
 
   private get _xIndex() {
@@ -124,9 +130,23 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     // biome-ignore lint/suspicious/noExplicitAny: any is used to pass through storeOptions
     getOptions?: { storeOptions?: any }
   ) {
-    const result = await this._data.getRaw(selection, getOptions);
+    // Convert selection format for zarrita
+    const zarrSelection = selection.map(s => {
+      if (s === null) return null;
+      if (typeof s === 'number') return s;
+      if ('_slice' in s && s._slice) {
+        // Convert our internal Slice to zarrita slice
+        return zarr.slice(s.start, s.stop, s.step);
+      }
+      return s;
+    });
+
+    // Pass abort signal if provided
+    const signal = getOptions?.storeOptions?.signal;
+    const result = await zarr.get(this._data, zarrSelection, signal);
+
     if (typeof result !== 'object') {
-      throw new Error('Expected object from getRaw');
+      throw new Error('Expected object from zarr.get');
     }
     return result;
   }

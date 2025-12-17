@@ -1,5 +1,4 @@
-import { openGroup } from 'zarr';
-import type { ZarrArray } from 'zarr';
+import * as zarr from 'zarrita';
 import type { OmeXml } from '../../omexml';
 import { getLabels, isInterleaved, prevPowerOf2 } from '../../utils';
 
@@ -15,6 +14,22 @@ function isOmeZarr(dataShape: number[], Pixels: OmeXml[0]['Pixels']) {
   const omeZarrShape = [SizeT, SizeC, SizeZ, SizeY, SizeX];
   return dataShape.every((size, i) => omeZarrShape[i] === size);
 }
+
+/**
+ * For convenience - similar-ish interface to ZarrArray from non-zarrita zarr implementation.
+ */
+export type ZarrArray = zarr.Array<zarr.DataType>;
+
+export type TypedArray =
+  | Int8Array
+  | Uint8Array
+  | Int16Array
+  | Uint16Array
+  | Int32Array
+  | Uint32Array
+  | Float32Array
+  | Float64Array;
+
 
 /*
  * Specifying different dimension orders form the METADATA.ome.xml is
@@ -80,8 +95,16 @@ function castLabels(dimnames: string[]) {
 }
 
 export async function loadMultiscales(store: ZarrArray['store'], path = '') {
-  const grp = await openGroup(store, path);
-  const rootAttrs = (await grp.attrs.asObject()) as RootAttrs;
+  // Create a location from the store
+  const location = zarr.root(store);
+  const groupLocation = path ? location.resolve(path) : location;
+
+  // Open the group
+  const grp = await zarr.open(groupLocation, { kind: 'group' });
+  const unknownAttrs = await grp.attrs;
+  // newer stores nest multiscales under 'ome', this may not be entirely robust logic?
+  const v3 = 'ome' in unknownAttrs;
+  const rootAttrs = (v3 ? unknownAttrs.ome : unknownAttrs) as RootAttrs;
 
   let paths = ['0'];
   // Default axes used for v0.1 and v0.2.
@@ -98,9 +121,13 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
     }
   }
 
-  const data = paths.map(path => grp.getItem(path));
+  // Load all arrays
+  const data = await Promise.all(
+    paths.map(p => zarr.open(groupLocation.resolve(p), { kind: 'array' }))
+  );
+
   return {
-    data: (await Promise.all(data)) as ZarrArray[],
+    data,
     rootAttrs,
     labels
   };

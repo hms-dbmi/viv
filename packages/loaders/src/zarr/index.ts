@@ -1,4 +1,4 @@
-import { HTTPStore } from 'zarr';
+import { FetchStore } from 'zarrita';
 import { FileStore } from './lib/storage';
 import { getRootPrefix } from './lib/utils';
 
@@ -26,7 +26,7 @@ export async function loadBioformatsZarr(
 
   if (typeof source === 'string') {
     const url = source.endsWith('/') ? source.slice(0, -1) : source;
-    const store = new HTTPStore(`${url}/${ZARR_DIR}`, options);
+    const store = new FetchStore(`${url}/${ZARR_DIR}`, options.fetchOptions);
     const xmlSource = await fetch(`${url}/${METADATA}`, options.fetchOptions);
     if (!xmlSource.ok) {
       throw Error('No OME-XML metadata found for store.');
@@ -58,6 +58,7 @@ export async function loadBioformatsZarr(
   }
 
   const store = new FileStore(fMap, getRootPrefix(source, ZARR_DIR));
+  //@ts-expect-error FileStore is not assignable to zarr.Readable - needs to be fixed
   return loadBioformats(store, xmlFile);
 }
 
@@ -72,7 +73,7 @@ export async function loadOmeZarr(
   source: string,
   options: Partial<ZarrOptions & { type: 'multiscales' }> = {}
 ) {
-  const store = new HTTPStore(source, options);
+  const store = new FetchStore(source, options.fetchOptions);
 
   if (options?.type !== 'multiscales') {
     throw Error('Only multiscale OME-Zarr is supported.');
