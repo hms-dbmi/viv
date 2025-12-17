@@ -1,15 +1,12 @@
+import { VIV_CHANNEL_INDEX_PLACEHOLDER } from '@vivjs/constants';
+const I = String(VIV_CHANNEL_INDEX_PLACEHOLDER);
 export default `\
 #version 300 es
 precision highp int;
 precision highp float;
 precision highp SAMPLER_TYPE;
 
-uniform highp SAMPLER_TYPE volume0;
-uniform highp SAMPLER_TYPE volume1;
-uniform highp SAMPLER_TYPE volume2;
-uniform highp SAMPLER_TYPE volume3;
-uniform highp SAMPLER_TYPE volume4;
-uniform highp SAMPLER_TYPE volume5;
+uniform highp SAMPLER_TYPE volume${I};
 
 uniform vec3 scaledDimensions;
 
@@ -19,7 +16,7 @@ uniform vec3 normals[NUM_PLANES];
 uniform float distances[NUM_PLANES];
 
 // color
-uniform vec3 colors[6];
+uniform vec3 colors[NUM_CHANNELS];
 
 // slices
 uniform vec2 xSlice;
@@ -27,7 +24,7 @@ uniform vec2 ySlice;
 uniform vec2 zSlice;
 
 // range
-uniform vec2 contrastLimits[6];
+uniform vec2 contrastLimits[NUM_CHANNELS];
 
 in vec3 vray_dir;
 flat in vec3 transformed_eye;
@@ -108,24 +105,10 @@ void main(void) {
 		float canShowZCoordinate = max(p.z - 0., 0.) * max(1. - p.z , 0.);
 		float canShowCoordinate = float(ceil(canShowXCoordinate * canShowYCoordinate * canShowZCoordinate));
 		canShow = canShowCoordinate * canShow;
-		float intensityValue0 = float(texture(volume0, p).r);
-		DECKGL_PROCESS_INTENSITY(intensityValue0, contrastLimits[0], 0);
-		intensityValue0 = canShow * intensityValue0;
-		float intensityValue1 = float(texture(volume1, p).r);
-		DECKGL_PROCESS_INTENSITY(intensityValue1, contrastLimits[1], 1);
-		intensityValue1 = canShow * intensityValue1;
-		float intensityValue2 = float(texture(volume2, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue2, contrastLimits[2], 2);
-		intensityValue2 = canShow * intensityValue2;
-		float intensityValue3 = float(texture(volume3, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue3, contrastLimits[3], 3);
-		intensityValue3 = canShow * intensityValue3;
-    	float intensityValue4 = float(texture(volume4, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue4, contrastLimits[4], 4);
-		intensityValue4 = canShow * intensityValue4;
-		float intensityValue5 = float(texture(volume5, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue5, contrastLimits[5], 5);
-		intensityValue5 = canShow * intensityValue5;
+		float intensityValue${I} = float(texture(volume${I}, p).r);
+		DECKGL_PROCESS_INTENSITY(intensityValue${I}, contrastLimits[${I}], ${I});
+		intensityValue${I} = canShow * intensityValue${I};
+
 
 		_RENDER
 

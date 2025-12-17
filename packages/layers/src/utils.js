@@ -56,7 +56,7 @@ export function padContrastLimits({
   const padSize = MAX_CHANNELS - newContrastLimits.length;
   if (padSize < 0) {
     throw Error(
-      `${newContrastLimits.lengths} channels passed in, but only 6 are allowed.`
+      `${newContrastLimits.lengths} channels passed in, but only ${MAX_CHANNELS} are allowed.`
     );
   }
 

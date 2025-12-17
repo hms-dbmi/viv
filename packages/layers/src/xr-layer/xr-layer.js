@@ -4,10 +4,11 @@ import { COORDINATE_SYSTEM, Layer, picking, project32 } from '@deck.gl/core';
 // ... needed to destructure for it to build with luma.gl 9, but we probably need to change these anyway
 import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
-import { ShaderAssembler } from '@luma.gl/shadertools';
+import { MAX_CHANNELS } from '@vivjs/constants';
 import { padContrastLimits } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
+import VivShaderAssembler from './viv-shader-assembler';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -49,7 +50,11 @@ const XRLayer = class extends Layer {
    */
   getShaders() {
     const { dtype, interpolation } = this.props;
-    const { shaderModule, sampler } = getRenderingAttrs(dtype, interpolation);
+    const { shaderModule, sampler } = getRenderingAttrs(
+      dtype,
+      interpolation,
+      MAX_CHANNELS
+    );
     const extensionDefinesDeckglProcessIntensity =
       this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
     const newChannelsModule = { ...channels, inject: {} };
@@ -61,7 +66,8 @@ const XRLayer = class extends Layer {
     return super.getShaders({
       ...shaderModule,
       defines: {
-        SAMPLER_TYPE: sampler
+        SAMPLER_TYPE: sampler,
+        NUM_CHANNELS: MAX_CHANNELS
       },
       modules: [project32, picking, newChannelsModule]
     });
@@ -88,6 +94,7 @@ const XRLayer = class extends Layer {
     // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
     // -- this way of setting parameters is now deprecated and will be subject to further changes moving towards later luma.gl versions & WebGPU.
+    // TODO - review this before merging!
     device.setParametersWebGL({
       [GL.UNPACK_ALIGNMENT]: 1,
       [GL.PACK_ALIGNMENT]: 1
@@ -106,10 +113,13 @@ const XRLayer = class extends Layer {
       numInstances: 1,
       positions: new Float64Array(12)
     });
-    const shaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
+    // we may want to make our own subclass of ShaderAssembler with some extra logic to handle varying NUM_CHANNELS...
+    // looks like a non-starter, goes against the grain somewhat... maybe if we make sure models will use it we might be ok?
+    const shaderAssembler = VivShaderAssembler.getVivAssembler(MAX_CHANNELS);
+    // const shaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
 
     const mutateStr =
-      'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)';
+      'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float[NUM_CHANNELS] intensity, vec2 vTexCoord)';
     const processStr =
       'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
     // Only initialize shader hook functions _once globally_
@@ -168,6 +178,40 @@ const XRLayer = class extends Layer {
     if (props.bounds !== oldProps.bounds) {
       attributeManager.invalidate('positions');
     }
+    ///// this next section WIP attempt... not currently doing anything useful
+    /// but not actively detrimental to the working of the app as long as the old
+    /// uniforms are still being used and set as before.
+    const { textures, model } = this.state;
+    if (textures && model) {
+      const { contrastLimits, domain, dtype, channelsVisible } = this.props;
+      // Check number of textures not null.
+      const numTextures = Object.values(textures).filter(t => t).length;
+      // Slider values and color values can come in before textures since their data is async.
+      // Thus we pad based on the number of textures bound.
+      const paddedContrastLimits = padContrastLimits({
+        contrastLimits: contrastLimits.slice(0, numTextures),
+        channelsVisible: channelsVisible.slice(0, numTextures),
+        domain,
+        dtype
+      });
+      const xrLayer = {};
+      for (let i = 0; i < MAX_CHANNELS; i++) {
+        xrLayer[`contrastLimits${i}`] = [
+          paddedContrastLimits[i * 2],
+          paddedContrastLimits[1 + i * 2]
+        ];
+      }
+      //>>>> this is the problem I have currently, although it seems like what I pass here should be reasonable
+      //webgl-render-pipeline.ts:412 luma.gl: Binding xrLayerUniforms not found in image-sub-layer-0,240,240,0-Background-Image-TiffPixelSource-#detail#-cached
+
+      //it's expecting `const module = this.modules[moduleName];` (where moduleName is xrLayerUniforms)
+      //but that isn't the name of a module.
+      //>>> The best candidate in model.shaderInputs.modules is 'channel-intensity'.
+      model.shaderInputs.setProps({
+        xrLayerUniforms: xrLayer
+      });
+      model.setBindings(textures);
+    }
   }
 
   /**
@@ -198,7 +242,8 @@ const XRLayer = class extends Layer {
         }
       }),
       bufferLayout: this.getAttributeManager().getBufferLayouts(),
-      isInstanced: false
+      isInstanced: false,
+      shaderAssembler: VivShaderAssembler.getVivAssembler(MAX_CHANNELS)
     });
   }
 
@@ -253,6 +298,13 @@ const XRLayer = class extends Layer {
         domain,
         dtype
       });
+      // const xrLayer = {};
+      // for (let i=0; i<MAX_CHANNELS; i++) {
+      //   xrLayer[`contrastLimits${i}`] = paddedContrastLimits[i];
+      // }
+      // model.shaderInputs.setProps({
+      //   xrLayerUniforms: xrLayer
+      // });
       model.setUniforms(
         {
           ...uniforms,
@@ -269,14 +321,10 @@ const XRLayer = class extends Layer {
    * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadChannelTextures(channelData) {
-    const textures = {
-      channel0: null,
-      channel1: null,
-      channel2: null,
-      channel3: null,
-      channel4: null,
-      channel5: null
-    };
+    const textures = {};
+    for (let i = 0; i < MAX_CHANNELS; i++) {
+      textures[`channel${i}`] = null;
+    }
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex?.delete());
     }

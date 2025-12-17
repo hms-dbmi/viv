@@ -9,6 +9,7 @@ import XRLayer from './xr-layer/xr-layer';
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+  // similar things also declared in several other places & we may end up re-arranging somewhat?
   contrastLimits: { type: 'array', value: [], compare: true },
   channelsVisible: { type: 'array', value: [], compare: true },
   selections: { type: 'array', value: [], compare: true },

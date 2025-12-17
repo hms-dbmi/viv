@@ -35,8 +35,10 @@ import { Plane } from '@math.gl/culling';
 import fs from './xr-3d-layer-fragment.glsl';
 import vs from './xr-3d-layer-vertex.glsl';
 
+import { MAX_CHANNELS } from '@vivjs/constants';
 import { ColorPalette3DExtensions } from '@vivjs/extensions';
 import { getDtypeValues, padContrastLimits, padWithDefault } from '../utils';
+import VivShaderAssembler from '../xr-layer/viv-shader-assembler';
 
 const channelsModule = {
   name: 'channel-intensity-module',
@@ -185,7 +187,8 @@ const XR3DLayer = class extends Layer {
         .replace('_AFTER_RENDER', _AFTER_RENDER),
       defines: {
         SAMPLER_TYPE: sampler,
-        NUM_PLANES: String(clippingPlanes.length || NUM_PLANES_DEFAULT)
+        NUM_PLANES: String(clippingPlanes.length || NUM_PLANES_DEFAULT),
+        NUM_CHANNELS: MAX_CHANNELS
       },
       modules: [newChannelsModule]
     });
@@ -242,7 +245,8 @@ const XR3DLayer = class extends Layer {
         attributes: {
           positions: new Float32Array(CUBE_STRIP)
         }
-      })
+      }),
+      shaderAssembler: VivShaderAssembler.getVivAssembler(MAX_CHANNELS)
     });
   }
 
@@ -332,14 +336,10 @@ const XR3DLayer = class extends Layer {
    * This function loads all textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadTexture(channelData) {
-    const textures = {
-      volume0: null,
-      volume1: null,
-      volume2: null,
-      volume3: null,
-      volume4: null,
-      volume5: null
-    };
+    const textures = {};
+    for (let i = 0; i < MAX_CHANNELS; i++) {
+      textures[`volume${i}`] = null;
+    }
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex?.delete());
     }
