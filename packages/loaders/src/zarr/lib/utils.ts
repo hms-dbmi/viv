@@ -30,7 +30,6 @@ export type TypedArray =
   | Float32Array
   | Float64Array;
 
-
 /*
  * Specifying different dimension orders form the METADATA.ome.xml is
  * possible and necessary for creating an OME-Zarr precursor.

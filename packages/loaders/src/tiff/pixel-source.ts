@@ -1,6 +1,6 @@
 import type { GeoTIFFImage } from 'geotiff';
-import type { TypedArray } from '../zarr/lib/utils';
 import { SIGNAL_ABORTED, getImageSize, isInterleaved } from '../utils';
+import type { TypedArray } from '../zarr/lib/utils';
 
 import type {
   Labels,

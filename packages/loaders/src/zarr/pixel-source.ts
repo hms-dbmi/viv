@@ -1,7 +1,7 @@
-import type { ZarrArray } from './lib/utils';
 import * as zarr from 'zarrita';
 import { getImageSize, isInterleaved } from '../utils';
 import { getIndexer } from './lib/indexer';
+import type { ZarrArray } from './lib/utils';
 
 import type {
   Labels,
@@ -81,7 +81,8 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     // Otherwise, assume it's already in the correct format (e.g., 'float64', 'float32', 'uint8')
     // This handles newer zarr formats that use full names.
     // Normalize to capitalized form to match SupportedDtype (e.g., 'Float64', 'Uint8')
-    return (normalized.charAt(0).toUpperCase() + normalized.slice(1)) as SupportedDtype;
+    return (normalized.charAt(0).toUpperCase() +
+      normalized.slice(1)) as SupportedDtype;
   }
 
   private get _xIndex() {
