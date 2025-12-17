@@ -152,9 +152,7 @@ export const useImage = source => {
         // Use colors from OMERO metadata, fall back to palette
         if (stats.colors.some(color => color !== null)) {
           // At least some channels have OMERO colors
-          newColors = stats.colors.map(
-            (color, i) => color ?? COLOR_PALLETE[i]
-          );
+          newColors = stats.colors.map((color, i) => color ?? COLOR_PALLETE[i]);
         } else {
           // No OMERO colors available - fall back to default behavior
           newColors =
