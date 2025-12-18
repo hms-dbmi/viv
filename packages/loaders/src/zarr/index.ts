@@ -58,7 +58,6 @@ export async function loadBioformatsZarr(
   }
 
   const store = new FileStore(fMap, getRootPrefix(source, ZARR_DIR));
-  //@ts-expect-error FileStore is not assignable to zarr.Readable - needs to be fixed
   return loadBioformats(store, xmlFile);
 }
 

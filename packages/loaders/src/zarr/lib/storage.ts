@@ -51,6 +51,6 @@ export class FileStore extends ReadOnlyStore {
       return undefined;
     }
     const buffer = await file.arrayBuffer();
-    return buffer;
+    return new Uint8Array(buffer);
   }
 }
