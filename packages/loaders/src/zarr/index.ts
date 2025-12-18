@@ -10,8 +10,12 @@ interface ZarrOptions {
 }
 
 /**
- * Opens root directory generated via `bioformats2raw --file_type=zarr`. Uses OME-XML metadata,
- * and assumes first image. This function is the zarr-equivalent to using loadOmeTiff.
+ * Opens root directory generated via `bioformats2raw`. Uses OME-XML metadata,
+ * and assumes that the source url is the root for a single image.
+ * This function is the zarr-equivalent to using loadOmeTiff.
+ * 
+ * Note that outputs from older versions may no longer load correctly
+ * https://github.com/hms-dbmi/viv/issues/905
  *
  * @param {string} source url
  * @param {{ fetchOptions: (undefined | RequestInit) }} options
@@ -21,6 +25,8 @@ export async function loadBioformatsZarr(
   source: string | (File & { path: string })[],
   options: Partial<ZarrOptions> = {}
 ) {
+  // https://github.com/hms-dbmi/viv/issues/905
+  // previously we had 'METADATA.ome.xml' & 'data.zarr'
   const METADATA = 'OME/METADATA.ome.xml';
   const ZARR_DIR = '';
 
