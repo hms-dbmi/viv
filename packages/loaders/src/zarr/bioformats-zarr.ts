@@ -1,6 +1,5 @@
-import type { ZarrArray } from 'zarr';
-
 import { fromString } from '../omexml';
+import type { ZarrArray } from './lib/utils';
 import {
   guessBioformatsLabels,
   guessTileSize,

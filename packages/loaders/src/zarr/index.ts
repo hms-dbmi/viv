@@ -1,4 +1,4 @@
-import { HTTPStore } from 'zarr';
+import { FetchStore } from 'zarrita';
 import { FileStore } from './lib/storage';
 import { getRootPrefix } from './lib/utils';
 
@@ -10,8 +10,13 @@ interface ZarrOptions {
 }
 
 /**
- * Opens root directory generated via `bioformats2raw --file_type=zarr`. Uses OME-XML metadata,
- * and assumes first image. This function is the zarr-equivalent to using loadOmeTiff.
+ * Opens root directory generated via `bioformats2raw`. Uses OME-XML metadata,
+ * and assumes that the source url is the root for a single image.
+ * This function is the zarr-equivalent to using loadOmeTiff - but
+ * somewhat deprecated now in favour of `loadOmeZarr` for OME-NGFF compliant images.
+ *
+ * Note that outputs from older versions of `bioformats2raw` may no longer load correctly
+ * https://github.com/hms-dbmi/viv/issues/905
  *
  * @param {string} source url
  * @param {{ fetchOptions: (undefined | RequestInit) }} options
@@ -21,12 +26,14 @@ export async function loadBioformatsZarr(
   source: string | (File & { path: string })[],
   options: Partial<ZarrOptions> = {}
 ) {
-  const METADATA = 'METADATA.ome.xml';
-  const ZARR_DIR = 'data.zarr';
+  // https://github.com/hms-dbmi/viv/issues/905
+  // previously we had 'METADATA.ome.xml' & 'data.zarr'
+  const METADATA = 'OME/METADATA.ome.xml';
+  const ZARR_DIR = '';
 
   if (typeof source === 'string') {
     const url = source.endsWith('/') ? source.slice(0, -1) : source;
-    const store = new HTTPStore(`${url}/${ZARR_DIR}`, options);
+    const store = new FetchStore(`${url}/${ZARR_DIR}`, options.fetchOptions);
     const xmlSource = await fetch(`${url}/${METADATA}`, options.fetchOptions);
     if (!xmlSource.ok) {
       throw Error('No OME-XML metadata found for store.');
@@ -72,7 +79,7 @@ export async function loadOmeZarr(
   source: string,
   options: Partial<ZarrOptions & { type: 'multiscales' }> = {}
 ) {
-  const store = new HTTPStore(source, options);
+  const store = new FetchStore(source, options.fetchOptions);
 
   if (options?.type !== 'multiscales') {
     throw Error('Only multiscale OME-Zarr is supported.');
