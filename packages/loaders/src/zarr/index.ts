@@ -21,8 +21,8 @@ export async function loadBioformatsZarr(
   source: string | (File & { path: string })[],
   options: Partial<ZarrOptions> = {}
 ) {
-  const METADATA = 'METADATA.ome.xml';
-  const ZARR_DIR = 'data.zarr';
+  const METADATA = 'OME/METADATA.ome.xml';
+  const ZARR_DIR = '';
 
   if (typeof source === 'string') {
     const url = source.endsWith('/') ? source.slice(0, -1) : source;
