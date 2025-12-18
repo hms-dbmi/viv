@@ -12,9 +12,10 @@ interface ZarrOptions {
 /**
  * Opens root directory generated via `bioformats2raw`. Uses OME-XML metadata,
  * and assumes that the source url is the root for a single image.
- * This function is the zarr-equivalent to using loadOmeTiff.
+ * This function is the zarr-equivalent to using loadOmeTiff - but
+ * somewhat deprecated now in favour of `loadOmeZarr` for OME-NGFF compliant images.
  * 
- * Note that outputs from older versions may no longer load correctly
+ * Note that outputs from older versions of `bioformats2raw` may no longer load correctly
  * https://github.com/hms-dbmi/viv/issues/905
  *
  * @param {string} source url
