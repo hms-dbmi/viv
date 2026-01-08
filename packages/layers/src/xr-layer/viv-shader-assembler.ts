@@ -17,7 +17,7 @@ import { MAX_CHANNELS, VIV_CHANNEL_INDEX_PLACEHOLDER } from '@vivjs/constants';
 // with appropriate documentation on what is considered stable & supported,
 // vs what is there for experimental purposes.
 
-const I = String(VIV_CHANNEL_INDEX_PLACEHOLDER);
+const I = VIV_CHANNEL_INDEX_PLACEHOLDER;
 //not a practical example, but the line-duplication will not work if there's a multiline expression
 //with mutable state. Not clear how we'd handle that in a simple way.
 `

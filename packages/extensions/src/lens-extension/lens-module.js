@@ -1,5 +1,5 @@
-import { VIV_CHANNEL_INDEX_PLACEHOLDER } from '@vivjs/constants';
-const I = String(VIV_CHANNEL_INDEX_PLACEHOLDER);
+import { VIV_CHANNEL_INDEX_PLACEHOLDER as I } from '@vivjs/constants';
+
 const fs = `\
 // lens bounds for ellipse
 uniform float majorLensAxis;

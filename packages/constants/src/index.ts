@@ -6,7 +6,7 @@ export const DEFAULT_COLOR_OFF = [0, 0, 0];
 
 export const MAX_CHANNELS = 10;
 
-export const VIV_CHANNEL_INDEX_PLACEHOLDER = Symbol('VIV_CHANNEL_INDEX');
+export const VIV_CHANNEL_INDEX_PLACEHOLDER = 'VIV_CHANNEL_INDEX';
 
 export const DEFAULT_FONT_FAMILY =
   "-apple-system, 'Helvetica Neue', Arial, sans-serif";
