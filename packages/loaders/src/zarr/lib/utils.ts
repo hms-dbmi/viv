@@ -120,9 +120,9 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
     }
   }
 
-  // Load all arrays
+  // Load all arrays - nb, in older bioformats zarr `{kind: 'array'}` was wrong here
   const data = await Promise.all(
-    paths.map(p => zarr.open(groupLocation.resolve(p), { kind: 'array' }))
+    paths.map(p => zarr.open(groupLocation.resolve(p)))
   );
 
   return {

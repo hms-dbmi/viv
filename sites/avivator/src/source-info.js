@@ -14,6 +14,7 @@ const sources = [
   },
   {
     // Generated with `bioformats2raw --file_type=zarr --dimension_order='XYZCT'`
+    // nb - this was an older version of `bioformats2raw`, making this a useful loadBioformatsZarr regression test
     // channels: 5, type: uint8
     path: 'LuCa-7color_Scan1/',
     description: 'Perkin Elmer LuCa-7color_Scan1.qptiff'

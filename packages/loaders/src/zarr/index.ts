@@ -10,31 +10,18 @@ interface ZarrOptions {
 }
 
 /**
- * Opens root directory generated via `bioformats2raw`. Uses OME-XML metadata,
- * and assumes that the source url is the root for a single image.
- * This function is the zarr-equivalent to using loadOmeTiff - but
- * somewhat deprecated now in favour of `loadOmeZarr` for OME-NGFF compliant images.
- *
- * Note that outputs from older versions of `bioformats2raw` may no longer load correctly
- * https://github.com/hms-dbmi/viv/issues/905
- *
- * @param {string} source url
- * @param {{ fetchOptions: (undefined | RequestInit) }} options
- * @return {Promise<{ data: ZarrPixelSource[], metadata: ImageMeta }>} data source and associated OMEXML metadata.
+ * Internal helper to load bioformats zarr with specified metadata and zarr directory paths.
  */
-export async function loadBioformatsZarr(
+async function _loadBioformatsZarrWithPaths(
   source: string | (File & { path: string })[],
+  metadataPath: string,
+  zarrDir: string,
   options: Partial<ZarrOptions> = {}
 ) {
-  // https://github.com/hms-dbmi/viv/issues/905
-  // previously we had 'METADATA.ome.xml' & 'data.zarr'
-  const METADATA = 'OME/METADATA.ome.xml';
-  const ZARR_DIR = '';
-
   if (typeof source === 'string') {
     const url = source.endsWith('/') ? source.slice(0, -1) : source;
-    const store = new FetchStore(`${url}/${ZARR_DIR}`, options.fetchOptions);
-    const xmlSource = await fetch(`${url}/${METADATA}`, options.fetchOptions);
+    const store = new FetchStore(`${url}/${zarrDir}`, options.fetchOptions);
+    const xmlSource = await fetch(`${url}/${metadataPath}`, options.fetchOptions);
     if (!xmlSource.ok) {
       throw Error('No OME-XML metadata found for store.');
     }
@@ -53,7 +40,7 @@ export async function loadBioformatsZarr(
 
   let xmlFile: File | undefined;
   for (const file of source) {
-    if (file.name === METADATA) {
+    if (file.name === metadataPath) {
       xmlFile = file;
     } else {
       fMap.set(file.path, file);
@@ -63,9 +50,35 @@ export async function loadBioformatsZarr(
   if (!xmlFile) {
     throw Error('No OME-XML metadata found for store.');
   }
-
-  const store = new FileStore(fMap, getRootPrefix(source, ZARR_DIR));
+  const store = new FileStore(fMap, getRootPrefix(source, zarrDir));
   return loadBioformats(store, xmlFile);
+}
+
+/**
+ * Opens root directory generated via `bioformats2raw`. Uses OME-XML metadata,
+ * and assumes that the source url is the root for a single image.
+ * This function is the zarr-equivalent to using loadOmeTiff - but
+ * somewhat deprecated now in favour of `loadOmeZarr` for OME-NGFF compliant images.
+ *
+ * Supports both old and new bioformats2raw formats:
+ * - Old format: METADATA.ome.xml at root, data.zarr/ directory
+ * - New format: OME/METADATA.ome.xml, root zarr directory
+ *
+ * @param {string} source url
+ * @param {{ fetchOptions: (undefined | RequestInit) }} options
+ * @return {Promise<{ data: ZarrPixelSource[], metadata: ImageMeta }>} data source and associated OMEXML metadata.
+ */
+export async function loadBioformatsZarr(
+  source: string | (File & { path: string })[],
+  options: Partial<ZarrOptions> = {}
+) {
+  // Try both old and new formats in parallel, return the first successful result
+  // Old format: METADATA.ome.xml at root, data.zarr/ directory
+  // New format: OME/METADATA.ome.xml, root zarr directory
+  return Promise.any([
+    _loadBioformatsZarrWithPaths(source, 'METADATA.ome.xml', 'data.zarr', options),
+    _loadBioformatsZarrWithPaths(source, 'OME/METADATA.ome.xml', '', options)
+  ]);
 }
 
 /**
