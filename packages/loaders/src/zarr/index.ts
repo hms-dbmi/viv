@@ -67,9 +67,9 @@ async function _loadBioformatsZarrWithPaths(
  * - Old format: METADATA.ome.xml at root, data.zarr/ directory
  * - New format: OME/METADATA.ome.xml, root zarr directory
  *
- * @param {string} source url
- * @param {{ fetchOptions: (undefined | RequestInit) }} options
- * @return {Promise<{ data: ZarrPixelSource[], metadata: ImageMeta }>} data source and associated OMEXML metadata.
+ * @param source url
+ * @param options
+ * @return data source and associated OMEXML metadata.
  */
 export async function loadBioformatsZarr(
   source: string | (File & { path: string })[],
@@ -92,9 +92,9 @@ export async function loadBioformatsZarr(
 /**
  * Opens root of multiscale OME-Zarr via URL.
  *
- * @param {string} source url
- * @param {{ fetchOptions: (undefined | RequestInit) }} options
- * @return {Promise<{ data: ZarrPixelSource[], metadata: RootAttrs }>} data source and associated OME-Zarr metadata.
+ * @param source url
+ * @param options
+ * @return data source and associated OME-Zarr metadata.
  */
 export async function loadOmeZarr(
   source: string,
