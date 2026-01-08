@@ -1,7 +1,7 @@
 import type { Labels, PixelSource } from '@vivjs/types';
 import quickselect from 'quickselect';
-import type { TypedArray } from 'zarr';
 import type { OmeXml } from './omexml';
+import type { TypedArray } from './zarr/lib/utils';
 
 export const DTYPE_LOOKUP = {
   uint8: 'Uint8',
