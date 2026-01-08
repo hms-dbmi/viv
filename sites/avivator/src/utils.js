@@ -223,31 +223,43 @@ export async function createLoader(
       return source;
     }
 
-    // Bio-Formats Zarr
+    // Bio-Formats Zarr and OME-Zarr
+    // Try both formats in parallel using Promise.any for better performance
     let source;
     try {
-      source = await loadBioformatsZarr(urlOrFile);
+      source = await Promise.any([
+        loadBioformatsZarr(urlOrFile),
+        (async () => {
+          // Transform OME-Zarr result to match bioformats format
+          const res = await loadOmeZarr(urlOrFile, { type: 'multiscales' });
+          const channels = res.metadata?.omero?.channels ?? [{ label: 'image' }];
+          // extract metadata into OME-XML-like form
+          const metadata = {
+            Pixels: {
+              Channels: channels.map(c => ({
+                Name: c.label,
+                SamplesPerPixel: 1,
+                Color: c.color ? [...hexToRgb(c.color), 255] : undefined
+              }))
+            }
+          };
+          return { data: res.data, metadata };
+        })()
+      ]);
     } catch (e) {
-      if (isZodError(e)) {
-        // If the error is a ZodError, it means there was an OME-XML file
-        // but it was invalid. We shouldn't try to load the file as a OME-Zarr.
+      // If Promise.any fails, check if any error was a ZodError
+      // ZodError means there was an OME-XML file but it was invalid.
+      // We shouldn't try to load the file as OME-Zarr in that case.
+      if (e instanceof AggregateError) {
+        const zodError = e.errors.find(err => isZodError(err));
+        if (zodError) {
+          throw zodError;
+        }
+      } else if (isZodError(e)) {
         throw e;
       }
-
-      // try ome-zarr
-      const res = await loadOmeZarr(urlOrFile, { type: 'multiscales' });
-      const channels = res.metadata?.omero?.channels ?? [{ label: 'image' }];
-      // extract metadata into OME-XML-like form
-      const metadata = {
-        Pixels: {
-          Channels: channels.map(c => ({
-            Name: c.label,
-            SamplesPerPixel: 1,
-            Color: c.color ? [...hexToRgb(c.color), 255] : undefined
-          }))
-        }
-      };
-      source = { data: res.data, metadata };
+      // Re-throw the original error if it's not a ZodError
+      throw e;
     }
     return source;
   } catch (e) {
