@@ -1,58 +1,44 @@
 import { ShaderAssembler } from '@luma.gl/shadertools';
-// oops, this may cause problems for publishing... or maybe not if this is only internal.
 import type { AssembleShaderProps } from '@luma.gl/shadertools/dist/lib/shader-assembly/assemble-shaders';
 import { MAX_CHANNELS, VIV_CHANNEL_INDEX_PLACEHOLDER } from '@vivjs/constants';
 
-// open question - should VivShaderAssembler be exposed as public API?
-// I doubt many people would have a reason to want it... but I likely will.
-// The reason for wanting to do so would be if an application needs
-// to implement complex viv extensions, with more involved code-generation...
-// Users should probably be discouraged from managing their own ShaderAssemblers
-// especially until we are more confident in their use.
-// So in deciding the public form of viv extension API (which should be ergonic/well-typed & stable),
-// it should also allow where possible for somewhat arbitrary extensibility
-// without getting too complex... i.e. some kind of shader generation pipeline thing.
-// Viv shouldn't be the place where any complex functionality along those lines
-// is maintained... but it should expose enough to allow other applications to experiment
-// with appropriate documentation on what is considered stable & supported,
-// vs what is there for experimental purposes.
-
-const I = VIV_CHANNEL_INDEX_PLACEHOLDER;
-//not a practical example, but the line-duplication will not work if there's a multiline expression
-//with mutable state. Not clear how we'd handle that in a simple way.
-`
-float mutableThing = 0.;
-mutableThing = opacity${I};
-float value${I} = mutableThing;
-
-mutableThing = opacity0;
-float value0 = mutableThing;
-mutableThing = opacity1;
-float value1 = mutableThing;
-
-mutableThing = opacity0;
-mutableThing = opacity1;
-float value0 = mutableThing;
-float value1 = mutableThing;
-`;
-
-
-function processGLSLShaderLine(line: string, numChannels: number) {
-  if (!line.includes(VIV_CHANNEL_INDEX_PLACEHOLDER.toString())) return line;
+/**
+ * Expands a single line by replacing the channel index placeholder with each channel number.
+ * Lines containing VIV_CHANNEL_INDEX are replicated for each channel (0 to numChannels-1).
+ */
+function expandLine(line: string, numChannels: number): string {
+  if (!line.includes(VIV_CHANNEL_INDEX_PLACEHOLDER)) return line;
   let str = '';
   for (let i = 0; i < numChannels; i++) {
-    str += `${line.replaceAll(VIV_CHANNEL_INDEX_PLACEHOLDER.toString(), i.toString())}\n`;
+    str += `${line.replaceAll(VIV_CHANNEL_INDEX_PLACEHOLDER, i.toString())}\n`;
   }
-  // Remove the trailing comma if present
+  // Remove the trailing comma if present (for array initializers)
   if (str.endsWith(',\n')) {
     str = `${str.slice(0, -2)}\n`;
   }
   return str;
 }
-function processGLSLShader(shader: string, n: number) {
+
+/**
+ * Processes a GLSL shader string, expanding channel index placeholders.
+ *
+ * Each line containing VIV_CHANNEL_INDEX is replicated for each channel,
+ * with the placeholder replaced by the channel number.
+ *
+ * For multi-line per-channel logic, use arrays and iterate with NUM_CHANNELS:
+ * ```glsl
+ * float intensity${I} = float(texture(channel${I}, vTexCoord).r);
+ * float[] intensity = float[NUM_CHANNELS](
+ *   // keep this on a separate line so it can be duplicated... then final comma will be removed.
+ *   intensity${I},
+ * );
+ * for(int i = 0; i < NUM_CHANNELS; i++) { ... }
+ * ```
+ */
+function processGLSLShader(shader: string, numChannels: number): string {
   return shader
     .split('\n')
-    .map(line => processGLSLShaderLine(line, n))
+    .map(line => expandLine(line, numChannels))
     .join('\n');
 }
 export default class VivShaderAssembler extends ShaderAssembler {
