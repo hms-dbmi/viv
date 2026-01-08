@@ -51,7 +51,6 @@ function slice(start: number, stop: number): Slice {
   return { start, stop, step: 1, _slice: true };
 }
 
-//type ZarrSource = Pick<ZarrArray, 'shape' | 'chunks' | 'dtype'>
 
 class BoundsCheckError extends Error {}
 
