@@ -1,4 +1,4 @@
-import { ShaderAssembler } from '@luma.gl/shadertools';
+import { ShaderAssembler, type ShaderModule } from '@luma.gl/shadertools';
 import type { AssembleShaderProps } from '@luma.gl/shadertools/dist/lib/shader-assembly/assemble-shaders';
 import { MAX_CHANNELS, VIV_CHANNEL_INDEX_PLACEHOLDER } from '@vivjs/constants';
 
@@ -41,9 +41,60 @@ function processGLSLShader(shader: string, numChannels: number): string {
     .map(line => expandLine(line, numChannels))
     .join('\n');
 }
+
+/**
+ * Expands a shader module's uniformTypes to include per-channel declarations.
+ * Any uniformType key containing VIV_CHANNEL_INDEX_PLACEHOLDER will be expanded.
+ * Required for per-channel uniforms because NUM_CHANNELS varies at runtime.
+ *
+ * @param module - Shader module definition
+ * @param numChannels - Number of channels to expand
+ * @returns Expanded shader module with per-channel uniformTypes
+ *
+ * @example
+ * const module = {
+ *   name: 'my-module',
+ *   uniformTypes: {
+ *     opacity: 'f32',
+ *     [`color${VIV_CHANNEL_INDEX_PLACEHOLDER}`]: 'vec3<f32>'
+ *   }
+ * };
+ * const expanded = VivShaderAssembler.expandShaderModule(module, 3);
+ * // expanded.uniformTypes = { opacity: 'f32', color0: 'vec3<f32>', color1: 'vec3<f32>', color2: 'vec3<f32>' }
+ */
+export function expandShaderModule(
+  module: ShaderModule,
+  numChannels: number
+): ShaderModule {
+  if (!module.uniformTypes) {
+    return module;
+  }
+
+  const expandedUniformTypes: typeof module.uniformTypes = {};
+  
+  for (const [key, value] of Object.entries(module.uniformTypes)) {
+    if (key.includes(VIV_CHANNEL_INDEX_PLACEHOLDER)) {
+      // Expand this uniform for each channel
+      for (let i = 0; i < numChannels; i++) {
+        const expandedKey = key.replaceAll(VIV_CHANNEL_INDEX_PLACEHOLDER, i.toString());
+        expandedUniformTypes[expandedKey] = value;
+      }
+    } else {
+      // Keep non-channel uniforms as-is
+      expandedUniformTypes[key] = value;
+    }
+  }
+
+  return {
+    ...module,
+    uniformTypes: expandedUniformTypes
+  };
+}
+
 export default class VivShaderAssembler extends ShaderAssembler {
   static defaultVivAssemblers: Record<number, VivShaderAssembler> = {};
   readonly numChannels: number;
+  
   constructor(numChannels = MAX_CHANNELS) {
     super();
     console.log(`Creating VivShaderAssembler for ${numChannels} channels`);
@@ -61,6 +112,17 @@ export default class VivShaderAssembler extends ShaderAssembler {
     }
     this.numChannels = numChannels;
   }
+  
+  /**
+   * Expands a shader module's uniformTypes for this assembler's channel count.
+   * 
+   * @param module - Shader module definition
+   * @returns Expanded shader module with per-channel uniformTypes
+   */
+  expandShaderModule(module: ShaderModule): ShaderModule {
+    return expandShaderModule(module, this.numChannels);
+  }
+  
   assembleGLSLShaderPair(props: AssembleShaderProps) {
     if (props.fs) props.fs = processGLSLShader(props.fs, this.numChannels);
     return super.assembleGLSLShaderPair(props);
