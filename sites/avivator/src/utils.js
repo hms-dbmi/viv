@@ -459,13 +459,13 @@ export const getMultiSelectionStats = async ({ loader, selections, use3d }) => {
   return { domains, contrastLimits };
 };
 
-export async function getSingleSelectionStatsWithOmero(
+export async function getSingleSelectionStatsWithOmero({
   metadata,
   channelIndex,
   loader,
   selection,
   use3d
-) {
+}) {
   // Try OMERO metadata first
   const omeroChannels = metadata?.omero?.channels;
   if (omeroChannels?.[channelIndex]?.window) {
@@ -483,21 +483,21 @@ export async function getSingleSelectionStatsWithOmero(
   return { ...stats, color: null };
 }
 
-export async function getMultiSelectionStatsWithOmero(
+export async function getMultiSelectionStatsWithOmero({
   metadata,
   loader,
   selections,
   use3d
-) {
+}) {
   const stats = await Promise.all(
     selections.map(selection =>
-      getSingleSelectionStatsWithOmero(
+      getSingleSelectionStatsWithOmero({
         metadata,
-        selection.c,
+        channelIndex: selection.c,
         loader,
         selection,
         use3d
-      )
+      })
     )
   );
   const domains = stats.map(stat => stat.domain);

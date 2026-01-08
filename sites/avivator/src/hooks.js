@@ -140,12 +140,12 @@ export const useImage = source => {
         }
         useViewerStore.setState({ useColormap: false, useLens: false });
       } else {
-        const stats = await getMultiSelectionStatsWithOmero(
+        const stats = await getMultiSelectionStatsWithOmero({
           metadata,
           loader,
-          newSelections,
-          false
-        );
+          selections: newSelections,
+          use3d: false,
+        });
         newDomains = stats.domains;
         newContrastLimits = stats.contrastLimits;
 
