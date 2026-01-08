@@ -7,23 +7,33 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+permissions:
+  id-token: write  # Required for OIDC trusted publishing via NPM and GitHub Actions
+  contents: read
+
+
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20.17.0 # required for OIDC publishing
+          registry-url: https://registry.npmjs.org/
+      # npm 11.5.1 or later is required for OIDC publishing, so update to latest to be sure
+      - run: npm install -g npm@latest
       - uses: pnpm/action-setup@v4
         with:
           run_install: true
-
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
           title: Create Release
           version: pnpm run version
-          publish: pnpm run publish
+          publish: pnpm run publish --provenance
           createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
