@@ -36,19 +36,18 @@ import fs from './xr-3d-layer-fragment.glsl';
 import vs from './xr-3d-layer-vertex.glsl';
 
 import { MAX_CHANNELS } from '@vivjs/constants';
-import { ColorPalette3DExtensions } from '@vivjs/extensions';
+import {
+  ColorPalette3DExtensions,
+  VivShaderAssembler,
+  expandShaderModule,
+  getDefaultPalette,
+  padColors,
+  padColorsForUBO
+} from '@vivjs/extensions';
 import { getDtypeValues, padContrastLimits, padWithDefault } from '../utils';
-import VivShaderAssembler from '../xr-layer/viv-shader-assembler';
-
-const channelsModule = {
-  name: 'channel-intensity-module',
-  fs: `\
-    float apply_contrast_limits(float intensity, vec2 contrastLimits) {
-      float contrastLimitsAppliedToIntensity = (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0]));
-      return max(0., contrastLimitsAppliedToIntensity);
-    }
-  `
-};
+import channelIntensity3D from './shader-modules/channel-intensity-3d';
+import fragmentUniforms3D from './shader-modules/fragment-uniforms-3d';
+import vertexUniforms3D from './shader-modules/vertex-uniforms-3d';
 
 // biome-ignore format: Avoid reformatting to keep the rows clear
 const CUBE_STRIP = [
@@ -74,6 +73,7 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'object', value: {}, compare: true },
   contrastLimits: { type: 'array', value: [], compare: true },
+  colors: { type: 'array', value: null, compare: true },
   dtype: { type: 'string', value: 'Uint8', compare: true },
   xSlice: { type: 'array', value: null, compare: true },
   ySlice: { type: 'array', value: null, compare: true },
@@ -173,7 +173,25 @@ const XR3DLayer = class extends Layer {
       getRenderingFromExtensions(extensions);
     const extensionDefinesDeckglProcessIntensity =
       this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
-    const newChannelsModule = { inject: {}, ...channelsModule };
+
+    const numPlanes = clippingPlanes.length || NUM_PLANES_DEFAULT;
+    const expandedChannelIntensity = expandShaderModule(
+      channelIntensity3D,
+      MAX_CHANNELS,
+      numPlanes
+    );
+    const expandedFragmentUniforms = expandShaderModule(
+      fragmentUniforms3D,
+      MAX_CHANNELS,
+      numPlanes
+    );
+    const expandedVertexUniforms = expandShaderModule(
+      vertexUniforms3D,
+      MAX_CHANNELS,
+      numPlanes
+    );
+
+    const newChannelsModule = { inject: {}, ...expandedChannelIntensity };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
         intensity = apply_contrast_limits(intensity, contrastLimits);
@@ -187,10 +205,14 @@ const XR3DLayer = class extends Layer {
         .replace('_AFTER_RENDER', _AFTER_RENDER),
       defines: {
         SAMPLER_TYPE: sampler,
-        NUM_PLANES: String(clippingPlanes.length || NUM_PLANES_DEFAULT),
+        NUM_PLANES: String(numPlanes),
         NUM_CHANNELS: MAX_CHANNELS
       },
-      modules: [newChannelsModule]
+      modules: [
+        newChannelsModule,
+        expandedFragmentUniforms,
+        expandedVertexUniforms
+      ]
     });
   }
 
@@ -238,6 +260,8 @@ const XR3DLayer = class extends Layer {
     if (!gl) {
       return null;
     }
+    const { clippingPlanes } = this.props;
+    const numPlanes = clippingPlanes.length || NUM_PLANES_DEFAULT;
     return new Model(gl, {
       ...this.getShaders(),
       geometry: new Geometry({
@@ -246,7 +270,10 @@ const XR3DLayer = class extends Layer {
           positions: new Float32Array(CUBE_STRIP)
         }
       }),
-      shaderAssembler: VivShaderAssembler.getVivAssembler(MAX_CHANNELS)
+      shaderAssembler: VivShaderAssembler.getVivAssembler(
+        MAX_CHANNELS,
+        numPlanes
+      )
     });
   }
 
@@ -258,6 +285,7 @@ const XR3DLayer = class extends Layer {
     const { textures, model, scaleMatrix } = this.state;
     const {
       contrastLimits,
+      colors,
       xSlice,
       ySlice,
       zSlice,
@@ -266,7 +294,8 @@ const XR3DLayer = class extends Layer {
       domain,
       dtype,
       clippingPlanes,
-      resolutionMatrix
+      resolutionMatrix,
+      selections
     } = this.props;
     const { viewMatrix, viewMatrixInverse, projectionMatrix } =
       this.context.viewport;
@@ -289,44 +318,87 @@ const XR3DLayer = class extends Layer {
         new Plane([1, 0, 0]),
         clippingPlanes.length || NUM_PLANES_DEFAULT
       );
-      // Need to flatten for shaders.
       const normals = paddedClippingPlanes.flatMap(plane => plane.normal);
       const distances = paddedClippingPlanes.map(plane => plane.distance);
 
-      model.setUniforms(
-        {
-          ...uniforms,
-          contrastLimits: paddedContrastLimits,
-          xSlice: new Float32Array(
-            xSlice
-              ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])
-              : [0, 1]
-          ),
-          ySlice: new Float32Array(
-            ySlice
-              ? ySlice.map(i => i / scaleMatrix[5] / resolutionMatrix[5])
-              : [0, 1]
-          ),
-          zSlice: new Float32Array(
-            zSlice
-              ? zSlice.map(i => i / scaleMatrix[10] / resolutionMatrix[10])
-              : [0, 1]
-          ),
-          eye_pos: new Float32Array([
-            viewMatrixInverse[12],
-            viewMatrixInverse[13],
-            viewMatrixInverse[14]
-          ]),
-          view: viewMatrix,
-          proj: projectionMatrix,
-          scale: scaleMatrix,
-          resolution: resolutionMatrix,
-          model: modelMatrix || new Matrix4(),
-          normals,
-          distances
-        },
-        { disableWanings: false }
+      const numPlanes = clippingPlanes.length || NUM_PLANES_DEFAULT;
+
+      // Get number of actual channels from textures
+      const numTextures = Object.values(textures).filter(t => t).length;
+      const numChannelsForColors = Math.max(
+        numTextures,
+        selections?.length || 0,
+        1
       );
+
+      const paddedColors = padColorsForUBO({
+        channelsVisible:
+          channelsVisible || Array(numChannelsForColors).fill(true),
+        colors: colors || getDefaultPalette(numChannelsForColors)
+      });
+
+      // Build per-channel contrast limits for UBO
+      const channelIntensity3DUniforms = {};
+      for (let i = 0; i < MAX_CHANNELS; i++) {
+        channelIntensity3DUniforms[`contrastLimits${i}`] = [
+          paddedContrastLimits[i * 2],
+          paddedContrastLimits[i * 2 + 1]
+        ];
+      }
+
+      // Build fragment uniforms for UBO
+      const fragmentUniforms3DUniforms = {
+        xSlice: xSlice
+          ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])
+          : [0, 1],
+        ySlice: ySlice
+          ? ySlice.map(i => i / scaleMatrix[5] / resolutionMatrix[5])
+          : [0, 1],
+        zSlice: zSlice
+          ? zSlice.map(i => i / scaleMatrix[10] / resolutionMatrix[10])
+          : [0, 1],
+        scale: scaleMatrix
+      };
+
+      // Add per-channel colors - ensure we always have valid arrays
+      for (let i = 0; i < MAX_CHANNELS; i++) {
+        fragmentUniforms3DUniforms[`color${i}`] = paddedColors[i] || [0, 0, 0];
+      }
+
+      // Add per-plane normals and distances
+      for (let i = 0; i < numPlanes; i++) {
+        fragmentUniforms3DUniforms[`normal${i}`] = [
+          normals[i * 3],
+          normals[i * 3 + 1],
+          normals[i * 3 + 2]
+        ];
+        fragmentUniforms3DUniforms[`distance${i}`] = distances[i];
+      }
+
+      // Build vertex uniforms for UBO
+      const vertexUniformsData = {
+        eye_pos: [
+          viewMatrixInverse[12],
+          viewMatrixInverse[13],
+          viewMatrixInverse[14]
+        ],
+        proj: projectionMatrix,
+        model: modelMatrix || new Matrix4(),
+        view: viewMatrix,
+        scale: scaleMatrix,
+        resolution: resolutionMatrix
+      };
+
+      // Set UBO uniforms via shaderInputs
+      // Keys must match module names: 'channelIntensity3D', 'fragmentUniforms3D', 'vertex'
+      model.shaderInputs.setProps({
+        channelIntensity3D: channelIntensity3DUniforms,
+        fragmentUniforms3D: fragmentUniforms3DUniforms,
+        vertex: vertexUniformsData
+      });
+
+      // All uniforms are now in UBOs - model.setUniforms is deprecated and will be removed
+      // Textures are still set via setBindings
       model.setBindings(textures);
       model.draw(this.context.renderPass);
     }

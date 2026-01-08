@@ -3,8 +3,8 @@ import { BitmapLayer as BaseBitmapLayer } from '@deck.gl/layers';
 import { GL } from '@luma.gl/constants';
 import { Model } from '@luma.gl/engine';
 import { MAX_CHANNELS } from '@vivjs/constants';
+import { VivShaderAssembler } from '@vivjs/extensions';
 import { addAlpha } from './utils';
-import VivShaderAssembler from './xr-layer/viv-shader-assembler';
 
 const PHOTOMETRIC_INTERPRETATIONS = {
   WhiteIsZero: 0,

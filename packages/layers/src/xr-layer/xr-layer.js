@@ -5,10 +5,10 @@ import { COORDINATE_SYSTEM, Layer, picking, project32 } from '@deck.gl/core';
 import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
 import { MAX_CHANNELS } from '@vivjs/constants';
+import { VivShaderAssembler, expandShaderModule } from '@vivjs/extensions';
 import { padContrastLimits } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
-import VivShaderAssembler, { expandShaderModule } from './viv-shader-assembler';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -278,11 +278,10 @@ const XRLayer = class extends Layer {
    * This function runs the shaders and draws to the canvas
    */
   draw(opts) {
-    const { uniforms } = opts;
     const { textures, model } = this.state;
     if (textures && model) {
-      // Uniforms are now set via UBO in updateState, just need to draw
-      model.setUniforms(uniforms);
+      // All Viv uniforms are now set via UBOs in updateState
+      // model.setUniforms is deprecated and will be removed in future deck.gl versions
       model.setBindings(textures);
       model.draw(this.context.renderPass);
     }

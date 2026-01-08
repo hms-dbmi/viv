@@ -4,6 +4,9 @@ import BaseExtension from './base-extension';
 const _BEFORE_RENDER = '';
 
 const _RENDER = `\
+  vec3 colors[NUM_CHANNELS] = vec3[NUM_CHANNELS](
+    fragmentUniforms3D.color${I},
+  );
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
   float intensityArray[NUM_CHANNELS] = float[NUM_CHANNELS](

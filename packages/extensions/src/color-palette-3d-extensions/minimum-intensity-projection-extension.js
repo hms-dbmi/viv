@@ -20,6 +20,9 @@ const _RENDER = `\
 `;
 
 const _AFTER_RENDER = `\
+  vec3 colors[NUM_CHANNELS] = vec3[NUM_CHANNELS](
+    fragmentUniforms3D.color${I},
+  );
   vec3 rgbCombo = vec3(0.0);
   for(int i = 0; i < NUM_CHANNELS; i++) {
     rgbCombo += max(0.0, min(1.0, minVals[i])) * vec3(colors[i]);
