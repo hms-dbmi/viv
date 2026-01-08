@@ -1,4 +1,5 @@
 import * as zarr from 'zarrita';
+import type { Slice } from 'zarrita';
 import { getImageSize, isInterleaved } from '../utils';
 import { getIndexer } from './lib/indexer';
 import type { ZarrArray } from './lib/utils';
@@ -38,17 +39,6 @@ interface ZarrTileSelection {
 interface ZarrRasterSelection {
   selection: number[];
   signal?: AbortSignal;
-}
-
-interface Slice {
-  start: number;
-  stop: number;
-  step: number;
-  _slice: true;
-}
-
-function slice(start: number, stop: number): Slice {
-  return { start, stop, step: 1, _slice: true };
 }
 
 class BoundsCheckError extends Error {}
@@ -121,7 +111,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
       throw new BoundsCheckError('Tile slice is out of bounds.');
     }
 
-    return [slice(xStart, xStop), slice(yStart, yStop)];
+    return [zarr.slice(xStart, xStop), zarr.slice(yStart, yStop)];
   }
 
   private async _getRaw(
@@ -129,20 +119,9 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     // biome-ignore lint/suspicious/noExplicitAny: any is used to pass through storeOptions
     getOptions?: { storeOptions?: any }
   ) {
-    // Convert selection format for zarrita
-    const zarrSelection = selection.map(s => {
-      if (s === null) return null;
-      if (typeof s === 'number') return s;
-      if ('_slice' in s && s._slice) {
-        // Convert our internal Slice to zarrita slice
-        return zarr.slice(s.start, s.stop, s.step);
-      }
-      return s;
-    });
-
     // Pass abort signal if provided
     const signal = getOptions?.storeOptions?.signal;
-    const result = await zarr.get(this._data, zarrSelection, signal);
+    const result = await zarr.get(this._data, selection, signal);
 
     if (typeof result !== 'object') {
       throw new Error('Expected object from zarr.get');
