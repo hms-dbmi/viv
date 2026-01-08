@@ -36,56 +36,6 @@ float value0 = mutableThing;
 float value1 = mutableThing;
 `;
 
-/**
- * (totally broken) Tagged-template function that expands the VIV_CHANNEL_INDEX_PLACEHOLDER symbol to the given number of channels.
- *
- * Something like this may be more appropriate for a public API once it's working.
- */
-export function vivShader(numChannels: number) {
-  // this is not doing remotely the right thing...
-  // maybe the proper approach is indeed rather than trying to have something that wraps an entire shader
-  // having ways of processing more local blocks of code
-  // consider that repeating individual lines may be undesirable - have a way of grouping that makes sense
-  //... comments in string above...
-  return (
-    strings: TemplateStringsArray,
-    ...expressions: (string | symbol)[]
-  ): string => {
-    let result = '';
-    for (let i = 0; i < strings.length; i++) {
-      const str = strings[i];
-      const expr = i < expressions.length ? expressions[i] : null;
-
-      // Check if this line contains the channel index placeholder
-      const hasPlaceholder =
-        expr === VIV_CHANNEL_INDEX_PLACEHOLDER ||
-        (typeof expr === 'string' && expr.includes('<VIV_CHANNEL_INDEX>'));
-
-      if (hasPlaceholder) {
-        // Expand this line for each channel
-        for (let ch = 0; ch < numChannels; ch++) {
-          result += str;
-          if (expr === VIV_CHANNEL_INDEX_PLACEHOLDER) {
-            result += ch;
-          } else if (typeof expr === 'string') {
-            result += expr.replaceAll('<VIV_CHANNEL_INDEX>', ch.toString());
-          }
-        }
-      } else {
-        // Regular line, no expansion needed
-        result += str;
-        if (expr !== null) {
-          result += String(expr);
-        }
-      }
-    }
-
-    // Remove trailing comma if present (for array initializers)
-    result = result.replace(/,\n(\s*)\)/g, '\n$1)');
-
-    return result;
-  };
-}
 
 function processGLSLShaderLine(line: string, numChannels: number) {
   if (!line.includes(VIV_CHANNEL_INDEX_PLACEHOLDER.toString())) return line;
