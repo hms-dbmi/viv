@@ -232,7 +232,9 @@ export async function createLoader(
         (async () => {
           // Transform OME-Zarr result to match bioformats format
           const res = await loadOmeZarr(urlOrFile, { type: 'multiscales' });
-          const channels = res.metadata?.omero?.channels ?? [{ label: 'image' }];
+          const channels = res.metadata?.omero?.channels ?? [
+            { label: 'image' }
+          ];
           // extract metadata into OME-XML-like form
           const metadata = {
             Pixels: {

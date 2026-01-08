@@ -21,7 +21,10 @@ async function _loadBioformatsZarrWithPaths(
   if (typeof source === 'string') {
     const url = source.endsWith('/') ? source.slice(0, -1) : source;
     const store = new FetchStore(`${url}/${zarrDir}`, options.fetchOptions);
-    const xmlSource = await fetch(`${url}/${metadataPath}`, options.fetchOptions);
+    const xmlSource = await fetch(
+      `${url}/${metadataPath}`,
+      options.fetchOptions
+    );
     if (!xmlSource.ok) {
       throw Error('No OME-XML metadata found for store.');
     }
@@ -76,7 +79,12 @@ export async function loadBioformatsZarr(
   // Old format: METADATA.ome.xml at root, data.zarr/ directory
   // New format: OME/METADATA.ome.xml, root zarr directory
   return Promise.any([
-    _loadBioformatsZarrWithPaths(source, 'METADATA.ome.xml', 'data.zarr', options),
+    _loadBioformatsZarrWithPaths(
+      source,
+      'METADATA.ome.xml',
+      'data.zarr',
+      options
+    ),
     _loadBioformatsZarrWithPaths(source, 'OME/METADATA.ome.xml', '', options)
   ]);
 }
