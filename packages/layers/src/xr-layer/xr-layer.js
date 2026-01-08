@@ -275,19 +275,6 @@ const XRLayer = class extends Layer {
   }
 
   /**
-   * This function runs the shaders and draws to the canvas
-   */
-  draw(opts) {
-    const { textures, model } = this.state;
-    if (textures && model) {
-      // All Viv uniforms are now set via UBOs in updateState
-      // model.setUniforms is deprecated and will be removed in future deck.gl versions
-      model.setBindings(textures);
-      model.draw(this.context.renderPass);
-    }
-  }
-
-  /**
    * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadChannelTextures(channelData) {
