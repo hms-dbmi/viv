@@ -12,20 +12,12 @@ uniform SAMPLER_TYPE channel${I};
 
 in vec2 vTexCoord;
 
-// range
-// todo: unfortunately probably need to stop using an array for such things.
-uniform vec2 contrastLimits[NUM_CHANNELS];
-// the token after uniform is one that will be used in JS (with or without Uniforms)
-// uniform xrLayerUniforms {
-//   vec2 contrastLimits${I};
-// } xrLayer;
-
 out vec4 fragColor;
 
 void main() {
 
   float intensity${I} = float(texture(channel${I}, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity${I}, contrastLimits[${I}], ${I});
+  DECKGL_PROCESS_INTENSITY(intensity${I}, channelIntensity.contrastLimits${I}, ${I});
   // DECKGL_PROCESS_INTENSITY(intensity${I}, xrLayer.contrastLimits${I}, ${I});
 
   float[] intensity = float[NUM_CHANNELS](

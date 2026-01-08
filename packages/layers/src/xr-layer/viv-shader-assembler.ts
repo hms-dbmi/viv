@@ -43,52 +43,65 @@ function processGLSLShader(shader: string, numChannels: number): string {
 }
 
 /**
- * Expands a shader module's uniformTypes to include per-channel declarations.
+ * Expands a shader module's uniformTypes and shader code to include per-channel declarations.
  * Any uniformType key containing VIV_CHANNEL_INDEX_PLACEHOLDER will be expanded.
+ * Any shader code (fs/vs) containing VIV_CHANNEL_INDEX_PLACEHOLDER will be expanded.
  * Required for per-channel uniforms because NUM_CHANNELS varies at runtime.
+ *
+ * Note: This is different from VivShaderAssembler.assembleGLSLShaderPair() which only
+ * expands the main shader code, not the shader code inside modules.
  *
  * @param module - Shader module definition
  * @param numChannels - Number of channels to expand
- * @returns Expanded shader module with per-channel uniformTypes
+ * @returns Expanded shader module with per-channel uniformTypes and shader code
  *
  * @example
  * const module = {
  *   name: 'my-module',
  *   uniformTypes: {
- *     opacity: 'f32',
  *     [`color${VIV_CHANNEL_INDEX_PLACEHOLDER}`]: 'vec3<f32>'
- *   }
+ *   },
+ *   fs: `uniform myUniforms { vec3 color${VIV_CHANNEL_INDEX_PLACEHOLDER}; } my;`
  * };
- * const expanded = VivShaderAssembler.expandShaderModule(module, 3);
- * // expanded.uniformTypes = { opacity: 'f32', color0: 'vec3<f32>', color1: 'vec3<f32>', color2: 'vec3<f32>' }
+ * const expanded = expandShaderModule(module, 3);
+ * // expanded.uniformTypes = { color0: 'vec3<f32>', color1: 'vec3<f32>', color2: 'vec3<f32>' }
+ * // expanded.fs = with color0, color1, color2 declarations
  */
 export function expandShaderModule(
   module: ShaderModule,
   numChannels: number
 ): ShaderModule {
-  if (!module.uniformTypes) {
-    return module;
-  }
+  const expandedModule: ShaderModule = { ...module };
 
-  const expandedUniformTypes: typeof module.uniformTypes = {};
-  
-  for (const [key, value] of Object.entries(module.uniformTypes)) {
-    if (key.includes(VIV_CHANNEL_INDEX_PLACEHOLDER)) {
-      // Expand this uniform for each channel
-      for (let i = 0; i < numChannels; i++) {
-        const expandedKey = key.replaceAll(VIV_CHANNEL_INDEX_PLACEHOLDER, i.toString());
-        expandedUniformTypes[expandedKey] = value;
+  // Expand uniformTypes if present
+  if (module.uniformTypes) {
+    const expandedUniformTypes: typeof module.uniformTypes = {};
+    
+    for (const [key, value] of Object.entries(module.uniformTypes)) {
+      if (key.includes(VIV_CHANNEL_INDEX_PLACEHOLDER)) {
+        // Expand this uniform for each channel
+        for (let i = 0; i < numChannels; i++) {
+          const expandedKey = key.replaceAll(VIV_CHANNEL_INDEX_PLACEHOLDER, i.toString());
+          expandedUniformTypes[expandedKey] = value;
+        }
+      } else {
+        // Keep non-channel uniforms as-is
+        expandedUniformTypes[key] = value;
       }
-    } else {
-      // Keep non-channel uniforms as-is
-      expandedUniformTypes[key] = value;
     }
+    expandedModule.uniformTypes = expandedUniformTypes;
   }
 
-  return {
-    ...module,
-    uniformTypes: expandedUniformTypes
-  };
+  // Expand shader code if present
+  // Module shader code is NOT expanded by assembleGLSLShaderPair(), so we must do it here
+  if (module.fs) {
+    expandedModule.fs = processGLSLShader(module.fs, numChannels);
+  }
+  if (module.vs) {
+    expandedModule.vs = processGLSLShader(module.vs, numChannels);
+  }
+
+  return expandedModule;
 }
 
 export default class VivShaderAssembler extends ShaderAssembler {

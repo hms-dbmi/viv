@@ -8,7 +8,7 @@ import { MAX_CHANNELS } from '@vivjs/constants';
 import { padContrastLimits } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
-import VivShaderAssembler from './viv-shader-assembler';
+import VivShaderAssembler, { expandShaderModule } from './viv-shader-assembler';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -57,7 +57,8 @@ const XRLayer = class extends Layer {
     );
     const extensionDefinesDeckglProcessIntensity =
       this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
-    const newChannelsModule = { ...channels, inject: {} };
+    const expandedChannels = expandShaderModule(channels, MAX_CHANNELS);
+    const newChannelsModule = { ...expandedChannels, inject: {} };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
         intensity = apply_contrast_limits(intensity, contrastLimits);
@@ -178,9 +179,7 @@ const XRLayer = class extends Layer {
     if (props.bounds !== oldProps.bounds) {
       attributeManager.invalidate('positions');
     }
-    ///// this next section WIP attempt... not currently doing anything useful
-    /// but not actively detrimental to the working of the app as long as the old
-    /// uniforms are still being used and set as before.
+    // Set UBO uniforms for channel intensity (contrast limits)
     const { textures, model } = this.state;
     if (textures && model) {
       const { contrastLimits, domain, dtype, channelsVisible } = this.props;
@@ -194,21 +193,16 @@ const XRLayer = class extends Layer {
         domain,
         dtype
       });
-      const xrLayer = {};
+      const channelIntensity = {};
       for (let i = 0; i < MAX_CHANNELS; i++) {
-        xrLayer[`contrastLimits${i}`] = [
+        channelIntensity[`contrastLimits${i}`] = [
           paddedContrastLimits[i * 2],
-          paddedContrastLimits[1 + i * 2]
+          paddedContrastLimits[i * 2 + 1]
         ];
       }
-      //>>>> this is the problem I have currently, although it seems like what I pass here should be reasonable
-      //webgl-render-pipeline.ts:412 luma.gl: Binding xrLayerUniforms not found in image-sub-layer-0,240,240,0-Background-Image-TiffPixelSource-#detail#-cached
-
-      //it's expecting `const module = this.modules[moduleName];` (where moduleName is xrLayerUniforms)
-      //but that isn't the name of a module.
-      //>>> The best candidate in model.shaderInputs.modules is 'channel-intensity'.
+      // Key must match module name and instance name (not block name)
       model.shaderInputs.setProps({
-        xrLayerUniforms: xrLayer
+        channelIntensity: channelIntensity
       });
       model.setBindings(textures);
     }
@@ -287,31 +281,8 @@ const XRLayer = class extends Layer {
     const { uniforms } = opts;
     const { textures, model } = this.state;
     if (textures && model) {
-      const { contrastLimits, domain, dtype, channelsVisible } = this.props;
-      // Check number of textures not null.
-      const numTextures = Object.values(textures).filter(t => t).length;
-      // Slider values and color values can come in before textures since their data is async.
-      // Thus we pad based on the number of textures bound.
-      const paddedContrastLimits = padContrastLimits({
-        contrastLimits: contrastLimits.slice(0, numTextures),
-        channelsVisible: channelsVisible.slice(0, numTextures),
-        domain,
-        dtype
-      });
-      // const xrLayer = {};
-      // for (let i=0; i<MAX_CHANNELS; i++) {
-      //   xrLayer[`contrastLimits${i}`] = paddedContrastLimits[i];
-      // }
-      // model.shaderInputs.setProps({
-      //   xrLayerUniforms: xrLayer
-      // });
-      model.setUniforms(
-        {
-          ...uniforms,
-          contrastLimits: paddedContrastLimits
-        },
-        { disableWarnings: false }
-      );
+      // Uniforms are now set via UBO in updateState, just need to draw
+      model.setUniforms(uniforms);
       model.setBindings(textures);
       model.draw(this.context.renderPass);
     }
