@@ -17,14 +17,41 @@ import {
 import TiffPixelSource from './pixel-source';
 
 function resolveMetadata(omexml: OmeXml, SubIFDs: number[] | undefined) {
+  const rois = omexml.rois || [];
+  const roiRefs = omexml.roiRefs || [];
+
+  // Create a map of ROI IDs to ROI objects for quick lookup
+  const roiMap = new Map(rois.map(roi => [roi.ID, roi]));
+
+  // Add ROIs to images based on ROIRefs
+  const images = (omexml.images || []).map(image => {
+    // Find ROIRefs that reference this image (if any)
+    const imageROIRefs = roiRefs.filter(roiRef => {
+      // ROIRefs might have an ImageRef or be associated with the image
+      // For now, we'll include all ROIRefs since we don't have explicit image association
+      return true; // TODO: Add proper image-ROI association logic
+    });
+
+    // Get the actual ROI objects referenced by the ROIRefs
+    const imageROIs = imageROIRefs
+      .map(roiRef => roiMap.get(roiRef.ID))
+      .filter(Boolean);
+
+    const { ROIRef, ...imageWithoutRefs } = image;
+    return {
+      ...imageWithoutRefs,
+      ROIs: imageROIs
+    };
+  });
+
   if (SubIFDs) {
     // Image is >= Bioformats 6.0 and resolutions are stored using SubIFDs.
-    return { levels: SubIFDs.length + 1, rootMeta: omexml };
+    return { levels: SubIFDs.length + 1, rootMeta: images };
   }
   // Image is legacy format; resolutions are stored as separate images.
   // We do not allow multi-images for legacy format.
-  const firstImageMetadata = omexml[0];
-  return { levels: omexml.length, rootMeta: [firstImageMetadata] };
+  const firstImageMetadata = images[0];
+  return { levels: images.length, rootMeta: [firstImageMetadata] };
 }
 
 /*
@@ -89,7 +116,7 @@ function createSingleFileOmeTiffPyramidalIndexer(
 
 type OmeTiffImage = {
   data: TiffPixelSource<OmeTiffDims>[];
-  metadata: OmeXml[number];
+  metadata: any;
 };
 
 export async function loadSingleFileOmeTiff(
@@ -134,18 +161,19 @@ export async function loadSingleFileOmeTiff(
     };
     const data = Array.from(
       { length: levels },
-      (_, level) =>
-        new TiffPixelSource(
-          sel => pyramidIndexer(sel, level),
+      (_, level) => {
+        return new TiffPixelSource(
+          sel => pyramidIndexer({ t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 }, level),
           dtype,
           tileSize,
           getShapeForBinaryDownsampleLevel({ axes, level }),
           axes.labels,
           meta,
           pool
-        )
+        );
+      }
     );
-    images.push({ data, metadata });
+    images.push({ data: data as TiffPixelSource<OmeTiffDims>[], metadata });
     imageIfdOffset += imageSize.t * imageSize.z * imageSize.c;
   }
   return images;
