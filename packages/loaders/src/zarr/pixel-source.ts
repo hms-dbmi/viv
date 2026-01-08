@@ -51,7 +51,6 @@ function slice(start: number, stop: number): Slice {
   return { start, stop, step: 1, _slice: true };
 }
 
-
 class BoundsCheckError extends Error {}
 
 class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
