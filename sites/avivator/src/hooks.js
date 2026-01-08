@@ -144,7 +144,7 @@ export const useImage = source => {
           metadata,
           loader,
           selections: newSelections,
-          use3d: false,
+          use3d: false
         });
         newDomains = stats.domains;
         newContrastLimits = stats.contrastLimits;
