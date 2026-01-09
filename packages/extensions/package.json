@@ -23,7 +23,8 @@
     "prepare": "node prepare.mjs"
   },
   "peerDependencies": {
-    "@deck.gl/core": "catalog:"
+    "@deck.gl/core": "catalog:",
+    "@luma.gl/shadertools": "catalog:"
   },
   "dependencies": {
     "@vivjs/constants": "workspace:*"
@@ -36,6 +37,11 @@
     "entries": [
       "src/index"
     ],
-    "declaration": true
+    "declaration": true,
+    "failOnWarn": false,
+    "externals": [
+      "@luma.gl/shadertools",
+      "@math.gl/core"
+    ]
   }
 }

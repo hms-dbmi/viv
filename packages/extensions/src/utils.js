@@ -58,3 +58,24 @@ export function padColors({ colors, channelsVisible }) {
   ).reduce((acc, val) => acc.concat(val), []);
   return paddedColors;
 }
+
+/**
+ * Pad colors for UBO (Uniform Buffer Objects) - returns array of vec3 arrays
+ * @param {{ colors: Color[], channelsVisible: boolean[] }}
+ * @returns {Color[]} Array of [r,g,b] arrays, normalized to 0-1 range
+ */
+export function padColorsForUBO({ colors, channelsVisible }) {
+  /** @type {Color[]} */
+  const newColors = colors.map((color, i) =>
+    channelsVisible[i]
+      ? color.map(c => c / MAX_COLOR_INTENSITY)
+      : DEFAULT_COLOR_OFF
+  );
+  const padSize = MAX_CHANNELS - newColors.length;
+  const paddedColors = padWithDefault(
+    newColors,
+    /** @type {Color} */ (DEFAULT_COLOR_OFF),
+    padSize
+  );
+  return paddedColors;
+}

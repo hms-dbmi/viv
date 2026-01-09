@@ -1,4 +1,4 @@
-export const MAX_CHANNELS = 6;
+export { MAX_CHANNELS } from '@vivjs/constants';
 export const DEFAULT_OVERVIEW = {
   margin: 25,
   scale: 0.15,

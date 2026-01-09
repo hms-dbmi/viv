@@ -1,6 +1,6 @@
 import { VIV_CHANNEL_INDEX_PLACEHOLDER as I } from '@vivjs/constants';
 
-const moduleName = 'channelIntensity';
+const moduleName = 'channelIntensity3D';
 
 const fs = `\
 uniform ${moduleName}Uniforms {
@@ -8,7 +8,8 @@ uniform ${moduleName}Uniforms {
 } ${moduleName};
 
 float apply_contrast_limits(float intensity, vec2 contrastLimits) {
-    return  max(0., (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0])));
+  float contrastLimitsAppliedToIntensity = (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0]));
+  return max(0., contrastLimitsAppliedToIntensity);
 }
 `;
 
@@ -16,10 +17,6 @@ export default {
   name: moduleName,
   uniformTypes: {
     [`contrastLimits${I}`]: 'vec2<f32>'
-  },
-  defines: {
-    SAMPLER_TYPE: 'usampler2D',
-    COLORMAP_FUNCTION: ''
   },
   fs
 };
