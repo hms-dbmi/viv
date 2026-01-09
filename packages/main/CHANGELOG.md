@@ -1,11 +1,17 @@
 # @hms-dbmi/viv
 
+## 0.18.2
+
+### Patch Changes
+
+- Configure NPM trusted publishing. (`@hms-dbmi/viv`) ([#936](https://github.com/hms-dbmi/viv/pull/936))
+
+
 ## 0.18.1
 
 ### Patch Changes
 
 - Migrate from Tape to Vitest testing framework. (`@vivjs/loaders`, `@vivjs/layers`, `@vivjs/views`) ([#902](https://github.com/hms-dbmi/viv/pull/902))
-
 
 ## 0.18.0
 
