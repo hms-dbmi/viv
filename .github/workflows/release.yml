@@ -9,8 +9,9 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
   id-token: write  # Required for OIDC trusted publishing via NPM and GitHub Actions
-  contents: read
-
+  # Need read/write contents and PRs in order for "changesets version" to open a "Create release" PR.
+  contents: write
+  pull-requests: write
 
 jobs:
   release:
