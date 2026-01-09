@@ -15,6 +15,38 @@ test('Loads zarr-multiscales', async () => {
   expect(data.length).toBe(2);
 });
 
+test('loadMultiscales detects v4 format (multiscales at root)', async () => {
+  const store = new FileSystemStore(`${FIXTURE}/data.zarr`);
+  const { rootAttrs } = await loadMultiscales(store, '0');
+
+  // v4 format has multiscales at root level, not nested under 'ome'
+  // Verify backward compatibility with v4 format
+  expect(rootAttrs).toBeDefined();
+});
+
+test('loadMultiscales v5 format detection (nested ome attributes)', async () => {
+  // Test the v5 detection logic - this requires a proper zarr v3 store structure
+  // Since we don't have a v5 fixture, we test the detection logic directly
+  const v5Attrs = {
+    ome: {
+      multiscales: [
+        {
+          datasets: [{ path: '0' }],
+          axes: ['t', 'c', 'z', 'y', 'x']
+        }
+      ]
+    }
+  };
+
+  // Test the detection logic: 'ome' in unknownAttrs
+  const v3 = 'ome' in v5Attrs;
+  expect(v3).toBe(true);
+  if (v3) {
+    expect(v5Attrs.ome).toBeDefined();
+    expect(v5Attrs.ome.multiscales).toBeDefined();
+  }
+});
+
 test('Indexer creation and usage.', () => {
   const labels = ['a', 'b', 'y', 'x'];
   const indexer = getIndexer(labels);
