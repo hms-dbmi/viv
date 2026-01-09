@@ -100,6 +100,8 @@ For changes to be reflected in package changelogs, run `npx changeset` and follo
 
 The [Changesets GitHub Action](https://github.com/changesets/action) will create and update a PR that applies changesets versions of `@vivjs/` packages to NPM.
 
+Note: If the release includes a new NPM package (e.g., `@vivjs/new-thing`), [OIDC trusted publishing](https://docs.npmjs.com/trusted-publishers) must first be configured via NPM (see [discussion](https://github.com/orgs/community/discussions/181927)).
+
 ## 🌎 Browser Support
 
 Viv supports coverage across Safari, Firefox, Chrome, and Edge. Please [file an issue](https://github.com/hms-dbmi/viv/issues/new) if you find a browser in which Viv does not work.
