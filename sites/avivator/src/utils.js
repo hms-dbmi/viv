@@ -7,10 +7,10 @@ import {
   ColorPalette3DExtensions,
   RENDERING_MODES,
   getChannelStats,
-  loadBioformatsZarr,
   loadMultiTiff,
   loadOmeTiff,
-  loadOmeZarr
+  loadOmeZarr,
+  DEPRECATED_loadBioformatsZarr,
 } from '@hms-dbmi/viv';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
@@ -226,7 +226,7 @@ export async function createLoader(
     // Bio-Formats Zarr
     let source;
     try {
-      source = await loadBioformatsZarr(urlOrFile);
+      source = await DEPRECATED_loadBioformatsZarr(urlOrFile);
     } catch (e) {
       if (isZodError(e)) {
         // If the error is a ZodError, it means there was an OME-XML file
