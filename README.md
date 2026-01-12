@@ -93,7 +93,8 @@ To develop and test the `@hms-dbmi/viv` package:
 
 1. Run `pnpm install` in `viv` root folder
 2. Run `pnpm dev` to start a development server
-3. Run `pnpm test` to run all tests (or specific, e.g., `pnpm test --filter=@vivjs/layers`)
+3. Download OME-Zarr files used as test fixtures - see [./packages/loaders/tests/fixtures/ome-zarr/README.md](./packages/loaders/tests/fixtures/ome-zarr/README.md).
+4. Run `pnpm test` to run all tests (or specific, e.g., `pnpm test --filter=@vivjs/layers`)
 
 ## 🛠️  Build
 
