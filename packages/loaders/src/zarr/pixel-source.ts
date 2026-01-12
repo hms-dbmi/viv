@@ -146,6 +146,9 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     const { x, y, selection, signal } = props;
     const [xSlice, ySlice] = this._getSlices(x, y);
     const sel = this._chunkIndex(selection, { x: xSlice, y: ySlice });
+    // Note: we could consider optimizing this by waiting until next animation frame to do any zarr.get calls.
+    // See Vizarr's getTile: https://github.com/hms-dbmi/vizarr/blob/6519259d48a0d0b14dcf9e8d1bd635cab08347db/src/ZarrPixelSource.ts#L106
+    // (I believe this may also be handling the fact that a single DeckGL tile may correspond to multiple Zarr chunks.)
     const tile = await this._getRaw(sel, { storeOptions: { signal } });
     const {
       data,

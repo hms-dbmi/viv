@@ -19,3 +19,5 @@ export FIXTURES_DIR='packages/loaders/tests/fixtures/ome-zarr'
 node scripts/directory-to-memory-store.mjs $FIXTURES_DIR/v0_5_idr0062A_6001240_labels.ome.zarr $FIXTURES_DIR/v0_5_idr0062A_6001240_labels.ome.zarr.json
 node scripts/directory-to-memory-store.mjs $FIXTURES_DIR/v0_4_idr0076A_10501752.ome.zarr $FIXTURES_DIR/v0_4_idr0076A_10501752.ome.zarr.json
 ```
+
+TODO: identify smaller images and check them into the repo instead of git-ignoring them.
