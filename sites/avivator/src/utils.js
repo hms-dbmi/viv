@@ -5,12 +5,12 @@ import { useEffect, useState } from 'react';
 import {
   AdditiveColormap3DExtensions,
   ColorPalette3DExtensions,
+  DEPRECATED_loadBioformatsZarr,
   RENDERING_MODES,
   getChannelStats,
   loadMultiTiff,
   loadOmeTiff,
-  loadOmeZarr,
-  DEPRECATED_loadBioformatsZarr,
+  loadOmeZarr
 } from '@hms-dbmi/viv';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';

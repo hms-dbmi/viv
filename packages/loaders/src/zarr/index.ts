@@ -14,7 +14,7 @@ interface ZarrOptions {
  * (circa 2022 and pre-v0.5.0). You are probably looking for the loadOmeZarr function instead,
  * which is designed to load modern OME-Zarr data following the OME-NGFF specifications,
  * which is also the current (as of 2026) bioformats2raw output format.
- * 
+ *
  * OLD DESCRIPTION: Opens root directory generated via `bioformats2raw --file_type=zarr`.
  * Uses OME-XML metadata, and assumes first image.
  * This function is the zarr-equivalent to using loadOmeTiff.
