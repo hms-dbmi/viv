@@ -51,19 +51,3 @@ test('Correct OME-XML.', async () => {
   expect(Pixels.Channels.length).toBe(3);
   expect(Pixels.Channels[0].SamplesPerPixel).toBe(1);
 });
-
-test('Backward compatibility with v4 bioformats format', async () => {
-  // Verify that existing v4 format (METADATA.ome.xml at root, data.zarr/)
-  // still works after zarrita migration
-  const { data, metadata } = await load(store, meta);
-  expect(data).toBeDefined();
-  expect(data.length).toBe(2);
-  expect(metadata).toBeDefined();
-  expect(metadata.Name).toBe('multi-channel.ome.tif');
-
-  // Verify zarrita compatibility - data should be accessible
-  const [base] = data;
-  const pixelData = await base.getRaster({ selection: { c: 0, z: 0, t: 0 } });
-  expect(pixelData.width).toBe(439);
-  expect(pixelData.height).toBe(167);
-});

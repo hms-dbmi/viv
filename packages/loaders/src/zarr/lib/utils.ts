@@ -102,7 +102,6 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
   const grp = await zarr.open(groupLocation, { kind: 'group' });
   const unknownAttrs = await grp.attrs;
   // newer stores nest multiscales under 'ome', this may not be entirely robust logic?
-  //https://ngff.openmicroscopy.org/0.5/index.html#metadata
   const v3 = 'ome' in unknownAttrs;
   const rootAttrs = (v3 ? unknownAttrs.ome : unknownAttrs) as RootAttrs;
 
