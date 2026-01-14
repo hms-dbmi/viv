@@ -43,18 +43,6 @@ We recommend converting proprietrary file formats to open standard formats via t
 `bioformats2raw` + `raw2ometiff` pipeline. Non-pyramidal datasets are also supported 
 provided the individual texture can be uploaded to the GPU (< `4096 x 4096` in pixel size).
 
-### OME-NGFF Format Support
-
-Viv supports multiple versions of the OME-NGFF specification:
-
-| Format | Specification | bioformats2raw Version | Zarr Version | Metadata Location | Multiscales Location |
-|--------|---------------|------------------------|--------------|-------------------|---------------------|
-| v4 bioformats | [OME-NGFF 0.4](https://ngff.openmicroscopy.org/0.4/) | v4 | v2 | `METADATA.ome.xml` at root | `data.zarr/` directory |
-| v5 bioformats | [OME-NGFF 0.5](https://ngff.openmicroscopy.org/0.5/) | v5 | v2 | `OME/METADATA.ome.xml` | Root zarr directory |
-| v5 multiscales | [OME-NGFF 0.4](https://ngff.openmicroscopy.org/0.4/#multiscale-md) / [0.5](https://ngff.openmicroscopy.org/0.5/) | N/A | v3 | `.zattrs` | Nested under `ome` key in `.zattrs` |
-
-The `loadBioformatsZarr` function automatically detects and supports both v4 and v5 bioformats formats. The `loadOmeZarr` function supports v5 multiscales (zarr v3 stores) which use zarrita for reading.
-
 Please see the [tutorial](./sites/docs/tutorial/README.md) for more information.
 
 > \*We describe **Indexed OME-TIFF** in our paper as an optional enhancement to provide
