@@ -1,5 +1,25 @@
 # @vivjs/layers
 
+## 0.18.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/constants@0.18.2
+  - @vivjs/extensions@0.18.2
+  - @vivjs/loaders@0.18.2
+  - @vivjs/types@0.18.2
+
+## 0.18.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/constants@0.18.1
+  - @vivjs/extensions@0.18.1
+  - @vivjs/loaders@0.18.1
+  - @vivjs/types@0.18.1
+
 ## 0.18.0
 
 ### Patch Changes

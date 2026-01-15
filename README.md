@@ -89,7 +89,7 @@ To build viv's documentation and the Avivator website (under `sites/`), run:
 
 ```sh
 pnpm build # all packages, avivator, and documentation
-pnpm -r build --filter=avivator # build a specific package or site
+pnpm --filter "avivator" build # build a specific package or site
 ```
 
 ## 📄 Sending PRs and making releases
@@ -99,6 +99,8 @@ For changes to be reflected in package changelogs, run `npx changeset` and follo
 > Note not every PR requires a changeset. Since changesets are focused on releases and changelogs, changes to the repository that don't effect these won't need a changeset (e.g., documentation, tests).
 
 The [Changesets GitHub Action](https://github.com/changesets/action) will create and update a PR that applies changesets versions of `@vivjs/` packages to NPM.
+
+Note: If the release includes a new NPM package (e.g., `@vivjs/new-thing`), [OIDC trusted publishing](https://docs.npmjs.com/trusted-publishers) must first be configured via NPM (see [discussion](https://github.com/orgs/community/discussions/181927)).
 
 ## 🌎 Browser Support
 
