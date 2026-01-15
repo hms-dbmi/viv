@@ -101,9 +101,15 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
   // Open the group
   const grp = await zarr.open(groupLocation, { kind: 'group' });
   const unknownAttrs = await grp.attrs;
-  // newer stores nest multiscales under 'ome', this may not be entirely robust logic?
-  const v3 = 'ome' in unknownAttrs;
-  const rootAttrs = (v3 ? unknownAttrs.ome : unknownAttrs) as RootAttrs;
+  // As of OME-NGFF v0.5, attributes are located under 'ome'.
+  // References:
+  // - https://github.com/zarr-developers/zeps/pull/28
+  // - https://github.com/ome/ngff/issues/182
+  // (The NGFF v0.5 spec also ties itself to the Zarr v3 format
+  // but Zarrita should handle the v2 and v3 differences transparently.)
+  // Reference: https://ngff.openmicroscopy.org/0.5/index.html#metadata
+  const ngff_v0_5_or_later = 'ome' in unknownAttrs;
+  const rootAttrs = (ngff_v0_5_or_later ? unknownAttrs.ome : unknownAttrs) as RootAttrs;
 
   let paths = ['0'];
   // Default axes used for v0.1 and v0.2.
@@ -122,7 +128,7 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
 
   // Load all arrays - nb, in older bioformats zarr `{kind: 'array'}` was wrong here
   const data = await Promise.all(
-    paths.map(p => zarr.open(groupLocation.resolve(p)))
+    paths.map(p => zarr.open(groupLocation.resolve(p), { kind: 'array' }))
   );
 
   return {

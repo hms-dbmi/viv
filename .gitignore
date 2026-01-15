@@ -23,3 +23,7 @@
 
 # auto-generated via `pnpm --filter=@viv/extensions prepare`
 packages/extensions/src/generated-colormaps.js
+
+# Exclude large test fixtures
+packages/loaders/tests/fixtures/ome-zarr/*.zarr/
+packages/loaders/tests/fixtures/ome-zarr/*.json
