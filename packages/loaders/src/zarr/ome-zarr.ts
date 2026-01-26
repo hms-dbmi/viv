@@ -1,4 +1,4 @@
-import type { ZarrArray } from 'zarr';
+import type { ZarrArray } from './lib/utils';
 import { guessTileSize, loadMultiscales } from './lib/utils';
 import ZarrPixelSource from './pixel-source';
 
