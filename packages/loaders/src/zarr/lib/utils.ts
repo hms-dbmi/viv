@@ -109,7 +109,9 @@ export async function loadMultiscales(store: ZarrArray['store'], path = '') {
   // but Zarrita should handle the v2 and v3 differences transparently.)
   // Reference: https://ngff.openmicroscopy.org/0.5/index.html#metadata
   const ngff_v0_5_or_later = 'ome' in unknownAttrs;
-  const rootAttrs = (ngff_v0_5_or_later ? unknownAttrs.ome : unknownAttrs) as RootAttrs;
+  const rootAttrs = (
+    ngff_v0_5_or_later ? unknownAttrs.ome : unknownAttrs
+  ) as RootAttrs;
 
   let paths = ['0'];
   // Default axes used for v0.1 and v0.2.

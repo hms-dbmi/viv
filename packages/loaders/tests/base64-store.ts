@@ -25,6 +25,6 @@ export function createStoreFromMapContents(mapContents: [string, string][]) {
         };
       }
       return Reflect.get(target, prop);
-    },
+    }
   });
 }

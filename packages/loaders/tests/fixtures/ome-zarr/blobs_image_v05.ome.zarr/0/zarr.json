@@ -1,18 +1,10 @@
 {
-  "shape": [
-    3,
-    12,
-    12
-  ],
+  "shape": [3, 12, 12],
   "data_type": "float64",
   "chunk_grid": {
     "name": "regular",
     "configuration": {
-      "chunk_shape": [
-        3,
-        12,
-        12
-      ]
+      "chunk_shape": [3, 12, 12]
     }
   },
   "chunk_key_encoding": {
@@ -38,11 +30,7 @@
     }
   ],
   "attributes": {},
-  "dimension_names": [
-    "c",
-    "y",
-    "x"
-  ],
+  "dimension_names": ["c", "y", "x"],
   "zarr_format": 3,
   "node_type": "array",
   "storage_transformers": []

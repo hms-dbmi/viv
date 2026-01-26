@@ -9,11 +9,11 @@
 
 // To read this store, see code in packages/utils/zarr-utils/base64-store.ts
 
-import { join, basename } from 'node:path';
-import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { basename, join } from 'node:path';
 
 let inputDir = process.argv[2];
-if(inputDir.startsWith('./')) {
+if (inputDir.startsWith('./')) {
   inputDir = inputDir.substring(2);
 }
 const outputFile = process.argv[3];
