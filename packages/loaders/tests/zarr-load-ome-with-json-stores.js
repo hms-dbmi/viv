@@ -1,8 +1,7 @@
 import { expect, test } from 'vitest';
 import * as zarr from 'zarrita';
-import { createStoreFromMapContents } from './base64-store';
 import { load as loadOme } from '../src/zarr/ome-zarr';
-
+import { createStoreFromMapContents } from './base64-store';
 
 import ome_ngff_0_4_fixture from './fixtures/ome-zarr/blobs_image_v04.ome.zarr.json';
 import ome_ngff_0_5_fixture from './fixtures/ome-zarr/blobs_image_v05.ome.zarr.json';
@@ -37,7 +36,6 @@ test('Check that JSON-based store fixtures can be loaded: NGFF v0.5', async () =
     expect.arrayContaining(['omero', 'version', 'multiscales'])
   );
 });
-
 
 test('Test loadOme function with NGFF v0.4 image', async () => {
   const store = createStoreFromMapContents(ome_ngff_0_4_fixture);
