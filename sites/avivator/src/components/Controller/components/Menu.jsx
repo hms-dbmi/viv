@@ -124,7 +124,7 @@ function Header(props) {
           >
             <TextField
               id="ome-input"
-              label="OME-TIFF/Bioformats-Zarr URL"
+              label="OME-TIFF/OME-Zarr URL"
               variant="filled"
               size="small"
               fullWidth
