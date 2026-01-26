@@ -24,7 +24,11 @@ export function padWithDefault(arr, defaultValue, padWidth) {
  * @param {keyof typeof DTYPE_VALUES} dtype
  */
 export function getDtypeValues(dtype) {
-  const values = DTYPE_VALUES[dtype];
+  // Normalize to capitalized form (e.g., 'Float64', 'Float32') to match DTYPE_VALUES keys
+  // Handle both 'float64'/'Float64' and 'float32'/'Float32' etc.
+  const normalizedDtype =
+    dtype.charAt(0).toUpperCase() + dtype.slice(1).toLowerCase();
+  const values = DTYPE_VALUES[normalizedDtype];
   if (!values) {
     const valid = Object.keys(DTYPE_VALUES);
     throw Error(`Dtype not supported, got ${dtype}. Must be one of ${valid}.`);
