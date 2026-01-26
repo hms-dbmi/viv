@@ -44,6 +44,5 @@ toc:
   - name: Loaders
   - loadOmeTiff
   - loadOmeZarr
-  - loadBioformatsZarr
   - loadMultiTiff
   - name: Misc

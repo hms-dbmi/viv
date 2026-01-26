@@ -1,5 +1,5 @@
 export { loadOmeTiff, loadMultiTiff } from './tiff';
-export { loadBioformatsZarr, loadOmeZarr } from './zarr';
+export { loadOmeZarr, DEPRECATED_loadBioformatsZarr } from './zarr';
 
 export { default as TiffPixelSource } from './tiff/pixel-source';
 export { default as ZarrPixelSource } from './zarr/pixel-source';

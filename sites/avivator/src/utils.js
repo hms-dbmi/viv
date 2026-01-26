@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
 import {
   AdditiveColormap3DExtensions,
   ColorPalette3DExtensions,
+  DEPRECATED_loadBioformatsZarr,
   RENDERING_MODES,
   getChannelStats,
-  loadBioformatsZarr,
   loadMultiTiff,
   loadOmeTiff,
   loadOmeZarr
@@ -228,7 +228,7 @@ export async function createLoader(
     let source;
     try {
       source = await Promise.any([
-        loadBioformatsZarr(urlOrFile),
+        DEPRECATED_loadBioformatsZarr(urlOrFile),
         (async () => {
           // Transform OME-Zarr result to match bioformats format
           const res = await loadOmeZarr(urlOrFile, { type: 'multiscales' });
