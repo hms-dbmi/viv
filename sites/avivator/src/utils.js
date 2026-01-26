@@ -243,7 +243,9 @@ export async function createLoader(
                 SamplesPerPixel: 1,
                 Color: c.color ? [...hexToRgb(c.color), 255] : undefined
               }))
-            }
+            },
+            // Preserve full OMERO metadata
+            omero: res.metadata?.omero
           };
           return { data: res.data, metadata };
         })()
@@ -260,6 +262,7 @@ export async function createLoader(
       } else if (isZodError(e)) {
         throw e;
       }
+
       // Re-throw the original error if it's not a ZodError
       throw e;
     }
@@ -471,6 +474,53 @@ export const getMultiSelectionStats = async ({ loader, selections, use3d }) => {
   const contrastLimits = stats.map(stat => stat.contrastLimits);
   return { domains, contrastLimits };
 };
+
+export async function getSingleSelectionStatsWithOmero({
+  metadata,
+  channelIndex,
+  loader,
+  selection,
+  use3d
+}) {
+  // Try OMERO metadata first
+  const omeroChannels = metadata?.omero?.channels;
+  if (omeroChannels?.[channelIndex]?.window) {
+    const { window, color } = omeroChannels[channelIndex];
+    const domainMin = window.min !== undefined ? window.min : window.start;
+    const domainMax = window.max !== undefined ? window.max : window.end;
+    const domain = [domainMin, domainMax];
+    const contrastLimits = [window.start, window.end];
+    const rgb = color ? hexToRgb(color) : null;
+    return { domain, contrastLimits, color: rgb };
+  }
+
+  // Fall back to computing from data
+  const stats = await getSingleSelectionStats({ loader, selection, use3d });
+  return { ...stats, color: null };
+}
+
+export async function getMultiSelectionStatsWithOmero({
+  metadata,
+  loader,
+  selections,
+  use3d
+}) {
+  const stats = await Promise.all(
+    selections.map(selection =>
+      getSingleSelectionStatsWithOmero({
+        metadata,
+        channelIndex: selection.c,
+        loader,
+        selection,
+        use3d
+      })
+    )
+  );
+  const domains = stats.map(stat => stat.domain);
+  const contrastLimits = stats.map(stat => stat.contrastLimits);
+  const colors = stats.map(stat => stat.color);
+  return { domains, contrastLimits, colors };
+}
 
 // https://stackoverflow.com/a/11381730
 export function isMobileOrTablet() {
