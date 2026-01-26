@@ -29,7 +29,6 @@ export async function loadOmeZarr(
   return loadOme(store);
 }
 
-
 /**
  * Internal helper to load bioformats zarr with specified metadata and zarr directory paths.
  */
@@ -88,7 +87,7 @@ async function _DEPRECATED_loadBioformatsZarrWithPaths(
  * `bioformats2raw --file_type=zarr`.
  * Uses OME-XML metadata, and assumes first image.
  * This function is the zarr-equivalent to using loadOmeTiff.
- * 
+ *
  * Supports both METADATA.ome.xml and OME/METADATA.ome.xml
  *
  * @param source url
@@ -114,6 +113,6 @@ export async function DEPRECATED_loadBioformatsZarr(
       'OME/METADATA.ome.xml',
       '',
       options
-    ),
+    )
   ]);
 }
