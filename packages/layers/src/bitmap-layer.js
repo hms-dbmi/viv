@@ -2,6 +2,8 @@ import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
 import { BitmapLayer as BaseBitmapLayer } from '@deck.gl/layers';
 import { GL } from '@luma.gl/constants';
 import { Model } from '@luma.gl/engine';
+import { MAX_CHANNELS } from '@vivjs/constants';
+import { VivShaderAssembler } from '@vivjs/extensions';
 import { addAlpha } from './utils';
 
 const PHOTOMETRIC_INTERPRETATIONS = {
@@ -97,7 +99,8 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
       isInstanced: false,
       inject: {
         'fs:DECKGL_FILTER_COLOR': photometricInterpretationShader
-      }
+      },
+      shaderAssembler: VivShaderAssembler.getVivAssembler(MAX_CHANNELS)
     });
   }
 }

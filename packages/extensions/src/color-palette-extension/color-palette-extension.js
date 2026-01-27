@@ -1,5 +1,7 @@
 import { LayerExtension } from '@deck.gl/core';
-import { getDefaultPalette, padColors } from '../utils';
+import { MAX_CHANNELS } from '@vivjs/constants';
+import { getDefaultPalette, padColorsForUBO } from '../utils';
+import { expandShaderModule } from '../viv-shader-assembler';
 import colorPalette from './color-palette-module';
 
 const defaultProps = {
@@ -20,9 +22,10 @@ const defaultProps = {
  */
 const ColorPaletteExtension = class extends LayerExtension {
   getShaders() {
+    const expandedColorPalette = expandShaderModule(colorPalette, MAX_CHANNELS);
     return {
       ...super.getShaders(),
-      modules: [colorPalette]
+      modules: [expandedColorPalette]
     };
   }
 
@@ -34,17 +37,30 @@ const ColorPaletteExtension = class extends LayerExtension {
       transparentColor = defaultProps.transparentColor.value,
       useTransparentColor = defaultProps.useTransparentColor.value
     } = this.props;
-    const paddedColors = padColors({
-      channelsVisible: channelsVisible || this.selections.map(() => true),
-      colors: colors || getDefaultPalette(this.props.selections.length)
+
+    // Get selections safely
+    const selections = this.props.selections || this.selections || [];
+    const numChannels = selections.length || MAX_CHANNELS;
+
+    const paddedColors = padColorsForUBO({
+      channelsVisible: channelsVisible || selections.map(() => true),
+      colors: colors || getDefaultPalette(numChannels)
     });
-    const uniforms = {
-      colors: paddedColors,
+
+    const colorPaletteUniforms = {
       opacity,
       transparentColor: (transparentColor || [0, 0, 0]).map(i => i / 255),
-      useTransparentColor: Boolean(useTransparentColor)
+      useTransparentColor: useTransparentColor ? 1 : 0
     };
-    this.state.model?.setUniforms(uniforms);
+
+    // Add per-channel colors
+    for (let i = 0; i < MAX_CHANNELS; i++) {
+      colorPaletteUniforms[`color${i}`] = paddedColors[i];
+    }
+
+    this.state.model?.shaderInputs.setProps({
+      colorPaletteModule: colorPaletteUniforms
+    });
   }
 };
 

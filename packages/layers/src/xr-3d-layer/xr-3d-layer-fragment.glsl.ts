@@ -1,41 +1,23 @@
+import {
+  VIV_CHANNEL_INDEX_PLACEHOLDER as I,
+  VIV_PLANE_INDEX_PLACEHOLDER as P
+} from '@vivjs/constants';
+
 export default `\
 #version 300 es
 precision highp int;
 precision highp float;
 precision highp SAMPLER_TYPE;
 
-uniform highp SAMPLER_TYPE volume0;
-uniform highp SAMPLER_TYPE volume1;
-uniform highp SAMPLER_TYPE volume2;
-uniform highp SAMPLER_TYPE volume3;
-uniform highp SAMPLER_TYPE volume4;
-uniform highp SAMPLER_TYPE volume5;
-
-uniform vec3 scaledDimensions;
-
-uniform mat4 scale;
-
-uniform vec3 normals[NUM_PLANES];
-uniform float distances[NUM_PLANES];
-
-// color
-uniform vec3 colors[6];
-
-// slices
-uniform vec2 xSlice;
-uniform vec2 ySlice;
-uniform vec2 zSlice;
-
-// range
-uniform vec2 contrastLimits[6];
+uniform highp SAMPLER_TYPE volume${I};
 
 in vec3 vray_dir;
 flat in vec3 transformed_eye;
 out vec4 color;
 
 vec2 intersect_box(vec3 orig, vec3 dir) {
-	vec3 box_min = vec3(xSlice[0], ySlice[0], zSlice[0]);
-	vec3 box_max = vec3(xSlice[1], ySlice[1], zSlice[1]);
+	vec3 box_min = vec3(fragmentUniforms3D.xSlice[0], fragmentUniforms3D.ySlice[0], fragmentUniforms3D.zSlice[0]);
+	vec3 box_max = vec3(fragmentUniforms3D.xSlice[1], fragmentUniforms3D.ySlice[1], fragmentUniforms3D.zSlice[1]);
 	vec3 inv_dir = 1. / dir;
 	vec3 tmin_tmp = (box_min - orig) * inv_dir;
 	vec3 tmax_tmp = (box_max - orig) * inv_dir;
@@ -83,7 +65,7 @@ void main(void) {
 	t_hit.x = max(t_hit.x, 0.);
 
 	// Step 3: Compute the step size to march through the volume grid
-	vec3 dt_vec = 1. / (scale * vec4(abs(ray_dir), 1.)).xyz;
+	vec3 dt_vec = 1. / (fragmentUniforms3D.scale * vec4(abs(ray_dir), 1.)).xyz;
 	float dt = 1. * min(dt_vec.x, min(dt_vec.y, dt_vec.z));
 
 	float offset = wang_hash(int(gl_FragCoord.x + 640. * gl_FragCoord.y));
@@ -96,6 +78,12 @@ void main(void) {
 	_BEFORE_RENDER
 	for (float t = t_hit.x; t < t_hit.y; t += dt) {
 		// Check if this point is on the "positive" side or "negative" side of the plane - only show positive.
+		vec3 normals[NUM_PLANES] = vec3[NUM_PLANES](
+			fragmentUniforms3D.normal${P},
+		);
+		float distances[NUM_PLANES] = float[NUM_PLANES](
+			fragmentUniforms3D.distance${P},
+		);
 		float canShow = 1.;
 		for (int i = 0; i < NUM_PLANES; i += 1) {
 			canShow *= max(0., sign(dot(normals[i], p) + distances[i]));
@@ -108,24 +96,13 @@ void main(void) {
 		float canShowZCoordinate = max(p.z - 0., 0.) * max(1. - p.z , 0.);
 		float canShowCoordinate = float(ceil(canShowXCoordinate * canShowYCoordinate * canShowZCoordinate));
 		canShow = canShowCoordinate * canShow;
-		float intensityValue0 = float(texture(volume0, p).r);
-		DECKGL_PROCESS_INTENSITY(intensityValue0, contrastLimits[0], 0);
-		intensityValue0 = canShow * intensityValue0;
-		float intensityValue1 = float(texture(volume1, p).r);
-		DECKGL_PROCESS_INTENSITY(intensityValue1, contrastLimits[1], 1);
-		intensityValue1 = canShow * intensityValue1;
-		float intensityValue2 = float(texture(volume2, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue2, contrastLimits[2], 2);
-		intensityValue2 = canShow * intensityValue2;
-		float intensityValue3 = float(texture(volume3, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue3, contrastLimits[3], 3);
-		intensityValue3 = canShow * intensityValue3;
-    	float intensityValue4 = float(texture(volume4, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue4, contrastLimits[4], 4);
-		intensityValue4 = canShow * intensityValue4;
-		float intensityValue5 = float(texture(volume5, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue5, contrastLimits[5], 5);
-		intensityValue5 = canShow * intensityValue5;
+		float intensityValue${I} = float(texture(volume${I}, p).r);
+		vec2 contrastLimits[NUM_CHANNELS] = vec2[NUM_CHANNELS](
+			channelIntensity3D.contrastLimits${I},
+		);
+		DECKGL_PROCESS_INTENSITY(intensityValue${I}, contrastLimits[${I}], ${I});
+		intensityValue${I} = canShow * intensityValue${I};
+
 
 		_RENDER
 

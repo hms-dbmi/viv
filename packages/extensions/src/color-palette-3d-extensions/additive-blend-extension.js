@@ -1,13 +1,19 @@
+import { VIV_CHANNEL_INDEX_PLACEHOLDER as I } from '@vivjs/constants';
 import BaseExtension from './base-extension';
 
 const _BEFORE_RENDER = '';
 
 const _RENDER = `\
+  vec3 colors[NUM_CHANNELS] = vec3[NUM_CHANNELS](
+    fragmentUniforms3D.color${I},
+  );
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
-  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
+  float intensityArray[NUM_CHANNELS] = float[NUM_CHANNELS](
+    intensityValue${I},
+  );
   float total = 0.0;
-  for(int i = 0; i < 6; i++) {
+  for(int i = 0; i < NUM_CHANNELS; i++) {
     float intensityValue = intensityArray[i];
     rgbCombo += max(0.0, min(1.0, intensityValue)) * colors[i];
     total += intensityValue;

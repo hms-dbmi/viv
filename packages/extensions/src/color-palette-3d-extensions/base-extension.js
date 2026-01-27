@@ -18,16 +18,11 @@ const BaseExtension = class extends LayerExtension {
     this.opts = this.opts || {};
   }
 
-  draw() {
-    const { colors, channelsVisible } = this.props;
-    const paddedColors = padColors({
-      channelsVisible: channelsVisible || this.selections.map(() => true),
-      colors: colors || getDefaultPalette(this.props.selections.length)
-    });
-    const uniforms = {
-      colors: paddedColors
-    };
-    this.state.model?.setUniforms(uniforms);
+  updateState({ props, oldProps, changeFlags, ...rest }) {
+    super.updateState({ props, oldProps, changeFlags, ...rest });
+    // Colors are now managed by the XR3DLayer via the fragmentUniforms3D UBO
+    // No need to set uniforms here anymore since model.setUniforms is deprecated
+    // The layer handles colors through shaderInputs.setProps() with fragmentUniforms3D
   }
 };
 

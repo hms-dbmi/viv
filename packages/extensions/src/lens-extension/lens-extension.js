@@ -1,5 +1,7 @@
 import { LayerExtension } from '@deck.gl/core';
-import { getDefaultPalette, padColors } from '../utils';
+import { MAX_CHANNELS } from '@vivjs/constants';
+import { getDefaultPalette, padColorsForUBO } from '../utils';
+import { expandShaderModule } from '../viv-shader-assembler';
 import lens from './lens-module';
 
 const defaultProps = {
@@ -24,9 +26,10 @@ const defaultProps = {
  * */
 const LensExtension = class extends LayerExtension {
   getShaders() {
+    const expandedLens = expandShaderModule(lens, MAX_CHANNELS);
     return {
       ...super.getShaders(),
-      modules: [lens]
+      modules: [expandedLens]
     };
   }
 
@@ -110,24 +113,37 @@ const LensExtension = class extends LayerExtension {
     const bottomMouseBoundScaled = (bottomMouseBound - top) / (bottom - top);
     const rightMouseBoundScaled = (rightMouseBound - left) / (right - left);
     const topMouseBoundScaled = (topMouseBound - top) / (bottom - top);
-    const paddedColors = padColors({
-      channelsVisible: channelsVisible || this.selections.map(() => true),
-      colors: colors || getDefaultPalette(this.props.selections.length)
+    // Get selections safely
+    const selections = this.props.selections || this.selections || [];
+    const numChannels = selections.length || MAX_CHANNELS;
+
+    const paddedColors = padColorsForUBO({
+      channelsVisible: channelsVisible || selections.map(() => true),
+      colors: colors || getDefaultPalette(numChannels)
     });
-    const uniforms = {
+
+    // Build per-channel color uniforms
+    const lensUniforms = {
       majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
       minorLensAxis: (bottomMouseBoundScaled - topMouseBoundScaled) / 2,
       lensCenter: [
         (rightMouseBoundScaled + leftMouseBoundScaled) / 2,
         (bottomMouseBoundScaled + topMouseBoundScaled) / 2
       ],
-      lensEnabled,
+      lensEnabled: lensEnabled ? 1 : 0,
       lensSelection,
-      lensBorderColor,
-      lensBorderRadius,
-      colors: paddedColors
+      lensBorderColor: lensBorderColor.map(i => i / 255),
+      lensBorderRadius
     };
-    this.state.model?.setUniforms(uniforms);
+
+    // Add per-channel colors
+    for (let i = 0; i < MAX_CHANNELS; i++) {
+      lensUniforms[`color${i}`] = paddedColors[i];
+    }
+
+    this.state.model?.shaderInputs.setProps({
+      lensModule: lensUniforms
+    });
   }
 
   finalizeState() {
