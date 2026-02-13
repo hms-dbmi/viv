@@ -22,7 +22,10 @@ const defaultProps = {
     type: 'string',
     value: 'nearest',
     compare: true
-  }
+  },
+  // Extension props are merged into layer props, but declaring them here
+  // ensures deck.gl tracks them for change detection(?)
+  colormap: { type: 'string', value: null, compare: true }
 };
 
 /**
@@ -161,7 +164,9 @@ const XRLayer = class extends Layer {
     super.updateState({ props, oldProps, changeFlags, ...rest });
     // setup model first
     // Check for colormap changes - when colormap changes, getShaders() returns different modules
-    // but deck.gl might not detect this as extensionsChanged if extension instance is the same
+    // but deck.gl might not detect this as extensionsChanged if extension instance is the same.
+    // By declaring colormap in defaultProps, deck.gl tracks it, but we still need this check
+    // as a fallback since extensionsChanged may not be set reliably.
     const colormapChanged = props.colormap !== oldProps?.colormap;
     if (
       changeFlags.extensionsChanged ||
