@@ -78,23 +78,15 @@ const AdditiveColormapExtension = class extends LayerExtension {
   }
 
   updateState({ props, oldProps, changeFlags, ...rest }) {
-    // does any of this existing logic need to change?
-    // (like, is there ever more than one model?)
     super.updateState({ props, oldProps, changeFlags, ...rest });
-    if (props.colormap !== oldProps.colormap) {
-      const { device } = this.context;
-      if (this.state.model) {
-        this.state.model.destroy();
-        this.setState({ model: this._getModel(device) });
-      }
-    }
+    // When colormap changes, getShaders() returns different modules, which triggers
+    // extensionsChanged in the layer, causing the layer to recreate models.
+    // We should NOT manage models here - that's the layer's responsibility.
     const name = this?.props?.colormap || defaultProps.colormap.value;
-    //XXXX WARNING... there are serious problems around use of colormaps at the moment
-    //not sure which changes are relevant, but this needs fixing.
-    //doesn't seem to make any difference moving to draw() with this.state.model rather than getModels()
-    console.log('additive-colormap', name);
     const extensionName = `additive_colormap_${name}`;
-    for (const model of this.getModels()) {
+    // Set uniforms on all models - getModels() returns an array (may be empty during model recreation)
+    const models = this.getModels();
+    for (const model of models) {
       model.shaderInputs.setProps({
         [extensionName]: {
           opacity: this.props.opacity,

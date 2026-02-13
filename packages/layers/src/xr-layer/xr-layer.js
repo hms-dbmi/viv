@@ -74,6 +74,7 @@ const XRLayer = class extends Layer {
     });
   }
 
+  // may consider reviewing this along with other extension stuff.
   _isHookDefinedByExtensions(hookName) {
     const { extensions } = this.props;
     return extensions?.some(e => {
@@ -159,9 +160,13 @@ const XRLayer = class extends Layer {
   updateState({ props, oldProps, changeFlags, ...rest }) {
     super.updateState({ props, oldProps, changeFlags, ...rest });
     // setup model first
+    // Check for colormap changes - when colormap changes, getShaders() returns different modules
+    // but deck.gl might not detect this as extensionsChanged if extension instance is the same
+    const colormapChanged = props.colormap !== oldProps?.colormap;
     if (
       changeFlags.extensionsChanged ||
-      props.interpolation !== oldProps.interpolation
+      props.interpolation !== oldProps.interpolation ||
+      colormapChanged
     ) {
       const { device } = this.context;
       if (this.state.model) {
@@ -238,6 +243,7 @@ const XRLayer = class extends Layer {
           }
         }
       }),
+      // is it possible this needs to change re colormap bugs???
       bufferLayout: this.getAttributeManager().getBufferLayouts(),
       isInstanced: false,
       shaderAssembler: VivShaderAssembler.getVivAssembler(MAX_CHANNELS)
