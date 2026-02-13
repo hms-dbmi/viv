@@ -1,10 +1,9 @@
-import { MAX_CHANNELS } from '@vivjs/constants';
+import { MAX_CHANNELS, VIV_CHANNEL_INDEX_PLACEHOLDER as I } from '@vivjs/constants';
 import { getDtypeValues } from '../utils';
 
 import fs from './xr-layer-fragment.glsl';
 import vs from './xr-layer-vertex.glsl';
 
-// still figuring out how to get bindings to work properly
 const coreShaderModule = { fs, vs, name: 'xrLayer' };
 
 export function getRenderingAttrs(
@@ -21,10 +20,13 @@ export function getRenderingAttrs(
   const values = getDtypeValues(isLinear ? 'Float32' : dtype);
   // we probably want to move this kind of uniformTypes generation to some kind of helper
   // nb - this particular code isn't actually doing anything functionally useful as I write this
-  const uniformTypes = {};
-  for (let i = 0; i < numChannels; i++) {
-    uniformTypes[`contrastLimits${i}`] = 'vec2<f32>';
-  }
+  // ^^ and now revisiting, I thought that comment might be outdated, but as of this moment it makes no discernible difference
+  const uniformTypes = {
+    // we can change this to total nonsense and nothing changes in the app AFAICT
+    // if it were to be of use for type-safety etc... I'm not sure where or how.
+    // but that might mean that we'd want to do some expandShaderModule type thing here.
+    [`contrastLimits${I}`]: 'vec2<f32>'
+  };
   return {
     shaderModule: { ...coreShaderModule, uniformTypes },
     filter: interpolation,

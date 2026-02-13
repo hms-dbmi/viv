@@ -96,6 +96,9 @@ const XRLayer = class extends Layer {
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
     // -- this way of setting parameters is now deprecated and will be subject to further changes moving towards later luma.gl versions & WebGPU.
     // TODO - review this before merging!
+    // this is still deprecated rather than removed, doesn't necessarily need urgent attention, but we should change if not difficult.
+    // testing requires careful application of datasets for which it actually matters, checking what that means.
+    // note, while it may seem wasteful to use more memory, there are probably good reasons for always having data nicely aligned.
     device.setParametersWebGL({
       [GL.UNPACK_ALIGNMENT]: 1,
       [GL.PACK_ALIGNMENT]: 1

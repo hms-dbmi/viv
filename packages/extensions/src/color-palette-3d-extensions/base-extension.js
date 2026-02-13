@@ -1,5 +1,4 @@
 import { LayerExtension } from '@deck.gl/core';
-import { getDefaultPalette, padColors } from '../utils';
 
 const defaultProps = {
   colors: { type: 'array', value: null, compare: true }
@@ -15,15 +14,13 @@ const BaseExtension = class extends LayerExtension {
   constructor(...args) {
     super(args);
     // After deck.gl 8.8, it does not seem like this is always initialized.
+    // TODO - review. looks like this whole class may be irrelevant.
+    // then again - it might be useful to have a `BaseVivExtension` class that is what users actually use...
+    // Colors are now managed by the XR3DLayer via the fragmentUniforms3D UBO
+    // The layer handles colors through shaderInputs.setProps() with fragmentUniforms3D
     this.opts = this.opts || {};
   }
 
-  updateState({ props, oldProps, changeFlags, ...rest }) {
-    super.updateState({ props, oldProps, changeFlags, ...rest });
-    // Colors are now managed by the XR3DLayer via the fragmentUniforms3D UBO
-    // No need to set uniforms here anymore since model.setUniforms is deprecated
-    // The layer handles colors through shaderInputs.setProps() with fragmentUniforms3D
-  }
 };
 
 BaseExtension.extensionName = 'BaseExtension';

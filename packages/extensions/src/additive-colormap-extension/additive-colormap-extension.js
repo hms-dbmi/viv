@@ -55,6 +55,7 @@ vec4 colormap(float intensity) {
 const defaultProps = {
   colormap: { type: 'string', value: 'viridis', compare: true },
   opacity: { type: 'number', value: 1.0, compare: true },
+  // we should review use of 'boolean', don't want to change it everywhere if not necessary.
   useTransparentColor: { type: 'boolean', value: false, compare: true }
 };
 
@@ -88,6 +89,10 @@ const AdditiveColormapExtension = class extends LayerExtension {
       }
     }
     const name = this?.props?.colormap || defaultProps.colormap.value;
+    //XXXX WARNING... there are serious problems around use of colormaps at the moment
+    //not sure which changes are relevant, but this needs fixing.
+    //doesn't seem to make any difference moving to draw() with this.state.model rather than getModels()
+    console.log('additive-colormap', name);
     const extensionName = `additive_colormap_${name}`;
     for (const model of this.getModels()) {
       model.shaderInputs.setProps({

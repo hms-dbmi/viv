@@ -68,7 +68,7 @@ function processGLSLShader(
 
 /**
  * Expands a shader module's uniformTypes and shader code to include per-channel and per-plane declarations.
- * Any uniformType key containing VIV_CHANNEL_INDEX_PLACEHOLDER will be expanded.
+ * Any uniformType key containing VIV_CHANNEL_INDEX_PLACEHOLDER will be expanded (we tend to import this `as I`).
  * Any uniformType key containing VIV_PLANE_INDEX_PLACEHOLDER will be expanded.
  * Any shader code (fs/vs) containing these placeholders will be expanded.
  * Required for per-channel/per-plane uniforms because counts vary at runtime.
@@ -82,16 +82,25 @@ function processGLSLShader(
  * @returns Expanded shader module with per-channel/per-plane uniformTypes and shader code
  *
  * @example
+ * import { VIV_CHANNEL_INDEX_PLACEHOLDER as I } from '@vivjs/constants';
  * const module = {
  *   name: 'my-module',
  *   uniformTypes: {
- *     [`color${VIV_CHANNEL_INDEX_PLACEHOLDER}`]: 'vec3<f32>'
+ *     [`color${I}`]: 'vec3<f32>'
  *   },
- *   fs: `uniform myUniforms { vec3 color${VIV_CHANNEL_INDEX_PLACEHOLDER}; } my;`
+ *   fs: `uniform myUniforms {
+ *     // note that with the current implementation it is important that statements needing expansion appear on their own line
+ *     vec3 color${I}; 
+ *   } my;`
  * };
  * const expanded = expandShaderModule(module, 3);
  * // expanded.uniformTypes = { color0: 'vec3<f32>', color1: 'vec3<f32>', color2: 'vec3<f32>' }
- * // expanded.fs = with color0, color1, color2 declarations
+ * // expanded.fs = `uniform myUniforms {
+ * //   // note that with the current implementation it is important that statements needing expansion appear on their own line
+ * //   vec3 color0;
+ * //   vec3 color1;
+ * //   vec3 color2;
+ * // } my;`
  */
 export function expandShaderModule(
   module: ShaderModule,
