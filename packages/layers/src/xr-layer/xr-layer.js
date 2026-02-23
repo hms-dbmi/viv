@@ -86,14 +86,16 @@ class XRLayer extends Layer {
         intensity = apply_contrast_limits(intensity, contrastLimits);
       `;
     }
-    return super.getShaders({
-      ...shaderModule,
-      defines: {
-        SAMPLER_TYPE: sampler,
-        NUM_CHANNELS: String(numChannels)
-      },
-      modules: [project32, picking, newChannelsModule]
-    });
+    return expandShaderModule(
+      super.getShaders({
+        ...shaderModule,
+        defines: {
+          SAMPLER_TYPE: sampler
+        },
+        modules: [project32, picking, newChannelsModule]
+      }),
+      numChannels
+    );
   }
 
   // may consider reviewing this along with other extension stuff.

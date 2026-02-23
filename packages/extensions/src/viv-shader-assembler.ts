@@ -93,6 +93,12 @@ function processGLSLShader(
  * Any shader code (fs/vs) containing these placeholders will be expanded.
  * Required for per-channel/per-plane uniforms because counts vary at runtime.
  *
+ * Defines: NUM_CHANNELS and NUM_PLANES are always set on the expanded module. When multiple modules
+ * supply defines, the shader assembler (luma.gl) merges them; conflict resolution order is
+ * implementation-dependent (typically object spread, so later wins). Viv layers use
+ * `expandShaderModule(super.getShaders(...), numChannels, numPlanes)` so the top-level descriptor
+ * has these defines in one place.
+ *
  *
  * @param module - Shader module definition
  * @param numChannels - Number of channels to expand
@@ -169,6 +175,12 @@ export function expandShaderModule(
   // if (expandedModule.modules) {
   //   expandedModule.modules = expandedModule.modules.map(m => expandShaderModule(m, numChannels, numPlanes));
   // }
+  const defines = { ...(module.defines || {}) };
+  //@ts-expect-error deck.gl ShaderModule.defines typed as Record<string, boolean> for some reason?
+  defines.NUM_CHANNELS = String(numChannels);
+  //@ts-expect-error deck.gl ShaderModule.defines typed as Record<string, boolean> for some reason?
+  defines.NUM_PLANES = String(numPlanes);
+  expandedModule.defines = defines;
   return expandedModule;
 }
 
