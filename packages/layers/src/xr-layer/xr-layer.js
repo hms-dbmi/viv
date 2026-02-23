@@ -169,7 +169,7 @@ class XRLayer extends Layer {
       changeFlags.extensionsChanged ||
       props.interpolation !== oldProps.interpolation ||
       colormapChanged ||
-      props.selections.length !== oldProps.selections.length
+      (props.selections?.length ?? 0) !== (oldProps.selections?.length ?? 0)
     ) {
       const { device } = this.context;
       if (this.state.model) {

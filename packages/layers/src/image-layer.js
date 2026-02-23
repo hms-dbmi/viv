@@ -1,6 +1,5 @@
 import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
-import { GL } from '@luma.gl/constants';
-
+import { MAX_CHANNELS } from '@vivjs/constants';
 import { ColorPaletteExtension } from '@vivjs/extensions';
 import { SIGNAL_ABORTED, isInterleaved } from '@vivjs/loaders';
 import BitmapLayer from './bitmap-layer';
@@ -60,6 +59,25 @@ const defaultProps = {
  * @ignore
  */
 const ImageLayer = class extends CompositeLayer {
+  /**
+   * Returns the number of channels for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumChannels() {
+    return (
+      this.props.selections?.length ??
+      this.props.channels?.length ??
+      MAX_CHANNELS
+    );
+  }
+
+  /**
+   * Returns the number of planes for this layer instance (always 1 for 2D layers).
+   * Implements VivLayer interface.
+   */
+  getNumPlanes() {
+    return 1;
+  }
   finalizeState() {
     this.state.abortController.abort();
   }
