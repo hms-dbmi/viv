@@ -3,14 +3,14 @@ packages:
   - packages/**
 
 catalog:
-  "@deck.gl/core": ~9.2.6
-  "@deck.gl/extensions": ~9.2.6
-  "@deck.gl/geo-layers": ~9.2.6
-  "@deck.gl/layers": ~9.2.6
-  "@deck.gl/mesh-layers": ~9.2.6
-  "@deck.gl/react": ~9.2.6
-  "@deck.gl/widgets": ~9.2.6
-  "@deck.gl/test-utils": ~9.2.6
+  "@deck.gl/core": ~9.2.9
+  "@deck.gl/extensions": ~9.2.9
+  "@deck.gl/geo-layers": ~9.2.9
+  "@deck.gl/layers": ~9.2.9
+  "@deck.gl/mesh-layers": ~9.2.9
+  "@deck.gl/react": ~9.2.9
+  "@deck.gl/widgets": ~9.2.9
+  "@deck.gl/test-utils": ~9.2.9
   "@luma.gl/constants": ~9.2.6
   "@luma.gl/core": ~9.2.6
   "@luma.gl/engine": ~9.2.6
