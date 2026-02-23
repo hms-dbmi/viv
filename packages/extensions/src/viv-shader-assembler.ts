@@ -1,10 +1,28 @@
 import { ShaderAssembler, type ShaderModule } from '@luma.gl/shadertools';
-import type { AssembleShaderProps } from '@luma.gl/shadertools/dist/lib/shader-assembly/assemble-shaders';
+import { LayerExtension, type Layer } from '@deck.gl/core';
 import {
-  MAX_CHANNELS,
   VIV_CHANNEL_INDEX_PLACEHOLDER,
   VIV_PLANE_INDEX_PLACEHOLDER
 } from '@vivjs/constants';
+
+/**
+ * Interface for Viv layers that support dynamic channel and plane counts.
+ * Layers implementing this interface must provide methods to query their
+ * actual channel/plane counts at runtime.
+ */
+export interface VivLayer extends Layer {
+  /**
+   * Returns the number of channels for this layer instance.
+   * Should be based on actual data (e.g., selections.length), not MAX_CHANNELS.
+   */
+  getNumChannels(): number;
+
+  /**
+   * Returns the number of planes for this layer instance.
+   * Defaults to 1 for 2D layers, or clippingPlanes.length for 3D layers.
+   */
+  getNumPlanes(): number;
+}
 
 /**
  * Expands a single line by replacing the channel or plane index placeholder with each index number.
@@ -68,13 +86,13 @@ function processGLSLShader(
 
 /**
  * Expands a shader module's uniformTypes and shader code to include per-channel and per-plane declarations.
+ * This is mostly an internal implementation detail used by `VivLayer` implementations, it's not expected that
+ * extensions should call it directly.
  * Any uniformType key containing VIV_CHANNEL_INDEX_PLACEHOLDER will be expanded (we tend to import this `as I`).
  * Any uniformType key containing VIV_PLANE_INDEX_PLACEHOLDER will be expanded.
  * Any shader code (fs/vs) containing these placeholders will be expanded.
  * Required for per-channel/per-plane uniforms because counts vary at runtime.
  *
- * Note: This is different from VivShaderAssembler.assembleGLSLShaderPair() which only
- * expands the main shader code, not the shader code inside modules.
  *
  * @param module - Shader module definition
  * @param numChannels - Number of channels to expand
@@ -107,7 +125,7 @@ export function expandShaderModule(
   numChannels: number,
   numPlanes = 1
 ): ShaderModule {
-  const expandedModule: ShaderModule = { ...module };
+  const expandedModule = { ...module };
 
   // Expand uniformTypes if present
   if (module.uniformTypes) {
@@ -140,28 +158,31 @@ export function expandShaderModule(
     expandedModule.uniformTypes = expandedUniformTypes;
   }
 
-  // Expand shader code if present
-  // Module shader code is NOT expanded by assembleGLSLShaderPair(), so we must do it here
   if (module.fs) {
     expandedModule.fs = processGLSLShader(module.fs, numChannels, numPlanes);
   }
   if (module.vs) {
     expandedModule.vs = processGLSLShader(module.vs, numChannels, numPlanes);
   }
-
+  // maybe we can expand the type and do something recursive like this...
+  // might not even need `VivLayerExtension`.
+  // if (expandedModule.modules) {
+  //   expandedModule.modules = expandedModule.modules.map(m => expandShaderModule(m, numChannels, numPlanes));
+  // }
   return expandedModule;
 }
 
-export default class VivShaderAssembler extends ShaderAssembler {
-  static defaultVivAssemblers: Record<string, VivShaderAssembler> = {};
-  readonly numChannels: number;
-  readonly numPlanes: number;
-
-  constructor(numChannels = MAX_CHANNELS, numPlanes = 1) {
+/**
+ * This class is used internally by `VivLayer`s to avoid problems with other normal deck.gl layers (in particular,
+ * `PolygonLayer`s used in `overview-layer`) that lack defines for `NUM_CHANNELS` which is part of the declared signature
+ * of Viv's hooks. This leads to shader compiler errors when these layers are used.
+ * 
+ * Registering viv-specific hooks here also reduces the places in which we break encapsulation of `ShaderAssembler`.
+ */
+export class VivShaderAssembler extends ShaderAssembler {
+  static _default: VivShaderAssembler;
+  constructor() {
     super();
-    console.log(
-      `Creating VivShaderAssembler for ${numChannels} channels and ${numPlanes} planes`
-    );
     // make sure we copy over any default modules and hook functions that deck.gl might need
     // not sure how confident we are that this will work in all circumstances... but we seem to be ok for now.
     const defaultShaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
@@ -174,34 +195,65 @@ export default class VivShaderAssembler extends ShaderAssembler {
     for (const hookFunction of defaultHookFunctions) {
       this.addShaderHook(hookFunction);
     }
-    this.numChannels = numChannels;
-    this.numPlanes = numPlanes;
+    //!!! if we add this hook to the defaultShaderAssembler used by other deck layers,
+    // then they fail to compile because of undefined NUM_CHANNELS
+    const mutateStr =
+      'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float[NUM_CHANNELS] intensity, vec2 vTexCoord)';
+    const processStr =
+      'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
+
+    this.addShaderHook(mutateStr);
+    this.addShaderHook(processStr);
   }
+  static getDefaultVivShaderAssembler() {
+    if (!VivShaderAssembler._default) {
+      VivShaderAssembler._default = new VivShaderAssembler();
+    }
+    return VivShaderAssembler._default;
+  }
+}
+
+
+/**
+ * Base class for Viv-specific layer extensions.
+ *
+ * Responsibilities:
+ * - Extensions implement `getVivShaderTemplates` and return shader *templates* (with placeholders)
+ * - `VivLayerExtension.getShaders`:
+ *   - Is called with `this` bound to the layer instance and `extension` as the extension instance
+ *     (this is similar to the pattern used by deck.gl more generally)
+ *   - Expands shader modules (uniformTypes + fs/vs) using `expandShaderModule` when any part of 
+ *     the system calls `getShaders()`
+ */
+export abstract class VivLayerExtension<OptionsT = unknown> extends LayerExtension<OptionsT> {
+  static extensionName = 'VivLayerExtension';
 
   /**
-   * Expands a shader module's uniformTypes for this assembler's channel and plane count.
-   *
-   * @param module - Shader module definition
-   * @returns Expanded shader module with per-channel and per-plane uniformTypes
+   * Extensions must implement this to return shader *templates* (with placeholders),
+   * not expanded modules.
    */
-  expandShaderModule(module: ShaderModule): ShaderModule {
-    return expandShaderModule(module, this.numChannels, this.numPlanes);
-  }
+  abstract getVivShaderTemplates(): ReturnType<LayerExtension['getShaders']>;
 
-  assembleGLSLShaderPair(props: AssembleShaderProps) {
-    if (props.fs)
-      props.fs = processGLSLShader(props.fs, this.numChannels, this.numPlanes);
-    return super.assembleGLSLShaderPair(props);
-  }
-  static getVivAssembler(NUM_CHANNELS = MAX_CHANNELS, NUM_PLANES = 1) {
-    const key = `${NUM_CHANNELS}_${NUM_PLANES}`;
-    if (!VivShaderAssembler.defaultVivAssemblers[key]) {
-      VivShaderAssembler.defaultVivAssemblers[key] = new VivShaderAssembler(
-        NUM_CHANNELS,
-        NUM_PLANES
-      );
-    }
-    return VivShaderAssembler.defaultVivAssemblers[key];
-    // return ShaderAssembler.getDefaultShaderAssembler();
+  /**
+   * deck.gl calls this as `extension.getShaders.call(layer, extension)`.
+   * `this` is therefore the layer, and `extension` is the extension instance.
+   */
+  getShaders(
+    this: VivLayer,
+    extension: this
+  ): ReturnType<LayerExtension['getShaders']> {
+    const templates = extension.getVivShaderTemplates() || {};
+
+    //not optional - we'll make sure these are implemented
+    const numChannels = this.getNumChannels();
+    const numPlanes = this.getNumPlanes();
+
+    const modules = (templates.modules || []).map((m: ShaderModule) =>
+      expandShaderModule(m, numChannels, numPlanes)
+    );
+
+    return {
+      modules
+    };
   }
 }

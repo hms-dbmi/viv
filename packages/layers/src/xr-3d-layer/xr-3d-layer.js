@@ -28,7 +28,6 @@ More information about that is detailed in the comments there.
 */
 import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
-import { ShaderAssembler } from '@luma.gl/shadertools';
 import { Matrix4 } from '@math.gl/core';
 import { Plane } from '@math.gl/culling';
 
@@ -38,11 +37,10 @@ import vs from './xr-3d-layer-vertex.glsl';
 import { MAX_CHANNELS } from '@vivjs/constants';
 import {
   ColorPalette3DExtensions,
-  VivShaderAssembler,
   expandShaderModule,
   getDefaultPalette,
-  padColors,
-  padColorsForUBO
+  padColorsForUBO,
+  VivShaderAssembler
 } from '@vivjs/extensions';
 import { getDtypeValues, padContrastLimits, padWithDefault } from '../utils';
 import channelIntensity3D from './shader-modules/channel-intensity-3d';
@@ -100,7 +98,11 @@ function getRenderingAttrs() {
 function getRenderingFromExtensions(extensions) {
   let rendering = {};
   extensions.forEach(extension => {
-    rendering = extension.rendering;
+    // it was just setting rendering to whichever the final extension was
+    // so the error message "requires at least one extension to define opts.rendering" is dubious.
+    // kinda fixing things that weren't broken potentially...
+    // also not entirely sure about this random extension.rendering property that isn't very standard deck.gl
+    if (extension.rendering._RENDER) rendering = extension.rendering;
   });
   if (!rendering._RENDER) {
     throw new Error(
@@ -131,6 +133,23 @@ function getRenderingFromExtensions(extensions) {
  * @ignore
  */
 const XR3DLayer = class extends Layer {
+  /**
+   * Returns the number of channels for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumChannels() {
+    return this.props.selections?.length ?? this.props.channels?.length ?? MAX_CHANNELS;
+  }
+
+  /**
+   * Returns the number of planes for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumPlanes() {
+    const { clippingPlanes } = this.props;
+    return clippingPlanes?.length || NUM_PLANES_DEFAULT;
+  }
+
   initializeState() {
     const { device } = this.context;
     // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
@@ -141,18 +160,13 @@ const XR3DLayer = class extends Layer {
       [GL.UNPACK_ALIGNMENT]: 1,
       [GL.PACK_ALIGNMENT]: 1
     });
-    const programManager = ShaderAssembler.getDefaultShaderAssembler();
-    const processStr =
-      'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
-    if (!programManager._hookFunctions.includes(processStr)) {
-      programManager.addShaderHook(processStr);
-    }
   }
 
   _isHookDefinedByExtensions(hookName) {
     const { extensions } = this.props;
     return extensions?.some(e => {
-      const shaders = e.getShaders();
+      // this is a bit of an odd pattern - but it's idiomatic for deck.gl, when in Rome...
+      const shaders = e.getShaders.call(this, e);
       if (shaders) {
         const { inject = {}, modules = [] } = shaders;
         const definesInjection = inject[hookName];
@@ -167,27 +181,31 @@ const XR3DLayer = class extends Layer {
    * This function compiles the shaders and the projection module.
    */
   getShaders() {
-    const { clippingPlanes, extensions } = this.props;
+    const { extensions } = this.props;
     const { sampler } = getRenderingAttrs();
     const { _BEFORE_RENDER, _RENDER, _AFTER_RENDER } =
       getRenderingFromExtensions(extensions);
     const extensionDefinesDeckglProcessIntensity =
       this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
 
-    const numPlanes = clippingPlanes.length || NUM_PLANES_DEFAULT;
+    // Get actual channel/plane counts from layer
+    const numChannels = this.getNumChannels();
+    const numPlanes = this.getNumPlanes();
+    // if we made expandShaderModule recursively handle modules,
+    // we probably don't need all this... indeed, we might not even need VivLayerExtension???
     const expandedChannelIntensity = expandShaderModule(
       channelIntensity3D,
-      MAX_CHANNELS,
+      numChannels,
       numPlanes
     );
     const expandedFragmentUniforms = expandShaderModule(
       fragmentUniforms3D,
-      MAX_CHANNELS,
+      numChannels,
       numPlanes
     );
     const expandedVertexUniforms = expandShaderModule(
       vertexUniforms3D,
-      MAX_CHANNELS,
+      numChannels,
       numPlanes
     );
 
@@ -197,7 +215,7 @@ const XR3DLayer = class extends Layer {
         intensity = apply_contrast_limits(intensity, contrastLimits);
       `;
     }
-    return super.getShaders({
+    return expandShaderModule(super.getShaders({
       vs,
       fs: fs
         .replace('_BEFORE_RENDER', _BEFORE_RENDER)
@@ -206,14 +224,14 @@ const XR3DLayer = class extends Layer {
       defines: {
         SAMPLER_TYPE: sampler,
         NUM_PLANES: String(numPlanes),
-        NUM_CHANNELS: MAX_CHANNELS
+        NUM_CHANNELS: String(numChannels)
       },
       modules: [
         newChannelsModule,
         expandedFragmentUniforms,
         expandedVertexUniforms
       ]
-    });
+    }), numChannels, numPlanes);
   }
 
   /**
@@ -260,8 +278,6 @@ const XR3DLayer = class extends Layer {
     if (!gl) {
       return null;
     }
-    const { clippingPlanes } = this.props;
-    const numPlanes = clippingPlanes.length || NUM_PLANES_DEFAULT;
     return new Model(gl, {
       ...this.getShaders(),
       geometry: new Geometry({
@@ -270,10 +286,7 @@ const XR3DLayer = class extends Layer {
           positions: new Float32Array(CUBE_STRIP)
         }
       }),
-      shaderAssembler: VivShaderAssembler.getVivAssembler(
-        MAX_CHANNELS,
-        numPlanes
-      )
+      shaderAssembler: VivShaderAssembler.getDefaultVivShaderAssembler()
     });
   }
 
@@ -338,8 +351,9 @@ const XR3DLayer = class extends Layer {
       });
 
       // Build per-channel contrast limits for UBO
+      const numChannels = this.getNumChannels();
       const channelIntensity3DUniforms = {};
-      for (let i = 0; i < MAX_CHANNELS; i++) {
+      for (let i = 0; i < numChannels; i++) {
         channelIntensity3DUniforms[`contrastLimits${i}`] = [
           paddedContrastLimits[i * 2],
           paddedContrastLimits[i * 2 + 1]
@@ -361,7 +375,7 @@ const XR3DLayer = class extends Layer {
       };
 
       // Add per-channel colors - ensure we always have valid arrays
-      for (let i = 0; i < MAX_CHANNELS; i++) {
+      for (let i = 0; i < numChannels; i++) {
         fragmentUniforms3DUniforms[`color${i}`] = paddedColors[i] || [0, 0, 0];
       }
 
@@ -408,8 +422,9 @@ const XR3DLayer = class extends Layer {
    * This function loads all textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadTexture(channelData) {
+    const numChannels = this.getNumChannels();
     const textures = {};
-    for (let i = 0; i < MAX_CHANNELS; i++) {
+    for (let i = 0; i < numChannels; i++) {
       textures[`volume${i}`] = null;
     }
     if (this.state.textures) {

@@ -5,7 +5,7 @@ import { COORDINATE_SYSTEM, Layer, picking, project32 } from '@deck.gl/core';
 import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
 import { MAX_CHANNELS } from '@vivjs/constants';
-import { VivShaderAssembler, expandShaderModule } from '@vivjs/extensions';
+import { expandShaderModule, VivShaderAssembler } from '@vivjs/extensions';
 import { padContrastLimits } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
@@ -42,25 +42,40 @@ const defaultProps = {
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {'nearest'|'linear'=} interpolation The `minFilter` and `magFilter` for luma.gl rendering (see https://luma.gl/docs/api-reference/core/resources/sampler#texture-magnification-filter) - default is 'nearest'
  */
-/**
- * @type {{ new (...props: import('@vivjs/types').Viv<LayerProps>[]) }}
- * @ignore
- */
-const XRLayer = class extends Layer {
+class XRLayer extends Layer {
+  /**
+   * Returns the number of channels for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumChannels() {
+    return this.props.selections?.length ?? this.props.channels?.length ?? MAX_CHANNELS;
+  }
+
+  /**
+   * Returns the number of planes for this layer instance (always 1 for 2D layers).
+   * Implements VivLayer interface.
+   */
+  getNumPlanes() {
+    return 1;
+  }
+
   /**
    * This function replaces `usampler` with `sampler` if the data is not an unsigned integer
    * and adds a standard ramp function default for DECKGL_PROCESS_INTENSITY.
    */
   getShaders() {
     const { dtype, interpolation } = this.props;
+    // Get actual channel count from layer
+    const numChannels = this.getNumChannels();
+    // nb - shaderModule expansion currently done inside getRenderingAttrs
     const { shaderModule, sampler } = getRenderingAttrs(
       dtype,
       interpolation,
-      MAX_CHANNELS
+      numChannels
     );
     const extensionDefinesDeckglProcessIntensity =
       this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
-    const expandedChannels = expandShaderModule(channels, MAX_CHANNELS);
+    const expandedChannels = expandShaderModule(channels, numChannels);
     const newChannelsModule = { ...expandedChannels, inject: {} };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
@@ -71,7 +86,7 @@ const XRLayer = class extends Layer {
       ...shaderModule,
       defines: {
         SAMPLER_TYPE: sampler,
-        NUM_CHANNELS: MAX_CHANNELS
+        NUM_CHANNELS: String(numChannels)
       },
       modules: [project32, picking, newChannelsModule]
     });
@@ -81,7 +96,7 @@ const XRLayer = class extends Layer {
   _isHookDefinedByExtensions(hookName) {
     const { extensions } = this.props;
     return extensions?.some(e => {
-      const shaders = e.getShaders();
+      const shaders = e.getShaders.call(this, e);
       const { inject = {}, modules = [] } = shaders;
       const definesInjection = inject[hookName];
       const moduleDefinesInjection = modules.some(m => m?.inject[hookName]);
@@ -121,28 +136,6 @@ const XRLayer = class extends Layer {
       numInstances: 1,
       positions: new Float64Array(12)
     });
-    // we may want to make our own subclass of ShaderAssembler with some extra logic to handle varying NUM_CHANNELS...
-    // looks like a non-starter, goes against the grain somewhat... maybe if we make sure models will use it we might be ok?
-    const shaderAssembler = VivShaderAssembler.getVivAssembler(MAX_CHANNELS);
-    // const shaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
-
-    const mutateStr =
-      'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float[NUM_CHANNELS] intensity, vec2 vTexCoord)';
-    const processStr =
-      'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
-    // Only initialize shader hook functions _once globally_
-    // Since the program manager is shared across all layers, but many layers
-    // might be created, this solves the performance issue of always adding new
-    // hook functions.
-    // See https://github.com/kylebarron/deck.gl-raster/blob/2eb91626f0836558f0be4cd201ea18980d7f7f2d/src/deckgl/raster-layer/raster-layer.js#L21-L40
-    // Note: _hookFunctions is private, not sure if there's an appropriate way to check if a hook function is already added.
-    // it may be better to add these hooks somewhere else rather than in initializeState of a layer?
-    if (!shaderAssembler._hookFunctions.includes(mutateStr)) {
-      shaderAssembler.addShaderHook(mutateStr);
-    }
-    if (!shaderAssembler._hookFunctions.includes(processStr)) {
-      shaderAssembler.addShaderHook(processStr);
-    }
   }
 
   /**
@@ -171,7 +164,8 @@ const XRLayer = class extends Layer {
     if (
       changeFlags.extensionsChanged ||
       props.interpolation !== oldProps.interpolation ||
-      colormapChanged
+      colormapChanged ||
+      props.selections.length !== oldProps.selections.length
     ) {
       const { device } = this.context;
       if (this.state.model) {
@@ -206,8 +200,9 @@ const XRLayer = class extends Layer {
         domain,
         dtype
       });
+      const numChannels = this.getNumChannels();
       const channelIntensity = {};
-      for (let i = 0; i < MAX_CHANNELS; i++) {
+      for (let i = 0; i < numChannels; i++) {
         channelIntensity[`contrastLimits${i}`] = [
           paddedContrastLimits[i * 2],
           paddedContrastLimits[i * 2 + 1]
@@ -248,10 +243,9 @@ const XRLayer = class extends Layer {
           }
         }
       }),
-      // is it possible this needs to change re colormap bugs???
       bufferLayout: this.getAttributeManager().getBufferLayouts(),
       isInstanced: false,
-      shaderAssembler: VivShaderAssembler.getVivAssembler(MAX_CHANNELS)
+      shaderAssembler: VivShaderAssembler.getDefaultVivShaderAssembler()
     });
   }
 
@@ -292,8 +286,9 @@ const XRLayer = class extends Layer {
    * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadChannelTextures(channelData) {
+    const numChannels = this.getNumChannels();
     const textures = {};
-    for (let i = 0; i < MAX_CHANNELS; i++) {
+    for (let i = 0; i < numChannels; i++) {
       textures[`channel${i}`] = null;
     }
     if (this.state.textures) {

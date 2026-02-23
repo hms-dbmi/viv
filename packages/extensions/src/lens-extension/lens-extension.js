@@ -1,7 +1,5 @@
-import { LayerExtension } from '@deck.gl/core';
-import { MAX_CHANNELS } from '@vivjs/constants';
+import { VivLayerExtension } from '../viv-shader-assembler';
 import { getDefaultPalette, padColorsForUBO } from '../utils';
-import { expandShaderModule } from '../viv-shader-assembler';
 import lens from './lens-module';
 
 const defaultProps = {
@@ -24,12 +22,10 @@ const defaultProps = {
  * @property {number=} lensBorderRadius Percentage of the radius of the lens for a border (default 0.02).
  * @property {Array<Array.<number>>=} colors Color palette to pseudo-color channels as.
  * */
-const LensExtension = class extends LayerExtension {
-  getShaders() {
-    const expandedLens = expandShaderModule(lens, MAX_CHANNELS);
+const LensExtension = class extends VivLayerExtension {
+  getVivShaderTemplates() {
     return {
-      ...super.getShaders(),
-      modules: [expandedLens]
+      modules: [lens]
     };
   }
 
@@ -115,7 +111,7 @@ const LensExtension = class extends LayerExtension {
     const topMouseBoundScaled = (topMouseBound - top) / (bottom - top);
     // Get selections safely
     const selections = this.props.selections || this.selections || [];
-    const numChannels = selections.length || MAX_CHANNELS;
+    const numChannels = this.getNumChannels();
 
     const paddedColors = padColorsForUBO({
       channelsVisible: channelsVisible || selections.map(() => true),
@@ -123,7 +119,7 @@ const LensExtension = class extends LayerExtension {
     });
 
     // Build per-channel color uniforms
-    const lensUniforms = {
+    const lensModule = {
       majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
       minorLensAxis: (bottomMouseBoundScaled - topMouseBoundScaled) / 2,
       lensCenter: [
@@ -136,13 +132,13 @@ const LensExtension = class extends LayerExtension {
       lensBorderRadius
     };
 
-    // Add per-channel colors
-    for (let i = 0; i < MAX_CHANNELS; i++) {
-      lensUniforms[`color${i}`] = paddedColors[i];
+    // Add per-channel colors, matching the expanded uniform layout.
+    for (let i = 0; i < numChannels; i++) {
+      lensModule[`color${i}`] = paddedColors[i];
     }
 
     this.state.model?.shaderInputs.setProps({
-      lensModule: lensUniforms
+      lensModule
     });
   }
 

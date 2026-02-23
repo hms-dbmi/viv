@@ -5,6 +5,8 @@ export { default as AdditiveColormap3DExtensions } from './additive-colormap-3d-
 export { default as ColorPalette3DExtensions } from './color-palette-3d-extensions/index';
 export { padColors, padColorsForUBO, getDefaultPalette } from './utils';
 export {
-  default as VivShaderAssembler,
-  expandShaderModule
+  VivShaderAssembler,
+  expandShaderModule,
+  VivLayerExtension,
+  type VivLayer,
 } from './viv-shader-assembler';

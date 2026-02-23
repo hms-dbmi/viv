@@ -1,4 +1,4 @@
-import { LayerExtension } from '@deck.gl/core';
+import { VivLayerExtension } from '../viv-shader-assembler';
 import { apply_transparent_color } from '../shader-utils';
 
 // This file is generated via `packages/extensions/prepare.mjs`
@@ -28,8 +28,6 @@ function colormapModuleFactory(name, apply_cmap) {
       useTransparentColor: 'u32'
     },
     fs: `\
-// uniform float opacity;
-// uniform bool useTransparentColor;
 uniform ${extensionName}Uniforms {
   float opacity;
   uint useTransparentColor; //no bool-like type in decode-shader-types.ts
@@ -67,8 +65,10 @@ const defaultProps = {
  * @property {string=} colormap String indicating a colormap (default: 'viridis').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {boolean=} useTransparentColor Indicates whether the shader should make the output of colormap_function(0) color transparent
  * */
-const AdditiveColormapExtension = class extends LayerExtension {
-  getShaders() {
+const AdditiveColormapExtension = class extends VivLayerExtension {
+  // this doesn't need any shader code template manipulation, as long as NUM_CHANNELS is defined
+  // we could just use `LayerExtension.getShaders()` as before here
+  getVivShaderTemplates() {
     const name = this?.props?.colormap || defaultProps.colormap.value;
     const apply_cmap = cmaps[name];
     if (!apply_cmap) {

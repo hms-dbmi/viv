@@ -2,9 +2,8 @@ import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
 import { BitmapLayer as BaseBitmapLayer } from '@deck.gl/layers';
 import { GL } from '@luma.gl/constants';
 import { Model } from '@luma.gl/engine';
-import { MAX_CHANNELS } from '@vivjs/constants';
-import { VivShaderAssembler } from '@vivjs/extensions';
 import { addAlpha } from './utils';
+import { expandShaderModule, VivShaderAssembler } from '@vivjs/extensions';
 
 const PHOTOMETRIC_INTERPRETATIONS = {
   WhiteIsZero: 0,
@@ -91,8 +90,9 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
       photometricInterpretation,
       transparentColorInHook
     );
+    const numChannels = this.props.selections.length; //!!! not confident here
     return new Model(this.context.device, {
-      ...this.getShaders(),
+      ...expandShaderModule(this.getShaders(), numChannels),
       id: this.props.id,
       bufferLayout: this.getAttributeManager().getBufferLayouts(),
       topology: 'triangle-list',
@@ -100,7 +100,7 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
       inject: {
         'fs:DECKGL_FILTER_COLOR': photometricInterpretationShader
       },
-      shaderAssembler: VivShaderAssembler.getVivAssembler(MAX_CHANNELS)
+      shaderAssembler: VivShaderAssembler.getDefaultVivShaderAssembler()
     });
   }
 }

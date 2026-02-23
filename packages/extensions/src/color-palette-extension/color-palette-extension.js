@@ -1,7 +1,5 @@
-import { LayerExtension } from '@deck.gl/core';
-import { MAX_CHANNELS } from '@vivjs/constants';
+import { VivLayerExtension } from '../viv-shader-assembler';
 import { getDefaultPalette, padColorsForUBO } from '../utils';
-import { expandShaderModule } from '../viv-shader-assembler';
 import colorPalette from './color-palette-module';
 
 const defaultProps = {
@@ -20,16 +18,16 @@ const defaultProps = {
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * @property {Boolean=} useTransparentColor Whether or not to use the value provided to transparentColor.
  */
-const ColorPaletteExtension = class extends LayerExtension {
-  getShaders() {
-    const expandedColorPalette = expandShaderModule(colorPalette, MAX_CHANNELS);
+const ColorPaletteExtension = class extends VivLayerExtension {
+  getVivShaderTemplates() {
     return {
-      ...super.getShaders(),
-      modules: [expandedColorPalette]
+      modules: [colorPalette]
     };
   }
 
-  draw() {
+  updateState({ props, oldProps, changeFlags, ...rest }) {
+    super.updateState({ props, oldProps, changeFlags, ...rest });
+
     const {
       colors,
       channelsVisible,
@@ -40,7 +38,7 @@ const ColorPaletteExtension = class extends LayerExtension {
 
     // Get selections safely
     const selections = this.props.selections || this.selections || [];
-    const numChannels = selections.length || MAX_CHANNELS;
+    const numChannels = this.getNumChannels();
 
     const paddedColors = padColorsForUBO({
       channelsVisible: channelsVisible || selections.map(() => true),
@@ -54,13 +52,15 @@ const ColorPaletteExtension = class extends LayerExtension {
     };
 
     // Add per-channel colors
-    for (let i = 0; i < MAX_CHANNELS; i++) {
+    for (let i = 0; i < numChannels; i++) {
       colorPaletteUniforms[`color${i}`] = paddedColors[i];
     }
 
-    this.state.model?.shaderInputs.setProps({
-      colorPaletteModule: colorPaletteUniforms
-    });
+    for (const model of this.getModels()) {
+      model.shaderInputs.setProps({
+        colorPaletteModule: colorPaletteUniforms
+      });
+    }
   }
 };
 

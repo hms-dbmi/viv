@@ -3,6 +3,7 @@ import { getDtypeValues } from '../utils';
 
 import fs from './xr-layer-fragment.glsl';
 import vs from './xr-layer-vertex.glsl';
+import { expandShaderModule } from '@vivjs/extensions';
 
 const coreShaderModule = { fs, vs, name: 'xrLayer' };
 
@@ -28,7 +29,8 @@ export function getRenderingAttrs(
     [`contrastLimits${I}`]: 'vec2<f32>'
   };
   return {
-    shaderModule: { ...coreShaderModule, uniformTypes },
+    // maybe we should do this in XRLayer instead
+    shaderModule: expandShaderModule({ ...coreShaderModule, uniformTypes }, numChannels),
     filter: interpolation,
     cast: isLinear ? data => new Float32Array(data) : data => data,
     ...values
