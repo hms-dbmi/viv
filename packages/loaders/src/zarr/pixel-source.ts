@@ -1,6 +1,8 @@
-import type { ZarrArray } from 'zarr';
+import * as zarr from 'zarrita';
+import type { Slice } from 'zarrita';
 import { getImageSize, isInterleaved } from '../utils';
 import { getIndexer } from './lib/indexer';
+import type { ZarrArray } from './lib/utils';
 
 import type {
   Labels,
@@ -8,6 +10,7 @@ import type {
   PixelSource,
   PixelSourceSelection,
   RasterSelection,
+  SupportedDtype,
   TileSelection
 } from '@vivjs/types';
 
@@ -38,27 +41,14 @@ interface ZarrRasterSelection {
   signal?: AbortSignal;
 }
 
-interface Slice {
-  start: number;
-  stop: number;
-  step: number;
-  _slice: true;
-}
-
-function slice(start: number, stop: number): Slice {
-  return { start, stop, step: 1, _slice: true };
-}
-
-type ZarrSource = Pick<ZarrArray, 'shape' | 'chunks' | 'dtype' | 'getRaw'>;
-
 class BoundsCheckError extends Error {}
 
 class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
-  private _data: ZarrSource;
+  private _data: ZarrArray;
   private _indexer: ZarrIndexer<S>;
 
   constructor(
-    data: ZarrSource,
+    data: ZarrArray,
     public labels: Labels<S>,
     public tileSize: number
   ) {
@@ -70,12 +60,17 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     return this._data.shape;
   }
 
-  get dtype() {
-    const suffix = this._data.dtype.slice(1) as keyof typeof DTYPE_LOOKUP;
-    if (!(suffix in DTYPE_LOOKUP)) {
-      throw Error(`Zarr dtype not supported, got ${suffix}.`);
+  get dtype(): SupportedDtype {
+    const normalized = this._data.dtype.toLowerCase();
+    // If it's a two-character code (like 'f8', 'u1'), look it up in the mapping
+    if (normalized.length === 2 && normalized in DTYPE_LOOKUP) {
+      return DTYPE_LOOKUP[normalized as keyof typeof DTYPE_LOOKUP];
     }
-    return DTYPE_LOOKUP[suffix];
+    // Otherwise, assume it's already in the correct format (e.g., 'float64', 'float32', 'uint8')
+    // This handles newer zarr formats that use full names.
+    // Normalize to capitalized form to match SupportedDtype (e.g., 'Float64', 'Uint8')
+    return (normalized.charAt(0).toUpperCase() +
+      normalized.slice(1)) as SupportedDtype;
   }
 
   private get _xIndex() {
@@ -116,7 +111,7 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
       throw new BoundsCheckError('Tile slice is out of bounds.');
     }
 
-    return [slice(xStart, xStop), slice(yStart, yStop)];
+    return [zarr.slice(xStart, xStop), zarr.slice(yStart, yStop)];
   }
 
   private async _getRaw(
@@ -124,9 +119,12 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     // biome-ignore lint/suspicious/noExplicitAny: any is used to pass through storeOptions
     getOptions?: { storeOptions?: any }
   ) {
-    const result = await this._data.getRaw(selection, getOptions);
+    // Pass abort signal if provided
+    const signal = getOptions?.storeOptions?.signal;
+    const result = await zarr.get(this._data, selection, signal);
+
     if (typeof result !== 'object') {
-      throw new Error('Expected object from getRaw');
+      throw new Error('Expected object from zarr.get');
     }
     return result;
   }
@@ -148,6 +146,9 @@ class ZarrPixelSource<S extends string[]> implements PixelSource<S> {
     const { x, y, selection, signal } = props;
     const [xSlice, ySlice] = this._getSlices(x, y);
     const sel = this._chunkIndex(selection, { x: xSlice, y: ySlice });
+    // Note: we could consider optimizing this by waiting until next animation frame to do any zarr.get calls.
+    // See Vizarr's getTile: https://github.com/hms-dbmi/vizarr/blob/6519259d48a0d0b14dcf9e8d1bd635cab08347db/src/ZarrPixelSource.ts#L106
+    // (I believe this may also be handling the fact that a single DeckGL tile may correspond to multiple Zarr chunks.)
     const tile = await this._getRaw(sel, { storeOptions: { signal } });
     const {
       data,

@@ -1,3 +1,8 @@
+NOTE (AS OF JAN 2026): This tutorial was written in 2022, and is now quite outdated.
+It was written before the OME-NGFF specification was published and therefore refers to bioformats2raw v0.5.0 or before which generated a zarr data representation that was a precursor to OME-NGFF/OME-Zarr.
+
+
+
 This guide demonstrates how to generate a pyramidal OME-TIFF [with Bio-Formats](https://www.glencoesoftware.com/blog/2019/12/09/converting-whole-slide-images-to-OME-TIFF.html) that can be viewed with
 [Avivator](http://avivator.gehlenborglab.org). Viv also supports [OME-NGFF](https://github.com/ome/ngff), but tooling to generate the format remains limited as the specification matures. We will update this tutorial accordingly when a method for generating OME-NGFF is endorsed by the Open Microscopy Environment.
 

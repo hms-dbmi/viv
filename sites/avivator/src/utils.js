@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
 import {
   AdditiveColormap3DExtensions,
   ColorPalette3DExtensions,
+  DEPRECATED_loadBioformatsZarr,
   RENDERING_MODES,
   getChannelStats,
-  loadBioformatsZarr,
   loadMultiTiff,
   loadOmeTiff,
   loadOmeZarr
@@ -223,27 +223,48 @@ export async function createLoader(
       return source;
     }
 
-    // Bio-Formats Zarr
+    // Bio-Formats Zarr and OME-Zarr
+    // Try both formats in parallel using Promise.any for better performance
     let source;
     try {
-      source = await loadBioformatsZarr(urlOrFile);
+      source = await Promise.any([
+        DEPRECATED_loadBioformatsZarr(urlOrFile),
+        (async () => {
+          // Transform OME-Zarr result to match bioformats format
+          const res = await loadOmeZarr(urlOrFile, { type: 'multiscales' });
+          const channels = res.metadata?.omero?.channels ?? [
+            { label: 'image' }
+          ];
+          // extract metadata into OME-XML-like form
+          const metadata = {
+            Pixels: {
+              Channels: channels.map(c => ({
+                Name: c.label,
+                SamplesPerPixel: 1,
+                Color: c.color ? [...hexToRgb(c.color), 255] : undefined
+              }))
+            },
+            // Preserve full OMERO metadata
+            omero: res.metadata?.omero
+          };
+          return { data: res.data, metadata };
+        })()
+      ]);
     } catch (e) {
-      if (isZodError(e)) {
-        // If the error is a ZodError, it means there was an OME-XML file
-        // but it was invalid. We shouldn't try to load the file as a OME-Zarr.
+      // If Promise.any fails, check if any error was a ZodError
+      // ZodError means there was an OME-XML file but it was invalid.
+      // We shouldn't try to load the file as OME-Zarr in that case.
+      if (e instanceof AggregateError) {
+        const zodError = e.errors.find(err => isZodError(err));
+        if (zodError) {
+          throw zodError;
+        }
+      } else if (isZodError(e)) {
         throw e;
       }
 
-      // try ome-zarr
-      const res = await loadOmeZarr(urlOrFile, { type: 'multiscales' });
-      const channels = res.metadata?.omero?.channels ?? [{ label: 'image' }];
-      // extract metadata into OME-XML-like form
-      const metadata = {
-        Pixels: {
-          Channels: channels.map(c => ({ Name: c.label, SamplesPerPixel: 1 }))
-        }
-      };
-      source = { data: res.data, metadata };
+      // Re-throw the original error if it's not a ZodError
+      throw e;
     }
     return source;
   } catch (e) {
@@ -453,6 +474,53 @@ export const getMultiSelectionStats = async ({ loader, selections, use3d }) => {
   const contrastLimits = stats.map(stat => stat.contrastLimits);
   return { domains, contrastLimits };
 };
+
+export async function getSingleSelectionStatsWithOmero({
+  metadata,
+  channelIndex,
+  loader,
+  selection,
+  use3d
+}) {
+  // Try OMERO metadata first
+  const omeroChannels = metadata?.omero?.channels;
+  if (omeroChannels?.[channelIndex]?.window) {
+    const { window, color } = omeroChannels[channelIndex];
+    const domainMin = window.min !== undefined ? window.min : window.start;
+    const domainMax = window.max !== undefined ? window.max : window.end;
+    const domain = [domainMin, domainMax];
+    const contrastLimits = [window.start, window.end];
+    const rgb = color ? hexToRgb(color) : null;
+    return { domain, contrastLimits, color: rgb };
+  }
+
+  // Fall back to computing from data
+  const stats = await getSingleSelectionStats({ loader, selection, use3d });
+  return { ...stats, color: null };
+}
+
+export async function getMultiSelectionStatsWithOmero({
+  metadata,
+  loader,
+  selections,
+  use3d
+}) {
+  const stats = await Promise.all(
+    selections.map(selection =>
+      getSingleSelectionStatsWithOmero({
+        metadata,
+        channelIndex: selection.c,
+        loader,
+        selection,
+        use3d
+      })
+    )
+  );
+  const domains = stats.map(stat => stat.domain);
+  const contrastLimits = stats.map(stat => stat.contrastLimits);
+  const colors = stats.map(stat => stat.color);
+  return { domains, contrastLimits, colors };
+}
 
 // https://stackoverflow.com/a/11381730
 export function isMobileOrTablet() {

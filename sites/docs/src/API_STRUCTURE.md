@@ -43,7 +43,7 @@ Viv wraps both Tiff- and Zarr-based data sources in a unified `PixelSource` inte
 source can be thought of as a multi-dimensional "stack" of image data with labeled
 dimensions (usually `["t", "c", "z", "y", "x"]`). A multiscale image is represented as list
 of pixel sources decreasing in shape. Viv provides several helper functions to intialize a
-loader via url: `loadOmeTiff`, `loadBioformatsZarr`, `loadOmeZarr`, and `loadMultiTiff`.
+loader via url: `loadOmeTiff`, `loadOmeZarr`, and `loadMultiTiff`.
 Each function returns a `Promise` for an object of shape `{ data: PixelSouce[], metadata: M }`,
 where `M` is a JavaScript object containing the format-specific metadata for the image.
 For OME-TIFF and Bioformats-Zarr, and MultiTiff the metadata is identical (OME-XML representation),

@@ -81,7 +81,8 @@ To develop and test the `@hms-dbmi/viv` package:
 
 1. Run `pnpm install` in `viv` root folder
 2. Run `pnpm dev` to start a development server
-3. Run `pnpm test` to run all tests (or specific, e.g., `pnpm test --filter=@vivjs/layers`)
+3. Download OME-Zarr files used as test fixtures - see [./packages/loaders/tests/fixtures/ome-zarr/README.md](./packages/loaders/tests/fixtures/ome-zarr/README.md).
+4. Run `pnpm test` to run all tests (or specific, e.g., `pnpm test --filter=@vivjs/layers`)
 
 ## 🛠️  Build
 
@@ -99,6 +100,8 @@ For changes to be reflected in package changelogs, run `npx changeset` and follo
 > Note not every PR requires a changeset. Since changesets are focused on releases and changelogs, changes to the repository that don't effect these won't need a changeset (e.g., documentation, tests).
 
 The [Changesets GitHub Action](https://github.com/changesets/action) will create and update a PR that applies changesets versions of `@vivjs/` packages to NPM.
+
+Note: If the release includes a new NPM package (e.g., `@vivjs/new-thing`), [OIDC trusted publishing](https://docs.npmjs.com/trusted-publishers) must first be configured via NPM (see [discussion](https://github.com/orgs/community/discussions/181927)).
 
 ## 🌎 Browser Support
 
