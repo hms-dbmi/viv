@@ -232,9 +232,7 @@ const XR3DLayer = class extends Layer {
           .replace('_RENDER', _RENDER)
           .replace('_AFTER_RENDER', _AFTER_RENDER),
         defines: {
-          SAMPLER_TYPE: sampler,
-          NUM_PLANES: String(numPlanes),
-          NUM_CHANNELS: String(numChannels)
+          SAMPLER_TYPE: sampler
         },
         modules: [
           newChannelsModule,
