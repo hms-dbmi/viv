@@ -6,7 +6,7 @@ import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
 import { MAX_CHANNELS } from '@vivjs/constants';
 import { expandShaderModule, VivShaderAssembler } from '@vivjs/extensions';
-import { padContrastLimits } from '../utils';
+import { padContrastLimits, normalizeTextureBindings } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
 
@@ -186,21 +186,24 @@ class XRLayer extends Layer {
     if (props.bounds !== oldProps.bounds) {
       attributeManager.invalidate('positions');
     }
-    // Set UBO uniforms for channel intensity (contrast limits)
-    const { textures, model } = this.state;
-    if (textures && model) {
+    // Set UBO uniforms and texture bindings. Use same-frame textures when we just loaded
+    // to avoid binding deleted refs (e.g. remove channel then add back).
+    const texturesToBind = this._newTexturesFromLoadThisFrame ?? this.state.textures;
+    const { model } = this.state;
+    const numChannels = this.getNumChannels();
+    const bindings = texturesToBind && model
+      ? normalizeTextureBindings(texturesToBind, numChannels, 'channel')
+      : null;
+
+    if (bindings) {
       const { contrastLimits, domain, dtype, channelsVisible } = this.props;
-      // Check number of textures not null.
-      const numTextures = Object.values(textures).filter(t => t).length;
-      // Slider values and color values can come in before textures since their data is async.
-      // Thus we pad based on the number of textures bound.
+      const numTextures = Object.values(bindings).filter(Boolean).length;
       const paddedContrastLimits = padContrastLimits({
         contrastLimits: contrastLimits.slice(0, numTextures),
         channelsVisible: channelsVisible.slice(0, numTextures),
         domain,
         dtype
       });
-      const numChannels = this.getNumChannels();
       const channelIntensity = {};
       for (let i = 0; i < numChannels; i++) {
         channelIntensity[`contrastLimits${i}`] = [
@@ -208,11 +211,8 @@ class XRLayer extends Layer {
           paddedContrastLimits[i * 2 + 1]
         ];
       }
-      // Key must match module name and instance name (not block name)
-      model.shaderInputs.setProps({
-        channelIntensity: channelIntensity
-      });
-      model.setBindings(textures);
+      model.shaderInputs.setProps({ channelIntensity });
+      model.setBindings(bindings);
     }
   }
 
@@ -311,7 +311,10 @@ class XRLayer extends Layer {
         if (!textures.channel0) throw new Error('Bad texture state!');
         if (!textures[key]) textures[key] = textures.channel0;
       }
+      this._newTexturesFromLoadThisFrame = textures;
       this.setState({ textures });
+    } else {
+      this._newTexturesFromLoadThisFrame = null;
     }
   }
 

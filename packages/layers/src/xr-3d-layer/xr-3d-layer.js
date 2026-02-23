@@ -42,7 +42,7 @@ import {
   padColorsForUBO,
   VivShaderAssembler
 } from '@vivjs/extensions';
-import { getDtypeValues, padContrastLimits, padWithDefault } from '../utils';
+import { getDtypeValues, padContrastLimits, padWithDefault, normalizeTextureBindings } from '../utils';
 import channelIntensity3D from './shader-modules/channel-intensity-3d';
 import fragmentUniforms3D from './shader-modules/fragment-uniforms-3d';
 import vertexUniforms3D from './shader-modules/vertex-uniforms-3d';
@@ -251,11 +251,14 @@ const XR3DLayer = class extends Layer {
    */
   updateState({ props, oldProps, changeFlags }) {
     // setup model first
+    const channelCountChanged =
+      (props.selections?.length ?? 0) !== (oldProps?.selections?.length ?? 0);
     if (
       changeFlags.extensionsChanged ||
       props.colormap !== oldProps.colormap ||
       props.renderingMode !== oldProps.renderingMode ||
-      props.clippingPlanes.length !== oldProps.clippingPlanes.length
+      props.clippingPlanes.length !== oldProps.clippingPlanes.length ||
+      channelCountChanged
     ) {
       const { device } = this.context;
       if (this.state.model) {
@@ -293,26 +296,32 @@ const XR3DLayer = class extends Layer {
   /**
    * This function runs the shaders and draws to the canvas
    */
-  draw(opts) {
-    const { uniforms } = opts;
-    const { textures, model, scaleMatrix } = this.state;
-    const {
-      contrastLimits,
-      colors,
-      xSlice,
-      ySlice,
-      zSlice,
-      modelMatrix,
-      channelsVisible,
-      domain,
-      dtype,
-      clippingPlanes,
-      resolutionMatrix,
-      selections
-    } = this.props;
-    const { viewMatrix, viewMatrixInverse, projectionMatrix } =
-      this.context.viewport;
-    if (textures && model && scaleMatrix) {
+  draw() {
+    const { model, scaleMatrix } = this.state;
+    const texturesToBind = this._newTexturesFromLoadThisFrame ?? this.state.textures;
+    const numChannels = this.getNumChannels();
+    const bindings =
+      texturesToBind && model && scaleMatrix
+        ? normalizeTextureBindings(texturesToBind, numChannels, 'volume')
+        : null;
+
+    if (bindings && model && scaleMatrix) {
+      const {
+        contrastLimits,
+        colors,
+        xSlice,
+        ySlice,
+        zSlice,
+        modelMatrix,
+        channelsVisible,
+        domain,
+        dtype,
+        clippingPlanes,
+        resolutionMatrix,
+        selections
+      } = this.props;
+      const { viewMatrix, viewMatrixInverse, projectionMatrix } =
+        this.context.viewport;
       const paddedContrastLimits = padContrastLimits({
         contrastLimits,
         channelsVisible,
@@ -337,7 +346,7 @@ const XR3DLayer = class extends Layer {
       const numPlanes = clippingPlanes.length || NUM_PLANES_DEFAULT;
 
       // Get number of actual channels from textures
-      const numTextures = Object.values(textures).filter(t => t).length;
+      const numTextures = Object.values(bindings).filter(t => t).length;
       const numChannelsForColors = Math.max(
         numTextures,
         selections?.length || 0,
@@ -351,7 +360,6 @@ const XR3DLayer = class extends Layer {
       });
 
       // Build per-channel contrast limits for UBO
-      const numChannels = this.getNumChannels();
       const channelIntensity3DUniforms = {};
       for (let i = 0; i < numChannels; i++) {
         channelIntensity3DUniforms[`contrastLimits${i}`] = [
@@ -413,7 +421,7 @@ const XR3DLayer = class extends Layer {
 
       // All uniforms are now in UBOs - model.setUniforms is deprecated and will be removed
       // Textures are still set via setBindings
-      model.setBindings(textures);
+      model.setBindings(bindings);
       model.draw(this.context.renderPass);
     }
   }
@@ -444,6 +452,7 @@ const XR3DLayer = class extends Layer {
         if (!textures.volume0) throw new Error('Bad texture state!');
         if (!textures[key]) textures[key] = textures.volume0;
       }
+      this._newTexturesFromLoadThisFrame = textures;
       this.setState({
         textures,
         scaleMatrix: new Matrix4().scale(
@@ -454,6 +463,8 @@ const XR3DLayer = class extends Layer {
           ])
         )
       });
+    } else {
+      this._newTexturesFromLoadThisFrame = null;
     }
   }
 
