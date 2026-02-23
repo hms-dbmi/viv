@@ -1,5 +1,5 @@
-import { VivLayerExtension } from '../viv-shader-assembler';
 import * as cmaps from '../generated-colormaps.js';
+import { VivLayerExtension } from '../viv-shader-assembler';
 
 /**
  * A utility to create a Deck.gl shader module for a `glsl-colormap`.

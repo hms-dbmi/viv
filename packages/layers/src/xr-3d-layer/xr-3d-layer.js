@@ -37,12 +37,17 @@ import vs from './xr-3d-layer-vertex.glsl';
 import { MAX_CHANNELS } from '@vivjs/constants';
 import {
   ColorPalette3DExtensions,
+  VivShaderAssembler,
   expandShaderModule,
   getDefaultPalette,
-  padColorsForUBO,
-  VivShaderAssembler
+  padColorsForUBO
 } from '@vivjs/extensions';
-import { getDtypeValues, padContrastLimits, padWithDefault, normalizeTextureBindings } from '../utils';
+import {
+  getDtypeValues,
+  normalizeTextureBindings,
+  padContrastLimits,
+  padWithDefault
+} from '../utils';
 import channelIntensity3D from './shader-modules/channel-intensity-3d';
 import fragmentUniforms3D from './shader-modules/fragment-uniforms-3d';
 import vertexUniforms3D from './shader-modules/vertex-uniforms-3d';
@@ -138,7 +143,11 @@ const XR3DLayer = class extends Layer {
    * Implements VivLayer interface.
    */
   getNumChannels() {
-    return this.props.selections?.length ?? this.props.channels?.length ?? MAX_CHANNELS;
+    return (
+      this.props.selections?.length ??
+      this.props.channels?.length ??
+      MAX_CHANNELS
+    );
   }
 
   /**
@@ -215,23 +224,27 @@ const XR3DLayer = class extends Layer {
         intensity = apply_contrast_limits(intensity, contrastLimits);
       `;
     }
-    return expandShaderModule(super.getShaders({
-      vs,
-      fs: fs
-        .replace('_BEFORE_RENDER', _BEFORE_RENDER)
-        .replace('_RENDER', _RENDER)
-        .replace('_AFTER_RENDER', _AFTER_RENDER),
-      defines: {
-        SAMPLER_TYPE: sampler,
-        NUM_PLANES: String(numPlanes),
-        NUM_CHANNELS: String(numChannels)
-      },
-      modules: [
-        newChannelsModule,
-        expandedFragmentUniforms,
-        expandedVertexUniforms
-      ]
-    }), numChannels, numPlanes);
+    return expandShaderModule(
+      super.getShaders({
+        vs,
+        fs: fs
+          .replace('_BEFORE_RENDER', _BEFORE_RENDER)
+          .replace('_RENDER', _RENDER)
+          .replace('_AFTER_RENDER', _AFTER_RENDER),
+        defines: {
+          SAMPLER_TYPE: sampler,
+          NUM_PLANES: String(numPlanes),
+          NUM_CHANNELS: String(numChannels)
+        },
+        modules: [
+          newChannelsModule,
+          expandedFragmentUniforms,
+          expandedVertexUniforms
+        ]
+      }),
+      numChannels,
+      numPlanes
+    );
   }
 
   /**
@@ -298,7 +311,8 @@ const XR3DLayer = class extends Layer {
    */
   draw() {
     const { model, scaleMatrix } = this.state;
-    const texturesToBind = this._newTexturesFromLoadThisFrame ?? this.state.textures;
+    const texturesToBind =
+      this._newTexturesFromLoadThisFrame ?? this.state.textures;
     const numChannels = this.getNumChannels();
     const bindings =
       texturesToBind && model && scaleMatrix

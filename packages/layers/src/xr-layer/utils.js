@@ -1,9 +1,12 @@
-import { MAX_CHANNELS, VIV_CHANNEL_INDEX_PLACEHOLDER as I } from '@vivjs/constants';
+import {
+  VIV_CHANNEL_INDEX_PLACEHOLDER as I,
+  MAX_CHANNELS
+} from '@vivjs/constants';
 import { getDtypeValues } from '../utils';
 
+import { expandShaderModule } from '@vivjs/extensions';
 import fs from './xr-layer-fragment.glsl';
 import vs from './xr-layer-vertex.glsl';
-import { expandShaderModule } from '@vivjs/extensions';
 
 const coreShaderModule = { fs, vs, name: 'xrLayer' };
 
@@ -30,7 +33,10 @@ export function getRenderingAttrs(
   };
   return {
     // maybe we should do this in XRLayer instead
-    shaderModule: expandShaderModule({ ...coreShaderModule, uniformTypes }, numChannels),
+    shaderModule: expandShaderModule(
+      { ...coreShaderModule, uniformTypes },
+      numChannels
+    ),
     filter: interpolation,
     cast: isLinear ? data => new Float32Array(data) : data => data,
     ...values

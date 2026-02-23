@@ -1,5 +1,5 @@
+import { type Layer, LayerExtension } from '@deck.gl/core';
 import { ShaderAssembler, type ShaderModule } from '@luma.gl/shadertools';
-import { LayerExtension, type Layer } from '@deck.gl/core';
 import {
   VIV_CHANNEL_INDEX_PLACEHOLDER,
   VIV_PLANE_INDEX_PLACEHOLDER
@@ -108,7 +108,7 @@ function processGLSLShader(
  *   },
  *   fs: `uniform myUniforms {
  *     // note that with the current implementation it is important that statements needing expansion appear on their own line
- *     vec3 color${I}; 
+ *     vec3 color${I};
  *   } my;`
  * };
  * const expanded = expandShaderModule(module, 3);
@@ -176,7 +176,7 @@ export function expandShaderModule(
  * This class is used internally by `VivLayer`s to avoid problems with other normal deck.gl layers (in particular,
  * `PolygonLayer`s used in `overview-layer`) that lack defines for `NUM_CHANNELS` which is part of the declared signature
  * of Viv's hooks. This leads to shader compiler errors when these layers are used.
- * 
+ *
  * Registering viv-specific hooks here also reduces the places in which we break encapsulation of `ShaderAssembler`.
  */
 export class VivShaderAssembler extends ShaderAssembler {
@@ -213,7 +213,6 @@ export class VivShaderAssembler extends ShaderAssembler {
   }
 }
 
-
 /**
  * Base class for Viv-specific layer extensions.
  *
@@ -222,10 +221,12 @@ export class VivShaderAssembler extends ShaderAssembler {
  * - `VivLayerExtension.getShaders`:
  *   - Is called with `this` bound to the layer instance and `extension` as the extension instance
  *     (this is similar to the pattern used by deck.gl more generally)
- *   - Expands shader modules (uniformTypes + fs/vs) using `expandShaderModule` when any part of 
+ *   - Expands shader modules (uniformTypes + fs/vs) using `expandShaderModule` when any part of
  *     the system calls `getShaders()`
  */
-export abstract class VivLayerExtension<OptionsT = unknown> extends LayerExtension<OptionsT> {
+export abstract class VivLayerExtension<
+  OptionsT = unknown
+> extends LayerExtension<OptionsT> {
   static extensionName = 'VivLayerExtension';
 
   /**

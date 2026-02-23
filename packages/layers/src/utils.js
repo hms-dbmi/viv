@@ -16,7 +16,11 @@ export function range(len) {
  * @param {string} [keyPrefix='channel']
  * @returns {Record<string, object> | null} normalized bindings or null if none
  */
-export function normalizeTextureBindings(textures, numChannelsRequired, keyPrefix = 'channel') {
+export function normalizeTextureBindings(
+  textures,
+  numChannelsRequired,
+  keyPrefix = 'channel'
+) {
   const keys = Object.keys(textures);
   const firstKey = `${keyPrefix}0`;
   const firstTexture = textures[firstKey];

@@ -5,8 +5,8 @@ import { COORDINATE_SYSTEM, Layer, picking, project32 } from '@deck.gl/core';
 import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
 import { MAX_CHANNELS } from '@vivjs/constants';
-import { expandShaderModule, VivShaderAssembler } from '@vivjs/extensions';
-import { padContrastLimits, normalizeTextureBindings } from '../utils';
+import { VivShaderAssembler, expandShaderModule } from '@vivjs/extensions';
+import { normalizeTextureBindings, padContrastLimits } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
 
@@ -48,7 +48,11 @@ class XRLayer extends Layer {
    * Implements VivLayer interface.
    */
   getNumChannels() {
-    return this.props.selections?.length ?? this.props.channels?.length ?? MAX_CHANNELS;
+    return (
+      this.props.selections?.length ??
+      this.props.channels?.length ??
+      MAX_CHANNELS
+    );
   }
 
   /**
@@ -188,12 +192,14 @@ class XRLayer extends Layer {
     }
     // Set UBO uniforms and texture bindings. Use same-frame textures when we just loaded
     // to avoid binding deleted refs (e.g. remove channel then add back).
-    const texturesToBind = this._newTexturesFromLoadThisFrame ?? this.state.textures;
+    const texturesToBind =
+      this._newTexturesFromLoadThisFrame ?? this.state.textures;
     const { model } = this.state;
     const numChannels = this.getNumChannels();
-    const bindings = texturesToBind && model
-      ? normalizeTextureBindings(texturesToBind, numChannels, 'channel')
-      : null;
+    const bindings =
+      texturesToBind && model
+        ? normalizeTextureBindings(texturesToBind, numChannels, 'channel')
+        : null;
 
     if (bindings) {
       const { contrastLimits, domain, dtype, channelsVisible } = this.props;
@@ -343,7 +349,7 @@ class XRLayer extends Layer {
       format: attrs.format
     });
   }
-};
+}
 
 XRLayer.layerName = 'XRLayer';
 XRLayer.defaultProps = defaultProps;

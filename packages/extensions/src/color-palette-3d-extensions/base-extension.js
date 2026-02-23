@@ -24,9 +24,8 @@ const BaseExtension = class extends VivLayerExtension {
     // nb - this is a special case
     // the properties on rendering will be hooked in and expanded as part of layer fs code
     // rather than via standard deck.gl extension mechanisms...
-    return {}
+    return {};
   }
-
 };
 
 BaseExtension.extensionName = 'BaseExtension';

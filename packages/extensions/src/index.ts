@@ -8,5 +8,5 @@ export {
   VivShaderAssembler,
   expandShaderModule,
   VivLayerExtension,
-  type VivLayer,
+  type VivLayer
 } from './viv-shader-assembler';

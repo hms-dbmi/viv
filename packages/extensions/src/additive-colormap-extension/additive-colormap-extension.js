@@ -1,5 +1,5 @@
-import { VivLayerExtension } from '../viv-shader-assembler';
 import { apply_transparent_color } from '../shader-utils';
+import { VivLayerExtension } from '../viv-shader-assembler';
 
 // This file is generated via `packages/extensions/prepare.mjs`
 import * as cmaps from '../generated-colormaps';

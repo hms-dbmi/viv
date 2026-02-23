@@ -1,5 +1,5 @@
-import { VivLayerExtension } from '../viv-shader-assembler';
 import { getDefaultPalette, padColorsForUBO } from '../utils';
+import { VivLayerExtension } from '../viv-shader-assembler';
 import lens from './lens-module';
 
 const defaultProps = {

@@ -2,8 +2,8 @@ import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
 import { BitmapLayer as BaseBitmapLayer } from '@deck.gl/layers';
 import { GL } from '@luma.gl/constants';
 import { Model } from '@luma.gl/engine';
+import { VivShaderAssembler, expandShaderModule } from '@vivjs/extensions';
 import { addAlpha } from './utils';
-import { expandShaderModule, VivShaderAssembler } from '@vivjs/extensions';
 
 const PHOTOMETRIC_INTERPRETATIONS = {
   WhiteIsZero: 0,
