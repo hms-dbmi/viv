@@ -138,22 +138,68 @@ const BitmapLayer = class extends CompositeLayer {
     super.initializeState(args);
   }
 
+  updateState({ props, oldProps }) {
+    const img = props.image;
+    if (!img?.data || !img.width || !img.height) {
+      if (this.state.bitmapTexture) {
+        this.state.bitmapTexture.delete();
+        this.setState({ bitmapTexture: null });
+      }
+      return;
+    }
+    if (props.image === oldProps?.image && this.state.bitmapTexture) {
+      return;
+    }
+    if (this.state.bitmapTexture) {
+      this.state.bitmapTexture.delete();
+    }
+    const dataRef =
+      img.data && img.data.length === img.width * img.height * 3
+        ? addAlpha(img.data)
+        : img.data;
+    const texture = this.context.device.createTexture({
+      width: img.width,
+      height: img.height,
+      dimension: '2d',
+      data: dataRef,
+      mipmaps: false,
+      format: img.format || 'rgba8unorm',
+      sampler: {
+        minFilter: 'linear',
+        magFilter: 'linear',
+        addressModeU: 'clamp-to-edge',
+        addressModeV: 'clamp-to-edge'
+      }
+    });
+    this.setState({ bitmapTexture: texture });
+  }
+
+  finalizeState() {
+    if (this.state.bitmapTexture) {
+      this.state.bitmapTexture.delete();
+      this.setState({ bitmapTexture: null });
+    }
+  }
+
   renderLayers() {
     const {
       photometricInterpretation,
       transparentColor: transparentColorInHook
     } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
-    this.props.image.data = addAlpha(this.props.image.data);
-    return new BitmapLayerWrapper(this.props, {
-      // transparentColor is a prop applied to the original image data by deck.gl's
-      // BitmapLayer and needs to be in the original colorspace.  It is used to determine
-      // what color is "transparent" in the original color space (i.e what shows when opacity is 0).
-      transparentColor,
-      // This is our transparentColor props which needs to be applied in the hook that converts to the RGB space.
-      transparentColorInHook,
-      id: `${this.props.id}-wrapped`
-    });
+    const image = this.state.bitmapTexture || this.props.image;
+    if (!image) return null;
+    if (!this.state.bitmapTexture && this.props.image?.data) {
+      this.props.image.data = addAlpha(this.props.image.data);
+    }
+    return new BitmapLayerWrapper(
+      { ...this.props, image },
+      {
+        transparentColor,
+        transparentColorInHook,
+        id: `${this.props.id}-wrapped`
+      }
+    );
   }
 };
 
