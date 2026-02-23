@@ -90,7 +90,7 @@ class BitmapLayerWrapper extends BaseBitmapLayer {
       photometricInterpretation,
       transparentColorInHook
     );
-    const numChannels = this.props.selections.length; //!!! not confident here
+    const numChannels = this.props.selections?.length || 0;
     return new Model(this.context.device, {
       ...expandShaderModule(this.getShaders(), numChannels),
       id: this.props.id,
