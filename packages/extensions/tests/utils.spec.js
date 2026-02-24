@@ -1,5 +1,5 @@
-import { describe, expect, test } from 'vitest';
 import { MAX_CHANNELS } from '@vivjs/constants';
+import { describe, expect, test } from 'vitest';
 import { getDefaultPalette, padColors, padColorsForUBO } from '../src/utils';
 
 describe('getDefaultPalette', () => {

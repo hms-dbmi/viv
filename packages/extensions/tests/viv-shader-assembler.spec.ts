@@ -1,22 +1,22 @@
-import { describe, expect, test } from 'vitest';
-import { parse } from '@shaderfrog/glsl-parser';
 import { ShaderAssembler, type ShaderModule } from '@luma.gl/shadertools';
+import { parse } from '@shaderfrog/glsl-parser';
 import {
   VIV_CHANNEL_INDEX_PLACEHOLDER,
   VIV_PLANE_INDEX_PLACEHOLDER
 } from '@vivjs/constants';
+import { describe, expect, test } from 'vitest';
 import {
-  expandShaderModule,
-  VivShaderAssembler
+  VivShaderAssembler,
+  expandShaderModule
 } from '../src/viv-shader-assembler';
 
+import channelIntensity3D from '../../layers/src/xr-3d-layer/shader-modules/channel-intensity-3d';
+import fragmentUniforms3D from '../../layers/src/xr-3d-layer/shader-modules/fragment-uniforms-3d';
 // These JS modules export plain objects whose types don't exactly match
 // luma.gl's ShaderModule (string values vs union-typed values). The cast
 // is safe -- expandShaderModule only reads keys/values, it doesn't validate
 // them against the union.
 import channelIntensity from '../../layers/src/xr-layer/shader-modules/channel-intensity';
-import channelIntensity3D from '../../layers/src/xr-3d-layer/shader-modules/channel-intensity-3d';
-import fragmentUniforms3D from '../../layers/src/xr-3d-layer/shader-modules/fragment-uniforms-3d';
 
 const I = VIV_CHANNEL_INDEX_PLACEHOLDER;
 const P = VIV_PLANE_INDEX_PLACEHOLDER;
@@ -77,8 +77,16 @@ describe('ShaderAssembler hook isolation', () => {
     const vivAssembler = VivShaderAssembler.getDefaultVivShaderAssembler();
     // @ts-expect-error accessing private _hookFunctions
     const hooks: string[] = vivAssembler._hookFunctions;
-    expect(hooks.some(h => typeof h === 'string' && h.includes('DECKGL_MUTATE_COLOR'))).toBe(true);
-    expect(hooks.some(h => typeof h === 'string' && h.includes('DECKGL_PROCESS_INTENSITY'))).toBe(true);
+    expect(
+      hooks.some(
+        h => typeof h === 'string' && h.includes('DECKGL_MUTATE_COLOR')
+      )
+    ).toBe(true);
+    expect(
+      hooks.some(
+        h => typeof h === 'string' && h.includes('DECKGL_PROCESS_INTENSITY')
+      )
+    ).toBe(true);
   });
 
   test('VivShaderAssembler hooks reference NUM_CHANNELS (in MUTATE_COLOR)', () => {
@@ -127,22 +135,43 @@ void main() { fragColor = vec4(1.0); }`;
     assertValidGLSL(result.vs, 'default assembler minimal vs');
   });
 
-  test.each([1, 3, 6])('VivShaderAssembler assembles channelIntensity module for %i channels', (numChannels) => {
-    const expanded = expandShaderModule(asModule(channelIntensity), numChannels);
-    expect(expanded.fs).toBeDefined();
-    assertValidGLSL(wrapSnippet(expanded.fs as string), `channelIntensity fs (${numChannels} ch)`);
-  });
+  test.each([1, 3, 6])(
+    'VivShaderAssembler assembles channelIntensity module for %i channels',
+    numChannels => {
+      const expanded = expandShaderModule(
+        asModule(channelIntensity),
+        numChannels
+      );
+      expect(expanded.fs).toBeDefined();
+      assertValidGLSL(
+        wrapSnippet(expanded.fs as string),
+        `channelIntensity fs (${numChannels} ch)`
+      );
+    }
+  );
 
-  test.each([1, 3, 6])('VivShaderAssembler assembles channelIntensity3D module for %i channels', (numChannels) => {
-    const expanded = expandShaderModule(asModule(channelIntensity3D), numChannels);
-    expect(expanded.fs).toBeDefined();
-    assertValidGLSL(wrapSnippet(expanded.fs as string), `channelIntensity3D fs (${numChannels} ch)`);
-  });
+  test.each([1, 3, 6])(
+    'VivShaderAssembler assembles channelIntensity3D module for %i channels',
+    numChannels => {
+      const expanded = expandShaderModule(
+        asModule(channelIntensity3D),
+        numChannels
+      );
+      expect(expanded.fs).toBeDefined();
+      assertValidGLSL(
+        wrapSnippet(expanded.fs as string),
+        `channelIntensity3D fs (${numChannels} ch)`
+      );
+    }
+  );
 
   test('fragmentUniforms3D expands with both channel and plane placeholders and parses', () => {
     const expanded = expandShaderModule(asModule(fragmentUniforms3D), 3, 2);
     expect(expanded.fs).toBeDefined();
-    assertValidGLSL(wrapSnippet(expanded.fs as string), 'fragmentUniforms3D fs (3ch, 2planes)');
+    assertValidGLSL(
+      wrapSnippet(expanded.fs as string),
+      'fragmentUniforms3D fs (3ch, 2planes)'
+    );
 
     expect(expanded.fs).toContain('color0');
     expect(expanded.fs).toContain('color1');
@@ -165,10 +194,13 @@ void main() { fragColor = vec4(1.0); }`;
 // ---------------------------------------------------------------------------
 describe('expandShaderModule', () => {
   test('expands uniformTypes keys with channel placeholder', () => {
-    const expanded = expandShaderModule(asModule({
-      name: 'test',
-      uniformTypes: { [`val${I}`]: 'f32' }
-    }), 3);
+    const expanded = expandShaderModule(
+      asModule({
+        name: 'test',
+        uniformTypes: { [`val${I}`]: 'f32' }
+      }),
+      3
+    );
     expect(expanded.uniformTypes).toEqual({
       val0: 'f32',
       val1: 'f32',
@@ -177,10 +209,14 @@ describe('expandShaderModule', () => {
   });
 
   test('expands uniformTypes keys with plane placeholder', () => {
-    const expanded = expandShaderModule(asModule({
-      name: 'test',
-      uniformTypes: { [`normal${P}`]: 'vec3<f32>' }
-    }), 1, 4);
+    const expanded = expandShaderModule(
+      asModule({
+        name: 'test',
+        uniformTypes: { [`normal${P}`]: 'vec3<f32>' }
+      }),
+      1,
+      4
+    );
     expect(expanded.uniformTypes).toEqual({
       normal0: 'vec3<f32>',
       normal1: 'vec3<f32>',
@@ -190,13 +226,16 @@ describe('expandShaderModule', () => {
   });
 
   test('leaves non-placeholder uniformTypes keys unchanged', () => {
-    const expanded = expandShaderModule(asModule({
-      name: 'test',
-      uniformTypes: {
-        opacity: 'f32',
-        [`color${I}`]: 'vec3<f32>'
-      }
-    }), 2);
+    const expanded = expandShaderModule(
+      asModule({
+        name: 'test',
+        uniformTypes: {
+          opacity: 'f32',
+          [`color${I}`]: 'vec3<f32>'
+        }
+      }),
+      2
+    );
     expect(expanded.uniformTypes).toEqual({
       opacity: 'f32',
       color0: 'vec3<f32>',
@@ -205,10 +244,13 @@ describe('expandShaderModule', () => {
   });
 
   test('expands fs shader code per-channel', () => {
-    const expanded = expandShaderModule(asModule({
-      name: 'test',
-      fs: `float val${I} = 0.0;`
-    }), 3);
+    const expanded = expandShaderModule(
+      asModule({
+        name: 'test',
+        fs: `float val${I} = 0.0;`
+      }),
+      3
+    );
     expect(expanded.fs).toContain('float val0 = 0.0;');
     expect(expanded.fs).toContain('float val1 = 0.0;');
     expect(expanded.fs).toContain('float val2 = 0.0;');
@@ -216,20 +258,26 @@ describe('expandShaderModule', () => {
   });
 
   test('expands vs shader code per-channel', () => {
-    const expanded = expandShaderModule(asModule({
-      name: 'test',
-      vs: `float val${I} = 0.0;`
-    }), 2);
+    const expanded = expandShaderModule(
+      asModule({
+        name: 'test',
+        vs: `float val${I} = 0.0;`
+      }),
+      2
+    );
     expect(expanded.vs).toContain('float val0 = 0.0;');
     expect(expanded.vs).toContain('float val1 = 0.0;');
     expect(expanded.vs).not.toContain(I);
   });
 
   test('removes trailing comma from array initializer lines', () => {
-    const expanded = expandShaderModule(asModule({
-      name: 'test',
-      fs: `float[] arr = float[3](\n  val${I},\n);`
-    }), 3);
+    const expanded = expandShaderModule(
+      asModule({
+        name: 'test',
+        fs: `float[] arr = float[3](\n  val${I},\n);`
+      }),
+      3
+    );
     const lines = (expanded.fs as string).split('\n');
     const lastValLine = lines.filter(l => l.trim().match(/^val\d/)).pop();
     expect(lastValLine).toBeDefined();
@@ -245,10 +293,13 @@ describe('expandShaderModule', () => {
   });
 
   test('preserves existing defines', () => {
-    const expanded = expandShaderModule(asModule({
-      name: 'test',
-      defines: { SAMPLER_TYPE: 'usampler2D' }
-    }), 2);
+    const expanded = expandShaderModule(
+      asModule({
+        name: 'test',
+        defines: { SAMPLER_TYPE: 'usampler2D' }
+      }),
+      2
+    );
     const defines = expanded.defines as unknown as Record<string, string>;
     expect(defines.SAMPLER_TYPE).toBe('usampler2D');
     expect(defines.NUM_CHANNELS).toBe('2');
@@ -265,15 +316,19 @@ describe('expandShaderModule', () => {
   });
 
   test('handles mixed channel and plane placeholders in uniformTypes', () => {
-    const expanded = expandShaderModule(asModule({
-      name: 'test',
-      uniformTypes: {
-        xSlice: 'vec2<f32>',
-        [`color${I}`]: 'vec3<f32>',
-        [`normal${P}`]: 'vec3<f32>',
-        [`distance${P}`]: 'f32'
-      }
-    }), 2, 3);
+    const expanded = expandShaderModule(
+      asModule({
+        name: 'test',
+        uniformTypes: {
+          xSlice: 'vec2<f32>',
+          [`color${I}`]: 'vec3<f32>',
+          [`normal${P}`]: 'vec3<f32>',
+          [`distance${P}`]: 'f32'
+        }
+      }),
+      2,
+      3
+    );
     expect(expanded.uniformTypes).toEqual({
       xSlice: 'vec2<f32>',
       color0: 'vec3<f32>',
@@ -303,11 +358,14 @@ describe('expandShaderModule', () => {
   });
 
   test('single channel expansion (edge case)', () => {
-    const expanded = expandShaderModule(asModule({
-      name: 'test',
-      uniformTypes: { [`contrastLimits${I}`]: 'vec2<f32>' },
-      fs: `vec2 contrastLimits${I};`
-    }), 1);
+    const expanded = expandShaderModule(
+      asModule({
+        name: 'test',
+        uniformTypes: { [`contrastLimits${I}`]: 'vec2<f32>' },
+        fs: `vec2 contrastLimits${I};`
+      }),
+      1
+    );
     expect(expanded.uniformTypes).toEqual({ contrastLimits0: 'vec2<f32>' });
     expect(expanded.fs).toContain('contrastLimits0');
     expect(expanded.fs).not.toContain(I);
@@ -318,7 +376,9 @@ describe('expandShaderModule', () => {
   });
 
   test('throws when numPlanes is 0', () => {
-    expect(() => expandShaderModule(asModule({ name: 'test' }), 1, 0)).toThrow();
+    expect(() =>
+      expandShaderModule(asModule({ name: 'test' }), 1, 0)
+    ).toThrow();
   });
 });
 
@@ -329,14 +389,20 @@ describe('real shader module GLSL validation', () => {
   test('channelIntensity module expanded fs is valid GLSL for various channel counts', () => {
     for (const n of [1, 2, 3, 6, 10]) {
       const expanded = expandShaderModule(asModule(channelIntensity), n);
-      assertValidGLSL(wrapSnippet(expanded.fs as string), `channelIntensity (${n} ch)`);
+      assertValidGLSL(
+        wrapSnippet(expanded.fs as string),
+        `channelIntensity (${n} ch)`
+      );
     }
   });
 
   test('channelIntensity3D module expanded fs is valid GLSL for various channel counts', () => {
     for (const n of [1, 2, 3, 6, 10]) {
       const expanded = expandShaderModule(asModule(channelIntensity3D), n);
-      assertValidGLSL(wrapSnippet(expanded.fs as string), `channelIntensity3D (${n} ch)`);
+      assertValidGLSL(
+        wrapSnippet(expanded.fs as string),
+        `channelIntensity3D (${n} ch)`
+      );
     }
   });
 
@@ -350,7 +416,10 @@ describe('real shader module GLSL validation', () => {
     ];
     for (const [ch, pl] of combos) {
       const expanded = expandShaderModule(asModule(fragmentUniforms3D), ch, pl);
-      assertValidGLSL(wrapSnippet(expanded.fs as string), `fragmentUniforms3D (${ch}ch, ${pl}planes)`);
+      assertValidGLSL(
+        wrapSnippet(expanded.fs as string),
+        `fragmentUniforms3D (${ch}ch, ${pl}planes)`
+      );
     }
   });
 
