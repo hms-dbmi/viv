@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { range } from '../src/multiscale-image-layer/utils';
 import {
+  normalizeTextureBindings,
   padContrastLimits,
   padWithDefault,
   sizeToMeters,
@@ -94,6 +95,15 @@ describe('utils', () => {
     }
   });
 
+  test('getRenderingAttrs expands uniformTypes for explicit numChannels', () => {
+    const attrs = getRenderingAttrs('Uint8', 'nearest', 3);
+    const keys = Object.keys(attrs.shaderModule.uniformTypes);
+    expect(keys).toContain('contrastLimits0');
+    expect(keys).toContain('contrastLimits1');
+    expect(keys).toContain('contrastLimits2');
+    expect(keys).not.toContain('contrastLimits3');
+  });
+
   test('sizeToMeters test', () => {
     expect(sizeToMeters(5, 'km')).toBe(5000);
     expect(sizeToMeters(10, 'm')).toBe(10);
@@ -109,5 +119,56 @@ describe('utils', () => {
     expect(snapValue(0.0234)).toEqual([0.025, 25, 'm']);
     expect(snapValue(2345.0)).toEqual([3000, 3, 'k']);
     expect(snapValue(999.0)).toEqual([1000, 1, 'k']);
+  });
+});
+
+describe('normalizeTextureBindings', () => {
+  const tex0 = { id: 'tex0' };
+  const tex1 = { id: 'tex1' };
+  const tex2 = { id: 'tex2' };
+
+  test('returns null for empty textures with no keys', () => {
+    expect(normalizeTextureBindings({}, 3)).toBeNull();
+  });
+
+  test('returns textures unchanged when key count matches required', () => {
+    const textures = { channel0: tex0, channel1: tex1 };
+    const result = normalizeTextureBindings(textures, 2);
+    expect(result).toBe(textures);
+  });
+
+  test('pads with first texture when fewer textures than required', () => {
+    const textures = { channel0: tex0 };
+    const result = normalizeTextureBindings(textures, 3);
+    expect(Object.keys(result)).toHaveLength(3);
+    expect(result.channel0).toBe(tex0);
+    expect(result.channel1).toBe(tex0);
+    expect(result.channel2).toBe(tex0);
+  });
+
+  test('trims to subset when more textures than required', () => {
+    const textures = { channel0: tex0, channel1: tex1, channel2: tex2 };
+    const result = normalizeTextureBindings(textures, 2);
+    expect(Object.keys(result)).toHaveLength(2);
+    expect(result.channel0).toBe(tex0);
+    expect(result.channel1).toBe(tex1);
+    expect(result.channel2).toBeUndefined();
+  });
+
+  test('works with custom keyPrefix', () => {
+    const textures = { volume0: tex0 };
+    const result = normalizeTextureBindings(textures, 3, 'volume');
+    expect(result.volume0).toBe(tex0);
+    expect(result.volume1).toBe(tex0);
+    expect(result.volume2).toBe(tex0);
+  });
+
+  test('does not pad missing keys that already exist', () => {
+    const textures = { channel0: tex0, channel1: tex1 };
+    const result = normalizeTextureBindings(textures, 4);
+    expect(result.channel0).toBe(tex0);
+    expect(result.channel1).toBe(tex1);
+    expect(result.channel2).toBe(tex0);
+    expect(result.channel3).toBe(tex0);
   });
 });

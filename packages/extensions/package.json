@@ -20,7 +20,8 @@
   ],
   "scripts": {
     "build": "npm run prepare && unbuild",
-    "prepare": "node prepare.mjs"
+    "prepare": "node prepare.mjs",
+    "test": "vitest --run"
   },
   "peerDependencies": {
     "@deck.gl/core": "catalog:",
