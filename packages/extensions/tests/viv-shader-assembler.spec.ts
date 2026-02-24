@@ -312,6 +312,14 @@ describe('expandShaderModule', () => {
     expect(expanded.fs).toContain('contrastLimits0');
     expect(expanded.fs).not.toContain(I);
   });
+
+  test('throws when numChannels is 0', () => {
+    expect(() => expandShaderModule(asModule({ name: 'test' }), 0)).toThrow();
+  });
+
+  test('throws when numPlanes is 0', () => {
+    expect(() => expandShaderModule(asModule({ name: 'test' }), 1, 0)).toThrow();
+  });
 });
 
 // ---------------------------------------------------------------------------

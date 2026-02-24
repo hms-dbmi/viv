@@ -131,6 +131,16 @@ export function expandShaderModule(
   numChannels: number,
   numPlanes = 1
 ): ShaderModule {
+  if (numChannels < 1) {
+    throw new Error(
+      `expandShaderModule requires numChannels >= 1, got ${numChannels}`
+    );
+  }
+  if (numPlanes < 1) {
+    throw new Error(
+      `expandShaderModule requires numPlanes >= 1, got ${numPlanes}`
+    );
+  }
   const expandedModule = { ...module };
 
   // Expand uniformTypes if present

@@ -171,4 +171,16 @@ describe('normalizeTextureBindings', () => {
     expect(result.channel2).toBe(tex0);
     expect(result.channel3).toBe(tex0);
   });
+
+  test('returns null when zero channels required', () => {
+    expect(normalizeTextureBindings({ channel0: tex0 }, 0)).toBeNull();
+  });
+
+  test('returns null when zero channels required and textures empty', () => {
+    expect(normalizeTextureBindings({}, 0)).toBeNull();
+  });
+
+  // Future: once deck.gl layer lifecycle tests work, add integration tests
+  // verifying that XRLayer/XR3DLayer skip model creation when numChannels === 0
+  // (i.e. when selections is []).
 });

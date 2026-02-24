@@ -21,6 +21,7 @@ export function normalizeTextureBindings(
   numChannelsRequired,
   keyPrefix = 'channel'
 ) {
+  if (numChannelsRequired === 0) return null;
   const keys = Object.keys(textures);
   const firstKey = `${keyPrefix}0`;
   const firstTexture = textures[firstKey];

@@ -161,6 +161,16 @@ class XRLayer extends Layer {
    */
   updateState({ props, oldProps, changeFlags, ...rest }) {
     super.updateState({ props, oldProps, changeFlags, ...rest });
+
+    const numChannels = this.getNumChannels();
+    if (numChannels === 0) {
+      if (this.state.model) {
+        this.state.model.destroy();
+        this.setState({ model: null });
+      }
+      return;
+    }
+
     // setup model first
     // Check for colormap changes - when colormap changes, getShaders() returns different modules
     // but deck.gl might not detect this as extensionsChanged if extension instance is the same.
@@ -197,7 +207,6 @@ class XRLayer extends Layer {
     const texturesToBind =
       this._newTexturesFromLoadThisFrame ?? this.state.textures;
     const { model } = this.state;
-    const numChannels = this.getNumChannels();
     const bindings =
       texturesToBind && model
         ? normalizeTextureBindings(texturesToBind, numChannels, 'channel')

@@ -261,6 +261,15 @@ const XR3DLayer = class extends Layer {
    * and loading any textures that need be loading.
    */
   updateState({ props, oldProps, changeFlags }) {
+    const numChannels = this.getNumChannels();
+    if (numChannels === 0) {
+      if (this.state.model) {
+        this.state.model.destroy();
+        this.setState({ model: null });
+      }
+      return;
+    }
+
     // setup model first
     const channelCountChanged =
       (props.selections?.length ?? 0) !== (oldProps?.selections?.length ?? 0);
