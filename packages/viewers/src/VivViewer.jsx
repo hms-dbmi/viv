@@ -70,7 +70,9 @@ class VivViewerWrapper extends React.PureComponent {
       });
     });
     this._onViewStateChange = this._onViewStateChange.bind(this);
-    this._onViewStateChange = debounce(this._onViewStateChange, 10,  {trailing: true})
+    this._onViewStateChange = debounce(this._onViewStateChange, 10, {
+      trailing: true
+    });
     this.layerFilter = this.layerFilter.bind(this);
     this.onHover = this.onHover.bind(this);
   }

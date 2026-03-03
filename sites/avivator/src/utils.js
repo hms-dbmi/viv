@@ -1,5 +1,5 @@
 import { Matrix4 } from '@math.gl/core';
-import { fromBlob, fromUrl, Pool } from 'geotiff';
+import { Pool, fromBlob, fromUrl } from 'geotiff';
 import { useEffect, useState } from 'react';
 
 import {
