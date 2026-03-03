@@ -1,5 +1,5 @@
 import { Matrix4 } from '@math.gl/core';
-import { fromBlob, fromUrl } from 'geotiff';
+import { fromBlob, fromUrl, Pool } from 'geotiff';
 import { useEffect, useState } from 'react';
 
 import {
@@ -176,21 +176,19 @@ export async function createLoader(
     // OME-TIFF
     if (isOmeTiff(urlOrFile)) {
       if (urlOrFile instanceof File) {
-        // TODO(2021-05-09): temporarily disable `pool` until inline worker module is fixed.
         const source = await loadOmeTiff(urlOrFile, {
           images: 'all',
-          pool: false
+          pool: new Pool()
         });
         return source;
       }
 
       const maybeOffsets = await fetchSingleFileOmeTiffOffsets(urlOrFile);
 
-      // TODO(2021-05-06): temporarily disable `pool` until inline worker module is fixed.
       const source = await loadOmeTiff(urlOrFile, {
         offsets: maybeOffsets,
         images: 'all',
-        pool: false
+        pool: new Pool()
       });
 
       // Show a warning if the total number of channels/images exceeds a fixed amount.
