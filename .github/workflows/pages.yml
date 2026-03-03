@@ -29,7 +29,7 @@ jobs:
           pnpm build --base /viv/
         working-directory: sites/avivator
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: sites/avivator/dist
 
