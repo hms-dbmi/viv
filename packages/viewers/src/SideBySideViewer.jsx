@@ -33,8 +33,8 @@ import VivViewer from './VivViewer';
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
- * @param {boolean} [props.showScaleBar] If true, displays a scale bar on each side-by-side view. By default, false.
- * @param {string} [props.scaleBarPosition] Position of scale bars ('bottom-right', 'top-right', 'top-left', 'bottom-left'). Default is 'bottom-right'.
+ * @param {boolean} [props.snapScaleBar] If true, aligns the scale bar value to predefined intervals
+ * for clearer readings, adjusting units if necessary. By default, false. 
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
@@ -59,9 +59,7 @@ const SideBySideViewer = props => {
     lensBorderColor = [255, 255, 255],
     lensBorderRadius = 0.02,
     transparentColor,
-    showScaleBar = false,
     snapScaleBar = false,
-    scaleBarPosition = 'bottom-right',
     onViewStateChange,
     onHover,
     onViewportLoad,
@@ -70,6 +68,14 @@ const SideBySideViewer = props => {
   } = props;
   const leftViewState = viewStatesProp?.find(v => v.id === 'left');
   const rightViewState = viewStatesProp?.find(v => v.id === 'right');
+  const leftId = `left-${SCALEBAR_VIEW_ID}`;
+  const rightId = `right-${SCALEBAR_VIEW_ID}`;
+  const leftScalebarViewState = viewStatesProp?.find(
+    v => v.id === leftId
+  );
+  const rightScalebarViewState = viewStatesProp?.find(
+    v => v.id === rightId
+  );
   // biome-ignore lint/correctness/useExhaustiveDependencies: Ignore carried over from eslint, without explanation.
   const viewStates = React.useMemo(() => {
     if (leftViewState && rightViewState) {
@@ -82,7 +88,9 @@ const SideBySideViewer = props => {
     );
     return [
       leftViewState || { ...defaultViewState, id: 'left' },
-      rightViewState || { ...defaultViewState, id: 'right' }
+      rightViewState || { ...defaultViewState, id: 'right' },
+      leftScalebarViewState || { ...defaultViewState, id: leftId },
+      rightScalebarViewState|| { ...defaultViewState, id: rightId }
     ];
   }, [loader, leftViewState, rightViewState]);
 
@@ -119,46 +127,27 @@ const SideBySideViewer = props => {
     extensions,
     transparentColor
   };
-  const views = [detailViewRight, detailViewLeft];
-  const layerProps = [layerConfig, layerConfig];
 
   // Add scale bar views if enabled and physical sizes are available
-  if (showScaleBar) {
-    const leftId = `left-${SCALEBAR_VIEW_ID}`;
-    const rightId = `right-${SCALEBAR_VIEW_ID}`;
-    const leftScalebarViewState = viewStatesProp?.find(
-      v => v.id === leftId
-    ) || { ...viewStates[0], id: leftId };
-    const rightScalebarViewState = viewStatesProp?.find(
-      v => v.id === rightId
-    ) || { ...viewStates[1], id: rightId };
-    const leftScaleBarView = new ScaleBarView({
-      id: leftId,
-      width: width / 2,
-      height,
-      loader,
-      position: scaleBarPosition,
-      snap: snapScaleBar,
-      imageViewId: 'left'
-    });
-    const rightScaleBarView = new ScaleBarView({
-      id: rightId,
-      width: width / 2,
-      height,
-      x: width / 2,
-      loader,
-      position: scaleBarPosition,
-      snap: snapScaleBar,
-      imageViewId: 'right'
-    });
-    views.push(leftScaleBarView);
-    views.push(rightScaleBarView);
-    layerProps.push(layerConfig);
-    layerProps.push(layerConfig);
-    // Add viewStates for the scale bars (same as the corresponding side views)
-    viewStates.push(leftScalebarViewState);
-    viewStates.push(rightScalebarViewState);
-  }
+  const leftScaleBarView = new ScaleBarView({
+    id: leftId,
+    width: width / 2,
+    height,
+    loader,
+    snap: snapScaleBar,
+    imageViewId: 'left'
+  });
+  const rightScaleBarView = new ScaleBarView({
+    id: rightId,
+    width: width / 2,
+    height,
+    x: width / 2,
+    loader,
+    snap: snapScaleBar,
+    imageViewId: 'right'
+  });
+  const views = [detailViewRight, detailViewLeft, leftScaleBarView, rightScaleBarView];
+  const layerProps = [layerConfig, layerConfig, layerConfig, layerConfig];
   const finalViewStates = [...viewStates];
 
   return loader ? (
