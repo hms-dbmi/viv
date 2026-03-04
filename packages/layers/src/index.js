@@ -5,7 +5,7 @@ export { default as VolumeLayer } from './volume-layer/volume-layer';
 export { default as XRLayer } from './xr-layer/xr-layer';
 export { default as XR3DLayer } from './xr-3d-layer/xr-3d-layer';
 export { default as BitmapLayer } from './bitmap-layer';
-
+export {default as ScaleBarLayer} from './scale-bar-layer';
 export {
   getPhysicalSizeScalingMatrix,
   makeBoundingBox,
