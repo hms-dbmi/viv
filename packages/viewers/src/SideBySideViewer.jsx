@@ -34,7 +34,7 @@ import VivViewer from './VivViewer';
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @param {boolean} [props.snapScaleBar] If true, aligns the scale bar value to predefined intervals
- * for clearer readings, adjusting units if necessary. By default, false. 
+ * for clearer readings, adjusting units if necessary. By default, false.
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
@@ -70,12 +70,8 @@ const SideBySideViewer = props => {
   const rightViewState = viewStatesProp?.find(v => v.id === 'right');
   const leftId = `left-${SCALEBAR_VIEW_ID}`;
   const rightId = `right-${SCALEBAR_VIEW_ID}`;
-  const leftScalebarViewState = viewStatesProp?.find(
-    v => v.id === leftId
-  );
-  const rightScalebarViewState = viewStatesProp?.find(
-    v => v.id === rightId
-  );
+  const leftScalebarViewState = viewStatesProp?.find(v => v.id === leftId);
+  const rightScalebarViewState = viewStatesProp?.find(v => v.id === rightId);
   // biome-ignore lint/correctness/useExhaustiveDependencies: Ignore carried over from eslint, without explanation.
   const viewStates = React.useMemo(() => {
     if (leftViewState && rightViewState) {
@@ -90,7 +86,7 @@ const SideBySideViewer = props => {
       leftViewState || { ...defaultViewState, id: 'left' },
       rightViewState || { ...defaultViewState, id: 'right' },
       leftScalebarViewState || { ...defaultViewState, id: leftId },
-      rightScalebarViewState|| { ...defaultViewState, id: rightId }
+      rightScalebarViewState || { ...defaultViewState, id: rightId }
     ];
   }, [loader, leftViewState, rightViewState]);
 
@@ -146,7 +142,12 @@ const SideBySideViewer = props => {
     snap: snapScaleBar,
     imageViewId: 'right'
   });
-  const views = [detailViewRight, detailViewLeft, leftScaleBarView, rightScaleBarView];
+  const views = [
+    detailViewRight,
+    detailViewLeft,
+    leftScaleBarView,
+    rightScaleBarView
+  ];
   const layerProps = [layerConfig, layerConfig, layerConfig, layerConfig];
   const finalViewStates = [...viewStates];
 
