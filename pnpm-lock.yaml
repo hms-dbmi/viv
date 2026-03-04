@@ -286,6 +286,9 @@ importers:
       '@math.gl/core':
         specifier: 'catalog:'
         version: 4.1.0
+      '@vivjs/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@vivjs/layers':
         specifier: workspace:*
         version: link:../layers

@@ -1,5 +1,5 @@
 import { ColorPaletteExtension } from '@vivjs/extensions';
-import { SideBySideView, getDefaultInitialViewState } from '@vivjs/views';
+import { ScaleBarView, SideBySideView, getDefaultInitialViewState } from '@vivjs/views';
 import * as React from 'react';
 import VivViewer from './VivViewer';
 
@@ -28,8 +28,10 @@ import VivViewer from './VivViewer';
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
- * @param {boolean} [props.snapScaleBar] If true, aligns the scale bar value to predefined intervals
- * for clearer readings, adjusting units if necessary. By default, false.
+ * @param {boolean} [props.showScaleBar] If true, displays a scale bar on each side-by-side view. By default, false.
+ * @param {string} [props.scaleBarUnit] Physical unit size per pixel for the scale bars (default: ''). Only used if showScaleBar is true.
+ * @param {number} [props.scaleBarSize] Physical size of a pixel (default: 1). Only used if showScaleBar is true.
+ * @param {string} [props.scaleBarPosition] Position of scale bars ('bottom-right', 'top-right', 'top-left', 'bottom-left'). Default is 'bottom-right'.
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
@@ -54,7 +56,10 @@ const SideBySideViewer = props => {
     lensBorderColor = [255, 255, 255],
     lensBorderRadius = 0.02,
     transparentColor,
-    snapScaleBar = false,
+    showScaleBar = false,
+    scaleBarUnit = '',
+    scaleBarSize = 1,
+    scaleBarPosition = 'bottom-right',
     onViewStateChange,
     onHover,
     onViewportLoad,
@@ -85,8 +90,7 @@ const SideBySideViewer = props => {
     panLock,
     zoomLock,
     height,
-    width: width / 2,
-    snapScaleBar
+    width: width / 2
   });
   const detailViewRight = new SideBySideView({
     id: 'right',
@@ -95,8 +99,7 @@ const SideBySideViewer = props => {
     panLock,
     zoomLock,
     height,
-    width: width / 2,
-    snapScaleBar
+    width: width / 2
   });
   const layerConfig = {
     loader,
@@ -116,6 +119,38 @@ const SideBySideViewer = props => {
   };
   const views = [detailViewRight, detailViewLeft];
   const layerProps = [layerConfig, layerConfig];
+  const finalViewStates = [...viewStates];
+
+  // Add scale bar views if enabled and physical sizes are available
+  if (showScaleBar && loader?.[0]?.meta?.physicalSizes?.x) {
+    const { size: defaultSize, unit: defaultUnit } = loader[0].meta.physicalSizes.x;
+    const leftScaleBarView = new ScaleBarView({
+      id: 'left-scale-bar',
+      width: width / 2,
+      height,
+      unit: scaleBarUnit || defaultUnit,
+      size: scaleBarSize || defaultSize,
+      position: scaleBarPosition,
+      snap: snapScaleBar,
+      imageViewId: 'left'
+    });
+    const rightScaleBarView = new ScaleBarView({
+      id: 'right-scale-bar',
+      width: width / 2,
+      height,
+      x: width / 2,
+      unit: scaleBarUnit || defaultUnit,
+      size: scaleBarSize || defaultSize,
+      position: scaleBarPosition,
+      snap: snapScaleBar,
+      imageViewId: 'right'
+    });
+    views.push(leftScaleBarView);
+    views.push(rightScaleBarView);
+    // Add viewStates for the scale bars (same as the corresponding side views)
+    finalViewStates.push({ ...viewStates[0], id: 'left-scale-bar' });
+    finalViewStates.push({ ...viewStates[1], id: 'right-scale-bar' });
+  }
   return loader ? (
     <VivViewer
       layerProps={layerProps}
@@ -123,7 +158,7 @@ const SideBySideViewer = props => {
       randomize
       onViewStateChange={onViewStateChange}
       onHover={onHover}
-      viewStates={viewStates}
+      viewStates={finalViewStates}
       deckProps={deckProps}
     />
   ) : null;

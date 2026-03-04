@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@math.gl/core": "catalog:",
+    "@vivjs/constants": "workspace:*",
     "@vivjs/layers": "workspace:*",
     "@vivjs/loaders": "workspace:*",
     "math.gl": "catalog:"

@@ -2,7 +2,6 @@ import DeckGL from '@deck.gl/react';
 import { getVivId } from '@vivjs/views';
 // No need to use the ES6 or React variants.
 import equal from 'fast-deep-equal';
-import debounce from 'lodash/debounce';
 import * as React from 'react';
 
 const areViewStatesEqual = (viewState, otherViewState) => {
@@ -64,15 +63,13 @@ class VivViewerWrapper extends React.PureComponent {
     };
     const { viewStates } = this.state;
     const { views, viewStates: initialViewStates } = this.props;
+    console.log(initialViewStates, views)
     views.forEach(view => {
       viewStates[view.id] = view.filterViewState({
         viewState: initialViewStates.find(v => v.id === view.id)
       });
     });
     this._onViewStateChange = this._onViewStateChange.bind(this);
-    this._onViewStateChange = debounce(this._onViewStateChange, 10, {
-      trailing: true
-    });
     this.layerFilter = this.layerFilter.bind(this);
     this.onHover = this.onHover.bind(this);
   }

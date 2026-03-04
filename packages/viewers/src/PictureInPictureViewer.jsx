@@ -3,7 +3,9 @@ import {
   DETAIL_VIEW_ID,
   DetailView,
   OVERVIEW_VIEW_ID,
+  SCALEBAR_VIEW_ID,
   OverviewView,
+  ScaleBarView,
   getDefaultInitialViewState
 } from '@vivjs/views';
 import * as React from 'react';
@@ -38,8 +40,10 @@ import VivViewer from './VivViewer';
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
- * @param {boolean} [props.snapScaleBar] If true, aligns the scale bar value to predefined intervals
- * for clearer readings, adjusting units if necessary. By default, false.
+ * @param {boolean} [props.showScaleBar] If true, displays a scale bar on the detail view. By default, false.
+ * @param {string} [props.scaleBarUnit] Physical unit size per pixel for the scale bar (default: ''). Only used if showScaleBar is true.
+ * @param {number} [props.scaleBarSize] Physical size of a pixel (default: 1). Only used if showScaleBar is true.
+ * @param {string} [props.scaleBarPosition] Position of scale bar ('bottom-right', 'top-right', 'top-left', 'bottom-left'). Default is 'bottom-right'.
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
  *     https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object)
@@ -68,7 +72,9 @@ const PictureInPictureViewer = props => {
     lensBorderRadius = 0.02,
     clickCenter = true,
     transparentColor,
+    showScaleBar = true,
     snapScaleBar = false,
+    scaleBarPosition = 'bottom-right',
     onViewStateChange,
     onHover,
     onViewportLoad,
@@ -87,8 +93,7 @@ const PictureInPictureViewer = props => {
   const detailView = new DetailView({
     id: DETAIL_VIEW_ID,
     height,
-    width,
-    snapScaleBar
+    width
   });
   const layerConfig = {
     loader,
@@ -109,6 +114,26 @@ const PictureInPictureViewer = props => {
   const views = [detailView];
   const layerProps = [layerConfig];
   const viewStates = [{ ...baseViewState, id: DETAIL_VIEW_ID }];
+
+  // Add scale bar view if enabled and physical sizes are available
+  if (showScaleBar && loader?.[0]?.meta?.physicalSizes?.x) {
+    const scalebarViewState = viewStatesProp?.find(
+      v => v.id === SCALEBAR_VIEW_ID
+    ) || { ...baseViewState, id: SCALEBAR_VIEW_ID };
+    const { size, unit } = loader[0].meta.physicalSizes.x;
+    const scaleBarView = new ScaleBarView({
+      id: SCALEBAR_VIEW_ID,
+      width,
+      height,
+      unit,
+      size,
+      position: scaleBarPosition,
+      snap: snapScaleBar,
+      imageViewId: DETAIL_VIEW_ID
+    });
+    views.push(scaleBarView);
+    viewStates.push(scalebarViewState);
+  }
   if (overviewOn && loader) {
     // It's unclear why this is needed because OverviewView.filterViewState sets "zoom" and "target".
     const overviewViewState = viewStatesProp?.find(

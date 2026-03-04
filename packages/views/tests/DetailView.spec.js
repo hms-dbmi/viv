@@ -1,4 +1,4 @@
-import { MultiscaleImageLayer, ScaleBarLayer } from '@vivjs/layers';
+import { MultiscaleImageLayer } from '@vivjs/layers';
 import { expect, test } from 'vitest';
 import { DETAIL_VIEW_ID, DetailView } from '../src';
 import { defaultArguments, generateViewTests } from './VivView.spec';
@@ -10,7 +10,7 @@ detailViewArguments.initialViewState.id = id;
 
 generateViewTests(DetailView, detailViewArguments);
 
-test('DetailView layer type and props check', () => {
+test('DetailView layer type check', () => {
   const view = new DetailView(detailViewArguments);
   const loader = { type: 'loads' };
   const layers = view.getLayers({
@@ -29,11 +29,11 @@ test('DetailView layer type and props check', () => {
     }
   });
   expect(layers[0] instanceof MultiscaleImageLayer).toBeTruthy();
-  expect(layers[1] instanceof ScaleBarLayer).toBeTruthy();
   expect(layers[0].props.viewportId).toBe(view.id);
+  // Note: ScaleBarLayer is now rendered via ScaleBarView instead
 });
 
-test('DetailView does not render scale bar without physical size', () => {
+test('DetailView renders only image layer', () => {
   const view = new DetailView(detailViewArguments);
   const loader = { type: 'loads' };
   const layers = view.getLayers({
