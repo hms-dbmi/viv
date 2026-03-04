@@ -31,7 +31,7 @@ export default class ScaleBarView extends VivView {
     imageViewId,
     position = 'bottom-right',
     length = 0.05,
-    snap = false,
+    snap = false
   }) {
     super({ id, width, height });
     this.id = id;
@@ -69,24 +69,17 @@ export default class ScaleBarView extends VivView {
   }
 
   getLayers({ viewStates }) {
-    const {loader} = this;
+    const { loader } = this;
     const layers = [];
     if (loader?.[0]?.meta?.physicalSizes?.x) {
-        const {
-          id,
-          height,
-          width,
-          position,
-          length,
-          snap,
-          imageViewId
-        } = this;
-        const { size, unit } = loader[0].meta.physicalSizes.x;
+      const { id, height, width, position, length, snap, imageViewId } = this;
+      const { size, unit } = loader[0].meta.physicalSizes.x;
 
-        // Get the image view's viewState to calculate correct scale
-        const imageViewState = viewStates[imageViewId];
-        const layerId = getVivId(id);
-        layers.push(new ScaleBarLayer({
+      // Get the image view's viewState to calculate correct scale
+      const imageViewState = viewStates[imageViewId];
+      const layerId = getVivId(id);
+      layers.push(
+        new ScaleBarLayer({
           id: layerId,
           unit,
           size,
@@ -96,10 +89,10 @@ export default class ScaleBarView extends VivView {
           snap,
           height,
           width
-        }));
-      }
-    console.log(layers)
+        })
+      );
+    }
+    console.log(layers);
     return layers;
   }
-    
 }
