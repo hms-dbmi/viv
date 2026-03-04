@@ -38,7 +38,9 @@ const ColorPaletteExtension = class extends VivLayerExtension {
 
     // Get selections safely
     const selections = this.props.selections || this.selections || [];
-    const numChannels = this.getNumChannels();
+    // we can't `this.getNumChannels()` here, still not totally happy with this
+    // we should probably just have props.numChannels / props.numPlanes and avoid `this` shenanigans?
+    const numChannels = selections.length;
 
     const paddedColors = padColorsForUBO({
       channelsVisible: channelsVisible || selections.map(() => true),

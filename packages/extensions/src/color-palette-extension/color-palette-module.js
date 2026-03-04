@@ -13,15 +13,14 @@ uniform ${moduleName}Uniforms {
 
 ${apply_transparent_color}
 
-void mutate_color(inout vec3 rgb, float intensity) {
+void mutate_color(inout vec3 rgb, float[NUM_CHANNELS] intensity, vec2 vTexCoord) {
   vec3 colors[NUM_CHANNELS] = vec3[NUM_CHANNELS](
     ${moduleName}.color${I},
   );
   for(int i = 0; i < NUM_CHANNELS; i++) {
-    rgb += max(0.0, min(1.0, intensity)) * vec3(colors[i]);
+    rgb += max(0.0, min(1.0, intensity[i])) * vec3(colors[i]);
   }
 }
-
 vec4 apply_opacity(vec3 rgb) {
   bool useTransparentColor = ${moduleName}.useTransparentColor != uint(0);
   return vec4(apply_transparent_color(rgb, ${moduleName}.transparentColor, useTransparentColor, ${moduleName}.opacity));
@@ -30,7 +29,7 @@ vec4 apply_opacity(vec3 rgb) {
 
 const DECKGL_MUTATE_COLOR = `\
 vec3 rgb = rgba.rgb;
-mutate_color(rgb, intensity);
+mutate_color(rgb, intensity, vTexCoord);
 rgba = apply_opacity(rgb);
 `;
 
