@@ -65,13 +65,18 @@ const ScaleBarLayer = class extends CompositeLayer {
     let adjustedBarLength = barScreenLength;
 
     if (snap) {
+      // Convert `size` to meters, since `snapValue`
+      // assumes the value is in meters.
       const meterSize = sizeToMeters(size, unit);
       const numUnits = barLength * meterSize;
+      // Get snapped value in original units and new units.
       const [snappedOrigUnits, snappedNewUnits, snappedUnitPrefix] =
         snapValue(numUnits);
       displayNumber = snappedNewUnits;
       displayUnit = `${snappedUnitPrefix}m`;
-      // Adjust bar length based on snapped value
+      // We adjust the bar length by using the ratio of the snapped
+      // value in original units to the original value passed to `snapValue` (which is based on `meterSize`).
+      // Then multiply by the zoom-based scaling to screen pixels.
       adjustedBarLength =
         (snappedOrigUnits / meterSize) * 2 ** imageViewState.zoom;
     }
@@ -186,7 +191,7 @@ const ScaleBarLayer = class extends CompositeLayer {
       sizeScale: 1,
       characterSet: [
         ...displayUnit.split(''),
-        ...[...Array(10).keys()].map(i => String(i)),
+        ...range(10).map(i => String(i)),
         '.',
         'e',
         '+'

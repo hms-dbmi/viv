@@ -124,7 +124,7 @@ const SideBySideViewer = props => {
     transparentColor
   };
 
-  // Add scale bar views if enabled and physical sizes are available
+  // Add scale bar views
   const leftScaleBarView = new ScaleBarView({
     id: leftId,
     width: width / 2,
