@@ -130,6 +130,7 @@ const PictureInPictureViewer = props => {
       imageViewId: DETAIL_VIEW_ID
     });
     views.push(scaleBarView);
+    layerProps.push(layerConfig);
     viewStates.push(scalebarViewState);
   }
   if (overviewOn && loader) {

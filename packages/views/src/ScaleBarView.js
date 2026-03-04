@@ -31,7 +31,9 @@ export default class ScaleBarView extends VivView {
     imageViewId,
     position = 'bottom-right',
     length = 0.05,
-    snap = false
+    snap = false,
+    x = 0,
+    y = 0
   }) {
     super({ id, width, height });
     this.id = id;
@@ -40,6 +42,8 @@ export default class ScaleBarView extends VivView {
     this.length = length;
     this.snap = snap;
     this.imageViewId = imageViewId;
+    this.x = x;
+    this.y = y;
   }
 
   getDeckGlView() {
@@ -49,8 +53,8 @@ export default class ScaleBarView extends VivView {
       controller: false, // Disable interaction on scale bar view
       height,
       width,
-      x: 0,
-      y: 0
+      x: this.x,
+      y: this.y
     });
   }
 
@@ -92,7 +96,6 @@ export default class ScaleBarView extends VivView {
         })
       );
     }
-    console.log(layers);
     return layers;
   }
 }

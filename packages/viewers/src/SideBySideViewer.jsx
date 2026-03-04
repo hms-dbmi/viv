@@ -1,5 +1,6 @@
 import { ColorPaletteExtension } from '@vivjs/extensions';
 import {
+  SCALEBAR_VIEW_ID,
   ScaleBarView,
   SideBySideView,
   getDefaultInitialViewState
@@ -61,8 +62,7 @@ const SideBySideViewer = props => {
     lensBorderRadius = 0.02,
     transparentColor,
     showScaleBar = false,
-    scaleBarUnit = '',
-    scaleBarSize = 1,
+    snapScaleBar = false,
     scaleBarPosition = 'bottom-right',
     onViewStateChange,
     onHover,
@@ -123,39 +123,46 @@ const SideBySideViewer = props => {
   };
   const views = [detailViewRight, detailViewLeft];
   const layerProps = [layerConfig, layerConfig];
-  const finalViewStates = [...viewStates];
 
   // Add scale bar views if enabled and physical sizes are available
-  if (showScaleBar && loader?.[0]?.meta?.physicalSizes?.x) {
-    const { size: defaultSize, unit: defaultUnit } =
-      loader[0].meta.physicalSizes.x;
+  if (showScaleBar) {
+    const leftId = `left-${SCALEBAR_VIEW_ID}`;
+    const rightId = `right-${SCALEBAR_VIEW_ID}`;
+    const leftScalebarViewState = viewStatesProp?.find(
+      v => v.id === leftId
+    ) || { ...viewStates[0], id: leftId };
+    const rightScalebarViewState = viewStatesProp?.find(
+      v => v.id === rightId
+    ) || { ...viewStates[1], id: rightId };
     const leftScaleBarView = new ScaleBarView({
-      id: 'left-scale-bar',
+      id: leftId,
       width: width / 2,
       height,
-      unit: scaleBarUnit || defaultUnit,
-      size: scaleBarSize || defaultSize,
+      loader,
       position: scaleBarPosition,
       snap: snapScaleBar,
       imageViewId: 'left'
     });
     const rightScaleBarView = new ScaleBarView({
-      id: 'right-scale-bar',
+      id: rightId,
       width: width / 2,
       height,
       x: width / 2,
-      unit: scaleBarUnit || defaultUnit,
-      size: scaleBarSize || defaultSize,
+      loader,
       position: scaleBarPosition,
       snap: snapScaleBar,
       imageViewId: 'right'
     });
     views.push(leftScaleBarView);
     views.push(rightScaleBarView);
+    layerProps.push(layerConfig);
+    layerProps.push(layerConfig);
     // Add viewStates for the scale bars (same as the corresponding side views)
-    finalViewStates.push({ ...viewStates[0], id: 'left-scale-bar' });
-    finalViewStates.push({ ...viewStates[1], id: 'right-scale-bar' });
+    viewStates.push(leftScalebarViewState);
+    viewStates.push(rightScalebarViewState);
   }
+  const finalViewStates = [...viewStates];
+
   return loader ? (
     <VivViewer
       layerProps={layerProps}

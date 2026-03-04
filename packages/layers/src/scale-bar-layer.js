@@ -49,7 +49,6 @@ const ScaleBarLayer = class extends CompositeLayer {
     } = this.props;
     // Get bounding box from the image view's imageViewState
     const boundingBox = makeBoundingBox(imageViewState);
-    console.log(boundingBox);
     const viewLength = boundingBox[2][0] - boundingBox[0][0];
 
     // Bar length in image space: 5% of view width
