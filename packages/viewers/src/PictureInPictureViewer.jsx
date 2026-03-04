@@ -3,8 +3,8 @@ import {
   DETAIL_VIEW_ID,
   DetailView,
   OVERVIEW_VIEW_ID,
-  SCALEBAR_VIEW_ID,
   OverviewView,
+  SCALEBAR_VIEW_ID,
   ScaleBarView,
   getDefaultInitialViewState
 } from '@vivjs/views';

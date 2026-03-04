@@ -1,7 +1,7 @@
 import { OrthographicView } from '@deck.gl/core';
 import { ScaleBarLayer } from '@vivjs/layers';
 import VivView from './VivView';
-import { getVivId, sizeToMeters, snapValue } from './utils';
+import { getVivId } from './utils';
 
 export const SCALEBAR_VIEW_ID = 'scalebar';
 
@@ -73,11 +73,31 @@ export default class ScaleBarView extends VivView {
   }
 
   getLayers({ viewStates }) {
-    const { id, height, width, unit, size, position, length, snap, imageViewId } = this;
+    const {
+      id,
+      height,
+      width,
+      unit,
+      size,
+      position,
+      length,
+      snap,
+      imageViewId
+    } = this;
 
     // Get the image view's viewState to calculate correct scale
     const imageViewState = viewStates[imageViewId];
     const layerId = getVivId(id);
-    return new ScaleBarLayer({ id: layerId, unit, size, position, viewState: imageViewState, length, snap, height, width });
+    return new ScaleBarLayer({
+      id: layerId,
+      unit,
+      size,
+      position,
+      imageViewState: { ...imageViewState, height, width },
+      length,
+      snap,
+      height,
+      width
+    });
   }
 }

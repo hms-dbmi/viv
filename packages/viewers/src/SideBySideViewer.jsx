@@ -1,5 +1,9 @@
 import { ColorPaletteExtension } from '@vivjs/extensions';
-import { ScaleBarView, SideBySideView, getDefaultInitialViewState } from '@vivjs/views';
+import {
+  ScaleBarView,
+  SideBySideView,
+  getDefaultInitialViewState
+} from '@vivjs/views';
 import * as React from 'react';
 import VivViewer from './VivViewer';
 
@@ -123,7 +127,8 @@ const SideBySideViewer = props => {
 
   // Add scale bar views if enabled and physical sizes are available
   if (showScaleBar && loader?.[0]?.meta?.physicalSizes?.x) {
-    const { size: defaultSize, unit: defaultUnit } = loader[0].meta.physicalSizes.x;
+    const { size: defaultSize, unit: defaultUnit } =
+      loader[0].meta.physicalSizes.x;
     const leftScaleBarView = new ScaleBarView({
       id: 'left-scale-bar',
       width: width / 2,

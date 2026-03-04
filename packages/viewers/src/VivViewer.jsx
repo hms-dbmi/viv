@@ -63,7 +63,6 @@ class VivViewerWrapper extends React.PureComponent {
     };
     const { viewStates } = this.state;
     const { views, viewStates: initialViewStates } = this.props;
-    console.log(initialViewStates, views)
     views.forEach(view => {
       viewStates[view.id] = view.filterViewState({
         viewState: initialViewStates.find(v => v.id === view.id)

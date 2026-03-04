@@ -4,37 +4,10 @@ import { makeBoundingBox, range, sizeToMeters, snapValue } from './utils';
 
 import { DEFAULT_FONT_FAMILY } from '@vivjs/constants';
 
-function getPosition(height, width, position, length, adjustedBarLength) {
-      // Position in screen space based on position parameter and length
-    let xLeftCoord, yCoord;
-    
-    switch (position) {
-      case 'bottom-right':
-        yCoord = height - height * length;
-        xLeftCoord = width - adjustedBarLength - width * length;
-        break;
-      case 'bottom-left':
-        yCoord = height - height * length;
-        xLeftCoord = width * length;
-        break;
-      case 'top-right':
-        yCoord = height * length;
-        xLeftCoord = width - adjustedBarLength - width * length;
-        break;
-      case 'top-left':
-        yCoord = height * length;
-        xLeftCoord = width * length;
-        break;
-      default:
-        throw new Error(`Position ${position} not found`);
-    }
-
-    return [yCoord, xLeftCoord];
-}
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
-  viewState: {
+  imageViewState: {
     type: 'object',
     value: { zoom: 0, target: [0, 0, 0], width: 1, height: 1 },
     compare: true
@@ -64,14 +37,28 @@ const defaultProps = {
  */
 const ScaleBarLayer = class extends CompositeLayer {
   renderLayers() {
-    const { id: layerId, unit, size, position, viewState, length, snap, height, width } = this.props;
-    // Get bounding box from the image view's viewState
-    const boundingBox = makeBoundingBox(viewState);
+    const {
+      id,
+      unit,
+      size,
+      position,
+      imageViewState,
+      length,
+      snap,
+      height,
+      width
+    } = this.props;
+    // Get bounding box from the image view's imageViewState
+    const boundingBox = makeBoundingBox(imageViewState);
+    console.log(boundingBox)
     const viewLength = boundingBox[2][0] - boundingBox[0][0];
+
     // Bar length in image space: 5% of view width
     const barLength = viewLength * 0.05;
     // Scale to screen pixels: at zoom 1, 1 image pixel = 2 screen pixels, so multiply by 2^zoom
-    const barScreenLength = barLength * Math.pow(2, viewState.zoom);
+    const barScreenLength = barLength * (2 ** imageViewState.zoom);
+
+
 
     // Bar height for tick marks (fixed screen pixels, not zoom-dependent)
     const barHeight = 10;
@@ -92,13 +79,14 @@ const ScaleBarLayer = class extends CompositeLayer {
       displayNumber = snappedNewUnits;
       displayUnit = `${snappedUnitPrefix}m`;
       // Adjust bar length based on snapped value
-      adjustedBarLength = (snappedOrigUnits / meterSize) * Math.pow(2, viewState.zoom);
+      adjustedBarLength = (snappedOrigUnits / meterSize) * (2 ** imageViewState.zoom);
     }
 
     // Position in screen space based on position parameter and length
-    let xLeftCoord, yCoord;
+    let xLeftCoord;
+    let yCoord;
     const isLeft = position.endsWith('-left');
-    
+
     switch (position) {
       case 'bottom-right':
         yCoord = height - height * length;
@@ -124,7 +112,7 @@ const ScaleBarLayer = class extends CompositeLayer {
 
     // Horizontal line for the scale bar
     const lengthBar = new LineLayer({
-      id: `scale-bar-length-${layerId}`,
+      id: `scale-bar-length-${id}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         [
@@ -140,7 +128,7 @@ const ScaleBarLayer = class extends CompositeLayer {
 
     // Left tick mark
     const tickBoundsLeft = new LineLayer({
-      id: `scale-bar-height-left-${layerId}`,
+      id: `scale-bar-height-left-${id}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         [
@@ -162,7 +150,7 @@ const ScaleBarLayer = class extends CompositeLayer {
 
     // Right tick mark
     const tickBoundsRight = new LineLayer({
-      id: `scale-bar-height-right-${layerId}`,
+      id: `scale-bar-height-right-${id}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         [
@@ -184,7 +172,7 @@ const ScaleBarLayer = class extends CompositeLayer {
 
     // Text label
     const textLayer = new TextLayer({
-      id: `units-label-layer-${layerId}`,
+      id: `units-label-layer-${id}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
       data: [
         {
