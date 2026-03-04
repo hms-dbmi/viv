@@ -34,8 +34,6 @@ import VivViewer from './VivViewer';
  * This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @param {boolean} [props.showScaleBar] If true, displays a scale bar on each side-by-side view. By default, false.
- * @param {string} [props.scaleBarUnit] Physical unit size per pixel for the scale bars (default: ''). Only used if showScaleBar is true.
- * @param {number} [props.scaleBarSize] Physical size of a pixel (default: 1). Only used if showScaleBar is true.
  * @param {string} [props.scaleBarPosition] Position of scale bars ('bottom-right', 'top-right', 'top-left', 'bottom-left'). Default is 'bottom-right'.
  * @param {import('./VivViewer').ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
  * @param {import('./VivViewer').Hover} [props.onHover] Callback that returns the picking info and the event (https://deck.gl/docs/api-reference/core/layer#onhover
