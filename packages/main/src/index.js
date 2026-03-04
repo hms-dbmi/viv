@@ -3,7 +3,6 @@
 export {
   MultiscaleImageLayer,
   ImageLayer,
-  ScaleBarLayer,
   XRLayer,
   XR3DLayer,
   OverviewLayer,
