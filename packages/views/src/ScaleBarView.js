@@ -34,7 +34,7 @@ export default class ScaleBarView extends VivView {
     unit = '',
     size = 1,
     position = 'bottom-right',
-    length = 0.085,
+    length = 0.05,
     snap = false,
     imageViewId = null
   }) {
