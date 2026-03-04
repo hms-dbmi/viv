@@ -30,7 +30,6 @@ test('DetailView layer type check', () => {
   });
   expect(layers[0] instanceof MultiscaleImageLayer).toBeTruthy();
   expect(layers[0].props.viewportId).toBe(view.id);
-  // Note: ScaleBarLayer is now rendered via ScaleBarView instead
 });
 
 test('DetailView renders only image layer', () => {
