@@ -99,7 +99,6 @@ export default class SideBySideView extends VivView {
   }
 
   getLayers({ props, viewStates }) {
-    const { loader } = props;
     const { id, viewportOutlineColor, viewportOutlineWidth, height, width } =
       this;
     const layerViewState = viewStates[id];

@@ -116,17 +116,15 @@ const PictureInPictureViewer = props => {
   const viewStates = [{ ...baseViewState, id: DETAIL_VIEW_ID }];
 
   // Add scale bar view if enabled and physical sizes are available
-  if (showScaleBar && loader?.[0]?.meta?.physicalSizes?.x) {
+  if (showScaleBar) {
     const scalebarViewState = viewStatesProp?.find(
       v => v.id === SCALEBAR_VIEW_ID
     ) || { ...baseViewState, id: SCALEBAR_VIEW_ID };
-    const { size, unit } = loader[0].meta.physicalSizes.x;
     const scaleBarView = new ScaleBarView({
       id: SCALEBAR_VIEW_ID,
       width,
       height,
-      unit,
-      size,
+      loader,
       position: scaleBarPosition,
       snap: snapScaleBar,
       imageViewId: DETAIL_VIEW_ID

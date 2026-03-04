@@ -27,19 +27,15 @@ export default class ScaleBarView extends VivView {
     id,
     width,
     height,
-    unit,
-    size,
-    x = 0,
-    y = 0,
+    loader,
+    imageViewId,
     position = 'bottom-right',
     length = 0.05,
     snap = false,
-    imageViewId = null
   }) {
-    super({ id, x, y, width, height });
+    super({ id, width, height });
     this.id = id;
-    this.unit = unit;
-    this.size = size;
+    this.loader = loader;
     this.position = position;
     this.length = length;
     this.snap = snap;
@@ -53,8 +49,8 @@ export default class ScaleBarView extends VivView {
       controller: false, // Disable interaction on scale bar view
       height,
       width,
-      x,
-      y
+      x: 0,
+      y: 0
     });
   }
 
@@ -73,31 +69,37 @@ export default class ScaleBarView extends VivView {
   }
 
   getLayers({ viewStates }) {
-    const {
-      id,
-      height,
-      width,
-      unit,
-      size,
-      position,
-      length,
-      snap,
-      imageViewId
-    } = this;
+    const {loader} = this;
+    const layers = [];
+    if (loader?.[0]?.meta?.physicalSizes?.x) {
+        const {
+          id,
+          height,
+          width,
+          position,
+          length,
+          snap,
+          imageViewId
+        } = this;
+        const { size, unit } = loader[0].meta.physicalSizes.x;
 
-    // Get the image view's viewState to calculate correct scale
-    const imageViewState = viewStates[imageViewId];
-    const layerId = getVivId(id);
-    return new ScaleBarLayer({
-      id: layerId,
-      unit,
-      size,
-      position,
-      imageViewState: { ...imageViewState, height, width },
-      length,
-      snap,
-      height,
-      width
-    });
+        // Get the image view's viewState to calculate correct scale
+        const imageViewState = viewStates[imageViewId];
+        const layerId = getVivId(id);
+        layers.push(new ScaleBarLayer({
+          id: layerId,
+          unit,
+          size,
+          position,
+          imageViewState: { ...imageViewState, height, width },
+          length,
+          snap,
+          height,
+          width
+        }));
+      }
+    console.log(layers)
+    return layers;
   }
+    
 }
