@@ -4,7 +4,6 @@ import { makeBoundingBox, range, sizeToMeters, snapValue } from './utils';
 
 import { DEFAULT_FONT_FAMILY } from '@vivjs/constants';
 
-
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
   imageViewState: {
@@ -50,15 +49,13 @@ const ScaleBarLayer = class extends CompositeLayer {
     } = this.props;
     // Get bounding box from the image view's imageViewState
     const boundingBox = makeBoundingBox(imageViewState);
-    console.log(boundingBox)
+    console.log(boundingBox);
     const viewLength = boundingBox[2][0] - boundingBox[0][0];
 
     // Bar length in image space: 5% of view width
     const barLength = viewLength * 0.05;
     // Scale to screen pixels: at zoom 1, 1 image pixel = 2 screen pixels, so multiply by 2^zoom
-    const barScreenLength = barLength * (2 ** imageViewState.zoom);
-
-
+    const barScreenLength = barLength * 2 ** imageViewState.zoom;
 
     // Bar height for tick marks (fixed screen pixels, not zoom-dependent)
     const barHeight = 10;
@@ -76,9 +73,9 @@ const ScaleBarLayer = class extends CompositeLayer {
       displayNumber = snappedNewUnits;
       displayUnit = `${snappedUnitPrefix}m`;
       // Adjust bar length based on snapped value
-      adjustedBarLength = (snappedOrigUnits / meterSize) * (2 ** imageViewState.zoom);
+      adjustedBarLength =
+        (snappedOrigUnits / meterSize) * 2 ** imageViewState.zoom;
     }
-    console.log(barLength, adjustedBarLength)
 
     // Position in screen space based on position parameter and length
     let xLeftCoord;
