@@ -13,10 +13,9 @@ export const SCALEBAR_VIEW_ID = 'scalebar';
  * @param {string} args.id id for this VivView (should be unique)
  * @param {number} args.width Width of the view on screen
  * @param {number} args.height Height of the view on screen
+ * @param {Array} args.loader Loader object
  * @param {number=} args.x X (top-left) location on screen. Default is 0.
  * @param {number=} args.y Y (top-left) location on screen. Default is 0.
- * @param {string=} args.unit Physical unit size per pixel at full resolution. Default is ''.
- * @param {number=} args.size Physical size of a pixel. Default is 1.
  * @param {string=} args.position Position within the view ('bottom-right', 'top-right', 'top-left', 'bottom-left'). Default is 'bottom-right'.
  * @param {number=} args.length Length of the scale bar as a fraction (0-1) of view dimension. Default is 0.085.
  * @param {boolean=} args.snap If true, aligns the scale bar value to predefined intervals. Default is false.
