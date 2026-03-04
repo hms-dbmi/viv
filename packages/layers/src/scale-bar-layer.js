@@ -63,17 +63,14 @@ const ScaleBarLayer = class extends CompositeLayer {
     // Bar height for tick marks (fixed screen pixels, not zoom-dependent)
     const barHeight = 10;
 
-    // Physical distance represented by the bar
-    const physicalDistance = barLength * size;
-
     // Calculate display values
-    let displayNumber = physicalDistance.toPrecision(5);
+    let displayNumber = (barLength * size).toPrecision(5);
     let displayUnit = unit;
     let adjustedBarLength = barScreenLength;
 
     if (snap) {
       const meterSize = sizeToMeters(size, unit);
-      const numUnits = physicalDistance * meterSize;
+      const numUnits = barLength * meterSize;
       const [snappedOrigUnits, snappedNewUnits, snappedUnitPrefix] =
         snapValue(numUnits);
       displayNumber = snappedNewUnits;
@@ -81,6 +78,7 @@ const ScaleBarLayer = class extends CompositeLayer {
       // Adjust bar length based on snapped value
       adjustedBarLength = (snappedOrigUnits / meterSize) * (2 ** imageViewState.zoom);
     }
+    console.log(barLength, adjustedBarLength)
 
     // Position in screen space based on position parameter and length
     let xLeftCoord;
