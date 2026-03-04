@@ -120,7 +120,7 @@ class XRLayer extends Layer {
     // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
     // -- this way of setting parameters is now deprecated and will be subject to further changes moving towards later luma.gl versions & WebGPU.
-    // TODO - review this before merging!
+    // TODO - keep this on the radar, figure out with deck/luma people what the preferred approach should be once this is removed.
     // this is still deprecated rather than removed, doesn't necessarily need urgent attention, but we should change if not difficult.
     // testing requires careful application of datasets for which it actually matters, checking what that means.
     // note, while it may seem wasteful to use more memory, there are probably good reasons for always having data nicely aligned.
@@ -300,6 +300,21 @@ class XRLayer extends Layer {
   }
 
   /**
+   * Track textures that were created during the current frame.
+   * These textures are used by `updateState` to bind same-frame textures
+   * and avoid referencing textures that may have been deleted when channels
+   * are removed and then added back.
+   *
+   * @param {Record<string, import('@luma.gl/core').Texture>|null} textures - Map of channel ids
+   *   (e.g. `channel0`, `channel1`) to textures created this frame, or null
+   *   when no channel textures were loaded.
+   * @private
+   */
+  _setNewTexturesFromLoadThisFrame(textures) {
+    this._newTexturesFromLoadThisFrame = textures;
+  }
+
+  /**
    * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadChannelTextures(channelData) {
@@ -328,10 +343,10 @@ class XRLayer extends Layer {
         if (!textures.channel0) throw new Error('Bad texture state!');
         if (!textures[key]) textures[key] = textures.channel0;
       }
-      this._newTexturesFromLoadThisFrame = textures;
+      this._setNewTexturesFromLoadThisFrame(textures);
       this.setState({ textures });
     } else {
-      this._newTexturesFromLoadThisFrame = null;
+      this._setNewTexturesFromLoadThisFrame(null);
     }
   }
 
