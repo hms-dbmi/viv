@@ -5,7 +5,10 @@ import { defaultArguments, generateViewTests } from './VivView.spec';
 
 const id = SCALEBAR_VIEW_ID;
 const loader = [
-  { meta: { physicalSizes:  {x: {size: 10, unit: 'nm'} }}, imageViewId: 'detail' },
+  {
+    meta: { physicalSizes: { x: { size: 10, unit: 'nm' } } },
+    imageViewId: 'detail'
+  }
 ];
 const scalebarViewArgs = { ...defaultArguments, loader };
 scalebarViewArgs.initialViewState = { ...defaultArguments.initialViewState };
