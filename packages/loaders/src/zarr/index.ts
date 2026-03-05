@@ -5,6 +5,9 @@ import { getRootPrefix } from './lib/utils';
 import { load as loadBioformats } from './bioformats-zarr';
 import { load as loadOme } from './ome-zarr';
 
+export { load as loadOmeZarrFromStore } from './ome-zarr';
+export type { RootAttrs } from './ome-zarr';
+
 interface ZarrOptions {
   fetchOptions: RequestInit;
 }
