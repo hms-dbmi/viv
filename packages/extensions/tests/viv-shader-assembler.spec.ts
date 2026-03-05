@@ -1,5 +1,4 @@
 import { ShaderAssembler, type ShaderModule } from '@luma.gl/shadertools';
-import { parse } from '@shaderfrog/glsl-parser';
 import {
   VIV_CHANNEL_INDEX_PLACEHOLDER,
   VIV_PLANE_INDEX_PLACEHOLDER
@@ -9,6 +8,7 @@ import {
   VivShaderAssembler,
   expandShaderModule
 } from '../src/viv-shader-assembler';
+import { wrapSnippet, assertValidGLSL } from './glsl-test-helpers';
 
 import channelIntensity3D from '../../layers/src/xr-3d-layer/shader-modules/channel-intensity-3d';
 import fragmentUniforms3D from '../../layers/src/xr-3d-layer/shader-modules/fragment-uniforms-3d';
@@ -21,8 +21,6 @@ import channelIntensity from '../../layers/src/xr-layer/shader-modules/channel-i
 const I = VIV_CHANNEL_INDEX_PLACEHOLDER;
 const P = VIV_PLANE_INDEX_PLACEHOLDER;
 
-const GLSL_PARSE_OPTIONS = { quiet: true };
-
 /**
  * Cast a loosely-typed module object to ShaderModule for use with expandShaderModule.
  * The real shader modules are JS files whose inferred types don't satisfy luma.gl's
@@ -31,32 +29,6 @@ const GLSL_PARSE_OPTIONS = { quiet: true };
 // biome-ignore lint/suspicious/noExplicitAny: test helper bridging JS module types to ShaderModule
 function asModule(m: any): ShaderModule {
   return m as ShaderModule;
-}
-
-/**
- * Wrap a GLSL snippet (uniform block, function defs) into a minimal
- * valid GLSL 300 es program so `@shaderfrog/glsl-parser` can parse it.
- */
-function wrapSnippet(snippet: string): string {
-  return `#version 300 es
-precision highp float;
-precision highp int;
-${snippet}
-void main() {}
-`;
-}
-
-/**
- * Parse GLSL and throw on syntax error. Returns the AST on success.
- */
-function assertValidGLSL(source: string, label?: string) {
-  try {
-    return parse(source, GLSL_PARSE_OPTIONS);
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : String(e);
-    const msg = label ? `GLSL parse failed (${label})` : 'GLSL parse failed';
-    throw new Error(`${msg}: ${message}\n---source---\n${source}`);
-  }
 }
 
 // ---------------------------------------------------------------------------
