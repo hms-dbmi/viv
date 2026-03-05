@@ -27,4 +27,3 @@ export function assertValidGLSL(source: string, label?: string) {
     throw new Error(`${msg}: ${message}\n---source---\n${source}`);
   }
 }
-

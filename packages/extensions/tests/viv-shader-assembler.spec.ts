@@ -8,7 +8,7 @@ import {
   VivShaderAssembler,
   expandShaderModule
 } from '../src/viv-shader-assembler';
-import { wrapSnippet, assertValidGLSL } from './glsl-test-helpers';
+import { assertValidGLSL, wrapSnippet } from './glsl-test-helpers';
 
 import channelIntensity3D from '../../layers/src/xr-3d-layer/shader-modules/channel-intensity-3d';
 import fragmentUniforms3D from '../../layers/src/xr-3d-layer/shader-modules/fragment-uniforms-3d';

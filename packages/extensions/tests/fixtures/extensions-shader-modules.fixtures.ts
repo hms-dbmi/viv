@@ -117,4 +117,3 @@ export const EXPECTED_LENS_INJECT_MAIN_END = `
       bool isFragOnLensBounds = frag_on_lens_bounds(vTexCoord);
       fragColor = (lensEnabled && isFragOnLensBounds) ? vec4(lensModule.lensBorderColor, 1.) : fragColor;
   `;
-
