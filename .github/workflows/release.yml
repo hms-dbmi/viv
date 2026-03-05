@@ -27,6 +27,7 @@ jobs:
       - run: npm install -g npm@latest
       - uses: pnpm/action-setup@v4
         with:
+          version: 9.5.0
           run_install: true
       - name: Create Release Pull Request or Publish to npm
         id: changesets
