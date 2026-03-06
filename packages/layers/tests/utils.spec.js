@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { range } from '../src/multiscale-image-layer/utils';
 import {
+  normalizeTextureBindings,
   padContrastLimits,
   padWithDefault,
   sizeToMeters,
@@ -27,13 +28,24 @@ describe('utils', () => {
 
   test('padContrastLimits test', () => {
     const expectedChannelOff = [
-      0, 5, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+      0, 5, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+      // added for MAX_CHANNELS = 10
+      255, 255, 255, 255, 255, 255, 255, 255
     ];
     const expected16Bit = [
       0,
       5,
       0,
       5,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      // added for MAX_CHANNELS = 10
       2 ** 16 - 1,
       2 ** 16 - 1,
       2 ** 16 - 1,
@@ -99,4 +111,67 @@ describe('utils', () => {
     expect(snapValue(2345.0)).toEqual([3000, 3, 'k']);
     expect(snapValue(999.0)).toEqual([1000, 1, 'k']);
   });
+});
+
+describe('normalizeTextureBindings', () => {
+  const tex0 = { id: 'tex0' };
+  const tex1 = { id: 'tex1' };
+  const tex2 = { id: 'tex2' };
+
+  test('returns null for empty textures with no keys', () => {
+    expect(normalizeTextureBindings({}, 3)).toBeNull();
+  });
+
+  test('returns textures unchanged when key count matches required', () => {
+    const textures = { channel0: tex0, channel1: tex1 };
+    const result = normalizeTextureBindings(textures, 2);
+    expect(result).toBe(textures);
+  });
+
+  test('pads with first texture when fewer textures than required', () => {
+    const textures = { channel0: tex0 };
+    const result = normalizeTextureBindings(textures, 3);
+    expect(Object.keys(result)).toHaveLength(3);
+    expect(result.channel0).toBe(tex0);
+    expect(result.channel1).toBe(tex0);
+    expect(result.channel2).toBe(tex0);
+  });
+
+  test('trims to subset when more textures than required', () => {
+    const textures = { channel0: tex0, channel1: tex1, channel2: tex2 };
+    const result = normalizeTextureBindings(textures, 2);
+    expect(Object.keys(result)).toHaveLength(2);
+    expect(result.channel0).toBe(tex0);
+    expect(result.channel1).toBe(tex1);
+    expect(result.channel2).toBeUndefined();
+  });
+
+  test('works with custom keyPrefix', () => {
+    const textures = { volume0: tex0 };
+    const result = normalizeTextureBindings(textures, 3, 'volume');
+    expect(result.volume0).toBe(tex0);
+    expect(result.volume1).toBe(tex0);
+    expect(result.volume2).toBe(tex0);
+  });
+
+  test('does not pad missing keys that already exist', () => {
+    const textures = { channel0: tex0, channel1: tex1 };
+    const result = normalizeTextureBindings(textures, 4);
+    expect(result.channel0).toBe(tex0);
+    expect(result.channel1).toBe(tex1);
+    expect(result.channel2).toBe(tex0);
+    expect(result.channel3).toBe(tex0);
+  });
+
+  test('returns null when zero channels required', () => {
+    expect(normalizeTextureBindings({ channel0: tex0 }, 0)).toBeNull();
+  });
+
+  test('returns null when zero channels required and textures empty', () => {
+    expect(normalizeTextureBindings({}, 0)).toBeNull();
+  });
+
+  // Future: once deck.gl layer lifecycle tests work, add integration tests
+  // verifying that XRLayer/XR3DLayer skip model creation when numChannels === 0
+  // (i.e. when selections is []).
 });

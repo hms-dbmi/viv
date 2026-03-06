@@ -19,6 +19,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
+        with:
+          version: 9.5.0
       - run: |
           pnpm install
           pnpm --filter=avivator build
@@ -36,5 +38,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
+          version: 9.5.0
           run_install: true
       - run: pnpm test

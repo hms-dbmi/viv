@@ -28,25 +28,29 @@ More information about that is detailed in the comments there.
 */
 import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
-import { ShaderAssembler } from '@luma.gl/shadertools';
 import { Matrix4 } from '@math.gl/core';
 import { Plane } from '@math.gl/culling';
 
 import fs from './xr-3d-layer-fragment.glsl';
 import vs from './xr-3d-layer-vertex.glsl';
 
-import { ColorPalette3DExtensions } from '@vivjs/extensions';
-import { getDtypeValues, padContrastLimits, padWithDefault } from '../utils';
-
-const channelsModule = {
-  name: 'channel-intensity-module',
-  fs: `\
-    float apply_contrast_limits(float intensity, vec2 contrastLimits) {
-      float contrastLimitsAppliedToIntensity = (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0]));
-      return max(0., contrastLimitsAppliedToIntensity);
-    }
-  `
-};
+import { MAX_CHANNELS } from '@vivjs/constants';
+import {
+  ColorPalette3DExtensions,
+  VivShaderAssembler,
+  expandShaderModule,
+  getDefaultPalette,
+  padColorsForUBO
+} from '@vivjs/extensions';
+import {
+  getDtypeValues,
+  normalizeTextureBindings,
+  padContrastLimits,
+  padWithDefault
+} from '../utils';
+import channelIntensity3D from './shader-modules/channel-intensity-3d';
+import fragmentUniforms3D from './shader-modules/fragment-uniforms-3d';
+import vertexUniforms3D from './shader-modules/vertex-uniforms-3d';
 
 // biome-ignore format: Avoid reformatting to keep the rows clear
 const CUBE_STRIP = [
@@ -72,6 +76,7 @@ const defaultProps = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: 'object', value: {}, compare: true },
   contrastLimits: { type: 'array', value: [], compare: true },
+  colors: { type: 'array', value: null, compare: true },
   dtype: { type: 'string', value: 'Uint8', compare: true },
   xSlice: { type: 'array', value: null, compare: true },
   ySlice: { type: 'array', value: null, compare: true },
@@ -98,7 +103,11 @@ function getRenderingAttrs() {
 function getRenderingFromExtensions(extensions) {
   let rendering = {};
   extensions.forEach(extension => {
-    rendering = extension.rendering;
+    // it was just setting rendering to whichever the final extension was
+    // so the error message "requires at least one extension to define opts.rendering" is dubious.
+    // kinda fixing things that weren't broken potentially...
+    // also not entirely sure about this random extension.rendering property that isn't very standard deck.gl
+    if (extension.rendering._RENDER) rendering = extension.rendering;
   });
   if (!rendering._RENDER) {
     throw new Error(
@@ -129,6 +138,27 @@ function getRenderingFromExtensions(extensions) {
  * @ignore
  */
 const XR3DLayer = class extends Layer {
+  /**
+   * Returns the number of channels for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumChannels() {
+    return (
+      this.props.selections?.length ??
+      this.props.channels?.length ??
+      MAX_CHANNELS
+    );
+  }
+
+  /**
+   * Returns the number of planes for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumPlanes() {
+    const { clippingPlanes } = this.props;
+    return clippingPlanes?.length || NUM_PLANES_DEFAULT;
+  }
+
   initializeState() {
     const { device } = this.context;
     // This tells WebGL how to read row data from the texture.  For example, the default here is 4 (i.e for RGBA, one byte per channel) so
@@ -139,18 +169,13 @@ const XR3DLayer = class extends Layer {
       [GL.UNPACK_ALIGNMENT]: 1,
       [GL.PACK_ALIGNMENT]: 1
     });
-    const programManager = ShaderAssembler.getDefaultShaderAssembler();
-    const processStr =
-      'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
-    if (!programManager._hookFunctions.includes(processStr)) {
-      programManager.addShaderHook(processStr);
-    }
   }
 
   _isHookDefinedByExtensions(hookName) {
     const { extensions } = this.props;
     return extensions?.some(e => {
-      const shaders = e.getShaders();
+      // this is a bit of an odd pattern - but it's idiomatic for deck.gl, when in Rome...
+      const shaders = e.getShaders.call(this, e);
       if (shaders) {
         const { inject = {}, modules = [] } = shaders;
         const definesInjection = inject[hookName];
@@ -165,30 +190,59 @@ const XR3DLayer = class extends Layer {
    * This function compiles the shaders and the projection module.
    */
   getShaders() {
-    const { clippingPlanes, extensions } = this.props;
+    const { extensions } = this.props;
     const { sampler } = getRenderingAttrs();
     const { _BEFORE_RENDER, _RENDER, _AFTER_RENDER } =
       getRenderingFromExtensions(extensions);
     const extensionDefinesDeckglProcessIntensity =
       this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
-    const newChannelsModule = { inject: {}, ...channelsModule };
+
+    // Get actual channel/plane counts from layer
+    const numChannels = this.getNumChannels();
+    const numPlanes = this.getNumPlanes();
+    // if we made expandShaderModule recursively handle modules,
+    // we probably don't need all this... indeed, we might not even need VivLayerExtension???
+    const expandedChannelIntensity = expandShaderModule(
+      channelIntensity3D,
+      numChannels,
+      numPlanes
+    );
+    const expandedFragmentUniforms = expandShaderModule(
+      fragmentUniforms3D,
+      numChannels,
+      numPlanes
+    );
+    const expandedVertexUniforms = expandShaderModule(
+      vertexUniforms3D,
+      numChannels,
+      numPlanes
+    );
+
+    const newChannelsModule = { inject: {}, ...expandedChannelIntensity };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
         intensity = apply_contrast_limits(intensity, contrastLimits);
       `;
     }
-    return super.getShaders({
-      vs,
-      fs: fs
-        .replace('_BEFORE_RENDER', _BEFORE_RENDER)
-        .replace('_RENDER', _RENDER)
-        .replace('_AFTER_RENDER', _AFTER_RENDER),
-      defines: {
-        SAMPLER_TYPE: sampler,
-        NUM_PLANES: String(clippingPlanes.length || NUM_PLANES_DEFAULT)
-      },
-      modules: [newChannelsModule]
-    });
+    return expandShaderModule(
+      super.getShaders({
+        vs,
+        fs: fs
+          .replace('_BEFORE_RENDER', _BEFORE_RENDER)
+          .replace('_RENDER', _RENDER)
+          .replace('_AFTER_RENDER', _AFTER_RENDER),
+        defines: {
+          SAMPLER_TYPE: sampler
+        },
+        modules: [
+          newChannelsModule,
+          expandedFragmentUniforms,
+          expandedVertexUniforms
+        ]
+      }),
+      numChannels,
+      numPlanes
+    );
   }
 
   /**
@@ -207,12 +261,24 @@ const XR3DLayer = class extends Layer {
    * and loading any textures that need be loading.
    */
   updateState({ props, oldProps, changeFlags }) {
+    const numChannels = this.getNumChannels();
+    if (numChannels === 0) {
+      if (this.state.model) {
+        this.state.model.destroy();
+        this.setState({ model: null });
+      }
+      return;
+    }
+
     // setup model first
+    const channelCountChanged =
+      (props.selections?.length ?? 0) !== (oldProps?.selections?.length ?? 0);
     if (
       changeFlags.extensionsChanged ||
       props.colormap !== oldProps.colormap ||
       props.renderingMode !== oldProps.renderingMode ||
-      props.clippingPlanes.length !== oldProps.clippingPlanes.length
+      props.clippingPlanes.length !== oldProps.clippingPlanes.length ||
+      channelCountChanged
     ) {
       const { device } = this.context;
       if (this.state.model) {
@@ -242,31 +308,41 @@ const XR3DLayer = class extends Layer {
         attributes: {
           positions: new Float32Array(CUBE_STRIP)
         }
-      })
+      }),
+      shaderAssembler: VivShaderAssembler.getDefaultVivShaderAssembler()
     });
   }
 
   /**
    * This function runs the shaders and draws to the canvas
    */
-  draw(opts) {
-    const { uniforms } = opts;
-    const { textures, model, scaleMatrix } = this.state;
-    const {
-      contrastLimits,
-      xSlice,
-      ySlice,
-      zSlice,
-      modelMatrix,
-      channelsVisible,
-      domain,
-      dtype,
-      clippingPlanes,
-      resolutionMatrix
-    } = this.props;
-    const { viewMatrix, viewMatrixInverse, projectionMatrix } =
-      this.context.viewport;
-    if (textures && model && scaleMatrix) {
+  draw() {
+    const { model, scaleMatrix } = this.state;
+    const texturesToBind =
+      this._newTexturesFromLoadThisFrame ?? this.state.textures;
+    const numChannels = this.getNumChannels();
+    const bindings =
+      texturesToBind && model && scaleMatrix
+        ? normalizeTextureBindings(texturesToBind, numChannels, 'volume')
+        : null;
+
+    if (bindings && model && scaleMatrix) {
+      const {
+        contrastLimits,
+        colors,
+        xSlice,
+        ySlice,
+        zSlice,
+        modelMatrix,
+        channelsVisible,
+        domain,
+        dtype,
+        clippingPlanes,
+        resolutionMatrix,
+        selections
+      } = this.props;
+      const { viewMatrix, viewMatrixInverse, projectionMatrix } =
+        this.context.viewport;
       const paddedContrastLimits = padContrastLimits({
         contrastLimits,
         channelsVisible,
@@ -285,45 +361,88 @@ const XR3DLayer = class extends Layer {
         new Plane([1, 0, 0]),
         clippingPlanes.length || NUM_PLANES_DEFAULT
       );
-      // Need to flatten for shaders.
       const normals = paddedClippingPlanes.flatMap(plane => plane.normal);
       const distances = paddedClippingPlanes.map(plane => plane.distance);
 
-      model.setUniforms(
-        {
-          ...uniforms,
-          contrastLimits: paddedContrastLimits,
-          xSlice: new Float32Array(
-            xSlice
-              ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])
-              : [0, 1]
-          ),
-          ySlice: new Float32Array(
-            ySlice
-              ? ySlice.map(i => i / scaleMatrix[5] / resolutionMatrix[5])
-              : [0, 1]
-          ),
-          zSlice: new Float32Array(
-            zSlice
-              ? zSlice.map(i => i / scaleMatrix[10] / resolutionMatrix[10])
-              : [0, 1]
-          ),
-          eye_pos: new Float32Array([
-            viewMatrixInverse[12],
-            viewMatrixInverse[13],
-            viewMatrixInverse[14]
-          ]),
-          view: viewMatrix,
-          proj: projectionMatrix,
-          scale: scaleMatrix,
-          resolution: resolutionMatrix,
-          model: modelMatrix || new Matrix4(),
-          normals,
-          distances
-        },
-        { disableWanings: false }
+      const numPlanes = clippingPlanes.length || NUM_PLANES_DEFAULT;
+
+      // Get number of actual channels from textures
+      const numTextures = Object.values(bindings).filter(t => t).length;
+      const numChannelsForColors = Math.max(
+        numTextures,
+        selections?.length || 0,
+        1
       );
-      model.setBindings(textures);
+
+      const paddedColors = padColorsForUBO({
+        channelsVisible:
+          channelsVisible || Array(numChannelsForColors).fill(true),
+        colors: colors || getDefaultPalette(numChannelsForColors)
+      });
+
+      // Build per-channel contrast limits for UBO
+      const channelIntensity3DUniforms = {};
+      for (let i = 0; i < numChannels; i++) {
+        channelIntensity3DUniforms[`contrastLimits${i}`] = [
+          paddedContrastLimits[i * 2],
+          paddedContrastLimits[i * 2 + 1]
+        ];
+      }
+
+      // Build fragment uniforms for UBO
+      const fragmentUniforms3DUniforms = {
+        xSlice: xSlice
+          ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])
+          : [0, 1],
+        ySlice: ySlice
+          ? ySlice.map(i => i / scaleMatrix[5] / resolutionMatrix[5])
+          : [0, 1],
+        zSlice: zSlice
+          ? zSlice.map(i => i / scaleMatrix[10] / resolutionMatrix[10])
+          : [0, 1],
+        scale: scaleMatrix
+      };
+
+      // Add per-channel colors - ensure we always have valid arrays
+      for (let i = 0; i < numChannels; i++) {
+        fragmentUniforms3DUniforms[`color${i}`] = paddedColors[i] || [0, 0, 0];
+      }
+
+      // Add per-plane normals and distances
+      for (let i = 0; i < numPlanes; i++) {
+        fragmentUniforms3DUniforms[`normal${i}`] = [
+          normals[i * 3],
+          normals[i * 3 + 1],
+          normals[i * 3 + 2]
+        ];
+        fragmentUniforms3DUniforms[`distance${i}`] = distances[i];
+      }
+
+      // Build vertex uniforms for UBO
+      const vertexUniformsData = {
+        eye_pos: [
+          viewMatrixInverse[12],
+          viewMatrixInverse[13],
+          viewMatrixInverse[14]
+        ],
+        proj: projectionMatrix,
+        model: modelMatrix || new Matrix4(),
+        view: viewMatrix,
+        scale: scaleMatrix,
+        resolution: resolutionMatrix
+      };
+
+      // Set UBO uniforms via shaderInputs
+      // Keys must match module names: 'channelIntensity3D', 'fragmentUniforms3D', 'vertex'
+      model.shaderInputs.setProps({
+        channelIntensity3D: channelIntensity3DUniforms,
+        fragmentUniforms3D: fragmentUniforms3DUniforms,
+        vertex: vertexUniformsData
+      });
+
+      // All uniforms are now in UBOs - model.setUniforms is deprecated and will be removed
+      // Textures are still set via setBindings
+      model.setBindings(bindings);
       model.draw(this.context.renderPass);
     }
   }
@@ -332,14 +451,11 @@ const XR3DLayer = class extends Layer {
    * This function loads all textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadTexture(channelData) {
-    const textures = {
-      volume0: null,
-      volume1: null,
-      volume2: null,
-      volume3: null,
-      volume4: null,
-      volume5: null
-    };
+    const numChannels = this.getNumChannels();
+    const textures = {};
+    for (let i = 0; i < numChannels; i++) {
+      textures[`volume${i}`] = null;
+    }
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex?.delete());
     }
@@ -357,6 +473,7 @@ const XR3DLayer = class extends Layer {
         if (!textures.volume0) throw new Error('Bad texture state!');
         if (!textures[key]) textures[key] = textures.volume0;
       }
+      this._newTexturesFromLoadThisFrame = textures;
       this.setState({
         textures,
         scaleMatrix: new Matrix4().scale(
@@ -367,6 +484,8 @@ const XR3DLayer = class extends Layer {
           ])
         )
       });
+    } else {
+      this._newTexturesFromLoadThisFrame = null;
     }
   }
 
