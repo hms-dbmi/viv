@@ -2,14 +2,15 @@
 
 > **WARNING - Breaking Changes**: If you have custom extensions, see the [Migration Guide](#migration-guide) below for important changes to support dynamic channel counts and deck.gl v9 UBO.
 
-Viv's shaders in 2D can be modified via [deck.gl shader hooks](https://deck.gl/docs/developer-guide/custom-layers/writing-shaders#standard-shader-hooks). The `LensExtension`, `AdditiveColormapExtension`, and `ColorPaletteExtension` (default) in Viv [implement shader hooks](https://github.com/hms-dbmi/viv/tree/main/src/extensions). In Viv you typically extend `VivLayerExtension` from `@vivjs/extensions` (a thin wrapper around deck.gl's `LayerExtension`) and return shader modules that inject into one of the following hooks.
+Viv's shaders in 2D can be modified via [deck.gl shader hooks](https://deck.gl/docs/developer-guide/custom-layers/writing-shaders#standard-shader-hooks). The `LensExtension`, `AdditiveColormapExtension`, and `ColorPaletteExtension` (default) in Viv [implement shader hooks](https://github.com/hms-dbmi/viv/tree/main/src/extensions). In Viv you should extend `VivLayerExtension` from `@vivjs/extensions` (a thin wrapper around deck.gl's `LayerExtension`) and return shader modules that inject into one of the following hooks.
 
 #### Viv shader extensions (`VivLayerExtension`)
 
-Custom shader behavior in Viv is implemented by subclassing `VivLayerExtension` and implementing `getVivShaderTemplates()`:
+Custom shader behavior in Viv is implemented by subclassing `VivLayerExtension` and implementing `getVivShaderTemplates()`, which will be internally called `getShader()`:
 
 ```js
 import { VivLayerExtension } from '@vivjs/extensions';
+import { VIV_CHANNEL_INDEX_PLACEHOLDER as I } from '@vivjs/constants';
 
 class MyExtension extends VivLayerExtension {
   getVivShaderTemplates() {
@@ -23,12 +24,15 @@ class MyExtension extends VivLayerExtension {
       model.shaderInputs.setProps({
         myUniformBlock: {
           // per-channel uniforms, e.g. color0..color{numChannels-1}
+          [`color${I}`]: 'vec3<f32>'
         }
       });
     }
   }
 }
 ```
+
+It is important not to override the `getShaders()` method directly, as has been designed to ensure that when deck.gl calls it, the appropriate 'expanded' version will be returned for the given layer.
 
 Each module can contribute GLSL via its `fs` / `vs` fields and an `inject` map keyed by hook names such as `'fs:DECKGL_MUTATE_COLOR'` or `'fs:DECKGL_PROCESS_INTENSITY'`.
 
@@ -93,6 +97,9 @@ const shaderModule = {
       // Direct access to individual parameters
       float maxIntensity = max(intensity0, intensity1);
       maxIntensity = max(maxIntensity, intensity2);
+      maxIntensity = max(maxIntensity, intensity3);
+      maxIntensity = max(maxIntensity, intensity4);
+      maxIntensity = max(maxIntensity, intensity5);
       rgba = vec4(vec3(maxIntensity), 1.0);
     `
   }
@@ -113,8 +120,8 @@ const shaderModule = {
   }
 };
 
-// In your extension's getShaders() method:
-getShaders() {
+// Instead of using getShaders, tend to use getVivShaderTemplates
+getVivShaderTemplates() {
   return {
     modules: [shaderModule]
   };
@@ -127,7 +134,7 @@ Viv is migrating to deck.gl v9.2+ which requires Uniform Buffer Objects (UBO) in
 
 **The Challenge:**
 
-Unfortunately, luma.gl's UBO system does not, as of this writing, support arrays in uniform declarations. This means:
+Unfortunately, luma.gl's uniform type system does not, as of this writing, support arrays in uniform declarations. This means we:
 - Cannot use: `uniform vec3 colors[NUM_CHANNELS];`
 - Must use: `uniform vec3 color0; uniform vec3 color1; uniform vec3 color2;` etc.
 
@@ -137,17 +144,25 @@ Combined with Viv's dynamic `NUM_CHANNELS`, this creates a problem: you cannot h
 
 Viv's shader tooling expands per-channel uniforms for you. In your template modules (returned from `getVivShaderTemplates()` on a `VivLayerExtension`), use `uniformTypes` together with `VIV_CHANNEL_INDEX_PLACEHOLDER` and wrap uniforms in a named UBO; Viv will expand `color${I}` into `color0`, `color1`, ... at runtime.
 
-**Old style (global uniforms):**
+**Old style (global uniforms, 6 separate intensity float arguments):**
 
 ```js
 const shaderModule = {
   name: 'my-custom-extension',
   fs: `
     uniform float opacity;
+    uniform vec3 color[6];
   `,
   inject: {
     'fs:DECKGL_MUTATE_COLOR': `
-      rgba = vec4(rgba.rgb, opacity);
+      vec3 result = vec3(0.0);
+      result += intensity0 * color[0];
+      result += intensity1 * color[1];
+      result += intensity2 * color[2];
+      result += intensity3 * color[3];
+      result += intensity4 * color[4];
+      result += intensity5 * color[5];
+      rgba = vec4(result, opacity);
     `
   }
 };
@@ -167,12 +182,15 @@ const shaderModule = {
   fs: `
     uniform myCustomExtensionUniforms {
       float opacity;
+      // we'd like to declare this as 'vec3 color[NUM_CHANNELS];'
+      // but the current luma.gl implementation won't allow that
       vec3 color${I};
     } myCustomExtension;
   `,
   inject: {
     'fs:DECKGL_MUTATE_COLOR': `
       vec3 color = vec3(0.0);
+      // making a local array allows us to loop later
       vec3 channelColor[NUM_CHANNELS] = vec3[NUM_CHANNELS](
         myCustomExtension.color${I},
       );
@@ -206,8 +224,6 @@ When using Viv layers together with `VivLayerExtension`:
 - **Extensions** (subclasses of `VivLayerExtension`) provide shader *templates* via `getVivShaderTemplates()`, using placeholders in `uniformTypes` and shader code.
 - `VivLayerExtension.getShaders()` is called with `this` bound to the layer; it reads `this.getNumChannels()` / `this.getNumPlanes()` and expands all modules using `expandShaderModule()`, so your shaders see concrete `color0`, `color1`, ..., plus `NUM_CHANNELS` / `NUM_PLANES` defines.
 - Extension methods like `updateState` or `draw` are also invoked with `this` as the layer; use `this.getNumChannels()` (or a layer prop such as `this.props.numChannels` if you set one) to know how many per-channel uniforms to provide, and populate `model.shaderInputs.setProps` with **only** the keys that match the expanded uniforms (e.g. `color0..color{N-1}`) to avoid \"uniform value not present\" warnings.
-
-**Note:** Channel expansion is required for per-channel uniforms in UBO blocks, as arrays are not supported in UBO uniform declarations in deck.gl/luma.gl. See the "Uniform Buffer Objects (UBO) Migration" section above for examples.
 
 #### How It Works
 
