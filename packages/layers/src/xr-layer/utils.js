@@ -24,10 +24,7 @@ export function getRenderingAttrs(
   const values = getDtypeValues(isLinear ? 'Float32' : dtype);
   return {
     // maybe we should do this in XRLayer instead
-    shaderModule: expandShaderModule(
-      { ...coreShaderModule },
-      numChannels
-    ),
+    shaderModule: expandShaderModule({ ...coreShaderModule }, numChannels),
     filter: interpolation,
     cast: isLinear ? data => new Float32Array(data) : data => data,
     ...values
