@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import type { ShaderModule } from '@luma.gl/shadertools';
 
 import {
   EXPECTED_COLOR_PALETTE_FS_3_CHANNELS,
@@ -20,12 +21,8 @@ import {
 } from '../src/viv-shader-assembler';
 import { assertValidGLSL, wrapSnippet } from './glsl-test-helpers';
 
-// Minimal stub implementation of VivLayer, sufficient for getShaders tests.
-class StubVivLayer
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error VivLayer extends deck.gl Layer, which we don't need at runtime here
-  implements VivLayer
-{
+// Minimal stub "layer-like" class, sufficient for getShaders tests.
+class StubVivLayer {
   constructor(
     private readonly numChannels: number,
     private readonly numPlanes: number
@@ -38,6 +35,11 @@ class StubVivLayer
   getNumPlanes(): number {
     return this.numPlanes;
   }
+}
+
+// return stub cast to VivLayer to satisfy TS
+function getStubVivLayer(channels=3, planes=1) {
+  return new StubVivLayer(channels, planes) as unknown as VivLayer;
 }
 
 describe('color-palette shader module expansion', () => {
@@ -115,7 +117,7 @@ describe('additive colormap extension (2D)', () => {
   test('colormap module has expected uniforms and structure', () => {
     const ext = new AdditiveColormapExtension();
     // VivLayerExtension.getShaders is called as extension.getShaders.call(layer, extension)
-    const layer = new StubVivLayer(3, 1);
+    const layer = getStubVivLayer();
     const getShaders = VivLayerExtension.prototype.getShaders as (
       this: VivLayer,
       extension: VivLayerExtension
@@ -144,7 +146,7 @@ describe('additive colormap extension (2D)', () => {
 describe('3D extensions', () => {
   test('additive colormap 3D base produces valid GLSL for viridis', () => {
     const ext = new AdditiveColormap3DBaseExtension();
-    const layer = new StubVivLayer(3, 1);
+    const layer = getStubVivLayer();
     const getShaders = VivLayerExtension.prototype.getShaders as (
       this: VivLayer,
       extension: VivLayerExtension
@@ -161,7 +163,7 @@ describe('3D extensions', () => {
 
   test('color palette 3D base cooperates with expandShaderModule', () => {
     const ext = new ColorPalette3DBaseExtension();
-    const layer = new StubVivLayer(3, 2);
+    const layer = new StubVivLayer(3, 2) as unknown as VivLayer;
     const getShaders = VivLayerExtension.prototype.getShaders as (
       this: VivLayer,
       extension: VivLayerExtension
@@ -176,7 +178,7 @@ describe('3D extensions', () => {
 
 describe('VivLayerExtension integration sanity checks', () => {
   test.skip('ColorPaletteExtension getShaders returns expanded module with defines', () => {
-    const layer = new StubVivLayer(3, 1);
+    const layer = getStubVivLayer();
     const ext =
       new (require('../src/color-palette-extension/color-palette-extension').default)();
 
@@ -198,7 +200,7 @@ describe('VivLayerExtension integration sanity checks', () => {
   });
 
   test.skip('LensExtension getShaders returns expanded module with defines', () => {
-    const layer = new StubVivLayer(3, 1);
+    const layer = getStubVivLayer();
     const ext = new (require('../src/lens-extension/lens-extension').default)();
 
     const getShaders = VivLayerExtension.prototype.getShaders as (
