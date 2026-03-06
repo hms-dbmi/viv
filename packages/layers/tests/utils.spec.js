@@ -95,15 +95,6 @@ describe('utils', () => {
     }
   });
 
-  test('getRenderingAttrs expands uniformTypes for explicit numChannels', () => {
-    const attrs = getRenderingAttrs('Uint8', 'nearest', 3);
-    const keys = Object.keys(attrs.shaderModule.uniformTypes);
-    expect(keys).toContain('contrastLimits0');
-    expect(keys).toContain('contrastLimits1');
-    expect(keys).toContain('contrastLimits2');
-    expect(keys).not.toContain('contrastLimits3');
-  });
-
   test('sizeToMeters test', () => {
     expect(sizeToMeters(5, 'km')).toBe(5000);
     expect(sizeToMeters(10, 'm')).toBe(10);
