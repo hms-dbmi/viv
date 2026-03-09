@@ -1,5 +1,5 @@
 import { Matrix4 } from '@math.gl/core';
-import { Pool, fromBlob, fromUrl } from 'geotiff';
+import { fromBlob, fromUrl } from 'geotiff';
 import { useEffect, useState } from 'react';
 
 import {
@@ -178,7 +178,8 @@ export async function createLoader(
       if (urlOrFile instanceof File) {
         const source = await loadOmeTiff(urlOrFile, {
           images: 'all',
-          pool: new Pool()
+          // Reference: https://github.com/hms-dbmi/viv/issues/949
+          pool: false
         });
         return source;
       }
@@ -188,7 +189,8 @@ export async function createLoader(
       const source = await loadOmeTiff(urlOrFile, {
         offsets: maybeOffsets,
         images: 'all',
-        pool: new Pool()
+        // Reference: https://github.com/hms-dbmi/viv/issues/949
+        pool: false
       });
 
       // Show a warning if the total number of channels/images exceeds a fixed amount.
