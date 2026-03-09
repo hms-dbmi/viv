@@ -178,7 +178,8 @@ export async function createLoader(
       if (urlOrFile instanceof File) {
         const source = await loadOmeTiff(urlOrFile, {
           images: 'all',
-          pool: new Pool()
+          // 2026-03-09 pool was causing out-of-memory crashes
+          pool: false // new Pool()
         });
         return source;
       }
@@ -188,7 +189,8 @@ export async function createLoader(
       const source = await loadOmeTiff(urlOrFile, {
         offsets: maybeOffsets,
         images: 'all',
-        pool: new Pool()
+        // 2026-03-09 pool was causing out-of-memory crashes
+        pool: false //new Pool()
       });
 
       // Show a warning if the total number of channels/images exceeds a fixed amount.
@@ -216,6 +218,7 @@ export async function createLoader(
       const mutiTiffSources = await generateMultiTiffSources(urlOrFile);
       const source = await loadMultiTiff(mutiTiffSources, {
         images: 'all',
+        // would pool be wanted here if it was working again?
         pool: false
       });
       return source;
