@@ -17,8 +17,8 @@ class MyExtension extends VivLayerExtension {
     return { modules: [myShaderModule] };
   }
 
-  updateState({ props, oldProps, changeFlags }) {
-    super.updateState({ props, oldProps, changeFlags });
+  updateState({ props, ...rest }) {
+    super.updateState({ props, ...rest });
     const numChannels = this.getNumChannels();
     const myUniformBlock = {};
     for (let i=0; i < numChannels; i++) {
