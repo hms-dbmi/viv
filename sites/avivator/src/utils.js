@@ -179,7 +179,7 @@ export async function createLoader(
         const source = await loadOmeTiff(urlOrFile, {
           images: 'all',
           // Reference: https://github.com/hms-dbmi/viv/issues/949
-          pool: false,
+          pool: false
         });
         return source;
       }
@@ -190,7 +190,7 @@ export async function createLoader(
         offsets: maybeOffsets,
         images: 'all',
         // Reference: https://github.com/hms-dbmi/viv/issues/949
-        pool: false,
+        pool: false
       });
 
       // Show a warning if the total number of channels/images exceeds a fixed amount.
