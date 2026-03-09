@@ -81,6 +81,28 @@ const getTransparentColor = photometricInterpretation => {
   }
 };
 
+/**
+ * Prepare an `image` object for GPU usage.
+ * - Validates that `data`, `width`, and `height` are present.
+ * - If the data length indicates RGB (\(width * height * 3\)), returns a clone
+ *   with an added opaque alpha channel.
+ * - Otherwise returns a shallow clone with the original data.
+ * - Returns null when the input is not usable.
+ *
+ * @param {{ data?: Uint8Array, width?: number, height?: number, format?: string } | null | undefined} img
+ * @returns {{ data: Uint8Array, width: number, height: number, format?: string } | null}
+ */
+const getPreparedImage = img => {
+  if (!img?.data || !img.width || !img.height) {
+    return null;
+  }
+  const data =
+    img.data && img.data.length === img.width * img.height * 3
+      ? addAlpha(img.data)
+      : img.data;
+  return { ...img, data };
+};
+
 class BitmapLayerWrapper extends BaseBitmapLayer {
   _getModel(gl) {
     const { photometricInterpretation, transparentColorInHook } = this.props;
@@ -138,9 +160,10 @@ const BitmapLayer = class extends CompositeLayer {
     super.initializeState(args);
   }
 
-  updateState({ props, oldProps }) {
-    const img = props.image;
-    if (!img?.data || !img.width || !img.height) {
+  updateState({ props, oldProps, ...rest }) {
+    super.updateState({ props, oldProps, ...rest });
+    const img = getPreparedImage(props.image);
+    if (!img) {
       if (this.state.bitmapTexture) {
         this.state.bitmapTexture.delete();
         this.setState({ bitmapTexture: null });
@@ -153,15 +176,11 @@ const BitmapLayer = class extends CompositeLayer {
     if (this.state.bitmapTexture) {
       this.state.bitmapTexture.delete();
     }
-    const dataRef =
-      img.data && img.data.length === img.width * img.height * 3
-        ? addAlpha(img.data)
-        : img.data;
     const texture = this.context.device.createTexture({
       width: img.width,
       height: img.height,
       dimension: '2d',
-      data: dataRef,
+      data: img.data,
       mipmaps: false,
       format: img.format || 'rgba8unorm',
       sampler: {
@@ -179,6 +198,7 @@ const BitmapLayer = class extends CompositeLayer {
       this.state.bitmapTexture.delete();
       this.setState({ bitmapTexture: null });
     }
+    super.finalizeState();
   }
 
   renderLayers() {
@@ -187,11 +207,8 @@ const BitmapLayer = class extends CompositeLayer {
       transparentColor: transparentColorInHook
     } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
-    const image = this.state.bitmapTexture || this.props.image;
+    const image = this.state.bitmapTexture || getPreparedImage(this.props.image);
     if (!image) return null;
-    if (!this.state.bitmapTexture && this.props.image?.data) {
-      this.props.image.data = addAlpha(this.props.image.data);
-    }
     return new BitmapLayerWrapper(
       { ...this.props, image },
       {
