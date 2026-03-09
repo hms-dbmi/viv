@@ -9,8 +9,8 @@
   "license": "MIT",
   "homepage": "https://github.com/hms-dbmi/viv#readme",
   "type": "module",
-  "main": "src/index.js",
-  "types": "src/index.js",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "publishConfig": {
     "main": "dist/index.mjs",
     "types": "dist/index.d.ts",
