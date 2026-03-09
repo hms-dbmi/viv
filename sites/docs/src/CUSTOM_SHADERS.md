@@ -20,12 +20,13 @@ class MyExtension extends VivLayerExtension {
   updateState({ props, oldProps, changeFlags }) {
     super.updateState({ props, oldProps, changeFlags });
     const numChannels = this.getNumChannels();
+    const myUniformBlock = {};
+    for (let i=0; i < numChannels; i++) {
+      myUniformBlock[`color${i}`] = props.color[i];
+    }
     for (const model of this.getModels()) {
       model.shaderInputs.setProps({
-        myUniformBlock: {
-          // per-channel uniforms, e.g. color0..color{numChannels-1}
-          [`color${I}`]: 'vec3<f32>'
-        }
+        myUniformBlock
       });
     }
   }
@@ -65,7 +66,7 @@ Viv supports a **dynamic number of channels at runtime** instead of a fixed maxi
 #### 2. DECKGL_MUTATE_COLOR Hook Signature Change
 
 The `DECKGL_MUTATE_COLOR` hook signature has changed from accepting multiple individual float parameters to accepting a single array parameter to support dynamic channel counts.
-ob
+
 **Old Signature (deprecated):**
 
 ```glsl
