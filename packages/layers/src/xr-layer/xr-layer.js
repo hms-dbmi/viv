@@ -214,10 +214,9 @@ class XRLayer extends Layer {
 
     if (bindings) {
       const { contrastLimits, domain, dtype, channelsVisible } = this.props;
-      const numTextures = Object.values(bindings).filter(Boolean).length;
       const paddedContrastLimits = padContrastLimits({
-        contrastLimits: contrastLimits.slice(0, numTextures),
-        channelsVisible: channelsVisible.slice(0, numTextures),
+        contrastLimits: contrastLimits.slice(0, numChannels),
+        channelsVisible: channelsVisible.slice(0, numChannels),
         domain,
         dtype
       });
