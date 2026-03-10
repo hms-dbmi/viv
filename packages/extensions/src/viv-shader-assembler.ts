@@ -265,7 +265,8 @@ export abstract class VivLayerExtension<
     this: VivLayer,
     extension: this
   ): ReturnType<LayerExtension['getShaders']> {
-    const templates = extension.getVivShaderTemplates() || {};
+    // calling with 'this' because of bug in colormap accessing this.props
+    const templates = extension.getVivShaderTemplates.call(this) || {};
 
     //not optional - we'll make sure these are implemented
     const numChannels = this.getNumChannels();
