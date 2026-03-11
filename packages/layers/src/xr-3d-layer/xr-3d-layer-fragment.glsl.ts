@@ -73,21 +73,15 @@ void main(void) {
 	// Step 4: Starting from the entry point, march the ray through the volume
 	// and sample it
 	vec3 p = transformed_eye + (t_hit.x + offset * dt) * ray_dir;
+	
+	#define _U fragmentUniforms3D
+	_BEFORE_RENDER
 
 	// TODO: Probably want to stop this process at some point to improve performance when marching down the edges.
-	_BEFORE_RENDER
 	for (float t = t_hit.x; t < t_hit.y; t += dt) {
 		// Check if this point is on the "positive" side or "negative" side of the plane - only show positive.
-		vec3 normals[NUM_PLANES] = vec3[NUM_PLANES](
-			fragmentUniforms3D.normal${P},
-		);
-		float distances[NUM_PLANES] = float[NUM_PLANES](
-			fragmentUniforms3D.distance${P},
-		);
 		float canShow = 1.;
-		for (int i = 0; i < NUM_PLANES; i += 1) {
-			canShow *= max(0., sign(dot(normals[i], p) + distances[i]));
-		}
+		canShow *= max(0., sign(dot(_U.normal${P}, p) + _U.distance${P}));
 		// Do not show coordinates outside 0-1 box.
 		// Something about the undefined behavior outside the box causes the additive blender to 
 		// render some very odd artifacts.
@@ -97,10 +91,7 @@ void main(void) {
 		float canShowCoordinate = float(ceil(canShowXCoordinate * canShowYCoordinate * canShowZCoordinate));
 		canShow = canShowCoordinate * canShow;
 		float intensityValue${I} = float(texture(volume${I}, p).r);
-		vec2 contrastLimits[NUM_CHANNELS] = vec2[NUM_CHANNELS](
-			channelIntensity3D.contrastLimits${I},
-		);
-		DECKGL_PROCESS_INTENSITY(intensityValue${I}, contrastLimits[${I}], ${I});
+		DECKGL_PROCESS_INTENSITY(intensityValue${I}, channelIntensity3D.contrastLimits${I}, ${I});
 		intensityValue${I} = canShow * intensityValue${I};
 
 
