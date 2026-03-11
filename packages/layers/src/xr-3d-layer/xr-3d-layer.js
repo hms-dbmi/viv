@@ -292,6 +292,11 @@ const XR3DLayer = class extends Layer {
     ) {
       this.loadTexture(props.channelData);
     }
+
+    // Recompute cached uniforms when props change and textures/scale are available.
+    if (this.state.textures && this.state.scaleMatrix) {
+      this._updateUniforms(props);
+    }
   }
 
   /**
@@ -314,123 +319,182 @@ const XR3DLayer = class extends Layer {
   }
 
   /**
+   * This function builds and caches UBO uniform data that is independent of view state.
+   */
+  _updateUniforms(props) {
+    const { textures, scaleMatrix } = this.state;
+    if (!textures || !scaleMatrix) return;
+
+    const numChannels = this.getNumChannels();
+    const {
+      contrastLimits,
+      colors,
+      xSlice,
+      ySlice,
+      zSlice,
+      channelsVisible,
+      domain,
+      dtype,
+      clippingPlanes,
+      resolutionMatrix,
+      selections
+    } = props;
+
+    const paddedContrastLimits = padContrastLimits({
+      contrastLimits,
+      channelsVisible,
+      domain,
+      dtype
+    });
+
+    const invertedScaleMatrix = scaleMatrix.clone().invert();
+    const invertedResolutionMatrix = resolutionMatrix.clone().invert();
+    const paddedClippingPlanes = padWithDefault(
+      clippingPlanes.map(p =>
+        p
+          .clone()
+          .transform(invertedScaleMatrix)
+          .transform(invertedResolutionMatrix)
+      ),
+      new Plane([1, 0, 0]),
+      clippingPlanes.length || NUM_PLANES_DEFAULT
+    );
+    const normals = paddedClippingPlanes.flatMap(plane => plane.normal);
+    const distances = paddedClippingPlanes.map(plane => plane.distance);
+
+    const numPlanes = clippingPlanes.length || NUM_PLANES_DEFAULT;
+
+    // Get number of actual channels from textures
+    const numTextures = Object.values(textures).filter(t => t).length;
+    const numChannelsForColors = Math.max(
+      numTextures,
+      selections?.length || 0,
+      1
+    );
+
+    const paddedColors = padColorsForUBO({
+      channelsVisible: channelsVisible || Array(numChannelsForColors).fill(true),
+      colors: colors || getDefaultPalette(numChannelsForColors)
+    });
+
+    // Build per-channel contrast limits for UBO
+    const channelIntensity3DUniforms = {};
+    for (let i = 0; i < numChannels; i++) {
+      channelIntensity3DUniforms[`contrastLimits${i}`] = [
+        paddedContrastLimits[i * 2],
+        paddedContrastLimits[i * 2 + 1]
+      ];
+    }
+
+    // Build fragment uniforms for UBO
+    const fragmentUniforms3DUniforms = {
+      xSlice: xSlice
+        ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])
+        : [0, 1],
+      ySlice: ySlice
+        ? ySlice.map(i => i / scaleMatrix[5] / resolutionMatrix[5])
+        : [0, 1],
+      zSlice: zSlice
+        ? zSlice.map(i => i / scaleMatrix[10] / resolutionMatrix[10])
+        : [0, 1],
+      scale: scaleMatrix
+    };
+
+    // Add per-channel colors - ensure we always have valid arrays
+    for (let i = 0; i < numChannels; i++) {
+      fragmentUniforms3DUniforms[`color${i}`] = paddedColors[i] || [0, 0, 0];
+    }
+
+    // Add per-plane normals and distances
+    for (let i = 0; i < numPlanes; i++) {
+      fragmentUniforms3DUniforms[`normal${i}`] = [
+        normals[i * 3],
+        normals[i * 3 + 1],
+        normals[i * 3 + 2]
+      ];
+      fragmentUniforms3DUniforms[`distance${i}`] = distances[i];
+    }
+
+    this.setState({
+      channelIntensity3DUniforms,
+      fragmentUniforms3DUniforms
+    });
+  }
+
+  /**
    * This function runs the shaders and draws to the canvas
    */
   draw() {
-    const { model, scaleMatrix } = this.state;
+    const { model, scaleMatrix, channelIntensity3DUniforms, fragmentUniforms3DUniforms } =
+      this.state;
+
+    // If texture-dependent uniforms have not yet been computed, try to
+    // initialize them and skip drawing for this frame. This prevents
+    // passing undefined uniform blocks to the shader on the first render
+    // after textures/scale are updated.
+    if (!channelIntensity3DUniforms || !fragmentUniforms3DUniforms) {
+      if (this.state.textures && scaleMatrix) {
+        this._updateUniforms(this.props);
+      }
+      return;
+    }
+
     const texturesToBind =
       this._newTexturesFromLoadThisFrame ?? this.state.textures;
     const numChannels = this.getNumChannels();
-    const bindings =
-      texturesToBind && model && scaleMatrix
-        ? normalizeTextureBindings(texturesToBind, numChannels, 'volume')
-        : null;
+    let bindings = null;
+    if (texturesToBind && model && scaleMatrix) {
+      // Cache bindings so we don't allocate new objects every frame when
+      // textures/numChannels are unchanged.
+      const cacheKeyTextures = texturesToBind;
+      const cacheKeyChannels = numChannels;
+      if (
+        this._cachedBindingsTextures !== cacheKeyTextures ||
+        this._cachedBindingsNumChannels !== cacheKeyChannels
+      ) {
+        this._cachedBindings = normalizeTextureBindings(
+          texturesToBind,
+          numChannels,
+          'volume'
+        );
+        this._cachedBindingsTextures = cacheKeyTextures;
+        this._cachedBindingsNumChannels = cacheKeyChannels;
+      }
+      bindings = this._cachedBindings;
+    }
 
     if (bindings && model && scaleMatrix) {
       const {
-        contrastLimits,
-        colors,
-        xSlice,
-        ySlice,
-        zSlice,
         modelMatrix,
-        channelsVisible,
-        domain,
-        dtype,
-        clippingPlanes,
-        resolutionMatrix,
-        selections
+        resolutionMatrix
       } = this.props;
       const { viewMatrix, viewMatrixInverse, projectionMatrix } =
         this.context.viewport;
-      const paddedContrastLimits = padContrastLimits({
-        contrastLimits,
-        channelsVisible,
-        domain,
-        dtype
-      });
-      const invertedScaleMatrix = scaleMatrix.clone().invert();
-      const invertedResolutionMatrix = resolutionMatrix.clone().invert();
-      const paddedClippingPlanes = padWithDefault(
-        clippingPlanes.map(p =>
-          p
-            .clone()
-            .transform(invertedScaleMatrix)
-            .transform(invertedResolutionMatrix)
-        ),
-        new Plane([1, 0, 0]),
-        clippingPlanes.length || NUM_PLANES_DEFAULT
-      );
-      const normals = paddedClippingPlanes.flatMap(plane => plane.normal);
-      const distances = paddedClippingPlanes.map(plane => plane.distance);
-
-      const numPlanes = clippingPlanes.length || NUM_PLANES_DEFAULT;
-
-      // Get number of actual channels from textures
-      const numTextures = Object.values(bindings).filter(t => t).length;
-      const numChannelsForColors = Math.max(
-        numTextures,
-        selections?.length || 0,
-        1
-      );
-
-      const paddedColors = padColorsForUBO({
-        channelsVisible:
-          channelsVisible || Array(numChannelsForColors).fill(true),
-        colors: colors || getDefaultPalette(numChannelsForColors)
-      });
-
-      // Build per-channel contrast limits for UBO
-      const channelIntensity3DUniforms = {};
-      for (let i = 0; i < numChannels; i++) {
-        channelIntensity3DUniforms[`contrastLimits${i}`] = [
-          paddedContrastLimits[i * 2],
-          paddedContrastLimits[i * 2 + 1]
-        ];
-      }
-
-      // Build fragment uniforms for UBO
-      const fragmentUniforms3DUniforms = {
-        xSlice: xSlice
-          ? xSlice.map(i => i / scaleMatrix[0] / resolutionMatrix[0])
-          : [0, 1],
-        ySlice: ySlice
-          ? ySlice.map(i => i / scaleMatrix[5] / resolutionMatrix[5])
-          : [0, 1],
-        zSlice: zSlice
-          ? zSlice.map(i => i / scaleMatrix[10] / resolutionMatrix[10])
-          : [0, 1],
-        scale: scaleMatrix
-      };
-
-      // Add per-channel colors - ensure we always have valid arrays
-      for (let i = 0; i < numChannels; i++) {
-        fragmentUniforms3DUniforms[`color${i}`] = paddedColors[i] || [0, 0, 0];
-      }
-
-      // Add per-plane normals and distances
-      for (let i = 0; i < numPlanes; i++) {
-        fragmentUniforms3DUniforms[`normal${i}`] = [
-          normals[i * 3],
-          normals[i * 3 + 1],
-          normals[i * 3 + 2]
-        ];
-        fragmentUniforms3DUniforms[`distance${i}`] = distances[i];
-      }
-
       // Build vertex uniforms for UBO
-      const vertexUniformsData = {
-        eye_pos: [
-          viewMatrixInverse[12],
-          viewMatrixInverse[13],
-          viewMatrixInverse[14]
-        ],
-        proj: projectionMatrix,
-        model: modelMatrix || new Matrix4(),
-        view: viewMatrix,
-        scale: scaleMatrix,
-        resolution: resolutionMatrix
-      };
+      // Reuse a single vertex uniform object to avoid per-frame allocations.
+      if (!this._vertexUniformsData) {
+        this._vertexUniformsData = {
+          eye_pos: [0, 0, 0],
+          proj: null,
+          model: null,
+          view: null,
+          scale: null,
+          resolution: null
+        };
+      }
+      const vertexUniformsData = this._vertexUniformsData;
+      const eyePos = vertexUniformsData.eye_pos;
+      eyePos[0] = viewMatrixInverse[12];
+      eyePos[1] = viewMatrixInverse[13];
+      eyePos[2] = viewMatrixInverse[14];
+      vertexUniformsData.proj = projectionMatrix;
+      if (!this._defaultModelMatrix) {
+        this._defaultModelMatrix = new Matrix4();
+      }
+      vertexUniformsData.model = modelMatrix || this._defaultModelMatrix;
+      vertexUniformsData.view = viewMatrix;
+      vertexUniformsData.scale = scaleMatrix;
+      vertexUniformsData.resolution = resolutionMatrix;
 
       // Set UBO uniforms via shaderInputs
       // Keys must match module names: 'channelIntensity3D', 'fragmentUniforms3D', 'vertex'
@@ -444,6 +508,11 @@ const XR3DLayer = class extends Layer {
       // Textures are still set via setBindings
       model.setBindings(bindings);
       model.draw(this.context.renderPass);
+      // After the first draw with new textures, switch back to using the
+      // stable textures reference so that binding caching remains effective.
+      if (this._newTexturesFromLoadThisFrame) {
+        this._newTexturesFromLoadThisFrame = null;
+      }
     }
   }
 
@@ -474,16 +543,21 @@ const XR3DLayer = class extends Layer {
         if (!textures[key]) textures[key] = textures.volume0;
       }
       this._newTexturesFromLoadThisFrame = textures;
-      this.setState({
-        textures,
-        scaleMatrix: new Matrix4().scale(
-          this.props.physicalSizeScalingMatrix.transformPoint([
-            width,
-            height,
-            depth
-          ])
-        )
-      });
+      this.setState(
+        {
+          textures,
+          scaleMatrix: new Matrix4().scale(
+            this.props.physicalSizeScalingMatrix.transformPoint([
+              width,
+              height,
+              depth
+            ])
+          )
+        },
+        () => {
+          this._updateUniforms(this.props);
+        }
+      );
     } else {
       this._newTexturesFromLoadThisFrame = null;
     }
