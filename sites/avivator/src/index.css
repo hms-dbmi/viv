@@ -12,3 +12,8 @@ body {
   color: red;
   margin: 15px;
 }
+
+/* this alleviates an intermittent issue with glitchy overflow oscillation */
+#deckgl-wrapper {
+  overflow: hidden;
+}
