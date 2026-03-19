@@ -207,7 +207,8 @@ const BitmapLayer = class extends CompositeLayer {
       transparentColor: transparentColorInHook
     } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
-    const image = this.state.bitmapTexture || getPreparedImage(this.props.image);
+    const image =
+      this.state.bitmapTexture || getPreparedImage(this.props.image);
     if (!image) return null;
     return new BitmapLayerWrapper(
       { ...this.props, image },

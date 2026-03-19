@@ -13,7 +13,7 @@ body {
   margin: 15px;
 }
 
-/* this aleviates an intermittent issue with glitchy overflow oscillation */
+/* this alleviates an intermittent issue with glitchy overflow oscillation */
 #deckgl-wrapper {
   overflow: hidden;
 }

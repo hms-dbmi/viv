@@ -373,7 +373,8 @@ const XR3DLayer = class extends Layer {
     );
 
     const paddedColors = padColorsForUBO({
-      channelsVisible: channelsVisible || Array(numChannelsForColors).fill(true),
+      channelsVisible:
+        channelsVisible || Array(numChannelsForColors).fill(true),
       colors: colors || getDefaultPalette(numChannelsForColors)
     });
 
@@ -425,8 +426,12 @@ const XR3DLayer = class extends Layer {
    * This function runs the shaders and draws to the canvas
    */
   draw() {
-    const { model, scaleMatrix, channelIntensity3DUniforms, fragmentUniforms3DUniforms } =
-      this.state;
+    const {
+      model,
+      scaleMatrix,
+      channelIntensity3DUniforms,
+      fragmentUniforms3DUniforms
+    } = this.state;
 
     // If texture-dependent uniforms have not yet been computed, try to
     // initialize them and skip drawing for this frame. This prevents
@@ -464,10 +469,7 @@ const XR3DLayer = class extends Layer {
     }
 
     if (bindings && model && scaleMatrix) {
-      const {
-        modelMatrix,
-        resolutionMatrix
-      } = this.props;
+      const { modelMatrix, resolutionMatrix } = this.props;
       const { viewMatrix, viewMatrixInverse, projectionMatrix } =
         this.context.viewport;
       // Build vertex uniforms for UBO

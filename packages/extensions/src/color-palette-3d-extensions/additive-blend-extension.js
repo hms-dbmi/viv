@@ -5,8 +5,8 @@ const _BEFORE_RENDER = `\
 ////// additive-blend before render
   float intensityValue${I} = 0.0;\
 `;
-  
-  const _RENDER = `\
+
+const _RENDER = `\
 ////// additive-blend render
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
