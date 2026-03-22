@@ -178,12 +178,13 @@ const ScaleBarLayer = class extends CompositeLayer {
           text: `${displayNumber}${displayUnit}`,
           position: [
             isLeft
-              ? xLeftCoord + adjustedBarLength * 0.5
-              : xRightCoord - adjustedBarLength * 0.5,
+              ? xLeftCoord
+              : xRightCoord,
             yCoord - barHeight * 2
           ]
         }
       ],
+      getTextAnchor: (isLeft ? 'start' : 'end'),
       getColor: [220, 220, 220, 255],
       getSize: 12,
       fontFamily: DEFAULT_FONT_FAMILY,
