@@ -1,5 +1,12 @@
 # @vivjs/types
 
+## 0.20.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/constants@0.20.0
+
 ## 0.19.0
 
 ### Patch Changes
