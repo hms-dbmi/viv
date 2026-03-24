@@ -40,6 +40,7 @@ export function createOmeImageIndexerFromResolver(
   const ifdCache: ImageFileDirectory[] = [];
   return async (sel: OmeTiffSelection, pyramidLevel: number) => {
     const { tiff, ifdIndex } = await resolveBaseResolutionImageLocation(sel);
+    // this is throwing in geotiff.js `requestIFD(1)` with test xenium jp2k image.
     const baseImage = await tiff.getImage(ifdIndex);
 
     // It's the highest resolution, no need to look up SubIFDs.
