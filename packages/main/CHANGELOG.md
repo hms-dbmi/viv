@@ -8,10 +8,6 @@
 
 - scale bar functionality is now split between a new view and a layer (`@vivjs/viewers`, `@vivjs/layers`, `@vivjs/views`) ([#948](https://github.com/hms-dbmi/viv/pull/948))
 
-### Patch Changes
-
-- debounce view state changes for scale bar performance (`@vivjs/viewers`) ([#947](https://github.com/hms-dbmi/viv/pull/947))
-
 
 ## 0.19.0
 
