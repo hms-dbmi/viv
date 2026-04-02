@@ -1,5 +1,5 @@
 import { PolygonLayer } from '@deck.gl/layers';
-import { ImageLayer, MultiscaleImageLayer, ScaleBarLayer } from '@vivjs/layers';
+import { ImageLayer, MultiscaleImageLayer } from '@vivjs/layers';
 import { describe, expect, test } from 'vitest';
 import { SideBySideView } from '../src';
 import { defaultArguments, generateViewTests } from './VivView.spec';
@@ -24,7 +24,6 @@ test('SideBySideView layer type and props check', () => {
   });
   expect(layers[0] instanceof ImageLayer).toBeTruthy();
   expect(layers[1] instanceof PolygonLayer).toBeTruthy();
-  expect(layers[2] instanceof ScaleBarLayer).toBeTruthy();
   expect(layers[0].props.viewportId).toBe(view.id);
 });
 
@@ -47,7 +46,6 @@ test('SideBySideView layer with multiscale', () => {
   });
   expect(layers[0] instanceof MultiscaleImageLayer).toBeTruthy();
   expect(layers[1] instanceof PolygonLayer).toBeTruthy();
-  expect(layers[2] instanceof ScaleBarLayer).toBeTruthy();
   expect(layers[0].props.viewportId).toBe(view.id);
 });
 

@@ -1,11 +1,29 @@
 # @hms-dbmi/viv
 
+## 0.20.0
+
+### Minor Changes
+
+- Export `loadOmeZarrFromStore` to allow loading OME-Zarr data from a custom store, enabling use cases like AWS SigV4 signed requests for private S3 buckets. (`@vivjs/loaders`) ([#944](https://github.com/hms-dbmi/viv/pull/944))
+
+- scale bar functionality is now split between a new view and a layer (`@vivjs/viewers`, `@vivjs/layers`, `@vivjs/views`) ([#948](https://github.com/hms-dbmi/viv/pull/948))
+
+
+## 0.19.0
+
+### Minor Changes
+
+- Rename loadBioformatsZarr to DEPRECATED_loadBioformatsZarr to reduce confusion. Update its description to point users to loadOmeZarr instead. (`@vivjs/loaders`) ([#939](https://github.com/hms-dbmi/viv/pull/939))
+
+- Support zarr images from v3 stores and newer bioformats output, replace zarr library with zarrita. (`@vivjs/loaders`, `@vivjs/layers`) ([#930](https://github.com/hms-dbmi/viv/pull/930))
+
+### Patch Changes
+
 ## 0.18.2
 
 ### Patch Changes
 
 - Configure NPM trusted publishing. (`@hms-dbmi/viv`) ([#936](https://github.com/hms-dbmi/viv/pull/936))
-
 
 ## 0.18.1
 
