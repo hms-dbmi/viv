@@ -1,5 +1,5 @@
 import DeckGL from '@deck.gl/react';
-import { getVivId, DETAIL_VIEW_ID, getDefaultInitialViewState, DetailView, OVERVIEW_VIEW_ID, OverviewView, SideBySideView, VolumeView } from '@vivjs/views';
+import { getVivId, DETAIL_VIEW_ID, getDefaultInitialViewState, DetailView, SCALEBAR_VIEW_ID, ScaleBarView, OVERVIEW_VIEW_ID, OverviewView, SideBySideView, VolumeView } from '@vivjs/views';
 import equal from 'fast-deep-equal';
 import * as React from 'react';
 import { ColorPaletteExtension, ColorPalette3DExtensions } from '@vivjs/extensions';
@@ -272,8 +272,7 @@ const PictureInPictureViewer = (props) => {
   const detailView = new DetailView({
     id: DETAIL_VIEW_ID,
     height,
-    width,
-    snapScaleBar
+    width
   });
   const layerConfig = {
     loader,
@@ -294,6 +293,20 @@ const PictureInPictureViewer = (props) => {
   const views = [detailView];
   const layerProps = [layerConfig];
   const viewStates = [{ ...baseViewState, id: DETAIL_VIEW_ID }];
+  const scalebarViewState = viewStatesProp?.find(
+    (v) => v.id === SCALEBAR_VIEW_ID
+  ) || { ...baseViewState, id: SCALEBAR_VIEW_ID };
+  const scaleBarView = new ScaleBarView({
+    id: SCALEBAR_VIEW_ID,
+    width,
+    height,
+    loader,
+    snap: snapScaleBar,
+    imageViewId: DETAIL_VIEW_ID
+  });
+  views.push(scaleBarView);
+  layerProps.push(layerConfig);
+  viewStates.push(scalebarViewState);
   if (overviewOn && loader) {
     const overviewViewState = viewStatesProp?.find(
       (v) => v.id === OVERVIEW_VIEW_ID
@@ -354,6 +367,10 @@ const SideBySideViewer = (props) => {
   } = props;
   const leftViewState = viewStatesProp?.find((v) => v.id === "left");
   const rightViewState = viewStatesProp?.find((v) => v.id === "right");
+  const leftId = `left-${SCALEBAR_VIEW_ID}`;
+  const rightId = `right-${SCALEBAR_VIEW_ID}`;
+  const leftScalebarViewState = viewStatesProp?.find((v) => v.id === leftId);
+  const rightScalebarViewState = viewStatesProp?.find((v) => v.id === rightId);
   const viewStates = React.useMemo(() => {
     if (leftViewState && rightViewState) {
       return viewStatesProp;
@@ -365,7 +382,9 @@ const SideBySideViewer = (props) => {
     );
     return [
       leftViewState || { ...defaultViewState, id: "left" },
-      rightViewState || { ...defaultViewState, id: "right" }
+      rightViewState || { ...defaultViewState, id: "right" },
+      leftScalebarViewState || { ...defaultViewState, id: leftId },
+      rightScalebarViewState || { ...defaultViewState, id: rightId }
     ];
   }, [loader, leftViewState, rightViewState]);
   const detailViewLeft = new SideBySideView({
@@ -374,8 +393,7 @@ const SideBySideViewer = (props) => {
     panLock,
     zoomLock,
     height,
-    width: width / 2,
-    snapScaleBar
+    width: width / 2
   });
   const detailViewRight = new SideBySideView({
     id: "right",
@@ -384,8 +402,7 @@ const SideBySideViewer = (props) => {
     panLock,
     zoomLock,
     height,
-    width: width / 2,
-    snapScaleBar
+    width: width / 2
   });
   const layerConfig = {
     loader,
@@ -403,8 +420,31 @@ const SideBySideViewer = (props) => {
     extensions,
     transparentColor
   };
-  const views = [detailViewRight, detailViewLeft];
-  const layerProps = [layerConfig, layerConfig];
+  const leftScaleBarView = new ScaleBarView({
+    id: leftId,
+    width: width / 2,
+    height,
+    loader,
+    snap: snapScaleBar,
+    imageViewId: "left"
+  });
+  const rightScaleBarView = new ScaleBarView({
+    id: rightId,
+    width: width / 2,
+    height,
+    x: width / 2,
+    loader,
+    snap: snapScaleBar,
+    imageViewId: "right"
+  });
+  const views = [
+    detailViewRight,
+    detailViewLeft,
+    leftScaleBarView,
+    rightScaleBarView
+  ];
+  const layerProps = [layerConfig, layerConfig, layerConfig, layerConfig];
+  const finalViewStates = [...viewStates];
   return loader ? /* @__PURE__ */ React.createElement(
     VivViewer,
     {
@@ -413,7 +453,7 @@ const SideBySideViewer = (props) => {
       randomize: true,
       onViewStateChange,
       onHover,
-      viewStates,
+      viewStates: finalViewStates,
       deckProps
     }
   ) : null;

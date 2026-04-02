@@ -630,16 +630,6 @@
               
                 
                 <li><a
-                  href='#loadbioformatszarr'
-                  class="">
-                  loadBioformatsZarr
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
                   href='#loadmultitiff'
                   class="">
                   loadMultiTiff
@@ -918,6 +908,26 @@
               
                 
                 <li><a
+                  href='#loadomezarrfromstore'
+                  class="">
+                  loadOmeZarrFromStore
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#deprecated_loadbioformatszarr'
+                  class="">
+                  DEPRECATED_loadBioformatsZarr
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#overview_view_id'
                   class="">
                   OVERVIEW_VIEW_ID
@@ -1022,6 +1032,7 @@ Please see the <a href="https://github.com/hms-dbmi/viv/blob/main/packages/main/
 <ol>
 <li>Run <code>pnpm install</code> in <code>viv</code> root folder</li>
 <li>Run <code>pnpm dev</code> to start a development server</li>
+<li>Download OME-Zarr files used as test fixtures - see <a href="./packages/loaders/tests/fixtures/ome-zarr/README.md">./packages/loaders/tests/fixtures/ome-zarr/README.md</a>.</li>
 <li>Run <code>pnpm test</code> to run all tests (or specific, e.g., <code>pnpm test --filter=@vivjs/layers</code>)</li>
 </ol>
 <h2>🛠️  Build</h2>
@@ -1032,6 +1043,7 @@ Please see the <a href="https://github.com/hms-dbmi/viv/blob/main/packages/main/
 <p>Note not every PR requires a changeset. Since changesets are focused on releases and changelogs, changes to the repository that don't effect these won't need a changeset (e.g., documentation, tests).</p>
 </blockquote>
 <p>The <a href="https://github.com/changesets/action">Changesets GitHub Action</a> will create and update a PR that applies changesets versions of <code>@vivjs/</code> packages to NPM.</p>
+<p>Note: If the release includes a new NPM package (e.g., <code>@vivjs/new-thing</code>), <a href="https://docs.npmjs.com/trusted-publishers">OIDC trusted publishing</a> must first be configured via NPM (see <a href="https://github.com/orgs/community/discussions/181927">discussion</a>).</p>
 <h2>🌎 Browser Support</h2>
 <p>Viv supports coverage across Safari, Firefox, Chrome, and Edge. Please <a href="https://github.com/hms-dbmi/viv/issues/new">file an issue</a> if you find a browser in which Viv does not work.</p>
 
@@ -1102,7 +1114,7 @@ The <code>XRLayer</code> (eXtended Range Layer) and <code>XR3DLayer</code> enabl
 source can be thought of as a multi-dimensional "stack" of image data with labeled
 dimensions (usually <code>["t", "c", "z", "y", "x"]</code>). A multiscale image is represented as list
 of pixel sources decreasing in shape. Viv provides several helper functions to intialize a
-loader via url: <code>loadOmeTiff</code>, <code>loadBioformatsZarr</code>, <code>loadOmeZarr</code>, and <code>loadMultiTiff</code>.
+loader via url: <code>loadOmeTiff</code>, <code>loadOmeZarr</code>, and <code>loadMultiTiff</code>.
 Each function returns a <code>Promise</code> for an object of shape <code>{ data: PixelSouce[], metadata: M }</code>,
 where <code>M</code> is a JavaScript object containing the format-specific metadata for the image.
 For OME-TIFF and Bioformats-Zarr, and MultiTiff the metadata is identical (OME-XML representation),
@@ -1144,7 +1156,9 @@ This metadata can be useful for creating UI componenets that describe the data s
   </h2>
 
   
-    <p>This guide demonstrates how to generate a pyramidal OME-TIFF <a href="https://www.glencoesoftware.com/blog/2019/12/09/converting-whole-slide-images-to-OME-TIFF.html">with Bio-Formats</a> that can be viewed with
+    <p>NOTE (AS OF JAN 2026): This tutorial was written in 2022, and is now quite outdated.
+It was written before the OME-NGFF specification was published and therefore refers to bioformats2raw v0.5.0 or before which generated a zarr data representation that was a precursor to OME-NGFF/OME-Zarr.</p>
+<p>This guide demonstrates how to generate a pyramidal OME-TIFF <a href="https://www.glencoesoftware.com/blog/2019/12/09/converting-whole-slide-images-to-OME-TIFF.html">with Bio-Formats</a> that can be viewed with
 <a href="http://avivator.gehlenborglab.org">Avivator</a>. Viv also supports <a href="https://github.com/ome/ngff">OME-NGFF</a>, but tooling to generate the format remains limited as the specification matures. We will update this tutorial accordingly when a method for generating OME-NGFF is endorsed by the Open Microscopy Environment.</p>
 <h3>Getting Started</h3>
 <blockquote>
@@ -1282,8 +1296,7 @@ provided by OME and viewed with Viv locally (without needing to run Bio-Formats)
   </div>
   
 
-  <p>This component provides a component for an overview-detail VivViewer of an image (i.e picture-in-picture).</p>
-
+  
     <div class='pre p1 fill-light mt0'>PictureInPictureViewer</div>
   
   
@@ -1301,269 +1314,9 @@ provided by OME and viewed with Viv locally (without needing to run Bio-Formats)
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>props</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>props</span> <code class='quiet'>(any)</code>
 	    
           </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.contrastLimits</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>List of [begin, end] values to control each channel's ramp function.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.colors</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>List of [r, g, b] values for each channel.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.channelsVisible</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>List of boolean values for each channel for whether or not it is visible.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.colormap</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
-  </td>
-  <td class='break-word'><span>String indicating a colormap (default: '').  The full list of options is here: 
-<a href="https://github.com/glslify/glsl-colormap#glsl-colormap">https://github.com/glslify/glsl-colormap#glsl-colormap</a>
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.loader</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>The data source for the viewer, PixelSource[]. If loader.length > 1, data is assumed to be multiscale.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.selections</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>Selection to be used for fetching data.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.overview</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
-  </td>
-  <td class='break-word'><span>Allows you to pass settings into the OverviewView: { scale, margin, position, minimumWidth, maximumWidth,
-boundingBoxColor, boundingBoxOutlineWidth, viewportOutlineColor, viewportOutlineWidth}.  See 
-<a href="http://viv.gehlenborglab.org/#overviewview">http://viv.gehlenborglab.org/#overviewview</a>
- for defaults.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.overviewOn</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
-  </td>
-  <td class='break-word'><span>Whether or not to show the OverviewView.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.viewStates</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span>Array of objects like [{ target: [x, y, 0], zoom: -zoom, id: DETAIL_VIEW_ID }] for setting where the viewer looks (optional - this is inferred from height/width/loader
-internally by default using getDefaultInitialViewState).
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.height</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
-  </td>
-  <td class='break-word'><span>Current height of the component.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.width</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
-  </td>
-  <td class='break-word'><span>Current width of the component.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.extensions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span><a href="https://deck.gl/docs/developer-guide/custom-layers/layer-extensions">deck.gl extensions</a>
- to add to the layers.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.clickCenter</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>?</code>
-  </td>
-  <td class='break-word'><span>Click to center the default view. Default is true.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.lensEnabled</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?</code>
-  </td>
-  <td class='break-word'><span>Whether or not to use the lens (deafult false). Must be used with the 
-<code>LensExtension</code>
- in the 
-<code>extensions</code>
- prop.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.lensSelection</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
-  </td>
-  <td class='break-word'><span>Numeric index of the channel to be focused on by the lens (default 0). Must be used with the 
-<code>LensExtension</code>
- in the 
-<code>extensions</code>
- prop.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.lensRadius</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
-  </td>
-  <td class='break-word'><span>Pixel radius of the lens (default: 100). Must be used with the 
-<code>LensExtension</code>
- in the 
-<code>extensions</code>
- prop.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.lensBorderColor</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span>RGB color of the border of the lens (default [255, 255, 255]). Must be used with the 
-<code>LensExtension</code>
- in the 
-<code>extensions</code>
- prop.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.lensBorderRadius</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
-  </td>
-  <td class='break-word'><span>Percentage of the radius of the lens for a border (default 0.02). Must be used with the 
-<code>LensExtension</code>
- in the 
-<code>extensions</code>
- prop.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.transparentColor</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span>An RGB (0-255 range) color to be considered "transparent" if provided.
-In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
-This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
-Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.snapScaleBar</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?</code>
-  </td>
-  <td class='break-word'><span>If true, aligns the scale bar value to predefined intervals
-for clearer readings, adjusting units if necessary. By default, false.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.onViewportLoad</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>?</code>
-  </td>
-  <td class='break-word'><span>Function that gets called when the data in the viewport loads.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.deckProps</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
-  </td>
-  <td class='break-word'><span>Additional options used when creating the DeckGL component.  See 
-<a href="https://deck.gl/docs/api-reference/core/deck#initialization-settings">the deck.gl docs.</a>
-.  
-<code>layerFilter</code>
-, 
-<code>layers</code>
-, 
-<code>onViewStateChange</code>
-, 
-<code>views</code>
-, 
-<code>viewState</code>
-, 
-<code>useDevicePixels</code>
-, and 
-<code>getCursor</code>
- are already set.
-</span></td>
-</tr>
-
-
-              
-            </tbody>
-          </table>
           
         </div>
       
@@ -1605,8 +1358,7 @@ for clearer readings, adjusting units if necessary. By default, false.
   </div>
   
 
-  <p>This component provides a side-by-side VivViewer with linked zoom/pan.</p>
-
+  
     <div class='pre p1 fill-light mt0'>SideBySideViewer</div>
   
   
@@ -1624,228 +1376,9 @@ for clearer readings, adjusting units if necessary. By default, false.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>props</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>props</span> <code class='quiet'>(any)</code>
 	    
           </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.contrastLimits</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>List of [begin, end] values to control each channel's ramp function.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.colors</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>List of [r, g, b] values for each channel.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.channelsVisible</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>List of boolean values for each channel for whether or not it is visible.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.colormap</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
-  </td>
-  <td class='break-word'><span>String indicating a colormap (default: '').  The full list of options is here: 
-<a href="https://github.com/glslify/glsl-colormap#glsl-colormap">https://github.com/glslify/glsl-colormap#glsl-colormap</a>
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.loader</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>This data source for the viewer. PixelSource[]. If loader.length > 1, data is assumed to be multiscale.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.selections</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>Selection to be used for fetching data.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.zoomLock</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
-  </td>
-  <td class='break-word'><span>Whether or not lock the zooms of the two views.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.panLock</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
-  </td>
-  <td class='break-word'><span>Whether or not lock the pans of the two views.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.viewStates</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span>List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }] for initializing where the viewer looks (optional - this is inferred from height/width/loader
-internally by default using getDefaultInitialViewState).
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.height</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
-  </td>
-  <td class='break-word'><span>Current height of the component.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.width</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
-  </td>
-  <td class='break-word'><span>Current width of the component.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.extensions</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span><a href="https://deck.gl/docs/developer-guide/custom-layers/layer-extensions">deck.gl extensions</a>
- to add to the layers.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.lensEnabled</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?</code>
-  </td>
-  <td class='break-word'><span>Whether or not to use the lens deafult (false).
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.lensSelection</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
-  </td>
-  <td class='break-word'><span>Numeric index of the channel to be focused on by the lens (default 0).
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.lensBorderColor</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span>RGB color of the border of the lens (default [255, 255, 255]).
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.lensBorderRadius</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
-  </td>
-  <td class='break-word'><span>Percentage of the radius of the lens for a border (default 0.02).
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.lensRadius</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
-  </td>
-  <td class='break-word'><span>Pixel radius of the lens (default: 100).
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.transparentColor</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span>An RGB (0-255 range) color to be considered "transparent" if provided.
-In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
-This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
-Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.snapScaleBar</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?</code>
-  </td>
-  <td class='break-word'><span>If true, aligns the scale bar value to predefined intervals
-for clearer readings, adjusting units if necessary. By default, false.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.deckProps</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
-  </td>
-  <td class='break-word'><span>Additional options used when creating the DeckGL component.  See 
-<a href="https://deck.gl/docs/api-reference/core/deck#initialization-settings">the deck.gl docs.</a>
-.  
-<code>layerFilter</code>
-, 
-<code>layers</code>
-, 
-<code>onViewStateChange</code>
-, 
-<code>views</code>
-, 
-<code>viewState</code>
-, 
-<code>useDevicePixels</code>
-, and 
-<code>getCursor</code>
- are already set.
-</span></td>
-</tr>
-
-
-              
-            </tbody>
-          </table>
           
         </div>
       
@@ -1887,8 +1420,7 @@ for clearer readings, adjusting units if necessary. By default, false.
   </div>
   
 
-  <p>This component provides a volumetric viewer that provides provides volume-ray-casting.</p>
-
+  
     <div class='pre p1 fill-light mt0'>VolumeViewer</div>
   
   
@@ -1906,192 +1438,8 @@ for clearer readings, adjusting units if necessary. By default, false.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>props</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>props</span> <code class='quiet'>(any)</code>
 	    
-          </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.contrastLimits</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>List of [begin, end] values to control each channel's ramp function.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.colors</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span>List of [r, g, b] values for each channel - necessary if using one of the ColorPalette3DExtensions extensions.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.channelsVisible</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>List of boolean values for each channel for whether or not it is visible.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.colormap</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
-  </td>
-  <td class='break-word'><span>String indicating a colormap (default: '').  The full list of options is here: 
-<a href="https://github.com/glslify/glsl-colormap#glsl-colormap">https://github.com/glslify/glsl-colormap#glsl-colormap</a>
- - necessary if using one of the AdditiveColormap3DExtensions extensions.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.loader</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>This data source for the viewer. PixelSource[]. If loader.length > 1, data is assumed to be multiscale.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.selections</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>Selection to be used for fetching data
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.resolution</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span>Resolution at which you would like to see the volume and load it into memory (0 highest, loader.length - 1 the lowest with default loader.length - 1)
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.modelMatrix</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
-  </td>
-  <td class='break-word'><span>A column major affine transformation to be applied to the volume.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.xSlice</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span>0-1 interval on which to slice the volume.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.ySlice</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span>0-1 interval on which to slice the volume.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.zSlice</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span>0-1 interval on which to slice the volume.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.onViewportLoad</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>?</code>
-  </td>
-  <td class='break-word'><span>Function that gets called when the data in the viewport loads.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.viewStates</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
-  </td>
-  <td class='break-word'><span>List of objects like [{ target: [x, y, z], zoom: -zoom, id: '3d' }] for initializing where the viewer looks (optional - this is inferred from height/width/loader
-internally by default using getDefaultInitialViewState).
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.height</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
-  </td>
-  <td class='break-word'><span>Current height of the component.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.width</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
-  </td>
-  <td class='break-word'><span>Current width of the component.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.clippingPlanes</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>>?</code>
-  </td>
-  <td class='break-word'><span>List of math.gl 
-<a href="https://math.gl/modules/culling/docs/api-reference/plane">Plane</a>
- objects.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.useFixedAxis</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>?</code>
-  </td>
-  <td class='break-word'><span>Whether or not to fix the axis of the camera (default is true).
-</span></td>
-</tr>
-
-
-              
-            </tbody>
-          </table>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>extensions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?)</code>
-	    <a href="https://deck.gl/docs/developer-guide/custom-layers/layer-extensions">deck.gl extensions</a>
- to add to the layers - default is AdditiveBlendExtension from ColorPalette3DExtensions.
-
           </div>
           
         </div>
@@ -2134,8 +1482,7 @@ internally by default using getDefaultInitialViewState).
   </div>
   
 
-  <p>This component wraps the DeckGL component.</p>
-
+  
     <div class='pre p1 fill-light mt0'>VivViewer</div>
   
   
@@ -2153,112 +1500,9 @@ internally by default using getDefaultInitialViewState).
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>props</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>props</span> <code class='quiet'>(any)</code>
 	    
           </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.layerProps</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></code>
-  </td>
-  <td class='break-word'><span>Props for the layers in each view.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.randomize</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?</code>
-  </td>
-  <td class='break-word'><span>Whether or not to randomize which view goes first (for dynamic rendering of multiple linked views).
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.viewStates</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>></code>
-  </td>
-  <td class='break-word'><span>List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }]
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.onViewStateChange</span> <code class='quiet'>ViewStateChange?</code>
-  </td>
-  <td class='break-word'><span>Callback that returns the deck.gl view state (
-<a href="https://deck.gl/docs/api-reference/core/deck#onviewstatechange">https://deck.gl/docs/api-reference/core/deck#onviewstatechange</a>
-).
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.onHover</span> <code class='quiet'>Hover?</code>
-  </td>
-  <td class='break-word'><span>Callback that returns the picking info and the event (
-<a href="https://deck.gl/docs/api-reference/core/layer#onhover">https://deck.gl/docs/api-reference/core/layer#onhover</a>
-
-
-<a href="https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object">https://deck.gl/docs/developer-guide/interactivity#the-picking-info-object</a>
-)
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.hoverHooks</span> <code class='quiet'>HoverHooks?</code>
-  </td>
-  <td class='break-word'><span>Object including utility hooks - an object with key handleValue like { handleValue: (valueArray) => {}, handleCoordinate: (coordinate) => {} } where valueArray
-has the pixel values for the image under the hover location and coordinate is the coordinate in the image from which the values are picked.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>props.deckProps</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?</code>
-  </td>
-  <td class='break-word'><span>Additional options used when creating the DeckGL component.  See 
-<a href="https://deck.gl/docs/api-reference/core/deck#initialization-settings">the deck.gl docs.</a>
-.  
-<code>layerFilter</code>
-, 
-<code>layers</code>
-, 
-<code>onViewStateChange</code>
-, 
-<code>views</code>
-, 
-<code>viewState</code>
-, 
-<code>useDevicePixels</code>
-, and 
-<code>getCursor</code>
- are already set.
-</span></td>
-</tr>
-
-
-              
-            </tbody>
-          </table>
           
         </div>
       
@@ -2313,9 +1557,8 @@ has the pixel values for the image under the hover location and coordinate is th
   </div>
   
 
-  <p>This class generates a layer and a view for use in the VivViewer</p>
-
-    <div class='pre p1 fill-light mt0'>new VivView(args: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
+  
+    <div class='pre p1 fill-light mt0'>new VivView($0: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
   
   
 
@@ -2332,7 +1575,7 @@ has the pixel values for the image under the hover location and coordinate is th
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>args</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>$0</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
 	    
           </div>
           
@@ -2350,50 +1593,45 @@ has the pixel values for the image under the hover location and coordinate is th
             <tbody class='mt1'>
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.id</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  <td class='break-word'><span class='code bold'>$0.id</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>Id for the current view
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.x</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.x</span> <code class='quiet'>any</code>
   
     (default <code>0</code>)
   </td>
-  <td class='break-word'><span>X (top-left) location on the screen for the current view
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.y</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.y</span> <code class='quiet'>any</code>
   
     (default <code>0</code>)
   </td>
-  <td class='break-word'><span>Y (top-left) location on the screen for the current view
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.height</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
+  <td class='break-word'><span class='code bold'>$0.height</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>Width of the view.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.width</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
+  <td class='break-word'><span class='code bold'>$0.width</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>Height of the view.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
@@ -2721,11 +1959,8 @@ has the pixel values for the image under the hover location and coordinate is th
   </div>
   
 
-  <p>This class generates a OverviewLayer and a view for use in the VivViewer as an overview to a Detailview (they must be used in conjection).
-From the base class VivView, only the initialViewState argument is used.  This class uses private methods to position its x and y from the
-additional arguments:</p>
-
-    <div class='pre p1 fill-light mt0'>new OverviewView(args: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
+  
+    <div class='pre p1 fill-light mt0'>new OverviewView($0: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
   
   
     <p>
@@ -2749,7 +1984,7 @@ additional arguments:</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>args</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>$0</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
 	    
           </div>
           
@@ -2767,125 +2002,113 @@ additional arguments:</p>
             <tbody class='mt1'>
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.id</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
+  <td class='break-word'><span class='code bold'>$0.id</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>for thie VivView
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.loader</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
+  <td class='break-word'><span class='code bold'>$0.loader</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>PixelSource[], where each PixelSource is decreasing in shape. If length == 1, not multiscale.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.detailHeight</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
+  <td class='break-word'><span class='code bold'>$0.detailHeight</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>Height of the detail view.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.detailWidth</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
+  <td class='break-word'><span class='code bold'>$0.detailWidth</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>Width of the detail view.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.scale</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.scale</span> <code class='quiet'>any</code>
   
     (default <code>0.2</code>)
   </td>
-  <td class='break-word'><span>Scale of this viewport relative to the detail. Default is .2.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.margin</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.margin</span> <code class='quiet'>any</code>
   
     (default <code>25</code>)
   </td>
-  <td class='break-word'><span>Margin to be offset from the the corner of the other viewport. Default is 25.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.position</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.position</span> <code class='quiet'>any</code>
   
-    (default <code>&#39;bottom-right&#39;</code>)
+    (default <code>&quot;bottom-right&quot;</code>)
   </td>
-  <td class='break-word'><span>Location of the viewport - one of "bottom-right", "top-right", "top-left", "bottom-left."  Default is 'bottom-right'.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.minimumWidth</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.minimumWidth</span> <code class='quiet'>any</code>
   
     (default <code>150</code>)
   </td>
-  <td class='break-word'><span>Absolute lower bound for how small the viewport should scale. Default is 150.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.maximumWidth</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.maximumWidth</span> <code class='quiet'>any</code>
   
     (default <code>350</code>)
   </td>
-  <td class='break-word'><span>Absolute upper bound for how large the viewport should scale. Default is 350.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.minimumHeight</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.minimumHeight</span> <code class='quiet'>any</code>
   
     (default <code>150</code>)
   </td>
-  <td class='break-word'><span>Absolute lower bound for how small the viewport should scale. Default is 150.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.maximumHeight</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.maximumHeight</span> <code class='quiet'>any</code>
   
     (default <code>350</code>)
   </td>
-  <td class='break-word'><span>Absolute upper bound for how large the viewport should scale. Default is 350.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.clickCenter</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.clickCenter</span> <code class='quiet'>any</code>
   
     (default <code>true</code>)
   </td>
-  <td class='break-word'><span>Click to center the default view. Default is true.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
@@ -3348,10 +2571,8 @@ additional arguments:</p>
   </div>
   
 
-  <p>This class generates a MultiscaleImageLayer and a view for use in the VivViewer as a detailed view.
-It takes the same arguments for its constructor as its base class VivView plus the following:</p>
-
-    <div class='pre p1 fill-light mt0'>new DetailView(args: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
+  
+    <div class='pre p1 fill-light mt0'>new DetailView($0: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
   
   
     <p>
@@ -3375,7 +2596,7 @@ It takes the same arguments for its constructor as its base class VivView plus t
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>args</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>$0</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
 	    
           </div>
           
@@ -3393,62 +2614,45 @@ It takes the same arguments for its constructor as its base class VivView plus t
             <tbody class='mt1'>
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.id</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  <td class='break-word'><span class='code bold'>$0.id</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>id of the View
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.x</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.x</span> <code class='quiet'>any</code>
   
     (default <code>0</code>)
   </td>
-  <td class='break-word'><span>X (top-left) location on the screen for the current view
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.y</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.y</span> <code class='quiet'>any</code>
   
     (default <code>0</code>)
   </td>
-  <td class='break-word'><span>Y (top-left) location on the screen for the current view
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.height</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
+  <td class='break-word'><span class='code bold'>$0.height</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>Width of the view.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.width</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
+  <td class='break-word'><span class='code bold'>$0.width</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>Height of the view.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>args.snapScaleBar</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?</code>
-  
-    (default <code>false</code>)
-  </td>
-  <td class='break-word'><span>If true, aligns the scale bar value to predefined intervals
-for clearer readings, adjusting units if necessary. By default, false.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
@@ -3526,14 +2730,6 @@ for clearer readings, adjusting units if necessary. By default, false.
               
                 <tr>
   <td class='break-word'><span class='code bold'>$0.props</span> <code class='quiet'>any</code>
-  </td>
-  <td class='break-word'><span></span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>$0.viewStates</span> <code class='quiet'>any</code>
   </td>
   <td class='break-word'><span></span></td>
 </tr>
@@ -3688,9 +2884,8 @@ for clearer readings, adjusting units if necessary. By default, false.
   </div>
   
 
-  <p>This class generates a VolumeLayer and a view for use in the VivViewer as volumetric rendering.</p>
-
-    <div class='pre p1 fill-light mt0'>new VolumeView(args: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
+  
+    <div class='pre p1 fill-light mt0'>new VolumeView($0: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
   
   
     <p>
@@ -3714,7 +2909,7 @@ for clearer readings, adjusting units if necessary. By default, false.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>args</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>$0</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
 	    
           </div>
           
@@ -3732,25 +2927,23 @@ for clearer readings, adjusting units if necessary. By default, false.
             <tbody class='mt1'>
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.target</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>></code>
+  <td class='break-word'><span class='code bold'>$0.target</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>Centered target for the camera (used if useFixedAxis is true)
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.useFixedAxis</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
+  <td class='break-word'><span class='code bold'>$0.useFixedAxis</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>Whether or not to fix the axis of the camera.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.args</span> <code class='quiet'>...any</code>
+  <td class='break-word'><span class='code bold'>$0.args</span> <code class='quiet'>...any</code>
   </td>
   <td class='break-word'><span></span></td>
 </tr>
@@ -4024,11 +3217,8 @@ for clearer readings, adjusting units if necessary. By default, false.
   </div>
   
 
-  <p>This class generates a MultiscaleImageLayer and a view for use in the SideBySideViewer.
-It is linked with its other views as controlled by <code>linkedIds</code>, <code>zoomLock</code>, and <code>panLock</code> parameters.
-It takes the same arguments for its constructor as its base class VivView plus the following:</p>
-
-    <div class='pre p1 fill-light mt0'>new SideBySideView(args: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
+  
+    <div class='pre p1 fill-light mt0'>new SideBySideView($0: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
   
   
     <p>
@@ -4052,7 +3242,7 @@ It takes the same arguments for its constructor as its base class VivView plus t
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>args</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>$0</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
 	    
           </div>
           
@@ -4070,117 +3260,95 @@ It takes the same arguments for its constructor as its base class VivView plus t
             <tbody class='mt1'>
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.id</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  <td class='break-word'><span class='code bold'>$0.id</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>id of the View
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.x</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.x</span> <code class='quiet'>any</code>
   
     (default <code>0</code>)
   </td>
-  <td class='break-word'><span>X (top-left) location on the screen for the current view
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.y</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.y</span> <code class='quiet'>any</code>
   
     (default <code>0</code>)
   </td>
-  <td class='break-word'><span>Y (top-left) location on the screen for the current view
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.height</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
+  <td class='break-word'><span class='code bold'>$0.height</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>Width of the view.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.width</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
+  <td class='break-word'><span class='code bold'>$0.width</span> <code class='quiet'>any</code>
   </td>
-  <td class='break-word'><span>Height of the view.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.linkedIds</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>></code>
+  <td class='break-word'><span class='code bold'>$0.linkedIds</span> <code class='quiet'>any</code>
   
     (default <code>[]</code>)
   </td>
-  <td class='break-word'><span>Ids of the other views to which this could be locked via zoom/pan.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.panLock</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
+  <td class='break-word'><span class='code bold'>$0.panLock</span> <code class='quiet'>any</code>
   
     (default <code>true</code>)
   </td>
-  <td class='break-word'><span>Whether or not we lock pan.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.zoomLock</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
+  <td class='break-word'><span class='code bold'>$0.zoomLock</span> <code class='quiet'>any</code>
   
     (default <code>true</code>)
   </td>
-  <td class='break-word'><span>Whether or not we lock zoom.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.viewportOutlineColor</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.viewportOutlineColor</span> <code class='quiet'>any</code>
   
     (default <code>[255,255,255]</code>)
   </td>
-  <td class='break-word'><span>Outline color of the border (default [255, 255, 255])
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>args.viewportOutlineWidth</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?</code>
+  <td class='break-word'><span class='code bold'>$0.viewportOutlineWidth</span> <code class='quiet'>any</code>
   
     (default <code>10</code>)
   </td>
-  <td class='break-word'><span>Default outline width (default 10)
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>args.snapScaleBar</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?</code>
-  
-    (default <code>false</code>)
-  </td>
-  <td class='break-word'><span>If true, aligns the scale bar value to predefined intervals
-for clearer readings, adjusting units if necessary. By default, false.
-</span></td>
+  <td class='break-word'><span></span></td>
 </tr>
 
 
@@ -4441,13 +3609,8 @@ for clearer readings, adjusting units if necessary. By default, false.
   </div>
   
 
-  <p>Computes statics from pixel data.</p>
-<p>This is helpful for generating histograms
-or scaling contrastLimits to reasonable range. Also provided are
-"contrastLimits" which are slider bounds that should give a
-good initial image.</p>
-
-    <div class='pre p1 fill-light mt0'>getChannelStats(arr: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArray</a>): {mean: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, sd: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, q1: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, q3: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, median: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, domain: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>, contrastLimits: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>}</div>
+  
+    <div class='pre p1 fill-light mt0'>getChannelStats(arr: any)</div>
   
   
 
@@ -4464,7 +3627,7 @@ good initial image.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>arr</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArray</a>)</code>
+            <span class='code bold'>arr</span> <code class='quiet'>(any)</code>
 	    
           </div>
           
@@ -4475,13 +3638,6 @@ good initial image.</p>
 
   
 
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code>{mean: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, sd: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, q1: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, q3: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, median: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, domain: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>, contrastLimits: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>}</code>:
-        
-      
-    
   
 
   
@@ -4515,9 +3671,8 @@ good initial image.</p>
   </div>
   
 
-  <p>Create an initial view state that centers the image in the viewport at the zoom level that fills the dimensions in <code>viewSize</code>.</p>
-
-    <div class='pre p1 fill-light mt0'>getDefaultInitialViewState(loader: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, viewSize: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, zoomBackOff: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?, use3d: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>?, modelMatrix: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>?): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  
+    <div class='pre p1 fill-light mt0'>getDefaultInitialViewState(loader: any, viewSize: any, zoomBackOff: any, use3d: any, modelMatrix: any)</div>
   
   
 
@@ -4534,49 +3689,42 @@ good initial image.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>loader</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    (PixelSource[] | PixelSource)
-
+            <span class='code bold'>loader</span> <code class='quiet'>(any)</code>
+	    
           </div>
           
         </div>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>viewSize</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    { height, width } object giving dimensions of the viewport for deducing the right zoom level to center the image.
-
+            <span class='code bold'>viewSize</span> <code class='quiet'>(any)</code>
+	    
           </div>
           
         </div>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>zoomBackOff</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?
+            <span class='code bold'>zoomBackOff</span> <code class='quiet'>(any
             = <code>0</code>)</code>
-	    A positive number which controls how far zoomed out the view state is from filling the entire viewport (default is 0 so the image fully fills the view).
-SideBySideViewer and PictureInPictureViewer use .5 when setting viewState automatically in their default behavior, so the viewport is slightly zoomed out from the image
-filling the whole screen.  1 unit of zoomBackOff (so a passed-in value of 1) corresponds to a 2x zooming out.
-
+	    
           </div>
           
         </div>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>use3d</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>?
+            <span class='code bold'>use3d</span> <code class='quiet'>(any
             = <code>false</code>)</code>
-	    Whether or not to return a view state that can be used with the 3d viewer
-
+	    
           </div>
           
         </div>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>modelMatrix</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>?)</code>
-	    If using a transformation matrix, passing it in here will allow this function to properly center the volume.
-
+            <span class='code bold'>modelMatrix</span> <code class='quiet'>(any)</code>
+	    
           </div>
           
         </div>
@@ -4586,14 +3734,6 @@ filling the whole screen.  1 unit of zoomBackOff (so a passed-in value of 1) cor
 
   
 
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
-        A default initial view state that centers the image within the view: { target: [x, y, 0], zoom: -zoom }.
-
-      
-    
   
 
   
@@ -4644,11 +3784,6 @@ filling the whole screen.  1 unit of zoomBackOff (so a passed-in value of 1) cor
   
     <div class='pre p1 fill-light mt0'>MultiscaleImageLayer</div>
   
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>
-    </p>
-  
   
 
   
@@ -4660,117 +3795,6 @@ filling the whole screen.  1 unit of zoomBackOff (so a passed-in value of 1) cor
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>contrastLimits</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>>)</code>
-          : List of [begin, end] values to control each channel's ramp function.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>channelsVisible</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>>)</code>
-          : List of boolean values for each channel for whether or not it is visible.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>loader</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
-          : Image pyramid. PixelSource[], where each PixelSource is decreasing in shape.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>selections</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
-          : Selection to be used for fetching data.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>domain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>>?)</code>
-          : Override for the possible max/min values (i.e something different than 65535 for uint16/'&#x3C;u2').
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>viewportId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
-          : Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>?)</code>
-          : Unique identifier for this layer.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>onTileError</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>?)</code>
-          : Custom override for handle tile fetching errors.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>onHover</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>?)</code>
-          : Hook function from deck.gl to handle hover objects.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>maxRequests</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
-          : Maximum parallel ongoing requests allowed before aborting.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>onClick</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>?)</code>
-          : Hook function from deck.gl to handle clicked-on objects.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>modelMatrix</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
-          : Math.gl Matrix4 object containing an affine transformation to be applied to the image.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>refinementStrategy</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
-          : 'best-available' | 'no-overlap' | 'never' will be passed to TileLayer. A default will be chosen based on opacity.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>excludeBackground</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?)</code>
-          : Whether to exclude the background image. The background image is also excluded for opacity!=1.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>extensions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?)</code>
-          : <a href="https://deck.gl/docs/developer-guide/custom-layers/layer-extensions">deck.gl extensions</a>
- to add to the layers.
-
-          
-        </div>
-      
-    </div>
   
 
   
@@ -4809,11 +3833,6 @@ filling the whole screen.  1 unit of zoomBackOff (so a passed-in value of 1) cor
   
     <div class='pre p1 fill-light mt0'>ImageLayer</div>
   
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
   
 
   
@@ -4825,96 +3844,6 @@ filling the whole screen.  1 unit of zoomBackOff (so a passed-in value of 1) cor
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>contrastLimits</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>>)</code>
-          : List of [begin, end] values to control each channel's ramp function.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>channelsVisible</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>>)</code>
-          : List of boolean values for each channel for whether or not it is visible.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>loader</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-          : PixelSource. Represents an N-dimensional image.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>selections</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
-          : Selection to be used for fetching data.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>domain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>>?)</code>
-          : Override for the possible max/min values (i.e something different than 65535 for uint16/'&#x3C;u2').
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>viewportId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
-          : Id for the current view.  This needs to match the viewState id in deck.gl and is necessary for the lens.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>onHover</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>?)</code>
-          : Hook function from deck.gl to handle hover objects.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>onClick</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>?)</code>
-          : Hook function from deck.gl to handle clicked-on objects.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>modelMatrix</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
-          : Math.gl Matrix4 object containing an affine transformation to be applied to the image.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>onViewportLoad</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>?)</code>
-          : Function that gets called when the data in the viewport loads.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>?)</code>
-          : Unique identifier for this layer.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>extensions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?)</code>
-          : <a href="https://deck.gl/docs/developer-guide/custom-layers/layer-extensions">deck.gl extensions</a>
- to add to the layers.
-
-          
-        </div>
-      
-    </div>
   
 
   
@@ -4953,11 +3882,6 @@ filling the whole screen.  1 unit of zoomBackOff (so a passed-in value of 1) cor
   
     <div class='pre p1 fill-light mt0'>XRLayer</div>
   
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>
-    </p>
-  
   
 
   
@@ -4969,81 +3893,6 @@ filling the whole screen.  1 unit of zoomBackOff (so a passed-in value of 1) cor
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>contrastLimits</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>>)</code>
-          : List of [begin, end] values to control each channel's ramp function.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>channelsVisible</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>>)</code>
-          : List of boolean values for each channel for whether or not it is visible.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>dtype</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : Dtype for the layer.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>domain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>?)</code>
-          : Override for the possible max/min values (i.e something different than 65535 for uint16/'&#x3C;u2').
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>?)</code>
-          : Unique identifier for this layer.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>onHover</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>?)</code>
-          : Hook function from deck.gl to handle hover objects.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>onClick</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>?)</code>
-          : Hook function from deck.gl to handle clicked-on objects.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>modelMatrix</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
-          : Math.gl Matrix4 object containing an affine transformation to be applied to the image.
-Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>interpolation</span> <code class='quiet'>((<code>"nearest"</code> | <code>"linear"</code>)?)</code>
-          : The 
-<code>minFilter</code>
- and 
-<code>magFilter</code>
- for luma.gl rendering (see 
-<a href="https://luma.gl/docs/api-reference/core/resources/sampler#texture-magnification-filter">https://luma.gl/docs/api-reference/core/resources/sampler#texture-magnification-filter</a>
-) - default is 'nearest'
-
-          
-        </div>
-      
-    </div>
   
 
   
@@ -5082,11 +3931,6 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
   
     <div class='pre p1 fill-light mt0'>VolumeLayer</div>
   
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
   
 
   
@@ -5098,119 +3942,6 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>contrastLimits</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>>)</code>
-          : List of [begin, end] values to control each channel's ramp function.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>channelsVisible</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>>)</code>
-          : List of boolean values for each channel for whether or not it is visible.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>loader</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
-          : PixelSource[]. Represents an N-dimensional image.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>selections</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
-          : Selection to be used for fetching data.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>domain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>>?)</code>
-          : Override for the possible max/min values (i.e something different than 65535 for uint16/'&#x3C;u2').
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>resolution</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
-          : Resolution at which you would like to see the volume and load it into memory (0 highest, loader.length -1 the lowest default 0)
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>modelMatrix</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
-          : A column major affine transformation to be applied to the volume.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>xSlice</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>?)</code>
-          : 0-width (physical coordinates) interval on which to slice the volume.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>ySlice</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>?)</code>
-          : 0-height (physical coordinates) interval on which to slice the volume.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>zSlice</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>?)</code>
-          : 0-depth (physical coordinates) interval on which to slice the volume.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>onViewportLoad</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>?)</code>
-          : Function that gets called when the data in the viewport loads.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>clippingPlanes</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>>?)</code>
-          : List of math.gl 
-<a href="https://math.gl/modules/culling/docs/api-reference/plane">Plane</a>
- objects.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>useProgressIndicator</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?)</code>
-          : Whether or not to use the default progress text + indicator (default is true)
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>onUpdate</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>?)</code>
-          : A callback to be used for getting updates of the progress, ({ progress }) => {}
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>extensions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?)</code>
-          : <a href="https://deck.gl/docs/developer-guide/custom-layers/layer-extensions">deck.gl extensions</a>
- to add to the layers - default is AdditiveBlendExtension from ColorPalette3DExtensions.
-
-          
-        </div>
-      
-    </div>
   
 
   
@@ -5249,11 +3980,6 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
   
     <div class='pre p1 fill-light mt0'>XR3DLayer</div>
   
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
   
 
   
@@ -5265,91 +3991,6 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>contrastLimits</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>>)</code>
-          : List of [begin, end] values to control each channel's ramp function.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>channelsVisible</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>>)</code>
-          : List of boolean values for each channel for whether or not it is visible.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>dtype</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : Dtype for the layer.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>domain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>>?)</code>
-          : Override for the possible max/min values (i.e something different than 65535 for uint16/'&#x3C;u2').
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>modelMatrix</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
-          : A column major affine transformation to be applied to the volume.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>xSlice</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>?)</code>
-          : 0-width (physical coordinates) interval on which to slice the volume.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>ySlice</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>?)</code>
-          : 0-height (physical coordinates) interval on which to slice the volume.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>zSlice</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>?)</code>
-          : 0-depth (physical coordinates) interval on which to slice the volume.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>clippingPlanes</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>>?)</code>
-          : List of math.gl 
-<a href="https://math.gl/modules/culling/docs/api-reference/plane">Plane</a>
- objects.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>resolutionMatrix</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
-          : Matrix for scaling the volume based on the (downsampled) resolution being displayed.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>extensions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?)</code>
-          : <a href="https://deck.gl/docs/developer-guide/custom-layers/layer-extensions">deck.gl extensions</a>
- to add to the layers - default is AdditiveBlendExtension from ColorPalette3DExtensions.
-
-          
-        </div>
-      
-    </div>
   
 
   
@@ -5388,11 +4029,6 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
   
     <div class='pre p1 fill-light mt0'>BitmapLayer</div>
   
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>
-    </p>
-  
   
 
   
@@ -5404,56 +4040,6 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>opacity</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
-          : Opacity of the layer.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>onClick</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>?)</code>
-          : Hook function from deck.gl to handle clicked-on objects.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>modelMatrix</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>?)</code>
-          : Math.gl Matrix4 object containing an affine transformation to be applied to the image.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>photometricInterpretation</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
-          : One of WhiteIsZero BlackIsZero YCbCr or RGB (default)
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>transparentColor</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>?)</code>
-          : An RGB (0-255 range) color to be considered "transparent" if provided.
-In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
-This parameter only needs to be a truthy value when using colormaps because each colormap has its own transparent color that is calculated on the shader.
-Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>?)</code>
-          : Unique identifier for this layer.
-
-          
-        </div>
-      
-    </div>
   
 
   
@@ -5492,11 +4078,6 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
   
     <div class='pre p1 fill-light mt0'>OverviewLayer</div>
   
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
   
 
   
@@ -5508,82 +4089,6 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>contrastLimits</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>>)</code>
-          : List of [begin, end] values to control each channel's ramp function.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>channelsVisible</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>>)</code>
-          : List of boolean values for each channel for whether or not it is visible.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>loader</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
-          : PixelSource[]. Assumes multiscale if loader.length > 1.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>selections</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
-          : Selection to be used for fetching data.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>boundingBoxColor</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>?)</code>
-          : [r, g, b] color of the bounding box (default: [255, 0, 0]).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>boundingBoxOutlineWidth</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
-          : Width of the bounding box in px (default: 1).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>viewportOutlineColor</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>?)</code>
-          : [r, g, b] color of the outline (default: [255, 190, 0]).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>viewportOutlineWidth</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
-          : Viewport outline width in px (default: 2).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>?)</code>
-          : Unique identifier for this layer.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>extensions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?)</code>
-          : <a href="https://deck.gl/docs/developer-guide/custom-layers/layer-extensions">deck.gl extensions</a>
- to add to the layers.
-
-          
-        </div>
-      
-    </div>
   
 
   
@@ -5622,11 +4127,6 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
   
     <div class='pre p1 fill-light mt0'>ScaleBarLayer</div>
   
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
   
 
   
@@ -5638,62 +4138,6 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>unit</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-          : Physical unit size per pixel at full resolution.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>size</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>)</code>
-          : Physical size of a pixel.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>viewState</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-          : The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
-
-<a href="https://github.com/visgl/deck.gl/issues/4504">https://github.com/visgl/deck.gl/issues/4504</a>
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>boundingBox</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?)</code>
-          : Boudning box of the view in which this should render.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
-          : Id from the parent layer.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>length</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
-          : Value from 0 to 1 representing the portion of the view to be used for the length part of the scale bar.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>snap</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
-          : If true, aligns the scale bar value to predefined intervals for clearer readings, adjusting units if necessary.
-
-          
-        </div>
-      
-    </div>
   
 
   
@@ -5742,15 +4186,9 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
   </div>
   
 
-  <p>This deck.gl extension allows for a lens that selectively shows one channel in its chosen color and then the others in white.</p>
-
+  
     <div class='pre p1 fill-light mt0'>LensExtension</div>
   
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
   
 
   
@@ -5762,53 +4200,6 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>lensEnabled</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?)</code>
-          : Whether or not to use the lens.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>lensSelection</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
-          : Numeric index of the channel to be focused on by the lens.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>lensRadius</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
-          : Pixel radius of the lens (default: 100).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>lensBorderColor</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>?)</code>
-          : RGB color of the border of the lens (default [255, 255, 255]).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>lensBorderRadius</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
-          : Percentage of the radius of the lens for a border (default 0.02).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>colors</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>>?)</code>
-          : Color palette to pseudo-color channels as.
-
-          
-        </div>
-      
-    </div>
   
 
   
@@ -5844,15 +4235,9 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
   </div>
   
 
-  <p>This deck.gl extension allows for an additive colormap like viridis or jet to be used for pseudo-coloring channels.</p>
-
+  
     <div class='pre p1 fill-light mt0'>AdditiveColormapExtension</div>
   
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>
-    </p>
-  
   
 
   
@@ -5864,33 +4249,6 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>opacity</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
-          : Opacity of the layer.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>colormap</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
-          : String indicating a colormap (default: 'viridis').  The full list of options is here: 
-<a href="https://github.com/glslify/glsl-colormap#glsl-colormap">https://github.com/glslify/glsl-colormap#glsl-colormap</a>
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>useTransparentColor</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?)</code>
-          : Indicates whether the shader should make the output of colormap_function(0) color transparent
-
-          
-        </div>
-      
-    </div>
   
 
   
@@ -5926,15 +4284,9 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
   </div>
   
 
-  <p>This deck.gl extension allows for a color palette to be used for pseudo-coloring channels.</p>
-
+  
     <div class='pre p1 fill-light mt0'>ColorPaletteExtension</div>
   
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>
-    </p>
-  
   
 
   
@@ -5946,40 +4298,6 @@ Thus setting this to a truthy value (with a colormap set) indicates that the sha
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>colors</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>>?)</code>
-          : Array of colors to map channels to (RGB).
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>opacity</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
-          : Opacity of the layer.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>transparentColor</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>?)</code>
-          : An RGB (0-255 range) color to be considered "transparent" if provided.
-In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>useTransparentColor</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>?)</code>
-          : Whether or not to use the value provided to transparentColor.
-
-          
-        </div>
-      
-    </div>
   
 
   
@@ -6015,16 +4333,9 @@ In other words, any fragment shader output equal transparentColor (before applyi
   </div>
   
 
-  <p>This object contains the BaseExtension, which can be extended for other color palette-style rendering, as well
-implementations of three ray casting algorithms as extensions.</p>
-
+  
     <div class='pre p1 fill-light mt0'>ColorPalette3DExtensions</div>
   
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>
-    </p>
-  
   
 
   
@@ -6036,35 +4347,6 @@ implementations of three ray casting algorithms as extensions.</p>
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>BaseExtension</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>AdditiveBlendExtension</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>MaximumIntensityProjectionExtension</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>MinimumIntensityProjectionExtension</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
-          
-          
-        </div>
-      
-    </div>
   
 
   
@@ -6298,16 +4580,9 @@ implementations of three ray casting algorithms as extensions.</p>
   </div>
   
 
-  <p>This object contains the BaseExtension, which can be extended for other additive colormap-style (i.e viridis, jet etc.) rendering, as well
-implementations of three ray casting algorithms as extensions.</p>
-
+  
     <div class='pre p1 fill-light mt0'>AdditiveColormap3DExtensions</div>
   
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>
-    </p>
-  
   
 
   
@@ -6319,35 +4594,6 @@ implementations of three ray casting algorithms as extensions.</p>
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>BaseExtension</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>AdditiveBlendExtension</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>MaximumIntensityProjectionExtension</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
-          
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>MinimumIntensityProjectionExtension</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
-          
-          
-        </div>
-      
-    </div>
   
 
   
@@ -6594,9 +4840,8 @@ implementations of three ray casting algorithms as extensions.</p>
   </div>
   
 
-  <p>Opens an OME-TIFF via URL and returns data source and associated metadata for first or all images in files.</p>
-
-    <div class='pre p1 fill-light mt0'>loadOmeTiff(source: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | File), opts: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;{data: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#tiffpixelsource">TiffPixelSource</a>>, metadata: ImageMeta}> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;{data: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#tiffpixelsource">TiffPixelSource</a>>, metadata: ImageMeta}>>)</div>
+  
+    <div class='pre p1 fill-light mt0'>loadOmeTiff(source: any, opts: any)</div>
   
   
 
@@ -6613,78 +4858,18 @@ implementations of three ray casting algorithms as extensions.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>source</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | File))</code>
-	    url or File object. If the url is prefixed with file:// will attempt to load with GeoTIFF's 'fromFile',
-which requires access to Node's fs module.
-
+            <span class='code bold'>source</span> <code class='quiet'>(any)</code>
+	    
           </div>
           
         </div>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>opts</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+            <span class='code bold'>opts</span> <code class='quiet'>(any
             = <code>{}</code>)</code>
 	    
           </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>opts.headers</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/HTML/Element/header">Headers</a>?</code>
-  </td>
-  <td class='break-word'><span>Headers passed to each underlying fetch request.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>opts.offsets</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>>?</code>
-  </td>
-  <td class='break-word'><span><a href="https://github.com/hms-dbmi/generate-tiff-offsets">Indexed-Tiff</a>
- IFD offsets.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>opts.pool</span> <code class='quiet'>GeoTIFF.Pool?</code>
-  </td>
-  <td class='break-word'><span>A geotiff.js 
-<a href="https://geotiffjs.github.io/geotiff.js/module-pool-Pool.html">Pool</a>
- for decoding image chunks.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>opts.images</span> <code class='quiet'>(<code>"first"</code> | <code>"all"</code>)</code>
-  
-    (default <code>&#39;first&#39;</code>)
-  </td>
-  <td class='break-word'><span>Whether to return 'all' or only the 'first' image in the OME-TIFF.
-Promise&#x3C;{ data: TiffPixelSource[], metadata: ImageMeta }>[] is returned.
-</span></td>
-</tr>
-
-
-              
-            </tbody>
-          </table>
           
         </div>
       
@@ -6693,14 +4878,6 @@ Promise&#x3C;{ data: TiffPixelSource[], metadata: ImageMeta }>[] is returned.
 
   
 
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;{data: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#tiffpixelsource">TiffPixelSource</a>>, metadata: ImageMeta}> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;{data: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#tiffpixelsource">TiffPixelSource</a>>, metadata: ImageMeta}>>)</code>:
-        data source and associated OME-Zarr metadata.
-
-      
-    
   
 
   
@@ -6734,9 +4911,8 @@ Promise&#x3C;{ data: TiffPixelSource[], metadata: ImageMeta }>[] is returned.
   </div>
   
 
-  <p>Opens root of multiscale OME-Zarr via URL.</p>
-
-    <div class='pre p1 fill-light mt0'>loadOmeZarr(source: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, options: {fetchOptions: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a> | RequestInit)}): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;{data: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#zarrpixelsource">ZarrPixelSource</a>>, metadata: RootAttrs}></div>
+  
+    <div class='pre p1 fill-light mt0'>loadOmeZarr(source: any, options: any)</div>
   
   
 
@@ -6753,16 +4929,15 @@ Promise&#x3C;{ data: TiffPixelSource[], metadata: ImageMeta }>[] is returned.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>source</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    url
-
+            <span class='code bold'>source</span> <code class='quiet'>(any)</code>
+	    
           </div>
           
         </div>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>options</span> <code class='quiet'>({fetchOptions: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a> | RequestInit)}
+            <span class='code bold'>options</span> <code class='quiet'>(any
             = <code>{}</code>)</code>
 	    
           </div>
@@ -6774,96 +4949,6 @@ Promise&#x3C;{ data: TiffPixelSource[], metadata: ImageMeta }>[] is returned.
 
   
 
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;{data: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#zarrpixelsource">ZarrPixelSource</a>>, metadata: RootAttrs}></code>:
-        data source and associated OME-Zarr metadata.
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='loadbioformatszarr'>
-      loadBioformatsZarr
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Opens root directory generated via <code>bioformats2raw --file_type=zarr</code>. Uses OME-XML metadata,
-and assumes first image. This function is the zarr-equivalent to using loadOmeTiff.</p>
-
-    <div class='pre p1 fill-light mt0'>loadBioformatsZarr(source: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, options: {fetchOptions: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a> | RequestInit)}): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;{data: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#zarrpixelsource">ZarrPixelSource</a>>, metadata: ImageMeta}></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>source</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    url
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>options</span> <code class='quiet'>({fetchOptions: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a> | RequestInit)}
-            = <code>{}</code>)</code>
-	    
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;{data: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#zarrpixelsource">ZarrPixelSource</a>>, metadata: ImageMeta}></code>:
-        data source and associated OMEXML metadata.
-
-      
-    
   
 
   
@@ -6897,11 +4982,8 @@ and assumes first image. This function is the zarr-equivalent to using loadOmeTi
   </div>
   
 
-  <p>Opens multiple tiffs as a multidimensional "stack" of 2D planes.
-Also supports loading multiple slickes of a stack from a stacked tiff.
-Returns the data source and OME-TIFF-like metadata.</p>
-
-    <div class='pre p1 fill-light mt0'>loadMultiTiff(sources: any, opts: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;{data: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#tiffpixelsource">TiffPixelSource</a>>, metadata: ImageMeta}></div>
+  
+    <div class='pre p1 fill-light mt0'>loadMultiTiff(sources: any, opts: any)</div>
   
   
 
@@ -6926,57 +5008,10 @@ Returns the data source and OME-TIFF-like metadata.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>opts</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+            <span class='code bold'>opts</span> <code class='quiet'>(any
             = <code>{}</code>)</code>
 	    
           </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>opts.pool</span> <code class='quiet'>GeoTIFF.Pool?</code>
-  </td>
-  <td class='break-word'><span>A geotiff.js 
-<a href="https://geotiffjs.github.io/geotiff.js/module-pool-Pool.html">Pool</a>
- for decoding image chunks.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>opts.name</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  
-    (default <code>&#39;MultiTiff&#39;</code>)
-  </td>
-  <td class='break-word'><span>a name for the "virtual" image stack.
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>opts.headers</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/HTML/Element/header">Headers</a>?</code>
-  </td>
-  <td class='break-word'><span>Headers passed to each underlying fetch request.
-</span></td>
-</tr>
-
-
-              
-            </tbody>
-          </table>
           
         </div>
       
@@ -6986,32 +5021,11 @@ Returns the data source and OME-TIFF-like metadata.</p>
   
 
   
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;{data: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#tiffpixelsource">TiffPixelSource</a>>, metadata: ImageMeta}></code>:
-        data source and associated metadata.
-
-      
-    
-  
 
   
 
   
 
-  
-    <div class='py1 quiet mt1 prose-big'>Example</div>
-    
-      
-      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> { data, metadata } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">loadMultiTiff</span>([
- [{ <span class="hljs-attr">c</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">t</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">z</span>: <span class="hljs-number">0</span> }, <span class="hljs-string">&#x27;https://example.com/channel_0.tif&#x27;</span>],
- [{ <span class="hljs-attr">c</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">t</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">z</span>: <span class="hljs-number">0</span> }, <span class="hljs-string">&#x27;https://example.com/channel_1.tif&#x27;</span>],
- [{ <span class="hljs-attr">c</span>: <span class="hljs-number">2</span>, <span class="hljs-attr">t</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">z</span>: <span class="hljs-number">0</span> }, <span class="hljs-literal">undefined</span>, { <span class="hljs-attr">c</span>: <span class="hljs-number">3</span>, <span class="hljs-attr">t</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">z</span>: <span class="hljs-number">0</span> }], <span class="hljs-string">&#x27;https://example.com/channels_2-3.tif&#x27;</span>],
-]);
-
-<span class="hljs-keyword">await</span> data.<span class="hljs-title function_">getRaster</span>({ <span class="hljs-attr">selection</span>: { <span class="hljs-attr">c</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">t</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">z</span>: <span class="hljs-number">0</span> } });
-<span class="hljs-comment">// { data: Uint16Array[...], width: 500, height: 500 }</span></pre>
-    
   
 
   
@@ -7111,13 +5125,7 @@ Returns the data source and OME-TIFF-like metadata.</p>
   
   
 
-  <div>Deprecated: We plan to remove 
-<code>DTYPE_VALUES</code>
- as a part of Viv's public API as it
-leaks internal implementation details. If this is something your project relies
-on, please open an issue for further discussion.
-<p>More info can be found here: <a href="https://github.com/hms-dbmi/viv/pull/372#discussion_r571707517">https://github.com/hms-dbmi/viv/pull/372#discussion_r571707517</a></p>
-</div>
+  
   
   
   
@@ -9003,6 +7011,139 @@ on, please open an issue for further discussion.
     </div>
   
 </div>
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='loadomezarrfromstore'>
+      loadOmeZarrFromStore
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>loadOmeZarrFromStore(store: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>store</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='deprecated_loadbioformatszarr'>
+      DEPRECATED_loadBioformatsZarr
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new DEPRECATED_loadBioformatsZarr(source: any, options: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>source</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(any
+            = <code>{}</code>)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
 
   
 

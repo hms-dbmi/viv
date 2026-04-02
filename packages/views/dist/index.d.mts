@@ -66,8 +66,6 @@ declare class VivView {
  * @param {Boolean} args.zoomLock Whether or not we lock zoom.
  * @param {Array=} args.viewportOutlineColor Outline color of the border (default [255, 255, 255])
  * @param {number=} args.viewportOutlineWidth Default outline width (default 10)
- * @param {boolean=} args.snapScaleBar If true, aligns the scale bar value to predefined intervals
- * for clearer readings, adjusting units if necessary. By default, false.
  * @param {number=} args.x X (top-left) location on the screen for the current view
  * @param {number=} args.y Y (top-left) location on the screen for the current view
  * @param {number} args.height Width of the view.
@@ -75,7 +73,7 @@ declare class VivView {
  * @param {string} args.id id of the View
  * */
 declare class SideBySideView extends VivView {
-    constructor({ id, x, y, height, width, linkedIds, panLock, zoomLock, viewportOutlineColor, viewportOutlineWidth, snapScaleBar }: {
+    constructor({ id, x, y, height, width, linkedIds, panLock, zoomLock, viewportOutlineColor, viewportOutlineWidth }: {
         id: any;
         x?: number | undefined;
         y?: number | undefined;
@@ -86,14 +84,12 @@ declare class SideBySideView extends VivView {
         zoomLock?: boolean | undefined;
         viewportOutlineColor?: number[] | undefined;
         viewportOutlineWidth?: number | undefined;
-        snapScaleBar?: boolean | undefined;
     });
     linkedIds: any[];
     panLock: boolean;
     zoomLock: boolean;
     viewportOutlineColor: number[];
     viewportOutlineWidth: number;
-    snapScaleBar: boolean;
     filterViewState({ viewState, oldViewState, currentViewState }: {
         viewState: any;
         oldViewState: any;
@@ -137,10 +133,12 @@ declare class VolumeView extends VivView {
 declare const DETAIL_VIEW_ID: "detail";
 /**
  * This class generates a MultiscaleImageLayer and a view for use in the VivViewer as a detailed view.
- * It takes the same arguments for its constructor as its base class VivView plus the following:
+ * It takes the same arguments for its constructor as its base class VivView.
+ *
+ * Note: Scale bars are now rendered using ScaleBarView rather than as a layer.
+ * Use ScaleBarView as a separate view if you want to display a scale bar.
+ *
  * @param {Object} args
- * @param {boolean=} args.snapScaleBar If true, aligns the scale bar value to predefined intervals
- * for clearer readings, adjusting units if necessary. By default, false.
  * @param {number=} args.x X (top-left) location on the screen for the current view
  * @param {number=} args.y Y (top-left) location on the screen for the current view
  * @param {number} args.height Width of the view.
@@ -148,18 +146,8 @@ declare const DETAIL_VIEW_ID: "detail";
  * @param {string} args.id id of the View
  * */
 declare class DetailView extends VivView {
-    constructor({ id, x, y, height, width, snapScaleBar }: {
-        id: any;
-        x?: number | undefined;
-        y?: number | undefined;
-        height: any;
-        width: any;
-        snapScaleBar?: boolean | undefined;
-    });
-    snapScaleBar: boolean;
-    getLayers({ props, viewStates }: {
+    getLayers({ props }: {
         props: any;
-        viewStates: any;
     }): any[][];
     filterViewState({ viewState, currentViewState }: {
         viewState: any;
@@ -219,8 +207,8 @@ declare class OverviewView extends VivView {
         minimumHeight: any;
         maximumHeight: any;
     }): void;
-    _imageWidth: number | undefined;
-    _imageHeight: number | undefined;
+    _imageWidth: any;
+    _imageHeight: any;
     scale: number | undefined;
     /**
      * Set the x and y (top left corner) of this overview relative to the detail.
@@ -233,6 +221,50 @@ declare class OverviewView extends VivView {
     getLayers({ viewStates, props }: {
         viewStates: any;
         props: any;
+    }): any[];
+}
+
+declare const SCALEBAR_VIEW_ID: "scalebar";
+/**
+ * This class generates a ScaleBar view that displays a scale bar in a specific screen position.
+ * The scale bar is positioned via the view mechanism and maintains a consistent visual position on screen.
+ *
+ * @param {Object} args
+ * @param {string} args.id id for this VivView (should be unique)
+ * @param {number} args.width Width of the view on screen
+ * @param {number} args.height Height of the view on screen
+ * @param {Array} args.loader Loader object
+ * @param {number=} args.x X (top-left) location on screen. Default is 0.
+ * @param {number=} args.y Y (top-left) location on screen. Default is 0.
+ * @param {string=} args.position Position within the view ('bottom-right', 'top-right', 'top-left', 'bottom-left'). Default is 'bottom-right'.
+ * @param {number=} args.length Length of the scale bar as a fraction (0-1) of view dimension. Default is 0.085.
+ * @param {boolean=} args.snap If true, aligns the scale bar value to predefined intervals. Default is false.
+ * @param {string=} args.imageViewId The id of the image view to track zoom from. Used to calculate correct scale values.
+ */
+declare class ScaleBarView extends VivView {
+    constructor({ id, width, height, loader, imageViewId, position, length, snap, x, y }: {
+        id: any;
+        width: any;
+        height: any;
+        loader: any;
+        imageViewId: any;
+        position?: string | undefined;
+        length?: number | undefined;
+        snap?: boolean | undefined;
+        x?: number | undefined;
+        y?: number | undefined;
+    });
+    loader: any;
+    position: string;
+    length: number;
+    snap: boolean;
+    imageViewId: any;
+    getDeckGlView(): OrthographicView;
+    filterViewState({ viewState }: {
+        viewState: any;
+    }): any;
+    getLayers({ viewStates }: {
+        viewStates: any;
     }): any[];
 }
 
@@ -250,4 +282,4 @@ declare function getVivId(id: any): string;
  */
 declare function getDefaultInitialViewState(loader: Object, viewSize: Object, zoomBackOff?: Object | undefined, use3d?: boolean | undefined, modelMatrix?: boolean | undefined): Object;
 
-export { DETAIL_VIEW_ID, DetailView, OVERVIEW_VIEW_ID, OverviewView, SideBySideView, VivView, VolumeView, getDefaultInitialViewState, getVivId };
+export { DETAIL_VIEW_ID, DetailView, OVERVIEW_VIEW_ID, OverviewView, SCALEBAR_VIEW_ID, ScaleBarView, SideBySideView, VivView, VolumeView, getDefaultInitialViewState, getVivId };

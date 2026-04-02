@@ -238,10 +238,10 @@ type LayerProps$4 = {
      */
     size: number;
     /**
-     * The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
+     * The current viewState for the desired image.  We cannot internally use this.context.viewport because it is one frame behind:
      * https://github.com/visgl/deck.gl/issues/4504
      */
-    viewState: Object;
+    imageViewState: Object;
     /**
      * Boudning box of the view in which this should render.
      */
@@ -264,7 +264,7 @@ type LayerProps$4 = {
  * @type {Object}
  * @property {String} unit Physical unit size per pixel at full resolution.
  * @property {Number} size Physical size of a pixel.
- * @property {Object} viewState The current viewState for the desired view.  We cannot internally use this.context.viewport because it is one frame behind:
+ * @property {Object} imageViewState The current viewState for the desired image.  We cannot internally use this.context.viewport because it is one frame behind:
  * https://github.com/visgl/deck.gl/issues/4504
  * @property {Array=} boundingBox Boudning box of the view in which this should render.
  * @property {string=} id Id from the parent layer.

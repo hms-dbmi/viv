@@ -2,7 +2,8 @@ import { BaseDecoder, fromBlob, fromFile, fromUrl, GeoTIFFImage, addDecoder } fr
 import { decompress } from 'lzw-tiff-decoder';
 import quickselect from 'quickselect';
 import * as z from 'zod';
-import { KeyError, openGroup, HTTPStore } from 'zarr';
+import * as zarr from 'zarrita';
+import { FetchStore } from 'zarrita';
 
 var __defProp$3 = Object.defineProperty;
 var __defNormalProp$3 = (obj, key, value) => key in obj ? __defProp$3(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
@@ -1215,17 +1216,13 @@ class FileStore extends ReadOnlyStore {
   _key(key) {
     return joinUrlParts(this._rootPrefix, key);
   }
-  async getItem(key) {
+  async get(key) {
     const file = this._map.get(this._key(key));
     if (!file) {
-      throw new KeyError(key);
+      return void 0;
     }
     const buffer = await file.arrayBuffer();
-    return buffer;
-  }
-  async containsItem(key) {
-    const path = this._key(key);
-    return this._map.has(path);
+    return new Uint8Array(buffer);
   }
 }
 
@@ -1266,8 +1263,12 @@ function castLabels(dimnames) {
   return dimnames;
 }
 async function loadMultiscales(store, path = "") {
-  const grp = await openGroup(store, path);
-  const rootAttrs = await grp.attrs.asObject();
+  const location = zarr.root(store);
+  const groupLocation = path ? location.resolve(path) : location;
+  const grp = await zarr.open(groupLocation, { kind: "group" });
+  const unknownAttrs = await grp.attrs;
+  const ngff_v0_5_or_later = "ome" in unknownAttrs;
+  const rootAttrs = ngff_v0_5_or_later ? unknownAttrs.ome : unknownAttrs;
   let paths = ["0"];
   let labels = castLabels(["t", "c", "z", "y", "x"]);
   if ("multiscales" in rootAttrs) {
@@ -1281,9 +1282,11 @@ async function loadMultiscales(store, path = "") {
       }
     }
   }
-  const data = paths.map((path2) => grp.getItem(path2));
+  const data = await Promise.all(
+    paths.map((p) => zarr.open(groupLocation.resolve(p), { kind: "array" }))
+  );
   return {
-    data: await Promise.all(data),
+    data,
     rootAttrs,
     labels
   };
@@ -1332,9 +1335,6 @@ const DTYPE_LOOKUP = {
   i2: "Int16",
   i4: "Int32"
 };
-function slice(start, stop) {
-  return { start, stop, step: 1, _slice: true };
-}
 class BoundsCheckError extends Error {
 }
 class ZarrPixelSource {
@@ -1350,11 +1350,11 @@ class ZarrPixelSource {
     return this._data.shape;
   }
   get dtype() {
-    const suffix = this._data.dtype.slice(1);
-    if (!(suffix in DTYPE_LOOKUP)) {
-      throw Error(`Zarr dtype not supported, got ${suffix}.`);
+    const normalized = this._data.dtype.toLowerCase();
+    if (normalized.length === 2 && normalized in DTYPE_LOOKUP) {
+      return DTYPE_LOOKUP[normalized];
     }
-    return DTYPE_LOOKUP[suffix];
+    return normalized.charAt(0).toUpperCase() + normalized.slice(1);
   }
   get _xIndex() {
     const interleave = isInterleaved(this._data.shape);
@@ -1385,12 +1385,13 @@ class ZarrPixelSource {
     if (xStart < 0 || yStart < 0 || xStop > width || yStop > height) {
       throw new BoundsCheckError("Tile slice is out of bounds.");
     }
-    return [slice(xStart, xStop), slice(yStart, yStop)];
+    return [zarr.slice(xStart, xStop), zarr.slice(yStart, yStop)];
   }
   async _getRaw(selection, getOptions) {
-    const result = await this._data.getRaw(selection, getOptions);
+    const signal = getOptions?.storeOptions?.signal;
+    const result = await zarr.get(this._data, selection, signal);
     if (typeof result !== "object") {
-      throw new Error("Expected object from getRaw");
+      throw new Error("Expected object from zarr.get");
     }
     return result;
   }
@@ -1465,13 +1466,21 @@ async function load(store) {
   };
 }
 
-async function loadBioformatsZarr(source, options = {}) {
-  const METADATA = "METADATA.ome.xml";
-  const ZARR_DIR = "data.zarr";
+async function loadOmeZarr(source, options = {}) {
+  const store = new FetchStore(source, options.fetchOptions);
+  if (options?.type !== "multiscales") {
+    throw Error("Only multiscale OME-Zarr is supported.");
+  }
+  return load(store);
+}
+async function _DEPRECATED_loadBioformatsZarrWithPaths(source, metadataPath, zarrDir, options = {}) {
   if (typeof source === "string") {
     const url = source.endsWith("/") ? source.slice(0, -1) : source;
-    const store2 = new HTTPStore(`${url}/${ZARR_DIR}`, options);
-    const xmlSource = await fetch(`${url}/${METADATA}`, options.fetchOptions);
+    const store2 = new FetchStore(`${url}/${zarrDir}`, options.fetchOptions);
+    const xmlSource = await fetch(
+      `${url}/${metadataPath}`,
+      options.fetchOptions
+    );
     if (!xmlSource.ok) {
       throw Error("No OME-XML metadata found for store.");
     }
@@ -1480,7 +1489,7 @@ async function loadBioformatsZarr(source, options = {}) {
   const fMap = /* @__PURE__ */ new Map();
   let xmlFile;
   for (const file of source) {
-    if (file.name === METADATA) {
+    if (file.name === metadataPath) {
       xmlFile = file;
     } else {
       fMap.set(file.path, file);
@@ -1489,15 +1498,24 @@ async function loadBioformatsZarr(source, options = {}) {
   if (!xmlFile) {
     throw Error("No OME-XML metadata found for store.");
   }
-  const store = new FileStore(fMap, getRootPrefix(source, ZARR_DIR));
+  const store = new FileStore(fMap, getRootPrefix(source, zarrDir));
   return load$1(store, xmlFile);
 }
-async function loadOmeZarr(source, options = {}) {
-  const store = new HTTPStore(source, options);
-  if (options?.type !== "multiscales") {
-    throw Error("Only multiscale OME-Zarr is supported.");
-  }
-  return load(store);
+async function DEPRECATED_loadBioformatsZarr(source, options = {}) {
+  return Promise.any([
+    _DEPRECATED_loadBioformatsZarrWithPaths(
+      source,
+      "METADATA.ome.xml",
+      "data.zarr",
+      options
+    ),
+    _DEPRECATED_loadBioformatsZarrWithPaths(
+      source,
+      "OME/METADATA.ome.xml",
+      "",
+      options
+    )
+  ]);
 }
 
-export { SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, getChannelStats, getImageSize, isInterleaved, loadBioformatsZarr, loadMultiTiff, loadOmeTiff, loadOmeZarr };
+export { DEPRECATED_loadBioformatsZarr, SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, getChannelStats, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore };

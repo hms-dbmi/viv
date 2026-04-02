@@ -1,5 +1,5 @@
-import { getPhysicalSizeScalingMatrix, MultiscaleImageLayer, ImageLayer, makeBoundingBox, OverviewLayer, ScaleBarLayer, VolumeLayer } from '@vivjs/layers';
 import { OrthographicView, Controller, COORDINATE_SYSTEM, OrbitView } from '@deck.gl/core';
+import { getPhysicalSizeScalingMatrix, MultiscaleImageLayer, ImageLayer, makeBoundingBox, OverviewLayer, ScaleBarLayer, VolumeLayer } from '@vivjs/layers';
 import { getImageSize } from '@vivjs/loaders';
 import { Matrix4 } from '@math.gl/core';
 import { PolygonLayer } from '@deck.gl/layers';
@@ -259,29 +259,12 @@ class OverviewView extends VivView {
 
 const DETAIL_VIEW_ID = "detail";
 class DetailView extends VivView {
-  constructor({ id, x = 0, y = 0, height, width, snapScaleBar = false }) {
+  constructor({ id, x = 0, y = 0, height, width }) {
     super({ id, x, y, height, width });
-    this.snapScaleBar = snapScaleBar;
   }
-  getLayers({ props, viewStates }) {
-    const { loader } = props;
-    const { id, height, width } = this;
-    const layerViewState = viewStates[id];
-    const layers = [getImageLayer(id, props)];
-    if (loader[0]?.meta?.physicalSizes?.x) {
-      const { size, unit } = loader[0].meta.physicalSizes.x;
-      layers.push(
-        new ScaleBarLayer({
-          id: getVivId(id),
-          loader,
-          unit,
-          size,
-          snap: this.snapScaleBar,
-          viewState: { ...layerViewState, height, width }
-        })
-      );
-    }
-    return layers;
+  getLayers({ props }) {
+    const { id } = this;
+    return [getImageLayer(id, props)];
   }
   filterViewState({ viewState, currentViewState }) {
     if (viewState.id === OVERVIEW_VIEW_ID) {
@@ -305,8 +288,7 @@ class SideBySideView extends VivView {
     panLock = true,
     zoomLock = true,
     viewportOutlineColor = [255, 255, 255],
-    viewportOutlineWidth = 10,
-    snapScaleBar = false
+    viewportOutlineWidth = 10
   }) {
     super({ id, x, y, height, width });
     this.linkedIds = linkedIds;
@@ -314,7 +296,6 @@ class SideBySideView extends VivView {
     this.zoomLock = zoomLock;
     this.viewportOutlineColor = viewportOutlineColor;
     this.viewportOutlineWidth = viewportOutlineWidth;
-    this.snapScaleBar = snapScaleBar;
   }
   filterViewState({ viewState, oldViewState, currentViewState }) {
     const { id: viewStateId } = viewState;
@@ -367,7 +348,6 @@ class SideBySideView extends VivView {
     };
   }
   getLayers({ props, viewStates }) {
-    const { loader } = props;
     const { id, viewportOutlineColor, viewportOutlineWidth, height, width } = this;
     const layerViewState = viewStates[id];
     const boundingBox = makeBoundingBox({ ...layerViewState, height, width });
@@ -383,16 +363,76 @@ class SideBySideView extends VivView {
       getLineWidth: viewportOutlineWidth * 2 ** -layerViewState.zoom
     });
     layers.push(border);
-    if (loader[0]?.meta?.physicalSizes?.x) {
+    return layers;
+  }
+}
+
+const SCALEBAR_VIEW_ID = "scalebar";
+class ScaleBarView extends VivView {
+  constructor({
+    id,
+    width,
+    height,
+    loader,
+    imageViewId,
+    position = "bottom-right",
+    length = 0.05,
+    snap = false,
+    x = 0,
+    y = 0
+  }) {
+    super({ id, width, height });
+    this.id = id;
+    this.loader = loader;
+    this.position = position;
+    this.length = length;
+    this.snap = snap;
+    this.imageViewId = imageViewId;
+    this.x = x;
+    this.y = y;
+  }
+  getDeckGlView() {
+    const { id, height, width, x, y } = this;
+    return new OrthographicView({
+      id,
+      controller: false,
+      // Disable interaction on scale bar view
+      height,
+      width,
+      x: this.x,
+      y: this.y
+    });
+  }
+  filterViewState({ viewState }) {
+    const { id, height, width } = this;
+    return {
+      ...viewState,
+      id,
+      height,
+      width,
+      target: [width / 2, height / 2, 0],
+      zoom: 0
+    };
+  }
+  getLayers({ viewStates }) {
+    const { loader } = this;
+    const layers = [];
+    if (loader?.[0]?.meta?.physicalSizes?.x) {
+      const { id, height, width, position, length, snap, imageViewId } = this;
       const { size, unit } = loader[0].meta.physicalSizes.x;
+      const imageViewState = viewStates[imageViewId];
+      const layerId = getVivId(id);
       layers.push(
         new ScaleBarLayer({
-          id: getVivId(id),
-          loader,
+          id: layerId,
           unit,
           size,
-          snap: this.snapScaleBar,
-          viewState: { ...layerViewState, height, width }
+          position,
+          imageViewState: { ...imageViewState, height, width },
+          length,
+          snap,
+          height,
+          width
         })
       );
     }
@@ -438,4 +478,4 @@ class VolumeView extends VivView {
   }
 }
 
-export { DETAIL_VIEW_ID, DetailView, OVERVIEW_VIEW_ID, OverviewView, SideBySideView, VivView, VolumeView, getDefaultInitialViewState, getVivId };
+export { DETAIL_VIEW_ID, DetailView, OVERVIEW_VIEW_ID, OverviewView, SCALEBAR_VIEW_ID, ScaleBarView, SideBySideView, VivView, VolumeView, getDefaultInitialViewState, getVivId };

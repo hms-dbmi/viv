@@ -20,7 +20,8 @@ function padWithDefault(arr, defaultValue, padWidth) {
   return arr;
 }
 function getDtypeValues(dtype) {
-  const values = DTYPE_VALUES[dtype];
+  const normalizedDtype = dtype.charAt(0).toUpperCase() + dtype.slice(1).toLowerCase();
+  const values = DTYPE_VALUES[normalizedDtype];
   if (!values) {
     const valid = Object.keys(DTYPE_VALUES);
     throw Error(`Dtype not supported, got ${dtype}. Must be one of ${valid}.`);
@@ -984,38 +985,9 @@ const OverviewLayer = class extends CompositeLayer {
 OverviewLayer.layerName = "OverviewLayer";
 OverviewLayer.defaultProps = defaultProps$3;
 
-function getPosition(boundingBox, position, length) {
-  const viewWidth = boundingBox[2][0] - boundingBox[0][0];
-  const viewHeight = boundingBox[2][1] - boundingBox[0][1];
-  switch (position) {
-    case "bottom-right": {
-      const yCoord = boundingBox[2][1] - viewHeight * length;
-      const xLeftCoord = boundingBox[2][0] - viewWidth * length;
-      return [yCoord, xLeftCoord];
-    }
-    case "top-right": {
-      const yCoord = boundingBox[0][1] + viewHeight * length;
-      const xLeftCoord = boundingBox[2][0] - viewWidth * length;
-      return [yCoord, xLeftCoord];
-    }
-    case "top-left": {
-      const yCoord = boundingBox[0][1] + viewHeight * length;
-      const xLeftCoord = boundingBox[0][0] + viewWidth * length;
-      return [yCoord, xLeftCoord];
-    }
-    case "bottom-left": {
-      const yCoord = boundingBox[2][1] - viewHeight * length;
-      const xLeftCoord = boundingBox[0][0] + viewWidth * length;
-      return [yCoord, xLeftCoord];
-    }
-    default: {
-      throw new Error(`Position ${position} not found`);
-    }
-  }
-}
 const defaultProps$2 = {
   pickable: { type: "boolean", value: true, compare: true },
-  viewState: {
+  imageViewState: {
     type: "object",
     value: { zoom: 0, target: [0, 0, 0], width: 1, height: 1 },
     compare: true
@@ -1028,29 +1000,57 @@ const defaultProps$2 = {
 };
 const ScaleBarLayer = class extends CompositeLayer {
   renderLayers() {
-    const { id, unit, size, position, viewState, length, snap } = this.props;
-    const boundingBox = makeBoundingBox(viewState);
-    const { zoom } = viewState;
+    const {
+      id,
+      unit,
+      size,
+      position,
+      imageViewState,
+      length,
+      snap,
+      height,
+      width
+    } = this.props;
+    const boundingBox = makeBoundingBox(imageViewState);
     const viewLength = boundingBox[2][0] - boundingBox[0][0];
     const barLength = viewLength * 0.05;
-    const barHeight = Math.max(
-      2 ** (-zoom + 1.5),
-      (boundingBox[2][1] - boundingBox[0][1]) * 7e-3
-    );
-    let adjustedBarLength = barLength;
+    const barScreenLength = barLength * 2 ** imageViewState.zoom;
+    const barHeight = 10;
     let displayNumber = (barLength * size).toPrecision(5);
     let displayUnit = unit;
+    let adjustedBarLength = barScreenLength;
     if (snap) {
       const meterSize = sizeToMeters(size, unit);
       const numUnits = barLength * meterSize;
       const [snappedOrigUnits, snappedNewUnits, snappedUnitPrefix] = snapValue(numUnits);
-      adjustedBarLength = snappedOrigUnits / meterSize;
       displayNumber = snappedNewUnits;
       displayUnit = `${snappedUnitPrefix}m`;
+      adjustedBarLength = snappedOrigUnits / meterSize * 2 ** imageViewState.zoom;
     }
-    const [yCoord, xLeftCoord] = getPosition(boundingBox, position, length);
-    const xRightCoord = xLeftCoord + barLength;
+    let xLeftCoord;
+    let yCoord;
     const isLeft = position.endsWith("-left");
+    switch (position) {
+      case "bottom-right":
+        yCoord = height - height * length;
+        xLeftCoord = width - adjustedBarLength - width * length;
+        break;
+      case "bottom-left":
+        yCoord = height - height * length;
+        xLeftCoord = width * length;
+        break;
+      case "top-right":
+        yCoord = height * length;
+        xLeftCoord = width - adjustedBarLength - width * length;
+        break;
+      case "top-left":
+        yCoord = height * length;
+        xLeftCoord = width * length;
+        break;
+      default:
+        throw new Error(`Position ${position} not found`);
+    }
+    const xRightCoord = xLeftCoord + adjustedBarLength;
     const lengthBar = new LineLayer({
       id: `scale-bar-length-${id}`,
       coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
@@ -1111,17 +1111,15 @@ const ScaleBarLayer = class extends CompositeLayer {
       data: [
         {
           text: `${displayNumber}${displayUnit}`,
-          position: [
-            isLeft ? xLeftCoord + barLength * 0.5 : xRightCoord - barLength * 0.5,
-            yCoord + barHeight * 4
-          ]
+          position: [isLeft ? xLeftCoord : xRightCoord, yCoord - barHeight * 2]
         }
       ],
+      getTextAnchor: isLeft ? "start" : "end",
       getColor: [220, 220, 220, 255],
       getSize: 12,
       fontFamily: DEFAULT_FONT_FAMILY,
-      sizeUnits: "meters",
-      sizeScale: 2 ** -zoom,
+      sizeUnits: "pixels",
+      sizeScale: 1,
       characterSet: [
         ...displayUnit.split(""),
         ...range(10).map((i) => String(i)),
