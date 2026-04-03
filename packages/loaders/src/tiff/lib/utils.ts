@@ -4,6 +4,8 @@ import type { DimensionOrder, OmeXml, PhysicalUnit } from '../../omexml';
 import { assert, DTYPE_LOOKUP, getLabels, prevPowerOf2 } from '../../utils';
 import type { MultiTiffImage } from '../multi-tiff';
 import { createOffsetsProxy } from './proxies';
+import type { ScannerOptions } from './resolve-offsets';
+import { resolveRemoteOffsets } from './resolve-offsets';
 
 // TODO: Remove the fancy label stuff
 export type OmeTiffDims =
@@ -351,13 +353,32 @@ export async function createGeoTiff(
   options: {
     headers?: Headers | Record<string, string>;
     offsets?: number[];
+    scannerOptions?: ScannerOptions;
   } = {}
 ): Promise<GeoTIFF> {
   const tiff = await createGeoTiffObject(source, options);
-  /*
-   * Performance enhancement. If offsets are provided, we
-   * create a proxy that intercepts calls to `tiff.getImage`
-   * and injects the pre-computed offsets.
-   */
-  return options.offsets ? createOffsetsProxy(tiff, options.offsets) : tiff;
+
+  if (options.offsets) {
+    return createOffsetsProxy(tiff, options.offsets);
+  }
+
+  if (!(source instanceof Blob)) {
+    const url = typeof source === 'string' ? new URL(source) : source;
+    if (url.protocol !== 'file:') {
+      try {
+        const offsets = await resolveRemoteOffsets(
+          url.href,
+          options.headers,
+          options.scannerOptions
+        );
+        if (offsets.length > 0) {
+          return createOffsetsProxy(tiff, offsets);
+        }
+      } catch {
+        // resolution failed, use default GeoTIFF traversal
+      }
+    }
+  }
+
+  return tiff;
 }
