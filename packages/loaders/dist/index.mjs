@@ -195,6 +195,291 @@ function createOffsetsProxy(tiff, offsets) {
   return new Proxy(tiff, { get });
 }
 
+const SCANNER_DEFAULTS = {
+  initialWindowSize: 64 * 1024,
+  maxWindowSize: 1024 * 1024,
+  mode: "adaptive"
+};
+function validateScannerOptions(opts) {
+  if (opts.initialWindowSize <= 0) {
+    throw new Error(
+      `initialWindowSize must be positive, got ${opts.initialWindowSize}`
+    );
+  }
+  if (opts.maxWindowSize <= 0) {
+    throw new Error(
+      `maxWindowSize must be positive, got ${opts.maxWindowSize}`
+    );
+  }
+  if (opts.initialWindowSize > opts.maxWindowSize) {
+    throw new Error(
+      `initialWindowSize (${opts.initialWindowSize}) must not exceed maxWindowSize (${opts.maxWindowSize})`
+    );
+  }
+}
+const LITTLE_ENDIAN = 18761;
+const BIG_ENDIAN = 19789;
+const CLASSIC_MAGIC = 42;
+const BIGTIFF_MAGIC = 43;
+function parseTiffHeader(buf) {
+  const view = new DataView(buf);
+  const bom = view.getUint16(0, false);
+  let littleEndian;
+  if (bom === LITTLE_ENDIAN) {
+    littleEndian = true;
+  } else if (bom === BIG_ENDIAN) {
+    littleEndian = false;
+  } else {
+    throw new Error(`Invalid TIFF byte-order mark: 0x${bom.toString(16)}`);
+  }
+  const magic = view.getUint16(2, littleEndian);
+  if (magic === CLASSIC_MAGIC) {
+    const firstIfdOffset = view.getUint32(4, littleEndian);
+    return { littleEndian, bigTiff: false, firstIfdOffset };
+  }
+  if (magic === BIGTIFF_MAGIC) {
+    const firstIfdOffset = readUint64(view, 8, littleEndian);
+    return { littleEndian, bigTiff: true, firstIfdOffset };
+  }
+  throw new Error(`Invalid TIFF magic number: ${magic}`);
+}
+function readUint64(view, offset, littleEndian) {
+  const lo = view.getUint32(offset, littleEndian);
+  const hi = view.getUint32(offset + 4, littleEndian);
+  const value = littleEndian ? hi * 4294967296 + lo : lo * 4294967296 + hi;
+  if (!Number.isSafeInteger(value)) {
+    throw new Error(`IFD offset exceeds safe integer range: ${value}`);
+  }
+  return value;
+}
+function computeRequiredIfdSize(buf, localOffset, format) {
+  const view = new DataView(buf);
+  const { littleEndian, bigTiff } = format;
+  if (bigTiff) {
+    if (localOffset + 8 > buf.byteLength)
+      return null;
+    const entryCount2 = readUint64(view, localOffset, littleEndian);
+    return 8 + entryCount2 * 20 + 8;
+  }
+  if (localOffset + 2 > buf.byteLength)
+    return null;
+  const entryCount = view.getUint16(localOffset, littleEndian);
+  return 2 + entryCount * 12 + 4;
+}
+function parseIfd(buf, localOffset, format) {
+  const view = new DataView(buf);
+  const { littleEndian, bigTiff } = format;
+  if (bigTiff) {
+    if (localOffset + 8 > buf.byteLength)
+      return null;
+    const entryCount2 = readUint64(view, localOffset, littleEndian);
+    const ifdSize2 = 8 + entryCount2 * 20 + 8;
+    if (localOffset + ifdSize2 > buf.byteLength)
+      return null;
+    const nextIfdOffset2 = readUint64(
+      view,
+      localOffset + 8 + entryCount2 * 20,
+      littleEndian
+    );
+    return { nextIfdOffset: nextIfdOffset2, bytesConsumed: ifdSize2 };
+  }
+  if (localOffset + 2 > buf.byteLength)
+    return null;
+  const entryCount = view.getUint16(localOffset, littleEndian);
+  const ifdSize = 2 + entryCount * 12 + 4;
+  if (localOffset + ifdSize > buf.byteLength)
+    return null;
+  const nextIfdOffset = view.getUint32(
+    localOffset + 2 + entryCount * 12,
+    littleEndian
+  );
+  return { nextIfdOffset, bytesConsumed: ifdSize };
+}
+function normalizeHeaders(headers) {
+  if (!headers)
+    return void 0;
+  if (headers instanceof Headers) {
+    const obj = {};
+    headers.forEach((v, k) => {
+      obj[k] = v;
+    });
+    return obj;
+  }
+  return headers;
+}
+async function fetchRange(url, start, end, headers) {
+  const resp = await fetch(url, {
+    headers: {
+      ...normalizeHeaders(headers),
+      Range: `bytes=${start}-${end - 1}`
+    }
+  });
+  if (resp.status === 206) {
+    return { buffer: await resp.arrayBuffer(), fullFile: false };
+  }
+  if (resp.ok) {
+    return { buffer: await resp.arrayBuffer(), fullFile: true };
+  }
+  throw new Error(
+    `HTTP ${resp.status} fetching range bytes=${start}-${end - 1}`
+  );
+}
+async function fetchOffsetsJson(url, headers) {
+  try {
+    const offsetsUrl = `${url}.offsets.json`;
+    console.log("[viv:offsets] Checking for offsets JSON at:", offsetsUrl);
+    const resp = await fetch(offsetsUrl, {
+      headers: normalizeHeaders(headers)
+    });
+    if (!resp.ok) {
+      console.log(
+        `[viv:offsets] offsets.json fetch returned HTTP ${resp.status}`
+      );
+      return null;
+    }
+    const data = await resp.json();
+    if (!Array.isArray(data) || data.length === 0) {
+      console.log(
+        "[viv:offsets] offsets.json response was not a valid array"
+      );
+      return null;
+    }
+    for (const n of data) {
+      if (typeof n !== "number" || !Number.isSafeInteger(n) || n < 0) {
+        console.log(
+          "[viv:offsets] offsets.json contains invalid entry:",
+          n
+        );
+        return null;
+      }
+    }
+    console.log(
+      `[viv:offsets] offsets.json loaded successfully: ${data.length} offsets`
+    );
+    return data;
+  } catch (err) {
+    console.log("[viv:offsets] offsets.json fetch failed:", err);
+    return null;
+  }
+}
+async function scanIfdOffsets(url, headers, options) {
+  const opts = { ...SCANNER_DEFAULTS, ...options };
+  validateScannerOptions(opts);
+  const initialWindow = opts.initialWindowSize;
+  const headerResult = await fetchRange(url, 0, 16, headers);
+  const format = parseTiffHeader(headerResult.buffer);
+  const offsets = [];
+  let currentOffset = format.firstIfdOffset;
+  if (currentOffset === 0)
+    return offsets;
+  let bufStart;
+  let buf;
+  let haveFullFile;
+  if (headerResult.fullFile) {
+    buf = headerResult.buffer;
+    bufStart = 0;
+    haveFullFile = true;
+  } else {
+    buf = new ArrayBuffer(0);
+    bufStart = -1;
+    haveFullFile = false;
+  }
+  while (currentOffset !== 0) {
+    offsets.push(currentOffset);
+    const localOffset = currentOffset - bufStart;
+    if (!haveFullFile && (bufStart < 0 || localOffset < 0 || localOffset >= buf.byteLength)) {
+      const result = await fetchRange(
+        url,
+        currentOffset,
+        currentOffset + initialWindow,
+        headers
+      );
+      buf = result.buffer;
+      bufStart = currentOffset;
+      if (result.fullFile) {
+        bufStart = 0;
+        haveFullFile = true;
+      }
+    }
+    const parsed = parseIfd(buf, currentOffset - bufStart, format);
+    if (parsed !== null) {
+      currentOffset = parsed.nextIfdOffset;
+      continue;
+    }
+    const requiredSize = computeRequiredIfdSize(
+      buf,
+      currentOffset - bufStart,
+      format
+    );
+    if (haveFullFile) {
+      throw new Error(
+        `IFD at offset ${currentOffset} extends beyond end of file`
+      );
+    }
+    if (opts.mode === "fixed") {
+      throw new Error(
+        `IFD at offset ${currentOffset} requires ${requiredSize ?? "> entry-count header"} bytes, exceeds fixed window of ${initialWindow} bytes`
+      );
+    }
+    const neededBytes = requiredSize ?? initialWindow * 2;
+    const retrySize = Math.min(
+      Math.max(neededBytes, initialWindow * 2),
+      opts.maxWindowSize
+    );
+    if (requiredSize !== null && retrySize < requiredSize) {
+      throw new Error(
+        `IFD at offset ${currentOffset} requires ${requiredSize} bytes, exceeds maxWindowSize of ${opts.maxWindowSize} bytes`
+      );
+    }
+    const retryResult = await fetchRange(
+      url,
+      currentOffset,
+      currentOffset + retrySize,
+      headers
+    );
+    buf = retryResult.buffer;
+    bufStart = currentOffset;
+    if (retryResult.fullFile) {
+      bufStart = 0;
+      haveFullFile = true;
+    }
+    const retry = parseIfd(buf, currentOffset - bufStart, format);
+    if (retry === null) {
+      const exactSize = computeRequiredIfdSize(
+        buf,
+        currentOffset - bufStart,
+        format
+      );
+      throw new Error(
+        `IFD at offset ${currentOffset} could not be parsed after retry (required=${exactSize ?? "unknown"} bytes, fetched=${retrySize}, max=${opts.maxWindowSize})`
+      );
+    }
+    currentOffset = retry.nextIfdOffset;
+  }
+  return offsets;
+}
+async function resolveRemoteOffsets(url, headers, scannerOptions) {
+  console.log("[viv:offsets] resolveRemoteOffsets called for:", url);
+  const jsonOffsets = await fetchOffsetsJson(url, headers);
+  if (jsonOffsets) {
+    console.log(
+      `[viv:offsets] Found .offsets.json with ${jsonOffsets.length} offsets for:`,
+      url
+    );
+    return jsonOffsets;
+  }
+  console.log(
+    "[viv:offsets] No .offsets.json found, scanning IFDs for:",
+    url
+  );
+  const offsets = await scanIfdOffsets(url, headers, scannerOptions);
+  console.log(
+    `[viv:offsets] IFD scan complete: found ${offsets.length} offsets for:`,
+    url
+  );
+  return offsets;
+}
+
 function extractPhysicalSizesfromPixels(d) {
   if (!d["PhysicalSizeX"] || !d["PhysicalSizeY"] || !d["PhysicalSizeXUnit"] || !d["PhysicalSizeYUnit"]) {
     return void 0;
@@ -411,7 +696,38 @@ function createGeoTiffObject(source, { headers }) {
 }
 async function createGeoTiff(source, options = {}) {
   const tiff = await createGeoTiffObject(source, options);
-  return options.offsets ? createOffsetsProxy(tiff, options.offsets) : tiff;
+  if (options.offsets) {
+    return createOffsetsProxy(tiff, options.offsets);
+  }
+  if (!(source instanceof Blob)) {
+    const url = typeof source === "string" ? new URL(source) : source;
+    if (url.protocol !== "file:") {
+      try {
+        const offsets = await resolveRemoteOffsets(
+          url.href,
+          options.headers,
+          options.scannerOptions
+        );
+        if (offsets.length > 0) {
+          console.log(
+            `[viv:offsets] Using resolved offsets (${offsets.length}) for:`,
+            url.href
+          );
+          return createOffsetsProxy(tiff, offsets);
+        }
+        console.log(
+          "[viv:offsets] No offsets resolved, falling back to default GeoTIFF traversal for:",
+          url.href
+        );
+      } catch (err) {
+        console.log(
+          "[viv:offsets] Offset resolution failed, falling back to default GeoTIFF traversal:",
+          err
+        );
+      }
+    }
+  }
+  return tiff;
 }
 
 function createOmeImageIndexerFromResolver(resolveBaseResolutionImageLocation, image) {

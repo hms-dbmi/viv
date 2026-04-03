@@ -372,10 +372,21 @@ export async function createGeoTiff(
           options.scannerOptions
         );
         if (offsets.length > 0) {
+          console.log(
+            `[viv:offsets] Using resolved offsets (${offsets.length}) for:`,
+            url.href
+          );
           return createOffsetsProxy(tiff, offsets);
         }
-      } catch {
-        // resolution failed, use default GeoTIFF traversal
+        console.log(
+          '[viv:offsets] No offsets resolved, falling back to default GeoTIFF traversal for:',
+          url.href
+        );
+      } catch (err) {
+        console.log(
+          '[viv:offsets] Offset resolution failed, falling back to default GeoTIFF traversal:',
+          err
+        );
       }
     }
   }

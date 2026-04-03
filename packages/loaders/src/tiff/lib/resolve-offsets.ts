@@ -171,19 +171,38 @@ async function fetchOffsetsJson(
 ): Promise<number[] | null> {
   try {
     const offsetsUrl = `${url}.offsets.json`;
+    console.log('[viv:offsets] Checking for offsets JSON at:', offsetsUrl);
     const resp = await fetch(offsetsUrl, {
       headers: normalizeHeaders(headers)
     });
-    if (!resp.ok) return null;
+    if (!resp.ok) {
+      console.log(
+        `[viv:offsets] offsets.json fetch returned HTTP ${resp.status}`
+      );
+      return null;
+    }
     const data = await resp.json();
-    if (!Array.isArray(data) || data.length === 0) return null;
+    if (!Array.isArray(data) || data.length === 0) {
+      console.log(
+        '[viv:offsets] offsets.json response was not a valid array'
+      );
+      return null;
+    }
     for (const n of data) {
       if (typeof n !== 'number' || !Number.isSafeInteger(n) || n < 0) {
+        console.log(
+          '[viv:offsets] offsets.json contains invalid entry:',
+          n
+        );
         return null;
       }
     }
+    console.log(
+      `[viv:offsets] offsets.json loaded successfully: ${data.length} offsets`
+    );
     return data;
-  } catch {
+  } catch (err) {
+    console.log('[viv:offsets] offsets.json fetch failed:', err);
     return null;
   }
 }
@@ -315,7 +334,23 @@ export async function resolveRemoteOffsets(
   headers?: HeadersInit,
   scannerOptions?: ScannerOptions
 ): Promise<number[]> {
+  console.log('[viv:offsets] resolveRemoteOffsets called for:', url);
   const jsonOffsets = await fetchOffsetsJson(url, headers);
-  if (jsonOffsets) return jsonOffsets;
-  return scanIfdOffsets(url, headers, scannerOptions);
+  if (jsonOffsets) {
+    console.log(
+      `[viv:offsets] Found .offsets.json with ${jsonOffsets.length} offsets for:`,
+      url
+    );
+    return jsonOffsets;
+  }
+  console.log(
+    '[viv:offsets] No .offsets.json found, scanning IFDs for:',
+    url
+  );
+  const offsets = await scanIfdOffsets(url, headers, scannerOptions);
+  console.log(
+    `[viv:offsets] IFD scan complete: found ${offsets.length} offsets for:`,
+    url
+  );
+  return offsets;
 }
