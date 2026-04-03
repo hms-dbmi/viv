@@ -50,11 +50,19 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
 
   private async _readRasters(image: GeoTIFFImage, props?: ReadRastersOptions) {
     const interleave = isInterleaved(this.shape);
-    const raster = await image.readRasters({
-      interleave,
-      ...props,
-      pool: this.pool
-    });
+    let raster: Awaited<ReturnType<GeoTIFFImage['readRasters']>>;
+    try {
+      raster = await image.readRasters({
+        interleave,
+        ...props,
+        pool: this.pool
+      });
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        throw SIGNAL_ABORTED;
+      }
+      throw err;
+    }
 
     if (props?.signal?.aborted) {
       throw SIGNAL_ABORTED;

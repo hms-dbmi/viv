@@ -806,11 +806,19 @@ class TiffPixelSource {
   }
   async _readRasters(image, props) {
     const interleave = isInterleaved(this.shape);
-    const raster = await image.readRasters({
-      interleave,
-      ...props,
-      pool: this.pool
-    });
+    let raster;
+    try {
+      raster = await image.readRasters({
+        interleave,
+        ...props,
+        pool: this.pool
+      });
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        throw SIGNAL_ABORTED;
+      }
+      throw err;
+    }
     if (props?.signal?.aborted) {
       throw SIGNAL_ABORTED;
     }
