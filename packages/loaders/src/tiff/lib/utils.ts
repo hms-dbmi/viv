@@ -351,9 +351,11 @@ export async function createGeoTiff(
   options: {
     headers?: Headers | Record<string, string>;
     offsets?: number[];
+    /** Pre-constructed GeoTIFF — skips internal HTTP client when provided. */
+    source?: GeoTIFF;
   } = {}
 ): Promise<GeoTIFF> {
-  const tiff = await createGeoTiffObject(source, options);
+  const tiff = options.source ?? (await createGeoTiffObject(source, options));
   /*
    * Performance enhancement. If offsets are provided, we
    * create a proxy that intercepts calls to `tiff.getImage`

@@ -98,10 +98,15 @@ export async function loadSingleFileOmeTiff(
     pool?: Pool;
     headers?: Headers | Record<string, string>;
     offsets?: number[];
+    source?: GeoTIFF;
   } = {}
 ) {
-  const { offsets, headers, pool } = options;
-  const tiff = await createGeoTiff(source, { headers, offsets });
+  const { offsets, headers, pool, source: prebuiltSource } = options;
+  const tiff = await createGeoTiff(source, {
+    headers,
+    offsets,
+    source: prebuiltSource
+  });
   const firstImage = await tiff.getImage();
   const { rootMeta, levels } = resolveMetadata(
     fromString(firstImage.fileDirectory.ImageDescription),
