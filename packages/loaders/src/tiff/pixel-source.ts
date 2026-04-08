@@ -50,13 +50,37 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
 
   private async _readRasters(image: GeoTIFFImage, props?: ReadRastersOptions) {
     const interleave = isInterleaved(this.shape);
-    const raster = await image.readRasters({
-      interleave,
-      ...props,
-      pool: this.pool
-    });
+    const signal = props?.signal;
 
-    if (props?.signal?.aborted) {
+    // Check if already aborted before starting.
+    if (signal?.aborted) {
+      throw SIGNAL_ABORTED;
+    }
+
+    // Don't pass the signal directly to geotiff. Its internal Promise.all
+    // over parallel fetch requests means an aborted signal causes multiple
+    // rejections, only the first of which is caught — the rest become
+    // unhandled AbortErrors. Instead, let the fetches complete and check
+    // the signal afterward.
+    const { signal: _signal, ...restProps } = props ?? {};
+
+    let raster: Awaited<ReturnType<GeoTIFFImage['readRasters']>>;
+    try {
+      raster = await image.readRasters({
+        interleave,
+        ...restProps,
+        pool: this.pool
+      });
+    } catch (err) {
+      // If the signal was aborted while fetching (e.g. page navigation),
+      // treat any resulting error as an abort.
+      if (signal?.aborted) {
+        throw SIGNAL_ABORTED;
+      }
+      throw err;
+    }
+
+    if (signal?.aborted) {
       throw SIGNAL_ABORTED;
     }
 
