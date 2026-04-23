@@ -9,7 +9,7 @@
  * - running the extension shader tests in watch mode, observing the updated
  *   `expanded.fs` / inject values from failing assertions, and
  * - copying the new strings back into this file.
- * 
+ *
  * Note that certain variables such as NUM_CHANNELS are not expanded by the Viv shader assembler;
  * the luma.gl ShaderModule.defines handles these.
  * Reference: https://github.com/visgl/luma.gl/blob/f941b224ce1267b635b6d6cfa5640402c53c43d9/modules/shadertools/src/lib/shader-module/shader-module.ts#L81
