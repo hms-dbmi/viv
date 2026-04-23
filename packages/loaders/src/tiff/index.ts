@@ -1,5 +1,5 @@
 import { addDecoder, fromBlob } from 'geotiff';
-import type { Pool } from 'geotiff';
+import type { GeoTIFF, Pool } from 'geotiff';
 
 import LZWDecoder from './lib/lzw-decoder';
 import {
@@ -21,6 +21,16 @@ interface TiffOptions {
   headers?: Headers | Record<string, string>;
   offsets?: number[];
   pool?: Pool;
+  /**
+   * A pre-constructed GeoTIFF instance. When provided, the loader skips
+   * its internal HTTP client and uses this GeoTIFF for all data access.
+   * This enables custom transport layers (e.g., AWS SigV4 request signing)
+   * via geotiff's `fromCustomClient()`.
+   *
+   * Only applies to single-file OME-TIFFs. Ignored for companion
+   * (multifile) OME-TIFFs which open multiple GeoTIFFs internally.
+   */
+  source?: GeoTIFF;
 }
 
 interface OmeTiffOptions extends TiffOptions {

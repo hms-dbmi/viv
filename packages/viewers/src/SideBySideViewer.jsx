@@ -1,5 +1,10 @@
 import { ColorPaletteExtension } from '@vivjs/extensions';
-import { SideBySideView, getDefaultInitialViewState } from '@vivjs/views';
+import {
+  SCALEBAR_VIEW_ID,
+  ScaleBarView,
+  SideBySideView,
+  getDefaultInitialViewState
+} from '@vivjs/views';
 import * as React from 'react';
 import VivViewer from './VivViewer';
 
@@ -63,6 +68,10 @@ const SideBySideViewer = props => {
   } = props;
   const leftViewState = viewStatesProp?.find(v => v.id === 'left');
   const rightViewState = viewStatesProp?.find(v => v.id === 'right');
+  const leftId = `left-${SCALEBAR_VIEW_ID}`;
+  const rightId = `right-${SCALEBAR_VIEW_ID}`;
+  const leftScalebarViewState = viewStatesProp?.find(v => v.id === leftId);
+  const rightScalebarViewState = viewStatesProp?.find(v => v.id === rightId);
   // biome-ignore lint/correctness/useExhaustiveDependencies: Ignore carried over from eslint, without explanation.
   const viewStates = React.useMemo(() => {
     if (leftViewState && rightViewState) {
@@ -75,7 +84,9 @@ const SideBySideViewer = props => {
     );
     return [
       leftViewState || { ...defaultViewState, id: 'left' },
-      rightViewState || { ...defaultViewState, id: 'right' }
+      rightViewState || { ...defaultViewState, id: 'right' },
+      leftScalebarViewState || { ...defaultViewState, id: leftId },
+      rightScalebarViewState || { ...defaultViewState, id: rightId }
     ];
   }, [loader, leftViewState, rightViewState]);
 
@@ -85,8 +96,7 @@ const SideBySideViewer = props => {
     panLock,
     zoomLock,
     height,
-    width: width / 2,
-    snapScaleBar
+    width: width / 2
   });
   const detailViewRight = new SideBySideView({
     id: 'right',
@@ -95,8 +105,7 @@ const SideBySideViewer = props => {
     panLock,
     zoomLock,
     height,
-    width: width / 2,
-    snapScaleBar
+    width: width / 2
   });
   const layerConfig = {
     loader,
@@ -114,8 +123,34 @@ const SideBySideViewer = props => {
     extensions,
     transparentColor
   };
-  const views = [detailViewRight, detailViewLeft];
-  const layerProps = [layerConfig, layerConfig];
+
+  // Add scale bar views
+  const leftScaleBarView = new ScaleBarView({
+    id: leftId,
+    width: width / 2,
+    height,
+    loader,
+    snap: snapScaleBar,
+    imageViewId: 'left'
+  });
+  const rightScaleBarView = new ScaleBarView({
+    id: rightId,
+    width: width / 2,
+    height,
+    x: width / 2,
+    loader,
+    snap: snapScaleBar,
+    imageViewId: 'right'
+  });
+  const views = [
+    detailViewRight,
+    detailViewLeft,
+    leftScaleBarView,
+    rightScaleBarView
+  ];
+  const layerProps = [layerConfig, layerConfig, layerConfig, layerConfig];
+  const finalViewStates = [...viewStates];
+
   return loader ? (
     <VivViewer
       layerProps={layerProps}
@@ -123,7 +158,7 @@ const SideBySideViewer = props => {
       randomize
       onViewStateChange={onViewStateChange}
       onHover={onHover}
-      viewStates={viewStates}
+      viewStates={finalViewStates}
       deckProps={deckProps}
     />
   ) : null;

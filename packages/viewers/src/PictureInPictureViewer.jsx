@@ -4,6 +4,8 @@ import {
   DetailView,
   OVERVIEW_VIEW_ID,
   OverviewView,
+  SCALEBAR_VIEW_ID,
+  ScaleBarView,
   getDefaultInitialViewState
 } from '@vivjs/views';
 import * as React from 'react';
@@ -87,8 +89,7 @@ const PictureInPictureViewer = props => {
   const detailView = new DetailView({
     id: DETAIL_VIEW_ID,
     height,
-    width,
-    snapScaleBar
+    width
   });
   const layerConfig = {
     loader,
@@ -109,6 +110,22 @@ const PictureInPictureViewer = props => {
   const views = [detailView];
   const layerProps = [layerConfig];
   const viewStates = [{ ...baseViewState, id: DETAIL_VIEW_ID }];
+
+  // Add scale bar view
+  const scalebarViewState = viewStatesProp?.find(
+    v => v.id === SCALEBAR_VIEW_ID
+  ) || { ...baseViewState, id: SCALEBAR_VIEW_ID };
+  const scaleBarView = new ScaleBarView({
+    id: SCALEBAR_VIEW_ID,
+    width,
+    height,
+    loader,
+    snap: snapScaleBar,
+    imageViewId: DETAIL_VIEW_ID
+  });
+  views.push(scaleBarView);
+  layerProps.push(layerConfig);
+  viewStates.push(scalebarViewState);
   if (overviewOn && loader) {
     // It's unclear why this is needed because OverviewView.filterViewState sets "zoom" and "target".
     const overviewViewState = viewStatesProp?.find(
