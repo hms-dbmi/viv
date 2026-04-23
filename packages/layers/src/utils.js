@@ -7,6 +7,45 @@ export function range(len) {
 }
 
 /**
+ * Returns a texture bindings object with exactly numChannels keys (keyPrefix0, keyPrefix1, ...).
+ * Pads with the first texture when there are fewer textures than required; uses a subset when more.
+ * Used so the pipeline always gets the expected binding count when channel count changes.
+ *
+ * @param {Record<string, object>} textures - e.g. { channel0, channel1, ... } or { volume0, volume1, ... }
+ * @param {number} numChannelsRequired
+ * @param {string} [keyPrefix='channel']
+ * @returns {Record<string, object> | null} normalized bindings or null if none
+ */
+export function normalizeTextureBindings(
+  textures,
+  numChannelsRequired,
+  keyPrefix = 'channel'
+) {
+  if (numChannelsRequired === 0) return null;
+  const keys = Object.keys(textures);
+  const firstKey = `${keyPrefix}0`;
+  const firstTexture = textures[firstKey];
+  if (!firstTexture && keys.length === 0) return null;
+  if (keys.length === numChannelsRequired) return textures;
+  if (keys.length < numChannelsRequired && firstTexture) {
+    const out = { ...textures };
+    for (let i = 0; i < numChannelsRequired; i++) {
+      const k = `${keyPrefix}${i}`;
+      if (!out[k]) out[k] = firstTexture;
+    }
+    return out;
+  }
+  if (keys.length > numChannelsRequired) {
+    const out = {};
+    for (let i = 0; i < numChannelsRequired; i++) {
+      out[`${keyPrefix}${i}`] = textures[`${keyPrefix}${i}`];
+    }
+    return out;
+  }
+  return null;
+}
+
+/**
  * @template T
  * @param {T[]} arr
  * @param {T} defaultValue
@@ -60,7 +99,7 @@ export function padContrastLimits({
   const padSize = MAX_CHANNELS - newContrastLimits.length;
   if (padSize < 0) {
     throw Error(
-      `${newContrastLimits.lengths} channels passed in, but only 6 are allowed.`
+      `${newContrastLimits.length} channels passed in, but only ${MAX_CHANNELS} are allowed.`
     );
   }
 

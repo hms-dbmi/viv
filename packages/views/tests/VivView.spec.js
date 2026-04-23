@@ -31,10 +31,16 @@ export function generateViewTests(ViewType, args, linkedViewIds = []) {
     const view = new ViewType(args);
     const deckGLView = view.getDeckGlView();
     const { height, width, x, y } = view;
-    expect(deckGLView._height.position).toBe(height);
-    expect(deckGLView._width.position).toBe(width);
-    expect(deckGLView._y.position).toBe(y);
-    expect(deckGLView._x.position).toBe(x);
+    // Note: previous tests were based on deck.gl internal deckGLView._height.position etc,
+    // which has changed.
+    const dimensions = deckGLView.getDimensions({
+      width: x + width + 100,
+      height: y + height + 100
+    });
+    expect(dimensions.height).toBe(height);
+    expect(dimensions.width).toBe(width);
+    expect(dimensions.y).toBe(y);
+    expect(dimensions.x).toBe(x);
   });
 
   test(`${ViewType.name} layer test`, () => {

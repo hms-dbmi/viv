@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@hms-dbmi/viv": "workspace:*",
+    "@vivjs/constants": "workspace:*",
     "@mui/material": "^6.0.0",
     "@mui/icons-material": "^6.0.0",
     "@mui/styles": "^6.0.0",

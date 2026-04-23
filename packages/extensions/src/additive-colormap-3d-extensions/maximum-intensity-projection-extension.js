@@ -1,24 +1,17 @@
+import { VIV_CHANNEL_INDEX_PLACEHOLDER as I } from '@vivjs/constants';
 import BaseExtension from './base-extension';
 
 const _BEFORE_RENDER = `\
-  float maxVals[6] = float[6](-1.0, -1.0, -1.0, -1.0, -1.0, -1.0);
+  float maxVal${I} = -1.;
 `;
 
 const _RENDER = `\
-  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
-
-  for(int i = 0; i < 6; i++) {
-    if(intensityArray[i] > maxVals[i]) {
-      maxVals[i] = intensityArray[i];
-    }
-  }
+  maxVal${I} = max(intensityValue${I}, maxVal${I});
 `;
 
 const _AFTER_RENDER = `\
   float total = 0.0;
-  for(int i = 0; i < 6; i++) {
-    total += maxVals[i];
-  }
+  total += maxVal${I};
   // Do not go past 1 in opacity/colormap value.
   total = min(total, 1.0);
   color = colormap(total, total);
