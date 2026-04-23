@@ -1,5 +1,12 @@
 # @hms-dbmi/viv
 
+## 0.20.1
+
+### Patch Changes
+
+- Support an options.source parameter for loadSingleFileOmeTiff, as an optional way to bypass the internal createGeoTiff function when users already have their own GeoTIFF instance to provide. (`@vivjs/loaders`) ([#957](https://github.com/hms-dbmi/viv/pull/957))
+
+
 ## 0.20.0
 
 ### Minor Changes
@@ -7,7 +14,6 @@
 - Export `loadOmeZarrFromStore` to allow loading OME-Zarr data from a custom store, enabling use cases like AWS SigV4 signed requests for private S3 buckets. (`@vivjs/loaders`) ([#944](https://github.com/hms-dbmi/viv/pull/944))
 
 - scale bar functionality is now split between a new view and a layer (`@vivjs/viewers`, `@vivjs/layers`, `@vivjs/views`) ([#948](https://github.com/hms-dbmi/viv/pull/948))
-
 
 ## 0.19.0
 
