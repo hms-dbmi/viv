@@ -31,7 +31,8 @@ export function generateViewTests(ViewType, args, linkedViewIds = []) {
     const view = new ViewType(args);
     const deckGLView = view.getDeckGlView();
     const { height, width, x, y } = view;
-    // nb - previous tests were based on deck.gl internal deckGLView._height.position etc which has changed
+    // Note: previous tests were based on deck.gl internal deckGLView._height.position etc,
+    // which has changed.
     const dimensions = deckGLView.getDimensions({
       width: x + width + 100,
       height: y + height + 100

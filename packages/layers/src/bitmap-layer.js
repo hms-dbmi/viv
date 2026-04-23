@@ -162,8 +162,7 @@ const BitmapLayer = class extends CompositeLayer {
 
   updateState({ props, oldProps, ...rest }) {
     super.updateState({ props, oldProps, ...rest });
-    const img = getPreparedImage(props.image);
-    if (!img) {
+    if (!props.image?.data || !props.image?.width || !props.image?.height) {
       if (this.state.bitmapTexture) {
         this.state.bitmapTexture.delete();
         this.setState({ bitmapTexture: null });
@@ -176,6 +175,7 @@ const BitmapLayer = class extends CompositeLayer {
     if (this.state.bitmapTexture) {
       this.state.bitmapTexture.delete();
     }
+    const img = getPreparedImage(props.image);
     const texture = this.context.device.createTexture({
       width: img.width,
       height: img.height,

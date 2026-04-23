@@ -52,7 +52,6 @@ const BaseExtension = class extends VivLayerExtension {
     const name = this?.props?.colormap || defaultProps.colormap.value;
     const apply_cmap = cmaps[name];
     return {
-      // nb - we don't need ...super.getShaders(), this was a no-op
       modules: [colormapModuleFactory3D(name, apply_cmap)]
     };
   }

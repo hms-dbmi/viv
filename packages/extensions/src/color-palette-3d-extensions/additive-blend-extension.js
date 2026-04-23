@@ -2,12 +2,12 @@ import { VIV_CHANNEL_INDEX_PLACEHOLDER as I } from '@vivjs/constants';
 import BaseExtension from './base-extension';
 
 const _BEFORE_RENDER = `\
-////// additive-blend before render
+// additive-blend before render
   float intensityValue${I} = 0.0;\
 `;
 
 const _RENDER = `\
-////// additive-blend render
+// additive-blend render
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
   float total = 0.0;

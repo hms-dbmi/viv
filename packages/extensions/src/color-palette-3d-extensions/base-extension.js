@@ -14,10 +14,7 @@ const BaseExtension = class extends VivLayerExtension {
   constructor(...args) {
     super(args);
     // After deck.gl 8.8, it does not seem like this is always initialized.
-    // TODO - review. looks like this whole class may be irrelevant.
-    // then again - it might be useful to have a `BaseVivExtension` class that is what users actually use...
-    // Colors are now managed by the XR3DLayer via the fragmentUniforms3D UBO
-    // The layer handles colors through shaderInputs.setProps() with fragmentUniforms3D
+    // TODO: should this be refactored - does it need to be a class?
     this.opts = this.opts || {};
   }
   getVivShaderTemplates() {

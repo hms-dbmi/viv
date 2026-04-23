@@ -218,7 +218,6 @@ export async function createLoader(
       const mutiTiffSources = await generateMultiTiffSources(urlOrFile);
       const source = await loadMultiTiff(mutiTiffSources, {
         images: 'all',
-        // would pool be wanted here if it was working again?
         pool: false
       });
       return source;

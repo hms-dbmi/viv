@@ -2,12 +2,12 @@ import { VIV_CHANNEL_INDEX_PLACEHOLDER as I } from '@vivjs/constants';
 import BaseExtension from './base-extension';
 
 const _BEFORE_RENDER = `\
-/////// additive-colormap-3d before render
+// additive-colormap-3d before render
   float intensityValue${I} = 0.0;
 `;
 
 const _RENDER = `\
-/////// additive-colormap-3d render
+// additive-colormap-3d render
   float total = 0.0;
 
   // this will create an unrolled accumulation over all channels

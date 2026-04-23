@@ -74,8 +74,6 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
 
   /*
    * Computes tile size given x, y coord.
-   * When the level dimension is exactly divisible by tileSize, the remainder is 0;
-   * that tile is out of bounds, so we must not return 0 (would create invalid texture).
    */
   private _getTileExtent(x: number, y: number) {
     const { height: zoomLevelHeight, width: zoomLevelWidth } =

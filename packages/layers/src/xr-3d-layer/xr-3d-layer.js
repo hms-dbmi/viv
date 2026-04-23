@@ -103,10 +103,6 @@ function getRenderingAttrs() {
 function getRenderingFromExtensions(extensions) {
   let rendering = {};
   extensions.forEach(extension => {
-    // it was just setting rendering to whichever the final extension was
-    // so the error message "requires at least one extension to define opts.rendering" is dubious.
-    // kinda fixing things that weren't broken potentially...
-    // also not entirely sure about this random extension.rendering property that isn't very standard deck.gl
     if (extension.rendering._RENDER) rendering = extension.rendering;
   });
   if (!rendering._RENDER) {
