@@ -13,7 +13,7 @@ uniform ${moduleName}Uniforms {
 
 ${apply_transparent_color}
 
-void mutate_color(inout vec3 rgb, float[NUM_CHANNELS] intensity, vec2 vTexCoord) {
+void mutate_color(inout vec3 rgb, float[NUM_CHANNELS] intensity) {
   vec3 colors[NUM_CHANNELS] = vec3[NUM_CHANNELS](
     ${moduleName}.color${I},
   );
@@ -29,7 +29,7 @@ vec4 apply_opacity(vec3 rgb) {
 
 const DECKGL_MUTATE_COLOR = `\
 vec3 rgb = rgba.rgb;
-mutate_color(rgb, intensity, vTexCoord);
+mutate_color(rgb, intensity);
 rgba = apply_opacity(rgb);
 `;
 

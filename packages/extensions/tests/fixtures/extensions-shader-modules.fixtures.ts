@@ -29,7 +29,7 @@ vec4 apply_transparent_color(vec3 color, vec3 transparentColor, bool useTranspar
   return vec4(color, (color == transparentColor && useTransparentColor) ? 0. : opacity);
 }
 
-void mutate_color(inout vec3 rgb, float[NUM_CHANNELS] intensity, vec2 vTexCoord) {
+void mutate_color(inout vec3 rgb, float[NUM_CHANNELS] intensity) {
 
   vec3 colors[NUM_CHANNELS] = vec3[NUM_CHANNELS](
     colorPaletteModule.color0,
@@ -48,7 +48,7 @@ vec4 apply_opacity(vec3 rgb) {
 `;
 
 export const EXPECTED_COLOR_PALETTE_INJECT_DECKGL_MUTATE_COLOR = `vec3 rgb = rgba.rgb;
-mutate_color(rgb, intensity, vTexCoord);
+mutate_color(rgb, intensity);
 rgba = apply_opacity(rgb);
 `;
 
