@@ -3,21 +3,21 @@ packages:
   - packages/**
 
 catalog:
-  "@deck.gl/core": ~9.2.9
-  "@deck.gl/extensions": ~9.2.9
-  "@deck.gl/geo-layers": ~9.2.9
-  "@deck.gl/layers": ~9.2.9
-  "@deck.gl/mesh-layers": ~9.2.9
-  "@deck.gl/react": ~9.2.9
-  "@deck.gl/widgets": ~9.2.9
-  "@deck.gl/test-utils": ~9.2.9
-  "@luma.gl/constants": ~9.2.6
-  "@luma.gl/core": ~9.2.6
-  "@luma.gl/engine": ~9.2.6
-  "@luma.gl/shadertools": ~9.2.6
-  "@luma.gl/test-utils": ~9.2.6
-  "@luma.gl/webgl": ~9.2.6
-  "@luma.gl/webgpu": ~9.2.6
+  "@deck.gl/core": ~9.3.2
+  "@deck.gl/extensions": ~9.3.2
+  "@deck.gl/geo-layers": ~9.3.2
+  "@deck.gl/layers": ~9.3.2
+  "@deck.gl/mesh-layers": ~9.3.2
+  "@deck.gl/react": ~9.3.2
+  "@deck.gl/widgets": ~9.3.2
+  "@deck.gl/test-utils": ~9.3.2
+  "@luma.gl/constants": ~9.3.3
+  "@luma.gl/core": ~9.3.3
+  "@luma.gl/engine": ~9.3.3
+  "@luma.gl/shadertools": ~9.3.3
+  "@luma.gl/test-utils": ~9.3.3
+  "@luma.gl/webgl": ~9.3.3
+  "@luma.gl/webgpu": ~9.3.3
   "@math.gl/core": ^4.0.1
   "@math.gl/culling": ^4.0.1
   "math.gl": ^4.0.1
