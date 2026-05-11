@@ -41,7 +41,8 @@ test('filterViewState does not inherit zoomX/zoomY from the tracked image view',
     y: 0,
     loader: [
       {
-        meta: { physicalSizes: { x: { size: 1, unit: 'm' } } } }
+        meta: { physicalSizes: { x: { size: 1, unit: 'm' } } }
+      }
     ],
     imageViewId: 'detail',
     position: 'bottom-right',
@@ -77,7 +78,8 @@ test('ScaleBarLayer keeps image view width/height for zoom math (not scale bar p
     y: 0,
     loader: [
       {
-        meta: { physicalSizes: { x: { size: 1, unit: 'm' } } } }
+        meta: { physicalSizes: { x: { size: 1, unit: 'm' } } }
+      }
     ],
     imageViewId: 'detail',
     position: 'bottom-right',
