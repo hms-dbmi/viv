@@ -1,5 +1,5 @@
-import { LayerExtension } from '@deck.gl/core';
-import { getDefaultPalette, padColors } from '../utils';
+import { getDefaultPalette, padColorsForUBO } from '../utils';
+import { VivLayerExtension } from '../viv-shader-assembler';
 import colorPalette from './color-palette-module';
 
 const defaultProps = {
@@ -18,15 +18,16 @@ const defaultProps = {
  * In other words, any fragment shader output equal transparentColor (before applying opacity) will have opacity 0.
  * @property {Boolean=} useTransparentColor Whether or not to use the value provided to transparentColor.
  */
-const ColorPaletteExtension = class extends LayerExtension {
-  getShaders() {
+const ColorPaletteExtension = class extends VivLayerExtension {
+  getVivShaderTemplates() {
     return {
-      ...super.getShaders(),
       modules: [colorPalette]
     };
   }
 
-  draw() {
+  updateState({ props, oldProps, changeFlags, ...rest }) {
+    super.updateState({ props, oldProps, changeFlags, ...rest });
+
     const {
       colors,
       channelsVisible,
@@ -34,17 +35,34 @@ const ColorPaletteExtension = class extends LayerExtension {
       transparentColor = defaultProps.transparentColor.value,
       useTransparentColor = defaultProps.useTransparentColor.value
     } = this.props;
-    const paddedColors = padColors({
-      channelsVisible: channelsVisible || this.selections.map(() => true),
-      colors: colors || getDefaultPalette(this.props.selections.length)
+
+    // Get selections safely
+    const selections = this.props.selections || this.selections || [];
+    // we can't `this.getNumChannels()` here, still not totally happy with this
+    // we should probably just have props.numChannels / props.numPlanes and avoid `this` shenanigans?
+    const numChannels = selections.length;
+
+    const paddedColors = padColorsForUBO({
+      channelsVisible: channelsVisible || selections.map(() => true),
+      colors: colors || getDefaultPalette(numChannels)
     });
-    const uniforms = {
-      colors: paddedColors,
+
+    const colorPaletteUniforms = {
       opacity,
       transparentColor: (transparentColor || [0, 0, 0]).map(i => i / 255),
-      useTransparentColor: Boolean(useTransparentColor)
+      useTransparentColor: useTransparentColor ? 1 : 0
     };
-    this.state.model?.setUniforms(uniforms);
+
+    // Add per-channel colors
+    for (let i = 0; i < numChannels; i++) {
+      colorPaletteUniforms[`color${i}`] = paddedColors[i];
+    }
+
+    for (const model of this.getModels()) {
+      model.shaderInputs.setProps({
+        colorPaletteModule: colorPaletteUniforms
+      });
+    }
   }
 };
 

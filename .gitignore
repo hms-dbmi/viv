@@ -21,5 +21,6 @@
 
 .pnpm-debug.log
 
+**/.pnpm-store/*
 # auto-generated via `pnpm --filter=@viv/extensions prepare`
 packages/extensions/src/generated-colormaps.js

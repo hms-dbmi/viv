@@ -1,5 +1,5 @@
-import { LayerExtension } from '@deck.gl/core';
 import * as cmaps from '../generated-colormaps.js';
+import { VivLayerExtension } from '../viv-shader-assembler';
 
 /**
  * A utility to create a Deck.gl shader module for a `glsl-colormap`.
@@ -17,6 +17,8 @@ import * as cmaps from '../generated-colormaps.js';
  *
  */
 function colormapModuleFactory3D(name, apply_cmap) {
+  // note - this is able to handle intensities for arbitrary number of viv channels
+  // without needing any shader code generation from template.
   const fs = `\
 ${apply_cmap}
 
@@ -39,18 +41,17 @@ const defaultProps = {
  * @type {object}
  * @property {string=} colormap String indicating a colormap (default: 'viridis').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * */
-const BaseExtension = class extends LayerExtension {
+const BaseExtension = class extends VivLayerExtension {
   constructor(...args) {
     super(args);
     // After deck.gl 8.8, it does not seem like this is always initialized.
     this.opts = this.opts || {};
   }
 
-  getShaders() {
+  getVivShaderTemplates() {
     const name = this?.props?.colormap || defaultProps.colormap.value;
     const apply_cmap = cmaps[name];
     return {
-      ...super.getShaders(),
       modules: [colormapModuleFactory3D(name, apply_cmap)]
     };
   }

@@ -1,5 +1,5 @@
-import { LayerExtension } from '@deck.gl/core';
 import { apply_transparent_color } from '../shader-utils';
+import { VivLayerExtension } from '../viv-shader-assembler';
 
 // This file is generated via `packages/extensions/prepare.mjs`
 import * as cmaps from '../generated-colormaps';
@@ -20,27 +20,31 @@ import * as cmaps from '../generated-colormaps';
  *
  */
 function colormapModuleFactory(name, apply_cmap) {
+  const extensionName = `additive_colormap_${name}`;
   return {
-    name: `additive-colormap-${name}`,
+    name: extensionName,
+    uniformTypes: {
+      opacity: 'f32',
+      useTransparentColor: 'u32'
+    },
     fs: `\
-uniform float opacity;
-uniform bool useTransparentColor;
-
+uniform ${extensionName}Uniforms {
+  float opacity;
+  uint useTransparentColor; //no bool-like type in decode-shader-types.ts
+} ${extensionName};
 ${apply_transparent_color}
 ${apply_cmap}
-
 vec4 colormap(float intensity) {
+  float opacity = ${extensionName}.opacity;
+  bool useTransparentColor = ${extensionName}.useTransparentColor != uint(0);
   return vec4(apply_transparent_color(apply_cmap(min(1.,intensity)).xyz, apply_cmap(0.).xyz, useTransparentColor, opacity));
 }`,
     inject: {
       'fs:DECKGL_MUTATE_COLOR': `\
   float intensityCombo = 0.;
-  intensityCombo += max(0.,intensity0);
-  intensityCombo += max(0.,intensity1);
-  intensityCombo += max(0.,intensity2);
-  intensityCombo += max(0.,intensity3);
-  intensityCombo += max(0.,intensity4);
-  intensityCombo += max(0.,intensity5);
+  for (int i = 0; i < NUM_CHANNELS; i++) {
+    intensityCombo += max(0.,intensity[i]);
+  }
   rgba = colormap(intensityCombo);`
     }
   };
@@ -49,6 +53,7 @@ vec4 colormap(float intensity) {
 const defaultProps = {
   colormap: { type: 'string', value: 'viridis', compare: true },
   opacity: { type: 'number', value: 1.0, compare: true },
+  // we should review use of 'boolean', don't want to change it everywhere if not necessary.
   useTransparentColor: { type: 'boolean', value: false, compare: true }
 };
 
@@ -60,8 +65,10 @@ const defaultProps = {
  * @property {string=} colormap String indicating a colormap (default: 'viridis').  The full list of options is here: https://github.com/glslify/glsl-colormap#glsl-colormap
  * @property {boolean=} useTransparentColor Indicates whether the shader should make the output of colormap_function(0) color transparent
  * */
-const AdditiveColormapExtension = class extends LayerExtension {
-  getShaders() {
+const AdditiveColormapExtension = class extends VivLayerExtension {
+  // this doesn't need any shader code template manipulation, as long as NUM_CHANNELS is defined
+  // we could just use `LayerExtension.getShaders()` as before here
+  getVivShaderTemplates() {
     const name = this?.props?.colormap || defaultProps.colormap.value;
     const apply_cmap = cmaps[name];
     if (!apply_cmap) {
@@ -72,25 +79,21 @@ const AdditiveColormapExtension = class extends LayerExtension {
 
   updateState({ props, oldProps, changeFlags, ...rest }) {
     super.updateState({ props, oldProps, changeFlags, ...rest });
-    if (props.colormap !== oldProps.colormap) {
-      const { device } = this.context;
-      if (this.state.model) {
-        this.state.model.destroy();
-        this.setState({ model: this._getModel(device) });
-      }
+    // When colormap changes, getShaders() returns different modules, which triggers
+    // extensionsChanged in the layer, causing the layer to recreate models.
+    // We should NOT manage models here - that's the layer's responsibility.
+    const name = this?.props?.colormap || defaultProps.colormap.value;
+    const extensionName = `additive_colormap_${name}`;
+    // Set uniforms on all models - getModels() returns an array (may be empty during model recreation)
+    const models = this.getModels();
+    for (const model of models) {
+      model.shaderInputs.setProps({
+        [extensionName]: {
+          opacity: this.props.opacity,
+          useTransparentColor: this.props.useTransparentColor
+        }
+      });
     }
-  }
-
-  draw() {
-    const {
-      useTransparentColor = defaultProps.useTransparentColor.value,
-      opacity = defaultProps.opacity.value
-    } = this.props;
-    const uniforms = {
-      opacity,
-      useTransparentColor
-    };
-    this.state.model?.setUniforms(uniforms);
   }
 };
 

@@ -4,8 +4,9 @@ import { COORDINATE_SYSTEM, Layer, picking, project32 } from '@deck.gl/core';
 // ... needed to destructure for it to build with luma.gl 9, but we probably need to change these anyway
 import { GL } from '@luma.gl/constants';
 import { Geometry, Model } from '@luma.gl/engine';
-import { ShaderAssembler } from '@luma.gl/shadertools';
-import { padContrastLimits } from '../utils';
+import { MAX_CHANNELS } from '@vivjs/constants';
+import { VivShaderAssembler, expandShaderModule } from '@vivjs/extensions';
+import { normalizeTextureBindings, padContrastLimits } from '../utils';
 import channels from './shader-modules/channel-intensity';
 import { getRenderingAttrs } from './utils';
 
@@ -21,7 +22,10 @@ const defaultProps = {
     type: 'string',
     value: 'nearest',
     compare: true
-  }
+  },
+  // Extension props are merged into layer props, but declaring them here
+  // ensures deck.gl tracks them for change detection(?)
+  colormap: { type: 'string', value: null, compare: true }
 };
 
 /**
@@ -38,39 +42,67 @@ const defaultProps = {
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {'nearest'|'linear'=} interpolation The `minFilter` and `magFilter` for luma.gl rendering (see https://luma.gl/docs/api-reference/core/resources/sampler#texture-magnification-filter) - default is 'nearest'
  */
-/**
- * @type {{ new (...props: import('@vivjs/types').Viv<LayerProps>[]) }}
- * @ignore
- */
-const XRLayer = class extends Layer {
+class XRLayer extends Layer {
+  /**
+   * Returns the number of channels for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumChannels() {
+    return (
+      this.props.selections?.length ??
+      this.props.channels?.length ??
+      MAX_CHANNELS
+    );
+  }
+
+  /**
+   * Returns the number of planes for this layer instance (always 1 for 2D layers).
+   * Implements VivLayer interface.
+   */
+  getNumPlanes() {
+    return 1;
+  }
+
   /**
    * This function replaces `usampler` with `sampler` if the data is not an unsigned integer
    * and adds a standard ramp function default for DECKGL_PROCESS_INTENSITY.
    */
   getShaders() {
     const { dtype, interpolation } = this.props;
-    const { shaderModule, sampler } = getRenderingAttrs(dtype, interpolation);
+    // Get actual channel count from layer
+    const numChannels = this.getNumChannels();
+    // nb - shaderModule expansion currently done inside getRenderingAttrs
+    const { shaderModule, sampler } = getRenderingAttrs(
+      dtype,
+      interpolation,
+      numChannels
+    );
     const extensionDefinesDeckglProcessIntensity =
       this._isHookDefinedByExtensions('fs:DECKGL_PROCESS_INTENSITY');
-    const newChannelsModule = { ...channels, inject: {} };
+    const expandedChannels = expandShaderModule(channels, numChannels);
+    const newChannelsModule = { ...expandedChannels, inject: {} };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject['fs:DECKGL_PROCESS_INTENSITY'] = `
         intensity = apply_contrast_limits(intensity, contrastLimits);
       `;
     }
-    return super.getShaders({
-      ...shaderModule,
-      defines: {
-        SAMPLER_TYPE: sampler
-      },
-      modules: [project32, picking, newChannelsModule]
-    });
+    return expandShaderModule(
+      super.getShaders({
+        ...shaderModule,
+        defines: {
+          SAMPLER_TYPE: sampler
+        },
+        modules: [project32, picking, newChannelsModule]
+      }),
+      numChannels
+    );
   }
 
+  // may consider reviewing this along with other extension stuff.
   _isHookDefinedByExtensions(hookName) {
     const { extensions } = this.props;
     return extensions?.some(e => {
-      const shaders = e.getShaders();
+      const shaders = e.getShaders.call(this, e);
       const { inject = {}, modules = [] } = shaders;
       const definesInjection = inject[hookName];
       const moduleDefinesInjection = modules.some(m => m?.inject[hookName]);
@@ -88,6 +120,10 @@ const XRLayer = class extends Layer {
     // we could use 2 as the value and it would still work, but 1 also works fine (and is more flexible for 8 bit - 1 byte - textures as well).
     // https://stackoverflow.com/questions/42789896/webgl-error-arraybuffer-not-big-enough-for-request-in-case-of-gl-luminance
     // -- this way of setting parameters is now deprecated and will be subject to further changes moving towards later luma.gl versions & WebGPU.
+    // TODO - keep this on the radar, figure out with deck/luma people what the preferred approach should be once this is removed.
+    // this is still deprecated rather than removed, doesn't necessarily need urgent attention, but we should change if not difficult.
+    // testing requires careful application of datasets for which it actually matters, checking what that means.
+    // note, while it may seem wasteful to use more memory, there are probably good reasons for always having data nicely aligned.
     device.setParametersWebGL({
       [GL.UNPACK_ALIGNMENT]: 1,
       [GL.PACK_ALIGNMENT]: 1
@@ -106,25 +142,6 @@ const XRLayer = class extends Layer {
       numInstances: 1,
       positions: new Float64Array(12)
     });
-    const shaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
-
-    const mutateStr =
-      'fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)';
-    const processStr =
-      'fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)';
-    // Only initialize shader hook functions _once globally_
-    // Since the program manager is shared across all layers, but many layers
-    // might be created, this solves the performance issue of always adding new
-    // hook functions.
-    // See https://github.com/kylebarron/deck.gl-raster/blob/2eb91626f0836558f0be4cd201ea18980d7f7f2d/src/deckgl/raster-layer/raster-layer.js#L21-L40
-    // Note: _hookFunctions is private, not sure if there's an appropriate way to check if a hook function is already added.
-    // it may be better to add these hooks somewhere else rather than in initializeState of a layer?
-    if (!shaderAssembler._hookFunctions.includes(mutateStr)) {
-      shaderAssembler.addShaderHook(mutateStr);
-    }
-    if (!shaderAssembler._hookFunctions.includes(processStr)) {
-      shaderAssembler.addShaderHook(processStr);
-    }
   }
 
   /**
@@ -144,10 +161,27 @@ const XRLayer = class extends Layer {
    */
   updateState({ props, oldProps, changeFlags, ...rest }) {
     super.updateState({ props, oldProps, changeFlags, ...rest });
+
+    const numChannels = this.getNumChannels();
+    if (numChannels === 0) {
+      if (this.state.model) {
+        this.state.model.destroy();
+        this.setState({ model: null });
+      }
+      return;
+    }
+
     // setup model first
+    // Check for colormap changes - when colormap changes, getShaders() returns different modules
+    // but deck.gl might not detect this as extensionsChanged if extension instance is the same.
+    // By declaring colormap in defaultProps, deck.gl tracks it, but we still need this check
+    // as a fallback since extensionsChanged may not be set reliably.
+    const colormapChanged = props.colormap !== oldProps?.colormap;
     if (
       changeFlags.extensionsChanged ||
-      props.interpolation !== oldProps.interpolation
+      props.interpolation !== oldProps.interpolation ||
+      colormapChanged ||
+      (props.selections?.length ?? 0) !== (oldProps.selections?.length ?? 0)
     ) {
       const { device } = this.context;
       if (this.state.model) {
@@ -167,6 +201,34 @@ const XRLayer = class extends Layer {
     const attributeManager = this.getAttributeManager();
     if (props.bounds !== oldProps.bounds) {
       attributeManager.invalidate('positions');
+    }
+    // Set UBO uniforms and texture bindings. Use same-frame textures when we just loaded
+    // to avoid binding deleted refs (e.g. remove channel then add back).
+    const texturesToBind =
+      this._newTexturesFromLoadThisFrame ?? this.state.textures;
+    const { model } = this.state;
+    const bindings =
+      texturesToBind && model
+        ? normalizeTextureBindings(texturesToBind, numChannels, 'channel')
+        : null;
+
+    if (bindings) {
+      const { contrastLimits, domain, dtype, channelsVisible } = this.props;
+      const paddedContrastLimits = padContrastLimits({
+        contrastLimits: contrastLimits.slice(0, numChannels),
+        channelsVisible: channelsVisible.slice(0, numChannels),
+        domain,
+        dtype
+      });
+      const channelIntensity = {};
+      for (let i = 0; i < numChannels; i++) {
+        channelIntensity[`contrastLimits${i}`] = [
+          paddedContrastLimits[i * 2],
+          paddedContrastLimits[i * 2 + 1]
+        ];
+      }
+      model.shaderInputs.setProps({ channelIntensity });
+      model.setBindings(bindings);
     }
   }
 
@@ -198,7 +260,8 @@ const XRLayer = class extends Layer {
         }
       }),
       bufferLayout: this.getAttributeManager().getBufferLayouts(),
-      isInstanced: false
+      isInstanced: false,
+      shaderAssembler: VivShaderAssembler.getDefaultVivShaderAssembler()
     });
   }
 
@@ -236,47 +299,29 @@ const XRLayer = class extends Layer {
   }
 
   /**
-   * This function runs the shaders and draws to the canvas
+   * Track textures that were created during the current frame.
+   * These textures are used by `updateState` to bind same-frame textures
+   * and avoid referencing textures that may have been deleted when channels
+   * are removed and then added back.
+   *
+   * @param {Record<string, import('@luma.gl/core').Texture>|null} textures - Map of channel ids
+   *   (e.g. `channel0`, `channel1`) to textures created this frame, or null
+   *   when no channel textures were loaded.
+   * @private
    */
-  draw(opts) {
-    const { uniforms } = opts;
-    const { textures, model } = this.state;
-    if (textures && model) {
-      const { contrastLimits, domain, dtype, channelsVisible } = this.props;
-      // Check number of textures not null.
-      const numTextures = Object.values(textures).filter(t => t).length;
-      // Slider values and color values can come in before textures since their data is async.
-      // Thus we pad based on the number of textures bound.
-      const paddedContrastLimits = padContrastLimits({
-        contrastLimits: contrastLimits.slice(0, numTextures),
-        channelsVisible: channelsVisible.slice(0, numTextures),
-        domain,
-        dtype
-      });
-      model.setUniforms(
-        {
-          ...uniforms,
-          contrastLimits: paddedContrastLimits
-        },
-        { disableWarnings: false }
-      );
-      model.setBindings(textures);
-      model.draw(this.context.renderPass);
-    }
+  _setNewTexturesFromLoadThisFrame(textures) {
+    this._newTexturesFromLoadThisFrame = textures;
   }
 
   /**
    * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadChannelTextures(channelData) {
-    const textures = {
-      channel0: null,
-      channel1: null,
-      channel2: null,
-      channel3: null,
-      channel4: null,
-      channel5: null
-    };
+    const numChannels = this.getNumChannels();
+    const textures = {};
+    for (let i = 0; i < numChannels; i++) {
+      textures[`channel${i}`] = null;
+    }
     if (this.state.textures) {
       Object.values(this.state.textures).forEach(tex => tex?.delete());
     }
@@ -297,7 +342,10 @@ const XRLayer = class extends Layer {
         if (!textures.channel0) throw new Error('Bad texture state!');
         if (!textures[key]) textures[key] = textures.channel0;
       }
+      this._setNewTexturesFromLoadThisFrame(textures);
       this.setState({ textures });
+    } else {
+      this._setNewTexturesFromLoadThisFrame(null);
     }
   }
 
@@ -326,7 +374,7 @@ const XRLayer = class extends Layer {
       format: attrs.format
     });
   }
-};
+}
 
 XRLayer.layerName = 'XRLayer';
 XRLayer.defaultProps = defaultProps;

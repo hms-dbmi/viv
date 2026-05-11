@@ -17,6 +17,9 @@ export function renderSubLayers(props) {
   if ([left, bottom, right, top].some(v => v < 0) || !data) {
     return null;
   }
+  if (data.width === 0 || data.height === 0) {
+    return null;
+  }
   const base = loader[0];
   const { height, width } = getImageSize(base);
   // Tiles are exactly fitted to have height and width such that their bounds match that of the actual image (not some padded version).

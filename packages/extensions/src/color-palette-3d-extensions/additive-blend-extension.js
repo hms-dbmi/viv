@@ -1,17 +1,18 @@
+import { VIV_CHANNEL_INDEX_PLACEHOLDER as I } from '@vivjs/constants';
 import BaseExtension from './base-extension';
 
-const _BEFORE_RENDER = '';
+const _BEFORE_RENDER = `\
+// additive-blend before render
+  float intensityValue${I} = 0.0;\
+`;
 
 const _RENDER = `\
+// additive-blend render
   vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
-  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
   float total = 0.0;
-  for(int i = 0; i < 6; i++) {
-    float intensityValue = intensityArray[i];
-    rgbCombo += max(0.0, min(1.0, intensityValue)) * colors[i];
-    total += intensityValue;
-  }
+  total += intensityValue${I};
+  rgbCombo += max(0.0, min(1.0, intensityValue${I})) * fragmentUniforms3D.color${I};
   // Do not go past 1 in opacity.
   total = min(total, 1.0);
   vec4 val_color = vec4(rgbCombo, total);
@@ -21,7 +22,7 @@ const _RENDER = `\
   color.a += (1.0 - color.a) * val_color.a;
   if (color.a >= 0.95) {
     break;
-  }
+  }\
 `;
 
 const _AFTER_RENDER = '';
