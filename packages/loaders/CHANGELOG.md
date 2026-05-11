@@ -1,5 +1,12 @@
 # @vivjs/loaders
 
+## 0.21.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/types@0.21.0
+
 ## 0.20.1
 
 ### Patch Changes
