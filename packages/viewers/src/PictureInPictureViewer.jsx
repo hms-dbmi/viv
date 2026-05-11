@@ -114,7 +114,11 @@ const PictureInPictureViewer = props => {
   // Add scale bar view
   const scalebarViewState = viewStatesProp?.find(
     v => v.id === SCALEBAR_VIEW_ID
-  ) || { ...baseViewState, id: SCALEBAR_VIEW_ID };
+  ) ?? {
+    id: SCALEBAR_VIEW_ID,
+    zoom: 0,
+    target: [width / 2, height / 2, 0]
+  };
   const scaleBarView = new ScaleBarView({
     id: SCALEBAR_VIEW_ID,
     width,
