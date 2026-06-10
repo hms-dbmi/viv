@@ -156,7 +156,6 @@ const SideBySideViewer = props => {
     <VivViewer
       layerProps={layerProps}
       views={views}
-      randomize
       onViewStateChange={onViewStateChange}
       onHover={onHover}
       viewStates={finalViewStates}
