@@ -23,7 +23,9 @@
     "build": "unbuild"
   },
   "peerDependencies": {
+    "@deck.gl/core": "catalog:",
     "@deck.gl/react": "catalog:",
+    "@deck.gl/widgets": "catalog:",
     "react": "catalog:"
   },
   "dependencies": {
