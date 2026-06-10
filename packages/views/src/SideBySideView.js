@@ -4,6 +4,20 @@ import { makeBoundingBox } from '@vivjs/layers';
 
 import VivView from './VivView';
 import { getImageLayer, getVivId } from './utils';
+
+/** Effective orthographic zoom; deck.gl v9+ may store it in zoomX/zoomY instead of zoom. */
+function getViewZoom({ zoom, zoomX, zoomY } = {}) {
+  if (zoomX != null) {
+    return zoomX;
+  }
+  if (zoomY != null) {
+    return zoomY;
+  }
+  if (Array.isArray(zoom)) {
+    return zoom[0];
+  }
+  return zoom;
+}
 /**
  * This class generates a MultiscaleImageLayer and a view for use in the SideBySideViewer.
  * It is linked with its other views as controlled by `linkedIds`, `zoomLock`, and `panLock` parameters.
@@ -43,59 +57,46 @@ export default class SideBySideView extends VivView {
 
   filterViewState({ viewState, oldViewState, currentViewState }) {
     const { id: viewStateId } = viewState;
-    const { id, linkedIds, panLock, zoomLock } = this;
+    const { id, height, width, linkedIds, panLock, zoomLock } = this;
     if (
       oldViewState &&
       linkedIds.indexOf(viewStateId) !== -1 &&
       (zoomLock || panLock)
     ) {
-      const thisViewState = {
-        height: currentViewState.height,
-        width: currentViewState.width,
-        target: [],
-        zoom: null
-      };
-      const [currentX, currentY] = currentViewState.target;
+      const [currentX, currentY, currentZ = 0] = currentViewState.target;
+      let zoom = getViewZoom(currentViewState);
+      let target = [currentX, currentY, currentZ];
+
+      // Apply the leader's delta so an intentional offset (from unlocked pan/zoom)
+      // between panels is preserved while locked.
       if (zoomLock) {
-        const dZoom = viewState.zoom - oldViewState.zoom;
-        thisViewState.zoom = currentViewState.zoom + dZoom;
-      } else {
-        thisViewState.zoom = currentViewState.zoom;
+        const dZoom = getViewZoom(viewState) - getViewZoom(oldViewState);
+        zoom = zoom + dZoom;
       }
       if (panLock) {
         const [oldX, oldY] = oldViewState.target;
         const [newX, newY] = viewState.target;
-        const dx = newX - oldX;
-        const dy = newY - oldY;
-        thisViewState.target.push(currentX + dx);
-        thisViewState.target.push(currentY + dy);
-      } else {
-        thisViewState.target.push(currentX);
-        thisViewState.target.push(currentY);
+        target = [currentX + (newX - oldX), currentY + (newY - oldY), currentZ];
       }
+
+      return { id, target, zoom, height, width };
+    }
+    if (viewState.id === id) {
       return {
         id,
-        target: thisViewState.target,
-        zoom: thisViewState.zoom,
-        height: thisViewState.height,
-        width: thisViewState.width
+        target: viewState.target,
+        zoom: getViewZoom(viewState),
+        height,
+        width
       };
     }
-    return viewState.id === id
-      ? {
-          id,
-          target: viewState.target,
-          zoom: viewState.zoom,
-          height: viewState.height,
-          width: viewState.width
-        }
-      : {
-          id,
-          target: currentViewState.target,
-          zoom: currentViewState.zoom,
-          height: currentViewState.height,
-          width: currentViewState.width
-        };
+    return {
+      id,
+      target: currentViewState.target,
+      zoom: getViewZoom(currentViewState),
+      height,
+      width
+    };
   }
 
   getLayers({ props, viewStates }) {
@@ -113,7 +114,7 @@ export default class SideBySideView extends VivView {
       filled: false,
       stroked: true,
       getLineColor: viewportOutlineColor,
-      getLineWidth: viewportOutlineWidth * 2 ** -layerViewState.zoom
+      getLineWidth: viewportOutlineWidth * 2 ** -getViewZoom(layerViewState)
     });
     layers.push(border);
 

@@ -102,11 +102,15 @@ class VivViewerWrapper extends React.PureComponent {
       }) || viewState;
     this.setState(prevState => {
       const viewStates = {};
+      // Use our last stored leader state for deltas — deck.gl may pass a stale
+      // oldViewState when wheel events are batched in one frame.
+      const leaderPreviousViewState =
+        prevState.viewStates[viewId] ?? oldViewState;
       views.forEach(view => {
         const currentViewState = prevState.viewStates[view.id];
         viewStates[view.id] = view.filterViewState({
           viewState: { ...viewState, id: viewId },
-          oldViewState,
+          oldViewState: leaderPreviousViewState,
           currentViewState
         });
       });
