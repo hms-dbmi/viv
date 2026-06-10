@@ -87,7 +87,7 @@ const SideBySideViewer = props => {
       leftViewState || { ...defaultViewState, id: 'left' },
       rightViewState || { ...defaultViewState, id: 'right' },
       leftScalebarViewState ?? { zoom: 0, target, id: leftId },
-      rightScalebarViewState ?? { zoom: 0, target, id: leftId },
+      rightScalebarViewState ?? { zoom: 0, target, id: rightId }
     ];
   }, [loader, leftViewState, rightViewState]);
 
