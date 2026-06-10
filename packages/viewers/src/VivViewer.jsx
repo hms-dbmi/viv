@@ -277,26 +277,9 @@ class VivViewerWrapper extends React.PureComponent {
   }
 
   render() {
-    const { views, randomize, useDevicePixels = true, deckProps } = this.props;
+    const { views, useDevicePixels = true, deckProps } = this.props;
     const { viewStates } = this.state;
     const deckGLViews = views.map(view => view.getDeckGlView());
-    // DeckGL seems to use the first view more than the second for updates
-    // so this forces it to use the others more evenly.  This isn't perfect,
-    // but I am not sure what else to do.  The DeckGL render hooks don't help,
-    // but maybe useEffect() would help?  I couldn't work it out as
-    // The issue is that I'm not sure how React would distinguish between forced updates
-    // from permuting the views array and "real" updates like zoom/pan.
-    // I tried keeping a counter but I couldn't figure out resetting it
-    // without triggering a re-render.
-    if (randomize) {
-      const random = Math.random();
-      const holdFirstElement = deckGLViews[0];
-      // weight has to go to 1.5 because we use Math.round().
-      const randomWieghted = random * 1.49;
-      const randomizedIndex = Math.round(randomWieghted * (views.length - 1));
-      deckGLViews[0] = deckGLViews[randomizedIndex];
-      deckGLViews[randomizedIndex] = holdFirstElement;
-    }
     return (
       <DeckGL
         {...(deckProps ?? {})}
@@ -322,7 +305,6 @@ class VivViewerWrapper extends React.PureComponent {
  * This component wraps the DeckGL component.
  * @param {Object} props
  * @param {Array} props.layerProps  Props for the layers in each view.
- * @param {boolean} [props.randomize] Whether or not to randomize which view goes first (for dynamic rendering of multiple linked views).
  * @param {Array.<import('../views').VivView>} props.views Various `VivView`s to render.
  * @param {Array.<object>} props.viewStates List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }]
  * @param {ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
