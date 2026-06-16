@@ -2,6 +2,11 @@ packages:
   - sites/**
   - packages/**
 
+allowBuilds:
+  '@biomejs/biome': false
+  esbuild: false
+  puppeteer: false
+
 catalog:
   "@deck.gl/core": ~9.3.3
   "@deck.gl/extensions": ~9.3.3
