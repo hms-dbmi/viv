@@ -59,13 +59,5 @@
     "@esbuild-plugins/node-globals-polyfill": "Necessary to run `tape` with browser-like `tape-run`.",
     "@esbuild-plugins/node-modules-polyfill": "Necessary to run `tape` with browser-like `tape-run`."
   },
-  "pnpm": {
-    "peerDependencyRules": {
-      "allowedVersions": {
-        "esbuild": "*",
-        "@loaders.gl/core": "4.3.0"
-      }
-    }
-  },
-  "packageManager": "pnpm@9.5.0"
+  "packageManager": "pnpm@11.7.0"
 }
