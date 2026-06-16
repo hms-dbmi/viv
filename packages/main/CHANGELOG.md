@@ -1,5 +1,16 @@
 # @hms-dbmi/viv
 
+## 0.22.0
+
+### Minor Changes
+
+- Update to latest versions of deck.gl and luma.gl, with fixes for regressions in side-by-side and picture-in-picture related to deck.gl viewState handling changes. (`@vivjs/viewers`, `@vivjs/layers`, `@vivjs/views`, `@vivjs/constants`, `@vivjs/extensions`, `@vivjs/loaders`, `@hms-dbmi/viv`, `@vivjs/types`) ([#963](https://github.com/hms-dbmi/viv/pull/963))
+
+  Removed randomize prop from VivViewer which was no longer necessary and caused glitches in view composition particularly noticeable in avivator with scalebar views in side-by-side mode, but which could also have caused problems for downstream apps.
+
+### Patch Changes
+
+
 ## 0.21.0
 
 ### Minor Changes
@@ -19,7 +30,6 @@
   See [sites/docs/src/CUSTOM_SHADERS.md](./sites/docs/src/CUSTOM_SHADERS.md) for more details.
 
 ### Patch Changes
-
 
 ## 0.20.1
 
