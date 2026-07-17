@@ -17,7 +17,7 @@
     "sideEffects": false
   },
   "scripts": {
-    "build": "mkdir -p dist && cp src/index.js dist/index.mjs && cp src/index.js dist/index.d.ts"
+    "build": "mkdir -p dist && rm -f dist/index.mjs dist/index.d.ts && cp src/index.js dist/index.mjs && cp src/index.js dist/index.d.ts"
   },
   "files": [
     "dist"

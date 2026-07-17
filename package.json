@@ -18,7 +18,7 @@
     "test": "pnpm -r --parallel test",
     "fix": "biome check --write .",
     "version": "node ./scripts/version.mjs",
-    "publish": "pnpm build && pnpm changeset publish"
+    "release": "pnpm build && pnpm changeset publish"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
