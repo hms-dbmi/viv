@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { range } from '../src/multiscale-image-layer/utils';
+import { range, renderSubLayers } from '../src/multiscale-image-layer/utils';
 import {
   normalizeTextureBindings,
   padContrastLimits,
@@ -110,6 +110,88 @@ describe('utils', () => {
     expect(snapValue(0.0234)).toEqual([0.025, 25, 'm']);
     expect(snapValue(2345.0)).toEqual([3000, 3, 'k']);
     expect(snapValue(999.0)).toEqual([1000, 1, 'k']);
+  });
+});
+
+describe('renderSubLayers', () => {
+  const TILE_SIZE = 512;
+
+  // `props.tile` as deck.gl's TileLayer builds it: the bbox of tile (x, y) at level -z
+  // assuming every tile is a full tileSize.
+  function tileProps({ x, y, z, width, height, imageSize }) {
+    const scale = 2 ** -z;
+    return {
+      id: 'test',
+      maxZoom: 0,
+      loader: [
+        {
+          dtype: 'Uint16',
+          tileSize: TILE_SIZE,
+          shape: [1, imageSize.height, imageSize.width]
+        }
+      ],
+      data: { data: [new Uint16Array(width * height)], width, height },
+      tile: {
+        index: { x, y, z },
+        bbox: {
+          left: x * TILE_SIZE * scale,
+          top: y * TILE_SIZE * scale,
+          right: (x + 1) * TILE_SIZE * scale,
+          bottom: (y + 1) * TILE_SIZE * scale
+        }
+      }
+    };
+  }
+
+  test('a full tile keeps the bounds deck.gl computed', () => {
+    const props = tileProps({
+      x: 1,
+      y: 1,
+      z: -2,
+      width: TILE_SIZE,
+      height: TILE_SIZE,
+      imageSize: { width: 4096, height: 4096 }
+    });
+    const { left, top, right, bottom } = props.tile.bbox;
+    expect(renderSubLayers(props).props.bounds).toEqual([
+      left,
+      bottom,
+      right,
+      top
+    ]);
+  });
+
+  test('a partial tile of an exactly-halved pyramid reaches the image edge', () => {
+    // 4096 x 4096 image, level 2 is 1024 x 1024: tile (1, 1) holds the last 512 x 512
+    // pixels of the level, which cover the image out to its bottom-right corner.
+    const props = tileProps({
+      x: 1,
+      y: 1,
+      z: -2,
+      width: 512,
+      height: 512,
+      imageSize: { width: 4096, height: 4096 }
+    });
+    expect(renderSubLayers(props).props.bounds).toEqual([
+      2048, 4096, 4096, 2048
+    ]);
+  });
+
+  test('a partial tile covers only the pixels its level has', () => {
+    // 4095 x 4095 image floor-halved to 1023 x 1023 at level 2, which covers 4092 px of
+    // the base: tile (1, 1) holds 511 x 511 pixels and must stop at 4092, not 4095 -
+    // stretching it to the image extent is what makes the image shift between levels.
+    const props = tileProps({
+      x: 1,
+      y: 1,
+      z: -2,
+      width: 511,
+      height: 511,
+      imageSize: { width: 4095, height: 4095 }
+    });
+    expect(renderSubLayers(props).props.bounds).toEqual([
+      2048, 4092, 4092, 2048
+    ]);
   });
 });
 
