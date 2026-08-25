@@ -1,6 +1,6 @@
 import type { GeoTIFFImage } from 'geotiff';
 
-import type Pool from './lib/Pool';
+import type { DecodePool } from './lib/Pool';
 import { getMultiTiffIndexer } from './lib/indexers';
 import {
   type OmeTiffSelection,
@@ -46,7 +46,7 @@ export async function load(
   imageName: string,
   images: MultiTiffImage[],
   channelNames: string[],
-  pool?: Pool
+  pool?: DecodePool | false
 ) {
   // Before doing any work make sure all of the images have the same resolution
   assertSameResolution(images);

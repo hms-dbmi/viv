@@ -1,7 +1,7 @@
 import type { GeoTIFF } from 'geotiff';
 import { type OmeXmlParsed, fromString } from '../omexml';
 import { assert } from '../utils';
-import type Pool from './lib/Pool';
+import type { DecodePool } from './lib/Pool';
 import { createOmeImageIndexerFromResolver } from './lib/indexers';
 import {
   type OmeTiffDims,
@@ -138,7 +138,7 @@ async function getPixelSourceOptionsForImage(
 export async function loadMultifileOmeTiff(
   source: string | File,
   options: {
-    pool?: Pool;
+    pool?: DecodePool | false;
     headers?: Headers | Record<string, string>;
   } = {}
 ) {

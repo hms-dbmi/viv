@@ -1,4 +1,5 @@
 export { loadOmeTiff, loadMultiTiff } from './tiff';
+export { Pool, type DecodePool } from './tiff/lib/Pool';
 export {
   loadOmeZarr,
   DEPRECATED_loadBioformatsZarr,

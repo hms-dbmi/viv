@@ -199,8 +199,8 @@ importers:
         specifier: workspace:*
         version: link:../types
       geotiff:
-        specifier: ^2.0.5
-        version: 2.1.3
+        specifier: 2.1.4-beta.0
+        version: 2.1.4-beta.0
       lzw-tiff-decoder:
         specifier: ^0.1.1
         version: 0.1.1
@@ -320,8 +320,8 @@ importers:
         specifier: ^6.0.0
         version: 6.4.8(@types/react@19.1.2)(react@18.3.1)
       geotiff:
-        specifier: ^2.0.5
-        version: 2.1.3
+        specifier: 2.1.4-beta.0
+        version: 2.1.4-beta.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -2498,8 +2498,8 @@ packages:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
 
-  geotiff@2.1.3:
-    resolution: {integrity: sha512-PT6uoF5a1+kbC3tHmZSUsLHBp2QJlHasxxxxPW47QIY1VBKpFB+FcDvX+MxER6UzgLQZ0xDzJ9s48B9JbOCTqA==}
+  geotiff@2.1.4-beta.0:
+    resolution: {integrity: sha512-jb6SYvHMyiCqwqgGGLDAxtig9h1g6O+n1wEyNEE4QgVEXOItYaWrEgPg9SAnwdoZm2yx6DpFtilbGG65hvZgpQ==}
     engines: {node: '>=10.19'}
 
   get-caller-file@2.0.5:
@@ -4357,8 +4357,8 @@ packages:
   zstd-codec@0.1.5:
     resolution: {integrity: sha512-v3fyjpK8S/dpY/X5WxqTK3IoCnp/ZOLxn144GZVlNUjtwAchzrVo03h+oMATFhCIiJ5KTr4V3vDQQYz4RU684g==}
 
-  zstddec@0.1.0:
-    resolution: {integrity: sha512-w2NTI8+3l3eeltKAdK8QpiLo/flRAr2p8AGeakfMZOXBxOg9HIu4LVDxBi81sYgVhFhdJjv1OrB5ssI8uFPoLg==}
+  zstddec@0.2.0:
+    resolution: {integrity: sha512-oyPnDa1X5c13+Y7mA/FDMNJrn4S8UNBe0KCqtDmor40Re7ALrPN6npFwyYVRRh+PqozZQdeg23QtbcamZnG5rA==}
 
   zustand@5.0.3:
     resolution: {integrity: sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==}
@@ -6675,7 +6675,7 @@ snapshots:
 
   gensync@1.0.0-beta.2: {}
 
-  geotiff@2.1.3:
+  geotiff@2.1.4-beta.0:
     dependencies:
       '@petamoriken/float16': 3.9.2
       lerc: 3.0.0
@@ -6684,7 +6684,7 @@ snapshots:
       quick-lru: 6.1.2
       web-worker: 1.5.0
       xml-utils: 1.10.2
-      zstddec: 0.1.0
+      zstddec: 0.2.0
 
   get-caller-file@2.0.5: {}
 
@@ -8841,7 +8841,7 @@ snapshots:
   zstd-codec@0.1.5:
     optional: true
 
-  zstddec@0.1.0: {}
+  zstddec@0.2.0: {}
 
   zustand@5.0.3(@types/react@19.1.2)(react@18.3.1):
     optionalDependencies:

@@ -1,6 +1,6 @@
 import { addDecoder, fromBlob } from 'geotiff';
-import type { Pool } from 'geotiff';
 
+import type { DecodePool } from './lib/Pool';
 import LZWDecoder from './lib/lzw-decoder';
 import {
   type OmeTiffDims,
@@ -15,12 +15,12 @@ import { loadMultifileOmeTiff } from './multifile-ome-tiff';
 import type TiffPixelSource from './pixel-source';
 import { loadSingleFileOmeTiff } from './singlefile-ome-tiff';
 
-addDecoder(5, () => LZWDecoder);
+addDecoder(5, () => Promise.resolve(LZWDecoder));
 
 interface TiffOptions {
   headers?: Headers | Record<string, string>;
   offsets?: number[];
-  pool?: Pool;
+  pool?: DecodePool | false;
 }
 
 interface OmeTiffOptions extends TiffOptions {
@@ -28,7 +28,7 @@ interface OmeTiffOptions extends TiffOptions {
 }
 
 interface MultiTiffOptions {
-  pool?: Pool;
+  pool?: DecodePool | false;
   name?: string;
   channelNames?: string[];
   headers?: Headers | Record<string, string>;
@@ -68,7 +68,7 @@ export async function loadOmeTiff(source: string | File): Promise<OmeTiffImage>;
  * @param {Object} opts
  * @param {Headers=} opts.headers - Headers passed to each underlying fetch request.
  * @param {Array<number>=} opts.offsets - [Indexed-Tiff](https://github.com/hms-dbmi/generate-tiff-offsets) IFD offsets.
- * @param {GeoTIFF.Pool} [opts.pool] - A geotiff.js [Pool](https://geotiffjs.github.io/geotiff.js/module-pool-Pool.html) for decoding image chunks.
+ * @param {import('./lib/Pool').DecodePool | false} [opts.pool] - Decode worker pool (see {@link Pool} from `@vivjs/loaders`) or `false` for main-thread decode.
  * @param {("first" | "all")} [opts.images='first'] - Whether to return 'all' or only the 'first' image in the OME-TIFF.
  * Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[] is returned.
  * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }> | Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[]} data source and associated OME-Zarr metadata.
@@ -115,7 +115,7 @@ function getImageSelectionName(
  * You should only provide (OmeTiffSelection | undefined)[] when loading from stacked tiffs. In this case the array index corresponds to the image index in the stack, and the selection is the
  * selection that image corresponds to. Undefined selections are for images that should not be loaded.
  * @param {Object} opts
- * @param {GeoTIFF.Pool} [opts.pool] - A geotiff.js [Pool](https://geotiffjs.github.io/geotiff.js/module-pool-Pool.html) for decoding image chunks.
+ * @param {import('./lib/Pool').DecodePool | false} [opts.pool] - Decode worker pool (see {@link Pool} from `@vivjs/loaders`) or `false` for main-thread decode.
  * @param {string} [opts.name='MultiTiff'] - a name for the "virtual" image stack.
  * @param {Headers=} opts.headers - Headers passed to each underlying fetch request.
  * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>} data source and associated metadata.

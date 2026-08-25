@@ -26,17 +26,11 @@
   },
   "dependencies": {
     "@vivjs/types": "workspace:*",
-    "geotiff": "^2.0.5",
+    "geotiff": "2.1.4-beta.0",
     "lzw-tiff-decoder": "^0.1.1",
     "quickselect": "^2.0.0",
     "zarrita": "^0.5.4",
     "zod": "^3.22.4"
-  },
-  "unbuild": {
-    "entries": [
-      "src/index"
-    ],
-    "declaration": true
   },
   "devDependencies": {
     "xmldom": "^0.6.0"

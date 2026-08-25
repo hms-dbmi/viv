@@ -12,7 +12,7 @@ import type {
   SupportedDtype,
   TileSelection
 } from '@vivjs/types';
-import type Pool from './lib/Pool';
+import type { DecodePool } from './lib/Pool';
 
 type ReadRastersOptions = NonNullable<
   Parameters<GeoTIFFImage['readRasters']>[0]
@@ -28,7 +28,7 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
     public shape: number[],
     public labels: Labels<S>,
     public meta?: PixelSourceMeta,
-    public pool?: Pool
+    public pool?: DecodePool | false
   ) {
     this._indexer = indexer;
   }

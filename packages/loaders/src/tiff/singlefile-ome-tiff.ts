@@ -2,7 +2,7 @@ import { fromString } from '../omexml';
 
 import type GeoTIFF from 'geotiff';
 import type { DimensionOrder, OmeXml } from '../omexml';
-import type Pool from './lib/Pool';
+import type { DecodePool } from './lib/Pool';
 import { createOmeImageIndexerFromResolver } from './lib/indexers';
 import {
   type OmeTiffDims,
@@ -122,7 +122,7 @@ type OmeTiffImage = {
 export async function loadSingleFileOmeTiff(
   source: string | URL | File,
   options: {
-    pool?: Pool;
+    pool?: DecodePool | false;
     headers?: Headers | Record<string, string>;
     offsets?: number[];
   } = {}
