@@ -1,10 +1,46 @@
-import { isInterleaved } from '@vivjs/loaders';
+import { getImageSize, isInterleaved } from '@vivjs/loaders';
 
 import BitmapLayer from '../bitmap-layer';
 import XRLayer from '../xr-layer/xr-layer';
 
 export function range(len) {
   return [...Array(len).keys()];
+}
+
+/**
+ * Deck.gl TileLayer zooms for each pyramid level, derived from width ratios.
+ * Dyadic (2x) pyramids yield [0, -1, -2, ...]; 4x pyramids yield [0, -2, -4, ...].
+ */
+export function getPyramidZoomLevels(loader) {
+  if (!Array.isArray(loader) || loader.length === 0) {
+    return [0];
+  }
+  const { width: baseWidth } = getImageSize(loader[0]);
+  return loader.map(level => {
+    const { width } = getImageSize(level);
+    // Avoid -0 from -Math.round(log2(1)).
+    return 0 - Math.round(Math.log2(baseWidth / width));
+  });
+}
+
+/**
+ * Finest available level zoom that is not finer than `z` (deck.gl tile z).
+ */
+export function snapToAvailableZoom(z, levelZooms) {
+  const target = Math.round(z);
+  for (const lz of levelZooms) {
+    if (lz <= target) {
+      return lz;
+    }
+  }
+  return levelZooms[levelZooms.length - 1];
+}
+
+/** Linear scale from base resolution to `loader[levelIndex]`. */
+export function getLevelScale(loader, levelIndex) {
+  const { width: baseWidth } = getImageSize(loader[0]);
+  const { width } = getImageSize(loader[levelIndex]);
+  return baseWidth / width;
 }
 
 export function renderSubLayers(props) {
@@ -30,12 +66,31 @@ export function renderSubLayers(props) {
   // multiscale-spatial-image / spatialdata, where level k spans size_k * 2**k, up to 2**k - 1
   // px short of the base) it over-scales them by a level-dependent amount, so the image
   // shifts as tiles of different levels are drawn. See #975.
-  const scale = 2 ** Math.round(-z);
+  //
+  // Non-dyadic pyramids (e.g. Bio-Formats 4x SubIFDs): MultiscaleImageLayer snaps deck.gl's
+  // intermediate zooms to a native level and remaps x/y. Bounds must use that native zoom
+  // so overlapping requests for the same native tile share one placement.
+  let scale = 2 ** Math.round(-z);
+  let boundLeft = left;
+  let boundTop = top;
+  if (Array.isArray(loader) && loader.length > 1 && base.labels) {
+    const levelZooms = getPyramidZoomLevels(loader);
+    const zNat = snapToAvailableZoom(z, levelZooms);
+    scale = 2 ** Math.round(-zNat);
+    const factor = 2 ** (Math.round(z) - zNat);
+    if (factor !== 1) {
+      const xNat = Math.floor(x / factor);
+      const yNat = Math.floor(y / factor);
+      const { tileSize } = base;
+      boundLeft = xNat * tileSize * scale;
+      boundTop = yNat * tileSize * scale;
+    }
+  }
   const bounds = [
-    left,
-    top + data.height * scale,
-    left + data.width * scale,
-    top
+    boundLeft,
+    boundTop + data.height * scale,
+    boundLeft + data.width * scale,
+    boundTop
   ];
   if (isInterleaved(base.shape)) {
     const { photometricInterpretation = 2 } = base.meta;

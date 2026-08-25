@@ -10,7 +10,7 @@ import {
   createGeoTiff,
   extractAxesFromPixels,
   extractPhysicalSizesfromPixels,
-  getShapeForBinaryDownsampleLevel,
+  getShapeForLevel,
   getTiffTileSize,
   guessImageDataType,
   isPackedRgbTiffImage,
@@ -204,21 +204,28 @@ export async function loadSingleFileOmeTiff(
       photometricInterpretation:
         firstImage.fileDirectory.PhotometricInterpretation
     };
-    const data = Array.from({ length: levels }, (_, level) => {
-      return new TiffPixelSource(
-        sel =>
-          pyramidIndexer(
-            { t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 },
-            level
-          ),
-        vivDtype,
-        tileSize,
-        getShapeForBinaryDownsampleLevel({ axes, level }),
-        axes.labels,
-        meta,
-        pool
-      );
-    });
+    const data = await Promise.all(
+      Array.from({ length: levels }, async (_, level) => {
+        const levelImage = await pyramidIndexer({ t: 0, c: 0, z: 0 }, level);
+        return new TiffPixelSource(
+          sel =>
+            pyramidIndexer(
+              { t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 },
+              level
+            ),
+          vivDtype,
+          tileSize,
+          getShapeForLevel({
+            axes,
+            width: levelImage.getWidth(),
+            height: levelImage.getHeight()
+          }),
+          axes.labels,
+          meta,
+          pool
+        );
+      })
+    );
     images.push({ data: data as TiffPixelSource<OmeTiffDims>[], metadata });
     imageIfdOffset += imageSize.t * imageSize.z * imageSize.c;
   }

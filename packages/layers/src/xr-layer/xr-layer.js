@@ -361,8 +361,8 @@ class XRLayer extends Layer {
       height,
       dimension: '2d',
       data: attrs.cast?.(data) ?? data,
-      // we don't want or need mimaps
-      mipmaps: false,
+      // luma.gl 9.3: `mipmaps` is ignored; texStorage2D needs a positive mipLevels.
+      mipLevels: 1,
       sampler: {
         // NEAREST for integer data
         minFilter: attrs.filter,

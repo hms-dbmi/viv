@@ -90,7 +90,7 @@ const getTransparentColor = photometricInterpretation => {
  * - Returns null when the input is not usable.
  *
  * @param {{ data?: Uint8Array, width?: number, height?: number, format?: string } | null | undefined} img
- * @returns {{ data: Uint8Array, width: number, height: number, format?: string } | null}
+ * @returns {{ data: Uint8Array | Uint8ClampedArray, width: number, height: number, format?: string } | null}
  */
 const getPreparedImage = img => {
   if (!img?.data || !img.width || !img.height) {
@@ -160,16 +160,60 @@ const BitmapLayer = class extends CompositeLayer {
     super.initializeState(args);
   }
 
+  updateState({ props, oldProps, ...rest }) {
+    super.updateState({ props, oldProps, ...rest });
+    const img = getPreparedImage(props.image);
+    if (!img) {
+      if (this.state.bitmapTexture) {
+        this.state.bitmapTexture.delete();
+        this.setState({ bitmapTexture: null });
+      }
+      return;
+    }
+    if (props.image === oldProps?.image && this.state.bitmapTexture) {
+      return;
+    }
+    if (this.state.bitmapTexture) {
+      this.state.bitmapTexture.delete();
+    }
+
+    // Upload ourselves: deck.gl 9.3's image prop helper reads size from
+    // `image.data` (not `{data,width,height}`), allocates a full mip chain,
+    // and calls generateMipmapsWebGL() — which throws GL_INVALID_VALUE /
+    // "levels not positive" / "format does not support mipmap" for our tiles.
+    const texture = this.context.device.createTexture({
+      width: img.width,
+      height: img.height,
+      dimension: '2d',
+      data: img.data,
+      mipLevels: 1,
+      format: img.format || 'rgba8unorm',
+      sampler: {
+        minFilter: 'linear',
+        magFilter: 'linear',
+        addressModeU: 'clamp-to-edge',
+        addressModeV: 'clamp-to-edge'
+      }
+    });
+    this.setState({ bitmapTexture: texture });
+  }
+
+  finalizeState() {
+    if (this.state.bitmapTexture) {
+      this.state.bitmapTexture.delete();
+      this.setState({ bitmapTexture: null });
+    }
+    super.finalizeState();
+  }
+
   renderLayers() {
     const {
       photometricInterpretation,
       transparentColor: transparentColorInHook
     } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
-    // Always pass a prepared {data,width,height} image — not a Luma Texture.
-    // BitmapLayerWrapper uses deck.gl's `image` prop type, which uploads GPU
-    // textures itself; Texture objects are not interchangeable with that shape.
-    const image = getPreparedImage(this.props.image);
+    // Pass a Luma Texture (createTexture short-circuits on Texture instances).
+    const image = this.state.bitmapTexture;
     if (!image) return null;
     return new BitmapLayerWrapper(
       { ...this.props, image },

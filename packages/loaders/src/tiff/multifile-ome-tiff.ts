@@ -9,7 +9,7 @@ import {
   createGeoTiff,
   extractAxesFromPixels,
   extractPhysicalSizesfromPixels,
-  getShapeForBinaryDownsampleLevel,
+  getShapeForLevel,
   getTiffTileSize,
   parsePixelDataType
 } from './lib/utils';
@@ -183,18 +183,30 @@ export async function loadMultifileOmeTiff(
       baseUrl: url,
       headers: options.headers || {}
     });
-    const data = Array.from(
-      { length: opts.levels },
-      (_, level) =>
-        new TiffPixelSource(
-          sel => opts.pyramidIndexer({ t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 }, level),
+    const data = await Promise.all(
+      Array.from({ length: opts.levels }, async (_, level) => {
+        const levelImage = await opts.pyramidIndexer(
+          { t: 0, c: 0, z: 0 },
+          level
+        );
+        return new TiffPixelSource(
+          sel =>
+            opts.pyramidIndexer(
+              { t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 },
+              level
+            ),
           opts.dtype,
           opts.tileSize,
-          getShapeForBinaryDownsampleLevel({ axes: opts.axes, level }),
+          getShapeForLevel({
+            axes: opts.axes,
+            width: levelImage.getWidth(),
+            height: levelImage.getHeight()
+          }),
           opts.axes.labels,
           opts.meta,
           options.pool
-        )
+        );
+      })
     );
     tiffImages.push({ data: data as TiffPixelSource<OmeTiffDims>[], metadata });
   }

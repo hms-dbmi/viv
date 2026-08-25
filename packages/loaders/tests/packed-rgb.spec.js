@@ -130,9 +130,39 @@ test.skipIf(!fs.existsSync(HE_CHUNKY))(
   }
 );
 
+test.skipIf(!fs.existsSync(HE_CHUNKY))(
+  'optional: LSP16103 pyramid shapes match SubIFD sizes (4x, not binary)',
+  async () => {
+    const { data } = await loadOmeTiff(`file://${HE_CHUNKY}`);
+    const widths = data.map(s => s.shape[s.labels.indexOf('x')]);
+    const heights = data.map(s => s.shape[s.labels.indexOf('y')]);
+    expect(widths).toEqual([102039, 25510, 6378, 1595, 399]);
+    expect(heights).toEqual([76379, 19095, 4774, 1194, 299]);
+    // Deck.gl zooms are ~0, -2, -4, -6, -8 for a 4x pyramid.
+    const zooms = widths.map(
+      w => 0 - Math.round(Math.log2(widths[0] / w))
+    );
+    expect(zooms).toEqual([0, -2, -4, -6, -8]);
+  }
+);
+
 test.skipIf(!fs.existsSync(HE_PLANAR))(
   'optional: LSP12653 planar RGB loads as interleaved SizeC=1',
   async () => {
     await assertPackedRgbContract(HE_PLANAR, PHOTOMETRIC_RGB);
+  }
+);
+
+test.skipIf(!fs.existsSync(HE_PLANAR))(
+  'optional: LSP12653 pyramid shapes match SubIFD sizes (2x)',
+  async () => {
+    const { data } = await loadOmeTiff(`file://${HE_PLANAR}`);
+    const widths = data.map(s => s.shape[s.labels.indexOf('x')]);
+    expect(widths[0]).toBe(29857);
+    expect(widths[1]).toBe(14928);
+    const zooms = widths.map(
+      w => 0 - Math.round(Math.log2(widths[0] / w))
+    );
+    expect(zooms).toEqual([0, -1, -2, -3, -4, -5]);
   }
 );

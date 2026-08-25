@@ -529,15 +529,15 @@ function extractAxesFromPixels(d) {
   }
   return { labels, shape };
 }
-function getShapeForBinaryDownsampleLevel(options) {
-  const { axes, level } = options;
+function getShapeForLevel(options) {
+  const { axes, width, height } = options;
   const xIndex = axes.labels.indexOf("x");
   assert(xIndex !== -1, "x dimension not found");
   const yIndex = axes.labels.indexOf("y");
   assert(yIndex !== -1, "y dimension not found");
   const resolutionShape = axes.shape.slice();
-  resolutionShape[xIndex] = axes.shape[xIndex] >> level;
-  resolutionShape[yIndex] = axes.shape[yIndex] >> level;
+  resolutionShape[xIndex] = width;
+  resolutionShape[yIndex] = height;
   return resolutionShape;
 }
 function getTiffTileSize(image) {
@@ -1253,7 +1253,6 @@ const OmeSchema = z.object({
 function fromString(str) {
   const raw = parseXML(str);
   const omeXml = OmeSchema.parse(raw);
-  console.log("simon", omeXml);
   return {
     images: omeXml.Image ?? [],
     rois: omeXml.ROI ?? [],
@@ -1364,17 +1363,29 @@ async function loadMultifileOmeTiff(source, options = {}) {
       baseUrl: url,
       headers: options.headers || {}
     });
-    const data = Array.from(
-      { length: opts.levels },
-      (_, level) => new TiffPixelSource(
-        (sel) => opts.pyramidIndexer({ t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 }, level),
-        opts.dtype,
-        opts.tileSize,
-        getShapeForBinaryDownsampleLevel({ axes: opts.axes, level }),
-        opts.axes.labels,
-        opts.meta,
-        options.pool
-      )
+    const data = await Promise.all(
+      Array.from({ length: opts.levels }, async (_, level) => {
+        const levelImage = await opts.pyramidIndexer(
+          { t: 0, c: 0, z: 0 },
+          level
+        );
+        return new TiffPixelSource(
+          (sel) => opts.pyramidIndexer(
+            { t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 },
+            level
+          ),
+          opts.dtype,
+          opts.tileSize,
+          getShapeForLevel({
+            axes: opts.axes,
+            width: levelImage.getWidth(),
+            height: levelImage.getHeight()
+          }),
+          opts.axes.labels,
+          opts.meta,
+          options.pool
+        );
+      })
     );
     tiffImages.push({ data, metadata });
   }
@@ -1484,20 +1495,27 @@ async function loadSingleFileOmeTiff(source, options = {}) {
       physicalSizes: extractPhysicalSizesfromPixels(metadata["Pixels"]),
       photometricInterpretation: firstImage.fileDirectory.PhotometricInterpretation
     };
-    const data = Array.from({ length: levels }, (_, level) => {
-      return new TiffPixelSource(
-        (sel) => pyramidIndexer(
-          { t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 },
-          level
-        ),
-        vivDtype,
-        tileSize,
-        getShapeForBinaryDownsampleLevel({ axes, level }),
-        axes.labels,
-        meta,
-        pool
-      );
-    });
+    const data = await Promise.all(
+      Array.from({ length: levels }, async (_, level) => {
+        const levelImage = await pyramidIndexer({ t: 0, c: 0, z: 0 }, level);
+        return new TiffPixelSource(
+          (sel) => pyramidIndexer(
+            { t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 },
+            level
+          ),
+          vivDtype,
+          tileSize,
+          getShapeForLevel({
+            axes,
+            width: levelImage.getWidth(),
+            height: levelImage.getHeight()
+          }),
+          axes.labels,
+          meta,
+          pool
+        );
+      })
+    );
     images.push({ data, metadata });
     imageIfdOffset += imageSize.t * imageSize.z * imageSize.c;
   }

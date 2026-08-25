@@ -193,6 +193,26 @@ describe('renderSubLayers', () => {
       2048, 4092, 4092, 2048
     ]);
   });
+
+  test('4x pyramid intermediate zoom snaps bounds to native level tile', () => {
+    const labels = ['c', 'y', 'x'];
+    const loader = [
+      { dtype: 'Uint8', tileSize: 256, labels, shape: [1, 1024, 1024], meta: {} },
+      { dtype: 'Uint8', tileSize: 256, labels, shape: [1, 256, 256], meta: {} }
+    ];
+    // Deck requests z=-1; native level is z=-2 (4x). Tile (1,0) maps to native (0,0).
+    const props = {
+      id: 'test',
+      maxZoom: 0,
+      loader,
+      data: { data: new Uint8Array(256 * 256 * 3), width: 256, height: 256 },
+      tile: {
+        index: { x: 1, y: 0, z: -1 },
+        bbox: { left: 512, top: 0, right: 1024, bottom: 512 }
+      }
+    };
+    expect(renderSubLayers(props).props.bounds).toEqual([0, 1024, 1024, 0]);
+  });
 });
 
 describe('normalizeTextureBindings', () => {

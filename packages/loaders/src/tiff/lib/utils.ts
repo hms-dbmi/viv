@@ -165,7 +165,8 @@ export function extractAxesFromPixels(d: OmeXml[number]['Pixels']) {
  * Compute the shape of the image at a given resolution level.
  *
  * Assumes that the image is downsampled by a factor of 2 for each
- * pyramid level.
+ * pyramid level. Prefer {@link getShapeForLevel} with actual IFD
+ * dimensions when SubIFD sizes are not exact binary halvings (e.g. 4x).
  */
 export function getShapeForBinaryDownsampleLevel(options: {
   axes: { shape: number[]; labels: string[] };
@@ -179,6 +180,25 @@ export function getShapeForBinaryDownsampleLevel(options: {
   const resolutionShape = axes.shape.slice();
   resolutionShape[xIndex] = axes.shape[xIndex] >> level;
   resolutionShape[yIndex] = axes.shape[yIndex] >> level;
+  return resolutionShape;
+}
+
+/**
+ * Build a resolution shape from measured width/height (e.g. TIFF IFD size).
+ */
+export function getShapeForLevel(options: {
+  axes: { shape: number[]; labels: string[] };
+  width: number;
+  height: number;
+}) {
+  const { axes, width, height } = options;
+  const xIndex = axes.labels.indexOf('x');
+  assert(xIndex !== -1, 'x dimension not found');
+  const yIndex = axes.labels.indexOf('y');
+  assert(yIndex !== -1, 'y dimension not found');
+  const resolutionShape = axes.shape.slice();
+  resolutionShape[xIndex] = width;
+  resolutionShape[yIndex] = height;
   return resolutionShape;
 }
 

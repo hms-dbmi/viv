@@ -573,7 +573,7 @@ const XR3DLayer = class extends Layer {
       dimension: '3d',
       data: attrs.cast?.(data) ?? data,
       format: attrs.format,
-      mipmaps: false,
+      mipLevels: 1,
       sampler: {
         minFilter: 'linear',
         magFilter: 'linear',

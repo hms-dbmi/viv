@@ -422,7 +422,6 @@ const OmeSchema = z
 export function fromString(str: string): OmeXml {
   const raw = parseXML(str);
   const omeXml = OmeSchema.parse(raw);
-  console.log('simon', omeXml);
   // With schema-level normalization, parsing is a simple projection
   return {
     images: omeXml.Image ?? [],

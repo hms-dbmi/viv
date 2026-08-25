@@ -1,6 +1,7 @@
 import { LayerExtension, COORDINATE_SYSTEM, CompositeLayer, Layer, project32, picking, OrthographicView, OrbitView, Controller } from '@deck.gl/core';
-import { GL } from '@luma.gl/constants';
 import { Matrix4 } from '@math.gl/core';
+import { ShaderAssembler } from '@luma.gl/shadertools';
+import { GL } from '@luma.gl/constants';
 import { BaseDecoder, addDecoder, getDecoder, fromBlob, fromFile, fromUrl, GeoTIFFImage } from 'geotiff';
 import { decompress } from 'lzw-tiff-decoder';
 import quickselect from 'quickselect';
@@ -9,7 +10,6 @@ import * as zarr from 'zarrita';
 import { FetchStore } from 'zarrita';
 import { BitmapLayer as BitmapLayer$1, PolygonLayer, LineLayer, TextLayer } from '@deck.gl/layers';
 import { Model, Geometry } from '@luma.gl/engine';
-import { ShaderAssembler } from '@luma.gl/shadertools';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { Plane } from '@math.gl/culling';
 import DeckGL from '@deck.gl/react';
@@ -18,7 +18,9 @@ import * as React from 'react';
 
 const MAX_COLOR_INTENSITY = 255;
 const DEFAULT_COLOR_OFF = [0, 0, 0];
-const MAX_CHANNELS = 6;
+const MAX_CHANNELS = 10;
+const VIV_CHANNEL_INDEX_PLACEHOLDER = "VIV_CHANNEL_INDEX";
+const VIV_PLANE_INDEX_PLACEHOLDER = "VIV_PLANE_INDEX";
 const DEFAULT_FONT_FAMILY = "-apple-system, 'Helvetica Neue', Arial, sans-serif";
 const DTYPE_VALUES = {
   Uint8: {
@@ -142,6 +144,137 @@ const apply_transparent_color = `vec4 apply_transparent_color(vec3 color, vec3 t
   return vec4(color, (color == transparentColor && useTransparentColor) ? 0. : opacity);
 }
 `;
+
+var __defProp$5 = Object.defineProperty;
+var __defNormalProp$5 = (obj, key, value) => key in obj ? __defProp$5(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField$5 = (obj, key, value) => {
+  __defNormalProp$5(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+function expandLine(line, numChannels, numPlanes = 1) {
+  if (line.includes(VIV_CHANNEL_INDEX_PLACEHOLDER)) {
+    let str = "";
+    for (let i = 0; i < numChannels; i++) {
+      str += `${line.replaceAll(VIV_CHANNEL_INDEX_PLACEHOLDER, i.toString())}
+`;
+    }
+    if (str.endsWith(",\n")) {
+      str = `${str.slice(0, -2)}
+`;
+    }
+    return str;
+  }
+  if (line.includes(VIV_PLANE_INDEX_PLACEHOLDER)) {
+    let str = "";
+    for (let i = 0; i < numPlanes; i++) {
+      str += `${line.replaceAll(VIV_PLANE_INDEX_PLACEHOLDER, i.toString())}
+`;
+    }
+    if (str.endsWith(",\n")) {
+      str = `${str.slice(0, -2)}
+`;
+    }
+    return str;
+  }
+  return line;
+}
+function processGLSLShader(shader, numChannels, numPlanes = 1) {
+  return shader.split("\n").map((line) => expandLine(line, numChannels, numPlanes)).join("\n");
+}
+function expandShaderModule(module, numChannels, numPlanes = 1) {
+  if (numChannels < 1) {
+    throw new Error(
+      `expandShaderModule requires numChannels >= 1, got ${numChannels}`
+    );
+  }
+  if (numPlanes < 1) {
+    throw new Error(
+      `expandShaderModule requires numPlanes >= 1, got ${numPlanes}`
+    );
+  }
+  const expandedModule = { ...module };
+  if (module.uniformTypes) {
+    const expandedUniformTypes = {};
+    for (const [key, value] of Object.entries(module.uniformTypes)) {
+      if (key.includes(VIV_CHANNEL_INDEX_PLACEHOLDER)) {
+        for (let i = 0; i < numChannels; i++) {
+          const expandedKey = key.replaceAll(
+            VIV_CHANNEL_INDEX_PLACEHOLDER,
+            i.toString()
+          );
+          expandedUniformTypes[expandedKey] = value;
+        }
+      } else if (key.includes(VIV_PLANE_INDEX_PLACEHOLDER)) {
+        for (let i = 0; i < numPlanes; i++) {
+          const expandedKey = key.replaceAll(
+            VIV_PLANE_INDEX_PLACEHOLDER,
+            i.toString()
+          );
+          expandedUniformTypes[expandedKey] = value;
+        }
+      } else {
+        expandedUniformTypes[key] = value;
+      }
+    }
+    expandedModule.uniformTypes = expandedUniformTypes;
+  }
+  if (module.fs) {
+    expandedModule.fs = processGLSLShader(module.fs, numChannels, numPlanes);
+  }
+  if (module.vs) {
+    expandedModule.vs = processGLSLShader(module.vs, numChannels, numPlanes);
+  }
+  const defines = { ...module.defines || {} };
+  defines.NUM_CHANNELS = String(numChannels);
+  defines.NUM_PLANES = String(numPlanes);
+  expandedModule.defines = defines;
+  return expandedModule;
+}
+const _VivShaderAssembler = class _VivShaderAssembler extends ShaderAssembler {
+  constructor() {
+    super();
+    const defaultShaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
+    const defaultModules = defaultShaderAssembler._getModuleList();
+    const defaultHookFunctions = defaultShaderAssembler._hookFunctions;
+    for (const module of defaultModules) {
+      this.addDefaultModule(module);
+    }
+    for (const hookFunction of defaultHookFunctions) {
+      this.addShaderHook(hookFunction);
+    }
+    //!!! if we add this hook to the defaultShaderAssembler used by other deck layers,
+    const mutateStr = "fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float[NUM_CHANNELS] intensity, vec2 vTexCoord)";
+    const processStr = "fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)";
+    this.addShaderHook(mutateStr);
+    this.addShaderHook(processStr);
+  }
+  static getDefaultVivShaderAssembler() {
+    if (!_VivShaderAssembler._default) {
+      _VivShaderAssembler._default = new _VivShaderAssembler();
+    }
+    return _VivShaderAssembler._default;
+  }
+};
+__publicField$5(_VivShaderAssembler, "_default");
+let VivShaderAssembler = _VivShaderAssembler;
+class VivLayerExtension extends LayerExtension {
+  /**
+   * deck.gl calls this as `extension.getShaders.call(layer, extension)`.
+   * `this` is therefore the layer, and `extension` is the extension instance.
+   */
+  getShaders(extension) {
+    const templates = extension.getVivShaderTemplates.call(this) || {};
+    const numChannels = this.getNumChannels();
+    const numPlanes = this.getNumPlanes();
+    const modules = (templates.modules || []).map(
+      (m) => expandShaderModule(m, numChannels, numPlanes)
+    );
+    return {
+      modules
+    };
+  }
+}
+__publicField$5(VivLayerExtension, "extensionName", "VivLayerExtension");
 
 const alpha = `vec4 apply_cmap (float x) {
   const float e0 = 0.0;
@@ -1533,25 +1666,29 @@ const cmaps = {
 };
 
 function colormapModuleFactory(name, apply_cmap) {
+  const extensionName = `additive_colormap_${name}`;
   return {
-    name: `additive-colormap-${name}`,
-    fs: `uniform float opacity;
-uniform bool useTransparentColor;
-
+    name: extensionName,
+    uniformTypes: {
+      opacity: "f32",
+      useTransparentColor: "u32"
+    },
+    fs: `uniform ${extensionName}Uniforms {
+  float opacity;
+  uint useTransparentColor; //no bool-like type in decode-shader-types.ts
+} ${extensionName};
 ${apply_transparent_color}
 ${apply_cmap}
-
 vec4 colormap(float intensity) {
+  float opacity = ${extensionName}.opacity;
+  bool useTransparentColor = ${extensionName}.useTransparentColor != uint(0);
   return vec4(apply_transparent_color(apply_cmap(min(1.,intensity)).xyz, apply_cmap(0.).xyz, useTransparentColor, opacity));
 }`,
     inject: {
       "fs:DECKGL_MUTATE_COLOR": `  float intensityCombo = 0.;
-  intensityCombo += max(0.,intensity0);
-  intensityCombo += max(0.,intensity1);
-  intensityCombo += max(0.,intensity2);
-  intensityCombo += max(0.,intensity3);
-  intensityCombo += max(0.,intensity4);
-  intensityCombo += max(0.,intensity5);
+  for (int i = 0; i < NUM_CHANNELS; i++) {
+    intensityCombo += max(0.,intensity[i]);
+  }
   rgba = colormap(intensityCombo);`
     }
   };
@@ -1559,10 +1696,13 @@ vec4 colormap(float intensity) {
 const defaultProps$4$1 = {
   colormap: { type: "string", value: "viridis", compare: true },
   opacity: { type: "number", value: 1, compare: true },
+  // we should review use of 'boolean', don't want to change it everywhere if not necessary.
   useTransparentColor: { type: "boolean", value: false, compare: true }
 };
-const AdditiveColormapExtension = class extends LayerExtension {
-  getShaders() {
+const AdditiveColormapExtension = class extends VivLayerExtension {
+  // this doesn't need any shader code template manipulation, as long as NUM_CHANNELS is defined
+  // we could just use `LayerExtension.getShaders()` as before here
+  getVivShaderTemplates() {
     const name = _optionalChain$4([this, 'optionalAccess', _ => _.props, 'optionalAccess', _2 => _2.colormap]) || defaultProps$4$1.colormap.value;
     const apply_cmap = cmaps[name];
     if (!apply_cmap) {
@@ -1572,24 +1712,17 @@ const AdditiveColormapExtension = class extends LayerExtension {
   }
   updateState({ props, oldProps, changeFlags, ...rest }) {
     super.updateState({ props, oldProps, changeFlags, ...rest });
-    if (props.colormap !== oldProps.colormap) {
-      const { device } = this.context;
-      if (this.state.model) {
-        this.state.model.destroy();
-        this.setState({ model: this._getModel(device) });
-      }
+    const name = _optionalChain$4([this, 'optionalAccess', _3 => _3.props, 'optionalAccess', _4 => _4.colormap]) || defaultProps$4$1.colormap.value;
+    const extensionName = `additive_colormap_${name}`;
+    const models = this.getModels();
+    for (const model of models) {
+      model.shaderInputs.setProps({
+        [extensionName]: {
+          opacity: this.props.opacity,
+          useTransparentColor: this.props.useTransparentColor
+        }
+      });
     }
-  }
-  draw() {
-    const {
-      useTransparentColor = defaultProps$4$1.useTransparentColor.value,
-      opacity = defaultProps$4$1.opacity.value
-    } = this.props;
-    const uniforms = {
-      opacity,
-      useTransparentColor
-    };
-    _optionalChain$4([this, 'access', _3 => _3.state, 'access', _4 => _4.model, 'optionalAccess', _5 => _5.setUniforms, 'call', _6 => _6(uniforms)]);
   }
 };
 AdditiveColormapExtension.extensionName = "AdditiveColormapExtension";
@@ -1638,34 +1771,55 @@ function padColors({ colors, channelsVisible }) {
   ).reduce((acc, val) => acc.concat(val), []);
   return paddedColors;
 }
+function padColorsForUBO({ colors, channelsVisible }) {
+  const newColors = colors.map(
+    (color, i) => channelsVisible[i] ? color.map((c) => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
+  );
+  const padSize = MAX_CHANNELS - newColors.length;
+  const paddedColors = padWithDefault$1(
+    newColors,
+    /** @type {Color} */
+    DEFAULT_COLOR_OFF,
+    padSize
+  );
+  return paddedColors;
+}
 
-const fs$1$1 = `uniform vec3 transparentColor;
-uniform bool useTransparentColor;
-uniform float opacity;
-
-uniform vec3 colors[6];
+const moduleName$1$1 = "colorPaletteModule";
+const fs$1$1 = `uniform ${moduleName$1$1}Uniforms {
+  vec3 transparentColor;
+  uint useTransparentColor;
+  float opacity;
+  vec3 color${VIV_CHANNEL_INDEX_PLACEHOLDER};
+} ${moduleName$1$1};
 
 ${apply_transparent_color}
 
-void mutate_color(inout vec3 rgb, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5) { 
-  rgb += max(0.0, min(1.0, intensity0)) * vec3(colors[0]);
-  rgb += max(0.0, min(1.0, intensity1)) * vec3(colors[1]);
-  rgb += max(0.0, min(1.0, intensity2)) * vec3(colors[2]);
-  rgb += max(0.0, min(1.0, intensity3)) * vec3(colors[3]);
-  rgb += max(0.0, min(1.0, intensity4)) * vec3(colors[4]);
-  rgb += max(0.0, min(1.0, intensity5)) * vec3(colors[5]);
+void mutate_color(inout vec3 rgb, float[NUM_CHANNELS] intensity) {
+  vec3 colors[NUM_CHANNELS] = vec3[NUM_CHANNELS](
+    ${moduleName$1$1}.color${VIV_CHANNEL_INDEX_PLACEHOLDER},
+  );
+  for(int i = 0; i < NUM_CHANNELS; i++) {
+    rgb += max(0.0, min(1.0, intensity[i])) * vec3(colors[i]);
+  }
 }
-
 vec4 apply_opacity(vec3 rgb) {
-  return vec4(apply_transparent_color(rgb, transparentColor, useTransparentColor, opacity));
+  bool useTransparentColor = ${moduleName$1$1}.useTransparentColor != uint(0);
+  return vec4(apply_transparent_color(rgb, ${moduleName$1$1}.transparentColor, useTransparentColor, ${moduleName$1$1}.opacity));
 }
 `;
 const DECKGL_MUTATE_COLOR = `vec3 rgb = rgba.rgb;
-mutate_color(rgb, intensity0, intensity1, intensity2, intensity3, intensity4, intensity5);
+mutate_color(rgb, intensity);
 rgba = apply_opacity(rgb);
 `;
 const colorPalette = {
-  name: "color-palette-module",
+  name: moduleName$1$1,
+  uniformTypes: {
+    transparentColor: "vec3<f32>",
+    useTransparentColor: "u32",
+    opacity: "f32",
+    [`color${VIV_CHANNEL_INDEX_PLACEHOLDER}`]: "vec3<f32>"
+  },
   fs: fs$1$1,
   inject: {
     "fs:DECKGL_MUTATE_COLOR": DECKGL_MUTATE_COLOR
@@ -1678,14 +1832,14 @@ const defaultProps$3$1 = {
   transparentColor: { type: "array", value: null, compare: true },
   useTransparentColor: { type: "boolean", value: false, compare: true }
 };
-const ColorPaletteExtension = class extends LayerExtension {
-  getShaders() {
+const ColorPaletteExtension = class extends VivLayerExtension {
+  getVivShaderTemplates() {
     return {
-      ...super.getShaders(),
       modules: [colorPalette]
     };
   }
-  draw() {
+  updateState({ props, oldProps, changeFlags, ...rest }) {
+    super.updateState({ props, oldProps, changeFlags, ...rest });
     const {
       colors,
       channelsVisible,
@@ -1693,35 +1847,46 @@ const ColorPaletteExtension = class extends LayerExtension {
       transparentColor = defaultProps$3$1.transparentColor.value,
       useTransparentColor = defaultProps$3$1.useTransparentColor.value
     } = this.props;
-    const paddedColors = padColors({
-      channelsVisible: channelsVisible || this.selections.map(() => true),
-      colors: colors || getDefaultPalette(this.props.selections.length)
+    const selections = this.props.selections || this.selections || [];
+    const numChannels = selections.length;
+    const paddedColors = padColorsForUBO({
+      channelsVisible: channelsVisible || selections.map(() => true),
+      colors: colors || getDefaultPalette(numChannels)
     });
-    const uniforms = {
-      colors: paddedColors,
+    const colorPaletteUniforms = {
       opacity,
       transparentColor: (transparentColor || [0, 0, 0]).map((i) => i / 255),
-      useTransparentColor: Boolean(useTransparentColor)
+      useTransparentColor: useTransparentColor ? 1 : 0
     };
-    _optionalChain$4([this, 'access', _7 => _7.state, 'access', _8 => _8.model, 'optionalAccess', _9 => _9.setUniforms, 'call', _10 => _10(uniforms)]);
+    for (let i = 0; i < numChannels; i++) {
+      colorPaletteUniforms[`color${i}`] = paddedColors[i];
+    }
+    for (const model of this.getModels()) {
+      model.shaderInputs.setProps({
+        colorPaletteModule: colorPaletteUniforms
+      });
+    }
   }
 };
 ColorPaletteExtension.extensionName = "ColorPaletteExtension";
 ColorPaletteExtension.defaultProps = defaultProps$3$1;
 
-const fs$3 = `// lens bounds for ellipse
-uniform float majorLensAxis;
-uniform float minorLensAxis;
-uniform vec2 lensCenter;
+const moduleName$4 = "lensModule";
+const fs$5 = `uniform ${moduleName$4}Uniforms {
+  // lens bounds for ellipse
+  float majorLensAxis;
+  float minorLensAxis;
 
-// lens uniforms
-uniform bool lensEnabled;
-uniform int lensSelection;
-uniform vec3 lensBorderColor;
-uniform float lensBorderRadius;
+  // lens uniforms
+  vec2 lensCenter;
+  uint lensEnabled;
+  int lensSelection;
+  vec3 lensBorderColor;
+  float lensBorderRadius;
 
-// color palette
-uniform vec3 colors[6];
+  // color palette
+  vec3 color${VIV_CHANNEL_INDEX_PLACEHOLDER};
+} ${moduleName$4};
 
 bool frag_in_lens_bounds(vec2 vTexCoord) {
   // Check membership in what is (not visually, but effectively) an ellipse.
@@ -1729,58 +1894,58 @@ bool frag_in_lens_bounds(vec2 vTexCoord) {
   // to get a circle visually we have to treat the check as that of an ellipse to get the effect of a circle.
 
   // Check membership in ellipse.
-  return pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.) < (1. - lensBorderRadius);
+  return pow((${moduleName$4}.lensCenter.x - vTexCoord.x) / ${moduleName$4}.majorLensAxis, 2.) + pow((${moduleName$4}.lensCenter.y - vTexCoord.y) / ${moduleName$4}.minorLensAxis, 2.) < (1. - ${moduleName$4}.lensBorderRadius);
 }
 
 bool frag_on_lens_bounds(vec2 vTexCoord) {
   // Same as the above, except this checks the boundary.
 
-  float ellipseDistance = pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.);
+  float ellipseDistance = pow((${moduleName$4}.lensCenter.x - vTexCoord.x) / ${moduleName$4}.majorLensAxis, 2.) + pow((${moduleName$4}.lensCenter.y - vTexCoord.y) / ${moduleName$4}.minorLensAxis, 2.);
 
   // Check membership on "bourndary" of ellipse.
-  return ellipseDistance <= 1. && ellipseDistance >= (1. - lensBorderRadius);
+  return ellipseDistance <= 1. && ellipseDistance >= (1. - ${moduleName$4}.lensBorderRadius);
 }
 // Return a float for boolean arithmetic calculation.
 float get_use_color_float(vec2 vTexCoord, int channelIndex) {
+  bool lensEnabled = ${moduleName$4}.lensEnabled != uint(0);
   bool isFragInLensBounds = frag_in_lens_bounds(vTexCoord);
   bool inLensAndUseLens = lensEnabled && isFragInLensBounds;
-  return float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));
+  return float(int((inLensAndUseLens && channelIndex == ${moduleName$4}.lensSelection) || (!inLensAndUseLens)));
  
 }
-void mutate_color(inout vec3 rgb, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord){
-  float useColorValue = 0.;
-
-  useColorValue = get_use_color_float(vTexCoord, 0);
-  rgb += max(0., min(1., intensity0)) * max(vec3(colors[0]), (1. - useColorValue) * vec3(1., 1., 1.));
-
-  useColorValue = get_use_color_float(vTexCoord, 1);
-  rgb += max(0., min(1., intensity1)) * max(vec3(colors[1]), (1. - useColorValue) * vec3(1., 1., 1.));
-
-  useColorValue = get_use_color_float(vTexCoord, 2);
-  rgb += max(0., min(1., intensity2)) * max(vec3(colors[2]), (1. - useColorValue) * vec3(1., 1., 1.));
-
-  useColorValue = get_use_color_float(vTexCoord, 3);
-  rgb += max(0., min(1., intensity3)) * max(vec3(colors[3]), (1. - useColorValue) * vec3(1., 1., 1.));
-
-  useColorValue = get_use_color_float(vTexCoord, 4);
-  rgb += max(0., min(1., intensity4)) * max(vec3(colors[4]), (1. - useColorValue) * vec3(1., 1., 1.));
-
-  useColorValue = get_use_color_float(vTexCoord, 5);
-  rgb += max(0., min(1., intensity5)) * max(vec3(colors[5]), (1. - useColorValue) * vec3(1., 1., 1.));
+void mutate_color(inout vec3 rgb, float[NUM_CHANNELS] intensity, vec2 vTexCoord) {
+  vec3 colors[NUM_CHANNELS] = vec3[NUM_CHANNELS](
+    ${moduleName$4}.color${VIV_CHANNEL_INDEX_PLACEHOLDER},
+  );
+  for(int i = 0; i < NUM_CHANNELS; i++) {
+    float useColorValue = get_use_color_float(vTexCoord, i);
+    rgb += max(0., min(1., intensity[i])) * max(vec3(colors[i]), (1. - useColorValue) * vec3(1., 1., 1.));
+  }
 }
 `;
 const lens = {
-  name: "lens-module",
-  fs: fs$3,
+  name: moduleName$4,
+  uniformTypes: {
+    majorLensAxis: "f32",
+    minorLensAxis: "f32",
+    lensCenter: "vec2<f32>",
+    lensEnabled: "u32",
+    lensSelection: "i32",
+    lensBorderColor: "vec3<f32>",
+    lensBorderRadius: "f32",
+    [`color${VIV_CHANNEL_INDEX_PLACEHOLDER}`]: "vec3<f32>"
+  },
+  fs: fs$5,
   inject: {
     "fs:DECKGL_MUTATE_COLOR": `
    vec3 rgb = rgba.rgb;
-   mutate_color(rgb, intensity0, intensity1, intensity2, intensity3, intensity4, intensity5, vTexCoord);
+   mutate_color(rgb, intensity, vTexCoord);
    rgba = vec4(rgb, 1.);
   `,
     "fs:#main-end": `
+      bool lensEnabled = ${moduleName$4}.lensEnabled != uint(0);
       bool isFragOnLensBounds = frag_on_lens_bounds(vTexCoord);
-      fragColor = (lensEnabled && isFragOnLensBounds) ? vec4(lensBorderColor, 1.) : fragColor;
+      fragColor = (lensEnabled && isFragOnLensBounds) ? vec4(${moduleName$4}.lensBorderColor, 1.) : fragColor;
   `
   }
 };
@@ -1793,10 +1958,9 @@ const defaultProps$2$1 = {
   lensBorderRadius: { type: "number", value: 0.02, compare: true },
   colors: { type: "array", value: null, compare: true }
 };
-const LensExtension = class extends LayerExtension {
-  getShaders() {
+const LensExtension = class extends VivLayerExtension {
+  getVivShaderTemplates() {
     return {
-      ...super.getShaders(),
       modules: [lens]
     };
   }
@@ -1870,31 +2034,37 @@ const LensExtension = class extends LayerExtension {
     const bottomMouseBoundScaled = (bottomMouseBound - top) / (bottom - top);
     const rightMouseBoundScaled = (rightMouseBound - left) / (right - left);
     const topMouseBoundScaled = (topMouseBound - top) / (bottom - top);
-    const paddedColors = padColors({
-      channelsVisible: channelsVisible || this.selections.map(() => true),
-      colors: colors || getDefaultPalette(this.props.selections.length)
+    const selections = this.props.selections || this.selections || [];
+    const numChannels = this.getNumChannels();
+    const paddedColors = padColorsForUBO({
+      channelsVisible: channelsVisible || selections.map(() => true),
+      colors: colors || getDefaultPalette(numChannels)
     });
-    const uniforms = {
+    const lensModule = {
       majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
       minorLensAxis: (bottomMouseBoundScaled - topMouseBoundScaled) / 2,
       lensCenter: [
         (rightMouseBoundScaled + leftMouseBoundScaled) / 2,
         (bottomMouseBoundScaled + topMouseBoundScaled) / 2
       ],
-      lensEnabled,
+      lensEnabled: lensEnabled ? 1 : 0,
       lensSelection,
-      lensBorderColor,
-      lensBorderRadius,
-      colors: paddedColors
+      lensBorderColor: lensBorderColor.map((i) => i / 255),
+      lensBorderRadius
     };
-    _optionalChain$4([this, 'access', _11 => _11.state, 'access', _12 => _12.model, 'optionalAccess', _13 => _13.setUniforms, 'call', _14 => _14(uniforms)]);
+    for (let i = 0; i < numChannels; i++) {
+      lensModule[`color${i}`] = paddedColors[i];
+    }
+    _optionalChain$4([this, 'access', _5 => _5.state, 'access', _6 => _6.model, 'optionalAccess', _7 => _7.shaderInputs, 'access', _8 => _8.setProps, 'call', _9 => _9({
+      lensModule
+    })]);
   }
   finalizeState() {
     if (this.context.deck) {
       this.context.deck.eventManager.off({
-        pointermove: _optionalChain$4([this, 'access', _15 => _15.state, 'optionalAccess', _16 => _16.onMouseMove]),
-        pointerleave: _optionalChain$4([this, 'access', _17 => _17.state, 'optionalAccess', _18 => _18.onMouseMove]),
-        wheel: _optionalChain$4([this, 'access', _19 => _19.state, 'optionalAccess', _20 => _20.onMouseMove])
+        pointermove: _optionalChain$4([this, 'access', _10 => _10.state, 'optionalAccess', _11 => _11.onMouseMove]),
+        pointerleave: _optionalChain$4([this, 'access', _12 => _12.state, 'optionalAccess', _13 => _13.onMouseMove]),
+        wheel: _optionalChain$4([this, 'access', _14 => _14.state, 'optionalAccess', _15 => _15.onMouseMove])
       });
     }
   }
@@ -1916,16 +2086,15 @@ vec4 colormap(float intensity, float opacity) {
 const defaultProps$1$1 = {
   colormap: { type: "string", value: "viridis", compare: true }
 };
-const BaseExtension$1 = class BaseExtension extends LayerExtension {
+const BaseExtension$1 = class BaseExtension extends VivLayerExtension {
   constructor(...args) {
     super(args);
     this.opts = this.opts || {};
   }
-  getShaders() {
-    const name = _optionalChain$4([this, 'optionalAccess', _21 => _21.props, 'optionalAccess', _22 => _22.colormap]) || defaultProps$1$1.colormap.value;
+  getVivShaderTemplates() {
+    const name = _optionalChain$4([this, 'optionalAccess', _16 => _16.props, 'optionalAccess', _17 => _17.colormap]) || defaultProps$1$1.colormap.value;
     const apply_cmap = cmaps[name];
     return {
-      ...super.getShaders(),
       modules: [colormapModuleFactory3D(name, apply_cmap)]
     };
   }
@@ -1943,13 +2112,14 @@ const BaseExtension$1 = class BaseExtension extends LayerExtension {
 BaseExtension$1.extensionName = "BaseExtension";
 BaseExtension$1.defaultProps = defaultProps$1$1;
 
-const _BEFORE_RENDER$5 = "";
-const _RENDER$5 = `  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
+const _BEFORE_RENDER$5 = `// additive-colormap-3d before render
+  float intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER} = 0.0;
+`;
+const _RENDER$5 = `// additive-colormap-3d render
   float total = 0.0;
 
-  for(int i = 0; i < 6; i++) {
-    total += intensityArray[i];
-  }
+  // this will create an unrolled accumulation over all channels
+  total += intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER};
   // Do not go past 1 in opacity/colormap value.
   total = min(total, 1.0);
 
@@ -1973,20 +2143,12 @@ const AdditiveBlendExtension$1 = class AdditiveBlendExtension extends BaseExtens
 };
 AdditiveBlendExtension$1.extensionName = "AdditiveBlendExtension";
 
-const _BEFORE_RENDER$4 = `  float maxVals[6] = float[6](-1.0, -1.0, -1.0, -1.0, -1.0, -1.0);
+const _BEFORE_RENDER$4 = `  float maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = -1.;
 `;
-const _RENDER$4 = `  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
-
-  for(int i = 0; i < 6; i++) {
-    if(intensityArray[i] > maxVals[i]) {
-      maxVals[i] = intensityArray[i];
-    }
-  }
+const _RENDER$4 = `  maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = max(intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER}, maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER});
 `;
 const _AFTER_RENDER$4 = `  float total = 0.0;
-  for(int i = 0; i < 6; i++) {
-    total += maxVals[i];
-  }
+  total += maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER};
   // Do not go past 1 in opacity/colormap value.
   total = min(total, 1.0);
   color = colormap(total, total);
@@ -1999,20 +2161,12 @@ const MaximumIntensityProjectionExtension$1 = class MaximumIntensityProjectionEx
 };
 MaximumIntensityProjectionExtension$1.extensionName = "MaximumIntensityProjectionExtension";
 
-const _BEFORE_RENDER$3 = `  float minVals[6] = float[6](1. / 0., 1. / 0., 1. / 0., 1. / 0., 1. / 0., 1. / 0.);
+const _BEFORE_RENDER$3 = `  float minVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = 1. / 0.;
 `;
-const _RENDER$3 = `  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
-
-  for(int i = 0; i < 6; i++) {
-    if(intensityArray[i] < minVals[i]) {
-      minVals[i] = intensityArray[i];
-    }
-  }
+const _RENDER$3 = `  minVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = min(intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER}, minVal${VIV_CHANNEL_INDEX_PLACEHOLDER});
 `;
 const _AFTER_RENDER$3 = `  float total = 0.0;
-  for(int i = 0; i < 6; i++) {
-    total += minVals[i];
-  }
+  total += minVal${VIV_CHANNEL_INDEX_PLACEHOLDER};
   // Do not go past 1 in opacity/colormap value.
   total = min(total, 1.0);
   color = colormap(total, total);
@@ -2035,36 +2189,26 @@ const AdditiveColormap3DExtensions = {
 const defaultProps$9 = {
   colors: { type: "array", value: null, compare: true }
 };
-const BaseExtension = class extends LayerExtension {
+const BaseExtension = class extends VivLayerExtension {
   constructor(...args) {
     super(args);
     this.opts = this.opts || {};
   }
-  draw() {
-    const { colors, channelsVisible } = this.props;
-    const paddedColors = padColors({
-      channelsVisible: channelsVisible || this.selections.map(() => true),
-      colors: colors || getDefaultPalette(this.props.selections.length)
-    });
-    const uniforms = {
-      colors: paddedColors
-    };
-    _optionalChain$4([this, 'access', _23 => _23.state, 'access', _24 => _24.model, 'optionalAccess', _25 => _25.setUniforms, 'call', _26 => _26(uniforms)]);
+  getVivShaderTemplates() {
+    return {};
   }
 };
 BaseExtension.extensionName = "BaseExtension";
 BaseExtension.defaultProps = defaultProps$9;
 
-const _BEFORE_RENDER$2 = "";
-const _RENDER$2 = `  vec3 rgbCombo = vec3(0.0);
+const _BEFORE_RENDER$2 = `// additive-blend before render
+  float intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER} = 0.0;`;
+const _RENDER$2 = `// additive-blend render
+  vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
-  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
   float total = 0.0;
-  for(int i = 0; i < 6; i++) {
-    float intensityValue = intensityArray[i];
-    rgbCombo += max(0.0, min(1.0, intensityValue)) * colors[i];
-    total += intensityValue;
-  }
+  total += intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER};
+  rgbCombo += max(0.0, min(1.0, intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER})) * fragmentUniforms3D.color${VIV_CHANNEL_INDEX_PLACEHOLDER};
   // Do not go past 1 in opacity.
   total = min(total, 1.0);
   vec4 val_color = vec4(rgbCombo, total);
@@ -2074,8 +2218,7 @@ const _RENDER$2 = `  vec3 rgbCombo = vec3(0.0);
   color.a += (1.0 - color.a) * val_color.a;
   if (color.a >= 0.95) {
     break;
-  }
-`;
+  }`;
 const _AFTER_RENDER$2 = "";
 const AdditiveBlendExtension = class extends BaseExtension {
   constructor(args) {
@@ -2085,20 +2228,12 @@ const AdditiveBlendExtension = class extends BaseExtension {
 };
 AdditiveBlendExtension.extensionName = "AdditiveBlendExtension";
 
-const _BEFORE_RENDER$1 = `  float maxVals[6] = float[6](-1.0, -1.0, -1.0, -1.0, -1.0, -1.0);
+const _BEFORE_RENDER$1 = `  float maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = -1.0;
 `;
-const _RENDER$1 = `  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
-
-  for(int i = 0; i < 6; i++) {
-    if(intensityArray[i] > maxVals[i]) {
-      maxVals[i] = intensityArray[i];
-    }
-  }
+const _RENDER$1 = `  maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = max(intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER}, maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER});
 `;
 const _AFTER_RENDER$1 = `  vec3 rgbCombo = vec3(0.0);
-  for(int i = 0; i < 6; i++) {
-    rgbCombo += max(0.0, min(1.0, maxVals[i])) * vec3(colors[i]);
-  }
+  rgbCombo += max(0.0, min(1.0, maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER})) * fragmentUniforms3D.color${VIV_CHANNEL_INDEX_PLACEHOLDER};
   color = vec4(rgbCombo, 1.0);
 `;
 const MaximumIntensityProjectionExtension = class extends BaseExtension {
@@ -2109,20 +2244,12 @@ const MaximumIntensityProjectionExtension = class extends BaseExtension {
 };
 MaximumIntensityProjectionExtension.extensionName = "MaximumIntensityProjectionExtension";
 
-const _BEFORE_RENDER = `  float minVals[6] = float[6](1. / 0., 1. / 0., 1. / 0., 1. / 0., 1. / 0., 1. / 0.);
+const _BEFORE_RENDER = `  float minVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = 1.0 / 0.0;
 `;
-const _RENDER = `  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
-
-  for(int i = 0; i < 6; i++) {
-    if(intensityArray[i] < minVals[i]) {
-      minVals[i] = intensityArray[i];
-    }
-  }
+const _RENDER = `  minVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = min(intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER}, minVal${VIV_CHANNEL_INDEX_PLACEHOLDER});
 `;
 const _AFTER_RENDER = `  vec3 rgbCombo = vec3(0.0);
-  for(int i = 0; i < 6; i++) {
-    rgbCombo += max(0.0, min(1.0, minVals[i])) * vec3(colors[i]);
-  }
+  rgbCombo += max(0.0, min(1.0, minVal${VIV_CHANNEL_INDEX_PLACEHOLDER})) * fragmentUniforms3D.color${VIV_CHANNEL_INDEX_PLACEHOLDER};
   color = vec4(rgbCombo, 1.0);
 `;
 const MinimumIntensityProjectionExtension = class extends BaseExtension {
@@ -2616,6 +2743,42 @@ async function resolveRemoteOffsets(url, headers, scannerOptions) {
   return offsets;
 }
 
+const PHOTOMETRIC_RGB = 2;
+const PHOTOMETRIC_YCBCR = 6;
+function padSampleArray(values, length, fallback) {
+  const src = values != null ? Array.from(values) : [];
+  const fill = _nullishCoalesce$2(src[0], () => ( fallback));
+  return Array.from({ length }, (_, i) => _nullishCoalesce$2(src[i], () => ( fill)));
+}
+function padTiffSampleTags(fileDirectory) {
+  const spp = Math.max(
+    1,
+    _nullishCoalesce$2(_nullishCoalesce$2(fileDirectory.SamplesPerPixel, () => ( _optionalChain$3([fileDirectory, 'access', _5 => _5.BitsPerSample, 'optionalAccess', _6 => _6.length]))), () => ( 1))
+  );
+  const bits = fileDirectory.BitsPerSample;
+  const formats = fileDirectory.SampleFormat;
+  const bitsOk = bits != null && bits.length >= spp;
+  const formatsOk = formats != null && formats.length >= spp;
+  if (bitsOk && formatsOk)
+    return;
+  if (!bitsOk) {
+    fileDirectory.BitsPerSample = padSampleArray(bits, spp, 8);
+  }
+  if (!formatsOk) {
+    fileDirectory.SampleFormat = padSampleArray(formats, spp, 1);
+  }
+}
+function isPackedRgbTiffImage(image) {
+  const fd = image.fileDirectory;
+  const spp = _nullishCoalesce$2(_nullishCoalesce$2(fd.SamplesPerPixel, () => ( _optionalChain$3([fd, 'access', _7 => _7.BitsPerSample, 'optionalAccess', _8 => _8.length]))), () => ( 1));
+  const photo = fd.PhotometricInterpretation;
+  return spp === 3 && (photo === PHOTOMETRIC_RGB || photo === PHOTOMETRIC_YCBCR);
+}
+function isPlanarRgbTiffImage(image) {
+  const fd = image.fileDirectory;
+  const spp = _nullishCoalesce$2(_nullishCoalesce$2(fd.SamplesPerPixel, () => ( _optionalChain$3([fd, 'access', _9 => _9.BitsPerSample, 'optionalAccess', _10 => _10.length]))), () => ( 1));
+  return fd.PhotometricInterpretation === PHOTOMETRIC_RGB && fd.PlanarConfiguration === 2 && spp === 3;
+}
 function extractPhysicalSizesfromPixels(d) {
   if (!d["PhysicalSizeX"] || !d["PhysicalSizeY"] || !d["PhysicalSizeXUnit"] || !d["PhysicalSizeYUnit"]) {
     return void 0;
@@ -2650,15 +2813,15 @@ function extractAxesFromPixels(d) {
   }
   return { labels, shape };
 }
-function getShapeForBinaryDownsampleLevel(options) {
-  const { axes, level } = options;
+function getShapeForLevel(options) {
+  const { axes, width, height } = options;
   const xIndex = axes.labels.indexOf("x");
   assert(xIndex !== -1, "x dimension not found");
   const yIndex = axes.labels.indexOf("y");
   assert(yIndex !== -1, "y dimension not found");
   const resolutionShape = axes.shape.slice();
-  resolutionShape[xIndex] = axes.shape[xIndex] >> level;
-  resolutionShape[yIndex] = axes.shape[yIndex] >> level;
+  resolutionShape[xIndex] = width;
+  resolutionShape[yIndex] = height;
   return resolutionShape;
 }
 function getTiffTileSize(image) {
@@ -2669,8 +2832,8 @@ function getTiffTileSize(image) {
 }
 function guessImageDataType(image) {
   const sampleIndex = 0;
-  const format = _nullishCoalesce$2(_optionalChain$3([image, 'access', _5 => _5.fileDirectory, 'optionalAccess', _6 => _6.SampleFormat, 'optionalAccess', _7 => _7[sampleIndex]]), () => ( 1));
-  const bitsPerSample = image.fileDirectory.BitsPerSample[sampleIndex];
+  const format = _nullishCoalesce$2(_optionalChain$3([image, 'access', _11 => _11.fileDirectory, 'optionalAccess', _12 => _12.SampleFormat, 'optionalAccess', _13 => _13[sampleIndex]]), () => ( 1));
+  const bitsPerSample = _nullishCoalesce$2(_optionalChain$3([image, 'access', _14 => _14.fileDirectory, 'access', _15 => _15.BitsPerSample, 'optionalAccess', _16 => _16[sampleIndex]]), () => ( 8));
   switch (format) {
     case 1:
       if (bitsPerSample <= 8) {
@@ -2813,7 +2976,7 @@ function getMultiTiffMetadata(imageName, tiffImages, channelNames, dimensionOrde
 function parseFilename(path) {
   const parsedFilename = {};
   const filename = path.split("/").pop();
-  const splitFilename = _optionalChain$3([filename, 'optionalAccess', _8 => _8.split, 'call', _9 => _9(".")]);
+  const splitFilename = _optionalChain$3([filename, 'optionalAccess', _17 => _17.split, 'call', _18 => _18(".")]);
   if (splitFilename) {
     parsedFilename.name = splitFilename.slice(0, -1).join(".");
     [, parsedFilename.extension] = splitFilename;
@@ -2874,6 +3037,7 @@ function createOmeImageIndexerFromResolver(resolveBaseResolutionImageLocation, i
   return async (sel, pyramidLevel) => {
     const { tiff, ifdIndex } = await resolveBaseResolutionImageLocation(sel);
     const baseImage = await tiff.getImage(ifdIndex);
+    padTiffSampleTags(baseImage.fileDirectory);
     if (pyramidLevel === 0) {
       return baseImage;
     }
@@ -2888,6 +3052,7 @@ function createOmeImageIndexerFromResolver(resolveBaseResolutionImageLocation, i
       ifdCache[index] = await tiff.parseFileDirectoryAt(index);
     }
     const ifd = ifdCache[index];
+    padTiffSampleTags(ifd.fileDirectory);
     return new GeoTIFFImage(
       ifd.fileDirectory,
       ifd.geoKeyDirectory,
@@ -2920,6 +3085,7 @@ var __publicField$3 = (obj, key, value) => {
   __defNormalProp$3(obj, key + "" , value);
   return value;
 };
+const RGB_SAMPLES = [0, 1, 2];
 class TiffPixelSource {
   constructor(indexer, dtype, tileSize, shape, labels, meta, pool) {
     this.dtype = dtype;
@@ -2944,29 +3110,49 @@ class TiffPixelSource {
     return this._readRasters(image, { window, width, height, signal });
   }
   async _readRasters(image, props) {
+    padTiffSampleTags(image.fileDirectory);
     const interleave = isInterleaved(this.shape);
-    const signal = _optionalChain$3([props, 'optionalAccess', _10 => _10.signal]);
-    if (_optionalChain$3([signal, 'optionalAccess', _11 => _11.aborted])) {
+    const signal = _optionalChain$3([props, 'optionalAccess', _19 => _19.signal]);
+    if (_optionalChain$3([signal, 'optionalAccess', _20 => _20.aborted])) {
       throw SIGNAL_ABORTED;
     }
     const { signal: _signal, ...restProps } = _nullishCoalesce$2(props, () => ( {}));
+    const planarRgb = isPlanarRgbTiffImage(image);
+    const packedRgb = isPackedRgbTiffImage(image);
     let raster;
     try {
-      raster = await image.readRasters({
-        interleave,
-        ...restProps,
-        pool: this.pool
-      });
+      if (planarRgb) {
+        raster = await image.readRasters({
+          ...restProps,
+          samples: RGB_SAMPLES,
+          interleave: true,
+          pool: this.pool
+        });
+      } else if (packedRgb) {
+        raster = await image.readRasters({
+          ...restProps,
+          samples: RGB_SAMPLES,
+          interleave: true,
+          pool: this.pool
+        });
+      } else {
+        raster = await image.readRasters({
+          interleave,
+          ...restProps,
+          pool: this.pool
+        });
+      }
     } catch (err) {
-      if (_optionalChain$3([signal, 'optionalAccess', _12 => _12.aborted])) {
+      if (_optionalChain$3([signal, 'optionalAccess', _21 => _21.aborted])) {
         throw SIGNAL_ABORTED;
       }
       throw err;
     }
-    if (_optionalChain$3([signal, 'optionalAccess', _13 => _13.aborted])) {
+    if (_optionalChain$3([signal, 'optionalAccess', _22 => _22.aborted])) {
       throw SIGNAL_ABORTED;
     }
-    const data = interleave ? raster : raster[0];
+    const useInterleaved = planarRgb || packedRgb || interleave;
+    const data = useInterleaved ? raster : raster[0];
     return {
       data,
       width: raster.width,
@@ -3351,7 +3537,6 @@ const OmeSchema = z.object({
 function fromString(str) {
   const raw = parseXML(str);
   const omeXml = OmeSchema.parse(raw);
-  console.log("simon", omeXml);
   return {
     images: _nullishCoalesce$2(omeXml.Image, () => ( [])),
     rois: _nullishCoalesce$2(omeXml.ROI, () => ( [])),
@@ -3462,17 +3647,29 @@ async function loadMultifileOmeTiff(source, options = {}) {
       baseUrl: url,
       headers: options.headers || {}
     });
-    const data = Array.from(
-      { length: opts.levels },
-      (_, level) => new TiffPixelSource(
-        (sel) => opts.pyramidIndexer({ t: _nullishCoalesce$2(sel.t, () => ( 0)), c: _nullishCoalesce$2(sel.c, () => ( 0)), z: _nullishCoalesce$2(sel.z, () => ( 0)) }, level),
-        opts.dtype,
-        opts.tileSize,
-        getShapeForBinaryDownsampleLevel({ axes: opts.axes, level }),
-        opts.axes.labels,
-        opts.meta,
-        options.pool
-      )
+    const data = await Promise.all(
+      Array.from({ length: opts.levels }, async (_, level) => {
+        const levelImage = await opts.pyramidIndexer(
+          { t: 0, c: 0, z: 0 },
+          level
+        );
+        return new TiffPixelSource(
+          (sel) => opts.pyramidIndexer(
+            { t: _nullishCoalesce$2(sel.t, () => ( 0)), c: _nullishCoalesce$2(sel.c, () => ( 0)), z: _nullishCoalesce$2(sel.z, () => ( 0)) },
+            level
+          ),
+          opts.dtype,
+          opts.tileSize,
+          getShapeForLevel({
+            axes: opts.axes,
+            width: levelImage.getWidth(),
+            height: levelImage.getHeight()
+          }),
+          opts.axes.labels,
+          opts.meta,
+          options.pool
+        );
+      })
     );
     tiffImages.push({ data, metadata });
   }
@@ -3526,6 +3723,25 @@ function createSingleFileOmeTiffPyramidalIndexer(tiff, image) {
     return { tiff, ifdIndex };
   }, image);
 }
+function collapsePackedRgbPixelsMetadata(metadata, vivDtype) {
+  const pixels = metadata.Pixels;
+  const firstChannel = _nullishCoalesce$2(_optionalChain$3([pixels, 'access', _23 => _23.Channels, 'optionalAccess', _24 => _24[0]]), () => ( {}));
+  return {
+    ...metadata,
+    Pixels: {
+      ...pixels,
+      SizeC: 1,
+      Interleaved: true,
+      Type: vivDtype,
+      Channels: [
+        {
+          ...firstChannel,
+          SamplesPerPixel: 3
+        }
+      ]
+    }
+  };
+}
 async function loadSingleFileOmeTiff(source, options = {}) {
   const { offsets, headers, pool, source: prebuiltSource } = options;
   const tiff = await createGeoTiff(source, {
@@ -3534,16 +3750,20 @@ async function loadSingleFileOmeTiff(source, options = {}) {
     source: prebuiltSource
   });
   const firstImage = await tiff.getImage();
+  padTiffSampleTags(firstImage.fileDirectory);
+  const packedRgb = isPackedRgbTiffImage(firstImage);
   const { rootMeta, levels } = resolveMetadata(
     fromString(firstImage.fileDirectory.ImageDescription),
     firstImage.fileDirectory.SubIFDs
   );
   const images = [];
   let imageIfdOffset = 0;
-  for (const metadata of rootMeta) {
+  for (const rawMetadata of rootMeta) {
+    const vivDtype = packedRgb ? guessImageDataType(firstImage) : parsePixelDataType(rawMetadata["Pixels"]["Type"]);
+    const metadata = packedRgb ? collapsePackedRgbPixelsMetadata(rawMetadata, vivDtype) : rawMetadata;
     const imageSize = {
       z: metadata["Pixels"]["SizeZ"],
-      c: metadata["Pixels"]["SizeC"],
+      c: packedRgb ? 1 : metadata["Pixels"]["SizeC"],
       t: metadata["Pixels"]["SizeT"]
     };
     const axes = extractAxesFromPixels(metadata["Pixels"]);
@@ -3552,7 +3772,6 @@ async function loadSingleFileOmeTiff(source, options = {}) {
       ifdOffset: imageIfdOffset,
       dimensionOrder: metadata["Pixels"]["DimensionOrder"]
     });
-    const dtype = parsePixelDataType(metadata["Pixels"]["Type"]);
     const tileSize = getTiffTileSize(
       await pyramidIndexer({ c: 0, t: 0, z: 0 }, 0)
     );
@@ -3560,19 +3779,26 @@ async function loadSingleFileOmeTiff(source, options = {}) {
       physicalSizes: extractPhysicalSizesfromPixels(metadata["Pixels"]),
       photometricInterpretation: firstImage.fileDirectory.PhotometricInterpretation
     };
-    const data = Array.from(
-      { length: levels },
-      (_, level) => {
+    const data = await Promise.all(
+      Array.from({ length: levels }, async (_, level) => {
+        const levelImage = await pyramidIndexer({ t: 0, c: 0, z: 0 }, level);
         return new TiffPixelSource(
-          (sel) => pyramidIndexer({ t: _nullishCoalesce$2(sel.t, () => ( 0)), c: _nullishCoalesce$2(sel.c, () => ( 0)), z: _nullishCoalesce$2(sel.z, () => ( 0)) }, level),
-          dtype,
+          (sel) => pyramidIndexer(
+            { t: _nullishCoalesce$2(sel.t, () => ( 0)), c: _nullishCoalesce$2(sel.c, () => ( 0)), z: _nullishCoalesce$2(sel.z, () => ( 0)) },
+            level
+          ),
+          vivDtype,
           tileSize,
-          getShapeForBinaryDownsampleLevel({ axes, level }),
+          getShapeForLevel({
+            axes,
+            width: levelImage.getWidth(),
+            height: levelImage.getHeight()
+          }),
           axes.labels,
           meta,
           pool
         );
-      }
+      })
     );
     images.push({ data, metadata });
     imageIfdOffset += imageSize.t * imageSize.z * imageSize.c;
@@ -3601,7 +3827,7 @@ async function loadMultiTiff(sources, opts = {}) {
     const imageSelections = Array.isArray(s) ? s : [s];
     if (typeof file === "string") {
       const parsedFilename = parseFilename(file);
-      const extension = _optionalChain$3([parsedFilename, 'access', _14 => _14.extension, 'optionalAccess', _15 => _15.toLowerCase, 'call', _16 => _16()]);
+      const extension = _optionalChain$3([parsedFilename, 'access', _25 => _25.extension, 'optionalAccess', _26 => _26.toLowerCase, 'call', _27 => _27()]);
       if (extension === "tif" || extension === "tiff") {
         const tiffImageName = parsedFilename.name;
         if (tiffImageName) {
@@ -3658,7 +3884,7 @@ var __publicField$2 = (obj, key, value) => {
   __defNormalProp$2(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
-const defaultPoolSize = _nullishCoalesce$2(_optionalChain$3([globalThis, 'optionalAccess', _17 => _17.navigator, 'optionalAccess', _18 => _18.hardwareConcurrency]), () => ( 4));
+const defaultPoolSize = _nullishCoalesce$2(_optionalChain$3([globalThis, 'optionalAccess', _28 => _28.navigator, 'optionalAccess', _29 => _29.hardwareConcurrency]), () => ( 4));
 function defaultCreateWorker() {
   return new Worker(new URL("./tiff/lib/decoder.worker.mjs", import.meta.url), {
     type: "module"
@@ -3944,7 +4170,7 @@ class ZarrPixelSource {
     return [zarr.slice(xStart, xStop), zarr.slice(yStart, yStop)];
   }
   async _getRaw(selection, getOptions) {
-    const signal = _optionalChain$3([getOptions, 'optionalAccess', _19 => _19.storeOptions, 'optionalAccess', _20 => _20.signal]);
+    const signal = _optionalChain$3([getOptions, 'optionalAccess', _30 => _30.storeOptions, 'optionalAccess', _31 => _31.signal]);
     const result = await zarr.get(this._data, selection, signal);
     if (typeof result !== "object") {
       throw new Error("Expected object from zarr.get");
@@ -4024,7 +4250,7 @@ async function load(store) {
 
 async function loadOmeZarr(source, options = {}) {
   const store = new FetchStore(source, options.fetchOptions);
-  if (_optionalChain$3([options, 'optionalAccess', _21 => _21.type]) !== "multiscales") {
+  if (_optionalChain$3([options, 'optionalAccess', _32 => _32.type]) !== "multiscales") {
     throw Error("Only multiscale OME-Zarr is supported.");
   }
   return load(store);
@@ -4078,6 +4304,34 @@ function _nullishCoalesce$1(lhs, rhsFn) { if (lhs != null) { return lhs; } else 
 function range(len) {
   return [...Array(len).keys()];
 }
+function normalizeTextureBindings(textures, numChannelsRequired, keyPrefix = "channel") {
+  if (numChannelsRequired === 0)
+    return null;
+  const keys = Object.keys(textures);
+  const firstKey = `${keyPrefix}0`;
+  const firstTexture = textures[firstKey];
+  if (!firstTexture && keys.length === 0)
+    return null;
+  if (keys.length === numChannelsRequired)
+    return textures;
+  if (keys.length < numChannelsRequired && firstTexture) {
+    const out = { ...textures };
+    for (let i = 0; i < numChannelsRequired; i++) {
+      const k = `${keyPrefix}${i}`;
+      if (!out[k])
+        out[k] = firstTexture;
+    }
+    return out;
+  }
+  if (keys.length > numChannelsRequired) {
+    const out = {};
+    for (let i = 0; i < numChannelsRequired; i++) {
+      out[`${keyPrefix}${i}`] = textures[`${keyPrefix}${i}`];
+    }
+    return out;
+  }
+  return null;
+}
 function padWithDefault(arr, defaultValue, padWidth) {
   for (let i = 0; i < padWidth; i += 1) {
     arr.push(defaultValue);
@@ -4109,7 +4363,7 @@ function padContrastLimits({
   const padSize = MAX_CHANNELS - newContrastLimits.length;
   if (padSize < 0) {
     throw Error(
-      `${newContrastLimits.lengths} channels passed in, but only 6 are allowed.`
+      `${newContrastLimits.length} channels passed in, but only ${MAX_CHANNELS} are allowed.`
     );
   }
   const paddedContrastLimits = padWithDefault(
@@ -4280,6 +4534,13 @@ const getTransparentColor = (photometricInterpretation) => {
       return [0, 0, 0, 0];
   }
 };
+const getPreparedImage = (img) => {
+  if (!_optionalChain$2([img, 'optionalAccess', _8 => _8.data]) || !img.width || !img.height) {
+    return null;
+  }
+  const data = img.data && img.data.length === img.width * img.height * 3 ? addAlpha(img.data) : img.data;
+  return { ...img, data };
+};
 class BitmapLayerWrapper extends BitmapLayer$1 {
   _getModel(gl) {
     const { photometricInterpretation, transparentColorInHook } = this.props;
@@ -4287,15 +4548,17 @@ class BitmapLayerWrapper extends BitmapLayer$1 {
       photometricInterpretation,
       transparentColorInHook
     );
+    const numChannels = _optionalChain$2([this, 'access', _9 => _9.props, 'access', _10 => _10.selections, 'optionalAccess', _11 => _11.length]) || 1;
     return new Model(this.context.device, {
-      ...this.getShaders(),
+      ...expandShaderModule(this.getShaders(), numChannels),
       id: this.props.id,
       bufferLayout: this.getAttributeManager().getBufferLayouts(),
       topology: "triangle-list",
       isInstanced: false,
       inject: {
         "fs:DECKGL_FILTER_COLOR": photometricInterpretationShader
-      }
+      },
+      shaderAssembler: VivShaderAssembler.getDefaultVivShaderAssembler()
     });
   }
 }
@@ -4308,22 +4571,62 @@ const BitmapLayer = class extends CompositeLayer {
     });
     super.initializeState(args);
   }
+  updateState({ props, oldProps, ...rest }) {
+    super.updateState({ props, oldProps, ...rest });
+    const img = getPreparedImage(props.image);
+    if (!img) {
+      if (this.state.bitmapTexture) {
+        this.state.bitmapTexture.delete();
+        this.setState({ bitmapTexture: null });
+      }
+      return;
+    }
+    if (props.image === _optionalChain$2([oldProps, 'optionalAccess', _12 => _12.image]) && this.state.bitmapTexture) {
+      return;
+    }
+    if (this.state.bitmapTexture) {
+      this.state.bitmapTexture.delete();
+    }
+    const texture = this.context.device.createTexture({
+      width: img.width,
+      height: img.height,
+      dimension: "2d",
+      data: img.data,
+      mipLevels: 1,
+      format: img.format || "rgba8unorm",
+      sampler: {
+        minFilter: "linear",
+        magFilter: "linear",
+        addressModeU: "clamp-to-edge",
+        addressModeV: "clamp-to-edge"
+      }
+    });
+    this.setState({ bitmapTexture: texture });
+  }
+  finalizeState() {
+    if (this.state.bitmapTexture) {
+      this.state.bitmapTexture.delete();
+      this.setState({ bitmapTexture: null });
+    }
+    super.finalizeState();
+  }
   renderLayers() {
     const {
       photometricInterpretation,
       transparentColor: transparentColorInHook
     } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
-    this.props.image.data = addAlpha(this.props.image.data);
-    return new BitmapLayerWrapper(this.props, {
-      // transparentColor is a prop applied to the original image data by deck.gl's
-      // BitmapLayer and needs to be in the original colorspace.  It is used to determine
-      // what color is "transparent" in the original color space (i.e what shows when opacity is 0).
-      transparentColor,
-      // This is our transparentColor props which needs to be applied in the hook that converts to the RGB space.
-      transparentColorInHook,
-      id: `${this.props.id}-wrapped`
-    });
+    const image = this.state.bitmapTexture;
+    if (!image)
+      return null;
+    return new BitmapLayerWrapper(
+      { ...this.props, image },
+      {
+        transparentColor,
+        transparentColorInHook,
+        id: `${this.props.id}-wrapped`
+      }
+    );
   }
 };
 BitmapLayer.layerName = "BitmapLayer";
@@ -4338,57 +4641,52 @@ BitmapLayer.defaultProps = {
 BitmapLayerWrapper.defaultProps = defaultProps$8;
 BitmapLayerWrapper.layerName = "BitmapLayerWrapper";
 
-const fs$2 = `float apply_contrast_limits(float intensity, vec2 contrastLimits) {
+const moduleName$3 = "channelIntensity";
+const fs$4 = `uniform ${moduleName$3}Uniforms {
+  vec2 contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER};
+} ${moduleName$3};
+
+float apply_contrast_limits(float intensity, vec2 contrastLimits) {
     return  max(0., (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0])));
 }
 `;
 const channels = {
-  name: "channel-intensity",
+  name: moduleName$3,
+  uniformTypes: {
+    [`contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER}`]: "vec2<f32>"
+  },
   defines: {
     SAMPLER_TYPE: "usampler2D",
     COLORMAP_FUNCTION: ""
   },
-  fs: fs$2
+  fs: fs$4
 };
 
-const fs$1 = `#version 300 es
+const fs$3 = `#version 300 es
 #define SHADER_NAME xr-layer-fragment-shader
-
 precision highp float;
 precision highp int;
 precision highp SAMPLER_TYPE;
 
 // our texture
-uniform SAMPLER_TYPE channel0;
-uniform SAMPLER_TYPE channel1;
-uniform SAMPLER_TYPE channel2;
-uniform SAMPLER_TYPE channel3;
-uniform SAMPLER_TYPE channel4;
-uniform SAMPLER_TYPE channel5;
+uniform SAMPLER_TYPE channel${VIV_CHANNEL_INDEX_PLACEHOLDER};
 
 in vec2 vTexCoord;
-
-// range
-uniform vec2 contrastLimits[6];
 
 out vec4 fragColor;
 
 void main() {
 
-  float intensity0 = float(texture(channel0, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity0, contrastLimits[0], 0);
-  float intensity1 = float(texture(channel1, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity1, contrastLimits[1], 1);
-  float intensity2 = float(texture(channel2, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity2, contrastLimits[2], 2);
-  float intensity3 = float(texture(channel3, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity3, contrastLimits[3], 3);
-  float intensity4 = float(texture(channel4, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity4, contrastLimits[4], 4);
-  float intensity5 = float(texture(channel5, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity5, contrastLimits[5], 5);
+  float intensity${VIV_CHANNEL_INDEX_PLACEHOLDER} = float(texture(channel${VIV_CHANNEL_INDEX_PLACEHOLDER}, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensity${VIV_CHANNEL_INDEX_PLACEHOLDER}, channelIntensity.contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER}, ${VIV_CHANNEL_INDEX_PLACEHOLDER});
+  // DECKGL_PROCESS_INTENSITY(intensity${VIV_CHANNEL_INDEX_PLACEHOLDER}, xrLayer.contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER}, ${VIV_CHANNEL_INDEX_PLACEHOLDER});
 
-  DECKGL_MUTATE_COLOR(fragColor, intensity0, intensity1, intensity2, intensity3, intensity4, intensity5, vTexCoord);
+  float[] intensity = float[NUM_CHANNELS](
+    // as of this writing, this will be expanded by some very fragile string processing to remove final comma...
+    // needs documenting and hopefully improving.
+    intensity${VIV_CHANNEL_INDEX_PLACEHOLDER},
+  );
+  DECKGL_MUTATE_COLOR(fragColor, intensity, vTexCoord);
 
 
   geometry.uv = vTexCoord;
@@ -4417,12 +4715,14 @@ void main(void) {
 }
 `;
 
-const coreShaderModule = { fs: fs$1, vs: vs$1 };
-function getRenderingAttrs$1(dtype, interpolation) {
+const coreShaderModule = { fs: fs$3, vs: vs$1, name: "xrLayer" };
+function getRenderingAttrs$1(dtype, interpolation, numChannels = MAX_CHANNELS) {
+  //!!! todo review whether we really need to be storing data as f32 - probably not.
   const isLinear = interpolation === "linear";
   const values = getDtypeValues(isLinear ? "Float32" : dtype);
   return {
-    shaderModule: coreShaderModule,
+    // maybe we should do this in XRLayer instead
+    shaderModule: expandShaderModule({ ...coreShaderModule }, numChannels),
     filter: interpolation,
     cast: isLinear ? (data) => new Float32Array(data) : (data) => data,
     ...values
@@ -4441,38 +4741,65 @@ const defaultProps$7 = {
     type: "string",
     value: "nearest",
     compare: true
-  }
+  },
+  // Extension props are merged into layer props, but declaring them here
+  // ensures deck.gl tracks them for change detection(?)
+  colormap: { type: "string", value: null, compare: true }
 };
-const XRLayer = class extends Layer {
+class XRLayer extends Layer {
+  /**
+   * Returns the number of channels for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumChannels() {
+    return _nullishCoalesce$1(_nullishCoalesce$1(_optionalChain$2([this, 'access', _13 => _13.props, 'access', _14 => _14.selections, 'optionalAccess', _15 => _15.length]), () => ( _optionalChain$2([this, 'access', _16 => _16.props, 'access', _17 => _17.channels, 'optionalAccess', _18 => _18.length]))), () => ( MAX_CHANNELS));
+  }
+  /**
+   * Returns the number of planes for this layer instance (always 1 for 2D layers).
+   * Implements VivLayer interface.
+   */
+  getNumPlanes() {
+    return 1;
+  }
   /**
    * This function replaces `usampler` with `sampler` if the data is not an unsigned integer
    * and adds a standard ramp function default for DECKGL_PROCESS_INTENSITY.
    */
   getShaders() {
     const { dtype, interpolation } = this.props;
-    const { shaderModule, sampler } = getRenderingAttrs$1(dtype, interpolation);
+    const numChannels = this.getNumChannels();
+    const { shaderModule, sampler } = getRenderingAttrs$1(
+      dtype,
+      interpolation,
+      numChannels
+    );
     const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions("fs:DECKGL_PROCESS_INTENSITY");
-    const newChannelsModule = { ...channels, inject: {} };
+    const expandedChannels = expandShaderModule(channels, numChannels);
+    const newChannelsModule = { ...expandedChannels, inject: {} };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject["fs:DECKGL_PROCESS_INTENSITY"] = `
         intensity = apply_contrast_limits(intensity, contrastLimits);
       `;
     }
-    return super.getShaders({
-      ...shaderModule,
-      defines: {
-        SAMPLER_TYPE: sampler
-      },
-      modules: [project32, picking, newChannelsModule]
-    });
+    return expandShaderModule(
+      super.getShaders({
+        ...shaderModule,
+        defines: {
+          SAMPLER_TYPE: sampler
+        },
+        modules: [project32, picking, newChannelsModule]
+      }),
+      numChannels
+    );
   }
+  // may consider reviewing this along with other extension stuff.
   _isHookDefinedByExtensions(hookName) {
     const { extensions } = this.props;
-    return _optionalChain$2([extensions, 'optionalAccess', _8 => _8.some, 'call', _9 => _9((e) => {
-      const shaders = e.getShaders();
+    return _optionalChain$2([extensions, 'optionalAccess', _19 => _19.some, 'call', _20 => _20((e) => {
+      const shaders = e.getShaders.call(this, e);
       const { inject = {}, modules = [] } = shaders;
       const definesInjection = inject[hookName];
-      const moduleDefinesInjection = modules.some((m) => _optionalChain$2([m, 'optionalAccess', _10 => _10.inject, 'access', _11 => _11[hookName]]));
+      const moduleDefinesInjection = modules.some((m) => _optionalChain$2([m, 'optionalAccess', _21 => _21.inject, 'access', _22 => _22[hookName]]));
       return definesInjection || moduleDefinesInjection;
     })]);
   }
@@ -4499,15 +4826,6 @@ const XRLayer = class extends Layer {
       numInstances: 1,
       positions: new Float64Array(12)
     });
-    const shaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
-    const mutateStr = "fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)";
-    const processStr = "fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)";
-    if (!shaderAssembler._hookFunctions.includes(mutateStr)) {
-      shaderAssembler.addShaderHook(mutateStr);
-    }
-    if (!shaderAssembler._hookFunctions.includes(processStr)) {
-      shaderAssembler.addShaderHook(processStr);
-    }
   }
   /**
    * This function finalizes state by clearing all textures from the WebGL context
@@ -4515,7 +4833,7 @@ const XRLayer = class extends Layer {
   finalizeState() {
     super.finalizeState();
     if (this.state.textures) {
-      Object.values(this.state.textures).forEach((tex) => _optionalChain$2([tex, 'optionalAccess', _12 => _12.delete, 'call', _13 => _13()]));
+      Object.values(this.state.textures).forEach((tex) => _optionalChain$2([tex, 'optionalAccess', _23 => _23.delete, 'call', _24 => _24()]));
     }
   }
   /**
@@ -4524,7 +4842,16 @@ const XRLayer = class extends Layer {
    */
   updateState({ props, oldProps, changeFlags, ...rest }) {
     super.updateState({ props, oldProps, changeFlags, ...rest });
-    if (changeFlags.extensionsChanged || props.interpolation !== oldProps.interpolation) {
+    const numChannels = this.getNumChannels();
+    if (numChannels === 0) {
+      if (this.state.model) {
+        this.state.model.destroy();
+        this.setState({ model: null });
+      }
+      return;
+    }
+    const colormapChanged = props.colormap !== _optionalChain$2([oldProps, 'optionalAccess', _25 => _25.colormap]);
+    if (changeFlags.extensionsChanged || props.interpolation !== oldProps.interpolation || colormapChanged || (_nullishCoalesce$1(_optionalChain$2([props, 'access', _26 => _26.selections, 'optionalAccess', _27 => _27.length]), () => ( 0))) !== (_nullishCoalesce$1(_optionalChain$2([oldProps, 'access', _28 => _28.selections, 'optionalAccess', _29 => _29.length]), () => ( 0)))) {
       const { device } = this.context;
       if (this.state.model) {
         this.state.model.destroy();
@@ -4532,12 +4859,33 @@ const XRLayer = class extends Layer {
       this.setState({ model: this._getModel(device) });
       this.getAttributeManager().invalidateAll();
     }
-    if (props.channelData !== oldProps.channelData && _optionalChain$2([props, 'access', _14 => _14.channelData, 'optionalAccess', _15 => _15.data]) !== _optionalChain$2([oldProps, 'access', _16 => _16.channelData, 'optionalAccess', _17 => _17.data]) || props.interpolation !== oldProps.interpolation) {
+    if (props.channelData !== oldProps.channelData && _optionalChain$2([props, 'access', _30 => _30.channelData, 'optionalAccess', _31 => _31.data]) !== _optionalChain$2([oldProps, 'access', _32 => _32.channelData, 'optionalAccess', _33 => _33.data]) || props.interpolation !== oldProps.interpolation) {
       this.loadChannelTextures(props.channelData);
     }
     const attributeManager = this.getAttributeManager();
     if (props.bounds !== oldProps.bounds) {
       attributeManager.invalidate("positions");
+    }
+    const texturesToBind = _nullishCoalesce$1(this._newTexturesFromLoadThisFrame, () => ( this.state.textures));
+    const { model } = this.state;
+    const bindings = texturesToBind && model ? normalizeTextureBindings(texturesToBind, numChannels, "channel") : null;
+    if (bindings) {
+      const { contrastLimits, domain, dtype, channelsVisible } = this.props;
+      const paddedContrastLimits = padContrastLimits({
+        contrastLimits: contrastLimits.slice(0, numChannels),
+        channelsVisible: channelsVisible.slice(0, numChannels),
+        domain,
+        dtype
+      });
+      const channelIntensity = {};
+      for (let i = 0; i < numChannels; i++) {
+        channelIntensity[`contrastLimits${i}`] = [
+          paddedContrastLimits[i * 2],
+          paddedContrastLimits[i * 2 + 1]
+        ];
+      }
+      model.shaderInputs.setProps({ channelIntensity });
+      model.setBindings(bindings);
     }
   }
   /**
@@ -4562,7 +4910,8 @@ const XRLayer = class extends Layer {
         }
       }),
       bufferLayout: this.getAttributeManager().getBufferLayouts(),
-      isInstanced: false
+      isInstanced: false,
+      shaderAssembler: VivShaderAssembler.getDefaultVivShaderAssembler()
     });
   }
   /**
@@ -4586,45 +4935,30 @@ const XRLayer = class extends Layer {
     attributes.value = positions;
   }
   /**
-   * This function runs the shaders and draws to the canvas
+   * Track textures that were created during the current frame.
+   * These textures are used by `updateState` to bind same-frame textures
+   * and avoid referencing textures that may have been deleted when channels
+   * are removed and then added back.
+   *
+   * @param {Record<string, import('@luma.gl/core').Texture>|null} textures - Map of channel ids
+   *   (e.g. `channel0`, `channel1`) to textures created this frame, or null
+   *   when no channel textures were loaded.
+   * @private
    */
-  draw(opts) {
-    const { uniforms } = opts;
-    const { textures, model } = this.state;
-    if (textures && model) {
-      const { contrastLimits, domain, dtype, channelsVisible } = this.props;
-      const numTextures = Object.values(textures).filter((t) => t).length;
-      const paddedContrastLimits = padContrastLimits({
-        contrastLimits: contrastLimits.slice(0, numTextures),
-        channelsVisible: channelsVisible.slice(0, numTextures),
-        domain,
-        dtype
-      });
-      model.setUniforms(
-        {
-          ...uniforms,
-          contrastLimits: paddedContrastLimits
-        },
-        { disableWarnings: false }
-      );
-      model.setBindings(textures);
-      model.draw(this.context.renderPass);
-    }
+  _setNewTexturesFromLoadThisFrame(textures) {
+    this._newTexturesFromLoadThisFrame = textures;
   }
   /**
    * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadChannelTextures(channelData) {
-    const textures = {
-      channel0: null,
-      channel1: null,
-      channel2: null,
-      channel3: null,
-      channel4: null,
-      channel5: null
-    };
+    const numChannels = this.getNumChannels();
+    const textures = {};
+    for (let i = 0; i < numChannels; i++) {
+      textures[`channel${i}`] = null;
+    }
     if (this.state.textures) {
-      Object.values(this.state.textures).forEach((tex) => _optionalChain$2([tex, 'optionalAccess', _18 => _18.delete, 'call', _19 => _19()]));
+      Object.values(this.state.textures).forEach((tex) => _optionalChain$2([tex, 'optionalAccess', _34 => _34.delete, 'call', _35 => _35()]));
     }
     if (channelData && Object.keys(channelData).length > 0 && channelData.data) {
       channelData.data.forEach((d, i) => {
@@ -4640,7 +4974,10 @@ const XRLayer = class extends Layer {
         if (!textures[key])
           textures[key] = textures.channel0;
       }
+      this._setNewTexturesFromLoadThisFrame(textures);
       this.setState({ textures });
+    } else {
+      this._setNewTexturesFromLoadThisFrame(null);
     }
   }
   /**
@@ -4653,9 +4990,9 @@ const XRLayer = class extends Layer {
       width,
       height,
       dimension: "2d",
-      data: _nullishCoalesce$1(_optionalChain$2([attrs, 'access', _20 => _20.cast, 'optionalCall', _21 => _21(data)]), () => ( data)),
-      // we don't want or need mimaps
-      mipmaps: false,
+      data: _nullishCoalesce$1(_optionalChain$2([attrs, 'access', _36 => _36.cast, 'optionalCall', _37 => _37(data)]), () => ( data)),
+      // luma.gl 9.3: `mipmaps` is ignored; texStorage2D needs a positive mipLevels.
+      mipLevels: 1,
       sampler: {
         // NEAREST for integer data
         minFilter: attrs.filter,
@@ -4667,13 +5004,14 @@ const XRLayer = class extends Layer {
       format: attrs.format
     });
   }
-};
+}
 XRLayer.layerName = "XRLayer";
 XRLayer.defaultProps = defaultProps$7;
 
 const defaultProps$6 = {
   pickable: { type: "boolean", value: true, compare: true },
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+  // similar things also declared in several other places & we may end up re-arranging somewhat?
   contrastLimits: { type: "array", value: [], compare: true },
   channelsVisible: { type: "array", value: [], compare: true },
   selections: { type: "array", value: [], compare: true },
@@ -4702,6 +5040,20 @@ const defaultProps$6 = {
   }
 };
 const ImageLayer = class extends CompositeLayer {
+  /**
+   * Returns the number of channels for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumChannels() {
+    return _nullishCoalesce$1(_nullishCoalesce$1(_optionalChain$2([this, 'access', _38 => _38.props, 'access', _39 => _39.selections, 'optionalAccess', _40 => _40.length]), () => ( _optionalChain$2([this, 'access', _41 => _41.props, 'access', _42 => _42.channels, 'optionalAccess', _43 => _43.length]))), () => ( MAX_CHANNELS));
+  }
+  /**
+   * Returns the number of planes for this layer instance (always 1 for 2D layers).
+   * Implements VivLayer interface.
+   */
+  getNumPlanes() {
+    return 1;
+  }
   finalizeState() {
     this.state.abortController.abort();
   }
@@ -4718,8 +5070,8 @@ const ImageLayer = class extends CompositeLayer {
       Promise.all(dataPromises).then((rasters) => {
         const raster = {
           data: rasters.map((d) => d.data),
-          width: _optionalChain$2([rasters, 'access', _22 => _22[0], 'optionalAccess', _23 => _23.width]),
-          height: _optionalChain$2([rasters, 'access', _24 => _24[0], 'optionalAccess', _25 => _25.height])
+          width: _optionalChain$2([rasters, 'access', _44 => _44[0], 'optionalAccess', _45 => _45.width]),
+          height: _optionalChain$2([rasters, 'access', _46 => _46[0], 'optionalAccess', _47 => _47.height])
         };
         if (isInterleaved(loader.shape)) {
           raster.data = raster.data[0];
@@ -4773,22 +5125,64 @@ const ImageLayer = class extends CompositeLayer {
 ImageLayer.layerName = "ImageLayer";
 ImageLayer.defaultProps = defaultProps$6;
 
+function getPyramidZoomLevels(loader) {
+  if (!Array.isArray(loader) || loader.length === 0) {
+    return [0];
+  }
+  const { width: baseWidth } = getImageSize(loader[0]);
+  return loader.map((level) => {
+    const { width } = getImageSize(level);
+    return 0 - Math.round(Math.log2(baseWidth / width));
+  });
+}
+function snapToAvailableZoom(z, levelZooms) {
+  const target = Math.round(z);
+  for (const lz of levelZooms) {
+    if (lz <= target) {
+      return lz;
+    }
+  }
+  return levelZooms[levelZooms.length - 1];
+}
+function getLevelScale(loader, levelIndex) {
+  const { width: baseWidth } = getImageSize(loader[0]);
+  const { width } = getImageSize(loader[levelIndex]);
+  return baseWidth / width;
+}
 function renderSubLayers(props) {
   const {
-    bbox: { left, top, right, bottom },
+    bbox: { left, top },
     index: { x, y, z }
   } = props.tile;
   const { data, id, loader, maxZoom } = props;
-  if ([left, bottom, right, top].some((v) => v < 0) || !data) {
+  if ([left, top].some((v) => v < 0) || !data) {
+    return null;
+  }
+  if (data.width === 0 || data.height === 0) {
     return null;
   }
   const base = loader[0];
-  const { height, width } = getImageSize(base);
+  let scale = 2 ** Math.round(-z);
+  let boundLeft = left;
+  let boundTop = top;
+  if (Array.isArray(loader) && loader.length > 1 && base.labels) {
+    const levelZooms = getPyramidZoomLevels(loader);
+    const zNat = snapToAvailableZoom(z, levelZooms);
+    scale = 2 ** Math.round(-zNat);
+    const factor = 2 ** (Math.round(z) - zNat);
+    if (factor !== 1) {
+      const xNat = Math.floor(x / factor);
+      const yNat = Math.floor(y / factor);
+      const { tileSize } = base;
+      boundLeft = xNat * tileSize * scale;
+      boundTop = yNat * tileSize * scale;
+    }
+  }
   const bounds = [
-    left,
-    data.height < base.tileSize ? height : bottom,
-    data.width < base.tileSize ? width : right,
-    top
+    boundLeft,
+    boundTop + data.height * scale,
+    boundLeft + data.width * scale,
+    boundTop
   ];
   if (isInterleaved(base.shape)) {
     const { photometricInterpretation = 2 } = base.meta;
@@ -4881,13 +5275,18 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       refinementStrategy
     } = this.props;
     const { tileSize, dtype } = loader[0];
+    const levelZooms = getPyramidZoomLevels(loader);
     const getTileData = async ({ index: { x, y, z }, signal }) => {
       if (!selections || selections.length === 0) {
         return null;
       }
-      const resolution = Math.round(-z);
+      const zNat = snapToAvailableZoom(z, levelZooms);
+      const resolution = levelZooms.indexOf(zNat);
+      const factor = 2 ** (Math.round(z) - zNat);
+      const xNat = Math.floor(x / factor);
+      const yNat = Math.floor(y / factor);
       const getTile = (selection) => {
-        const config = { x, y, selection, signal };
+        const config = { x: xNat, y: yNat, selection, signal };
         return loader[resolution].getTile(config);
       };
       try {
@@ -4927,7 +5326,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       ),
       extent: [0, 0, width, height],
       // See the above note within for why the use of zoomOffset and the rounding necessary.
-      minZoom: Math.round(-(loader.length - 1)),
+      minZoom: levelZooms[levelZooms.length - 1],
       maxZoom: 0,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
       // multiple rendered sublayers (some of which have been cached) from overlapping
@@ -4946,7 +5345,9 @@ const MultiscaleImageLayer = class extends CompositeLayer {
     const baseLayer = implementsGetRaster && !excludeBackground && new ImageLayer(this.props, {
       id: `Background-Image-${id}`,
       loader: lowestResolution,
-      modelMatrix: layerModelMatrix.scale(2 ** (loader.length - 1)),
+      modelMatrix: layerModelMatrix.scale(
+        getLevelScale(loader, loader.length - 1)
+      ),
       visible: !viewportId || this.context.viewport.id === viewportId,
       onHover,
       onClick,
@@ -5011,14 +5412,15 @@ const OverviewLayer = class extends CompositeLayer {
     const { width, height } = getImageSize(loader[0]);
     const z = loader.length - 1;
     const lowestResolution = loader[z];
+    const levelScale = getLevelScale(loader, z);
     const overview = new ImageLayer(this.props, {
       id: `viewport-${id}`,
-      modelMatrix: new Matrix4().scale(2 ** z * overviewScale),
+      modelMatrix: new Matrix4().scale(levelScale * overviewScale),
       loader: lowestResolution
     });
     const boundingBoxOutline = new PolygonLayer({
       id: `bounding-box-overview-${id}`,
-      coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+      coordinateSystem: "cartesian",
       data: [boundingBox],
       getPolygon: (f) => f,
       filled: false,
@@ -5028,7 +5430,7 @@ const OverviewLayer = class extends CompositeLayer {
     });
     const viewportOutline = new PolygonLayer({
       id: `viewport-outline-${id}`,
-      coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+      coordinateSystem: "cartesian",
       data: [
         [
           [0, 0],
@@ -5199,43 +5601,20 @@ const ScaleBarLayer = class extends CompositeLayer {
 ScaleBarLayer.layerName = "ScaleBarLayer";
 ScaleBarLayer.defaultProps = defaultProps$2;
 
-const fs = `#version 300 es
+const fs$2 = `#version 300 es
 precision highp int;
 precision highp float;
 precision highp SAMPLER_TYPE;
 
-uniform highp SAMPLER_TYPE volume0;
-uniform highp SAMPLER_TYPE volume1;
-uniform highp SAMPLER_TYPE volume2;
-uniform highp SAMPLER_TYPE volume3;
-uniform highp SAMPLER_TYPE volume4;
-uniform highp SAMPLER_TYPE volume5;
-
-uniform vec3 scaledDimensions;
-
-uniform mat4 scale;
-
-uniform vec3 normals[NUM_PLANES];
-uniform float distances[NUM_PLANES];
-
-// color
-uniform vec3 colors[6];
-
-// slices
-uniform vec2 xSlice;
-uniform vec2 ySlice;
-uniform vec2 zSlice;
-
-// range
-uniform vec2 contrastLimits[6];
+uniform highp SAMPLER_TYPE volume${VIV_CHANNEL_INDEX_PLACEHOLDER};
 
 in vec3 vray_dir;
 flat in vec3 transformed_eye;
 out vec4 color;
 
 vec2 intersect_box(vec3 orig, vec3 dir) {
-	vec3 box_min = vec3(xSlice[0], ySlice[0], zSlice[0]);
-	vec3 box_max = vec3(xSlice[1], ySlice[1], zSlice[1]);
+	vec3 box_min = vec3(fragmentUniforms3D.xSlice[0], fragmentUniforms3D.ySlice[0], fragmentUniforms3D.zSlice[0]);
+	vec3 box_max = vec3(fragmentUniforms3D.xSlice[1], fragmentUniforms3D.ySlice[1], fragmentUniforms3D.zSlice[1]);
 	vec3 inv_dir = 1. / dir;
 	vec3 tmin_tmp = (box_min - orig) * inv_dir;
 	vec3 tmax_tmp = (box_max - orig) * inv_dir;
@@ -5283,7 +5662,7 @@ void main(void) {
 	t_hit.x = max(t_hit.x, 0.);
 
 	// Step 3: Compute the step size to march through the volume grid
-	vec3 dt_vec = 1. / (scale * vec4(abs(ray_dir), 1.)).xyz;
+	vec3 dt_vec = 1. / (fragmentUniforms3D.scale * vec4(abs(ray_dir), 1.)).xyz;
 	float dt = 1. * min(dt_vec.x, min(dt_vec.y, dt_vec.z));
 
 	float offset = wang_hash(int(gl_FragCoord.x + 640. * gl_FragCoord.y));
@@ -5291,15 +5670,15 @@ void main(void) {
 	// Step 4: Starting from the entry point, march the ray through the volume
 	// and sample it
 	vec3 p = transformed_eye + (t_hit.x + offset * dt) * ray_dir;
+	
+	#define _U fragmentUniforms3D
+	_BEFORE_RENDER
 
 	// TODO: Probably want to stop this process at some point to improve performance when marching down the edges.
-	_BEFORE_RENDER
 	for (float t = t_hit.x; t < t_hit.y; t += dt) {
 		// Check if this point is on the "positive" side or "negative" side of the plane - only show positive.
 		float canShow = 1.;
-		for (int i = 0; i < NUM_PLANES; i += 1) {
-			canShow *= max(0., sign(dot(normals[i], p) + distances[i]));
-		}
+		canShow *= max(0., sign(dot(_U.normal${VIV_PLANE_INDEX_PLACEHOLDER}, p) + _U.distance${VIV_PLANE_INDEX_PLACEHOLDER}));
 		// Do not show coordinates outside 0-1 box.
 		// Something about the undefined behavior outside the box causes the additive blender to 
 		// render some very odd artifacts.
@@ -5308,24 +5687,10 @@ void main(void) {
 		float canShowZCoordinate = max(p.z - 0., 0.) * max(1. - p.z , 0.);
 		float canShowCoordinate = float(ceil(canShowXCoordinate * canShowYCoordinate * canShowZCoordinate));
 		canShow = canShowCoordinate * canShow;
-		float intensityValue0 = float(texture(volume0, p).r);
-		DECKGL_PROCESS_INTENSITY(intensityValue0, contrastLimits[0], 0);
-		intensityValue0 = canShow * intensityValue0;
-		float intensityValue1 = float(texture(volume1, p).r);
-		DECKGL_PROCESS_INTENSITY(intensityValue1, contrastLimits[1], 1);
-		intensityValue1 = canShow * intensityValue1;
-		float intensityValue2 = float(texture(volume2, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue2, contrastLimits[2], 2);
-		intensityValue2 = canShow * intensityValue2;
-		float intensityValue3 = float(texture(volume3, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue3, contrastLimits[3], 3);
-		intensityValue3 = canShow * intensityValue3;
-    	float intensityValue4 = float(texture(volume4, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue4, contrastLimits[4], 4);
-		intensityValue4 = canShow * intensityValue4;
-		float intensityValue5 = float(texture(volume5, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue5, contrastLimits[5], 5);
-		intensityValue5 = canShow * intensityValue5;
+		float intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER} = float(texture(volume${VIV_CHANNEL_INDEX_PLACEHOLDER}, p).r);
+		DECKGL_PROCESS_INTENSITY(intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER}, channelIntensity3D.contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER}, ${VIV_CHANNEL_INDEX_PLACEHOLDER});
+		intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER} = canShow * intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER};
+
 
 		_RENDER
 
@@ -5344,19 +5709,17 @@ const vs = `#version 300 es
 // Unit-cube vertices
 in vec3 positions;
 
-// Eye position - last column of the inverted view matrix
-uniform vec3 eye_pos;
-// Projection matrix
-uniform mat4 proj;
-// Model Matrix
-uniform mat4 model;
-// View Matrix
-uniform mat4 view;
-// A matrix for scaling in the model space before any transformations.
-// This projects the unit cube up to match the "pixel size" multiplied by the physical size ratio, if provided.
-uniform mat4 scale;
-uniform mat4 resolution;
-
+uniform vertexUniforms {
+  // Eye position - last column of the inverted view matrix  
+  vec3 eye_pos;
+  mat4 proj;
+  mat4 model;
+  mat4 view;
+  // A matrix for scaling in the model space before any transformations.
+  // This projects the unit cube up to match the "pixel size" multiplied by the physical size ratio, if provided.
+  mat4 scale;
+  mat4 resolution;
+} vertex;
 
 out vec3 vray_dir;
 flat out vec3 transformed_eye;
@@ -5364,7 +5727,7 @@ flat out vec3 transformed_eye;
 void main() {
 
   // Step 1: Standard MVP transformation (+ the scale matrix) to place the positions on your 2D screen ready for rasterization + fragment processing.
-  gl_Position = proj * view * model * scale * resolution * vec4(positions, 1.);
+  gl_Position = vertex.proj * vertex.view * vertex.model * vertex.scale * vertex.resolution * vec4(positions, 1.);
 
   // Step 2: Invert the eye back from world space to the normalized 0-1 cube world space because ray casting on the fragment shader runs in 0-1 space.
   // Geometrically, the transformed_eye is a position relative to the 0-1 normalized vertices, which themselves are the inverse of the model + scale trasnformation.
@@ -5404,21 +5767,69 @@ void main() {
   /
  #
   */
-  transformed_eye = (inverse(resolution) * inverse(scale) * inverse(model) * (vec4(eye_pos, 1.))).xyz;
+  transformed_eye = (inverse(vertex.resolution) * inverse(vertex.scale) * inverse(vertex.model) * (vec4(vertex.eye_pos, 1.))).xyz;
 
   // Step 3: Rays are from eye to vertices so that they get interpolated over the fragments.
   vray_dir = positions - transformed_eye;
 }
 `;
 
-const channelsModule = {
-  name: "channel-intensity-module",
-  fs: `    float apply_contrast_limits(float intensity, vec2 contrastLimits) {
-      float contrastLimitsAppliedToIntensity = (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0]));
-      return max(0., contrastLimitsAppliedToIntensity);
-    }
-  `
+const moduleName$2 = "channelIntensity3D";
+const fs$1 = `uniform ${moduleName$2}Uniforms {
+  vec2 contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER};
+} ${moduleName$2};
+
+float apply_contrast_limits(float intensity, vec2 contrastLimits) {
+  float contrastLimitsAppliedToIntensity = (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0]));
+  return max(0., contrastLimitsAppliedToIntensity);
+}
+`;
+const channelIntensity3D = {
+  name: moduleName$2,
+  uniformTypes: {
+    [`contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER}`]: "vec2<f32>"
+  },
+  fs: fs$1
 };
+
+const moduleName$1 = "fragmentUniforms3D";
+const fs = `uniform ${moduleName$1}Uniforms {
+  vec2 xSlice;
+  vec2 ySlice;
+  vec2 zSlice;
+  mat4 scale;
+  vec3 color${VIV_CHANNEL_INDEX_PLACEHOLDER};
+  vec3 normal${VIV_PLANE_INDEX_PLACEHOLDER};
+  float distance${VIV_PLANE_INDEX_PLACEHOLDER};
+} ${moduleName$1};
+`;
+const fragmentUniforms3D = {
+  name: moduleName$1,
+  uniformTypes: {
+    xSlice: "vec2<f32>",
+    ySlice: "vec2<f32>",
+    zSlice: "vec2<f32>",
+    scale: "mat4x4<f32>",
+    [`color${VIV_CHANNEL_INDEX_PLACEHOLDER}`]: "vec3<f32>",
+    [`normal${VIV_PLANE_INDEX_PLACEHOLDER}`]: "vec3<f32>",
+    [`distance${VIV_PLANE_INDEX_PLACEHOLDER}`]: "f32"
+  },
+  fs
+};
+
+const moduleName = "vertex";
+const vertexUniforms3D = {
+  name: moduleName,
+  uniformTypes: {
+    eye_pos: "vec3<f32>",
+    proj: "mat4x4<f32>",
+    model: "mat4x4<f32>",
+    view: "mat4x4<f32>",
+    scale: "mat4x4<f32>",
+    resolution: "mat4x4<f32>"
+  }
+};
+
 const CUBE_STRIP = [
   1,
   1,
@@ -5469,6 +5880,7 @@ const defaultProps$1 = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: "object", value: {}, compare: true },
   contrastLimits: { type: "array", value: [], compare: true },
+  colors: { type: "array", value: null, compare: true },
   dtype: { type: "string", value: "Uint8", compare: true },
   xSlice: { type: "array", value: null, compare: true },
   ySlice: { type: "array", value: null, compare: true },
@@ -5493,7 +5905,8 @@ function getRenderingAttrs() {
 function getRenderingFromExtensions(extensions) {
   let rendering = {};
   extensions.forEach((extension) => {
-    rendering = extension.rendering;
+    if (extension.rendering._RENDER)
+      rendering = extension.rendering;
   });
   if (!rendering._RENDER) {
     throw new Error(
@@ -5503,26 +5916,36 @@ function getRenderingFromExtensions(extensions) {
   return rendering;
 }
 const XR3DLayer = class extends Layer {
+  /**
+   * Returns the number of channels for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumChannels() {
+    return _nullishCoalesce$1(_nullishCoalesce$1(_optionalChain$2([this, 'access', _48 => _48.props, 'access', _49 => _49.selections, 'optionalAccess', _50 => _50.length]), () => ( _optionalChain$2([this, 'access', _51 => _51.props, 'access', _52 => _52.channels, 'optionalAccess', _53 => _53.length]))), () => ( MAX_CHANNELS));
+  }
+  /**
+   * Returns the number of planes for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumPlanes() {
+    const { clippingPlanes } = this.props;
+    return _optionalChain$2([clippingPlanes, 'optionalAccess', _54 => _54.length]) || NUM_PLANES_DEFAULT;
+  }
   initializeState() {
     const { device } = this.context;
     device.setParametersWebGL({
       [GL.UNPACK_ALIGNMENT]: 1,
       [GL.PACK_ALIGNMENT]: 1
     });
-    const programManager = ShaderAssembler.getDefaultShaderAssembler();
-    const processStr = "fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)";
-    if (!programManager._hookFunctions.includes(processStr)) {
-      programManager.addShaderHook(processStr);
-    }
   }
   _isHookDefinedByExtensions(hookName) {
     const { extensions } = this.props;
-    return _optionalChain$2([extensions, 'optionalAccess', _26 => _26.some, 'call', _27 => _27((e) => {
-      const shaders = e.getShaders();
+    return _optionalChain$2([extensions, 'optionalAccess', _55 => _55.some, 'call', _56 => _56((e) => {
+      const shaders = e.getShaders.call(this, e);
       if (shaders) {
         const { inject = {}, modules = [] } = shaders;
         const definesInjection = inject[hookName];
-        const moduleDefinesInjection = modules.some((m) => _optionalChain$2([m, 'optionalAccess', _28 => _28.inject, 'optionalAccess', _29 => _29[hookName]]));
+        const moduleDefinesInjection = modules.some((m) => _optionalChain$2([m, 'optionalAccess', _57 => _57.inject, 'optionalAccess', _58 => _58[hookName]]));
         return definesInjection || moduleDefinesInjection;
       }
       return false;
@@ -5532,25 +5955,49 @@ const XR3DLayer = class extends Layer {
    * This function compiles the shaders and the projection module.
    */
   getShaders() {
-    const { clippingPlanes, extensions } = this.props;
+    const { extensions } = this.props;
     const { sampler } = getRenderingAttrs();
     const { _BEFORE_RENDER, _RENDER, _AFTER_RENDER } = getRenderingFromExtensions(extensions);
     const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions("fs:DECKGL_PROCESS_INTENSITY");
-    const newChannelsModule = { inject: {}, ...channelsModule };
+    const numChannels = this.getNumChannels();
+    const numPlanes = this.getNumPlanes();
+    const expandedChannelIntensity = expandShaderModule(
+      channelIntensity3D,
+      numChannels,
+      numPlanes
+    );
+    const expandedFragmentUniforms = expandShaderModule(
+      fragmentUniforms3D,
+      numChannels,
+      numPlanes
+    );
+    const expandedVertexUniforms = expandShaderModule(
+      vertexUniforms3D,
+      numChannels,
+      numPlanes
+    );
+    const newChannelsModule = { inject: {}, ...expandedChannelIntensity };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject["fs:DECKGL_PROCESS_INTENSITY"] = `
         intensity = apply_contrast_limits(intensity, contrastLimits);
       `;
     }
-    return super.getShaders({
-      vs,
-      fs: fs.replace("_BEFORE_RENDER", _BEFORE_RENDER).replace("_RENDER", _RENDER).replace("_AFTER_RENDER", _AFTER_RENDER),
-      defines: {
-        SAMPLER_TYPE: sampler,
-        NUM_PLANES: String(clippingPlanes.length || NUM_PLANES_DEFAULT)
-      },
-      modules: [newChannelsModule]
-    });
+    return expandShaderModule(
+      super.getShaders({
+        vs,
+        fs: fs$2.replace("_BEFORE_RENDER", _BEFORE_RENDER).replace("_RENDER", _RENDER).replace("_AFTER_RENDER", _AFTER_RENDER),
+        defines: {
+          SAMPLER_TYPE: sampler
+        },
+        modules: [
+          newChannelsModule,
+          expandedFragmentUniforms,
+          expandedVertexUniforms
+        ]
+      }),
+      numChannels,
+      numPlanes
+    );
   }
   /**
    * This function finalizes state by clearing all textures from the WebGL context
@@ -5558,7 +6005,7 @@ const XR3DLayer = class extends Layer {
   finalizeState() {
     super.finalizeState();
     if (this.state.textures) {
-      Object.values(this.state.textures).forEach((tex) => _optionalChain$2([tex, 'optionalAccess', _30 => _30.delete, 'call', _31 => _31()]));
+      Object.values(this.state.textures).forEach((tex) => _optionalChain$2([tex, 'optionalAccess', _59 => _59.delete, 'call', _60 => _60()]));
     }
   }
   /**
@@ -5566,15 +6013,27 @@ const XR3DLayer = class extends Layer {
    * and loading any textures that need be loading.
    */
   updateState({ props, oldProps, changeFlags }) {
-    if (changeFlags.extensionsChanged || props.colormap !== oldProps.colormap || props.renderingMode !== oldProps.renderingMode || props.clippingPlanes.length !== oldProps.clippingPlanes.length) {
+    const numChannels = this.getNumChannels();
+    if (numChannels === 0) {
+      if (this.state.model) {
+        this.state.model.destroy();
+        this.setState({ model: null });
+      }
+      return;
+    }
+    const channelCountChanged = (_nullishCoalesce$1(_optionalChain$2([props, 'access', _61 => _61.selections, 'optionalAccess', _62 => _62.length]), () => ( 0))) !== (_nullishCoalesce$1(_optionalChain$2([oldProps, 'optionalAccess', _63 => _63.selections, 'optionalAccess', _64 => _64.length]), () => ( 0)));
+    if (changeFlags.extensionsChanged || props.colormap !== oldProps.colormap || props.renderingMode !== oldProps.renderingMode || props.clippingPlanes.length !== oldProps.clippingPlanes.length || channelCountChanged) {
       const { device } = this.context;
       if (this.state.model) {
         this.state.model.destroy();
       }
       this.setState({ model: this._getModel(device) });
     }
-    if (props.channelData && _optionalChain$2([props, 'optionalAccess', _32 => _32.channelData, 'optionalAccess', _33 => _33.data]) !== _optionalChain$2([oldProps, 'optionalAccess', _34 => _34.channelData, 'optionalAccess', _35 => _35.data])) {
+    if (props.channelData && _optionalChain$2([props, 'optionalAccess', _65 => _65.channelData, 'optionalAccess', _66 => _66.data]) !== _optionalChain$2([oldProps, 'optionalAccess', _67 => _67.channelData, 'optionalAccess', _68 => _68.data])) {
       this.loadTexture(props.channelData);
+    }
+    if (this.state.textures && this.state.scaleMatrix) {
+      this._updateUniforms(props);
     }
   }
   /**
@@ -5591,92 +6050,170 @@ const XR3DLayer = class extends Layer {
         attributes: {
           positions: new Float32Array(CUBE_STRIP)
         }
-      })
+      }),
+      shaderAssembler: VivShaderAssembler.getDefaultVivShaderAssembler()
+    });
+  }
+  /**
+   * This function builds and caches UBO uniform data that is independent of view state.
+   */
+  _updateUniforms(props) {
+    const { textures, scaleMatrix } = this.state;
+    if (!textures || !scaleMatrix)
+      return;
+    const numChannels = this.getNumChannels();
+    const {
+      contrastLimits,
+      colors,
+      xSlice,
+      ySlice,
+      zSlice,
+      channelsVisible,
+      domain,
+      dtype,
+      clippingPlanes,
+      resolutionMatrix,
+      selections
+    } = props;
+    const paddedContrastLimits = padContrastLimits({
+      contrastLimits,
+      channelsVisible,
+      domain,
+      dtype
+    });
+    const invertedScaleMatrix = scaleMatrix.clone().invert();
+    const invertedResolutionMatrix = resolutionMatrix.clone().invert();
+    const paddedClippingPlanes = padWithDefault(
+      clippingPlanes.map(
+        (p) => p.clone().transform(invertedScaleMatrix).transform(invertedResolutionMatrix)
+      ),
+      new Plane([1, 0, 0]),
+      clippingPlanes.length || NUM_PLANES_DEFAULT
+    );
+    const normals = paddedClippingPlanes.flatMap((plane) => plane.normal);
+    const distances = paddedClippingPlanes.map((plane) => plane.distance);
+    const numPlanes = clippingPlanes.length || NUM_PLANES_DEFAULT;
+    const numTextures = Object.values(textures).filter((t) => t).length;
+    const numChannelsForColors = Math.max(
+      numTextures,
+      _optionalChain$2([selections, 'optionalAccess', _69 => _69.length]) || 0,
+      1
+    );
+    const paddedColors = padColorsForUBO({
+      channelsVisible: channelsVisible || Array(numChannelsForColors).fill(true),
+      colors: colors || getDefaultPalette(numChannelsForColors)
+    });
+    const channelIntensity3DUniforms = {};
+    for (let i = 0; i < numChannels; i++) {
+      channelIntensity3DUniforms[`contrastLimits${i}`] = [
+        paddedContrastLimits[i * 2],
+        paddedContrastLimits[i * 2 + 1]
+      ];
+    }
+    const fragmentUniforms3DUniforms = {
+      xSlice: xSlice ? xSlice.map((i) => i / scaleMatrix[0] / resolutionMatrix[0]) : [0, 1],
+      ySlice: ySlice ? ySlice.map((i) => i / scaleMatrix[5] / resolutionMatrix[5]) : [0, 1],
+      zSlice: zSlice ? zSlice.map((i) => i / scaleMatrix[10] / resolutionMatrix[10]) : [0, 1],
+      scale: scaleMatrix
+    };
+    for (let i = 0; i < numChannels; i++) {
+      fragmentUniforms3DUniforms[`color${i}`] = paddedColors[i] || [0, 0, 0];
+    }
+    for (let i = 0; i < numPlanes; i++) {
+      fragmentUniforms3DUniforms[`normal${i}`] = [
+        normals[i * 3],
+        normals[i * 3 + 1],
+        normals[i * 3 + 2]
+      ];
+      fragmentUniforms3DUniforms[`distance${i}`] = distances[i];
+    }
+    this.setState({
+      channelIntensity3DUniforms,
+      fragmentUniforms3DUniforms
     });
   }
   /**
    * This function runs the shaders and draws to the canvas
    */
-  draw(opts) {
-    const { uniforms } = opts;
-    const { textures, model, scaleMatrix } = this.state;
+  draw() {
     const {
-      contrastLimits,
-      xSlice,
-      ySlice,
-      zSlice,
-      modelMatrix,
-      channelsVisible,
-      domain,
-      dtype,
-      clippingPlanes,
-      resolutionMatrix
-    } = this.props;
-    const { viewMatrix, viewMatrixInverse, projectionMatrix } = this.context.viewport;
-    if (textures && model && scaleMatrix) {
-      const paddedContrastLimits = padContrastLimits({
-        contrastLimits,
-        channelsVisible,
-        domain,
-        dtype
+      model,
+      scaleMatrix,
+      channelIntensity3DUniforms,
+      fragmentUniforms3DUniforms
+    } = this.state;
+    if (!channelIntensity3DUniforms || !fragmentUniforms3DUniforms) {
+      if (this.state.textures && scaleMatrix) {
+        this._updateUniforms(this.props);
+      }
+      return;
+    }
+    const texturesToBind = _nullishCoalesce$1(this._newTexturesFromLoadThisFrame, () => ( this.state.textures));
+    const numChannels = this.getNumChannels();
+    let bindings = null;
+    if (texturesToBind && model && scaleMatrix) {
+      const cacheKeyTextures = texturesToBind;
+      const cacheKeyChannels = numChannels;
+      if (this._cachedBindingsTextures !== cacheKeyTextures || this._cachedBindingsNumChannels !== cacheKeyChannels) {
+        this._cachedBindings = normalizeTextureBindings(
+          texturesToBind,
+          numChannels,
+          "volume"
+        );
+        this._cachedBindingsTextures = cacheKeyTextures;
+        this._cachedBindingsNumChannels = cacheKeyChannels;
+      }
+      bindings = this._cachedBindings;
+    }
+    if (bindings && model && scaleMatrix) {
+      const { modelMatrix, resolutionMatrix } = this.props;
+      const { viewMatrix, viewMatrixInverse, projectionMatrix } = this.context.viewport;
+      if (!this._vertexUniformsData) {
+        this._vertexUniformsData = {
+          eye_pos: [0, 0, 0],
+          proj: null,
+          model: null,
+          view: null,
+          scale: null,
+          resolution: null
+        };
+      }
+      const vertexUniformsData = this._vertexUniformsData;
+      const eyePos = vertexUniformsData.eye_pos;
+      eyePos[0] = viewMatrixInverse[12];
+      eyePos[1] = viewMatrixInverse[13];
+      eyePos[2] = viewMatrixInverse[14];
+      vertexUniformsData.proj = projectionMatrix;
+      if (!this._defaultModelMatrix) {
+        this._defaultModelMatrix = new Matrix4();
+      }
+      vertexUniformsData.model = modelMatrix || this._defaultModelMatrix;
+      vertexUniformsData.view = viewMatrix;
+      vertexUniformsData.scale = scaleMatrix;
+      vertexUniformsData.resolution = resolutionMatrix;
+      model.shaderInputs.setProps({
+        channelIntensity3D: channelIntensity3DUniforms,
+        fragmentUniforms3D: fragmentUniforms3DUniforms,
+        vertex: vertexUniformsData
       });
-      const invertedScaleMatrix = scaleMatrix.clone().invert();
-      const invertedResolutionMatrix = resolutionMatrix.clone().invert();
-      const paddedClippingPlanes = padWithDefault(
-        clippingPlanes.map(
-          (p) => p.clone().transform(invertedScaleMatrix).transform(invertedResolutionMatrix)
-        ),
-        new Plane([1, 0, 0]),
-        clippingPlanes.length || NUM_PLANES_DEFAULT
-      );
-      const normals = paddedClippingPlanes.flatMap((plane) => plane.normal);
-      const distances = paddedClippingPlanes.map((plane) => plane.distance);
-      model.setUniforms(
-        {
-          ...uniforms,
-          contrastLimits: paddedContrastLimits,
-          xSlice: new Float32Array(
-            xSlice ? xSlice.map((i) => i / scaleMatrix[0] / resolutionMatrix[0]) : [0, 1]
-          ),
-          ySlice: new Float32Array(
-            ySlice ? ySlice.map((i) => i / scaleMatrix[5] / resolutionMatrix[5]) : [0, 1]
-          ),
-          zSlice: new Float32Array(
-            zSlice ? zSlice.map((i) => i / scaleMatrix[10] / resolutionMatrix[10]) : [0, 1]
-          ),
-          eye_pos: new Float32Array([
-            viewMatrixInverse[12],
-            viewMatrixInverse[13],
-            viewMatrixInverse[14]
-          ]),
-          view: viewMatrix,
-          proj: projectionMatrix,
-          scale: scaleMatrix,
-          resolution: resolutionMatrix,
-          model: modelMatrix || new Matrix4(),
-          normals,
-          distances
-        },
-        { disableWanings: false }
-      );
-      model.setBindings(textures);
+      model.setBindings(bindings);
       model.draw(this.context.renderPass);
+      if (this._newTexturesFromLoadThisFrame) {
+        this._newTexturesFromLoadThisFrame = null;
+      }
     }
   }
   /**
    * This function loads all textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadTexture(channelData) {
-    const textures = {
-      volume0: null,
-      volume1: null,
-      volume2: null,
-      volume3: null,
-      volume4: null,
-      volume5: null
-    };
+    const numChannels = this.getNumChannels();
+    const textures = {};
+    for (let i = 0; i < numChannels; i++) {
+      textures[`volume${i}`] = null;
+    }
     if (this.state.textures) {
-      Object.values(this.state.textures).forEach((tex) => _optionalChain$2([tex, 'optionalAccess', _36 => _36.delete, 'call', _37 => _37()]));
+      Object.values(this.state.textures).forEach((tex) => _optionalChain$2([tex, 'optionalAccess', _70 => _70.delete, 'call', _71 => _71()]));
     }
     if (channelData && Object.keys(channelData).length > 0 && channelData.data) {
       const { height, width, depth } = channelData;
@@ -5689,16 +6226,24 @@ const XR3DLayer = class extends Layer {
         if (!textures[key])
           textures[key] = textures.volume0;
       }
-      this.setState({
-        textures,
-        scaleMatrix: new Matrix4().scale(
-          this.props.physicalSizeScalingMatrix.transformPoint([
-            width,
-            height,
-            depth
-          ])
-        )
-      });
+      this._newTexturesFromLoadThisFrame = textures;
+      this.setState(
+        {
+          textures,
+          scaleMatrix: new Matrix4().scale(
+            this.props.physicalSizeScalingMatrix.transformPoint([
+              width,
+              height,
+              depth
+            ])
+          )
+        },
+        () => {
+          this._updateUniforms(this.props);
+        }
+      );
+    } else {
+      this._newTexturesFromLoadThisFrame = null;
     }
   }
   /**
@@ -5711,9 +6256,9 @@ const XR3DLayer = class extends Layer {
       height,
       depth,
       dimension: "3d",
-      data: _nullishCoalesce$1(_optionalChain$2([attrs, 'access', _38 => _38.cast, 'optionalCall', _39 => _39(data)]), () => ( data)),
+      data: _nullishCoalesce$1(_optionalChain$2([attrs, 'access', _72 => _72.cast, 'optionalCall', _73 => _73(data)]), () => ( data)),
       format: attrs.format,
-      mipmaps: false,
+      mipLevels: 1,
       sampler: {
         minFilter: "linear",
         magFilter: "linear",
@@ -5884,9 +6429,9 @@ const VolumeLayer = class extends CompositeLayer {
         }
         const volume = {
           data: volumes.map((d) => d.data),
-          width: _optionalChain$2([volumes, 'access', _40 => _40[0], 'optionalAccess', _41 => _41.width]),
-          height: _optionalChain$2([volumes, 'access', _42 => _42[0], 'optionalAccess', _43 => _43.height]),
-          depth: _optionalChain$2([volumes, 'access', _44 => _44[0], 'optionalAccess', _45 => _45.depth])
+          width: _optionalChain$2([volumes, 'access', _74 => _74[0], 'optionalAccess', _75 => _75.width]),
+          height: _optionalChain$2([volumes, 'access', _76 => _76[0], 'optionalAccess', _77 => _77.height]),
+          depth: _optionalChain$2([volumes, 'access', _78 => _78[0], 'optionalAccess', _79 => _79.depth])
         };
         this.setState({
           ...volume,
@@ -6160,13 +6705,12 @@ class OverviewView extends VivView {
       clear: true
     });
   }
-  filterViewState({ viewState }) {
-    const { _imageWidth, _imageHeight, scale } = this;
+  filterViewState({ viewState: _viewState }) {
+    const { _imageWidth, _imageHeight, scale, id, height, width } = this;
     return {
-      ...viewState,
-      height: this.height,
-      width: this.width,
-      id: this.id,
+      id,
+      height,
+      width,
       target: [_imageWidth * scale / 2, _imageHeight * scale / 2, 0],
       zoom: -(this.loader.length - 1)
     };
@@ -6209,6 +6753,18 @@ class DetailView extends VivView {
   }
 }
 
+function getViewZoom({ zoom, zoomX, zoomY } = {}) {
+  if (zoomX != null) {
+    return zoomX;
+  }
+  if (zoomY != null) {
+    return zoomY;
+  }
+  if (Array.isArray(zoom)) {
+    return zoom[0];
+  }
+  return zoom;
+}
 class SideBySideView extends VivView {
   constructor({
     id,
@@ -6231,52 +6787,37 @@ class SideBySideView extends VivView {
   }
   filterViewState({ viewState, oldViewState, currentViewState }) {
     const { id: viewStateId } = viewState;
-    const { id, linkedIds, panLock, zoomLock } = this;
+    const { id, height, width, linkedIds, panLock, zoomLock } = this;
     if (oldViewState && linkedIds.indexOf(viewStateId) !== -1 && (zoomLock || panLock)) {
-      const thisViewState = {
-        height: currentViewState.height,
-        width: currentViewState.width,
-        target: [],
-        zoom: null
-      };
-      const [currentX, currentY] = currentViewState.target;
+      const [currentX, currentY, currentZ = 0] = currentViewState.target;
+      let zoom = getViewZoom(currentViewState);
+      let target = [currentX, currentY, currentZ];
       if (zoomLock) {
-        const dZoom = viewState.zoom - oldViewState.zoom;
-        thisViewState.zoom = currentViewState.zoom + dZoom;
-      } else {
-        thisViewState.zoom = currentViewState.zoom;
+        const dZoom = getViewZoom(viewState) - getViewZoom(oldViewState);
+        zoom = zoom + dZoom;
       }
       if (panLock) {
         const [oldX, oldY] = oldViewState.target;
         const [newX, newY] = viewState.target;
-        const dx = newX - oldX;
-        const dy = newY - oldY;
-        thisViewState.target.push(currentX + dx);
-        thisViewState.target.push(currentY + dy);
-      } else {
-        thisViewState.target.push(currentX);
-        thisViewState.target.push(currentY);
+        target = [currentX + (newX - oldX), currentY + (newY - oldY), currentZ];
       }
+      return { id, target, zoom, height, width };
+    }
+    if (viewState.id === id) {
       return {
         id,
-        target: thisViewState.target,
-        zoom: thisViewState.zoom,
-        height: thisViewState.height,
-        width: thisViewState.width
+        target: viewState.target,
+        zoom: getViewZoom(viewState),
+        height,
+        width
       };
     }
-    return viewState.id === id ? {
-      id,
-      target: viewState.target,
-      zoom: viewState.zoom,
-      height: viewState.height,
-      width: viewState.width
-    } : {
+    return {
       id,
       target: currentViewState.target,
-      zoom: currentViewState.zoom,
-      height: currentViewState.height,
-      width: currentViewState.width
+      zoom: getViewZoom(currentViewState),
+      height,
+      width
     };
   }
   getLayers({ props, viewStates }) {
@@ -6292,7 +6833,7 @@ class SideBySideView extends VivView {
       filled: false,
       stroked: true,
       getLineColor: viewportOutlineColor,
-      getLineWidth: viewportOutlineWidth * 2 ** -layerViewState.zoom
+      getLineWidth: viewportOutlineWidth * 2 ** -getViewZoom(layerViewState)
     });
     layers.push(border);
     return layers;
@@ -6338,7 +6879,6 @@ class ScaleBarView extends VivView {
   filterViewState({ viewState }) {
     const { id, height, width } = this;
     return {
-      ...viewState,
       id,
       height,
       width,
@@ -6353,6 +6893,9 @@ class ScaleBarView extends VivView {
       const { id, height, width, position, length, snap, imageViewId } = this;
       const { size, unit } = loader[0].meta.physicalSizes.x;
       const imageViewState = viewStates[imageViewId];
+      if (!imageViewState) {
+        return layers;
+      }
       const layerId = getVivId(id);
       layers.push(
         new ScaleBarLayer({
@@ -6360,7 +6903,7 @@ class ScaleBarView extends VivView {
           unit,
           size,
           position,
-          imageViewState: { ...imageViewState, height, width },
+          imageViewState: { ...imageViewState },
           length,
           snap,
           height,
@@ -6457,11 +7000,12 @@ class VivViewerWrapper extends React.PureComponent {
     })]) || viewState;
     this.setState((prevState) => {
       const viewStates = {};
+      const leaderPreviousViewState = _nullishCoalesce(prevState.viewStates[viewId], () => ( oldViewState));
       views.forEach((view) => {
         const currentViewState = prevState.viewStates[view.id];
         viewStates[view.id] = view.filterViewState({
           viewState: { ...viewState, id: viewId },
-          oldViewState,
+          oldViewState: leaderPreviousViewState,
           currentViewState
         });
       });
@@ -6612,17 +7156,9 @@ class VivViewerWrapper extends React.PureComponent {
     );
   }
   render() {
-    const { views, randomize, useDevicePixels = true, deckProps } = this.props;
+    const { views, useDevicePixels = true, deckProps } = this.props;
     const { viewStates } = this.state;
     const deckGLViews = views.map((view) => view.getDeckGlView());
-    if (randomize) {
-      const random = Math.random();
-      const holdFirstElement = deckGLViews[0];
-      const randomWieghted = random * 1.49;
-      const randomizedIndex = Math.round(randomWieghted * (views.length - 1));
-      deckGLViews[0] = deckGLViews[randomizedIndex];
-      deckGLViews[randomizedIndex] = holdFirstElement;
-    }
     return /* @__PURE__ */ React.createElement(
       DeckGL,
       {
@@ -6700,9 +7236,13 @@ const PictureInPictureViewer = (props) => {
   const views = [detailView];
   const layerProps = [layerConfig];
   const viewStates = [{ ...baseViewState, id: DETAIL_VIEW_ID }];
-  const scalebarViewState = _optionalChain([viewStatesProp, 'optionalAccess', _20 => _20.find, 'call', _21 => _21(
+  const scalebarViewState = _nullishCoalesce(_optionalChain([viewStatesProp, 'optionalAccess', _20 => _20.find, 'call', _21 => _21(
     (v) => v.id === SCALEBAR_VIEW_ID
-  )]) || { ...baseViewState, id: SCALEBAR_VIEW_ID };
+  )]), () => ( {
+    id: SCALEBAR_VIEW_ID,
+    zoom: 0,
+    target: [width / 2, height / 2, 0]
+  }));
   const scaleBarView = new ScaleBarView({
     id: SCALEBAR_VIEW_ID,
     width,
@@ -6715,9 +7255,9 @@ const PictureInPictureViewer = (props) => {
   layerProps.push(layerConfig);
   viewStates.push(scalebarViewState);
   if (overviewOn && loader) {
-    const overviewViewState = _optionalChain([viewStatesProp, 'optionalAccess', _22 => _22.find, 'call', _23 => _23(
+    const overviewViewState = _nullishCoalesce(_optionalChain([viewStatesProp, 'optionalAccess', _22 => _22.find, 'call', _23 => _23(
       (v) => v.id === OVERVIEW_VIEW_ID
-    )]) || { ...baseViewState, id: OVERVIEW_VIEW_ID };
+    )]), () => ( { id: OVERVIEW_VIEW_ID }));
     const overviewView = new OverviewView({
       id: OVERVIEW_VIEW_ID,
       loader,
@@ -6787,11 +7327,12 @@ const SideBySideViewer = (props) => {
       { height, width: width / 2 },
       0.5
     );
+    const target = [width / 4, height / 2, 0];
     return [
       leftViewState || { ...defaultViewState, id: "left" },
       rightViewState || { ...defaultViewState, id: "right" },
-      leftScalebarViewState || { ...defaultViewState, id: leftId },
-      rightScalebarViewState || { ...defaultViewState, id: rightId }
+      _nullishCoalesce(leftScalebarViewState, () => ( { zoom: 0, target, id: leftId })),
+      _nullishCoalesce(rightScalebarViewState, () => ( { zoom: 0, target, id: rightId }))
     ];
   }, [loader, leftViewState, rightViewState]);
   const detailViewLeft = new SideBySideView({
@@ -6857,7 +7398,6 @@ const SideBySideViewer = (props) => {
     {
       layerProps,
       views,
-      randomize: true,
       onViewStateChange,
       onHover,
       viewStates: finalViewStates,
@@ -6943,4 +7483,4 @@ const VolumeViewer = (props) => {
   ) : null;
 };
 
-export { AdditiveColormap3DExtensions, AdditiveColormapExtension, BitmapLayer, COLORMAPS, ColorPalette3DExtensions, ColorPaletteExtension, DEPRECATED_loadBioformatsZarr, DETAIL_VIEW_ID, DTYPE_VALUES, DetailView, ImageLayer, LensExtension, MAX_CHANNELS, MultiscaleImageLayer, OVERVIEW_VIEW_ID, OverviewLayer, OverviewView, PictureInPictureViewer, Pool, RENDERING_MODES, SIGNAL_ABORTED, ScaleBarLayer, SideBySideView, SideBySideViewer, TiffPixelSource, VivView, VivViewer, VolumeLayer, VolumeView, VolumeViewer, XR3DLayer, XRLayer, ZarrPixelSource, getChannelStats, getDefaultInitialViewState, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore };
+export { AdditiveColormap3DExtensions, AdditiveColormapExtension, BitmapLayer, COLORMAPS, ColorPalette3DExtensions, ColorPaletteExtension, DEPRECATED_loadBioformatsZarr, DETAIL_VIEW_ID, DTYPE_VALUES, DetailView, ImageLayer, LensExtension, MAX_CHANNELS, MultiscaleImageLayer, OVERVIEW_VIEW_ID, OverviewLayer, OverviewView, PictureInPictureViewer, Pool, RENDERING_MODES, SIGNAL_ABORTED, ScaleBarLayer, SideBySideView, SideBySideViewer, TiffPixelSource, VivLayerExtension, VivShaderAssembler, VivView, VivViewer, VolumeLayer, VolumeView, VolumeViewer, XR3DLayer, XRLayer, ZarrPixelSource, expandShaderModule, getChannelStats, getDefaultInitialViewState, getDefaultPalette, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore, padColors, padColorsForUBO };

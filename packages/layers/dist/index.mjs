@@ -1,10 +1,10 @@
 import { OrthographicView, COORDINATE_SYSTEM, CompositeLayer, Layer, project32, picking } from '@deck.gl/core';
-import { GL } from '@luma.gl/constants';
 import { Matrix4 } from '@math.gl/core';
 import { expandShaderModule, VivShaderAssembler, ColorPaletteExtension, ColorPalette3DExtensions, padColorsForUBO, getDefaultPalette } from '@vivjs/extensions';
 import { isInterleaved, SIGNAL_ABORTED, getImageSize } from '@vivjs/loaders';
 import { MAX_CHANNELS, DTYPE_VALUES, VIV_CHANNEL_INDEX_PLACEHOLDER, DEFAULT_FONT_FAMILY, VIV_PLANE_INDEX_PLACEHOLDER } from '@vivjs/constants';
 import { BitmapLayer as BitmapLayer$1, PolygonLayer, LineLayer, TextLayer } from '@deck.gl/layers';
+import { GL } from '@luma.gl/constants';
 import { Model, Geometry } from '@luma.gl/engine';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { Plane } from '@math.gl/culling';
@@ -279,13 +279,52 @@ const BitmapLayer = class extends CompositeLayer {
     });
     super.initializeState(args);
   }
+  updateState({ props, oldProps, ...rest }) {
+    super.updateState({ props, oldProps, ...rest });
+    const img = getPreparedImage(props.image);
+    if (!img) {
+      if (this.state.bitmapTexture) {
+        this.state.bitmapTexture.delete();
+        this.setState({ bitmapTexture: null });
+      }
+      return;
+    }
+    if (props.image === oldProps?.image && this.state.bitmapTexture) {
+      return;
+    }
+    if (this.state.bitmapTexture) {
+      this.state.bitmapTexture.delete();
+    }
+    const texture = this.context.device.createTexture({
+      width: img.width,
+      height: img.height,
+      dimension: "2d",
+      data: img.data,
+      mipLevels: 1,
+      format: img.format || "rgba8unorm",
+      sampler: {
+        minFilter: "linear",
+        magFilter: "linear",
+        addressModeU: "clamp-to-edge",
+        addressModeV: "clamp-to-edge"
+      }
+    });
+    this.setState({ bitmapTexture: texture });
+  }
+  finalizeState() {
+    if (this.state.bitmapTexture) {
+      this.state.bitmapTexture.delete();
+      this.setState({ bitmapTexture: null });
+    }
+    super.finalizeState();
+  }
   renderLayers() {
     const {
       photometricInterpretation,
       transparentColor: transparentColorInHook
     } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
-    const image = getPreparedImage(this.props.image);
+    const image = this.state.bitmapTexture;
     if (!image)
       return null;
     return new BitmapLayerWrapper(
@@ -660,8 +699,8 @@ class XRLayer extends Layer {
       height,
       dimension: "2d",
       data: attrs.cast?.(data) ?? data,
-      // we don't want or need mimaps
-      mipmaps: false,
+      // luma.gl 9.3: `mipmaps` is ignored; texStorage2D needs a positive mipLevels.
+      mipLevels: 1,
       sampler: {
         // NEAREST for integer data
         minFilter: attrs.filter,
@@ -794,6 +833,30 @@ const ImageLayer = class extends CompositeLayer {
 ImageLayer.layerName = "ImageLayer";
 ImageLayer.defaultProps = defaultProps$6;
 
+function getPyramidZoomLevels(loader) {
+  if (!Array.isArray(loader) || loader.length === 0) {
+    return [0];
+  }
+  const { width: baseWidth } = getImageSize(loader[0]);
+  return loader.map((level) => {
+    const { width } = getImageSize(level);
+    return 0 - Math.round(Math.log2(baseWidth / width));
+  });
+}
+function snapToAvailableZoom(z, levelZooms) {
+  const target = Math.round(z);
+  for (const lz of levelZooms) {
+    if (lz <= target) {
+      return lz;
+    }
+  }
+  return levelZooms[levelZooms.length - 1];
+}
+function getLevelScale(loader, levelIndex) {
+  const { width: baseWidth } = getImageSize(loader[0]);
+  const { width } = getImageSize(loader[levelIndex]);
+  return baseWidth / width;
+}
 function renderSubLayers(props) {
   const {
     bbox: { left, top },
@@ -807,12 +870,27 @@ function renderSubLayers(props) {
     return null;
   }
   const base = loader[0];
-  const scale = 2 ** Math.round(-z);
+  let scale = 2 ** Math.round(-z);
+  let boundLeft = left;
+  let boundTop = top;
+  if (Array.isArray(loader) && loader.length > 1 && base.labels) {
+    const levelZooms = getPyramidZoomLevels(loader);
+    const zNat = snapToAvailableZoom(z, levelZooms);
+    scale = 2 ** Math.round(-zNat);
+    const factor = 2 ** (Math.round(z) - zNat);
+    if (factor !== 1) {
+      const xNat = Math.floor(x / factor);
+      const yNat = Math.floor(y / factor);
+      const { tileSize } = base;
+      boundLeft = xNat * tileSize * scale;
+      boundTop = yNat * tileSize * scale;
+    }
+  }
   const bounds = [
-    left,
-    top + data.height * scale,
-    left + data.width * scale,
-    top
+    boundLeft,
+    boundTop + data.height * scale,
+    boundLeft + data.width * scale,
+    boundTop
   ];
   if (isInterleaved(base.shape)) {
     const { photometricInterpretation = 2 } = base.meta;
@@ -905,13 +983,18 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       refinementStrategy
     } = this.props;
     const { tileSize, dtype } = loader[0];
+    const levelZooms = getPyramidZoomLevels(loader);
     const getTileData = async ({ index: { x, y, z }, signal }) => {
       if (!selections || selections.length === 0) {
         return null;
       }
-      const resolution = Math.round(-z);
+      const zNat = snapToAvailableZoom(z, levelZooms);
+      const resolution = levelZooms.indexOf(zNat);
+      const factor = 2 ** (Math.round(z) - zNat);
+      const xNat = Math.floor(x / factor);
+      const yNat = Math.floor(y / factor);
       const getTile = (selection) => {
-        const config = { x, y, selection, signal };
+        const config = { x: xNat, y: yNat, selection, signal };
         return loader[resolution].getTile(config);
       };
       try {
@@ -951,7 +1034,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       ),
       extent: [0, 0, width, height],
       // See the above note within for why the use of zoomOffset and the rounding necessary.
-      minZoom: Math.round(-(loader.length - 1)),
+      minZoom: levelZooms[levelZooms.length - 1],
       maxZoom: 0,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
       // multiple rendered sublayers (some of which have been cached) from overlapping
@@ -970,7 +1053,9 @@ const MultiscaleImageLayer = class extends CompositeLayer {
     const baseLayer = implementsGetRaster && !excludeBackground && new ImageLayer(this.props, {
       id: `Background-Image-${id}`,
       loader: lowestResolution,
-      modelMatrix: layerModelMatrix.scale(2 ** (loader.length - 1)),
+      modelMatrix: layerModelMatrix.scale(
+        getLevelScale(loader, loader.length - 1)
+      ),
       visible: !viewportId || this.context.viewport.id === viewportId,
       onHover,
       onClick,
@@ -1035,9 +1120,10 @@ const OverviewLayer = class extends CompositeLayer {
     const { width, height } = getImageSize(loader[0]);
     const z = loader.length - 1;
     const lowestResolution = loader[z];
+    const levelScale = getLevelScale(loader, z);
     const overview = new ImageLayer(this.props, {
       id: `viewport-${id}`,
-      modelMatrix: new Matrix4().scale(2 ** z * overviewScale),
+      modelMatrix: new Matrix4().scale(levelScale * overviewScale),
       loader: lowestResolution
     });
     const boundingBoxOutline = new PolygonLayer({
@@ -1880,7 +1966,7 @@ const XR3DLayer = class extends Layer {
       dimension: "3d",
       data: attrs.cast?.(data) ?? data,
       format: attrs.format,
-      mipmaps: false,
+      mipLevels: 1,
       sampler: {
         minFilter: "linear",
         magFilter: "linear",
