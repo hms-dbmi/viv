@@ -1,5 +1,33 @@
 # @vivjs/extensions
 
+## 0.22.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/constants@0.22.1
+
+## 0.22.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/constants@0.22.0
+
+## 0.21.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/constants@0.21.0
+
+## 0.20.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/constants@0.20.1
+
 ## 0.20.0
 
 ### Patch Changes

@@ -76,23 +76,38 @@ test('OverviewView respects maximumWidth and minimumWidth when width > height.',
   expect(view.width).toBe(5);
 });
 
-test('OverviewView maintains viewState.', () => {
+test('OverviewView maintains fixed viewState regardless of detail view changes.', () => {
   const view = new OverviewView(overviewViewArguments);
-  const viewState1 = view.filterViewState({
-    height: 10,
-    width: 10,
-    target: [0, 0, 0],
-    zoom: 0
-  });
-  const viewState2 = view.filterViewState({
-    height: 15,
-    width: 20,
-    target: [0, 0, 0],
-    zoom: 0
-  });
-  const { height, width } = view;
+  const viewState1 = view.filterViewState({ viewState: {} });
+  const viewState2 = view.filterViewState({ viewState: {} });
+  const { height, width, scale, _imageWidth, _imageHeight } = view;
+  const expectedTarget = [
+    (_imageWidth * scale) / 2,
+    (_imageHeight * scale) / 2,
+    0
+  ];
   expect(viewState1.zoom).toBe(-(loader.length - 1));
   expect(viewState1.height).toBe(height);
   expect(viewState1.width).toBe(width);
+  expect(viewState1.target).toEqual(expectedTarget);
   expect(viewState1.target).toEqual(viewState2.target);
+});
+
+test('filterViewState does not inherit zoomX/zoomY from the detail view', () => {
+  const view = new OverviewView(overviewViewArguments);
+  const out = view.filterViewState({
+    viewState: {
+      id: DETAIL_VIEW_ID,
+      zoom: -2,
+      zoomX: -2,
+      zoomY: -2,
+      target: [50000, 40000, 0],
+      width: 900,
+      height: 700
+    }
+  });
+  expect(out.id).toBe(OVERVIEW_VIEW_ID);
+  expect(out.zoom).toBe(-(loader.length - 1));
+  expect(out).not.toHaveProperty('zoomX');
+  expect(out).not.toHaveProperty('zoomY');
 });

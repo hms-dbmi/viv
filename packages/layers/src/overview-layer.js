@@ -1,4 +1,4 @@
-import { COORDINATE_SYSTEM, CompositeLayer } from '@deck.gl/core';
+import { CompositeLayer } from '@deck.gl/core';
 import { PolygonLayer } from '@deck.gl/layers';
 import { Matrix4 } from '@math.gl/core';
 import { ColorPaletteExtension } from '@vivjs/extensions';
@@ -85,7 +85,7 @@ const OverviewLayer = class extends CompositeLayer {
     });
     const boundingBoxOutline = new PolygonLayer({
       id: `bounding-box-overview-${id}`,
-      coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+      coordinateSystem: 'cartesian',
       data: [boundingBox],
       getPolygon: f => f,
       filled: false,
@@ -95,7 +95,7 @@ const OverviewLayer = class extends CompositeLayer {
     });
     const viewportOutline = new PolygonLayer({
       id: `viewport-outline-${id}`,
-      coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+      coordinateSystem: 'cartesian',
       data: [
         [
           [0, 0],

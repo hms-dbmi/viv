@@ -354,12 +354,19 @@ export async function createGeoTiff(
     headers?: Headers | Record<string, string>;
     offsets?: number[];
     scannerOptions?: ScannerOptions;
+    /** Pre-constructed GeoTIFF — skips internal HTTP client when provided. */
+    source?: GeoTIFF;
   } = {}
 ): Promise<GeoTIFF> {
-  const tiff = await createGeoTiffObject(source, options);
+  const tiff = options.source ?? (await createGeoTiffObject(source, options));
 
   if (options.offsets) {
     return createOffsetsProxy(tiff, options.offsets);
+  }
+
+  // Skip remote offset probing when a prebuilt GeoTIFF was supplied.
+  if (options.source) {
+    return tiff;
   }
 
   if (!(source instanceof Blob)) {

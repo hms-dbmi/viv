@@ -1,6 +1,6 @@
 {
   "name": "@vivjs/views",
-  "version": "0.20.0",
+  "version": "0.22.1",
   "author": "Ilan Gold",
   "repository": {
     "type": "git",
@@ -24,7 +24,11 @@
   },
   "peerDependencies": {
     "@deck.gl/core": "catalog:",
-    "@deck.gl/layers": "catalog:"
+    "@deck.gl/layers": "catalog:",
+    "@luma.gl/core": "catalog:",
+    "@luma.gl/engine": "catalog:",
+    "@luma.gl/shadertools": "catalog:",
+    "@luma.gl/webgl": "catalog:"
   },
   "dependencies": {
     "@math.gl/core": "catalog:",

@@ -5,19 +5,17 @@ export default `\
 // Unit-cube vertices
 in vec3 positions;
 
-// Eye position - last column of the inverted view matrix
-uniform vec3 eye_pos;
-// Projection matrix
-uniform mat4 proj;
-// Model Matrix
-uniform mat4 model;
-// View Matrix
-uniform mat4 view;
-// A matrix for scaling in the model space before any transformations.
-// This projects the unit cube up to match the "pixel size" multiplied by the physical size ratio, if provided.
-uniform mat4 scale;
-uniform mat4 resolution;
-
+uniform vertexUniforms {
+  // Eye position - last column of the inverted view matrix  
+  vec3 eye_pos;
+  mat4 proj;
+  mat4 model;
+  mat4 view;
+  // A matrix for scaling in the model space before any transformations.
+  // This projects the unit cube up to match the "pixel size" multiplied by the physical size ratio, if provided.
+  mat4 scale;
+  mat4 resolution;
+} vertex;
 
 out vec3 vray_dir;
 flat out vec3 transformed_eye;
@@ -25,7 +23,7 @@ flat out vec3 transformed_eye;
 void main() {
 
   // Step 1: Standard MVP transformation (+ the scale matrix) to place the positions on your 2D screen ready for rasterization + fragment processing.
-  gl_Position = proj * view * model * scale * resolution * vec4(positions, 1.);
+  gl_Position = vertex.proj * vertex.view * vertex.model * vertex.scale * vertex.resolution * vec4(positions, 1.);
 
   // Step 2: Invert the eye back from world space to the normalized 0-1 cube world space because ray casting on the fragment shader runs in 0-1 space.
   // Geometrically, the transformed_eye is a position relative to the 0-1 normalized vertices, which themselves are the inverse of the model + scale trasnformation.
@@ -65,7 +63,7 @@ void main() {
   /
  #
   */
-  transformed_eye = (inverse(resolution) * inverse(scale) * inverse(model) * (vec4(eye_pos, 1.))).xyz;
+  transformed_eye = (inverse(vertex.resolution) * inverse(vertex.scale) * inverse(vertex.model) * (vec4(vertex.eye_pos, 1.))).xyz;
 
   // Step 3: Rays are from eye to vertices so that they get interpolated over the fragments.
   vray_dir = positions - transformed_eye;

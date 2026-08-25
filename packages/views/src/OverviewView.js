@@ -170,14 +170,15 @@ export default class OverviewView extends VivView {
     });
   }
 
-  filterViewState({ viewState }) {
-    // Scale the view as the overviewScale changes with screen resizing - basically, do not react to any view state changes.
-    const { _imageWidth, _imageHeight, scale } = this;
+  filterViewState({ viewState: _viewState }) {
+    // Do not react to detail-view pan/zoom. Deck.gl v9+ OrthographicViewState may carry
+    // zoomX / zoomY (and other fields) from the active view; spreading them here kept the
+    // overview viewport zoomed instead of only updating the viewport outline.
+    const { _imageWidth, _imageHeight, scale, id, height, width } = this;
     return {
-      ...viewState,
-      height: this.height,
-      width: this.width,
-      id: this.id,
+      id,
+      height,
+      width,
       target: [(_imageWidth * scale) / 2, (_imageHeight * scale) / 2, 0],
       zoom: -(this.loader.length - 1)
     };

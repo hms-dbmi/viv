@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { range } from '../src/multiscale-image-layer/utils';
+import { range, renderSubLayers } from '../src/multiscale-image-layer/utils';
 import {
+  normalizeTextureBindings,
   padContrastLimits,
   padWithDefault,
   sizeToMeters,
@@ -27,13 +28,24 @@ describe('utils', () => {
 
   test('padContrastLimits test', () => {
     const expectedChannelOff = [
-      0, 5, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+      0, 5, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+      // added for MAX_CHANNELS = 10
+      255, 255, 255, 255, 255, 255, 255, 255
     ];
     const expected16Bit = [
       0,
       5,
       0,
       5,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      2 ** 16 - 1,
+      // added for MAX_CHANNELS = 10
       2 ** 16 - 1,
       2 ** 16 - 1,
       2 ** 16 - 1,
@@ -99,4 +111,149 @@ describe('utils', () => {
     expect(snapValue(2345.0)).toEqual([3000, 3, 'k']);
     expect(snapValue(999.0)).toEqual([1000, 1, 'k']);
   });
+});
+
+describe('renderSubLayers', () => {
+  const TILE_SIZE = 512;
+
+  // `props.tile` as deck.gl's TileLayer builds it: the bbox of tile (x, y) at level -z
+  // assuming every tile is a full tileSize.
+  function tileProps({ x, y, z, width, height, imageSize }) {
+    const scale = 2 ** -z;
+    return {
+      id: 'test',
+      maxZoom: 0,
+      loader: [
+        {
+          dtype: 'Uint16',
+          tileSize: TILE_SIZE,
+          shape: [1, imageSize.height, imageSize.width]
+        }
+      ],
+      data: { data: [new Uint16Array(width * height)], width, height },
+      tile: {
+        index: { x, y, z },
+        bbox: {
+          left: x * TILE_SIZE * scale,
+          top: y * TILE_SIZE * scale,
+          right: (x + 1) * TILE_SIZE * scale,
+          bottom: (y + 1) * TILE_SIZE * scale
+        }
+      }
+    };
+  }
+
+  test('a full tile keeps the bounds deck.gl computed', () => {
+    const props = tileProps({
+      x: 1,
+      y: 1,
+      z: -2,
+      width: TILE_SIZE,
+      height: TILE_SIZE,
+      imageSize: { width: 4096, height: 4096 }
+    });
+    const { left, top, right, bottom } = props.tile.bbox;
+    expect(renderSubLayers(props).props.bounds).toEqual([
+      left,
+      bottom,
+      right,
+      top
+    ]);
+  });
+
+  test('a partial tile of an exactly-halved pyramid reaches the image edge', () => {
+    // 4096 x 4096 image, level 2 is 1024 x 1024: tile (1, 1) holds the last 512 x 512
+    // pixels of the level, which cover the image out to its bottom-right corner.
+    const props = tileProps({
+      x: 1,
+      y: 1,
+      z: -2,
+      width: 512,
+      height: 512,
+      imageSize: { width: 4096, height: 4096 }
+    });
+    expect(renderSubLayers(props).props.bounds).toEqual([
+      2048, 4096, 4096, 2048
+    ]);
+  });
+
+  test('a partial tile covers only the pixels its level has', () => {
+    // 4095 x 4095 image floor-halved to 1023 x 1023 at level 2, which covers 4092 px of
+    // the base: tile (1, 1) holds 511 x 511 pixels and must stop at 4092, not 4095 -
+    // stretching it to the image extent is what makes the image shift between levels.
+    const props = tileProps({
+      x: 1,
+      y: 1,
+      z: -2,
+      width: 511,
+      height: 511,
+      imageSize: { width: 4095, height: 4095 }
+    });
+    expect(renderSubLayers(props).props.bounds).toEqual([
+      2048, 4092, 4092, 2048
+    ]);
+  });
+});
+
+describe('normalizeTextureBindings', () => {
+  const tex0 = { id: 'tex0' };
+  const tex1 = { id: 'tex1' };
+  const tex2 = { id: 'tex2' };
+
+  test('returns null for empty textures with no keys', () => {
+    expect(normalizeTextureBindings({}, 3)).toBeNull();
+  });
+
+  test('returns textures unchanged when key count matches required', () => {
+    const textures = { channel0: tex0, channel1: tex1 };
+    const result = normalizeTextureBindings(textures, 2);
+    expect(result).toBe(textures);
+  });
+
+  test('pads with first texture when fewer textures than required', () => {
+    const textures = { channel0: tex0 };
+    const result = normalizeTextureBindings(textures, 3);
+    expect(Object.keys(result)).toHaveLength(3);
+    expect(result.channel0).toBe(tex0);
+    expect(result.channel1).toBe(tex0);
+    expect(result.channel2).toBe(tex0);
+  });
+
+  test('trims to subset when more textures than required', () => {
+    const textures = { channel0: tex0, channel1: tex1, channel2: tex2 };
+    const result = normalizeTextureBindings(textures, 2);
+    expect(Object.keys(result)).toHaveLength(2);
+    expect(result.channel0).toBe(tex0);
+    expect(result.channel1).toBe(tex1);
+    expect(result.channel2).toBeUndefined();
+  });
+
+  test('works with custom keyPrefix', () => {
+    const textures = { volume0: tex0 };
+    const result = normalizeTextureBindings(textures, 3, 'volume');
+    expect(result.volume0).toBe(tex0);
+    expect(result.volume1).toBe(tex0);
+    expect(result.volume2).toBe(tex0);
+  });
+
+  test('does not pad missing keys that already exist', () => {
+    const textures = { channel0: tex0, channel1: tex1 };
+    const result = normalizeTextureBindings(textures, 4);
+    expect(result.channel0).toBe(tex0);
+    expect(result.channel1).toBe(tex1);
+    expect(result.channel2).toBe(tex0);
+    expect(result.channel3).toBe(tex0);
+  });
+
+  test('returns null when zero channels required', () => {
+    expect(normalizeTextureBindings({ channel0: tex0 }, 0)).toBeNull();
+  });
+
+  test('returns null when zero channels required and textures empty', () => {
+    expect(normalizeTextureBindings({}, 0)).toBeNull();
+  });
+
+  // Future: once deck.gl layer lifecycle tests work, add integration tests
+  // verifying that XRLayer/XR3DLayer skip model creation when numChannels === 0
+  // (i.e. when selections is []).
 });

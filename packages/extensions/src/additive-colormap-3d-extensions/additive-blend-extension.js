@@ -1,14 +1,17 @@
+import { VIV_CHANNEL_INDEX_PLACEHOLDER as I } from '@vivjs/constants';
 import BaseExtension from './base-extension';
 
-const _BEFORE_RENDER = '';
+const _BEFORE_RENDER = `\
+// additive-colormap-3d before render
+  float intensityValue${I} = 0.0;
+`;
 
 const _RENDER = `\
-  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
+// additive-colormap-3d render
   float total = 0.0;
 
-  for(int i = 0; i < 6; i++) {
-    total += intensityArray[i];
-  }
+  // this will create an unrolled accumulation over all channels
+  total += intensityValue${I};
   // Do not go past 1 in opacity/colormap value.
   total = min(total, 1.0);
 

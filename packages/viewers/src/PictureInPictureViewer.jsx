@@ -114,7 +114,11 @@ const PictureInPictureViewer = props => {
   // Add scale bar view
   const scalebarViewState = viewStatesProp?.find(
     v => v.id === SCALEBAR_VIEW_ID
-  ) || { ...baseViewState, id: SCALEBAR_VIEW_ID };
+  ) ?? {
+    id: SCALEBAR_VIEW_ID,
+    zoom: 0,
+    target: [width / 2, height / 2, 0]
+  };
   const scaleBarView = new ScaleBarView({
     id: SCALEBAR_VIEW_ID,
     width,
@@ -127,10 +131,10 @@ const PictureInPictureViewer = props => {
   layerProps.push(layerConfig);
   viewStates.push(scalebarViewState);
   if (overviewOn && loader) {
-    // It's unclear why this is needed because OverviewView.filterViewState sets "zoom" and "target".
+    // OverviewView.filterViewState owns the overview camera (fixed zoom/target); only id is required here.
     const overviewViewState = viewStatesProp?.find(
       v => v.id === OVERVIEW_VIEW_ID
-    ) || { ...baseViewState, id: OVERVIEW_VIEW_ID };
+    ) ?? { id: OVERVIEW_VIEW_ID };
     const overviewView = new OverviewView({
       id: OVERVIEW_VIEW_ID,
       loader,

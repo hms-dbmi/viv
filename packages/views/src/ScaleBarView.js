@@ -58,11 +58,11 @@ export default class ScaleBarView extends VivView {
   }
 
   filterViewState({ viewState }) {
-    // Do not react to any view state changes - always return fixed viewState
-    // This keeps the scale bar pinned to its screen location
+    // Do not react to image view pan/zoom. Deck.gl v9+ OrthographicViewState may carry
+    // zoomX / zoomY (and other fields) from the active view; spreading them here kept the
+    // scale bar viewport zoomed, so Cartesian scale bar geometry drifted on screen.
     const { id, height, width } = this;
     return {
-      ...viewState,
       id,
       height,
       width,
@@ -80,14 +80,19 @@ export default class ScaleBarView extends VivView {
 
       // Get the image view's viewState to calculate correct scale
       const imageViewState = viewStates[imageViewId];
+      if (!imageViewState) {
+        return layers;
+      }
       const layerId = getVivId(id);
+      // imageViewState must keep the *image* view width/height for makeBoundingBox inside
+      // ScaleBarLayer; this view's width/height are only for Cartesian layout in the scale bar panel.
       layers.push(
         new ScaleBarLayer({
           id: layerId,
           unit,
           size,
           position,
-          imageViewState: { ...imageViewState, height, width },
+          imageViewState: { ...imageViewState },
           length,
           snap,
           height,

@@ -1,5 +1,48 @@
 # @hms-dbmi/viv
 
+## 0.22.1
+
+### Patch Changes
+
+- Place partial (edge) tiles in MultiscaleImageLayer at their true footprint instead of snapping them to the full image extent. The old bounds assumed every pyramid level was an exact halving of its parent; on a floor-halved pyramid (level k spanning size_k \* 2\*\*k, up to 2\*\*k - 1 px short of the base) they over-scaled the right-column and bottom-row tiles by a level-dependent amount, so the image shifted slightly in x/y as tiles of different levels were drawn. Full tiles are unaffected, as are exactly-halving pyramids. (`@vivjs/layers`) ([#976](https://github.com/hms-dbmi/viv/pull/976))
+
+
+## 0.22.0
+
+### Minor Changes
+
+- Update to latest versions of deck.gl and luma.gl, with fixes for regressions in side-by-side and picture-in-picture related to deck.gl viewState handling changes. (`@vivjs/viewers`, `@vivjs/layers`, `@vivjs/views`, `@vivjs/constants`, `@vivjs/extensions`, `@vivjs/loaders`, `@hms-dbmi/viv`, `@vivjs/types`) ([#963](https://github.com/hms-dbmi/viv/pull/963))
+
+  Removed randomize prop from VivViewer which was no longer necessary and caused glitches in view composition particularly noticeable in avivator with scalebar views in side-by-side mode, but which could also have caused problems for downstream apps.
+
+### Patch Changes
+
+## 0.21.0
+
+### Minor Changes
+
+- Updates DeckGL from `~9.1.11` to `~9.2.9` (and LumaGL from `~9.1.9` to `~9.2.6`). (`@vivjs/extensions`, `@vivjs/constants`, `@vivjs/loaders`, `@vivjs/viewers`, `@vivjs/layers`, `@vivjs/views`, `@hms-dbmi/viv`, `@vivjs/types`) ([#924](https://github.com/hms-dbmi/viv/pull/924))
+  For basic usage of Viv, this will be the most prominent change.
+
+  For "power users" who have implemented custom Viv layers or layer extensions:
+
+  - Custom layers and extensions may also need to migrate to [Uniform Buffer Objects](https://deck.gl/docs/upgrade-guide#uniform-buffers) due to the DeckGL upgrade.
+  - The internal shader assembly pipeline has been redesigned to allow a dynamic number of channels (and 'planes' for volumetric rendering) at runtime.
+    - For custom layers, `VivLayer` subclasses must implement `getNumChannels(): number` and `getNumPlanes(): number`, to enable compatibility with `VivLayerExtension`s that assume a dynamic number of channels.
+    - For custom layer extensions, `VivLayerExtension` subclasses must implement the `getVivShaderTemplates(): { modules }` method (rather than a `getShaders` method). The function signature of `DECKGL_MUTATE_COLOR` has also changed.
+
+  Optionally, `VivLayer`s can use the new `VivShaderAssembler` and `expandShaderModule` in order to assemble fragment/vertex shaders that assume a dynamic number of channels.
+
+  See [sites/docs/src/CUSTOM_SHADERS.md](./sites/docs/src/CUSTOM_SHADERS.md) for more details.
+
+### Patch Changes
+
+## 0.20.1
+
+### Patch Changes
+
+- Support an options.source parameter for loadSingleFileOmeTiff, as an optional way to bypass the internal createGeoTiff function when users already have their own GeoTIFF instance to provide. (`@vivjs/loaders`) ([#957](https://github.com/hms-dbmi/viv/pull/957))
+
 ## 0.20.0
 
 ### Minor Changes
@@ -7,7 +50,6 @@
 - Export `loadOmeZarrFromStore` to allow loading OME-Zarr data from a custom store, enabling use cases like AWS SigV4 signed requests for private S3 buckets. (`@vivjs/loaders`) ([#944](https://github.com/hms-dbmi/viv/pull/944))
 
 - scale bar functionality is now split between a new view and a layer (`@vivjs/viewers`, `@vivjs/layers`, `@vivjs/views`) ([#948](https://github.com/hms-dbmi/viv/pull/948))
-
 
 ## 0.19.0
 

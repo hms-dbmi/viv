@@ -6,6 +6,34 @@
 
 - TIFF loading now ships a custom `Pool` (exported from `@vivjs/loaders` / `@hms-dbmi/viv`) that matches geotiff’s pool job protocol (`jobId`) and always sends decode jobs to Web Workers when the pool size is non-zero—unlike geotiff’s built-in pool, which can skip workers for some compression paths. Requires `geotiff` 2.1.4-beta.0; apps bundling Viv should use a single `geotiff` instance (for example Vite `resolve.dedupe: ['geotiff']`) so main thread and workers share decoder registration. See [hms-dbmi/viv#949](https://github.com/hms-dbmi/viv/issues/949).
 
+## 0.22.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/types@0.22.1
+
+## 0.22.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/types@0.22.0
+
+## 0.21.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/types@0.21.0
+
+## 0.20.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vivjs/types@0.20.1
+
 ## 0.20.0
 
 ### Patch Changes
