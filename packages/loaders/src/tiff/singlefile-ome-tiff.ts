@@ -12,6 +12,9 @@ import {
   extractPhysicalSizesfromPixels,
   getShapeForBinaryDownsampleLevel,
   getTiffTileSize,
+  guessImageDataType,
+  isPackedRgbTiffImage,
+  padTiffSampleTags,
   parsePixelDataType
 } from './lib/utils';
 import TiffPixelSource from './pixel-source';
@@ -114,6 +117,33 @@ function createSingleFileOmeTiffPyramidalIndexer(
   }, image);
 }
 
+/**
+ * Collapse OME SizeC=3 sample metadata into a single interleaved RGB channel
+ * when TIFF tags indicate packed RGB (one IFD, spp=3, photometric RGB/YCbCr).
+ */
+function collapsePackedRgbPixelsMetadata(
+  metadata: OmeXml[number],
+  vivDtype: string
+) {
+  const pixels = metadata.Pixels;
+  const firstChannel = pixels.Channels?.[0] ?? {};
+  return {
+    ...metadata,
+    Pixels: {
+      ...pixels,
+      SizeC: 1,
+      Interleaved: true,
+      Type: vivDtype,
+      Channels: [
+        {
+          ...firstChannel,
+          SamplesPerPixel: 3
+        }
+      ]
+    }
+  };
+}
+
 type OmeTiffImage = {
   data: TiffPixelSource<OmeTiffDims>[];
   metadata: any;
@@ -135,6 +165,9 @@ export async function loadSingleFileOmeTiff(
     source: prebuiltSource
   });
   const firstImage = await tiff.getImage();
+  padTiffSampleTags(firstImage.fileDirectory);
+  const packedRgb = isPackedRgbTiffImage(firstImage);
+
   const { rootMeta, levels } = resolveMetadata(
     fromString(firstImage.fileDirectory.ImageDescription),
     firstImage.fileDirectory.SubIFDs
@@ -143,10 +176,18 @@ export async function loadSingleFileOmeTiff(
   const images: OmeTiffImage[] = [];
   let imageIfdOffset = 0;
 
-  for (const metadata of rootMeta) {
+  for (const rawMetadata of rootMeta) {
+    const vivDtype = packedRgb
+      ? guessImageDataType(firstImage)
+      : parsePixelDataType(rawMetadata['Pixels']['Type']);
+    const metadata = packedRgb
+      ? collapsePackedRgbPixelsMetadata(rawMetadata, vivDtype)
+      : rawMetadata;
+
+    // Packed RGB: SizeC is samples, not IFDs — index with c=1.
     const imageSize = {
       z: metadata['Pixels']['SizeZ'],
-      c: metadata['Pixels']['SizeC'],
+      c: packedRgb ? 1 : metadata['Pixels']['SizeC'],
       t: metadata['Pixels']['SizeT']
     };
     const axes = extractAxesFromPixels(metadata['Pixels']);
@@ -155,7 +196,6 @@ export async function loadSingleFileOmeTiff(
       ifdOffset: imageIfdOffset,
       dimensionOrder: metadata['Pixels']['DimensionOrder']
     });
-    const dtype = parsePixelDataType(metadata['Pixels']['Type']);
     const tileSize = getTiffTileSize(
       await pyramidIndexer({ c: 0, t: 0, z: 0 }, 0)
     );
@@ -164,20 +204,21 @@ export async function loadSingleFileOmeTiff(
       photometricInterpretation:
         firstImage.fileDirectory.PhotometricInterpretation
     };
-    const data = Array.from(
-      { length: levels },
-      (_, level) => {
-        return new TiffPixelSource(
-          sel => pyramidIndexer({ t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 }, level),
-          dtype,
-          tileSize,
-          getShapeForBinaryDownsampleLevel({ axes, level }),
-          axes.labels,
-          meta,
-          pool
-        );
-      }
-    );
+    const data = Array.from({ length: levels }, (_, level) => {
+      return new TiffPixelSource(
+        sel =>
+          pyramidIndexer(
+            { t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 },
+            level
+          ),
+        vivDtype,
+        tileSize,
+        getShapeForBinaryDownsampleLevel({ axes, level }),
+        axes.labels,
+        meta,
+        pool
+      );
+    });
     images.push({ data: data as TiffPixelSource<OmeTiffDims>[], metadata });
     imageIfdOffset += imageSize.t * imageSize.z * imageSize.c;
   }

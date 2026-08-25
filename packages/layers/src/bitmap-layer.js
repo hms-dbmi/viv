@@ -160,55 +160,16 @@ const BitmapLayer = class extends CompositeLayer {
     super.initializeState(args);
   }
 
-  updateState({ props, oldProps, ...rest }) {
-    super.updateState({ props, oldProps, ...rest });
-    if (!props.image?.data || !props.image?.width || !props.image?.height) {
-      if (this.state.bitmapTexture) {
-        this.state.bitmapTexture.delete();
-        this.setState({ bitmapTexture: null });
-      }
-      return;
-    }
-    if (props.image === oldProps?.image && this.state.bitmapTexture) {
-      return;
-    }
-    if (this.state.bitmapTexture) {
-      this.state.bitmapTexture.delete();
-    }
-    const img = getPreparedImage(props.image);
-    const texture = this.context.device.createTexture({
-      width: img.width,
-      height: img.height,
-      dimension: '2d',
-      data: img.data,
-      mipmaps: false,
-      format: img.format || 'rgba8unorm',
-      sampler: {
-        minFilter: 'linear',
-        magFilter: 'linear',
-        addressModeU: 'clamp-to-edge',
-        addressModeV: 'clamp-to-edge'
-      }
-    });
-    this.setState({ bitmapTexture: texture });
-  }
-
-  finalizeState() {
-    if (this.state.bitmapTexture) {
-      this.state.bitmapTexture.delete();
-      this.setState({ bitmapTexture: null });
-    }
-    super.finalizeState();
-  }
-
   renderLayers() {
     const {
       photometricInterpretation,
       transparentColor: transparentColorInHook
     } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
-    const image =
-      this.state.bitmapTexture || getPreparedImage(this.props.image);
+    // Always pass a prepared {data,width,height} image — not a Luma Texture.
+    // BitmapLayerWrapper uses deck.gl's `image` prop type, which uploads GPU
+    // textures itself; Texture objects are not interchangeable with that shape.
+    const image = getPreparedImage(this.props.image);
     if (!image) return null;
     return new BitmapLayerWrapper(
       { ...this.props, image },

@@ -1,6 +1,26 @@
-import { Pool, GeoTIFFImage } from 'geotiff';
+import { GeoTIFFImage, GeoTIFF } from 'geotiff';
 import { PixelSource, SupportedDtype, Labels, PixelSourceMeta, PixelSourceSelection, RasterSelection, PixelData, TileSelection } from '@vivjs/types';
 import * as zarr from 'zarrita';
+
+/**
+ * Structural type compatible with `GeoTIFFImage.readRasters({ pool })`.
+ *
+ * @see https://github.com/geotiffjs/geotiff.js/blob/master/src/pool.js
+ */
+type DecodePool = {
+    decode: (fileDirectory: unknown, buffer: ArrayBuffer) => Promise<ArrayBuffer>;
+    destroy?: () => void | Promise<void>;
+};
+/**
+ * Decoder pool for geotiff.js: same surface as geotiff's default Pool (`decode` /
+ * `destroy`) but always sends work to decoder workers when `size > 0`.
+ */
+declare class Pool implements DecodePool {
+    private workerWrappers;
+    constructor(size?: number, createWorker?: () => Worker);
+    decode(fileDirectory: unknown, buffer: ArrayBuffer): Promise<ArrayBuffer>;
+    destroy(): Promise<void>;
+}
 
 type OmeXml = {
     images?: any[];
@@ -8,19 +28,15 @@ type OmeXml = {
     roiRefs?: any[];
 };
 
-declare class export_default extends Pool {
-    constructor();
-}
-
 declare class TiffPixelSource<S extends string[]> implements PixelSource<S> {
     dtype: SupportedDtype;
     tileSize: number;
     shape: number[];
     labels: Labels<S>;
     meta?: PixelSourceMeta | undefined;
-    pool?: export_default | undefined;
+    pool?: (DecodePool | false) | undefined;
     private _indexer;
-    constructor(indexer: (sel: PixelSourceSelection<S>) => Promise<GeoTIFFImage>, dtype: SupportedDtype, tileSize: number, shape: number[], labels: Labels<S>, meta?: PixelSourceMeta | undefined, pool?: export_default | undefined);
+    constructor(indexer: (sel: PixelSourceSelection<S>) => Promise<GeoTIFFImage>, dtype: SupportedDtype, tileSize: number, shape: number[], labels: Labels<S>, meta?: PixelSourceMeta | undefined, pool?: (DecodePool | false) | undefined);
     getRaster({ selection, signal }: RasterSelection<S>): Promise<PixelData>;
     getTile({ x, y, selection, signal }: TileSelection<S>): Promise<PixelData>;
     private _readRasters;
@@ -38,10 +54,20 @@ interface OmeTiffSelection {
 interface TiffOptions {
     headers?: Headers | Record<string, string>;
     offsets?: number[];
-    pool?: Pool;
+    pool?: DecodePool | false;
+    /**
+     * A pre-constructed GeoTIFF instance. When provided, the loader skips
+     * its internal HTTP client and uses this GeoTIFF for all data access.
+     * This enables custom transport layers (e.g., AWS SigV4 request signing)
+     * via geotiff's `fromCustomClient()`.
+     *
+     * Only applies to single-file OME-TIFFs. Ignored for companion
+     * (multifile) OME-TIFFs which open multiple GeoTIFFs internally.
+     */
+    source?: GeoTIFF;
 }
 interface MultiTiffOptions {
-    pool?: Pool;
+    pool?: DecodePool | false;
     name?: string;
     channelNames?: string[];
     headers?: Headers | Record<string, string>;
@@ -83,7 +109,7 @@ declare function loadOmeTiff(source: string | File): Promise<OmeTiffImage>;
  * You should only provide (OmeTiffSelection | undefined)[] when loading from stacked tiffs. In this case the array index corresponds to the image index in the stack, and the selection is the
  * selection that image corresponds to. Undefined selections are for images that should not be loaded.
  * @param {Object} opts
- * @param {GeoTIFF.Pool} [opts.pool] - A geotiff.js [Pool](https://geotiffjs.github.io/geotiff.js/module-pool-Pool.html) for decoding image chunks.
+ * @param {import('./lib/Pool').DecodePool | false} [opts.pool] - Decode worker pool (see {@link Pool} from `@vivjs/loaders`) or `false` for main-thread decode.
  * @param {string} [opts.name='MultiTiff'] - a name for the "virtual" image stack.
  * @param {Headers=} opts.headers - Headers passed to each underlying fetch request.
  * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>} data source and associated metadata.
@@ -269,5 +295,5 @@ declare function getImageSize<T extends string[]>(source: PixelSource<T>): {
 };
 declare const SIGNAL_ABORTED = "__vivSignalAborted";
 
-export { DEPRECATED_loadBioformatsZarr, SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, getChannelStats, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore };
-export type { RootAttrs };
+export { DEPRECATED_loadBioformatsZarr, Pool, SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, getChannelStats, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore };
+export type { DecodePool, RootAttrs };

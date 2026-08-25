@@ -2,7 +2,9 @@ import { GL } from '@luma.gl/constants';
 
 declare const MAX_COLOR_INTENSITY = 255;
 declare const DEFAULT_COLOR_OFF: number[];
-declare const MAX_CHANNELS = 6;
+declare const MAX_CHANNELS = 10;
+declare const VIV_CHANNEL_INDEX_PLACEHOLDER = "VIV_CHANNEL_INDEX";
+declare const VIV_PLANE_INDEX_PLACEHOLDER = "VIV_PLANE_INDEX";
 declare const DEFAULT_FONT_FAMILY = "-apple-system, 'Helvetica Neue', Arial, sans-serif";
 /**
  * @deprecated We plan to remove `DTYPE_VALUES` as a part of Viv's public API as it
@@ -77,4 +79,4 @@ declare enum RENDERING_MODES {
     ADDITIVE = "Additive"
 }
 
-export { COLORMAPS, DEFAULT_COLOR_OFF, DEFAULT_FONT_FAMILY, DTYPE_VALUES, MAX_CHANNELS, MAX_COLOR_INTENSITY, RENDERING_MODES };
+export { COLORMAPS, DEFAULT_COLOR_OFF, DEFAULT_FONT_FAMILY, DTYPE_VALUES, MAX_CHANNELS, MAX_COLOR_INTENSITY, RENDERING_MODES, VIV_CHANNEL_INDEX_PLACEHOLDER, VIV_PLANE_INDEX_PLACEHOLDER };

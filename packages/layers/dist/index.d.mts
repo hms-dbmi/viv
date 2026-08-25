@@ -1,7 +1,10 @@
 import * as _vivjs_types from '@vivjs/types';
+import * as _luma_gl_core from '@luma.gl/core';
+import { Layer } from '@deck.gl/core';
+import { Model } from '@luma.gl/engine';
 import { Matrix4 } from '@math.gl/core';
 
-type LayerProps$7 = {
+type LayerProps$6 = {
     /**
      * List of [begin, end] values to control each channel's ramp function.
      */
@@ -87,10 +90,10 @@ type LayerProps$7 = {
  * @ignore
  */
 declare const MultiscaleImageLayer: {
-    new <S extends string[]>(...props: _vivjs_types.Viv<LayerProps$7, S>[]): any;
+    new <S extends string[]>(...props: _vivjs_types.Viv<LayerProps$6, S>[]): any;
 };
 
-type LayerProps$6 = {
+type LayerProps$5 = {
     /**
      * List of [begin, end] values to control each channel's ramp function.
      */
@@ -161,10 +164,10 @@ type LayerProps$6 = {
  * @ignore
  */
 declare const ImageLayer: {
-    new <S extends string[]>(...props: _vivjs_types.Viv<LayerProps$6, S>[]): any;
+    new <S extends string[]>(...props: _vivjs_types.Viv<LayerProps$5, S>[]): any;
 };
 
-type LayerProps$5 = {
+type LayerProps$4 = {
     /**
      * List of [begin, end] values to control each channel's ramp function.
      */
@@ -225,10 +228,10 @@ type LayerProps$5 = {
  * @ignore
  */
 declare const OverviewLayer: {
-    new <S extends string[]>(...props: _vivjs_types.Viv<LayerProps$5, S>[]): any;
+    new <S extends string[]>(...props: _vivjs_types.Viv<LayerProps$4, S>[]): any;
 };
 
-type LayerProps$4 = {
+type LayerProps$3 = {
     /**
      * Physical unit size per pixel at full resolution.
      */
@@ -276,10 +279,10 @@ type LayerProps$4 = {
  * @ignore
  */
 declare const ScaleBarLayer: {
-    new (...props: LayerProps$4[]): any;
+    new (...props: LayerProps$3[]): any;
 };
 
-type LayerProps$3 = {
+type LayerProps$2 = {
     /**
      * List of [begin, end] values to control each channel's ramp function.
      */
@@ -365,48 +368,9 @@ type LayerProps$3 = {
  * @ignore
  */
 declare const VolumeLayer: {
-    new <S extends string[]>(...props: _vivjs_types.Viv<LayerProps$3, S>[]): any;
+    new <S extends string[]>(...props: _vivjs_types.Viv<LayerProps$2, S>[]): any;
 };
 
-type LayerProps$2 = {
-    /**
-     * List of [begin, end] values to control each channel's ramp function.
-     */
-    contrastLimits: Array<Array<number>>;
-    /**
-     * List of boolean values for each channel for whether or not it is visible.
-     */
-    channelsVisible: Array<boolean>;
-    /**
-     * Dtype for the layer.
-     */
-    dtype: string;
-    /**
-     * Override for the possible max/min values (i.e something different than 65535 for uint16/'<u2').
-     */
-    domain?: Array<number> | undefined;
-    /**
-     * Unique identifier for this layer.
-     */
-    id?: string | undefined;
-    /**
-     * Hook function from deck.gl to handle hover objects.
-     */
-    onHover?: Function | undefined;
-    /**
-     * Hook function from deck.gl to handle clicked-on objects.
-     */
-    onClick?: Function | undefined;
-    /**
-     * Math.gl Matrix4 object containing an affine transformation to be applied to the image.
-     * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
-     */
-    modelMatrix?: Object | undefined;
-    /**
-     * The `minFilter` and `magFilter` for luma.gl rendering (see https://luma.gl/docs/api-reference/core/resources/sampler#texture-magnification-filter) - default is 'nearest'
-     */
-    interpolation?: ("nearest" | "linear") | undefined;
-};
 /**
  * @typedef LayerProps
  * @type {object}
@@ -421,13 +385,141 @@ type LayerProps$2 = {
  * Thus setting this to a truthy value (with a colormap set) indicates that the shader should make that color transparent.
  * @property {'nearest'|'linear'=} interpolation The `minFilter` and `magFilter` for luma.gl rendering (see https://luma.gl/docs/api-reference/core/resources/sampler#texture-magnification-filter) - default is 'nearest'
  */
-/**
- * @type {{ new (...props: import('@vivjs/types').Viv<LayerProps>[]) }}
- * @ignore
- */
-declare const XRLayer: {
-    new (...props: _vivjs_types.Viv<LayerProps$2>[]): any;
-};
+declare class XRLayer extends Layer<any> {
+    constructor(...propObjects: Partial<any>[]);
+    /**
+     * Returns the number of channels for this layer instance.
+     * Implements VivLayer interface.
+     */
+    getNumChannels(): any;
+    /**
+     * Returns the number of planes for this layer instance (always 1 for 2D layers).
+     * Implements VivLayer interface.
+     */
+    getNumPlanes(): number;
+    /**
+     * This function replaces `usampler` with `sampler` if the data is not an unsigned integer
+     * and adds a standard ramp function default for DECKGL_PROCESS_INTENSITY.
+     */
+    getShaders(): any;
+    _isHookDefinedByExtensions(hookName: any): any;
+    /**
+     * This function initializes the internal state.
+     */
+    initializeState(): void;
+    /**
+     * This function finalizes state by clearing all textures from the WebGL context
+     */
+    finalizeState(): void;
+    /**
+     * This function updates state by retriggering model creation (shader compilation and attribute binding)
+     * and loading any textures that need be loading.
+     */
+    updateState({ props, oldProps, changeFlags, ...rest }: {
+        [x: string]: any;
+        props: any;
+        oldProps: any;
+        changeFlags: any;
+    }): void;
+    /**
+     * This function creates the luma.gl model.
+     */
+    _getModel(gl: any): Model | null;
+    /**
+     * This function generates view positions for use as a vec3 in the shader
+     */
+    calculatePositions(attributes: any): void;
+    /**
+     * Track textures that were created during the current frame.
+     * These textures are used by `updateState` to bind same-frame textures
+     * and avoid referencing textures that may have been deleted when channels
+     * are removed and then added back.
+     *
+     * @param {Record<string, import('@luma.gl/core').Texture>|null} textures - Map of channel ids
+     *   (e.g. `channel0`, `channel1`) to textures created this frame, or null
+     *   when no channel textures were loaded.
+     * @private
+     */
+    private _setNewTexturesFromLoadThisFrame;
+    _newTexturesFromLoadThisFrame: Record<string, _luma_gl_core.Texture> | null | undefined;
+    /**
+     * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
+     */
+    loadChannelTextures(channelData: any): void;
+    /**
+     * This function creates textures from the data
+     */
+    dataToTexture(data: any, width: any, height: any): _luma_gl_core.Texture;
+}
+declare namespace XRLayer {
+    export let layerName: string;
+    export { defaultProps };
+}
+
+declare namespace defaultProps {
+    namespace pickable {
+        let type: string;
+        let value: boolean;
+        let compare: boolean;
+    }
+    let coordinateSystem: "cartesian";
+    namespace channelData {
+        let type_1: string;
+        export { type_1 as type };
+        let value_1: {};
+        export { value_1 as value };
+        let compare_1: boolean;
+        export { compare_1 as compare };
+    }
+    namespace bounds {
+        let type_2: string;
+        export { type_2 as type };
+        let value_2: number[];
+        export { value_2 as value };
+        let compare_2: boolean;
+        export { compare_2 as compare };
+    }
+    namespace contrastLimits {
+        let type_3: string;
+        export { type_3 as type };
+        let value_3: never[];
+        export { value_3 as value };
+        let compare_3: boolean;
+        export { compare_3 as compare };
+    }
+    namespace channelsVisible {
+        let type_4: string;
+        export { type_4 as type };
+        let value_4: never[];
+        export { value_4 as value };
+        let compare_4: boolean;
+        export { compare_4 as compare };
+    }
+    namespace dtype {
+        let type_5: string;
+        export { type_5 as type };
+        let value_5: string;
+        export { value_5 as value };
+        let compare_5: boolean;
+        export { compare_5 as compare };
+    }
+    namespace interpolation {
+        let type_6: string;
+        export { type_6 as type };
+        let value_6: string;
+        export { value_6 as value };
+        let compare_6: boolean;
+        export { compare_6 as compare };
+    }
+    namespace colormap {
+        let type_7: string;
+        export { type_7 as type };
+        let value_7: null;
+        export { value_7 as value };
+        let compare_7: boolean;
+        export { compare_7 as compare };
+    }
+}
 
 type LayerProps$1 = {
     /**

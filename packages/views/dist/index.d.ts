@@ -215,9 +215,15 @@ declare class OverviewView extends VivView {
      */
     _setXY(): void;
     getDeckGlView(): OrthographicView;
-    filterViewState({ viewState }: {
+    filterViewState({ viewState: _viewState }: {
         viewState: any;
-    }): any;
+    }): {
+        id: any;
+        height: any;
+        width: any;
+        target: number[];
+        zoom: number;
+    };
     getLayers({ viewStates, props }: {
         viewStates: any;
         props: any;
@@ -262,7 +268,13 @@ declare class ScaleBarView extends VivView {
     getDeckGlView(): OrthographicView;
     filterViewState({ viewState }: {
         viewState: any;
-    }): any;
+    }): {
+        id: any;
+        height: any;
+        width: any;
+        target: number[];
+        zoom: number;
+    };
     getLayers({ viewStates }: {
         viewStates: any;
     }): any[];

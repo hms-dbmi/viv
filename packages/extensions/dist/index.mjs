@@ -1,10 +1,142 @@
 import { LayerExtension } from '@deck.gl/core';
-import { MAX_COLOR_INTENSITY, DEFAULT_COLOR_OFF, MAX_CHANNELS } from '@vivjs/constants';
+import { ShaderAssembler } from '@luma.gl/shadertools';
+import { VIV_CHANNEL_INDEX_PLACEHOLDER, VIV_PLANE_INDEX_PLACEHOLDER, MAX_COLOR_INTENSITY, DEFAULT_COLOR_OFF, MAX_CHANNELS } from '@vivjs/constants';
 
 const apply_transparent_color = `vec4 apply_transparent_color(vec3 color, vec3 transparentColor, bool useTransparentColor, float opacity){
   return vec4(color, (color == transparentColor && useTransparentColor) ? 0. : opacity);
 }
 `;
+
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => {
+  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+function expandLine(line, numChannels, numPlanes = 1) {
+  if (line.includes(VIV_CHANNEL_INDEX_PLACEHOLDER)) {
+    let str = "";
+    for (let i = 0; i < numChannels; i++) {
+      str += `${line.replaceAll(VIV_CHANNEL_INDEX_PLACEHOLDER, i.toString())}
+`;
+    }
+    if (str.endsWith(",\n")) {
+      str = `${str.slice(0, -2)}
+`;
+    }
+    return str;
+  }
+  if (line.includes(VIV_PLANE_INDEX_PLACEHOLDER)) {
+    let str = "";
+    for (let i = 0; i < numPlanes; i++) {
+      str += `${line.replaceAll(VIV_PLANE_INDEX_PLACEHOLDER, i.toString())}
+`;
+    }
+    if (str.endsWith(",\n")) {
+      str = `${str.slice(0, -2)}
+`;
+    }
+    return str;
+  }
+  return line;
+}
+function processGLSLShader(shader, numChannels, numPlanes = 1) {
+  return shader.split("\n").map((line) => expandLine(line, numChannels, numPlanes)).join("\n");
+}
+function expandShaderModule(module, numChannels, numPlanes = 1) {
+  if (numChannels < 1) {
+    throw new Error(
+      `expandShaderModule requires numChannels >= 1, got ${numChannels}`
+    );
+  }
+  if (numPlanes < 1) {
+    throw new Error(
+      `expandShaderModule requires numPlanes >= 1, got ${numPlanes}`
+    );
+  }
+  const expandedModule = { ...module };
+  if (module.uniformTypes) {
+    const expandedUniformTypes = {};
+    for (const [key, value] of Object.entries(module.uniformTypes)) {
+      if (key.includes(VIV_CHANNEL_INDEX_PLACEHOLDER)) {
+        for (let i = 0; i < numChannels; i++) {
+          const expandedKey = key.replaceAll(
+            VIV_CHANNEL_INDEX_PLACEHOLDER,
+            i.toString()
+          );
+          expandedUniformTypes[expandedKey] = value;
+        }
+      } else if (key.includes(VIV_PLANE_INDEX_PLACEHOLDER)) {
+        for (let i = 0; i < numPlanes; i++) {
+          const expandedKey = key.replaceAll(
+            VIV_PLANE_INDEX_PLACEHOLDER,
+            i.toString()
+          );
+          expandedUniformTypes[expandedKey] = value;
+        }
+      } else {
+        expandedUniformTypes[key] = value;
+      }
+    }
+    expandedModule.uniformTypes = expandedUniformTypes;
+  }
+  if (module.fs) {
+    expandedModule.fs = processGLSLShader(module.fs, numChannels, numPlanes);
+  }
+  if (module.vs) {
+    expandedModule.vs = processGLSLShader(module.vs, numChannels, numPlanes);
+  }
+  const defines = { ...module.defines || {} };
+  defines.NUM_CHANNELS = String(numChannels);
+  defines.NUM_PLANES = String(numPlanes);
+  expandedModule.defines = defines;
+  return expandedModule;
+}
+const _VivShaderAssembler = class _VivShaderAssembler extends ShaderAssembler {
+  constructor() {
+    super();
+    const defaultShaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
+    const defaultModules = defaultShaderAssembler._getModuleList();
+    const defaultHookFunctions = defaultShaderAssembler._hookFunctions;
+    for (const module of defaultModules) {
+      this.addDefaultModule(module);
+    }
+    for (const hookFunction of defaultHookFunctions) {
+      this.addShaderHook(hookFunction);
+    }
+    //!!! if we add this hook to the defaultShaderAssembler used by other deck layers,
+    const mutateStr = "fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float[NUM_CHANNELS] intensity, vec2 vTexCoord)";
+    const processStr = "fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)";
+    this.addShaderHook(mutateStr);
+    this.addShaderHook(processStr);
+  }
+  static getDefaultVivShaderAssembler() {
+    if (!_VivShaderAssembler._default) {
+      _VivShaderAssembler._default = new _VivShaderAssembler();
+    }
+    return _VivShaderAssembler._default;
+  }
+};
+__publicField(_VivShaderAssembler, "_default");
+let VivShaderAssembler = _VivShaderAssembler;
+class VivLayerExtension extends LayerExtension {
+  /**
+   * deck.gl calls this as `extension.getShaders.call(layer, extension)`.
+   * `this` is therefore the layer, and `extension` is the extension instance.
+   */
+  getShaders(extension) {
+    const templates = extension.getVivShaderTemplates.call(this) || {};
+    const numChannels = this.getNumChannels();
+    const numPlanes = this.getNumPlanes();
+    const modules = (templates.modules || []).map(
+      (m) => expandShaderModule(m, numChannels, numPlanes)
+    );
+    return {
+      modules
+    };
+  }
+}
+__publicField(VivLayerExtension, "extensionName", "VivLayerExtension");
 
 const alpha = `vec4 apply_cmap (float x) {
   const float e0 = 0.0;
@@ -1396,25 +1528,29 @@ const cmaps = {
 };
 
 function colormapModuleFactory(name, apply_cmap) {
+  const extensionName = `additive_colormap_${name}`;
   return {
-    name: `additive-colormap-${name}`,
-    fs: `uniform float opacity;
-uniform bool useTransparentColor;
-
+    name: extensionName,
+    uniformTypes: {
+      opacity: "f32",
+      useTransparentColor: "u32"
+    },
+    fs: `uniform ${extensionName}Uniforms {
+  float opacity;
+  uint useTransparentColor; //no bool-like type in decode-shader-types.ts
+} ${extensionName};
 ${apply_transparent_color}
 ${apply_cmap}
-
 vec4 colormap(float intensity) {
+  float opacity = ${extensionName}.opacity;
+  bool useTransparentColor = ${extensionName}.useTransparentColor != uint(0);
   return vec4(apply_transparent_color(apply_cmap(min(1.,intensity)).xyz, apply_cmap(0.).xyz, useTransparentColor, opacity));
 }`,
     inject: {
       "fs:DECKGL_MUTATE_COLOR": `  float intensityCombo = 0.;
-  intensityCombo += max(0.,intensity0);
-  intensityCombo += max(0.,intensity1);
-  intensityCombo += max(0.,intensity2);
-  intensityCombo += max(0.,intensity3);
-  intensityCombo += max(0.,intensity4);
-  intensityCombo += max(0.,intensity5);
+  for (int i = 0; i < NUM_CHANNELS; i++) {
+    intensityCombo += max(0.,intensity[i]);
+  }
   rgba = colormap(intensityCombo);`
     }
   };
@@ -1422,10 +1558,13 @@ vec4 colormap(float intensity) {
 const defaultProps$4 = {
   colormap: { type: "string", value: "viridis", compare: true },
   opacity: { type: "number", value: 1, compare: true },
+  // we should review use of 'boolean', don't want to change it everywhere if not necessary.
   useTransparentColor: { type: "boolean", value: false, compare: true }
 };
-const AdditiveColormapExtension = class extends LayerExtension {
-  getShaders() {
+const AdditiveColormapExtension = class extends VivLayerExtension {
+  // this doesn't need any shader code template manipulation, as long as NUM_CHANNELS is defined
+  // we could just use `LayerExtension.getShaders()` as before here
+  getVivShaderTemplates() {
     const name = this?.props?.colormap || defaultProps$4.colormap.value;
     const apply_cmap = cmaps[name];
     if (!apply_cmap) {
@@ -1435,24 +1574,17 @@ const AdditiveColormapExtension = class extends LayerExtension {
   }
   updateState({ props, oldProps, changeFlags, ...rest }) {
     super.updateState({ props, oldProps, changeFlags, ...rest });
-    if (props.colormap !== oldProps.colormap) {
-      const { device } = this.context;
-      if (this.state.model) {
-        this.state.model.destroy();
-        this.setState({ model: this._getModel(device) });
-      }
+    const name = this?.props?.colormap || defaultProps$4.colormap.value;
+    const extensionName = `additive_colormap_${name}`;
+    const models = this.getModels();
+    for (const model of models) {
+      model.shaderInputs.setProps({
+        [extensionName]: {
+          opacity: this.props.opacity,
+          useTransparentColor: this.props.useTransparentColor
+        }
+      });
     }
-  }
-  draw() {
-    const {
-      useTransparentColor = defaultProps$4.useTransparentColor.value,
-      opacity = defaultProps$4.opacity.value
-    } = this.props;
-    const uniforms = {
-      opacity,
-      useTransparentColor
-    };
-    this.state.model?.setUniforms(uniforms);
   }
 };
 AdditiveColormapExtension.extensionName = "AdditiveColormapExtension";
@@ -1501,34 +1633,55 @@ function padColors({ colors, channelsVisible }) {
   ).reduce((acc, val) => acc.concat(val), []);
   return paddedColors;
 }
+function padColorsForUBO({ colors, channelsVisible }) {
+  const newColors = colors.map(
+    (color, i) => channelsVisible[i] ? color.map((c) => c / MAX_COLOR_INTENSITY) : DEFAULT_COLOR_OFF
+  );
+  const padSize = MAX_CHANNELS - newColors.length;
+  const paddedColors = padWithDefault(
+    newColors,
+    /** @type {Color} */
+    DEFAULT_COLOR_OFF,
+    padSize
+  );
+  return paddedColors;
+}
 
-const fs$1 = `uniform vec3 transparentColor;
-uniform bool useTransparentColor;
-uniform float opacity;
-
-uniform vec3 colors[6];
+const moduleName$1 = "colorPaletteModule";
+const fs$1 = `uniform ${moduleName$1}Uniforms {
+  vec3 transparentColor;
+  uint useTransparentColor;
+  float opacity;
+  vec3 color${VIV_CHANNEL_INDEX_PLACEHOLDER};
+} ${moduleName$1};
 
 ${apply_transparent_color}
 
-void mutate_color(inout vec3 rgb, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5) { 
-  rgb += max(0.0, min(1.0, intensity0)) * vec3(colors[0]);
-  rgb += max(0.0, min(1.0, intensity1)) * vec3(colors[1]);
-  rgb += max(0.0, min(1.0, intensity2)) * vec3(colors[2]);
-  rgb += max(0.0, min(1.0, intensity3)) * vec3(colors[3]);
-  rgb += max(0.0, min(1.0, intensity4)) * vec3(colors[4]);
-  rgb += max(0.0, min(1.0, intensity5)) * vec3(colors[5]);
+void mutate_color(inout vec3 rgb, float[NUM_CHANNELS] intensity) {
+  vec3 colors[NUM_CHANNELS] = vec3[NUM_CHANNELS](
+    ${moduleName$1}.color${VIV_CHANNEL_INDEX_PLACEHOLDER},
+  );
+  for(int i = 0; i < NUM_CHANNELS; i++) {
+    rgb += max(0.0, min(1.0, intensity[i])) * vec3(colors[i]);
+  }
 }
-
 vec4 apply_opacity(vec3 rgb) {
-  return vec4(apply_transparent_color(rgb, transparentColor, useTransparentColor, opacity));
+  bool useTransparentColor = ${moduleName$1}.useTransparentColor != uint(0);
+  return vec4(apply_transparent_color(rgb, ${moduleName$1}.transparentColor, useTransparentColor, ${moduleName$1}.opacity));
 }
 `;
 const DECKGL_MUTATE_COLOR = `vec3 rgb = rgba.rgb;
-mutate_color(rgb, intensity0, intensity1, intensity2, intensity3, intensity4, intensity5);
+mutate_color(rgb, intensity);
 rgba = apply_opacity(rgb);
 `;
 const colorPalette = {
-  name: "color-palette-module",
+  name: moduleName$1,
+  uniformTypes: {
+    transparentColor: "vec3<f32>",
+    useTransparentColor: "u32",
+    opacity: "f32",
+    [`color${VIV_CHANNEL_INDEX_PLACEHOLDER}`]: "vec3<f32>"
+  },
   fs: fs$1,
   inject: {
     "fs:DECKGL_MUTATE_COLOR": DECKGL_MUTATE_COLOR
@@ -1541,14 +1694,14 @@ const defaultProps$3 = {
   transparentColor: { type: "array", value: null, compare: true },
   useTransparentColor: { type: "boolean", value: false, compare: true }
 };
-const ColorPaletteExtension = class extends LayerExtension {
-  getShaders() {
+const ColorPaletteExtension = class extends VivLayerExtension {
+  getVivShaderTemplates() {
     return {
-      ...super.getShaders(),
       modules: [colorPalette]
     };
   }
-  draw() {
+  updateState({ props, oldProps, changeFlags, ...rest }) {
+    super.updateState({ props, oldProps, changeFlags, ...rest });
     const {
       colors,
       channelsVisible,
@@ -1556,35 +1709,46 @@ const ColorPaletteExtension = class extends LayerExtension {
       transparentColor = defaultProps$3.transparentColor.value,
       useTransparentColor = defaultProps$3.useTransparentColor.value
     } = this.props;
-    const paddedColors = padColors({
-      channelsVisible: channelsVisible || this.selections.map(() => true),
-      colors: colors || getDefaultPalette(this.props.selections.length)
+    const selections = this.props.selections || this.selections || [];
+    const numChannels = selections.length;
+    const paddedColors = padColorsForUBO({
+      channelsVisible: channelsVisible || selections.map(() => true),
+      colors: colors || getDefaultPalette(numChannels)
     });
-    const uniforms = {
-      colors: paddedColors,
+    const colorPaletteUniforms = {
       opacity,
       transparentColor: (transparentColor || [0, 0, 0]).map((i) => i / 255),
-      useTransparentColor: Boolean(useTransparentColor)
+      useTransparentColor: useTransparentColor ? 1 : 0
     };
-    this.state.model?.setUniforms(uniforms);
+    for (let i = 0; i < numChannels; i++) {
+      colorPaletteUniforms[`color${i}`] = paddedColors[i];
+    }
+    for (const model of this.getModels()) {
+      model.shaderInputs.setProps({
+        colorPaletteModule: colorPaletteUniforms
+      });
+    }
   }
 };
 ColorPaletteExtension.extensionName = "ColorPaletteExtension";
 ColorPaletteExtension.defaultProps = defaultProps$3;
 
-const fs = `// lens bounds for ellipse
-uniform float majorLensAxis;
-uniform float minorLensAxis;
-uniform vec2 lensCenter;
+const moduleName = "lensModule";
+const fs = `uniform ${moduleName}Uniforms {
+  // lens bounds for ellipse
+  float majorLensAxis;
+  float minorLensAxis;
 
-// lens uniforms
-uniform bool lensEnabled;
-uniform int lensSelection;
-uniform vec3 lensBorderColor;
-uniform float lensBorderRadius;
+  // lens uniforms
+  vec2 lensCenter;
+  uint lensEnabled;
+  int lensSelection;
+  vec3 lensBorderColor;
+  float lensBorderRadius;
 
-// color palette
-uniform vec3 colors[6];
+  // color palette
+  vec3 color${VIV_CHANNEL_INDEX_PLACEHOLDER};
+} ${moduleName};
 
 bool frag_in_lens_bounds(vec2 vTexCoord) {
   // Check membership in what is (not visually, but effectively) an ellipse.
@@ -1592,58 +1756,58 @@ bool frag_in_lens_bounds(vec2 vTexCoord) {
   // to get a circle visually we have to treat the check as that of an ellipse to get the effect of a circle.
 
   // Check membership in ellipse.
-  return pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.) < (1. - lensBorderRadius);
+  return pow((${moduleName}.lensCenter.x - vTexCoord.x) / ${moduleName}.majorLensAxis, 2.) + pow((${moduleName}.lensCenter.y - vTexCoord.y) / ${moduleName}.minorLensAxis, 2.) < (1. - ${moduleName}.lensBorderRadius);
 }
 
 bool frag_on_lens_bounds(vec2 vTexCoord) {
   // Same as the above, except this checks the boundary.
 
-  float ellipseDistance = pow((lensCenter.x - vTexCoord.x) / majorLensAxis, 2.) + pow((lensCenter.y - vTexCoord.y) / minorLensAxis, 2.);
+  float ellipseDistance = pow((${moduleName}.lensCenter.x - vTexCoord.x) / ${moduleName}.majorLensAxis, 2.) + pow((${moduleName}.lensCenter.y - vTexCoord.y) / ${moduleName}.minorLensAxis, 2.);
 
   // Check membership on "bourndary" of ellipse.
-  return ellipseDistance <= 1. && ellipseDistance >= (1. - lensBorderRadius);
+  return ellipseDistance <= 1. && ellipseDistance >= (1. - ${moduleName}.lensBorderRadius);
 }
 // Return a float for boolean arithmetic calculation.
 float get_use_color_float(vec2 vTexCoord, int channelIndex) {
+  bool lensEnabled = ${moduleName}.lensEnabled != uint(0);
   bool isFragInLensBounds = frag_in_lens_bounds(vTexCoord);
   bool inLensAndUseLens = lensEnabled && isFragInLensBounds;
-  return float(int((inLensAndUseLens && channelIndex == lensSelection) || (!inLensAndUseLens)));
+  return float(int((inLensAndUseLens && channelIndex == ${moduleName}.lensSelection) || (!inLensAndUseLens)));
  
 }
-void mutate_color(inout vec3 rgb, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord){
-  float useColorValue = 0.;
-
-  useColorValue = get_use_color_float(vTexCoord, 0);
-  rgb += max(0., min(1., intensity0)) * max(vec3(colors[0]), (1. - useColorValue) * vec3(1., 1., 1.));
-
-  useColorValue = get_use_color_float(vTexCoord, 1);
-  rgb += max(0., min(1., intensity1)) * max(vec3(colors[1]), (1. - useColorValue) * vec3(1., 1., 1.));
-
-  useColorValue = get_use_color_float(vTexCoord, 2);
-  rgb += max(0., min(1., intensity2)) * max(vec3(colors[2]), (1. - useColorValue) * vec3(1., 1., 1.));
-
-  useColorValue = get_use_color_float(vTexCoord, 3);
-  rgb += max(0., min(1., intensity3)) * max(vec3(colors[3]), (1. - useColorValue) * vec3(1., 1., 1.));
-
-  useColorValue = get_use_color_float(vTexCoord, 4);
-  rgb += max(0., min(1., intensity4)) * max(vec3(colors[4]), (1. - useColorValue) * vec3(1., 1., 1.));
-
-  useColorValue = get_use_color_float(vTexCoord, 5);
-  rgb += max(0., min(1., intensity5)) * max(vec3(colors[5]), (1. - useColorValue) * vec3(1., 1., 1.));
+void mutate_color(inout vec3 rgb, float[NUM_CHANNELS] intensity, vec2 vTexCoord) {
+  vec3 colors[NUM_CHANNELS] = vec3[NUM_CHANNELS](
+    ${moduleName}.color${VIV_CHANNEL_INDEX_PLACEHOLDER},
+  );
+  for(int i = 0; i < NUM_CHANNELS; i++) {
+    float useColorValue = get_use_color_float(vTexCoord, i);
+    rgb += max(0., min(1., intensity[i])) * max(vec3(colors[i]), (1. - useColorValue) * vec3(1., 1., 1.));
+  }
 }
 `;
 const lens = {
-  name: "lens-module",
+  name: moduleName,
+  uniformTypes: {
+    majorLensAxis: "f32",
+    minorLensAxis: "f32",
+    lensCenter: "vec2<f32>",
+    lensEnabled: "u32",
+    lensSelection: "i32",
+    lensBorderColor: "vec3<f32>",
+    lensBorderRadius: "f32",
+    [`color${VIV_CHANNEL_INDEX_PLACEHOLDER}`]: "vec3<f32>"
+  },
   fs,
   inject: {
     "fs:DECKGL_MUTATE_COLOR": `
    vec3 rgb = rgba.rgb;
-   mutate_color(rgb, intensity0, intensity1, intensity2, intensity3, intensity4, intensity5, vTexCoord);
+   mutate_color(rgb, intensity, vTexCoord);
    rgba = vec4(rgb, 1.);
   `,
     "fs:#main-end": `
+      bool lensEnabled = ${moduleName}.lensEnabled != uint(0);
       bool isFragOnLensBounds = frag_on_lens_bounds(vTexCoord);
-      fragColor = (lensEnabled && isFragOnLensBounds) ? vec4(lensBorderColor, 1.) : fragColor;
+      fragColor = (lensEnabled && isFragOnLensBounds) ? vec4(${moduleName}.lensBorderColor, 1.) : fragColor;
   `
   }
 };
@@ -1656,10 +1820,9 @@ const defaultProps$2 = {
   lensBorderRadius: { type: "number", value: 0.02, compare: true },
   colors: { type: "array", value: null, compare: true }
 };
-const LensExtension = class extends LayerExtension {
-  getShaders() {
+const LensExtension = class extends VivLayerExtension {
+  getVivShaderTemplates() {
     return {
-      ...super.getShaders(),
       modules: [lens]
     };
   }
@@ -1733,24 +1896,30 @@ const LensExtension = class extends LayerExtension {
     const bottomMouseBoundScaled = (bottomMouseBound - top) / (bottom - top);
     const rightMouseBoundScaled = (rightMouseBound - left) / (right - left);
     const topMouseBoundScaled = (topMouseBound - top) / (bottom - top);
-    const paddedColors = padColors({
-      channelsVisible: channelsVisible || this.selections.map(() => true),
-      colors: colors || getDefaultPalette(this.props.selections.length)
+    const selections = this.props.selections || this.selections || [];
+    const numChannels = this.getNumChannels();
+    const paddedColors = padColorsForUBO({
+      channelsVisible: channelsVisible || selections.map(() => true),
+      colors: colors || getDefaultPalette(numChannels)
     });
-    const uniforms = {
+    const lensModule = {
       majorLensAxis: (rightMouseBoundScaled - leftMouseBoundScaled) / 2,
       minorLensAxis: (bottomMouseBoundScaled - topMouseBoundScaled) / 2,
       lensCenter: [
         (rightMouseBoundScaled + leftMouseBoundScaled) / 2,
         (bottomMouseBoundScaled + topMouseBoundScaled) / 2
       ],
-      lensEnabled,
+      lensEnabled: lensEnabled ? 1 : 0,
       lensSelection,
-      lensBorderColor,
-      lensBorderRadius,
-      colors: paddedColors
+      lensBorderColor: lensBorderColor.map((i) => i / 255),
+      lensBorderRadius
     };
-    this.state.model?.setUniforms(uniforms);
+    for (let i = 0; i < numChannels; i++) {
+      lensModule[`color${i}`] = paddedColors[i];
+    }
+    this.state.model?.shaderInputs.setProps({
+      lensModule
+    });
   }
   finalizeState() {
     if (this.context.deck) {
@@ -1779,16 +1948,15 @@ vec4 colormap(float intensity, float opacity) {
 const defaultProps$1 = {
   colormap: { type: "string", value: "viridis", compare: true }
 };
-const BaseExtension$1 = class BaseExtension extends LayerExtension {
+const BaseExtension$1 = class BaseExtension extends VivLayerExtension {
   constructor(...args) {
     super(args);
     this.opts = this.opts || {};
   }
-  getShaders() {
+  getVivShaderTemplates() {
     const name = this?.props?.colormap || defaultProps$1.colormap.value;
     const apply_cmap = cmaps[name];
     return {
-      ...super.getShaders(),
       modules: [colormapModuleFactory3D(name, apply_cmap)]
     };
   }
@@ -1806,13 +1974,14 @@ const BaseExtension$1 = class BaseExtension extends LayerExtension {
 BaseExtension$1.extensionName = "BaseExtension";
 BaseExtension$1.defaultProps = defaultProps$1;
 
-const _BEFORE_RENDER$5 = "";
-const _RENDER$5 = `  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
+const _BEFORE_RENDER$5 = `// additive-colormap-3d before render
+  float intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER} = 0.0;
+`;
+const _RENDER$5 = `// additive-colormap-3d render
   float total = 0.0;
 
-  for(int i = 0; i < 6; i++) {
-    total += intensityArray[i];
-  }
+  // this will create an unrolled accumulation over all channels
+  total += intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER};
   // Do not go past 1 in opacity/colormap value.
   total = min(total, 1.0);
 
@@ -1836,20 +2005,12 @@ const AdditiveBlendExtension$1 = class AdditiveBlendExtension extends BaseExtens
 };
 AdditiveBlendExtension$1.extensionName = "AdditiveBlendExtension";
 
-const _BEFORE_RENDER$4 = `  float maxVals[6] = float[6](-1.0, -1.0, -1.0, -1.0, -1.0, -1.0);
+const _BEFORE_RENDER$4 = `  float maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = -1.;
 `;
-const _RENDER$4 = `  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
-
-  for(int i = 0; i < 6; i++) {
-    if(intensityArray[i] > maxVals[i]) {
-      maxVals[i] = intensityArray[i];
-    }
-  }
+const _RENDER$4 = `  maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = max(intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER}, maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER});
 `;
 const _AFTER_RENDER$4 = `  float total = 0.0;
-  for(int i = 0; i < 6; i++) {
-    total += maxVals[i];
-  }
+  total += maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER};
   // Do not go past 1 in opacity/colormap value.
   total = min(total, 1.0);
   color = colormap(total, total);
@@ -1862,20 +2023,12 @@ const MaximumIntensityProjectionExtension$1 = class MaximumIntensityProjectionEx
 };
 MaximumIntensityProjectionExtension$1.extensionName = "MaximumIntensityProjectionExtension";
 
-const _BEFORE_RENDER$3 = `  float minVals[6] = float[6](1. / 0., 1. / 0., 1. / 0., 1. / 0., 1. / 0., 1. / 0.);
+const _BEFORE_RENDER$3 = `  float minVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = 1. / 0.;
 `;
-const _RENDER$3 = `  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
-
-  for(int i = 0; i < 6; i++) {
-    if(intensityArray[i] < minVals[i]) {
-      minVals[i] = intensityArray[i];
-    }
-  }
+const _RENDER$3 = `  minVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = min(intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER}, minVal${VIV_CHANNEL_INDEX_PLACEHOLDER});
 `;
 const _AFTER_RENDER$3 = `  float total = 0.0;
-  for(int i = 0; i < 6; i++) {
-    total += minVals[i];
-  }
+  total += minVal${VIV_CHANNEL_INDEX_PLACEHOLDER};
   // Do not go past 1 in opacity/colormap value.
   total = min(total, 1.0);
   color = colormap(total, total);
@@ -1898,36 +2051,26 @@ const AdditiveColormap3DExtensions = {
 const defaultProps = {
   colors: { type: "array", value: null, compare: true }
 };
-const BaseExtension = class extends LayerExtension {
+const BaseExtension = class extends VivLayerExtension {
   constructor(...args) {
     super(args);
     this.opts = this.opts || {};
   }
-  draw() {
-    const { colors, channelsVisible } = this.props;
-    const paddedColors = padColors({
-      channelsVisible: channelsVisible || this.selections.map(() => true),
-      colors: colors || getDefaultPalette(this.props.selections.length)
-    });
-    const uniforms = {
-      colors: paddedColors
-    };
-    this.state.model?.setUniforms(uniforms);
+  getVivShaderTemplates() {
+    return {};
   }
 };
 BaseExtension.extensionName = "BaseExtension";
 BaseExtension.defaultProps = defaultProps;
 
-const _BEFORE_RENDER$2 = "";
-const _RENDER$2 = `  vec3 rgbCombo = vec3(0.0);
+const _BEFORE_RENDER$2 = `// additive-blend before render
+  float intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER} = 0.0;`;
+const _RENDER$2 = `// additive-blend render
+  vec3 rgbCombo = vec3(0.0);
   vec3 hsvCombo = vec3(0.0);
-  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
   float total = 0.0;
-  for(int i = 0; i < 6; i++) {
-    float intensityValue = intensityArray[i];
-    rgbCombo += max(0.0, min(1.0, intensityValue)) * colors[i];
-    total += intensityValue;
-  }
+  total += intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER};
+  rgbCombo += max(0.0, min(1.0, intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER})) * fragmentUniforms3D.color${VIV_CHANNEL_INDEX_PLACEHOLDER};
   // Do not go past 1 in opacity.
   total = min(total, 1.0);
   vec4 val_color = vec4(rgbCombo, total);
@@ -1937,8 +2080,7 @@ const _RENDER$2 = `  vec3 rgbCombo = vec3(0.0);
   color.a += (1.0 - color.a) * val_color.a;
   if (color.a >= 0.95) {
     break;
-  }
-`;
+  }`;
 const _AFTER_RENDER$2 = "";
 const AdditiveBlendExtension = class extends BaseExtension {
   constructor(args) {
@@ -1948,20 +2090,12 @@ const AdditiveBlendExtension = class extends BaseExtension {
 };
 AdditiveBlendExtension.extensionName = "AdditiveBlendExtension";
 
-const _BEFORE_RENDER$1 = `  float maxVals[6] = float[6](-1.0, -1.0, -1.0, -1.0, -1.0, -1.0);
+const _BEFORE_RENDER$1 = `  float maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = -1.0;
 `;
-const _RENDER$1 = `  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
-
-  for(int i = 0; i < 6; i++) {
-    if(intensityArray[i] > maxVals[i]) {
-      maxVals[i] = intensityArray[i];
-    }
-  }
+const _RENDER$1 = `  maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = max(intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER}, maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER});
 `;
 const _AFTER_RENDER$1 = `  vec3 rgbCombo = vec3(0.0);
-  for(int i = 0; i < 6; i++) {
-    rgbCombo += max(0.0, min(1.0, maxVals[i])) * vec3(colors[i]);
-  }
+  rgbCombo += max(0.0, min(1.0, maxVal${VIV_CHANNEL_INDEX_PLACEHOLDER})) * fragmentUniforms3D.color${VIV_CHANNEL_INDEX_PLACEHOLDER};
   color = vec4(rgbCombo, 1.0);
 `;
 const MaximumIntensityProjectionExtension = class extends BaseExtension {
@@ -1972,20 +2106,12 @@ const MaximumIntensityProjectionExtension = class extends BaseExtension {
 };
 MaximumIntensityProjectionExtension.extensionName = "MaximumIntensityProjectionExtension";
 
-const _BEFORE_RENDER = `  float minVals[6] = float[6](1. / 0., 1. / 0., 1. / 0., 1. / 0., 1. / 0., 1. / 0.);
+const _BEFORE_RENDER = `  float minVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = 1.0 / 0.0;
 `;
-const _RENDER = `  float intensityArray[6] = float[6](intensityValue0, intensityValue1, intensityValue2, intensityValue3, intensityValue4, intensityValue5);
-
-  for(int i = 0; i < 6; i++) {
-    if(intensityArray[i] < minVals[i]) {
-      minVals[i] = intensityArray[i];
-    }
-  }
+const _RENDER = `  minVal${VIV_CHANNEL_INDEX_PLACEHOLDER} = min(intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER}, minVal${VIV_CHANNEL_INDEX_PLACEHOLDER});
 `;
 const _AFTER_RENDER = `  vec3 rgbCombo = vec3(0.0);
-  for(int i = 0; i < 6; i++) {
-    rgbCombo += max(0.0, min(1.0, minVals[i])) * vec3(colors[i]);
-  }
+  rgbCombo += max(0.0, min(1.0, minVal${VIV_CHANNEL_INDEX_PLACEHOLDER})) * fragmentUniforms3D.color${VIV_CHANNEL_INDEX_PLACEHOLDER};
   color = vec4(rgbCombo, 1.0);
 `;
 const MinimumIntensityProjectionExtension = class extends BaseExtension {
@@ -2003,4 +2129,4 @@ const ColorPalette3DExtensions = {
   MinimumIntensityProjectionExtension
 };
 
-export { AdditiveColormap3DExtensions, AdditiveColormapExtension, ColorPalette3DExtensions, ColorPaletteExtension, LensExtension };
+export { AdditiveColormap3DExtensions, AdditiveColormapExtension, ColorPalette3DExtensions, ColorPaletteExtension, LensExtension, VivLayerExtension, VivShaderAssembler, expandShaderModule, getDefaultPalette, padColors, padColorsForUBO };

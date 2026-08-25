@@ -228,13 +228,12 @@ class OverviewView extends VivView {
       clear: true
     });
   }
-  filterViewState({ viewState }) {
-    const { _imageWidth, _imageHeight, scale } = this;
+  filterViewState({ viewState: _viewState }) {
+    const { _imageWidth, _imageHeight, scale, id, height, width } = this;
     return {
-      ...viewState,
-      height: this.height,
-      width: this.width,
-      id: this.id,
+      id,
+      height,
+      width,
       target: [_imageWidth * scale / 2, _imageHeight * scale / 2, 0],
       zoom: -(this.loader.length - 1)
     };
@@ -277,6 +276,18 @@ class DetailView extends VivView {
   }
 }
 
+function getViewZoom({ zoom, zoomX, zoomY } = {}) {
+  if (zoomX != null) {
+    return zoomX;
+  }
+  if (zoomY != null) {
+    return zoomY;
+  }
+  if (Array.isArray(zoom)) {
+    return zoom[0];
+  }
+  return zoom;
+}
 class SideBySideView extends VivView {
   constructor({
     id,
@@ -299,52 +310,37 @@ class SideBySideView extends VivView {
   }
   filterViewState({ viewState, oldViewState, currentViewState }) {
     const { id: viewStateId } = viewState;
-    const { id, linkedIds, panLock, zoomLock } = this;
+    const { id, height, width, linkedIds, panLock, zoomLock } = this;
     if (oldViewState && linkedIds.indexOf(viewStateId) !== -1 && (zoomLock || panLock)) {
-      const thisViewState = {
-        height: currentViewState.height,
-        width: currentViewState.width,
-        target: [],
-        zoom: null
-      };
-      const [currentX, currentY] = currentViewState.target;
+      const [currentX, currentY, currentZ = 0] = currentViewState.target;
+      let zoom = getViewZoom(currentViewState);
+      let target = [currentX, currentY, currentZ];
       if (zoomLock) {
-        const dZoom = viewState.zoom - oldViewState.zoom;
-        thisViewState.zoom = currentViewState.zoom + dZoom;
-      } else {
-        thisViewState.zoom = currentViewState.zoom;
+        const dZoom = getViewZoom(viewState) - getViewZoom(oldViewState);
+        zoom = zoom + dZoom;
       }
       if (panLock) {
         const [oldX, oldY] = oldViewState.target;
         const [newX, newY] = viewState.target;
-        const dx = newX - oldX;
-        const dy = newY - oldY;
-        thisViewState.target.push(currentX + dx);
-        thisViewState.target.push(currentY + dy);
-      } else {
-        thisViewState.target.push(currentX);
-        thisViewState.target.push(currentY);
+        target = [currentX + (newX - oldX), currentY + (newY - oldY), currentZ];
       }
+      return { id, target, zoom, height, width };
+    }
+    if (viewState.id === id) {
       return {
         id,
-        target: thisViewState.target,
-        zoom: thisViewState.zoom,
-        height: thisViewState.height,
-        width: thisViewState.width
+        target: viewState.target,
+        zoom: getViewZoom(viewState),
+        height,
+        width
       };
     }
-    return viewState.id === id ? {
-      id,
-      target: viewState.target,
-      zoom: viewState.zoom,
-      height: viewState.height,
-      width: viewState.width
-    } : {
+    return {
       id,
       target: currentViewState.target,
-      zoom: currentViewState.zoom,
-      height: currentViewState.height,
-      width: currentViewState.width
+      zoom: getViewZoom(currentViewState),
+      height,
+      width
     };
   }
   getLayers({ props, viewStates }) {
@@ -360,7 +356,7 @@ class SideBySideView extends VivView {
       filled: false,
       stroked: true,
       getLineColor: viewportOutlineColor,
-      getLineWidth: viewportOutlineWidth * 2 ** -layerViewState.zoom
+      getLineWidth: viewportOutlineWidth * 2 ** -getViewZoom(layerViewState)
     });
     layers.push(border);
     return layers;
@@ -406,7 +402,6 @@ class ScaleBarView extends VivView {
   filterViewState({ viewState }) {
     const { id, height, width } = this;
     return {
-      ...viewState,
       id,
       height,
       width,
@@ -421,6 +416,9 @@ class ScaleBarView extends VivView {
       const { id, height, width, position, length, snap, imageViewId } = this;
       const { size, unit } = loader[0].meta.physicalSizes.x;
       const imageViewState = viewStates[imageViewId];
+      if (!imageViewState) {
+        return layers;
+      }
       const layerId = getVivId(id);
       layers.push(
         new ScaleBarLayer({
@@ -428,7 +426,7 @@ class ScaleBarView extends VivView {
           unit,
           size,
           position,
-          imageViewState: { ...imageViewState, height, width },
+          imageViewState: { ...imageViewState },
           length,
           snap,
           height,

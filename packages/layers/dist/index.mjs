@@ -1,17 +1,44 @@
 import { OrthographicView, COORDINATE_SYSTEM, CompositeLayer, Layer, project32, picking } from '@deck.gl/core';
 import { GL } from '@luma.gl/constants';
 import { Matrix4 } from '@math.gl/core';
-import { ColorPaletteExtension, ColorPalette3DExtensions } from '@vivjs/extensions';
+import { expandShaderModule, VivShaderAssembler, ColorPaletteExtension, ColorPalette3DExtensions, padColorsForUBO, getDefaultPalette } from '@vivjs/extensions';
 import { isInterleaved, SIGNAL_ABORTED, getImageSize } from '@vivjs/loaders';
+import { MAX_CHANNELS, DTYPE_VALUES, VIV_CHANNEL_INDEX_PLACEHOLDER, DEFAULT_FONT_FAMILY, VIV_PLANE_INDEX_PLACEHOLDER } from '@vivjs/constants';
 import { BitmapLayer as BitmapLayer$1, PolygonLayer, LineLayer, TextLayer } from '@deck.gl/layers';
 import { Model, Geometry } from '@luma.gl/engine';
-import { MAX_CHANNELS, DTYPE_VALUES, DEFAULT_FONT_FAMILY } from '@vivjs/constants';
-import { ShaderAssembler } from '@luma.gl/shadertools';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { Plane } from '@math.gl/culling';
 
 function range(len) {
   return [...Array(len).keys()];
+}
+function normalizeTextureBindings(textures, numChannelsRequired, keyPrefix = "channel") {
+  if (numChannelsRequired === 0)
+    return null;
+  const keys = Object.keys(textures);
+  const firstKey = `${keyPrefix}0`;
+  const firstTexture = textures[firstKey];
+  if (!firstTexture && keys.length === 0)
+    return null;
+  if (keys.length === numChannelsRequired)
+    return textures;
+  if (keys.length < numChannelsRequired && firstTexture) {
+    const out = { ...textures };
+    for (let i = 0; i < numChannelsRequired; i++) {
+      const k = `${keyPrefix}${i}`;
+      if (!out[k])
+        out[k] = firstTexture;
+    }
+    return out;
+  }
+  if (keys.length > numChannelsRequired) {
+    const out = {};
+    for (let i = 0; i < numChannelsRequired; i++) {
+      out[`${keyPrefix}${i}`] = textures[`${keyPrefix}${i}`];
+    }
+    return out;
+  }
+  return null;
 }
 function padWithDefault(arr, defaultValue, padWidth) {
   for (let i = 0; i < padWidth; i += 1) {
@@ -44,7 +71,7 @@ function padContrastLimits({
   const padSize = MAX_CHANNELS - newContrastLimits.length;
   if (padSize < 0) {
     throw Error(
-      `${newContrastLimits.lengths} channels passed in, but only 6 are allowed.`
+      `${newContrastLimits.length} channels passed in, but only ${MAX_CHANNELS} are allowed.`
     );
   }
   const paddedContrastLimits = padWithDefault(
@@ -215,6 +242,13 @@ const getTransparentColor = (photometricInterpretation) => {
       return [0, 0, 0, 0];
   }
 };
+const getPreparedImage = (img) => {
+  if (!img?.data || !img.width || !img.height) {
+    return null;
+  }
+  const data = img.data && img.data.length === img.width * img.height * 3 ? addAlpha(img.data) : img.data;
+  return { ...img, data };
+};
 class BitmapLayerWrapper extends BitmapLayer$1 {
   _getModel(gl) {
     const { photometricInterpretation, transparentColorInHook } = this.props;
@@ -222,15 +256,17 @@ class BitmapLayerWrapper extends BitmapLayer$1 {
       photometricInterpretation,
       transparentColorInHook
     );
+    const numChannels = this.props.selections?.length || 1;
     return new Model(this.context.device, {
-      ...this.getShaders(),
+      ...expandShaderModule(this.getShaders(), numChannels),
       id: this.props.id,
       bufferLayout: this.getAttributeManager().getBufferLayouts(),
       topology: "triangle-list",
       isInstanced: false,
       inject: {
         "fs:DECKGL_FILTER_COLOR": photometricInterpretationShader
-      }
+      },
+      shaderAssembler: VivShaderAssembler.getDefaultVivShaderAssembler()
     });
   }
 }
@@ -249,16 +285,17 @@ const BitmapLayer = class extends CompositeLayer {
       transparentColor: transparentColorInHook
     } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
-    this.props.image.data = addAlpha(this.props.image.data);
-    return new BitmapLayerWrapper(this.props, {
-      // transparentColor is a prop applied to the original image data by deck.gl's
-      // BitmapLayer and needs to be in the original colorspace.  It is used to determine
-      // what color is "transparent" in the original color space (i.e what shows when opacity is 0).
-      transparentColor,
-      // This is our transparentColor props which needs to be applied in the hook that converts to the RGB space.
-      transparentColorInHook,
-      id: `${this.props.id}-wrapped`
-    });
+    const image = getPreparedImage(this.props.image);
+    if (!image)
+      return null;
+    return new BitmapLayerWrapper(
+      { ...this.props, image },
+      {
+        transparentColor,
+        transparentColorInHook,
+        id: `${this.props.id}-wrapped`
+      }
+    );
   }
 };
 BitmapLayer.layerName = "BitmapLayer";
@@ -273,57 +310,52 @@ BitmapLayer.defaultProps = {
 BitmapLayerWrapper.defaultProps = defaultProps$8;
 BitmapLayerWrapper.layerName = "BitmapLayerWrapper";
 
-const fs$2 = `float apply_contrast_limits(float intensity, vec2 contrastLimits) {
+const moduleName$3 = "channelIntensity";
+const fs$4 = `uniform ${moduleName$3}Uniforms {
+  vec2 contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER};
+} ${moduleName$3};
+
+float apply_contrast_limits(float intensity, vec2 contrastLimits) {
     return  max(0., (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0])));
 }
 `;
 const channels = {
-  name: "channel-intensity",
+  name: moduleName$3,
+  uniformTypes: {
+    [`contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER}`]: "vec2<f32>"
+  },
   defines: {
     SAMPLER_TYPE: "usampler2D",
     COLORMAP_FUNCTION: ""
   },
-  fs: fs$2
+  fs: fs$4
 };
 
-const fs$1 = `#version 300 es
+const fs$3 = `#version 300 es
 #define SHADER_NAME xr-layer-fragment-shader
-
 precision highp float;
 precision highp int;
 precision highp SAMPLER_TYPE;
 
 // our texture
-uniform SAMPLER_TYPE channel0;
-uniform SAMPLER_TYPE channel1;
-uniform SAMPLER_TYPE channel2;
-uniform SAMPLER_TYPE channel3;
-uniform SAMPLER_TYPE channel4;
-uniform SAMPLER_TYPE channel5;
+uniform SAMPLER_TYPE channel${VIV_CHANNEL_INDEX_PLACEHOLDER};
 
 in vec2 vTexCoord;
-
-// range
-uniform vec2 contrastLimits[6];
 
 out vec4 fragColor;
 
 void main() {
 
-  float intensity0 = float(texture(channel0, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity0, contrastLimits[0], 0);
-  float intensity1 = float(texture(channel1, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity1, contrastLimits[1], 1);
-  float intensity2 = float(texture(channel2, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity2, contrastLimits[2], 2);
-  float intensity3 = float(texture(channel3, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity3, contrastLimits[3], 3);
-  float intensity4 = float(texture(channel4, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity4, contrastLimits[4], 4);
-  float intensity5 = float(texture(channel5, vTexCoord).r);
-  DECKGL_PROCESS_INTENSITY(intensity5, contrastLimits[5], 5);
+  float intensity${VIV_CHANNEL_INDEX_PLACEHOLDER} = float(texture(channel${VIV_CHANNEL_INDEX_PLACEHOLDER}, vTexCoord).r);
+  DECKGL_PROCESS_INTENSITY(intensity${VIV_CHANNEL_INDEX_PLACEHOLDER}, channelIntensity.contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER}, ${VIV_CHANNEL_INDEX_PLACEHOLDER});
+  // DECKGL_PROCESS_INTENSITY(intensity${VIV_CHANNEL_INDEX_PLACEHOLDER}, xrLayer.contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER}, ${VIV_CHANNEL_INDEX_PLACEHOLDER});
 
-  DECKGL_MUTATE_COLOR(fragColor, intensity0, intensity1, intensity2, intensity3, intensity4, intensity5, vTexCoord);
+  float[] intensity = float[NUM_CHANNELS](
+    // as of this writing, this will be expanded by some very fragile string processing to remove final comma...
+    // needs documenting and hopefully improving.
+    intensity${VIV_CHANNEL_INDEX_PLACEHOLDER},
+  );
+  DECKGL_MUTATE_COLOR(fragColor, intensity, vTexCoord);
 
 
   geometry.uv = vTexCoord;
@@ -352,12 +384,14 @@ void main(void) {
 }
 `;
 
-const coreShaderModule = { fs: fs$1, vs: vs$1 };
-function getRenderingAttrs$1(dtype, interpolation) {
+const coreShaderModule = { fs: fs$3, vs: vs$1, name: "xrLayer" };
+function getRenderingAttrs$1(dtype, interpolation, numChannels = MAX_CHANNELS) {
+  //!!! todo review whether we really need to be storing data as f32 - probably not.
   const isLinear = interpolation === "linear";
   const values = getDtypeValues(isLinear ? "Float32" : dtype);
   return {
-    shaderModule: coreShaderModule,
+    // maybe we should do this in XRLayer instead
+    shaderModule: expandShaderModule({ ...coreShaderModule }, numChannels),
     filter: interpolation,
     cast: isLinear ? (data) => new Float32Array(data) : (data) => data,
     ...values
@@ -376,35 +410,62 @@ const defaultProps$7 = {
     type: "string",
     value: "nearest",
     compare: true
-  }
+  },
+  // Extension props are merged into layer props, but declaring them here
+  // ensures deck.gl tracks them for change detection(?)
+  colormap: { type: "string", value: null, compare: true }
 };
-const XRLayer = class extends Layer {
+class XRLayer extends Layer {
+  /**
+   * Returns the number of channels for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumChannels() {
+    return this.props.selections?.length ?? this.props.channels?.length ?? MAX_CHANNELS;
+  }
+  /**
+   * Returns the number of planes for this layer instance (always 1 for 2D layers).
+   * Implements VivLayer interface.
+   */
+  getNumPlanes() {
+    return 1;
+  }
   /**
    * This function replaces `usampler` with `sampler` if the data is not an unsigned integer
    * and adds a standard ramp function default for DECKGL_PROCESS_INTENSITY.
    */
   getShaders() {
     const { dtype, interpolation } = this.props;
-    const { shaderModule, sampler } = getRenderingAttrs$1(dtype, interpolation);
+    const numChannels = this.getNumChannels();
+    const { shaderModule, sampler } = getRenderingAttrs$1(
+      dtype,
+      interpolation,
+      numChannels
+    );
     const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions("fs:DECKGL_PROCESS_INTENSITY");
-    const newChannelsModule = { ...channels, inject: {} };
+    const expandedChannels = expandShaderModule(channels, numChannels);
+    const newChannelsModule = { ...expandedChannels, inject: {} };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject["fs:DECKGL_PROCESS_INTENSITY"] = `
         intensity = apply_contrast_limits(intensity, contrastLimits);
       `;
     }
-    return super.getShaders({
-      ...shaderModule,
-      defines: {
-        SAMPLER_TYPE: sampler
-      },
-      modules: [project32, picking, newChannelsModule]
-    });
+    return expandShaderModule(
+      super.getShaders({
+        ...shaderModule,
+        defines: {
+          SAMPLER_TYPE: sampler
+        },
+        modules: [project32, picking, newChannelsModule]
+      }),
+      numChannels
+    );
   }
+  // may consider reviewing this along with other extension stuff.
   _isHookDefinedByExtensions(hookName) {
     const { extensions } = this.props;
     return extensions?.some((e) => {
-      const shaders = e.getShaders();
+      const shaders = e.getShaders.call(this, e);
       const { inject = {}, modules = [] } = shaders;
       const definesInjection = inject[hookName];
       const moduleDefinesInjection = modules.some((m) => m?.inject[hookName]);
@@ -434,15 +495,6 @@ const XRLayer = class extends Layer {
       numInstances: 1,
       positions: new Float64Array(12)
     });
-    const shaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
-    const mutateStr = "fs:DECKGL_MUTATE_COLOR(inout vec4 rgba, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)";
-    const processStr = "fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)";
-    if (!shaderAssembler._hookFunctions.includes(mutateStr)) {
-      shaderAssembler.addShaderHook(mutateStr);
-    }
-    if (!shaderAssembler._hookFunctions.includes(processStr)) {
-      shaderAssembler.addShaderHook(processStr);
-    }
   }
   /**
    * This function finalizes state by clearing all textures from the WebGL context
@@ -459,7 +511,16 @@ const XRLayer = class extends Layer {
    */
   updateState({ props, oldProps, changeFlags, ...rest }) {
     super.updateState({ props, oldProps, changeFlags, ...rest });
-    if (changeFlags.extensionsChanged || props.interpolation !== oldProps.interpolation) {
+    const numChannels = this.getNumChannels();
+    if (numChannels === 0) {
+      if (this.state.model) {
+        this.state.model.destroy();
+        this.setState({ model: null });
+      }
+      return;
+    }
+    const colormapChanged = props.colormap !== oldProps?.colormap;
+    if (changeFlags.extensionsChanged || props.interpolation !== oldProps.interpolation || colormapChanged || (props.selections?.length ?? 0) !== (oldProps.selections?.length ?? 0)) {
       const { device } = this.context;
       if (this.state.model) {
         this.state.model.destroy();
@@ -473,6 +534,27 @@ const XRLayer = class extends Layer {
     const attributeManager = this.getAttributeManager();
     if (props.bounds !== oldProps.bounds) {
       attributeManager.invalidate("positions");
+    }
+    const texturesToBind = this._newTexturesFromLoadThisFrame ?? this.state.textures;
+    const { model } = this.state;
+    const bindings = texturesToBind && model ? normalizeTextureBindings(texturesToBind, numChannels, "channel") : null;
+    if (bindings) {
+      const { contrastLimits, domain, dtype, channelsVisible } = this.props;
+      const paddedContrastLimits = padContrastLimits({
+        contrastLimits: contrastLimits.slice(0, numChannels),
+        channelsVisible: channelsVisible.slice(0, numChannels),
+        domain,
+        dtype
+      });
+      const channelIntensity = {};
+      for (let i = 0; i < numChannels; i++) {
+        channelIntensity[`contrastLimits${i}`] = [
+          paddedContrastLimits[i * 2],
+          paddedContrastLimits[i * 2 + 1]
+        ];
+      }
+      model.shaderInputs.setProps({ channelIntensity });
+      model.setBindings(bindings);
     }
   }
   /**
@@ -497,7 +579,8 @@ const XRLayer = class extends Layer {
         }
       }),
       bufferLayout: this.getAttributeManager().getBufferLayouts(),
-      isInstanced: false
+      isInstanced: false,
+      shaderAssembler: VivShaderAssembler.getDefaultVivShaderAssembler()
     });
   }
   /**
@@ -521,43 +604,28 @@ const XRLayer = class extends Layer {
     attributes.value = positions;
   }
   /**
-   * This function runs the shaders and draws to the canvas
+   * Track textures that were created during the current frame.
+   * These textures are used by `updateState` to bind same-frame textures
+   * and avoid referencing textures that may have been deleted when channels
+   * are removed and then added back.
+   *
+   * @param {Record<string, import('@luma.gl/core').Texture>|null} textures - Map of channel ids
+   *   (e.g. `channel0`, `channel1`) to textures created this frame, or null
+   *   when no channel textures were loaded.
+   * @private
    */
-  draw(opts) {
-    const { uniforms } = opts;
-    const { textures, model } = this.state;
-    if (textures && model) {
-      const { contrastLimits, domain, dtype, channelsVisible } = this.props;
-      const numTextures = Object.values(textures).filter((t) => t).length;
-      const paddedContrastLimits = padContrastLimits({
-        contrastLimits: contrastLimits.slice(0, numTextures),
-        channelsVisible: channelsVisible.slice(0, numTextures),
-        domain,
-        dtype
-      });
-      model.setUniforms(
-        {
-          ...uniforms,
-          contrastLimits: paddedContrastLimits
-        },
-        { disableWarnings: false }
-      );
-      model.setBindings(textures);
-      model.draw(this.context.renderPass);
-    }
+  _setNewTexturesFromLoadThisFrame(textures) {
+    this._newTexturesFromLoadThisFrame = textures;
   }
   /**
    * This function loads all channel textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadChannelTextures(channelData) {
-    const textures = {
-      channel0: null,
-      channel1: null,
-      channel2: null,
-      channel3: null,
-      channel4: null,
-      channel5: null
-    };
+    const numChannels = this.getNumChannels();
+    const textures = {};
+    for (let i = 0; i < numChannels; i++) {
+      textures[`channel${i}`] = null;
+    }
     if (this.state.textures) {
       Object.values(this.state.textures).forEach((tex) => tex?.delete());
     }
@@ -575,7 +643,10 @@ const XRLayer = class extends Layer {
         if (!textures[key])
           textures[key] = textures.channel0;
       }
+      this._setNewTexturesFromLoadThisFrame(textures);
       this.setState({ textures });
+    } else {
+      this._setNewTexturesFromLoadThisFrame(null);
     }
   }
   /**
@@ -602,13 +673,14 @@ const XRLayer = class extends Layer {
       format: attrs.format
     });
   }
-};
+}
 XRLayer.layerName = "XRLayer";
 XRLayer.defaultProps = defaultProps$7;
 
 const defaultProps$6 = {
   pickable: { type: "boolean", value: true, compare: true },
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+  // similar things also declared in several other places & we may end up re-arranging somewhat?
   contrastLimits: { type: "array", value: [], compare: true },
   channelsVisible: { type: "array", value: [], compare: true },
   selections: { type: "array", value: [], compare: true },
@@ -637,6 +709,20 @@ const defaultProps$6 = {
   }
 };
 const ImageLayer = class extends CompositeLayer {
+  /**
+   * Returns the number of channels for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumChannels() {
+    return this.props.selections?.length ?? this.props.channels?.length ?? MAX_CHANNELS;
+  }
+  /**
+   * Returns the number of planes for this layer instance (always 1 for 2D layers).
+   * Implements VivLayer interface.
+   */
+  getNumPlanes() {
+    return 1;
+  }
   finalizeState() {
     this.state.abortController.abort();
   }
@@ -710,19 +796,22 @@ ImageLayer.defaultProps = defaultProps$6;
 
 function renderSubLayers(props) {
   const {
-    bbox: { left, top, right, bottom },
+    bbox: { left, top },
     index: { x, y, z }
   } = props.tile;
   const { data, id, loader, maxZoom } = props;
-  if ([left, bottom, right, top].some((v) => v < 0) || !data) {
+  if ([left, top].some((v) => v < 0) || !data) {
+    return null;
+  }
+  if (data.width === 0 || data.height === 0) {
     return null;
   }
   const base = loader[0];
-  const { height, width } = getImageSize(base);
+  const scale = 2 ** Math.round(-z);
   const bounds = [
     left,
-    data.height < base.tileSize ? height : bottom,
-    data.width < base.tileSize ? width : right,
+    top + data.height * scale,
+    left + data.width * scale,
     top
   ];
   if (isInterleaved(base.shape)) {
@@ -953,7 +1042,7 @@ const OverviewLayer = class extends CompositeLayer {
     });
     const boundingBoxOutline = new PolygonLayer({
       id: `bounding-box-overview-${id}`,
-      coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+      coordinateSystem: "cartesian",
       data: [boundingBox],
       getPolygon: (f) => f,
       filled: false,
@@ -963,7 +1052,7 @@ const OverviewLayer = class extends CompositeLayer {
     });
     const viewportOutline = new PolygonLayer({
       id: `viewport-outline-${id}`,
-      coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+      coordinateSystem: "cartesian",
       data: [
         [
           [0, 0],
@@ -1134,43 +1223,20 @@ const ScaleBarLayer = class extends CompositeLayer {
 ScaleBarLayer.layerName = "ScaleBarLayer";
 ScaleBarLayer.defaultProps = defaultProps$2;
 
-const fs = `#version 300 es
+const fs$2 = `#version 300 es
 precision highp int;
 precision highp float;
 precision highp SAMPLER_TYPE;
 
-uniform highp SAMPLER_TYPE volume0;
-uniform highp SAMPLER_TYPE volume1;
-uniform highp SAMPLER_TYPE volume2;
-uniform highp SAMPLER_TYPE volume3;
-uniform highp SAMPLER_TYPE volume4;
-uniform highp SAMPLER_TYPE volume5;
-
-uniform vec3 scaledDimensions;
-
-uniform mat4 scale;
-
-uniform vec3 normals[NUM_PLANES];
-uniform float distances[NUM_PLANES];
-
-// color
-uniform vec3 colors[6];
-
-// slices
-uniform vec2 xSlice;
-uniform vec2 ySlice;
-uniform vec2 zSlice;
-
-// range
-uniform vec2 contrastLimits[6];
+uniform highp SAMPLER_TYPE volume${VIV_CHANNEL_INDEX_PLACEHOLDER};
 
 in vec3 vray_dir;
 flat in vec3 transformed_eye;
 out vec4 color;
 
 vec2 intersect_box(vec3 orig, vec3 dir) {
-	vec3 box_min = vec3(xSlice[0], ySlice[0], zSlice[0]);
-	vec3 box_max = vec3(xSlice[1], ySlice[1], zSlice[1]);
+	vec3 box_min = vec3(fragmentUniforms3D.xSlice[0], fragmentUniforms3D.ySlice[0], fragmentUniforms3D.zSlice[0]);
+	vec3 box_max = vec3(fragmentUniforms3D.xSlice[1], fragmentUniforms3D.ySlice[1], fragmentUniforms3D.zSlice[1]);
 	vec3 inv_dir = 1. / dir;
 	vec3 tmin_tmp = (box_min - orig) * inv_dir;
 	vec3 tmax_tmp = (box_max - orig) * inv_dir;
@@ -1218,7 +1284,7 @@ void main(void) {
 	t_hit.x = max(t_hit.x, 0.);
 
 	// Step 3: Compute the step size to march through the volume grid
-	vec3 dt_vec = 1. / (scale * vec4(abs(ray_dir), 1.)).xyz;
+	vec3 dt_vec = 1. / (fragmentUniforms3D.scale * vec4(abs(ray_dir), 1.)).xyz;
 	float dt = 1. * min(dt_vec.x, min(dt_vec.y, dt_vec.z));
 
 	float offset = wang_hash(int(gl_FragCoord.x + 640. * gl_FragCoord.y));
@@ -1226,15 +1292,15 @@ void main(void) {
 	// Step 4: Starting from the entry point, march the ray through the volume
 	// and sample it
 	vec3 p = transformed_eye + (t_hit.x + offset * dt) * ray_dir;
+	
+	#define _U fragmentUniforms3D
+	_BEFORE_RENDER
 
 	// TODO: Probably want to stop this process at some point to improve performance when marching down the edges.
-	_BEFORE_RENDER
 	for (float t = t_hit.x; t < t_hit.y; t += dt) {
 		// Check if this point is on the "positive" side or "negative" side of the plane - only show positive.
 		float canShow = 1.;
-		for (int i = 0; i < NUM_PLANES; i += 1) {
-			canShow *= max(0., sign(dot(normals[i], p) + distances[i]));
-		}
+		canShow *= max(0., sign(dot(_U.normal${VIV_PLANE_INDEX_PLACEHOLDER}, p) + _U.distance${VIV_PLANE_INDEX_PLACEHOLDER}));
 		// Do not show coordinates outside 0-1 box.
 		// Something about the undefined behavior outside the box causes the additive blender to 
 		// render some very odd artifacts.
@@ -1243,24 +1309,10 @@ void main(void) {
 		float canShowZCoordinate = max(p.z - 0., 0.) * max(1. - p.z , 0.);
 		float canShowCoordinate = float(ceil(canShowXCoordinate * canShowYCoordinate * canShowZCoordinate));
 		canShow = canShowCoordinate * canShow;
-		float intensityValue0 = float(texture(volume0, p).r);
-		DECKGL_PROCESS_INTENSITY(intensityValue0, contrastLimits[0], 0);
-		intensityValue0 = canShow * intensityValue0;
-		float intensityValue1 = float(texture(volume1, p).r);
-		DECKGL_PROCESS_INTENSITY(intensityValue1, contrastLimits[1], 1);
-		intensityValue1 = canShow * intensityValue1;
-		float intensityValue2 = float(texture(volume2, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue2, contrastLimits[2], 2);
-		intensityValue2 = canShow * intensityValue2;
-		float intensityValue3 = float(texture(volume3, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue3, contrastLimits[3], 3);
-		intensityValue3 = canShow * intensityValue3;
-    	float intensityValue4 = float(texture(volume4, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue4, contrastLimits[4], 4);
-		intensityValue4 = canShow * intensityValue4;
-		float intensityValue5 = float(texture(volume5, p).r);
-  		DECKGL_PROCESS_INTENSITY(intensityValue5, contrastLimits[5], 5);
-		intensityValue5 = canShow * intensityValue5;
+		float intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER} = float(texture(volume${VIV_CHANNEL_INDEX_PLACEHOLDER}, p).r);
+		DECKGL_PROCESS_INTENSITY(intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER}, channelIntensity3D.contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER}, ${VIV_CHANNEL_INDEX_PLACEHOLDER});
+		intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER} = canShow * intensityValue${VIV_CHANNEL_INDEX_PLACEHOLDER};
+
 
 		_RENDER
 
@@ -1279,19 +1331,17 @@ const vs = `#version 300 es
 // Unit-cube vertices
 in vec3 positions;
 
-// Eye position - last column of the inverted view matrix
-uniform vec3 eye_pos;
-// Projection matrix
-uniform mat4 proj;
-// Model Matrix
-uniform mat4 model;
-// View Matrix
-uniform mat4 view;
-// A matrix for scaling in the model space before any transformations.
-// This projects the unit cube up to match the "pixel size" multiplied by the physical size ratio, if provided.
-uniform mat4 scale;
-uniform mat4 resolution;
-
+uniform vertexUniforms {
+  // Eye position - last column of the inverted view matrix  
+  vec3 eye_pos;
+  mat4 proj;
+  mat4 model;
+  mat4 view;
+  // A matrix for scaling in the model space before any transformations.
+  // This projects the unit cube up to match the "pixel size" multiplied by the physical size ratio, if provided.
+  mat4 scale;
+  mat4 resolution;
+} vertex;
 
 out vec3 vray_dir;
 flat out vec3 transformed_eye;
@@ -1299,7 +1349,7 @@ flat out vec3 transformed_eye;
 void main() {
 
   // Step 1: Standard MVP transformation (+ the scale matrix) to place the positions on your 2D screen ready for rasterization + fragment processing.
-  gl_Position = proj * view * model * scale * resolution * vec4(positions, 1.);
+  gl_Position = vertex.proj * vertex.view * vertex.model * vertex.scale * vertex.resolution * vec4(positions, 1.);
 
   // Step 2: Invert the eye back from world space to the normalized 0-1 cube world space because ray casting on the fragment shader runs in 0-1 space.
   // Geometrically, the transformed_eye is a position relative to the 0-1 normalized vertices, which themselves are the inverse of the model + scale trasnformation.
@@ -1339,21 +1389,69 @@ void main() {
   /
  #
   */
-  transformed_eye = (inverse(resolution) * inverse(scale) * inverse(model) * (vec4(eye_pos, 1.))).xyz;
+  transformed_eye = (inverse(vertex.resolution) * inverse(vertex.scale) * inverse(vertex.model) * (vec4(vertex.eye_pos, 1.))).xyz;
 
   // Step 3: Rays are from eye to vertices so that they get interpolated over the fragments.
   vray_dir = positions - transformed_eye;
 }
 `;
 
-const channelsModule = {
-  name: "channel-intensity-module",
-  fs: `    float apply_contrast_limits(float intensity, vec2 contrastLimits) {
-      float contrastLimitsAppliedToIntensity = (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0]));
-      return max(0., contrastLimitsAppliedToIntensity);
-    }
-  `
+const moduleName$2 = "channelIntensity3D";
+const fs$1 = `uniform ${moduleName$2}Uniforms {
+  vec2 contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER};
+} ${moduleName$2};
+
+float apply_contrast_limits(float intensity, vec2 contrastLimits) {
+  float contrastLimitsAppliedToIntensity = (intensity - contrastLimits[0]) / max(0.0005, (contrastLimits[1] - contrastLimits[0]));
+  return max(0., contrastLimitsAppliedToIntensity);
+}
+`;
+const channelIntensity3D = {
+  name: moduleName$2,
+  uniformTypes: {
+    [`contrastLimits${VIV_CHANNEL_INDEX_PLACEHOLDER}`]: "vec2<f32>"
+  },
+  fs: fs$1
 };
+
+const moduleName$1 = "fragmentUniforms3D";
+const fs = `uniform ${moduleName$1}Uniforms {
+  vec2 xSlice;
+  vec2 ySlice;
+  vec2 zSlice;
+  mat4 scale;
+  vec3 color${VIV_CHANNEL_INDEX_PLACEHOLDER};
+  vec3 normal${VIV_PLANE_INDEX_PLACEHOLDER};
+  float distance${VIV_PLANE_INDEX_PLACEHOLDER};
+} ${moduleName$1};
+`;
+const fragmentUniforms3D = {
+  name: moduleName$1,
+  uniformTypes: {
+    xSlice: "vec2<f32>",
+    ySlice: "vec2<f32>",
+    zSlice: "vec2<f32>",
+    scale: "mat4x4<f32>",
+    [`color${VIV_CHANNEL_INDEX_PLACEHOLDER}`]: "vec3<f32>",
+    [`normal${VIV_PLANE_INDEX_PLACEHOLDER}`]: "vec3<f32>",
+    [`distance${VIV_PLANE_INDEX_PLACEHOLDER}`]: "f32"
+  },
+  fs
+};
+
+const moduleName = "vertex";
+const vertexUniforms3D = {
+  name: moduleName,
+  uniformTypes: {
+    eye_pos: "vec3<f32>",
+    proj: "mat4x4<f32>",
+    model: "mat4x4<f32>",
+    view: "mat4x4<f32>",
+    scale: "mat4x4<f32>",
+    resolution: "mat4x4<f32>"
+  }
+};
+
 const CUBE_STRIP = [
   1,
   1,
@@ -1404,6 +1502,7 @@ const defaultProps$1 = {
   coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
   channelData: { type: "object", value: {}, compare: true },
   contrastLimits: { type: "array", value: [], compare: true },
+  colors: { type: "array", value: null, compare: true },
   dtype: { type: "string", value: "Uint8", compare: true },
   xSlice: { type: "array", value: null, compare: true },
   ySlice: { type: "array", value: null, compare: true },
@@ -1428,7 +1527,8 @@ function getRenderingAttrs() {
 function getRenderingFromExtensions(extensions) {
   let rendering = {};
   extensions.forEach((extension) => {
-    rendering = extension.rendering;
+    if (extension.rendering._RENDER)
+      rendering = extension.rendering;
   });
   if (!rendering._RENDER) {
     throw new Error(
@@ -1438,22 +1538,32 @@ function getRenderingFromExtensions(extensions) {
   return rendering;
 }
 const XR3DLayer = class extends Layer {
+  /**
+   * Returns the number of channels for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumChannels() {
+    return this.props.selections?.length ?? this.props.channels?.length ?? MAX_CHANNELS;
+  }
+  /**
+   * Returns the number of planes for this layer instance.
+   * Implements VivLayer interface.
+   */
+  getNumPlanes() {
+    const { clippingPlanes } = this.props;
+    return clippingPlanes?.length || NUM_PLANES_DEFAULT;
+  }
   initializeState() {
     const { device } = this.context;
     device.setParametersWebGL({
       [GL.UNPACK_ALIGNMENT]: 1,
       [GL.PACK_ALIGNMENT]: 1
     });
-    const programManager = ShaderAssembler.getDefaultShaderAssembler();
-    const processStr = "fs:DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)";
-    if (!programManager._hookFunctions.includes(processStr)) {
-      programManager.addShaderHook(processStr);
-    }
   }
   _isHookDefinedByExtensions(hookName) {
     const { extensions } = this.props;
     return extensions?.some((e) => {
-      const shaders = e.getShaders();
+      const shaders = e.getShaders.call(this, e);
       if (shaders) {
         const { inject = {}, modules = [] } = shaders;
         const definesInjection = inject[hookName];
@@ -1467,25 +1577,49 @@ const XR3DLayer = class extends Layer {
    * This function compiles the shaders and the projection module.
    */
   getShaders() {
-    const { clippingPlanes, extensions } = this.props;
+    const { extensions } = this.props;
     const { sampler } = getRenderingAttrs();
     const { _BEFORE_RENDER, _RENDER, _AFTER_RENDER } = getRenderingFromExtensions(extensions);
     const extensionDefinesDeckglProcessIntensity = this._isHookDefinedByExtensions("fs:DECKGL_PROCESS_INTENSITY");
-    const newChannelsModule = { inject: {}, ...channelsModule };
+    const numChannels = this.getNumChannels();
+    const numPlanes = this.getNumPlanes();
+    const expandedChannelIntensity = expandShaderModule(
+      channelIntensity3D,
+      numChannels,
+      numPlanes
+    );
+    const expandedFragmentUniforms = expandShaderModule(
+      fragmentUniforms3D,
+      numChannels,
+      numPlanes
+    );
+    const expandedVertexUniforms = expandShaderModule(
+      vertexUniforms3D,
+      numChannels,
+      numPlanes
+    );
+    const newChannelsModule = { inject: {}, ...expandedChannelIntensity };
     if (!extensionDefinesDeckglProcessIntensity) {
       newChannelsModule.inject["fs:DECKGL_PROCESS_INTENSITY"] = `
         intensity = apply_contrast_limits(intensity, contrastLimits);
       `;
     }
-    return super.getShaders({
-      vs,
-      fs: fs.replace("_BEFORE_RENDER", _BEFORE_RENDER).replace("_RENDER", _RENDER).replace("_AFTER_RENDER", _AFTER_RENDER),
-      defines: {
-        SAMPLER_TYPE: sampler,
-        NUM_PLANES: String(clippingPlanes.length || NUM_PLANES_DEFAULT)
-      },
-      modules: [newChannelsModule]
-    });
+    return expandShaderModule(
+      super.getShaders({
+        vs,
+        fs: fs$2.replace("_BEFORE_RENDER", _BEFORE_RENDER).replace("_RENDER", _RENDER).replace("_AFTER_RENDER", _AFTER_RENDER),
+        defines: {
+          SAMPLER_TYPE: sampler
+        },
+        modules: [
+          newChannelsModule,
+          expandedFragmentUniforms,
+          expandedVertexUniforms
+        ]
+      }),
+      numChannels,
+      numPlanes
+    );
   }
   /**
    * This function finalizes state by clearing all textures from the WebGL context
@@ -1501,7 +1635,16 @@ const XR3DLayer = class extends Layer {
    * and loading any textures that need be loading.
    */
   updateState({ props, oldProps, changeFlags }) {
-    if (changeFlags.extensionsChanged || props.colormap !== oldProps.colormap || props.renderingMode !== oldProps.renderingMode || props.clippingPlanes.length !== oldProps.clippingPlanes.length) {
+    const numChannels = this.getNumChannels();
+    if (numChannels === 0) {
+      if (this.state.model) {
+        this.state.model.destroy();
+        this.setState({ model: null });
+      }
+      return;
+    }
+    const channelCountChanged = (props.selections?.length ?? 0) !== (oldProps?.selections?.length ?? 0);
+    if (changeFlags.extensionsChanged || props.colormap !== oldProps.colormap || props.renderingMode !== oldProps.renderingMode || props.clippingPlanes.length !== oldProps.clippingPlanes.length || channelCountChanged) {
       const { device } = this.context;
       if (this.state.model) {
         this.state.model.destroy();
@@ -1510,6 +1653,9 @@ const XR3DLayer = class extends Layer {
     }
     if (props.channelData && props?.channelData?.data !== oldProps?.channelData?.data) {
       this.loadTexture(props.channelData);
+    }
+    if (this.state.textures && this.state.scaleMatrix) {
+      this._updateUniforms(props);
     }
   }
   /**
@@ -1526,90 +1672,168 @@ const XR3DLayer = class extends Layer {
         attributes: {
           positions: new Float32Array(CUBE_STRIP)
         }
-      })
+      }),
+      shaderAssembler: VivShaderAssembler.getDefaultVivShaderAssembler()
+    });
+  }
+  /**
+   * This function builds and caches UBO uniform data that is independent of view state.
+   */
+  _updateUniforms(props) {
+    const { textures, scaleMatrix } = this.state;
+    if (!textures || !scaleMatrix)
+      return;
+    const numChannels = this.getNumChannels();
+    const {
+      contrastLimits,
+      colors,
+      xSlice,
+      ySlice,
+      zSlice,
+      channelsVisible,
+      domain,
+      dtype,
+      clippingPlanes,
+      resolutionMatrix,
+      selections
+    } = props;
+    const paddedContrastLimits = padContrastLimits({
+      contrastLimits,
+      channelsVisible,
+      domain,
+      dtype
+    });
+    const invertedScaleMatrix = scaleMatrix.clone().invert();
+    const invertedResolutionMatrix = resolutionMatrix.clone().invert();
+    const paddedClippingPlanes = padWithDefault(
+      clippingPlanes.map(
+        (p) => p.clone().transform(invertedScaleMatrix).transform(invertedResolutionMatrix)
+      ),
+      new Plane([1, 0, 0]),
+      clippingPlanes.length || NUM_PLANES_DEFAULT
+    );
+    const normals = paddedClippingPlanes.flatMap((plane) => plane.normal);
+    const distances = paddedClippingPlanes.map((plane) => plane.distance);
+    const numPlanes = clippingPlanes.length || NUM_PLANES_DEFAULT;
+    const numTextures = Object.values(textures).filter((t) => t).length;
+    const numChannelsForColors = Math.max(
+      numTextures,
+      selections?.length || 0,
+      1
+    );
+    const paddedColors = padColorsForUBO({
+      channelsVisible: channelsVisible || Array(numChannelsForColors).fill(true),
+      colors: colors || getDefaultPalette(numChannelsForColors)
+    });
+    const channelIntensity3DUniforms = {};
+    for (let i = 0; i < numChannels; i++) {
+      channelIntensity3DUniforms[`contrastLimits${i}`] = [
+        paddedContrastLimits[i * 2],
+        paddedContrastLimits[i * 2 + 1]
+      ];
+    }
+    const fragmentUniforms3DUniforms = {
+      xSlice: xSlice ? xSlice.map((i) => i / scaleMatrix[0] / resolutionMatrix[0]) : [0, 1],
+      ySlice: ySlice ? ySlice.map((i) => i / scaleMatrix[5] / resolutionMatrix[5]) : [0, 1],
+      zSlice: zSlice ? zSlice.map((i) => i / scaleMatrix[10] / resolutionMatrix[10]) : [0, 1],
+      scale: scaleMatrix
+    };
+    for (let i = 0; i < numChannels; i++) {
+      fragmentUniforms3DUniforms[`color${i}`] = paddedColors[i] || [0, 0, 0];
+    }
+    for (let i = 0; i < numPlanes; i++) {
+      fragmentUniforms3DUniforms[`normal${i}`] = [
+        normals[i * 3],
+        normals[i * 3 + 1],
+        normals[i * 3 + 2]
+      ];
+      fragmentUniforms3DUniforms[`distance${i}`] = distances[i];
+    }
+    this.setState({
+      channelIntensity3DUniforms,
+      fragmentUniforms3DUniforms
     });
   }
   /**
    * This function runs the shaders and draws to the canvas
    */
-  draw(opts) {
-    const { uniforms } = opts;
-    const { textures, model, scaleMatrix } = this.state;
+  draw() {
     const {
-      contrastLimits,
-      xSlice,
-      ySlice,
-      zSlice,
-      modelMatrix,
-      channelsVisible,
-      domain,
-      dtype,
-      clippingPlanes,
-      resolutionMatrix
-    } = this.props;
-    const { viewMatrix, viewMatrixInverse, projectionMatrix } = this.context.viewport;
-    if (textures && model && scaleMatrix) {
-      const paddedContrastLimits = padContrastLimits({
-        contrastLimits,
-        channelsVisible,
-        domain,
-        dtype
+      model,
+      scaleMatrix,
+      channelIntensity3DUniforms,
+      fragmentUniforms3DUniforms
+    } = this.state;
+    if (!channelIntensity3DUniforms || !fragmentUniforms3DUniforms) {
+      if (this.state.textures && scaleMatrix) {
+        this._updateUniforms(this.props);
+      }
+      return;
+    }
+    const texturesToBind = this._newTexturesFromLoadThisFrame ?? this.state.textures;
+    const numChannels = this.getNumChannels();
+    let bindings = null;
+    if (texturesToBind && model && scaleMatrix) {
+      const cacheKeyTextures = texturesToBind;
+      const cacheKeyChannels = numChannels;
+      if (this._cachedBindingsTextures !== cacheKeyTextures || this._cachedBindingsNumChannels !== cacheKeyChannels) {
+        this._cachedBindings = normalizeTextureBindings(
+          texturesToBind,
+          numChannels,
+          "volume"
+        );
+        this._cachedBindingsTextures = cacheKeyTextures;
+        this._cachedBindingsNumChannels = cacheKeyChannels;
+      }
+      bindings = this._cachedBindings;
+    }
+    if (bindings && model && scaleMatrix) {
+      const { modelMatrix, resolutionMatrix } = this.props;
+      const { viewMatrix, viewMatrixInverse, projectionMatrix } = this.context.viewport;
+      if (!this._vertexUniformsData) {
+        this._vertexUniformsData = {
+          eye_pos: [0, 0, 0],
+          proj: null,
+          model: null,
+          view: null,
+          scale: null,
+          resolution: null
+        };
+      }
+      const vertexUniformsData = this._vertexUniformsData;
+      const eyePos = vertexUniformsData.eye_pos;
+      eyePos[0] = viewMatrixInverse[12];
+      eyePos[1] = viewMatrixInverse[13];
+      eyePos[2] = viewMatrixInverse[14];
+      vertexUniformsData.proj = projectionMatrix;
+      if (!this._defaultModelMatrix) {
+        this._defaultModelMatrix = new Matrix4();
+      }
+      vertexUniformsData.model = modelMatrix || this._defaultModelMatrix;
+      vertexUniformsData.view = viewMatrix;
+      vertexUniformsData.scale = scaleMatrix;
+      vertexUniformsData.resolution = resolutionMatrix;
+      model.shaderInputs.setProps({
+        channelIntensity3D: channelIntensity3DUniforms,
+        fragmentUniforms3D: fragmentUniforms3DUniforms,
+        vertex: vertexUniformsData
       });
-      const invertedScaleMatrix = scaleMatrix.clone().invert();
-      const invertedResolutionMatrix = resolutionMatrix.clone().invert();
-      const paddedClippingPlanes = padWithDefault(
-        clippingPlanes.map(
-          (p) => p.clone().transform(invertedScaleMatrix).transform(invertedResolutionMatrix)
-        ),
-        new Plane([1, 0, 0]),
-        clippingPlanes.length || NUM_PLANES_DEFAULT
-      );
-      const normals = paddedClippingPlanes.flatMap((plane) => plane.normal);
-      const distances = paddedClippingPlanes.map((plane) => plane.distance);
-      model.setUniforms(
-        {
-          ...uniforms,
-          contrastLimits: paddedContrastLimits,
-          xSlice: new Float32Array(
-            xSlice ? xSlice.map((i) => i / scaleMatrix[0] / resolutionMatrix[0]) : [0, 1]
-          ),
-          ySlice: new Float32Array(
-            ySlice ? ySlice.map((i) => i / scaleMatrix[5] / resolutionMatrix[5]) : [0, 1]
-          ),
-          zSlice: new Float32Array(
-            zSlice ? zSlice.map((i) => i / scaleMatrix[10] / resolutionMatrix[10]) : [0, 1]
-          ),
-          eye_pos: new Float32Array([
-            viewMatrixInverse[12],
-            viewMatrixInverse[13],
-            viewMatrixInverse[14]
-          ]),
-          view: viewMatrix,
-          proj: projectionMatrix,
-          scale: scaleMatrix,
-          resolution: resolutionMatrix,
-          model: modelMatrix || new Matrix4(),
-          normals,
-          distances
-        },
-        { disableWanings: false }
-      );
-      model.setBindings(textures);
+      model.setBindings(bindings);
       model.draw(this.context.renderPass);
+      if (this._newTexturesFromLoadThisFrame) {
+        this._newTexturesFromLoadThisFrame = null;
+      }
     }
   }
   /**
    * This function loads all textures from incoming resolved promises/data from the loaders by calling `dataToTexture`
    */
   loadTexture(channelData) {
-    const textures = {
-      volume0: null,
-      volume1: null,
-      volume2: null,
-      volume3: null,
-      volume4: null,
-      volume5: null
-    };
+    const numChannels = this.getNumChannels();
+    const textures = {};
+    for (let i = 0; i < numChannels; i++) {
+      textures[`volume${i}`] = null;
+    }
     if (this.state.textures) {
       Object.values(this.state.textures).forEach((tex) => tex?.delete());
     }
@@ -1624,16 +1848,24 @@ const XR3DLayer = class extends Layer {
         if (!textures[key])
           textures[key] = textures.volume0;
       }
-      this.setState({
-        textures,
-        scaleMatrix: new Matrix4().scale(
-          this.props.physicalSizeScalingMatrix.transformPoint([
-            width,
-            height,
-            depth
-          ])
-        )
-      });
+      this._newTexturesFromLoadThisFrame = textures;
+      this.setState(
+        {
+          textures,
+          scaleMatrix: new Matrix4().scale(
+            this.props.physicalSizeScalingMatrix.transformPoint([
+              width,
+              height,
+              depth
+            ])
+          )
+        },
+        () => {
+          this._updateUniforms(this.props);
+        }
+      );
+    } else {
+      this._newTexturesFromLoadThisFrame = null;
     }
   }
   /**

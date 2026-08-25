@@ -1,31 +1,10 @@
-import { BaseDecoder, fromBlob, fromFile, fromUrl, GeoTIFFImage, addDecoder } from 'geotiff';
-import { decompress } from 'lzw-tiff-decoder';
+import { fromBlob, fromFile, fromUrl, GeoTIFFImage, addDecoder, getDecoder } from 'geotiff';
+import { L as LZWDecoder } from './shared/loaders.9634c5c9.mjs';
 import quickselect from 'quickselect';
 import * as z from 'zod';
 import * as zarr from 'zarrita';
 import { FetchStore } from 'zarrita';
-
-var __defProp$3 = Object.defineProperty;
-var __defNormalProp$3 = (obj, key, value) => key in obj ? __defProp$3(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField$3 = (obj, key, value) => {
-  __defNormalProp$3(obj, typeof key !== "symbol" ? key + "" : key, value);
-  return value;
-};
-class LZWDecoder extends BaseDecoder {
-  constructor(fileDirectory) {
-    super();
-    __publicField$3(this, "maxUncompressedSize");
-    const width = fileDirectory.TileWidth || fileDirectory.ImageWidth;
-    const height = fileDirectory.TileLength || fileDirectory.ImageLength;
-    const nbytes = fileDirectory.BitsPerSample[0] / 8;
-    this.maxUncompressedSize = width * height * nbytes;
-  }
-  async decodeBlock(buffer) {
-    const bytes = new Uint8Array(buffer);
-    const decoded = await decompress(bytes, this.maxUncompressedSize);
-    return decoded.buffer;
-  }
-}
+import 'lzw-tiff-decoder';
 
 const DTYPE_LOOKUP$1 = {
   uint8: "Uint8",
@@ -480,6 +459,42 @@ async function resolveRemoteOffsets(url, headers, scannerOptions) {
   return offsets;
 }
 
+const PHOTOMETRIC_RGB = 2;
+const PHOTOMETRIC_YCBCR = 6;
+function padSampleArray(values, length, fallback) {
+  const src = values != null ? Array.from(values) : [];
+  const fill = src[0] ?? fallback;
+  return Array.from({ length }, (_, i) => src[i] ?? fill);
+}
+function padTiffSampleTags(fileDirectory) {
+  const spp = Math.max(
+    1,
+    fileDirectory.SamplesPerPixel ?? fileDirectory.BitsPerSample?.length ?? 1
+  );
+  const bits = fileDirectory.BitsPerSample;
+  const formats = fileDirectory.SampleFormat;
+  const bitsOk = bits != null && bits.length >= spp;
+  const formatsOk = formats != null && formats.length >= spp;
+  if (bitsOk && formatsOk)
+    return;
+  if (!bitsOk) {
+    fileDirectory.BitsPerSample = padSampleArray(bits, spp, 8);
+  }
+  if (!formatsOk) {
+    fileDirectory.SampleFormat = padSampleArray(formats, spp, 1);
+  }
+}
+function isPackedRgbTiffImage(image) {
+  const fd = image.fileDirectory;
+  const spp = fd.SamplesPerPixel ?? fd.BitsPerSample?.length ?? 1;
+  const photo = fd.PhotometricInterpretation;
+  return spp === 3 && (photo === PHOTOMETRIC_RGB || photo === PHOTOMETRIC_YCBCR);
+}
+function isPlanarRgbTiffImage(image) {
+  const fd = image.fileDirectory;
+  const spp = fd.SamplesPerPixel ?? fd.BitsPerSample?.length ?? 1;
+  return fd.PhotometricInterpretation === PHOTOMETRIC_RGB && fd.PlanarConfiguration === 2 && spp === 3;
+}
 function extractPhysicalSizesfromPixels(d) {
   if (!d["PhysicalSizeX"] || !d["PhysicalSizeY"] || !d["PhysicalSizeXUnit"] || !d["PhysicalSizeYUnit"]) {
     return void 0;
@@ -534,7 +549,7 @@ function getTiffTileSize(image) {
 function guessImageDataType(image) {
   const sampleIndex = 0;
   const format = image.fileDirectory?.SampleFormat?.[sampleIndex] ?? 1;
-  const bitsPerSample = image.fileDirectory.BitsPerSample[sampleIndex];
+  const bitsPerSample = image.fileDirectory.BitsPerSample?.[sampleIndex] ?? 8;
   switch (format) {
     case 1:
       if (bitsPerSample <= 8) {
@@ -695,9 +710,12 @@ function createGeoTiffObject(source, { headers }) {
   return fromUrl(url.href, { headers, cacheSize: Number.POSITIVE_INFINITY });
 }
 async function createGeoTiff(source, options = {}) {
-  const tiff = await createGeoTiffObject(source, options);
+  const tiff = options.source ?? await createGeoTiffObject(source, options);
   if (options.offsets) {
     return createOffsetsProxy(tiff, options.offsets);
+  }
+  if (options.source) {
+    return tiff;
   }
   if (!(source instanceof Blob)) {
     const url = typeof source === "string" ? new URL(source) : source;
@@ -735,6 +753,7 @@ function createOmeImageIndexerFromResolver(resolveBaseResolutionImageLocation, i
   return async (sel, pyramidLevel) => {
     const { tiff, ifdIndex } = await resolveBaseResolutionImageLocation(sel);
     const baseImage = await tiff.getImage(ifdIndex);
+    padTiffSampleTags(baseImage.fileDirectory);
     if (pyramidLevel === 0) {
       return baseImage;
     }
@@ -749,6 +768,7 @@ function createOmeImageIndexerFromResolver(resolveBaseResolutionImageLocation, i
       ifdCache[index] = await tiff.parseFileDirectoryAt(index);
     }
     const ifd = ifdCache[index];
+    padTiffSampleTags(ifd.fileDirectory);
     return new GeoTIFFImage(
       ifd.fileDirectory,
       ifd.geoKeyDirectory,
@@ -775,12 +795,13 @@ function getMultiTiffIndexer(tiffs) {
   };
 }
 
-var __defProp$2 = Object.defineProperty;
-var __defNormalProp$2 = (obj, key, value) => key in obj ? __defProp$2(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField$2 = (obj, key, value) => {
-  __defNormalProp$2(obj, typeof key !== "symbol" ? key + "" : key, value);
+var __defProp$3 = Object.defineProperty;
+var __defNormalProp$3 = (obj, key, value) => key in obj ? __defProp$3(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField$3 = (obj, key, value) => {
+  __defNormalProp$3(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
+const RGB_SAMPLES = [0, 1, 2];
 class TiffPixelSource {
   constructor(indexer, dtype, tileSize, shape, labels, meta, pool) {
     this.dtype = dtype;
@@ -789,7 +810,7 @@ class TiffPixelSource {
     this.labels = labels;
     this.meta = meta;
     this.pool = pool;
-    __publicField$2(this, "_indexer");
+    __publicField$3(this, "_indexer");
     this._indexer = indexer;
   }
   async getRaster({ selection, signal }) {
@@ -805,19 +826,38 @@ class TiffPixelSource {
     return this._readRasters(image, { window, width, height, signal });
   }
   async _readRasters(image, props) {
+    padTiffSampleTags(image.fileDirectory);
     const interleave = isInterleaved(this.shape);
     const signal = props?.signal;
     if (signal?.aborted) {
       throw SIGNAL_ABORTED;
     }
     const { signal: _signal, ...restProps } = props ?? {};
+    const planarRgb = isPlanarRgbTiffImage(image);
+    const packedRgb = isPackedRgbTiffImage(image);
     let raster;
     try {
-      raster = await image.readRasters({
-        interleave,
-        ...restProps,
-        pool: this.pool
-      });
+      if (planarRgb) {
+        raster = await image.readRasters({
+          ...restProps,
+          samples: RGB_SAMPLES,
+          interleave: true,
+          pool: this.pool
+        });
+      } else if (packedRgb) {
+        raster = await image.readRasters({
+          ...restProps,
+          samples: RGB_SAMPLES,
+          interleave: true,
+          pool: this.pool
+        });
+      } else {
+        raster = await image.readRasters({
+          interleave,
+          ...restProps,
+          pool: this.pool
+        });
+      }
     } catch (err) {
       if (signal?.aborted) {
         throw SIGNAL_ABORTED;
@@ -827,7 +867,8 @@ class TiffPixelSource {
     if (signal?.aborted) {
       throw SIGNAL_ABORTED;
     }
-    const data = interleave ? raster : raster[0];
+    const useInterleaved = planarRgb || packedRgb || interleave;
+    const data = useInterleaved ? raster : raster[0];
     return {
       data,
       width: raster.width,
@@ -1387,20 +1428,47 @@ function createSingleFileOmeTiffPyramidalIndexer(tiff, image) {
     return { tiff, ifdIndex };
   }, image);
 }
+function collapsePackedRgbPixelsMetadata(metadata, vivDtype) {
+  const pixels = metadata.Pixels;
+  const firstChannel = pixels.Channels?.[0] ?? {};
+  return {
+    ...metadata,
+    Pixels: {
+      ...pixels,
+      SizeC: 1,
+      Interleaved: true,
+      Type: vivDtype,
+      Channels: [
+        {
+          ...firstChannel,
+          SamplesPerPixel: 3
+        }
+      ]
+    }
+  };
+}
 async function loadSingleFileOmeTiff(source, options = {}) {
-  const { offsets, headers, pool } = options;
-  const tiff = await createGeoTiff(source, { headers, offsets });
+  const { offsets, headers, pool, source: prebuiltSource } = options;
+  const tiff = await createGeoTiff(source, {
+    headers,
+    offsets,
+    source: prebuiltSource
+  });
   const firstImage = await tiff.getImage();
+  padTiffSampleTags(firstImage.fileDirectory);
+  const packedRgb = isPackedRgbTiffImage(firstImage);
   const { rootMeta, levels } = resolveMetadata(
     fromString(firstImage.fileDirectory.ImageDescription),
     firstImage.fileDirectory.SubIFDs
   );
   const images = [];
   let imageIfdOffset = 0;
-  for (const metadata of rootMeta) {
+  for (const rawMetadata of rootMeta) {
+    const vivDtype = packedRgb ? guessImageDataType(firstImage) : parsePixelDataType(rawMetadata["Pixels"]["Type"]);
+    const metadata = packedRgb ? collapsePackedRgbPixelsMetadata(rawMetadata, vivDtype) : rawMetadata;
     const imageSize = {
       z: metadata["Pixels"]["SizeZ"],
-      c: metadata["Pixels"]["SizeC"],
+      c: packedRgb ? 1 : metadata["Pixels"]["SizeC"],
       t: metadata["Pixels"]["SizeT"]
     };
     const axes = extractAxesFromPixels(metadata["Pixels"]);
@@ -1409,7 +1477,6 @@ async function loadSingleFileOmeTiff(source, options = {}) {
       ifdOffset: imageIfdOffset,
       dimensionOrder: metadata["Pixels"]["DimensionOrder"]
     });
-    const dtype = parsePixelDataType(metadata["Pixels"]["Type"]);
     const tileSize = getTiffTileSize(
       await pyramidIndexer({ c: 0, t: 0, z: 0 }, 0)
     );
@@ -1417,27 +1484,27 @@ async function loadSingleFileOmeTiff(source, options = {}) {
       physicalSizes: extractPhysicalSizesfromPixels(metadata["Pixels"]),
       photometricInterpretation: firstImage.fileDirectory.PhotometricInterpretation
     };
-    const data = Array.from(
-      { length: levels },
-      (_, level) => {
-        return new TiffPixelSource(
-          (sel) => pyramidIndexer({ t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 }, level),
-          dtype,
-          tileSize,
-          getShapeForBinaryDownsampleLevel({ axes, level }),
-          axes.labels,
-          meta,
-          pool
-        );
-      }
-    );
+    const data = Array.from({ length: levels }, (_, level) => {
+      return new TiffPixelSource(
+        (sel) => pyramidIndexer(
+          { t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 },
+          level
+        ),
+        vivDtype,
+        tileSize,
+        getShapeForBinaryDownsampleLevel({ axes, level }),
+        axes.labels,
+        meta,
+        pool
+      );
+    });
     images.push({ data, metadata });
     imageIfdOffset += imageSize.t * imageSize.z * imageSize.c;
   }
   return images;
 }
 
-addDecoder(5, () => LZWDecoder);
+addDecoder(5, () => Promise.resolve(LZWDecoder));
 function isSupportedCompanionOmeTiffFile(source) {
   return typeof source === "string" && source.endsWith(".companion.ome");
 }
@@ -1507,6 +1574,90 @@ async function loadMultiTiff(sources, opts = {}) {
     return load$2(name, tiffImage, opts.channelNames || channelNames, pool);
   }
   throw new Error("Unable to load image from provided TiffFolder source.");
+}
+
+var __defProp$2 = Object.defineProperty;
+var __defNormalProp$2 = (obj, key, value) => key in obj ? __defProp$2(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField$2 = (obj, key, value) => {
+  __defNormalProp$2(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+const defaultPoolSize = globalThis?.navigator?.hardwareConcurrency ?? 4;
+function defaultCreateWorker() {
+  return new Worker(new URL("./tiff/lib/decoder.worker.mjs", import.meta.url), {
+    type: "module"
+  });
+}
+class WorkerWrapper {
+  constructor(worker) {
+    __publicField$2(this, "worker");
+    __publicField$2(this, "jobIdCounter", 0);
+    __publicField$2(this, "jobs", /* @__PURE__ */ new Map());
+    this.worker = worker;
+    this.worker.addEventListener("message", (e) => this.onWorkerMessage(e));
+  }
+  getJobCount() {
+    return this.jobs.size;
+  }
+  onWorkerMessage(e) {
+    const { jobId, error, ...result } = e.data;
+    const job = this.jobs.get(jobId);
+    this.jobs.delete(jobId);
+    if (!job)
+      return;
+    if (error)
+      job.reject(new Error(error));
+    else
+      job.resolve(result);
+  }
+  submitJob(message, transferables = []) {
+    const jobId = this.jobIdCounter++;
+    const promise = new Promise((resolve, reject) => {
+      this.jobs.set(jobId, { resolve, reject });
+    });
+    this.worker.postMessage({ ...message, jobId }, transferables);
+    return promise;
+  }
+  terminate() {
+    this.worker.terminate();
+  }
+}
+class Pool {
+  constructor(size = defaultPoolSize, createWorker = defaultCreateWorker) {
+    __publicField$2(this, "workerWrappers", null);
+    if (size) {
+      this.workerWrappers = (async () => {
+        const wrappers = [];
+        for (let i = 0; i < size; i++) {
+          wrappers.push(new WorkerWrapper(createWorker()));
+        }
+        return wrappers;
+      })();
+    }
+  }
+  async decode(fileDirectory, buffer) {
+    if (this.workerWrappers) {
+      const workerWrapper = (await this.workerWrappers).reduce(
+        (a, b) => a.getJobCount() < b.getJobCount() ? a : b
+      );
+      const { decoded } = await workerWrapper.submitJob(
+        { fileDirectory, buffer },
+        [buffer]
+      );
+      return decoded;
+    }
+    const decoder = await getDecoder(fileDirectory);
+    return decoder.decode(fileDirectory, buffer);
+  }
+  async destroy() {
+    if (!this.workerWrappers)
+      return;
+    const wrappers = await this.workerWrappers;
+    this.workerWrappers = null;
+    for (const w of wrappers) {
+      w.terminate();
+    }
+  }
 }
 
 var __defProp$1 = Object.defineProperty;
@@ -1847,4 +1998,4 @@ async function DEPRECATED_loadBioformatsZarr(source, options = {}) {
   ]);
 }
 
-export { DEPRECATED_loadBioformatsZarr, SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, getChannelStats, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore };
+export { DEPRECATED_loadBioformatsZarr, Pool, SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, getChannelStats, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore };

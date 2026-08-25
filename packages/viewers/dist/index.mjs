@@ -50,11 +50,12 @@ class VivViewerWrapper extends React.PureComponent {
     }) || viewState;
     this.setState((prevState) => {
       const viewStates = {};
+      const leaderPreviousViewState = prevState.viewStates[viewId] ?? oldViewState;
       views.forEach((view) => {
         const currentViewState = prevState.viewStates[view.id];
         viewStates[view.id] = view.filterViewState({
           viewState: { ...viewState, id: viewId },
-          oldViewState,
+          oldViewState: leaderPreviousViewState,
           currentViewState
         });
       });
@@ -205,17 +206,9 @@ class VivViewerWrapper extends React.PureComponent {
     );
   }
   render() {
-    const { views, randomize, useDevicePixels = true, deckProps } = this.props;
+    const { views, useDevicePixels = true, deckProps } = this.props;
     const { viewStates } = this.state;
     const deckGLViews = views.map((view) => view.getDeckGlView());
-    if (randomize) {
-      const random = Math.random();
-      const holdFirstElement = deckGLViews[0];
-      const randomWieghted = random * 1.49;
-      const randomizedIndex = Math.round(randomWieghted * (views.length - 1));
-      deckGLViews[0] = deckGLViews[randomizedIndex];
-      deckGLViews[randomizedIndex] = holdFirstElement;
-    }
     return /* @__PURE__ */ React.createElement(
       DeckGL,
       {
@@ -295,7 +288,11 @@ const PictureInPictureViewer = (props) => {
   const viewStates = [{ ...baseViewState, id: DETAIL_VIEW_ID }];
   const scalebarViewState = viewStatesProp?.find(
     (v) => v.id === SCALEBAR_VIEW_ID
-  ) || { ...baseViewState, id: SCALEBAR_VIEW_ID };
+  ) ?? {
+    id: SCALEBAR_VIEW_ID,
+    zoom: 0,
+    target: [width / 2, height / 2, 0]
+  };
   const scaleBarView = new ScaleBarView({
     id: SCALEBAR_VIEW_ID,
     width,
@@ -310,7 +307,7 @@ const PictureInPictureViewer = (props) => {
   if (overviewOn && loader) {
     const overviewViewState = viewStatesProp?.find(
       (v) => v.id === OVERVIEW_VIEW_ID
-    ) || { ...baseViewState, id: OVERVIEW_VIEW_ID };
+    ) ?? { id: OVERVIEW_VIEW_ID };
     const overviewView = new OverviewView({
       id: OVERVIEW_VIEW_ID,
       loader,
@@ -380,11 +377,12 @@ const SideBySideViewer = (props) => {
       { height, width: width / 2 },
       0.5
     );
+    const target = [width / 4, height / 2, 0];
     return [
       leftViewState || { ...defaultViewState, id: "left" },
       rightViewState || { ...defaultViewState, id: "right" },
-      leftScalebarViewState || { ...defaultViewState, id: leftId },
-      rightScalebarViewState || { ...defaultViewState, id: rightId }
+      leftScalebarViewState ?? { zoom: 0, target, id: leftId },
+      rightScalebarViewState ?? { zoom: 0, target, id: rightId }
     ];
   }, [loader, leftViewState, rightViewState]);
   const detailViewLeft = new SideBySideView({
@@ -450,7 +448,6 @@ const SideBySideViewer = (props) => {
     {
       layerProps,
       views,
-      randomize: true,
       onViewStateChange,
       onHover,
       viewStates: finalViewStates,

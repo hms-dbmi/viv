@@ -13,10 +13,17 @@ import type {
   TileSelection
 } from '@vivjs/types';
 import type { DecodePool } from './lib/Pool';
+import {
+  isPackedRgbTiffImage,
+  isPlanarRgbTiffImage,
+  padTiffSampleTags
+} from './lib/utils';
 
 type ReadRastersOptions = NonNullable<
   Parameters<GeoTIFFImage['readRasters']>[0]
 >;
+
+const RGB_SAMPLES = [0, 1, 2];
 
 class TiffPixelSource<S extends string[]> implements PixelSource<S> {
   private _indexer: (sel: PixelSourceSelection<S>) => Promise<GeoTIFFImage>;
@@ -49,6 +56,8 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
   }
 
   private async _readRasters(image: GeoTIFFImage, props?: ReadRastersOptions) {
+    padTiffSampleTags(image.fileDirectory);
+
     const interleave = isInterleaved(this.shape);
     const signal = props?.signal;
 
@@ -64,13 +73,33 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
     // the signal afterward.
     const { signal: _signal, ...restProps } = props ?? {};
 
+    const planarRgb = isPlanarRgbTiffImage(image);
+    const packedRgb = isPackedRgbTiffImage(image);
+
     let raster: Awaited<ReturnType<GeoTIFFImage['readRasters']>>;
     try {
-      raster = await image.readRasters({
-        interleave,
-        ...restProps,
-        pool: this.pool
-      });
+      if (planarRgb) {
+        // Separate planes in one IFD — must request all samples interleaved.
+        raster = await image.readRasters({
+          ...restProps,
+          samples: RGB_SAMPLES,
+          interleave: true,
+          pool: this.pool
+        });
+      } else if (packedRgb) {
+        raster = await image.readRasters({
+          ...restProps,
+          samples: RGB_SAMPLES,
+          interleave: true,
+          pool: this.pool
+        });
+      } else {
+        raster = await image.readRasters({
+          interleave,
+          ...restProps,
+          pool: this.pool
+        });
+      }
     } catch (err) {
       // If the signal was aborted while fetching (e.g. page navigation),
       // treat any resulting error as an abort.
@@ -84,11 +113,12 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
       throw SIGNAL_ABORTED;
     }
 
+    const useInterleaved = planarRgb || packedRgb || interleave;
     /*
      * geotiff.js returns objects with different structure
      * depending on `interleave`. It's weird, but this seems to work.
      */
-    const data = (interleave ? raster : raster[0]) as TypedArray;
+    const data = (useInterleaved ? raster : raster[0]) as TypedArray;
     return {
       data,
       width: (raster as TypedArray & { width: number }).width,

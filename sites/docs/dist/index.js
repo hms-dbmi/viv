@@ -1,7 +1,7 @@
 import { LayerExtension, COORDINATE_SYSTEM, CompositeLayer, Layer, project32, picking, OrthographicView, OrbitView, Controller } from '@deck.gl/core';
 import { GL } from '@luma.gl/constants';
 import { Matrix4 } from '@math.gl/core';
-import { addDecoder, BaseDecoder, fromBlob, fromFile, fromUrl, GeoTIFFImage } from 'geotiff';
+import { BaseDecoder, addDecoder, getDecoder, fromBlob, fromFile, fromUrl, GeoTIFFImage } from 'geotiff';
 import { decompress } from 'lzw-tiff-decoder';
 import quickselect from 'quickselect';
 import * as z from 'zod';
@@ -2140,17 +2140,16 @@ const ColorPalette3DExtensions = {
   MinimumIntensityProjectionExtension
 };
 
-function _nullishCoalesce$2(lhs, rhsFn) { if (lhs != null) { return lhs; } else { return rhsFn(); } } function _optionalChain$3(ops) { let lastAccessLHS = undefined; let value = ops[0]; let i = 1; while (i < ops.length) { const op = ops[i]; const fn = ops[i + 1]; i += 2; if ((op === 'optionalAccess' || op === 'optionalCall') && value == null) { return undefined; } if (op === 'access' || op === 'optionalAccess') { lastAccessLHS = value; value = fn(value); } else if (op === 'call' || op === 'optionalCall') { value = fn((...args) => value.call(lastAccessLHS, ...args)); lastAccessLHS = undefined; } } return value; }
-var __defProp$3 = Object.defineProperty;
-var __defNormalProp$3 = (obj, key, value) => key in obj ? __defProp$3(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField$3 = (obj, key, value) => {
-  __defNormalProp$3(obj, key + "" , value);
+var __defProp$4 = Object.defineProperty;
+var __defNormalProp$4 = (obj, key, value) => key in obj ? __defProp$4(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField$4 = (obj, key, value) => {
+  __defNormalProp$4(obj, key + "" , value);
   return value;
 };
 class LZWDecoder extends BaseDecoder {
   constructor(fileDirectory) {
     super();
-    __publicField$3(this, "maxUncompressedSize");
+    __publicField$4(this, "maxUncompressedSize");
     const width = fileDirectory.TileWidth || fileDirectory.ImageWidth;
     const height = fileDirectory.TileLength || fileDirectory.ImageLength;
     const nbytes = fileDirectory.BitsPerSample[0] / 8;
@@ -2163,6 +2162,7 @@ class LZWDecoder extends BaseDecoder {
   }
 }
 
+function _nullishCoalesce$2(lhs, rhsFn) { if (lhs != null) { return lhs; } else { return rhsFn(); } } async function _asyncNullishCoalesce(lhs, rhsFn) { if (lhs != null) { return lhs; } else { return await rhsFn(); } } function _optionalChain$3(ops) { let lastAccessLHS = undefined; let value = ops[0]; let i = 1; while (i < ops.length) { const op = ops[i]; const fn = ops[i + 1]; i += 2; if ((op === 'optionalAccess' || op === 'optionalCall') && value == null) { return undefined; } if (op === 'access' || op === 'optionalAccess') { lastAccessLHS = value; value = fn(value); } else if (op === 'call' || op === 'optionalCall') { value = fn((...args) => value.call(lastAccessLHS, ...args)); lastAccessLHS = undefined; } } return value; }
 const DTYPE_LOOKUP$1 = {
   uint8: "Uint8",
   uint16: "Uint16",
@@ -2329,6 +2329,291 @@ function createOffsetsProxy(tiff, offsets) {
     return Reflect.get(target, key);
   };
   return new Proxy(tiff, { get });
+}
+
+const SCANNER_DEFAULTS = {
+  initialWindowSize: 64 * 1024,
+  maxWindowSize: 1024 * 1024,
+  mode: "adaptive"
+};
+function validateScannerOptions(opts) {
+  if (opts.initialWindowSize <= 0) {
+    throw new Error(
+      `initialWindowSize must be positive, got ${opts.initialWindowSize}`
+    );
+  }
+  if (opts.maxWindowSize <= 0) {
+    throw new Error(
+      `maxWindowSize must be positive, got ${opts.maxWindowSize}`
+    );
+  }
+  if (opts.initialWindowSize > opts.maxWindowSize) {
+    throw new Error(
+      `initialWindowSize (${opts.initialWindowSize}) must not exceed maxWindowSize (${opts.maxWindowSize})`
+    );
+  }
+}
+const LITTLE_ENDIAN = 18761;
+const BIG_ENDIAN = 19789;
+const CLASSIC_MAGIC = 42;
+const BIGTIFF_MAGIC = 43;
+function parseTiffHeader(buf) {
+  const view = new DataView(buf);
+  const bom = view.getUint16(0, false);
+  let littleEndian;
+  if (bom === LITTLE_ENDIAN) {
+    littleEndian = true;
+  } else if (bom === BIG_ENDIAN) {
+    littleEndian = false;
+  } else {
+    throw new Error(`Invalid TIFF byte-order mark: 0x${bom.toString(16)}`);
+  }
+  const magic = view.getUint16(2, littleEndian);
+  if (magic === CLASSIC_MAGIC) {
+    const firstIfdOffset = view.getUint32(4, littleEndian);
+    return { littleEndian, bigTiff: false, firstIfdOffset };
+  }
+  if (magic === BIGTIFF_MAGIC) {
+    const firstIfdOffset = readUint64(view, 8, littleEndian);
+    return { littleEndian, bigTiff: true, firstIfdOffset };
+  }
+  throw new Error(`Invalid TIFF magic number: ${magic}`);
+}
+function readUint64(view, offset, littleEndian) {
+  const lo = view.getUint32(offset, littleEndian);
+  const hi = view.getUint32(offset + 4, littleEndian);
+  const value = littleEndian ? hi * 4294967296 + lo : lo * 4294967296 + hi;
+  if (!Number.isSafeInteger(value)) {
+    throw new Error(`IFD offset exceeds safe integer range: ${value}`);
+  }
+  return value;
+}
+function computeRequiredIfdSize(buf, localOffset, format) {
+  const view = new DataView(buf);
+  const { littleEndian, bigTiff } = format;
+  if (bigTiff) {
+    if (localOffset + 8 > buf.byteLength)
+      return null;
+    const entryCount2 = readUint64(view, localOffset, littleEndian);
+    return 8 + entryCount2 * 20 + 8;
+  }
+  if (localOffset + 2 > buf.byteLength)
+    return null;
+  const entryCount = view.getUint16(localOffset, littleEndian);
+  return 2 + entryCount * 12 + 4;
+}
+function parseIfd(buf, localOffset, format) {
+  const view = new DataView(buf);
+  const { littleEndian, bigTiff } = format;
+  if (bigTiff) {
+    if (localOffset + 8 > buf.byteLength)
+      return null;
+    const entryCount2 = readUint64(view, localOffset, littleEndian);
+    const ifdSize2 = 8 + entryCount2 * 20 + 8;
+    if (localOffset + ifdSize2 > buf.byteLength)
+      return null;
+    const nextIfdOffset2 = readUint64(
+      view,
+      localOffset + 8 + entryCount2 * 20,
+      littleEndian
+    );
+    return { nextIfdOffset: nextIfdOffset2, bytesConsumed: ifdSize2 };
+  }
+  if (localOffset + 2 > buf.byteLength)
+    return null;
+  const entryCount = view.getUint16(localOffset, littleEndian);
+  const ifdSize = 2 + entryCount * 12 + 4;
+  if (localOffset + ifdSize > buf.byteLength)
+    return null;
+  const nextIfdOffset = view.getUint32(
+    localOffset + 2 + entryCount * 12,
+    littleEndian
+  );
+  return { nextIfdOffset, bytesConsumed: ifdSize };
+}
+function normalizeHeaders(headers) {
+  if (!headers)
+    return void 0;
+  if (headers instanceof Headers) {
+    const obj = {};
+    headers.forEach((v, k) => {
+      obj[k] = v;
+    });
+    return obj;
+  }
+  return headers;
+}
+async function fetchRange(url, start, end, headers) {
+  const resp = await fetch(url, {
+    headers: {
+      ...normalizeHeaders(headers),
+      Range: `bytes=${start}-${end - 1}`
+    }
+  });
+  if (resp.status === 206) {
+    return { buffer: await resp.arrayBuffer(), fullFile: false };
+  }
+  if (resp.ok) {
+    return { buffer: await resp.arrayBuffer(), fullFile: true };
+  }
+  throw new Error(
+    `HTTP ${resp.status} fetching range bytes=${start}-${end - 1}`
+  );
+}
+async function fetchOffsetsJson(url, headers) {
+  try {
+    const offsetsUrl = `${url}.offsets.json`;
+    console.log("[viv:offsets] Checking for offsets JSON at:", offsetsUrl);
+    const resp = await fetch(offsetsUrl, {
+      headers: normalizeHeaders(headers)
+    });
+    if (!resp.ok) {
+      console.log(
+        `[viv:offsets] offsets.json fetch returned HTTP ${resp.status}`
+      );
+      return null;
+    }
+    const data = await resp.json();
+    if (!Array.isArray(data) || data.length === 0) {
+      console.log(
+        "[viv:offsets] offsets.json response was not a valid array"
+      );
+      return null;
+    }
+    for (const n of data) {
+      if (typeof n !== "number" || !Number.isSafeInteger(n) || n < 0) {
+        console.log(
+          "[viv:offsets] offsets.json contains invalid entry:",
+          n
+        );
+        return null;
+      }
+    }
+    console.log(
+      `[viv:offsets] offsets.json loaded successfully: ${data.length} offsets`
+    );
+    return data;
+  } catch (err) {
+    console.log("[viv:offsets] offsets.json fetch failed:", err);
+    return null;
+  }
+}
+async function scanIfdOffsets(url, headers, options) {
+  const opts = { ...SCANNER_DEFAULTS, ...options };
+  validateScannerOptions(opts);
+  const initialWindow = opts.initialWindowSize;
+  const headerResult = await fetchRange(url, 0, 16, headers);
+  const format = parseTiffHeader(headerResult.buffer);
+  const offsets = [];
+  let currentOffset = format.firstIfdOffset;
+  if (currentOffset === 0)
+    return offsets;
+  let bufStart;
+  let buf;
+  let haveFullFile;
+  if (headerResult.fullFile) {
+    buf = headerResult.buffer;
+    bufStart = 0;
+    haveFullFile = true;
+  } else {
+    buf = new ArrayBuffer(0);
+    bufStart = -1;
+    haveFullFile = false;
+  }
+  while (currentOffset !== 0) {
+    offsets.push(currentOffset);
+    const localOffset = currentOffset - bufStart;
+    if (!haveFullFile && (bufStart < 0 || localOffset < 0 || localOffset >= buf.byteLength)) {
+      const result = await fetchRange(
+        url,
+        currentOffset,
+        currentOffset + initialWindow,
+        headers
+      );
+      buf = result.buffer;
+      bufStart = currentOffset;
+      if (result.fullFile) {
+        bufStart = 0;
+        haveFullFile = true;
+      }
+    }
+    const parsed = parseIfd(buf, currentOffset - bufStart, format);
+    if (parsed !== null) {
+      currentOffset = parsed.nextIfdOffset;
+      continue;
+    }
+    const requiredSize = computeRequiredIfdSize(
+      buf,
+      currentOffset - bufStart,
+      format
+    );
+    if (haveFullFile) {
+      throw new Error(
+        `IFD at offset ${currentOffset} extends beyond end of file`
+      );
+    }
+    if (opts.mode === "fixed") {
+      throw new Error(
+        `IFD at offset ${currentOffset} requires ${_nullishCoalesce$2(requiredSize, () => ( "> entry-count header"))} bytes, exceeds fixed window of ${initialWindow} bytes`
+      );
+    }
+    const neededBytes = _nullishCoalesce$2(requiredSize, () => ( initialWindow * 2));
+    const retrySize = Math.min(
+      Math.max(neededBytes, initialWindow * 2),
+      opts.maxWindowSize
+    );
+    if (requiredSize !== null && retrySize < requiredSize) {
+      throw new Error(
+        `IFD at offset ${currentOffset} requires ${requiredSize} bytes, exceeds maxWindowSize of ${opts.maxWindowSize} bytes`
+      );
+    }
+    const retryResult = await fetchRange(
+      url,
+      currentOffset,
+      currentOffset + retrySize,
+      headers
+    );
+    buf = retryResult.buffer;
+    bufStart = currentOffset;
+    if (retryResult.fullFile) {
+      bufStart = 0;
+      haveFullFile = true;
+    }
+    const retry = parseIfd(buf, currentOffset - bufStart, format);
+    if (retry === null) {
+      const exactSize = computeRequiredIfdSize(
+        buf,
+        currentOffset - bufStart,
+        format
+      );
+      throw new Error(
+        `IFD at offset ${currentOffset} could not be parsed after retry (required=${_nullishCoalesce$2(exactSize, () => ( "unknown"))} bytes, fetched=${retrySize}, max=${opts.maxWindowSize})`
+      );
+    }
+    currentOffset = retry.nextIfdOffset;
+  }
+  return offsets;
+}
+async function resolveRemoteOffsets(url, headers, scannerOptions) {
+  console.log("[viv:offsets] resolveRemoteOffsets called for:", url);
+  const jsonOffsets = await fetchOffsetsJson(url, headers);
+  if (jsonOffsets) {
+    console.log(
+      `[viv:offsets] Found .offsets.json with ${jsonOffsets.length} offsets for:`,
+      url
+    );
+    return jsonOffsets;
+  }
+  console.log(
+    "[viv:offsets] No .offsets.json found, scanning IFDs for:",
+    url
+  );
+  const offsets = await scanIfdOffsets(url, headers, scannerOptions);
+  console.log(
+    `[viv:offsets] IFD scan complete: found ${offsets.length} offsets for:`,
+    url
+  );
+  return offsets;
 }
 
 function extractPhysicalSizesfromPixels(d) {
@@ -2546,8 +2831,42 @@ function createGeoTiffObject(source, { headers }) {
   return fromUrl(url.href, { headers, cacheSize: Number.POSITIVE_INFINITY });
 }
 async function createGeoTiff(source, options = {}) {
-  const tiff = await createGeoTiffObject(source, options);
-  return options.offsets ? createOffsetsProxy(tiff, options.offsets) : tiff;
+  const tiff = await _asyncNullishCoalesce(options.source, async () => ( await createGeoTiffObject(source, options)));
+  if (options.offsets) {
+    return createOffsetsProxy(tiff, options.offsets);
+  }
+  if (options.source) {
+    return tiff;
+  }
+  if (!(source instanceof Blob)) {
+    const url = typeof source === "string" ? new URL(source) : source;
+    if (url.protocol !== "file:") {
+      try {
+        const offsets = await resolveRemoteOffsets(
+          url.href,
+          options.headers,
+          options.scannerOptions
+        );
+        if (offsets.length > 0) {
+          console.log(
+            `[viv:offsets] Using resolved offsets (${offsets.length}) for:`,
+            url.href
+          );
+          return createOffsetsProxy(tiff, offsets);
+        }
+        console.log(
+          "[viv:offsets] No offsets resolved, falling back to default GeoTIFF traversal for:",
+          url.href
+        );
+      } catch (err) {
+        console.log(
+          "[viv:offsets] Offset resolution failed, falling back to default GeoTIFF traversal:",
+          err
+        );
+      }
+    }
+  }
+  return tiff;
 }
 
 function createOmeImageIndexerFromResolver(resolveBaseResolutionImageLocation, image) {
@@ -2595,10 +2914,10 @@ function getMultiTiffIndexer(tiffs) {
   };
 }
 
-var __defProp$2 = Object.defineProperty;
-var __defNormalProp$2 = (obj, key, value) => key in obj ? __defProp$2(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField$2 = (obj, key, value) => {
-  __defNormalProp$2(obj, key + "" , value);
+var __defProp$3 = Object.defineProperty;
+var __defNormalProp$3 = (obj, key, value) => key in obj ? __defProp$3(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField$3 = (obj, key, value) => {
+  __defNormalProp$3(obj, key + "" , value);
   return value;
 };
 class TiffPixelSource {
@@ -2609,7 +2928,7 @@ class TiffPixelSource {
     this.labels = labels;
     this.meta = meta;
     this.pool = pool;
-    __publicField$2(this, "_indexer");
+    __publicField$3(this, "_indexer");
     this._indexer = indexer;
   }
   async getRaster({ selection, signal }) {
@@ -2626,12 +2945,25 @@ class TiffPixelSource {
   }
   async _readRasters(image, props) {
     const interleave = isInterleaved(this.shape);
-    const raster = await image.readRasters({
-      interleave,
-      ...props,
-      pool: this.pool
-    });
-    if (_optionalChain$3([props, 'optionalAccess', _10 => _10.signal, 'optionalAccess', _11 => _11.aborted])) {
+    const signal = _optionalChain$3([props, 'optionalAccess', _10 => _10.signal]);
+    if (_optionalChain$3([signal, 'optionalAccess', _11 => _11.aborted])) {
+      throw SIGNAL_ABORTED;
+    }
+    const { signal: _signal, ...restProps } = _nullishCoalesce$2(props, () => ( {}));
+    let raster;
+    try {
+      raster = await image.readRasters({
+        interleave,
+        ...restProps,
+        pool: this.pool
+      });
+    } catch (err) {
+      if (_optionalChain$3([signal, 'optionalAccess', _12 => _12.aborted])) {
+        throw SIGNAL_ABORTED;
+      }
+      throw err;
+    }
+    if (_optionalChain$3([signal, 'optionalAccess', _13 => _13.aborted])) {
       throw SIGNAL_ABORTED;
     }
     const data = interleave ? raster : raster[0];
@@ -3195,8 +3527,12 @@ function createSingleFileOmeTiffPyramidalIndexer(tiff, image) {
   }, image);
 }
 async function loadSingleFileOmeTiff(source, options = {}) {
-  const { offsets, headers, pool } = options;
-  const tiff = await createGeoTiff(source, { headers, offsets });
+  const { offsets, headers, pool, source: prebuiltSource } = options;
+  const tiff = await createGeoTiff(source, {
+    headers,
+    offsets,
+    source: prebuiltSource
+  });
   const firstImage = await tiff.getImage();
   const { rootMeta, levels } = resolveMetadata(
     fromString(firstImage.fileDirectory.ImageDescription),
@@ -3244,7 +3580,7 @@ async function loadSingleFileOmeTiff(source, options = {}) {
   return images;
 }
 
-addDecoder(5, () => LZWDecoder);
+addDecoder(5, () => Promise.resolve(LZWDecoder));
 function isSupportedCompanionOmeTiffFile(source) {
   return typeof source === "string" && source.endsWith(".companion.ome");
 }
@@ -3265,7 +3601,7 @@ async function loadMultiTiff(sources, opts = {}) {
     const imageSelections = Array.isArray(s) ? s : [s];
     if (typeof file === "string") {
       const parsedFilename = parseFilename(file);
-      const extension = _optionalChain$3([parsedFilename, 'access', _12 => _12.extension, 'optionalAccess', _13 => _13.toLowerCase, 'call', _14 => _14()]);
+      const extension = _optionalChain$3([parsedFilename, 'access', _14 => _14.extension, 'optionalAccess', _15 => _15.toLowerCase, 'call', _16 => _16()]);
       if (extension === "tif" || extension === "tiff") {
         const tiffImageName = parsedFilename.name;
         if (tiffImageName) {
@@ -3314,6 +3650,90 @@ async function loadMultiTiff(sources, opts = {}) {
     return load$2(name, tiffImage, opts.channelNames || channelNames, pool);
   }
   throw new Error("Unable to load image from provided TiffFolder source.");
+}
+
+var __defProp$2 = Object.defineProperty;
+var __defNormalProp$2 = (obj, key, value) => key in obj ? __defProp$2(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField$2 = (obj, key, value) => {
+  __defNormalProp$2(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+const defaultPoolSize = _nullishCoalesce$2(_optionalChain$3([globalThis, 'optionalAccess', _17 => _17.navigator, 'optionalAccess', _18 => _18.hardwareConcurrency]), () => ( 4));
+function defaultCreateWorker() {
+  return new Worker(new URL("./tiff/lib/decoder.worker.mjs", import.meta.url), {
+    type: "module"
+  });
+}
+class WorkerWrapper {
+  constructor(worker) {
+    __publicField$2(this, "worker");
+    __publicField$2(this, "jobIdCounter", 0);
+    __publicField$2(this, "jobs", /* @__PURE__ */ new Map());
+    this.worker = worker;
+    this.worker.addEventListener("message", (e) => this.onWorkerMessage(e));
+  }
+  getJobCount() {
+    return this.jobs.size;
+  }
+  onWorkerMessage(e) {
+    const { jobId, error, ...result } = e.data;
+    const job = this.jobs.get(jobId);
+    this.jobs.delete(jobId);
+    if (!job)
+      return;
+    if (error)
+      job.reject(new Error(error));
+    else
+      job.resolve(result);
+  }
+  submitJob(message, transferables = []) {
+    const jobId = this.jobIdCounter++;
+    const promise = new Promise((resolve, reject) => {
+      this.jobs.set(jobId, { resolve, reject });
+    });
+    this.worker.postMessage({ ...message, jobId }, transferables);
+    return promise;
+  }
+  terminate() {
+    this.worker.terminate();
+  }
+}
+class Pool {
+  constructor(size = defaultPoolSize, createWorker = defaultCreateWorker) {
+    __publicField$2(this, "workerWrappers", null);
+    if (size) {
+      this.workerWrappers = (async () => {
+        const wrappers = [];
+        for (let i = 0; i < size; i++) {
+          wrappers.push(new WorkerWrapper(createWorker()));
+        }
+        return wrappers;
+      })();
+    }
+  }
+  async decode(fileDirectory, buffer) {
+    if (this.workerWrappers) {
+      const workerWrapper = (await this.workerWrappers).reduce(
+        (a, b) => a.getJobCount() < b.getJobCount() ? a : b
+      );
+      const { decoded } = await workerWrapper.submitJob(
+        { fileDirectory, buffer },
+        [buffer]
+      );
+      return decoded;
+    }
+    const decoder = await getDecoder(fileDirectory);
+    return decoder.decode(fileDirectory, buffer);
+  }
+  async destroy() {
+    if (!this.workerWrappers)
+      return;
+    const wrappers = await this.workerWrappers;
+    this.workerWrappers = null;
+    for (const w of wrappers) {
+      w.terminate();
+    }
+  }
 }
 
 var __defProp$1 = Object.defineProperty;
@@ -3524,7 +3944,7 @@ class ZarrPixelSource {
     return [zarr.slice(xStart, xStop), zarr.slice(yStart, yStop)];
   }
   async _getRaw(selection, getOptions) {
-    const signal = _optionalChain$3([getOptions, 'optionalAccess', _15 => _15.storeOptions, 'optionalAccess', _16 => _16.signal]);
+    const signal = _optionalChain$3([getOptions, 'optionalAccess', _19 => _19.storeOptions, 'optionalAccess', _20 => _20.signal]);
     const result = await zarr.get(this._data, selection, signal);
     if (typeof result !== "object") {
       throw new Error("Expected object from zarr.get");
@@ -3604,7 +4024,7 @@ async function load(store) {
 
 async function loadOmeZarr(source, options = {}) {
   const store = new FetchStore(source, options.fetchOptions);
-  if (_optionalChain$3([options, 'optionalAccess', _17 => _17.type]) !== "multiscales") {
+  if (_optionalChain$3([options, 'optionalAccess', _21 => _21.type]) !== "multiscales") {
     throw Error("Only multiscale OME-Zarr is supported.");
   }
   return load(store);
@@ -6523,4 +6943,4 @@ const VolumeViewer = (props) => {
   ) : null;
 };
 
-export { AdditiveColormap3DExtensions, AdditiveColormapExtension, BitmapLayer, COLORMAPS, ColorPalette3DExtensions, ColorPaletteExtension, DEPRECATED_loadBioformatsZarr, DETAIL_VIEW_ID, DTYPE_VALUES, DetailView, ImageLayer, LensExtension, MAX_CHANNELS, MultiscaleImageLayer, OVERVIEW_VIEW_ID, OverviewLayer, OverviewView, PictureInPictureViewer, RENDERING_MODES, SIGNAL_ABORTED, ScaleBarLayer, SideBySideView, SideBySideViewer, TiffPixelSource, VivView, VivViewer, VolumeLayer, VolumeView, VolumeViewer, XR3DLayer, XRLayer, ZarrPixelSource, getChannelStats, getDefaultInitialViewState, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore };
+export { AdditiveColormap3DExtensions, AdditiveColormapExtension, BitmapLayer, COLORMAPS, ColorPalette3DExtensions, ColorPaletteExtension, DEPRECATED_loadBioformatsZarr, DETAIL_VIEW_ID, DTYPE_VALUES, DetailView, ImageLayer, LensExtension, MAX_CHANNELS, MultiscaleImageLayer, OVERVIEW_VIEW_ID, OverviewLayer, OverviewView, PictureInPictureViewer, Pool, RENDERING_MODES, SIGNAL_ABORTED, ScaleBarLayer, SideBySideView, SideBySideViewer, TiffPixelSource, VivView, VivViewer, VolumeLayer, VolumeView, VolumeViewer, XR3DLayer, XRLayer, ZarrPixelSource, getChannelStats, getDefaultInitialViewState, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore };

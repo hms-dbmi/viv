@@ -1,6 +1,6 @@
 import { type GeoTIFF, GeoTIFFImage } from 'geotiff';
 import type { MultiTiffImage } from '../multi-tiff';
-import type { OmeTiffSelection } from './utils';
+import { type OmeTiffSelection, padTiffSampleTags } from './utils';
 
 type ImageFileDirectory = Awaited<ReturnType<GeoTIFF['parseFileDirectoryAt']>>;
 
@@ -41,6 +41,7 @@ export function createOmeImageIndexerFromResolver(
   return async (sel: OmeTiffSelection, pyramidLevel: number) => {
     const { tiff, ifdIndex } = await resolveBaseResolutionImageLocation(sel);
     const baseImage = await tiff.getImage(ifdIndex);
+    padTiffSampleTags(baseImage.fileDirectory);
 
     // It's the highest resolution, no need to look up SubIFDs.
     if (pyramidLevel === 0) {
@@ -63,6 +64,7 @@ export function createOmeImageIndexerFromResolver(
       ifdCache[index] = await tiff.parseFileDirectoryAt(index);
     }
     const ifd = ifdCache[index];
+    padTiffSampleTags(ifd.fileDirectory);
 
     // Create a new image object manually from IFD
     return new GeoTIFFImage(

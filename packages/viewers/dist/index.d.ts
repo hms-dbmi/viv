@@ -15,7 +15,6 @@ type HoverHooks = {
  * This component wraps the DeckGL component.
  * @param {Object} props
  * @param {Array} props.layerProps  Props for the layers in each view.
- * @param {boolean} [props.randomize] Whether or not to randomize which view goes first (for dynamic rendering of multiple linked views).
  * @param {Array.<import('../views').VivView>} props.views Various `VivView`s to render.
  * @param {Array.<object>} props.viewStates List of objects like [{ target: [x, y, 0], zoom: -zoom, id: 'left' }, { target: [x, y, 0], zoom: -zoom, id: 'right' }]
  * @param {ViewStateChange} [props.onViewStateChange] Callback that returns the deck.gl view state (https://deck.gl/docs/api-reference/core/deck#onviewstatechange).
@@ -27,7 +26,6 @@ type HoverHooks = {
  */
 declare function VivViewer(props: {
     layerProps: any[];
-    randomize?: boolean | undefined;
     views: Array<any>;
     viewStates: Array<object>;
     onViewStateChange?: ViewStateChange | undefined;

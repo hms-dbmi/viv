@@ -832,6 +832,40 @@
               
                 
                 <li><a
+                  href='#pool'
+                  class=" toggle-sibling">
+                  Pool
+                  <span class='icon'>▸</span>
+                </a>
+                
+                <div class='toggle-target display-none'>
+                  
+                  
+                    <ul class='list-reset py1-ul pl1'>
+                      <li class='h5'><span>Instance members</span></li>
+                      
+                      <li><a
+                        href='#pooldecode'
+                        class='regular pre-open'>
+                        #decode
+                      </a></li>
+                      
+                      <li><a
+                        href='#pooldestroy'
+                        class='regular pre-open'>
+                        #destroy
+                      </a></li>
+                      
+                    </ul>
+                  
+                  
+                  
+                </div>
+                
+                </li>
+              
+                
+                <li><a
                   href='#zarrpixelsource'
                   class=" toggle-sibling">
                   ZarrPixelSource
@@ -1134,15 +1168,82 @@ This metadata can be useful for creating UI componenets that describe the data s
 
   
     <h3>2D</h3>
-<p>Viv's shaders in 2D can be modified via <a href="https://deck.gl/docs/developer-guide/custom-layers/writing-shaders#standard-shader-hooks">deck.gl shader hooks</a>. The <code>LensExtension</code>, <code>AdditiveColormapExtension</code>, and <code>ColorPaletteExtesnion</code> (default) in Viv <a href="https://github.com/hms-dbmi/viv/tree/main/src/extensions">implement shader hooks</a>. Implementing your own shader hook requires extending the <a href="https://deck.gl/docs/api-reference/extensions/overview">standard layer extension</a> with a <code>getShaders</code> method that returns an <code>inject</code> function for one of the following supported hooks:</p>
+<blockquote>
+<p><strong>WARNING - Breaking Changes</strong>: If you have custom extensions, see the <a href="#migration-guide">Migration Guide</a> below for important changes to support dynamic channel counts and deck.gl v9 UBO.</p>
+</blockquote>
+<p>Viv's shaders in 2D can be modified via <a href="https://deck.gl/docs/developer-guide/custom-layers/writing-shaders#standard-shader-hooks">deck.gl shader hooks</a>. The <code>LensExtension</code>, <code>AdditiveColormapExtension</code>, and <code>ColorPaletteExtension</code> (default) in Viv <a href="https://github.com/hms-dbmi/viv/tree/main/src/extensions">implement shader hooks</a>. In Viv you should extend <code>VivLayerExtension</code> from <code>@vivjs/extensions</code> (a thin wrapper around deck.gl's <code>LayerExtension</code>) and return shader modules that inject into one of the following hooks.</p>
+<h4>Viv shader extensions (<code>VivLayerExtension</code>)</h4>
+<p>Custom shader behavior in Viv is implemented by subclassing <code>VivLayerExtension</code> and implementing <code>getVivShaderTemplates()</code>, which will be internally called <code>getShader()</code>:</p>
+<p>It is important not to override the <code>getShaders()</code> method directly, as has been designed to ensure that when deck.gl calls it, the appropriate 'expanded' version will be returned for the given layer.</p>
+<p>Each module can contribute GLSL via its <code>fs</code> / <code>vs</code> fields and an <code>inject</code> map keyed by hook names such as <code>'fs:DECKGL_MUTATE_COLOR'</code> or <code>'fs:DECKGL_PROCESS_INTENSITY'</code>.</p>
 <h4><code>DECKGL_PROCESS_INTENSITY(inout float intensity, vec2 contrastLimits, int channelIndex)</code></h4>
 <p>This hook allows for custom processing of raw pixel intensities. For example, a non-linear (or alternative) transformation function may be provided to override the default linear ramp function with two contrast limit endpoints. This hook is available on all layers in all modes. By default, the layer provides a reasonable function for this.</p>
-<h4><code>DECKGL_MUTATE_COLOR(inout vec4 rgba, float intensity0, float intensity1, float intensity2, float intensity3, float intensity4, float intensity5, vec2 vTexCoord)</code></h4>
+<h4><code>DECKGL_MUTATE_COLOR(inout vec4 rgba, float[NUM_CHANNELS] intensity, vec2 vTexCoord)</code></h4>
+<p><strong>Breaking Change:</strong> The signature of this hook changed from accepting multiple individual float parameters (<code>intensity0</code>, <code>intensity1</code>, etc.) to accepting a single <code>float[NUM_CHANNELS] intensity</code> array parameter.</p>
 <p>This hook allows for users to mutate conversion of a processed intensity (from <code>DECKGL_PROCESS_INTENSITY</code>) into a color. This is only available in 2D layers. An implementation for this hook is required by all Viv extensions.</p>
 <h4><code>DECKGL_FILTER_COLOR(inout vec4 color, FragmentGeometry geometry)</code></h4>
 <p>Please see deck.gl's <a href="https://deck.gl/docs/developer-guide/custom-layers/writing-shaders#fsdeckgl_filter_color">documentation</a> as this is a standard hook. This hook may be used for example to apply a gamma transformation to the output colors.</p>
+<h3>Migration Guide</h3>
+<h4>1. Dynamic Channel Count (Breaking Change)</h4>
+<p>Viv supports a <strong>dynamic number of channels at runtime</strong> instead of a fixed maximum. This is a fundamental architectural change that affects how shaders are written.</p>
+<p><strong>Key changes:</strong></p>
+<ul>
+<li><code>NUM_CHANNELS</code> now varies at runtime based on layer props (for example, the length of <code>selections</code>).</li>
+<li>Shader modules should be written as templates and generated programmatically so that uniforms and loops respect the current channel count; avoid fixed-index assumptions like <code>intensity0</code> through <code>intensity5</code>.</li>
+<li>For per-channel data (including UBO uniforms), use <code>VIV_CHANNEL_INDEX_PLACEHOLDER</code> and loop constructs with <code>NUM_CHANNELS</code> so Viv can expand your shader code for the active channel count.</li>
+</ul>
+<h4>2. DECKGL_MUTATE_COLOR Hook Signature Change</h4>
+<p>The <code>DECKGL_MUTATE_COLOR</code> hook signature has changed from accepting multiple individual float parameters to accepting a single array parameter to support dynamic channel counts.</p>
+<p><strong>Old Signature (deprecated):</strong></p>
+<p><strong>New Signature:</strong></p>
+<p><strong>How to Update Your Code:</strong></p>
+<p>Replace direct parameter names with array accesses and use loops for dynamic channel handling:</p>
+<ul>
+<li><code>intensity0</code> → <code>intensity[0]</code></li>
+<li><code>intensity1</code> → <code>intensity[1]</code></li>
+<li>Hardcoded operations → loops with <code>NUM_CHANNELS</code></li>
+</ul>
+<p><strong>Example:</strong></p>
+<h4>3. Uniform Buffer Objects (UBO) Migration</h4>
+<p>Viv is migrating to deck.gl v9.2+ which requires Uniform Buffer Objects (UBO) instead of WebGL1-style global uniforms. See the <a href="https://deck.gl/docs/upgrade-guide">deck.gl upgrade guide</a> for more details.</p>
+<p><strong>The Challenge:</strong></p>
+<p>Unfortunately, luma.gl's uniform type system does not, as of this writing, support arrays in uniform declarations. This means we:</p>
+<ul>
+<li>Cannot use: <code>uniform vec3 colors[NUM_CHANNELS];</code></li>
+<li>Must use: <code>uniform vec3 color0; uniform vec3 color1; uniform vec3 color2;</code> etc.</li>
+</ul>
+<p>Combined with Viv's dynamic <code>NUM_CHANNELS</code>, this creates a problem: you cannot hardcode uniform declarations because the channel count varies at runtime.</p>
+<p><strong>The Solution (short version):</strong></p>
+<p>Viv's shader tooling expands per-channel uniforms for you. In your template modules (returned from <code>getVivShaderTemplates()</code> on a <code>VivLayerExtension</code>), use <code>uniformTypes</code> together with <code>VIV_CHANNEL_INDEX_PLACEHOLDER</code> and wrap uniforms in a named UBO; Viv will expand <code>color${I}</code> into <code>color0</code>, <code>color1</code>, ... at runtime.</p>
+<p><strong>Old style (global uniforms, 6 separate intensity float arguments):</strong></p>
+<p><strong>New style (UBO with per-channel uniforms):</strong></p>
+<p>In your extension's <code>updateState</code>, use <code>model.shaderInputs.setProps({ myCustomExtension: { opacity, color0, ..., color{N-1} } })</code> to supply JS values that match the expanded uniforms. For a complete working example, see <code>color-palette-module.js</code> and <code>color-palette-extension.js</code> in the Viv extensions package.</p>
+<p>Manual declarations like <code>color0</code>, <code>color1</code>, ... without using the placeholder are fragile: when <code>NUM_CHANNELS</code> changes, they will no longer match the expanded uniforms. Prefer the placeholder pattern so the expansion always matches the runtime channel count.</p>
+<p><strong>Key changes:</strong></p>
+<ul>
+<li>Add a <code>uniformTypes</code> object to define the types of your uniforms (e.g., <code>'f32'</code> for float, <code>'u32'</code> for uint, <code>'vec3&#x3C;f32>'</code> for vec3).</li>
+<li>Wrap related uniforms in a <code>uniform</code> block with a unique name and access them through the block (e.g., <code>myCustomExtension.opacity</code>).</li>
+<li>For per-channel uniforms, use <code>VIV_CHANNEL_INDEX_PLACEHOLDER</code> in both <code>uniformTypes</code> keys and shader code so Viv's <code>expandShaderModule()</code> can generate per-channel declarations based on the layer's channel count.</li>
+<li>Update your extension's <code>updateState</code> method to use <code>model.shaderInputs.setProps</code> instead of <code>model.setUniforms</code> to feed values into UBOs.</li>
+</ul>
+<h3>VivLayerExtension responsibilities and channel index expansion</h3>
+<p>Viv supports a channel index placeholder for generating per-channel shader code. Use <code>VIV_CHANNEL_INDEX_PLACEHOLDER</code> from <code>@vivjs/constants</code> in your shader strings, and Viv will expand lines containing it for each channel.</p>
+<p>When using Viv layers together with <code>VivLayerExtension</code>:</p>
+<ul>
+<li><strong>Layers</strong> such as <code>XRLayer</code> and <code>XR3DLayer</code> own the actual channel/plane counts (via methods like <code>getNumChannels()</code> / <code>getNumPlanes()</code> and their props), create models, and select the shader assembler.</li>
+<li><strong>Extensions</strong> (subclasses of <code>VivLayerExtension</code>) provide shader <em>templates</em> via <code>getVivShaderTemplates()</code>, using placeholders in <code>uniformTypes</code> and shader code.</li>
+<li><code>VivLayerExtension.getShaders()</code> is called with <code>this</code> bound to the layer; it reads <code>this.getNumChannels()</code> / <code>this.getNumPlanes()</code> and expands all modules using <code>expandShaderModule()</code>, so your shaders see concrete <code>color0</code>, <code>color1</code>, ..., plus <code>NUM_CHANNELS</code> / <code>NUM_PLANES</code> defines.</li>
+<li>Extension methods like <code>updateState</code> or <code>draw</code> are also invoked with <code>this</code> as the layer; use <code>this.getNumChannels()</code> (or a layer prop such as <code>this.props.numChannels</code> if you set one) to know how many per-channel uniforms to provide, and populate <code>model.shaderInputs.setProps</code> with <strong>only</strong> the keys that match the expanded uniforms (e.g. <code>color0..color{N-1}</code>) to avoid "uniform value not present" warnings.</li>
+</ul>
+<h4>How It Works</h4>
+<p><strong>The expansion happens line-by-line.</strong> Each line containing the placeholder is replicated for each channel (0 to NUM_CHANNELS-1), with the placeholder replaced by the channel number. Lines without the placeholder pass through unchanged.</p>
+<p><strong>Critical:</strong> Only put the placeholder in lines you want replicated. For array initializers, put the array declaration on separate lines from the elements:</p>
+<p>Do <strong>not</strong> put the placeholder on the same line as the array declaration – that would cause the entire declaration to be duplicated for each channel.</p>
+<h4>Recommended Pattern: Arrays and Iteration</h4>
+<p>Use the placeholder for code that genuinely cannot use arrays (sampler declarations, texture reads, individual variable declarations). For processing logic, collect values into an array and iterate with <code>NUM_CHANNELS</code>:</p>
+<p>This pattern avoids issues with multi-line per-channel code where mutable state could produce unexpected results. Each expansion line should be self-contained. If for some reason it is required to have more complex nested iteration etc, it can be handled with normal GLSL code.</p>
 <h3>3D</h3>
-<p>Viv's shaders can be modified in 3D similar to the above, with the exception of <code>DECKGL_MUTATE_COLOR</code>. Instead, at least one provided extension must implement <code>_BEFORE_RENDER</code>, <code>_RENDER</code> and <code>_AFTER_RENDER</code>. Specifically, one extension must have <code>opts.rendering</code> as an object with at least the <code>_RENDER</code> property a string that contains valid glsl code. For example, the <code>MaximumIntensityProjectionExtension</code> uses <code>_BEFORE_RENDER</code> to set up an array which will hold the found maximum intensities. <code>_RENDER</code> fills that array as maximum intensities are found. And finally <code>_AFTER_RENDER</code> will place those intensities in the <code>color</code> or <code>fragColor</code> buffer to be rendered.</p>
+<p>Viv's shaders can be modified in 3D similarly, but they do not use <code>DECKGL_MUTATE_COLOR</code>. Instead, at least one extension must provide 3D rendering code by setting <code>this.rendering = { _RENDER, _BEFORE_RENDER?, _AFTER_RENDER? }</code> on the extension instance, where each property is a GLSL string. For example, <code>MaximumIntensityProjectionExtension</code> uses <code>_BEFORE_RENDER</code> to initialize per-channel accumulators, <code>_RENDER</code> to update them while ray marching, and <code>_AFTER_RENDER</code> to write the final intensities into the <code>color</code> / <code>fragColor</code> output.</p>
 
   
 </section></div>
@@ -6303,6 +6404,201 @@ provided by OME and viewed with Viv locally (without needing to run Bio-Formats)
         </div>
       
     </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='pool'>
+      Pool
+    </h3>
+    
+    
+  </div>
+  
+
+  
+    <div class='pre p1 fill-light mt0'>new Pool(size: any, createWorker: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>size</span> <code class='quiet'>(any
+            = <code>defaultPoolSize</code>)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>createWorker</span> <code class='quiet'>(any
+            = <code>defaultCreateWorker</code>)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Instance Members</div>
+    <div class="clearfix">
+  
+    <div class='border-bottom' id='pooldecode'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>decode(fileDirectory, buffer)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  
+    <div class='pre p1 fill-light mt0'>decode(fileDirectory: any, buffer: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>fileDirectory</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>buffer</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='pooldestroy'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>destroy()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  
+    <div class='pre p1 fill-light mt0'>destroy()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
   
 
   

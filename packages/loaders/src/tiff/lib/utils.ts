@@ -22,6 +22,83 @@ export interface OmeTiffSelection {
   z: number;
 }
 
+/** TIFF PhotometricInterpretation: RGB */
+export const PHOTOMETRIC_RGB = 2;
+/** TIFF PhotometricInterpretation: YCbCr (common for JPEG H&E) */
+export const PHOTOMETRIC_YCBCR = 6;
+
+type TiffSampleDirectory = {
+  SamplesPerPixel?: number;
+  BitsPerSample?: ArrayLike<number>;
+  SampleFormat?: ArrayLike<number>;
+  PhotometricInterpretation?: number;
+  PlanarConfiguration?: number;
+};
+
+function padSampleArray(
+  values: ArrayLike<number> | undefined,
+  length: number,
+  fallback: number
+): number[] {
+  const src = values != null ? Array.from(values) : [];
+  const fill = src[0] ?? fallback;
+  return Array.from({ length }, (_, i) => src[i] ?? fill);
+}
+
+/**
+ * Bio-Formats often writes a single SampleFormat (or BitsPerSample) value for
+ * RGB files. geotiff.js indexes those tags per sample and throws
+ * `Unsupported data format/bitsPerSample` when the array is short.
+ * Mutates `fileDirectory` in place; no-op when lengths already match.
+ */
+export function padTiffSampleTags(fileDirectory: TiffSampleDirectory): void {
+  const spp = Math.max(
+    1,
+    fileDirectory.SamplesPerPixel ?? fileDirectory.BitsPerSample?.length ?? 1
+  );
+  const bits = fileDirectory.BitsPerSample;
+  const formats = fileDirectory.SampleFormat;
+  const bitsOk = bits != null && bits.length >= spp;
+  const formatsOk = formats != null && formats.length >= spp;
+  if (bitsOk && formatsOk) return;
+  if (!bitsOk) {
+    fileDirectory.BitsPerSample = padSampleArray(bits, spp, 8);
+  }
+  if (!formatsOk) {
+    fileDirectory.SampleFormat = padSampleArray(formats, spp, 1);
+  }
+}
+
+/**
+ * One IFD with 3 samples and photometric RGB or YCbCr — a packed RGB image,
+ * not three fluorescence channels (those are photometric BlackIsZero + spp=1).
+ */
+export function isPackedRgbTiffImage(image: {
+  fileDirectory: TiffSampleDirectory;
+}): boolean {
+  const fd = image.fileDirectory;
+  const spp = fd.SamplesPerPixel ?? fd.BitsPerSample?.length ?? 1;
+  const photo = fd.PhotometricInterpretation;
+  return (
+    spp === 3 && (photo === PHOTOMETRIC_RGB || photo === PHOTOMETRIC_YCBCR)
+  );
+}
+
+/**
+ * Photometric RGB stored as separate planes in one IFD (PlanarConfiguration=2).
+ */
+export function isPlanarRgbTiffImage(image: {
+  fileDirectory: TiffSampleDirectory;
+}): boolean {
+  const fd = image.fileDirectory;
+  const spp = fd.SamplesPerPixel ?? fd.BitsPerSample?.length ?? 1;
+  return (
+    fd.PhotometricInterpretation === PHOTOMETRIC_RGB &&
+    fd.PlanarConfiguration === 2 &&
+    spp === 3
+  );
+}
+
 type PhysicalSize = {
   size: number;
   unit: PhysicalUnit;
@@ -114,11 +191,11 @@ export function getTiffTileSize(image: GeoTIFFImage) {
 }
 
 // Inspired by/borrowed from https://geotiffjs.github.io/geotiff.js/geotiffimage.js.html#line297
-function guessImageDataType(image: GeoTIFFImage) {
+export function guessImageDataType(image: GeoTIFFImage) {
   // Assuming these are flat TIFFs, just grab the info for the first image/sample.
   const sampleIndex = 0;
   const format = image.fileDirectory?.SampleFormat?.[sampleIndex] ?? 1;
-  const bitsPerSample = image.fileDirectory.BitsPerSample[sampleIndex];
+  const bitsPerSample = image.fileDirectory.BitsPerSample?.[sampleIndex] ?? 8;
   switch (format) {
     case 1: // unsigned integer data
       if (bitsPerSample <= 8) {
