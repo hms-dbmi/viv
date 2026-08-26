@@ -795,6 +795,36 @@ function getMultiTiffIndexer(tiffs) {
   };
 }
 
+function needsPhotometricRgbConversion(photometricInterpretation) {
+  return photometricInterpretation === PHOTOMETRIC_YCBCR;
+}
+function convertInterleavedPhotometricToRgb(data, photometricInterpretation) {
+  if (photometricInterpretation === PHOTOMETRIC_YCBCR) {
+    return interleavedYCbCrToRgb(data);
+  }
+  if (ArrayBuffer.isView(data) && data instanceof Uint8Array) {
+    return data;
+  }
+  return Uint8Array.from(data);
+}
+function interleavedYCbCrToRgb(data) {
+  const out = new Uint8Array(data.length);
+  for (let i = 0; i < data.length; i += 3) {
+    const y = data[i];
+    const cb = data[i + 1];
+    const cr = data[i + 2];
+    out[i] = clampRgb8(y + 1.402 * (cr - 128));
+    out[i + 1] = clampRgb8(
+      y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128)
+    );
+    out[i + 2] = clampRgb8(y + 1.772 * (cb - 128));
+  }
+  return out;
+}
+function clampRgb8(v) {
+  return Math.max(0, Math.min(255, Math.round(v)));
+}
+
 var __defProp$3 = Object.defineProperty;
 var __defNormalProp$3 = (obj, key, value) => key in obj ? __defProp$3(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField$3 = (obj, key, value) => {
@@ -868,7 +898,11 @@ class TiffPixelSource {
       throw SIGNAL_ABORTED;
     }
     const useInterleaved = planarRgb || packedRgb || interleave;
-    const data = useInterleaved ? raster : raster[0];
+    let data = useInterleaved ? raster : raster[0];
+    const photo = image.fileDirectory.PhotometricInterpretation;
+    if ((packedRgb || planarRgb) && needsPhotometricRgbConversion(photo)) {
+      data = convertInterleavedPhotometricToRgb(data, photo);
+    }
     return {
       data,
       width: raster.width,
@@ -918,10 +952,14 @@ async function assertCompleteStack(images, indexer) {
 async function load$2(imageName, images, channelNames, pool) {
   assertSameResolution(images);
   const firstImage = images[0].tiff;
-  const { PhotometricInterpretation: photometricInterpretation } = firstImage.fileDirectory;
+  const sourcePhoto = firstImage.fileDirectory.PhotometricInterpretation;
   const dimensionOrder = "XYZCT";
   const tileSize = getTiffTileSize(firstImage);
-  const meta = { photometricInterpretation };
+  const visualRgb = isPackedRgbTiffImage(firstImage) || isPlanarRgbTiffImage(firstImage);
+  const meta = {
+    sourcePhotometricInterpretation: sourcePhoto,
+    photometricInterpretation: visualRgb ? PHOTOMETRIC_RGB : sourcePhoto
+  };
   const indexer = getMultiTiffIndexer(images);
   const { shape, labels, dtype } = getMultiTiffMeta(dimensionOrder, images);
   const metadata = getMultiTiffMetadata(
@@ -1331,7 +1369,8 @@ async function getPixelSourceOptionsForImage(metadata, config) {
     dtype: parsePixelDataType(metadata["Pixels"]["Type"]),
     meta: {
       physicalSizes: extractPhysicalSizesfromPixels(metadata["Pixels"]),
-      photometricInterpretation: baseImage.fileDirectory.PhotometricInterpretation
+      sourcePhotometricInterpretation: baseImage.fileDirectory.PhotometricInterpretation,
+      photometricInterpretation: isPackedRgbTiffImage(baseImage) || isPlanarRgbTiffImage(baseImage) ? PHOTOMETRIC_RGB : baseImage.fileDirectory.PhotometricInterpretation
     }
   };
 }
@@ -1491,9 +1530,12 @@ async function loadSingleFileOmeTiff(source, options = {}) {
     const tileSize = getTiffTileSize(
       await pyramidIndexer({ c: 0, t: 0, z: 0 }, 0)
     );
+    const sourcePhoto = firstImage.fileDirectory.PhotometricInterpretation;
     const meta = {
       physicalSizes: extractPhysicalSizesfromPixels(metadata["Pixels"]),
-      photometricInterpretation: firstImage.fileDirectory.PhotometricInterpretation
+      sourcePhotometricInterpretation: sourcePhoto,
+      // Visual RGB (packed/planar): getTile normalizes samples to RGB.
+      photometricInterpretation: packedRgb ? PHOTOMETRIC_RGB : sourcePhoto
     };
     const data = await Promise.all(
       Array.from({ length: levels }, async (_, level) => {
@@ -2016,4 +2058,4 @@ async function DEPRECATED_loadBioformatsZarr(source, options = {}) {
   ]);
 }
 
-export { DEPRECATED_loadBioformatsZarr, Pool, SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, getChannelStats, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore };
+export { DEPRECATED_loadBioformatsZarr, PHOTOMETRIC_RGB, PHOTOMETRIC_YCBCR, Pool, SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, convertInterleavedPhotometricToRgb, getChannelStats, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore, needsPhotometricRgbConversion };

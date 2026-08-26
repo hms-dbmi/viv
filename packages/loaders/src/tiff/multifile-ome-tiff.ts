@@ -11,7 +11,10 @@ import {
   extractPhysicalSizesfromPixels,
   getShapeForLevel,
   getTiffTileSize,
-  parsePixelDataType
+  isPackedRgbTiffImage,
+  isPlanarRgbTiffImage,
+  parsePixelDataType,
+  PHOTOMETRIC_RGB
 } from './lib/utils';
 import TiffPixelSource from './pixel-source';
 
@@ -129,8 +132,12 @@ async function getPixelSourceOptionsForImage(
     dtype: parsePixelDataType(metadata['Pixels']['Type']),
     meta: {
       physicalSizes: extractPhysicalSizesfromPixels(metadata['Pixels']),
+      sourcePhotometricInterpretation:
+        baseImage.fileDirectory.PhotometricInterpretation,
       photometricInterpretation:
-        baseImage.fileDirectory.PhotometricInterpretation
+        isPackedRgbTiffImage(baseImage) || isPlanarRgbTiffImage(baseImage)
+          ? PHOTOMETRIC_RGB
+          : baseImage.fileDirectory.PhotometricInterpretation
     }
   };
 }

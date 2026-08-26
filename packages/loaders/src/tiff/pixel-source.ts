@@ -14,6 +14,10 @@ import type {
 } from '@vivjs/types';
 import type { DecodePool } from './lib/Pool';
 import {
+  convertInterleavedPhotometricToRgb,
+  needsPhotometricRgbConversion
+} from './lib/photometricRgb';
+import {
   isPackedRgbTiffImage,
   isPlanarRgbTiffImage,
   padTiffSampleTags
@@ -118,7 +122,20 @@ class TiffPixelSource<S extends string[]> implements PixelSource<S> {
      * geotiff.js returns objects with different structure
      * depending on `interleave`. It's weird, but this seems to work.
      */
-    const data = (useInterleaved ? raster : raster[0]) as TypedArray;
+    let data = (useInterleaved ? raster : raster[0]) as TypedArray;
+
+    // Packed/planar visual RGB: normalize YCbCr (etc.) to RGB so getTile
+    // returns R,G,B for all consumers. meta.photometricInterpretation is
+    // rewritten to RGB at load time — do not skip this or BitmapLayer will
+    // double-convert if meta still said YCbCr.
+    const photo = image.fileDirectory.PhotometricInterpretation;
+    if (
+      (packedRgb || planarRgb) &&
+      needsPhotometricRgbConversion(photo)
+    ) {
+      data = convertInterleavedPhotometricToRgb(data, photo) as TypedArray;
+    }
+
     return {
       data,
       width: (raster as TypedArray & { width: number }).width,

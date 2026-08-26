@@ -99,7 +99,7 @@ const HE_CHUNKY = '/Users/simon/Research/cycif-data/HE/LSP16103.ome.tif';
 const HE_PLANAR =
   '/Users/simon/Research/cycif-data/HE/LSP12653_20220330_192452_040060.ome.tiff';
 
-async function assertPackedRgbContract(sourcePath, photometric) {
+async function assertPackedRgbContract(sourcePath, sourcePhotometric) {
   const { data, metadata } = await loadOmeTiff(`file://${sourcePath}`);
   const [base] = data;
   expect(base.dtype).toBe('Uint8');
@@ -112,7 +112,9 @@ async function assertPackedRgbContract(sourcePath, photometric) {
   expect(metadata.Pixels.Channels.length).toBe(1);
   expect(metadata.Pixels.Channels[0].SamplesPerPixel).toBe(3);
   expect(metadata.Pixels.Type).toBe('Uint8');
-  expect(base.meta.photometricInterpretation).toBe(photometric);
+  // Visual RGB sources advertise RGB after loader normalization.
+  expect(base.meta.photometricInterpretation).toBe(PHOTOMETRIC_RGB);
+  expect(base.meta.sourcePhotometricInterpretation).toBe(sourcePhotometric);
 
   // One tile only — these pyramids are multi-GB; avoid full getRaster.
   const tile = await base.getTile({
@@ -121,12 +123,34 @@ async function assertPackedRgbContract(sourcePath, photometric) {
     selection: { c: 0, t: 0, z: 0 }
   });
   expect(tile.data.length).toBe(tile.width * tile.height * 3);
+  return { base, tile };
 }
 
 test.skipIf(!fs.existsSync(HE_CHUNKY))(
   'optional: LSP16103 packed YCbCr JPEG RGB loads as interleaved SizeC=1',
   async () => {
-    await assertPackedRgbContract(HE_CHUNKY, PHOTOMETRIC_YCBCR);
+    const { tile } = await assertPackedRgbContract(
+      HE_CHUNKY,
+      PHOTOMETRIC_YCBCR
+    );
+    // After YCbCr→RGB, tissue tiles are not near-neutral YCbCr gray.
+    // Sample a few pixels: mean R/G/B should differ from Y≈mid, Cb/Cr≈128.
+    let sumR = 0;
+    let sumG = 0;
+    let sumB = 0;
+    const n = Math.min(256, tile.width * tile.height);
+    for (let i = 0; i < n; i++) {
+      const o = i * 3;
+      sumR += tile.data[o];
+      sumG += tile.data[o + 1];
+      sumB += tile.data[o + 2];
+    }
+    const meanR = sumR / n;
+    const meanG = sumG / n;
+    const meanB = sumB / n;
+    // Converted RGB for H&E is rarely all three means near each other at ~128.
+    const spread = Math.max(meanR, meanG, meanB) - Math.min(meanR, meanG, meanB);
+    expect(spread).toBeGreaterThan(5);
   }
 );
 

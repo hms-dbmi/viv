@@ -50,6 +50,10 @@ interface OmeTiffSelection {
     c: number;
     z: number;
 }
+/** TIFF PhotometricInterpretation: RGB */
+declare const PHOTOMETRIC_RGB = 2;
+/** TIFF PhotometricInterpretation: YCbCr (common for JPEG H&E) */
+declare const PHOTOMETRIC_YCBCR = 6;
 
 interface TiffOptions {
     headers?: Headers | Record<string, string>;
@@ -295,5 +299,17 @@ declare function getImageSize<T extends string[]>(source: PixelSource<T>): {
 };
 declare const SIGNAL_ABORTED = "__vivSignalAborted";
 
-export { DEPRECATED_loadBioformatsZarr, Pool, SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, getChannelStats, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore };
+/**
+ * True when interleaved visual samples are not yet RGB and must be converted
+ * before consumers that assume R,G,B (BitmapLayer with meta=RGB, analysis, etc.).
+ * Extend here for CMYK / CIELab if those packed paths land.
+ */
+declare function needsPhotometricRgbConversion(photometricInterpretation?: number): boolean;
+/**
+ * Convert interleaved photometric samples to RGB. Matches geotiff.js
+ * `fromYCbCr` and Viv BitmapLayer (Cb/Cr centered at 128 on 0–255).
+ */
+declare function convertInterleavedPhotometricToRgb(data: ArrayLike<number>, photometricInterpretation?: number): Uint8Array;
+
+export { DEPRECATED_loadBioformatsZarr, PHOTOMETRIC_RGB, PHOTOMETRIC_YCBCR, Pool, SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, convertInterleavedPhotometricToRgb, getChannelStats, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore, needsPhotometricRgbConversion };
 export type { DecodePool, RootAttrs };

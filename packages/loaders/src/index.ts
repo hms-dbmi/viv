@@ -16,3 +16,12 @@ export {
   isInterleaved,
   SIGNAL_ABORTED
 } from './utils';
+
+export {
+  PHOTOMETRIC_RGB,
+  PHOTOMETRIC_YCBCR
+} from './tiff/lib/utils';
+export {
+  convertInterleavedPhotometricToRgb,
+  needsPhotometricRgbConversion
+} from './tiff/lib/photometricRgb';

@@ -15,7 +15,8 @@ import {
   guessImageDataType,
   isPackedRgbTiffImage,
   padTiffSampleTags,
-  parsePixelDataType
+  parsePixelDataType,
+  PHOTOMETRIC_RGB
 } from './lib/utils';
 import TiffPixelSource from './pixel-source';
 
@@ -199,10 +200,12 @@ export async function loadSingleFileOmeTiff(
     const tileSize = getTiffTileSize(
       await pyramidIndexer({ c: 0, t: 0, z: 0 }, 0)
     );
+    const sourcePhoto = firstImage.fileDirectory.PhotometricInterpretation;
     const meta = {
       physicalSizes: extractPhysicalSizesfromPixels(metadata['Pixels']),
-      photometricInterpretation:
-        firstImage.fileDirectory.PhotometricInterpretation
+      sourcePhotometricInterpretation: sourcePhoto,
+      // Visual RGB (packed/planar): getTile normalizes samples to RGB.
+      photometricInterpretation: packedRgb ? PHOTOMETRIC_RGB : sourcePhoto
     };
     const data = await Promise.all(
       Array.from({ length: levels }, async (_, level) => {
