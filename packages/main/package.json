@@ -9,14 +9,15 @@
   "license": "MIT",
   "homepage": "https://github.com/hms-dbmi/viv#readme",
   "type": "module",
-  "main": "src/index.js",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "publishConfig": {
     "main": "dist/index.mjs",
     "types": "dist/index.d.ts",
     "sideEffects": false
   },
   "scripts": {
-    "build": "mkdir -p dist && cp src/index.js dist/index.mjs && cp src/index.js dist/index.d.ts"
+    "build": "mkdir -p dist && rm -f dist/index.mjs dist/index.d.ts && cp src/index.js dist/index.mjs && cp src/index.js dist/index.d.ts"
   },
   "files": [
     "dist"

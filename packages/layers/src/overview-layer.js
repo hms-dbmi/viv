@@ -5,6 +5,7 @@ import { ColorPaletteExtension } from '@vivjs/extensions';
 import { getImageSize } from '@vivjs/loaders';
 
 import ImageLayer from './image-layer';
+import { getLevelScale } from './multiscale-image-layer/utils';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -77,10 +78,11 @@ const OverviewLayer = class extends CompositeLayer {
     const { width, height } = getImageSize(loader[0]);
     const z = loader.length - 1;
     const lowestResolution = loader[z];
+    const levelScale = getLevelScale(loader, z);
 
     const overview = new ImageLayer(this.props, {
       id: `viewport-${id}`,
-      modelMatrix: new Matrix4().scale(2 ** z * overviewScale),
+      modelMatrix: new Matrix4().scale(levelScale * overviewScale),
       loader: lowestResolution
     });
     const boundingBoxOutline = new PolygonLayer({

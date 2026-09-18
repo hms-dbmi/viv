@@ -6,6 +6,7 @@ import {
   AdditiveColormap3DExtensions,
   ColorPalette3DExtensions,
   DEPRECATED_loadBioformatsZarr,
+  Pool,
   RENDERING_MODES,
   getChannelStats,
   loadMultiTiff,
@@ -14,6 +15,9 @@ import {
 } from '@hms-dbmi/viv';
 
 import { GLOBAL_SLIDER_DIMENSION_FIELDS } from './constants';
+
+/** Shared GeoTIFF decode pool (`Pool` from `@hms-dbmi/viv`). */
+const decodePool = new Pool();
 
 const MAX_CHANNELS_FOR_SNACKBAR_WARNING = 40;
 
@@ -178,8 +182,7 @@ export async function createLoader(
       if (urlOrFile instanceof File) {
         const source = await loadOmeTiff(urlOrFile, {
           images: 'all',
-          // Reference: https://github.com/hms-dbmi/viv/issues/949
-          pool: false
+          pool: decodePool
         });
         return source;
       }
@@ -189,8 +192,7 @@ export async function createLoader(
       const source = await loadOmeTiff(urlOrFile, {
         offsets: maybeOffsets,
         images: 'all',
-        // Reference: https://github.com/hms-dbmi/viv/issues/949
-        pool: false
+        pool: decodePool
       });
 
       // Show a warning if the total number of channels/images exceeds a fixed amount.
@@ -217,8 +219,7 @@ export async function createLoader(
     if (isMultiTiff(urlOrFile)) {
       const mutiTiffSources = await generateMultiTiffSources(urlOrFile);
       const source = await loadMultiTiff(mutiTiffSources, {
-        images: 'all',
-        pool: false
+        pool: decodePool
       });
       return source;
     }

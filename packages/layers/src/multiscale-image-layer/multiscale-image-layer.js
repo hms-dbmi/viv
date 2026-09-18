@@ -1,11 +1,15 @@
 import { CompositeLayer } from '@deck.gl/core';
-import { GL } from '@luma.gl/constants';
 import { Matrix4 } from '@math.gl/core';
 
 import { ColorPaletteExtension } from '@vivjs/extensions';
 import { SIGNAL_ABORTED, getImageSize, isInterleaved } from '@vivjs/loaders';
 import ImageLayer from '../image-layer';
 import MultiscaleImageLayerBase from './multiscale-image-layer-base';
+import {
+  getLevelScale,
+  getPyramidZoomLevels,
+  snapToAvailableZoom
+} from './utils';
 
 const defaultProps = {
   pickable: { type: 'boolean', value: true, compare: true },
@@ -66,6 +70,7 @@ const MultiscaleImageLayer = class extends CompositeLayer {
     } = this.props;
     // Get properties from highest resolution
     const { tileSize, dtype } = loader[0];
+    const levelZooms = getPyramidZoomLevels(loader);
     // This is basically to invert:
     // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128
     // The z level can be wrong for showing the correct scales because of the calculation deck.gl does
@@ -76,15 +81,16 @@ const MultiscaleImageLayer = class extends CompositeLayer {
         return null;
       }
 
-      // I don't fully undertstand why this works, but I have a sense.
-      // It's basically to cancel out:
-      // https://github.com/visgl/deck.gl/pull/4616/files#diff-4d6a2e500c0e79e12e562c4f1217dc80R128,
-      // which felt odd to me to beign with.
-      // The image-tile example works without, this but I have a feeling there is something
-      // going on with our pyramids and/or rendering that is different.
-      const resolution = Math.round(-z);
+      // Map deck.gl's power-of-two zoom to a native pyramid level. For 2x pyramids
+      // this is resolution = -z. For 4x (etc.) intermediate zooms snap to the
+      // next-coarser native level and x/y are remapped to that level's tile grid.
+      const zNat = snapToAvailableZoom(z, levelZooms);
+      const resolution = levelZooms.indexOf(zNat);
+      const factor = 2 ** (Math.round(z) - zNat);
+      const xNat = Math.floor(x / factor);
+      const yNat = Math.floor(y / factor);
       const getTile = selection => {
-        const config = { x, y, selection, signal };
+        const config = { x: xNat, y: yNat, selection, signal };
         return loader[resolution].getTile(config);
       };
 
@@ -145,17 +151,25 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       ),
       extent: [0, 0, width, height],
       // See the above note within for why the use of zoomOffset and the rounding necessary.
-      minZoom: Math.round(-(loader.length - 1)),
+      minZoom: levelZooms[levelZooms.length - 1],
       maxZoom: 0,
       // We want a no-overlap caching strategy with an opacity < 1 to prevent
       // multiple rendered sublayers (some of which have been cached) from overlapping
       refinementStrategy:
         refinementStrategy || (opacity === 1 ? 'best-available' : 'no-overlap'),
       // TileLayer checks `changeFlags.updateTriggersChanged.getTileData` to see if tile cache
-      // needs to be re-created. We want to trigger this behavior if the loader changes.
+      // needs to be re-created. Key selections by t/c/z values so a new array with the same
+      // planes (contrast, color, visibility) does not drop the cache.
       // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
       updateTriggers: {
-        getTileData: [loader, selections]
+        getTileData: [
+          loader,
+          selections?.length
+            ? selections
+                .map(s => `${s?.t ?? 0},${s?.c ?? 0},${s?.z ?? 0}`)
+                .join('|')
+            : ''
+        ]
       },
       onTileError: onTileError || loader[0].onTileError
     });
@@ -174,7 +188,9 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       new ImageLayer(this.props, {
         id: `Background-Image-${id}`,
         loader: lowestResolution,
-        modelMatrix: layerModelMatrix.scale(2 ** (loader.length - 1)),
+        modelMatrix: layerModelMatrix.scale(
+          getLevelScale(loader, loader.length - 1)
+        ),
         visible: !viewportId || this.context.viewport.id === viewportId,
         onHover,
         onClick,

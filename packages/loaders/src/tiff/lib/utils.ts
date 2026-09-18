@@ -4,6 +4,8 @@ import type { DimensionOrder, OmeXml, PhysicalUnit } from '../../omexml';
 import { assert, DTYPE_LOOKUP, getLabels, prevPowerOf2 } from '../../utils';
 import type { MultiTiffImage } from '../multi-tiff';
 import { createOffsetsProxy } from './proxies';
+import type { ScannerOptions } from './resolve-offsets';
+import { resolveRemoteOffsets } from './resolve-offsets';
 
 // TODO: Remove the fancy label stuff
 export type OmeTiffDims =
@@ -18,6 +20,88 @@ export interface OmeTiffSelection {
   t: number;
   c: number;
   z: number;
+}
+
+/** TIFF PhotometricInterpretation: BlackIsZero (typical fluorescence) */
+export const PHOTOMETRIC_BLACK_IS_ZERO = 1;
+/** TIFF PhotometricInterpretation: RGB */
+export const PHOTOMETRIC_RGB = 2;
+/** TIFF PhotometricInterpretation: YCbCr (common for JPEG H&E) */
+export const PHOTOMETRIC_YCBCR = 6;
+
+/** How packed/planar visual RGB is presented on the Viv loader. */
+export type PackedRgbLayout = 'interleaved' | 'planar';
+
+type TiffSampleDirectory = {
+  SamplesPerPixel?: number;
+  BitsPerSample?: ArrayLike<number>;
+  SampleFormat?: ArrayLike<number>;
+  PhotometricInterpretation?: number;
+  PlanarConfiguration?: number;
+};
+
+function padSampleArray(
+  values: ArrayLike<number> | undefined,
+  length: number,
+  fallback: number
+): number[] {
+  const src = values != null ? Array.from(values) : [];
+  const fill = src[0] ?? fallback;
+  return Array.from({ length }, (_, i) => src[i] ?? fill);
+}
+
+/**
+ * Bio-Formats often writes a single SampleFormat (or BitsPerSample) value for
+ * RGB files. geotiff.js indexes those tags per sample and throws
+ * `Unsupported data format/bitsPerSample` when the array is short.
+ * Mutates `fileDirectory` in place; no-op when lengths already match.
+ */
+export function padTiffSampleTags(fileDirectory: TiffSampleDirectory): void {
+  const spp = Math.max(
+    1,
+    fileDirectory.SamplesPerPixel ?? fileDirectory.BitsPerSample?.length ?? 1
+  );
+  const bits = fileDirectory.BitsPerSample;
+  const formats = fileDirectory.SampleFormat;
+  const bitsOk = bits != null && bits.length >= spp;
+  const formatsOk = formats != null && formats.length >= spp;
+  if (bitsOk && formatsOk) return;
+  if (!bitsOk) {
+    fileDirectory.BitsPerSample = padSampleArray(bits, spp, 8);
+  }
+  if (!formatsOk) {
+    fileDirectory.SampleFormat = padSampleArray(formats, spp, 1);
+  }
+}
+
+/**
+ * One IFD with 3 samples and photometric RGB or YCbCr — a packed RGB image,
+ * not three fluorescence channels (those are photometric BlackIsZero + spp=1).
+ */
+export function isPackedRgbTiffImage(image: {
+  fileDirectory: TiffSampleDirectory;
+}): boolean {
+  const fd = image.fileDirectory;
+  const spp = fd.SamplesPerPixel ?? fd.BitsPerSample?.length ?? 1;
+  const photo = fd.PhotometricInterpretation;
+  return (
+    spp === 3 && (photo === PHOTOMETRIC_RGB || photo === PHOTOMETRIC_YCBCR)
+  );
+}
+
+/**
+ * Photometric RGB stored as separate planes in one IFD (PlanarConfiguration=2).
+ */
+export function isPlanarRgbTiffImage(image: {
+  fileDirectory: TiffSampleDirectory;
+}): boolean {
+  const fd = image.fileDirectory;
+  const spp = fd.SamplesPerPixel ?? fd.BitsPerSample?.length ?? 1;
+  return (
+    fd.PhotometricInterpretation === PHOTOMETRIC_RGB &&
+    fd.PlanarConfiguration === 2 &&
+    spp === 3
+  );
 }
 
 type PhysicalSize = {
@@ -86,7 +170,8 @@ export function extractAxesFromPixels(d: OmeXml[number]['Pixels']) {
  * Compute the shape of the image at a given resolution level.
  *
  * Assumes that the image is downsampled by a factor of 2 for each
- * pyramid level.
+ * pyramid level. Prefer {@link getShapeForLevel} with actual IFD
+ * dimensions when SubIFD sizes are not exact binary halvings (e.g. 4x).
  */
 export function getShapeForBinaryDownsampleLevel(options: {
   axes: { shape: number[]; labels: string[] };
@@ -103,6 +188,25 @@ export function getShapeForBinaryDownsampleLevel(options: {
   return resolutionShape;
 }
 
+/**
+ * Build a resolution shape from measured width/height (e.g. TIFF IFD size).
+ */
+export function getShapeForLevel(options: {
+  axes: { shape: number[]; labels: string[] };
+  width: number;
+  height: number;
+}) {
+  const { axes, width, height } = options;
+  const xIndex = axes.labels.indexOf('x');
+  assert(xIndex !== -1, 'x dimension not found');
+  const yIndex = axes.labels.indexOf('y');
+  assert(yIndex !== -1, 'y dimension not found');
+  const resolutionShape = axes.shape.slice();
+  resolutionShape[xIndex] = width;
+  resolutionShape[yIndex] = height;
+  return resolutionShape;
+}
+
 export function getTiffTileSize(image: GeoTIFFImage) {
   const tileWidth = image.getTileWidth();
   const tileHeight = image.getTileHeight();
@@ -112,11 +216,11 @@ export function getTiffTileSize(image: GeoTIFFImage) {
 }
 
 // Inspired by/borrowed from https://geotiffjs.github.io/geotiff.js/geotiffimage.js.html#line297
-function guessImageDataType(image: GeoTIFFImage) {
+export function guessImageDataType(image: GeoTIFFImage) {
   // Assuming these are flat TIFFs, just grab the info for the first image/sample.
   const sampleIndex = 0;
   const format = image.fileDirectory?.SampleFormat?.[sampleIndex] ?? 1;
-  const bitsPerSample = image.fileDirectory.BitsPerSample[sampleIndex];
+  const bitsPerSample = image.fileDirectory.BitsPerSample?.[sampleIndex] ?? 8;
   switch (format) {
     case 1: // unsigned integer data
       if (bitsPerSample <= 8) {
@@ -351,15 +455,50 @@ export async function createGeoTiff(
   options: {
     headers?: Headers | Record<string, string>;
     offsets?: number[];
+    scannerOptions?: ScannerOptions;
     /** Pre-constructed GeoTIFF — skips internal HTTP client when provided. */
     source?: GeoTIFF;
   } = {}
 ): Promise<GeoTIFF> {
   const tiff = options.source ?? (await createGeoTiffObject(source, options));
-  /*
-   * Performance enhancement. If offsets are provided, we
-   * create a proxy that intercepts calls to `tiff.getImage`
-   * and injects the pre-computed offsets.
-   */
-  return options.offsets ? createOffsetsProxy(tiff, options.offsets) : tiff;
+
+  if (options.offsets) {
+    return createOffsetsProxy(tiff, options.offsets);
+  }
+
+  // Skip remote offset probing when a prebuilt GeoTIFF was supplied.
+  if (options.source) {
+    return tiff;
+  }
+
+  if (!(source instanceof Blob)) {
+    const url = typeof source === 'string' ? new URL(source) : source;
+    if (url.protocol !== 'file:') {
+      try {
+        const offsets = await resolveRemoteOffsets(
+          url.href,
+          options.headers,
+          options.scannerOptions
+        );
+        if (offsets.length > 0) {
+          console.log(
+            `[viv:offsets] Using resolved offsets (${offsets.length}) for:`,
+            url.href
+          );
+          return createOffsetsProxy(tiff, offsets);
+        }
+        console.log(
+          '[viv:offsets] No offsets resolved, falling back to default GeoTIFF traversal for:',
+          url.href
+        );
+      } catch (err) {
+        console.log(
+          '[viv:offsets] Offset resolution failed, falling back to default GeoTIFF traversal:',
+          err
+        );
+      }
+    }
+  }
+
+  return tiff;
 }

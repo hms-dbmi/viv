@@ -90,7 +90,7 @@ const getTransparentColor = photometricInterpretation => {
  * - Returns null when the input is not usable.
  *
  * @param {{ data?: Uint8Array, width?: number, height?: number, format?: string } | null | undefined} img
- * @returns {{ data: Uint8Array, width: number, height: number, format?: string } | null}
+ * @returns {{ data: Uint8Array | Uint8ClampedArray, width: number, height: number, format?: string } | null}
  */
 const getPreparedImage = img => {
   if (!img?.data || !img.width || !img.height) {
@@ -162,7 +162,8 @@ const BitmapLayer = class extends CompositeLayer {
 
   updateState({ props, oldProps, ...rest }) {
     super.updateState({ props, oldProps, ...rest });
-    if (!props.image?.data || !props.image?.width || !props.image?.height) {
+    const img = getPreparedImage(props.image);
+    if (!img) {
       if (this.state.bitmapTexture) {
         this.state.bitmapTexture.delete();
         this.setState({ bitmapTexture: null });
@@ -175,13 +176,17 @@ const BitmapLayer = class extends CompositeLayer {
     if (this.state.bitmapTexture) {
       this.state.bitmapTexture.delete();
     }
-    const img = getPreparedImage(props.image);
+
+    // Upload ourselves: deck.gl 9.3's image prop helper reads size from
+    // `image.data` (not `{data,width,height}`), allocates a full mip chain,
+    // and calls generateMipmapsWebGL() — which throws GL_INVALID_VALUE /
+    // "levels not positive" / "format does not support mipmap" for our tiles.
     const texture = this.context.device.createTexture({
       width: img.width,
       height: img.height,
       dimension: '2d',
       data: img.data,
-      mipmaps: false,
+      mipLevels: 1,
       format: img.format || 'rgba8unorm',
       sampler: {
         minFilter: 'linear',
@@ -207,8 +212,8 @@ const BitmapLayer = class extends CompositeLayer {
       transparentColor: transparentColorInHook
     } = this.props;
     const transparentColor = getTransparentColor(photometricInterpretation);
-    const image =
-      this.state.bitmapTexture || getPreparedImage(this.props.image);
+    // Pass a Luma Texture (createTexture short-circuits on Texture instances).
+    const image = this.state.bitmapTexture;
     if (!image) return null;
     return new BitmapLayerWrapper(
       { ...this.props, image },

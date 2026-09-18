@@ -35,7 +35,13 @@ interface PhysicalSize {
 
 export interface PixelSourceMeta {
   physicalSizes?: { [key: string]: PhysicalSize };
+  /**
+   * Encoding of samples returned by getTile/getRaster. For packed/planar
+   * visual RGB TIFF sources this is RGB (2) after loader normalization.
+   */
   photometricInterpretation?: number;
+  /** Original TIFF PhotometricInterpretation tag before any normalization. */
+  sourcePhotometricInterpretation?: number;
 }
 
 export type Labels<S extends string[]> =

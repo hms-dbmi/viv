@@ -1,4 +1,5 @@
 export { loadOmeTiff, loadMultiTiff } from './tiff';
+export { Pool, type DecodePool } from './tiff/lib/Pool';
 export {
   loadOmeZarr,
   DEPRECATED_loadBioformatsZarr,
@@ -15,3 +16,14 @@ export {
   isInterleaved,
   SIGNAL_ABORTED
 } from './utils';
+
+export {
+  PHOTOMETRIC_BLACK_IS_ZERO,
+  PHOTOMETRIC_RGB,
+  PHOTOMETRIC_YCBCR
+} from './tiff/lib/utils';
+export type { PackedRgbLayout } from './tiff/lib/utils';
+export {
+  convertInterleavedPhotometricToRgb,
+  needsPhotometricRgbConversion
+} from './tiff/lib/photometricRgb';

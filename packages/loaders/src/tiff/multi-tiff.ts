@@ -1,12 +1,15 @@
 import type { GeoTIFFImage } from 'geotiff';
 
-import type Pool from './lib/Pool';
+import type { DecodePool } from './lib/Pool';
 import { getMultiTiffIndexer } from './lib/indexers';
 import {
   type OmeTiffSelection,
   getMultiTiffMeta,
   getMultiTiffMetadata,
-  getTiffTileSize
+  getTiffTileSize,
+  isPackedRgbTiffImage,
+  isPlanarRgbTiffImage,
+  PHOTOMETRIC_RGB
 } from './lib/utils';
 import TiffPixelSource from './pixel-source';
 
@@ -46,18 +49,22 @@ export async function load(
   imageName: string,
   images: MultiTiffImage[],
   channelNames: string[],
-  pool?: Pool
+  pool?: DecodePool | false
 ) {
   // Before doing any work make sure all of the images have the same resolution
   assertSameResolution(images);
 
   const firstImage = images[0].tiff;
-  const { PhotometricInterpretation: photometricInterpretation } =
-    firstImage.fileDirectory;
+  const sourcePhoto = firstImage.fileDirectory.PhotometricInterpretation;
   // Not sure if we need this or if the order matters for this use case.
   const dimensionOrder = 'XYZCT';
   const tileSize = getTiffTileSize(firstImage);
-  const meta = { photometricInterpretation };
+  const visualRgb =
+    isPackedRgbTiffImage(firstImage) || isPlanarRgbTiffImage(firstImage);
+  const meta = {
+    sourcePhotometricInterpretation: sourcePhoto,
+    photometricInterpretation: visualRgb ? PHOTOMETRIC_RGB : sourcePhoto
+  };
   const indexer = getMultiTiffIndexer(images);
   const { shape, labels, dtype } = getMultiTiffMeta(dimensionOrder, images);
   const metadata = getMultiTiffMetadata(
