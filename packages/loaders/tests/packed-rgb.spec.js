@@ -149,7 +149,8 @@ test.skipIf(!fs.existsSync(HE_CHUNKY))(
     const meanG = sumG / n;
     const meanB = sumB / n;
     // Converted RGB for H&E is rarely all three means near each other at ~128.
-    const spread = Math.max(meanR, meanG, meanB) - Math.min(meanR, meanG, meanB);
+    const spread =
+      Math.max(meanR, meanG, meanB) - Math.min(meanR, meanG, meanB);
     expect(spread).toBeGreaterThan(5);
   }
 );
@@ -163,9 +164,7 @@ test.skipIf(!fs.existsSync(HE_CHUNKY))(
     expect(widths).toEqual([102039, 25510, 6378, 1595, 399]);
     expect(heights).toEqual([76379, 19095, 4774, 1194, 299]);
     // Deck.gl zooms are ~0, -2, -4, -6, -8 for a 4x pyramid.
-    const zooms = widths.map(
-      w => 0 - Math.round(Math.log2(widths[0] / w))
-    );
+    const zooms = widths.map(w => 0 - Math.round(Math.log2(widths[0] / w)));
     expect(zooms).toEqual([0, -2, -4, -6, -8]);
   }
 );
@@ -184,9 +183,7 @@ test.skipIf(!fs.existsSync(HE_PLANAR))(
     const widths = data.map(s => s.shape[s.labels.indexOf('x')]);
     expect(widths[0]).toBe(29857);
     expect(widths[1]).toBe(14928);
-    const zooms = widths.map(
-      w => 0 - Math.round(Math.log2(widths[0] / w))
-    );
+    const zooms = widths.map(w => 0 - Math.round(Math.log2(widths[0] / w)));
     expect(zooms).toEqual([0, -1, -2, -3, -4, -5]);
   }
 );

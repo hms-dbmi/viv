@@ -6,6 +6,7 @@ import LZWDecoder from './lib/lzw-decoder';
 import {
   type OmeTiffDims,
   type OmeTiffSelection,
+  type PackedRgbLayout,
   createGeoTiff,
   parseFilename
 } from './lib/utils';
@@ -32,6 +33,13 @@ interface TiffOptions {
    * (multifile) OME-TIFFs which open multiple GeoTIFFs internally.
    */
   source?: GeoTIFF;
+  /**
+   * Packed/planar visual RGB (TIFF spp=3, photometric RGB or YCbCr).
+   * `"interleaved"` (default) collapses to SizeC=1 + `_c` for BitmapLayer.
+   * `"planar"` presents three SPP=1 channels for XRLayer; one JPEG decode
+   * is shared across `c`.
+   */
+  packedRgb?: PackedRgbLayout;
 }
 
 interface OmeTiffOptions extends TiffOptions {
@@ -80,6 +88,7 @@ export async function loadOmeTiff(source: string | File): Promise<OmeTiffImage>;
  * @param {Headers=} opts.headers - Headers passed to each underlying fetch request.
  * @param {Array<number>=} opts.offsets - [Indexed-Tiff](https://github.com/hms-dbmi/generate-tiff-offsets) IFD offsets.
  * @param {import('./lib/Pool').DecodePool | false} [opts.pool] - Decode worker pool (see {@link Pool} from `@vivjs/loaders`) or `false` for main-thread decode.
+ * @param {("interleaved" | "planar")} [opts.packedRgb='interleaved'] - Packed visual RGB layout. `"planar"` exposes three SPP=1 channels.
  * @param {("first" | "all")} [opts.images='first'] - Whether to return 'all' or only the 'first' image in the OME-TIFF.
  * Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[] is returned.
  * @return {Promise<{ data: TiffPixelSource[], metadata: ImageMeta }> | Promise<{ data: TiffPixelSource[], metadata: ImageMeta }>[]} data source and associated OME-Zarr metadata.

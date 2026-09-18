@@ -22,10 +22,15 @@ export interface OmeTiffSelection {
   z: number;
 }
 
+/** TIFF PhotometricInterpretation: BlackIsZero (typical fluorescence) */
+export const PHOTOMETRIC_BLACK_IS_ZERO = 1;
 /** TIFF PhotometricInterpretation: RGB */
 export const PHOTOMETRIC_RGB = 2;
 /** TIFF PhotometricInterpretation: YCbCr (common for JPEG H&E) */
 export const PHOTOMETRIC_YCBCR = 6;
+
+/** How packed/planar visual RGB is presented on the Viv loader. */
+export type PackedRgbLayout = 'interleaved' | 'planar';
 
 type TiffSampleDirectory = {
   SamplesPerPixel?: number;

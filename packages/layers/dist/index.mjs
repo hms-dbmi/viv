@@ -1040,10 +1040,14 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       // multiple rendered sublayers (some of which have been cached) from overlapping
       refinementStrategy: refinementStrategy || (opacity === 1 ? "best-available" : "no-overlap"),
       // TileLayer checks `changeFlags.updateTriggersChanged.getTileData` to see if tile cache
-      // needs to be re-created. We want to trigger this behavior if the loader changes.
+      // needs to be re-created. Key selections by t/c/z values so a new array with the same
+      // planes (contrast, color, visibility) does not drop the cache.
       // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
       updateTriggers: {
-        getTileData: [loader, selections]
+        getTileData: [
+          loader,
+          selections?.length ? selections.map((s) => `${s?.t ?? 0},${s?.c ?? 0},${s?.z ?? 0}`).join("|") : ""
+        ]
       },
       onTileError: onTileError || loader[0].onTileError
     });

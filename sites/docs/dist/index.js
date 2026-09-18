@@ -2743,6 +2743,7 @@ async function resolveRemoteOffsets(url, headers, scannerOptions) {
   return offsets;
 }
 
+const PHOTOMETRIC_BLACK_IS_ZERO = 1;
 const PHOTOMETRIC_RGB = 2;
 const PHOTOMETRIC_YCBCR = 6;
 function padSampleArray(values, length, fallback) {
@@ -3079,12 +3080,60 @@ function getMultiTiffIndexer(tiffs) {
   };
 }
 
+function needsPhotometricRgbConversion(photometricInterpretation) {
+  return photometricInterpretation === PHOTOMETRIC_YCBCR;
+}
+function convertInterleavedPhotometricToRgb(data, photometricInterpretation) {
+  if (photometricInterpretation === PHOTOMETRIC_YCBCR) {
+    return interleavedYCbCrToRgb(data);
+  }
+  if (ArrayBuffer.isView(data) && data instanceof Uint8Array) {
+    return data;
+  }
+  return Uint8Array.from(data);
+}
+function interleavedYCbCrToRgb(data) {
+  const out = new Uint8Array(data.length);
+  for (let i = 0; i < data.length; i += 3) {
+    const y = data[i];
+    const cb = data[i + 1];
+    const cr = data[i + 2];
+    out[i] = clampRgb8(y + 1.402 * (cr - 128));
+    out[i + 1] = clampRgb8(
+      y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128)
+    );
+    out[i + 2] = clampRgb8(y + 1.772 * (cb - 128));
+  }
+  return out;
+}
+function clampRgb8(v) {
+  return Math.max(0, Math.min(255, Math.round(v)));
+}
+
 var __defProp$3 = Object.defineProperty;
 var __defNormalProp$3 = (obj, key, value) => key in obj ? __defProp$3(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField$3 = (obj, key, value) => {
-  __defNormalProp$3(obj, key + "" , value);
+  __defNormalProp$3(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
+function sliceInterleavedSample(data, width, height, sample) {
+  const n = width * height;
+  const ArrayType = data.constructor;
+  const out = new ArrayType(n);
+  const s = sample | 0;
+  for (let i = 0; i < n; i++) {
+    out[i] = data[i * 3 + s];
+  }
+  return out;
+}
+function packedDecodeKey(selection, props) {
+  const t = _nullishCoalesce$2(_optionalChain$3([selection, 'optionalAccess', _19 => _19.t]), () => ( 0));
+  const z = _nullishCoalesce$2(_optionalChain$3([selection, 'optionalAccess', _20 => _20.z]), () => ( 0));
+  const window = _optionalChain$3([props, 'optionalAccess', _21 => _21.window]);
+  if (window)
+    return `${t}:${z}:${window.join(",")}`;
+  return `${t}:${z}:raster`;
+}
 const RGB_SAMPLES = [0, 1, 2];
 class TiffPixelSource {
   constructor(indexer, dtype, tileSize, shape, labels, meta, pool) {
@@ -3095,11 +3144,14 @@ class TiffPixelSource {
     this.meta = meta;
     this.pool = pool;
     __publicField$3(this, "_indexer");
+    /** In-flight packed RGB decodes so c=0,1,2 share one JPEG decode. */
+    // ponytail: dropped after this turn; LRU if sequential channel toggles re-decode.
+    __publicField$3(this, "_packedDecodes", /* @__PURE__ */ new Map());
     this._indexer = indexer;
   }
   async getRaster({ selection, signal }) {
     const image = await this._indexer(selection);
-    return this._readRasters(image, { signal });
+    return this._readRasters(image, { signal }, selection);
   }
   async getTile({ x, y, selection, signal }) {
     const { height, width } = this._getTileExtent(x, y);
@@ -3107,28 +3159,56 @@ class TiffPixelSource {
     const y0 = y * this.tileSize;
     const window = [x0, y0, x0 + width, y0 + height];
     const image = await this._indexer(selection);
-    return this._readRasters(image, { window, width, height, signal });
+    return this._readRasters(
+      image,
+      { window, width, height, signal },
+      selection
+    );
   }
-  async _readRasters(image, props) {
+  async _readRasters(image, props, selection) {
     padTiffSampleTags(image.fileDirectory);
     const interleave = isInterleaved(this.shape);
-    const signal = _optionalChain$3([props, 'optionalAccess', _19 => _19.signal]);
-    if (_optionalChain$3([signal, 'optionalAccess', _20 => _20.aborted])) {
+    const signal = _optionalChain$3([props, 'optionalAccess', _22 => _22.signal]);
+    if (_optionalChain$3([signal, 'optionalAccess', _23 => _23.aborted])) {
       throw SIGNAL_ABORTED;
     }
+    const packedRgb = isPackedRgbTiffImage(image);
+    const presentPlanar = packedRgb && !interleave;
+    if (presentPlanar) {
+      const key = packedDecodeKey(selection, props);
+      let pending = this._packedDecodes.get(key);
+      if (!pending) {
+        pending = this._decodeVisualRgb(image, props, signal);
+        this._packedDecodes.set(key, pending);
+        pending.then(
+          () => {
+            queueMicrotask(() => this._packedDecodes.delete(key));
+          },
+          () => {
+            this._packedDecodes.delete(key);
+          }
+        );
+      }
+      const rgb = await pending;
+      const sample = Math.max(
+        0,
+        Math.min(2, Number(selection.c) || 0)
+      );
+      return {
+        data: sliceInterleavedSample(rgb.data, rgb.width, rgb.height, sample),
+        width: rgb.width,
+        height: rgb.height
+      };
+    }
+    return this._decodeVisualRgb(image, props, signal);
+  }
+  async _decodeVisualRgb(image, props, signal) {
+    const interleave = isInterleaved(this.shape);
     const { signal: _signal, ...restProps } = _nullishCoalesce$2(props, () => ( {}));
-    const planarRgb = isPlanarRgbTiffImage(image);
     const packedRgb = isPackedRgbTiffImage(image);
     let raster;
     try {
-      if (planarRgb) {
-        raster = await image.readRasters({
-          ...restProps,
-          samples: RGB_SAMPLES,
-          interleave: true,
-          pool: this.pool
-        });
-      } else if (packedRgb) {
+      if (packedRgb) {
         raster = await image.readRasters({
           ...restProps,
           samples: RGB_SAMPLES,
@@ -3143,16 +3223,20 @@ class TiffPixelSource {
         });
       }
     } catch (err) {
-      if (_optionalChain$3([signal, 'optionalAccess', _21 => _21.aborted])) {
+      if (_optionalChain$3([signal, 'optionalAccess', _24 => _24.aborted])) {
         throw SIGNAL_ABORTED;
       }
       throw err;
     }
-    if (_optionalChain$3([signal, 'optionalAccess', _22 => _22.aborted])) {
+    if (_optionalChain$3([signal, 'optionalAccess', _25 => _25.aborted])) {
       throw SIGNAL_ABORTED;
     }
-    const useInterleaved = planarRgb || packedRgb || interleave;
-    const data = useInterleaved ? raster : raster[0];
+    const useInterleaved = packedRgb || interleave;
+    let data = useInterleaved ? raster : raster[0];
+    const photo = image.fileDirectory.PhotometricInterpretation;
+    if (packedRgb && needsPhotometricRgbConversion(photo)) {
+      data = convertInterleavedPhotometricToRgb(data, photo);
+    }
     return {
       data,
       width: raster.width,
@@ -3202,10 +3286,14 @@ async function assertCompleteStack(images, indexer) {
 async function load$2(imageName, images, channelNames, pool) {
   assertSameResolution(images);
   const firstImage = images[0].tiff;
-  const { PhotometricInterpretation: photometricInterpretation } = firstImage.fileDirectory;
+  const sourcePhoto = firstImage.fileDirectory.PhotometricInterpretation;
   const dimensionOrder = "XYZCT";
   const tileSize = getTiffTileSize(firstImage);
-  const meta = { photometricInterpretation };
+  const visualRgb = isPackedRgbTiffImage(firstImage) || isPlanarRgbTiffImage(firstImage);
+  const meta = {
+    sourcePhotometricInterpretation: sourcePhoto,
+    photometricInterpretation: visualRgb ? PHOTOMETRIC_RGB : sourcePhoto
+  };
   const indexer = getMultiTiffIndexer(images);
   const { shape, labels, dtype } = getMultiTiffMeta(dimensionOrder, images);
   const metadata = getMultiTiffMetadata(
@@ -3615,7 +3703,8 @@ async function getPixelSourceOptionsForImage(metadata, config) {
     dtype: parsePixelDataType(metadata["Pixels"]["Type"]),
     meta: {
       physicalSizes: extractPhysicalSizesfromPixels(metadata["Pixels"]),
-      photometricInterpretation: baseImage.fileDirectory.PhotometricInterpretation
+      sourcePhotometricInterpretation: baseImage.fileDirectory.PhotometricInterpretation,
+      photometricInterpretation: isPackedRgbTiffImage(baseImage) || isPlanarRgbTiffImage(baseImage) ? PHOTOMETRIC_RGB : baseImage.fileDirectory.PhotometricInterpretation
     }
   };
 }
@@ -3676,6 +3765,22 @@ async function loadMultifileOmeTiff(source, options = {}) {
   return tiffImages;
 }
 
+function rootMetaForAvailableIfds(images, imageCount, packedRgb) {
+  if (images.length <= 1)
+    return images;
+  const out = [];
+  let used = 0;
+  for (const image of images) {
+    const p = image.Pixels;
+    const c = packedRgb ? 1 : Math.max(1, _nullishCoalesce$2(_optionalChain$3([p, 'optionalAccess', _26 => _26.SizeC]), () => ( 1)));
+    const n = Math.max(1, _nullishCoalesce$2(_optionalChain$3([p, 'optionalAccess', _27 => _27.SizeZ]), () => ( 1))) * c * Math.max(1, _nullishCoalesce$2(_optionalChain$3([p, 'optionalAccess', _28 => _28.SizeT]), () => ( 1)));
+    if (out.length > 0 && used + n > imageCount)
+      break;
+    out.push(image);
+    used += n;
+  }
+  return out;
+}
 function resolveMetadata(omexml, SubIFDs) {
   const rois = omexml.rois || [];
   const roiRefs = omexml.roiRefs || [];
@@ -3725,7 +3830,7 @@ function createSingleFileOmeTiffPyramidalIndexer(tiff, image) {
 }
 function collapsePackedRgbPixelsMetadata(metadata, vivDtype) {
   const pixels = metadata.Pixels;
-  const firstChannel = _nullishCoalesce$2(_optionalChain$3([pixels, 'access', _23 => _23.Channels, 'optionalAccess', _24 => _24[0]]), () => ( {}));
+  const firstChannel = _nullishCoalesce$2(_optionalChain$3([pixels, 'access', _29 => _29.Channels, 'optionalAccess', _30 => _30[0]]), () => ( {}));
   return {
     ...metadata,
     Pixels: {
@@ -3742,8 +3847,38 @@ function collapsePackedRgbPixelsMetadata(metadata, vivDtype) {
     }
   };
 }
+const PLANAR_RGB_CHANNEL_NAMES = ["R", "G", "B"];
+function presentPackedRgbAsPlanarChannels(metadata, vivDtype) {
+  const pixels = metadata.Pixels;
+  const src = _nullishCoalesce$2(pixels.Channels, () => ( []));
+  const channels = src.length >= 3 ? src.slice(0, 3).map((ch) => ({
+    ...ch,
+    SamplesPerPixel: 1
+  })) : PLANAR_RGB_CHANNEL_NAMES.map((name, i) => ({
+    ..._nullishCoalesce$2(src[0], () => ( {})),
+    ID: `Channel:0:${i}`,
+    Name: name,
+    SamplesPerPixel: 1
+  }));
+  return {
+    ...metadata,
+    Pixels: {
+      ...pixels,
+      SizeC: 3,
+      Interleaved: false,
+      Type: vivDtype,
+      Channels: channels
+    }
+  };
+}
 async function loadSingleFileOmeTiff(source, options = {}) {
-  const { offsets, headers, pool, source: prebuiltSource } = options;
+  const {
+    offsets,
+    headers,
+    pool,
+    source: prebuiltSource,
+    packedRgb: packedRgbLayout = "interleaved"
+  } = options;
   const tiff = await createGeoTiff(source, {
     headers,
     offsets,
@@ -3756,11 +3891,14 @@ async function loadSingleFileOmeTiff(source, options = {}) {
     fromString(firstImage.fileDirectory.ImageDescription),
     firstImage.fileDirectory.SubIFDs
   );
+  const imageCount = await tiff.getImageCount();
+  const usableMeta = rootMetaForAvailableIfds(rootMeta, imageCount, packedRgb);
   const images = [];
   let imageIfdOffset = 0;
-  for (const rawMetadata of rootMeta) {
+  for (const rawMetadata of usableMeta) {
     const vivDtype = packedRgb ? guessImageDataType(firstImage) : parsePixelDataType(rawMetadata["Pixels"]["Type"]);
-    const metadata = packedRgb ? collapsePackedRgbPixelsMetadata(rawMetadata, vivDtype) : rawMetadata;
+    const presentPlanar = packedRgb && packedRgbLayout === "planar";
+    const metadata = packedRgb ? presentPlanar ? presentPackedRgbAsPlanarChannels(rawMetadata, vivDtype) : collapsePackedRgbPixelsMetadata(rawMetadata, vivDtype) : rawMetadata;
     const imageSize = {
       z: metadata["Pixels"]["SizeZ"],
       c: packedRgb ? 1 : metadata["Pixels"]["SizeC"],
@@ -3775,16 +3913,22 @@ async function loadSingleFileOmeTiff(source, options = {}) {
     const tileSize = getTiffTileSize(
       await pyramidIndexer({ c: 0, t: 0, z: 0 }, 0)
     );
+    const sourcePhoto = firstImage.fileDirectory.PhotometricInterpretation;
     const meta = {
       physicalSizes: extractPhysicalSizesfromPixels(metadata["Pixels"]),
-      photometricInterpretation: firstImage.fileDirectory.PhotometricInterpretation
+      sourcePhotometricInterpretation: sourcePhoto,
+      photometricInterpretation: packedRgb ? presentPlanar ? PHOTOMETRIC_BLACK_IS_ZERO : PHOTOMETRIC_RGB : sourcePhoto
     };
     const data = await Promise.all(
       Array.from({ length: levels }, async (_, level) => {
         const levelImage = await pyramidIndexer({ t: 0, c: 0, z: 0 }, level);
         return new TiffPixelSource(
           (sel) => pyramidIndexer(
-            { t: _nullishCoalesce$2(sel.t, () => ( 0)), c: _nullishCoalesce$2(sel.c, () => ( 0)), z: _nullishCoalesce$2(sel.z, () => ( 0)) },
+            {
+              t: _nullishCoalesce$2(sel.t, () => ( 0)),
+              c: packedRgb ? 0 : _nullishCoalesce$2(sel.c, () => ( 0)),
+              z: _nullishCoalesce$2(sel.z, () => ( 0))
+            },
             level
           ),
           vivDtype,
@@ -3827,7 +3971,7 @@ async function loadMultiTiff(sources, opts = {}) {
     const imageSelections = Array.isArray(s) ? s : [s];
     if (typeof file === "string") {
       const parsedFilename = parseFilename(file);
-      const extension = _optionalChain$3([parsedFilename, 'access', _25 => _25.extension, 'optionalAccess', _26 => _26.toLowerCase, 'call', _27 => _27()]);
+      const extension = _optionalChain$3([parsedFilename, 'access', _31 => _31.extension, 'optionalAccess', _32 => _32.toLowerCase, 'call', _33 => _33()]);
       if (extension === "tif" || extension === "tiff") {
         const tiffImageName = parsedFilename.name;
         if (tiffImageName) {
@@ -3884,7 +4028,7 @@ var __publicField$2 = (obj, key, value) => {
   __defNormalProp$2(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
-const defaultPoolSize = _nullishCoalesce$2(_optionalChain$3([globalThis, 'optionalAccess', _28 => _28.navigator, 'optionalAccess', _29 => _29.hardwareConcurrency]), () => ( 4));
+const defaultPoolSize = _nullishCoalesce$2(_optionalChain$3([globalThis, 'optionalAccess', _34 => _34.navigator, 'optionalAccess', _35 => _35.hardwareConcurrency]), () => ( 4));
 function defaultCreateWorker() {
   return new Worker(new URL("./tiff/lib/decoder.worker.mjs", import.meta.url), {
     type: "module"
@@ -4170,7 +4314,7 @@ class ZarrPixelSource {
     return [zarr.slice(xStart, xStop), zarr.slice(yStart, yStop)];
   }
   async _getRaw(selection, getOptions) {
-    const signal = _optionalChain$3([getOptions, 'optionalAccess', _30 => _30.storeOptions, 'optionalAccess', _31 => _31.signal]);
+    const signal = _optionalChain$3([getOptions, 'optionalAccess', _36 => _36.storeOptions, 'optionalAccess', _37 => _37.signal]);
     const result = await zarr.get(this._data, selection, signal);
     if (typeof result !== "object") {
       throw new Error("Expected object from zarr.get");
@@ -4250,7 +4394,7 @@ async function load(store) {
 
 async function loadOmeZarr(source, options = {}) {
   const store = new FetchStore(source, options.fetchOptions);
-  if (_optionalChain$3([options, 'optionalAccess', _32 => _32.type]) !== "multiscales") {
+  if (_optionalChain$3([options, 'optionalAccess', _38 => _38.type]) !== "multiscales") {
     throw Error("Only multiscale OME-Zarr is supported.");
   }
   return load(store);
@@ -5332,10 +5476,14 @@ const MultiscaleImageLayer = class extends CompositeLayer {
       // multiple rendered sublayers (some of which have been cached) from overlapping
       refinementStrategy: refinementStrategy || (opacity === 1 ? "best-available" : "no-overlap"),
       // TileLayer checks `changeFlags.updateTriggersChanged.getTileData` to see if tile cache
-      // needs to be re-created. We want to trigger this behavior if the loader changes.
+      // needs to be re-created. Key selections by t/c/z values so a new array with the same
+      // planes (contrast, color, visibility) does not drop the cache.
       // https://github.com/uber/deck.gl/blob/3f67ea6dfd09a4d74122f93903cb6b819dd88d52/modules/geo-layers/src/tile-layer/tile-layer.js#L50
       updateTriggers: {
-        getTileData: [loader, selections]
+        getTileData: [
+          loader,
+          _optionalChain$2([selections, 'optionalAccess', _48 => _48.length]) ? selections.map((s) => `${_nullishCoalesce$1(_optionalChain$2([s, 'optionalAccess', _49 => _49.t]), () => ( 0))},${_nullishCoalesce$1(_optionalChain$2([s, 'optionalAccess', _50 => _50.c]), () => ( 0))},${_nullishCoalesce$1(_optionalChain$2([s, 'optionalAccess', _51 => _51.z]), () => ( 0))}`).join("|") : ""
+        ]
       },
       onTileError: onTileError || loader[0].onTileError
     });
@@ -5921,7 +6069,7 @@ const XR3DLayer = class extends Layer {
    * Implements VivLayer interface.
    */
   getNumChannels() {
-    return _nullishCoalesce$1(_nullishCoalesce$1(_optionalChain$2([this, 'access', _48 => _48.props, 'access', _49 => _49.selections, 'optionalAccess', _50 => _50.length]), () => ( _optionalChain$2([this, 'access', _51 => _51.props, 'access', _52 => _52.channels, 'optionalAccess', _53 => _53.length]))), () => ( MAX_CHANNELS));
+    return _nullishCoalesce$1(_nullishCoalesce$1(_optionalChain$2([this, 'access', _52 => _52.props, 'access', _53 => _53.selections, 'optionalAccess', _54 => _54.length]), () => ( _optionalChain$2([this, 'access', _55 => _55.props, 'access', _56 => _56.channels, 'optionalAccess', _57 => _57.length]))), () => ( MAX_CHANNELS));
   }
   /**
    * Returns the number of planes for this layer instance.
@@ -5929,7 +6077,7 @@ const XR3DLayer = class extends Layer {
    */
   getNumPlanes() {
     const { clippingPlanes } = this.props;
-    return _optionalChain$2([clippingPlanes, 'optionalAccess', _54 => _54.length]) || NUM_PLANES_DEFAULT;
+    return _optionalChain$2([clippingPlanes, 'optionalAccess', _58 => _58.length]) || NUM_PLANES_DEFAULT;
   }
   initializeState() {
     const { device } = this.context;
@@ -5940,12 +6088,12 @@ const XR3DLayer = class extends Layer {
   }
   _isHookDefinedByExtensions(hookName) {
     const { extensions } = this.props;
-    return _optionalChain$2([extensions, 'optionalAccess', _55 => _55.some, 'call', _56 => _56((e) => {
+    return _optionalChain$2([extensions, 'optionalAccess', _59 => _59.some, 'call', _60 => _60((e) => {
       const shaders = e.getShaders.call(this, e);
       if (shaders) {
         const { inject = {}, modules = [] } = shaders;
         const definesInjection = inject[hookName];
-        const moduleDefinesInjection = modules.some((m) => _optionalChain$2([m, 'optionalAccess', _57 => _57.inject, 'optionalAccess', _58 => _58[hookName]]));
+        const moduleDefinesInjection = modules.some((m) => _optionalChain$2([m, 'optionalAccess', _61 => _61.inject, 'optionalAccess', _62 => _62[hookName]]));
         return definesInjection || moduleDefinesInjection;
       }
       return false;
@@ -6005,7 +6153,7 @@ const XR3DLayer = class extends Layer {
   finalizeState() {
     super.finalizeState();
     if (this.state.textures) {
-      Object.values(this.state.textures).forEach((tex) => _optionalChain$2([tex, 'optionalAccess', _59 => _59.delete, 'call', _60 => _60()]));
+      Object.values(this.state.textures).forEach((tex) => _optionalChain$2([tex, 'optionalAccess', _63 => _63.delete, 'call', _64 => _64()]));
     }
   }
   /**
@@ -6021,7 +6169,7 @@ const XR3DLayer = class extends Layer {
       }
       return;
     }
-    const channelCountChanged = (_nullishCoalesce$1(_optionalChain$2([props, 'access', _61 => _61.selections, 'optionalAccess', _62 => _62.length]), () => ( 0))) !== (_nullishCoalesce$1(_optionalChain$2([oldProps, 'optionalAccess', _63 => _63.selections, 'optionalAccess', _64 => _64.length]), () => ( 0)));
+    const channelCountChanged = (_nullishCoalesce$1(_optionalChain$2([props, 'access', _65 => _65.selections, 'optionalAccess', _66 => _66.length]), () => ( 0))) !== (_nullishCoalesce$1(_optionalChain$2([oldProps, 'optionalAccess', _67 => _67.selections, 'optionalAccess', _68 => _68.length]), () => ( 0)));
     if (changeFlags.extensionsChanged || props.colormap !== oldProps.colormap || props.renderingMode !== oldProps.renderingMode || props.clippingPlanes.length !== oldProps.clippingPlanes.length || channelCountChanged) {
       const { device } = this.context;
       if (this.state.model) {
@@ -6029,7 +6177,7 @@ const XR3DLayer = class extends Layer {
       }
       this.setState({ model: this._getModel(device) });
     }
-    if (props.channelData && _optionalChain$2([props, 'optionalAccess', _65 => _65.channelData, 'optionalAccess', _66 => _66.data]) !== _optionalChain$2([oldProps, 'optionalAccess', _67 => _67.channelData, 'optionalAccess', _68 => _68.data])) {
+    if (props.channelData && _optionalChain$2([props, 'optionalAccess', _69 => _69.channelData, 'optionalAccess', _70 => _70.data]) !== _optionalChain$2([oldProps, 'optionalAccess', _71 => _71.channelData, 'optionalAccess', _72 => _72.data])) {
       this.loadTexture(props.channelData);
     }
     if (this.state.textures && this.state.scaleMatrix) {
@@ -6096,7 +6244,7 @@ const XR3DLayer = class extends Layer {
     const numTextures = Object.values(textures).filter((t) => t).length;
     const numChannelsForColors = Math.max(
       numTextures,
-      _optionalChain$2([selections, 'optionalAccess', _69 => _69.length]) || 0,
+      _optionalChain$2([selections, 'optionalAccess', _73 => _73.length]) || 0,
       1
     );
     const paddedColors = padColorsForUBO({
@@ -6213,7 +6361,7 @@ const XR3DLayer = class extends Layer {
       textures[`volume${i}`] = null;
     }
     if (this.state.textures) {
-      Object.values(this.state.textures).forEach((tex) => _optionalChain$2([tex, 'optionalAccess', _70 => _70.delete, 'call', _71 => _71()]));
+      Object.values(this.state.textures).forEach((tex) => _optionalChain$2([tex, 'optionalAccess', _74 => _74.delete, 'call', _75 => _75()]));
     }
     if (channelData && Object.keys(channelData).length > 0 && channelData.data) {
       const { height, width, depth } = channelData;
@@ -6256,7 +6404,7 @@ const XR3DLayer = class extends Layer {
       height,
       depth,
       dimension: "3d",
-      data: _nullishCoalesce$1(_optionalChain$2([attrs, 'access', _72 => _72.cast, 'optionalCall', _73 => _73(data)]), () => ( data)),
+      data: _nullishCoalesce$1(_optionalChain$2([attrs, 'access', _76 => _76.cast, 'optionalCall', _77 => _77(data)]), () => ( data)),
       format: attrs.format,
       mipLevels: 1,
       sampler: {
@@ -6429,9 +6577,9 @@ const VolumeLayer = class extends CompositeLayer {
         }
         const volume = {
           data: volumes.map((d) => d.data),
-          width: _optionalChain$2([volumes, 'access', _74 => _74[0], 'optionalAccess', _75 => _75.width]),
-          height: _optionalChain$2([volumes, 'access', _76 => _76[0], 'optionalAccess', _77 => _77.height]),
-          depth: _optionalChain$2([volumes, 'access', _78 => _78[0], 'optionalAccess', _79 => _79.depth])
+          width: _optionalChain$2([volumes, 'access', _78 => _78[0], 'optionalAccess', _79 => _79.width]),
+          height: _optionalChain$2([volumes, 'access', _80 => _80[0], 'optionalAccess', _81 => _81.height]),
+          depth: _optionalChain$2([volumes, 'access', _82 => _82[0], 'optionalAccess', _83 => _83.depth])
         };
         this.setState({
           ...volume,
@@ -7483,4 +7631,4 @@ const VolumeViewer = (props) => {
   ) : null;
 };
 
-export { AdditiveColormap3DExtensions, AdditiveColormapExtension, BitmapLayer, COLORMAPS, ColorPalette3DExtensions, ColorPaletteExtension, DEPRECATED_loadBioformatsZarr, DETAIL_VIEW_ID, DTYPE_VALUES, DetailView, ImageLayer, LensExtension, MAX_CHANNELS, MultiscaleImageLayer, OVERVIEW_VIEW_ID, OverviewLayer, OverviewView, PictureInPictureViewer, Pool, RENDERING_MODES, SIGNAL_ABORTED, ScaleBarLayer, SideBySideView, SideBySideViewer, TiffPixelSource, VivLayerExtension, VivShaderAssembler, VivView, VivViewer, VolumeLayer, VolumeView, VolumeViewer, XR3DLayer, XRLayer, ZarrPixelSource, expandShaderModule, getChannelStats, getDefaultInitialViewState, getDefaultPalette, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore, padColors, padColorsForUBO };
+export { AdditiveColormap3DExtensions, AdditiveColormapExtension, BitmapLayer, COLORMAPS, ColorPalette3DExtensions, ColorPaletteExtension, DEPRECATED_loadBioformatsZarr, DETAIL_VIEW_ID, DTYPE_VALUES, DetailView, ImageLayer, LensExtension, MAX_CHANNELS, MultiscaleImageLayer, OVERVIEW_VIEW_ID, OverviewLayer, OverviewView, PHOTOMETRIC_BLACK_IS_ZERO, PHOTOMETRIC_RGB, PHOTOMETRIC_YCBCR, PictureInPictureViewer, Pool, RENDERING_MODES, SIGNAL_ABORTED, ScaleBarLayer, SideBySideView, SideBySideViewer, TiffPixelSource, VivLayerExtension, VivShaderAssembler, VivView, VivViewer, VolumeLayer, VolumeView, VolumeViewer, XR3DLayer, XRLayer, ZarrPixelSource, convertInterleavedPhotometricToRgb, expandShaderModule, getChannelStats, getDefaultInitialViewState, getDefaultPalette, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore, needsPhotometricRgbConversion, padColors, padColorsForUBO };

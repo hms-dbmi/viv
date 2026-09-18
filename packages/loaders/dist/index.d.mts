@@ -36,10 +36,13 @@ declare class TiffPixelSource<S extends string[]> implements PixelSource<S> {
     meta?: PixelSourceMeta | undefined;
     pool?: (DecodePool | false) | undefined;
     private _indexer;
+    /** In-flight packed RGB decodes so c=0,1,2 share one JPEG decode. */
+    private _packedDecodes;
     constructor(indexer: (sel: PixelSourceSelection<S>) => Promise<GeoTIFFImage>, dtype: SupportedDtype, tileSize: number, shape: number[], labels: Labels<S>, meta?: PixelSourceMeta | undefined, pool?: (DecodePool | false) | undefined);
     getRaster({ selection, signal }: RasterSelection<S>): Promise<PixelData>;
     getTile({ x, y, selection, signal }: TileSelection<S>): Promise<PixelData>;
     private _readRasters;
+    private _decodeVisualRgb;
     private _getTileExtent;
     onTileError(err: Error): void;
 }
@@ -50,10 +53,14 @@ interface OmeTiffSelection {
     c: number;
     z: number;
 }
+/** TIFF PhotometricInterpretation: BlackIsZero (typical fluorescence) */
+declare const PHOTOMETRIC_BLACK_IS_ZERO = 1;
 /** TIFF PhotometricInterpretation: RGB */
 declare const PHOTOMETRIC_RGB = 2;
 /** TIFF PhotometricInterpretation: YCbCr (common for JPEG H&E) */
 declare const PHOTOMETRIC_YCBCR = 6;
+/** How packed/planar visual RGB is presented on the Viv loader. */
+type PackedRgbLayout = 'interleaved' | 'planar';
 
 interface TiffOptions {
     headers?: Headers | Record<string, string>;
@@ -69,6 +76,13 @@ interface TiffOptions {
      * (multifile) OME-TIFFs which open multiple GeoTIFFs internally.
      */
     source?: GeoTIFF;
+    /**
+     * Packed/planar visual RGB (TIFF spp=3, photometric RGB or YCbCr).
+     * `"interleaved"` (default) collapses to SizeC=1 + `_c` for BitmapLayer.
+     * `"planar"` presents three SPP=1 channels for XRLayer; one JPEG decode
+     * is shared across `c`.
+     */
+    packedRgb?: PackedRgbLayout;
 }
 interface MultiTiffOptions {
     pool?: DecodePool | false;
@@ -311,5 +325,5 @@ declare function needsPhotometricRgbConversion(photometricInterpretation?: numbe
  */
 declare function convertInterleavedPhotometricToRgb(data: ArrayLike<number>, photometricInterpretation?: number): Uint8Array;
 
-export { DEPRECATED_loadBioformatsZarr, PHOTOMETRIC_RGB, PHOTOMETRIC_YCBCR, Pool, SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, convertInterleavedPhotometricToRgb, getChannelStats, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore, needsPhotometricRgbConversion };
-export type { DecodePool, RootAttrs };
+export { DEPRECATED_loadBioformatsZarr, PHOTOMETRIC_BLACK_IS_ZERO, PHOTOMETRIC_RGB, PHOTOMETRIC_YCBCR, Pool, SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, convertInterleavedPhotometricToRgb, getChannelStats, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore, needsPhotometricRgbConversion };
+export type { DecodePool, PackedRgbLayout, RootAttrs };

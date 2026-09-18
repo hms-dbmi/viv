@@ -459,6 +459,7 @@ async function resolveRemoteOffsets(url, headers, scannerOptions) {
   return offsets;
 }
 
+const PHOTOMETRIC_BLACK_IS_ZERO = 1;
 const PHOTOMETRIC_RGB = 2;
 const PHOTOMETRIC_YCBCR = 6;
 function padSampleArray(values, length, fallback) {
@@ -831,6 +832,24 @@ var __publicField$3 = (obj, key, value) => {
   __defNormalProp$3(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
+function sliceInterleavedSample(data, width, height, sample) {
+  const n = width * height;
+  const ArrayType = data.constructor;
+  const out = new ArrayType(n);
+  const s = sample | 0;
+  for (let i = 0; i < n; i++) {
+    out[i] = data[i * 3 + s];
+  }
+  return out;
+}
+function packedDecodeKey(selection, props) {
+  const t = selection?.t ?? 0;
+  const z = selection?.z ?? 0;
+  const window = props?.window;
+  if (window)
+    return `${t}:${z}:${window.join(",")}`;
+  return `${t}:${z}:raster`;
+}
 const RGB_SAMPLES = [0, 1, 2];
 class TiffPixelSource {
   constructor(indexer, dtype, tileSize, shape, labels, meta, pool) {
@@ -841,11 +860,14 @@ class TiffPixelSource {
     this.meta = meta;
     this.pool = pool;
     __publicField$3(this, "_indexer");
+    /** In-flight packed RGB decodes so c=0,1,2 share one JPEG decode. */
+    // ponytail: dropped after this turn; LRU if sequential channel toggles re-decode.
+    __publicField$3(this, "_packedDecodes", /* @__PURE__ */ new Map());
     this._indexer = indexer;
   }
   async getRaster({ selection, signal }) {
     const image = await this._indexer(selection);
-    return this._readRasters(image, { signal });
+    return this._readRasters(image, { signal }, selection);
   }
   async getTile({ x, y, selection, signal }) {
     const { height, width } = this._getTileExtent(x, y);
@@ -853,28 +875,56 @@ class TiffPixelSource {
     const y0 = y * this.tileSize;
     const window = [x0, y0, x0 + width, y0 + height];
     const image = await this._indexer(selection);
-    return this._readRasters(image, { window, width, height, signal });
+    return this._readRasters(
+      image,
+      { window, width, height, signal },
+      selection
+    );
   }
-  async _readRasters(image, props) {
+  async _readRasters(image, props, selection) {
     padTiffSampleTags(image.fileDirectory);
     const interleave = isInterleaved(this.shape);
     const signal = props?.signal;
     if (signal?.aborted) {
       throw SIGNAL_ABORTED;
     }
+    const packedRgb = isPackedRgbTiffImage(image);
+    const presentPlanar = packedRgb && !interleave;
+    if (presentPlanar) {
+      const key = packedDecodeKey(selection, props);
+      let pending = this._packedDecodes.get(key);
+      if (!pending) {
+        pending = this._decodeVisualRgb(image, props, signal);
+        this._packedDecodes.set(key, pending);
+        pending.then(
+          () => {
+            queueMicrotask(() => this._packedDecodes.delete(key));
+          },
+          () => {
+            this._packedDecodes.delete(key);
+          }
+        );
+      }
+      const rgb = await pending;
+      const sample = Math.max(
+        0,
+        Math.min(2, Number(selection.c) || 0)
+      );
+      return {
+        data: sliceInterleavedSample(rgb.data, rgb.width, rgb.height, sample),
+        width: rgb.width,
+        height: rgb.height
+      };
+    }
+    return this._decodeVisualRgb(image, props, signal);
+  }
+  async _decodeVisualRgb(image, props, signal) {
+    const interleave = isInterleaved(this.shape);
     const { signal: _signal, ...restProps } = props ?? {};
-    const planarRgb = isPlanarRgbTiffImage(image);
     const packedRgb = isPackedRgbTiffImage(image);
     let raster;
     try {
-      if (planarRgb) {
-        raster = await image.readRasters({
-          ...restProps,
-          samples: RGB_SAMPLES,
-          interleave: true,
-          pool: this.pool
-        });
-      } else if (packedRgb) {
+      if (packedRgb) {
         raster = await image.readRasters({
           ...restProps,
           samples: RGB_SAMPLES,
@@ -897,10 +947,10 @@ class TiffPixelSource {
     if (signal?.aborted) {
       throw SIGNAL_ABORTED;
     }
-    const useInterleaved = planarRgb || packedRgb || interleave;
+    const useInterleaved = packedRgb || interleave;
     let data = useInterleaved ? raster : raster[0];
     const photo = image.fileDirectory.PhotometricInterpretation;
-    if ((packedRgb || planarRgb) && needsPhotometricRgbConversion(photo)) {
+    if (packedRgb && needsPhotometricRgbConversion(photo)) {
       data = convertInterleavedPhotometricToRgb(data, photo);
     }
     return {
@@ -1431,6 +1481,22 @@ async function loadMultifileOmeTiff(source, options = {}) {
   return tiffImages;
 }
 
+function rootMetaForAvailableIfds(images, imageCount, packedRgb) {
+  if (images.length <= 1)
+    return images;
+  const out = [];
+  let used = 0;
+  for (const image of images) {
+    const p = image.Pixels;
+    const c = packedRgb ? 1 : Math.max(1, p?.SizeC ?? 1);
+    const n = Math.max(1, p?.SizeZ ?? 1) * c * Math.max(1, p?.SizeT ?? 1);
+    if (out.length > 0 && used + n > imageCount)
+      break;
+    out.push(image);
+    used += n;
+  }
+  return out;
+}
 function resolveMetadata(omexml, SubIFDs) {
   const rois = omexml.rois || [];
   const roiRefs = omexml.roiRefs || [];
@@ -1497,8 +1563,38 @@ function collapsePackedRgbPixelsMetadata(metadata, vivDtype) {
     }
   };
 }
+const PLANAR_RGB_CHANNEL_NAMES = ["R", "G", "B"];
+function presentPackedRgbAsPlanarChannels(metadata, vivDtype) {
+  const pixels = metadata.Pixels;
+  const src = pixels.Channels ?? [];
+  const channels = src.length >= 3 ? src.slice(0, 3).map((ch) => ({
+    ...ch,
+    SamplesPerPixel: 1
+  })) : PLANAR_RGB_CHANNEL_NAMES.map((name, i) => ({
+    ...src[0] ?? {},
+    ID: `Channel:0:${i}`,
+    Name: name,
+    SamplesPerPixel: 1
+  }));
+  return {
+    ...metadata,
+    Pixels: {
+      ...pixels,
+      SizeC: 3,
+      Interleaved: false,
+      Type: vivDtype,
+      Channels: channels
+    }
+  };
+}
 async function loadSingleFileOmeTiff(source, options = {}) {
-  const { offsets, headers, pool, source: prebuiltSource } = options;
+  const {
+    offsets,
+    headers,
+    pool,
+    source: prebuiltSource,
+    packedRgb: packedRgbLayout = "interleaved"
+  } = options;
   const tiff = await createGeoTiff(source, {
     headers,
     offsets,
@@ -1511,11 +1607,14 @@ async function loadSingleFileOmeTiff(source, options = {}) {
     fromString(firstImage.fileDirectory.ImageDescription),
     firstImage.fileDirectory.SubIFDs
   );
+  const imageCount = await tiff.getImageCount();
+  const usableMeta = rootMetaForAvailableIfds(rootMeta, imageCount, packedRgb);
   const images = [];
   let imageIfdOffset = 0;
-  for (const rawMetadata of rootMeta) {
+  for (const rawMetadata of usableMeta) {
     const vivDtype = packedRgb ? guessImageDataType(firstImage) : parsePixelDataType(rawMetadata["Pixels"]["Type"]);
-    const metadata = packedRgb ? collapsePackedRgbPixelsMetadata(rawMetadata, vivDtype) : rawMetadata;
+    const presentPlanar = packedRgb && packedRgbLayout === "planar";
+    const metadata = packedRgb ? presentPlanar ? presentPackedRgbAsPlanarChannels(rawMetadata, vivDtype) : collapsePackedRgbPixelsMetadata(rawMetadata, vivDtype) : rawMetadata;
     const imageSize = {
       z: metadata["Pixels"]["SizeZ"],
       c: packedRgb ? 1 : metadata["Pixels"]["SizeC"],
@@ -1534,15 +1633,18 @@ async function loadSingleFileOmeTiff(source, options = {}) {
     const meta = {
       physicalSizes: extractPhysicalSizesfromPixels(metadata["Pixels"]),
       sourcePhotometricInterpretation: sourcePhoto,
-      // Visual RGB (packed/planar): getTile normalizes samples to RGB.
-      photometricInterpretation: packedRgb ? PHOTOMETRIC_RGB : sourcePhoto
+      photometricInterpretation: packedRgb ? presentPlanar ? PHOTOMETRIC_BLACK_IS_ZERO : PHOTOMETRIC_RGB : sourcePhoto
     };
     const data = await Promise.all(
       Array.from({ length: levels }, async (_, level) => {
         const levelImage = await pyramidIndexer({ t: 0, c: 0, z: 0 }, level);
         return new TiffPixelSource(
           (sel) => pyramidIndexer(
-            { t: sel.t ?? 0, c: sel.c ?? 0, z: sel.z ?? 0 },
+            {
+              t: sel.t ?? 0,
+              c: packedRgb ? 0 : sel.c ?? 0,
+              z: sel.z ?? 0
+            },
             level
           ),
           vivDtype,
@@ -2058,4 +2160,4 @@ async function DEPRECATED_loadBioformatsZarr(source, options = {}) {
   ]);
 }
 
-export { DEPRECATED_loadBioformatsZarr, PHOTOMETRIC_RGB, PHOTOMETRIC_YCBCR, Pool, SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, convertInterleavedPhotometricToRgb, getChannelStats, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore, needsPhotometricRgbConversion };
+export { DEPRECATED_loadBioformatsZarr, PHOTOMETRIC_BLACK_IS_ZERO, PHOTOMETRIC_RGB, PHOTOMETRIC_YCBCR, Pool, SIGNAL_ABORTED, TiffPixelSource, ZarrPixelSource, convertInterleavedPhotometricToRgb, getChannelStats, getImageSize, isInterleaved, loadMultiTiff, loadOmeTiff, loadOmeZarr, load as loadOmeZarrFromStore, needsPhotometricRgbConversion };

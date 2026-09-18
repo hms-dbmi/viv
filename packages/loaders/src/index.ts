@@ -18,9 +18,11 @@ export {
 } from './utils';
 
 export {
+  PHOTOMETRIC_BLACK_IS_ZERO,
   PHOTOMETRIC_RGB,
   PHOTOMETRIC_YCBCR
 } from './tiff/lib/utils';
+export type { PackedRgbLayout } from './tiff/lib/utils';
 export {
   convertInterleavedPhotometricToRgb,
   needsPhotometricRgbConversion
