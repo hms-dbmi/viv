@@ -8,21 +8,21 @@ allowBuilds:
   puppeteer: false
 
 catalog:
-  "@deck.gl/core": ~9.3.3
-  "@deck.gl/extensions": ~9.3.3
-  "@deck.gl/geo-layers": ~9.3.3
-  "@deck.gl/layers": ~9.3.3
-  "@deck.gl/mesh-layers": ~9.3.3
-  "@deck.gl/react": ~9.3.3
-  "@deck.gl/widgets": ~9.3.3
-  "@deck.gl/test-utils": ~9.3.3
-  "@luma.gl/constants": ~9.3.3
-  "@luma.gl/core": ~9.3.3
-  "@luma.gl/engine": ~9.3.3
-  "@luma.gl/shadertools": ~9.3.3
-  "@luma.gl/test-utils": ~9.3.3
-  "@luma.gl/webgl": ~9.3.3
-  "@luma.gl/webgpu": ~9.3.3
+  "@deck.gl/core": ~9.4.0
+  "@deck.gl/extensions": ~9.4.0
+  "@deck.gl/geo-layers": ~9.4.0
+  "@deck.gl/layers": ~9.4.0
+  "@deck.gl/mesh-layers": ~9.4.0
+  "@deck.gl/react": ~9.4.0
+  "@deck.gl/widgets": ~9.4.0
+  "@deck.gl/test-utils": ~9.4.0
+  "@luma.gl/constants": ~9.4.0
+  "@luma.gl/core": ~9.4.0
+  "@luma.gl/engine": ~9.4.0
+  "@luma.gl/shadertools": ~9.4.0
+  "@luma.gl/test-utils": ~9.4.0
+  "@luma.gl/webgl": ~9.4.0
+  "@luma.gl/webgpu": ~9.4.0
   "@math.gl/core": ^4.0.1
   "@math.gl/culling": ^4.0.1
   "math.gl": ^4.0.1

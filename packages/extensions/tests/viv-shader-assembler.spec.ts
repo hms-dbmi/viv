@@ -36,7 +36,7 @@ function asModule(m: any): ShaderModule {
 // ---------------------------------------------------------------------------
 describe('ShaderAssembler hook isolation', () => {
   test('default ShaderAssembler does NOT have hooks referencing NUM_CHANNELS', () => {
-    const defaultAssembler = ShaderAssembler.getDefaultShaderAssembler();
+    const defaultAssembler = ShaderAssembler.getDefaultShaderAssembler('glsl');
     // @ts-expect-error accessing private _hookFunctions
     const hooks: string[] = defaultAssembler._hookFunctions;
     for (const hook of hooks) {
@@ -86,7 +86,7 @@ describe('shader assembly GLSL validation', () => {
   };
 
   test('default ShaderAssembler assembles a minimal shader without NUM_CHANNELS', () => {
-    const assembler = ShaderAssembler.getDefaultShaderAssembler();
+    const assembler = ShaderAssembler.getDefaultShaderAssembler('glsl');
     const minimalVs = `#version 300 es
 void main() { gl_Position = vec4(0.0); }`;
     const minimalFs = `#version 300 es
