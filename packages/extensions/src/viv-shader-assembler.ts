@@ -1,5 +1,9 @@
 import { type Layer, LayerExtension } from '@deck.gl/core';
-import { ShaderAssembler, type ShaderModule } from '@luma.gl/shadertools';
+import {
+  GLSLShaderAssembler,
+  ShaderAssembler,
+  type ShaderModule
+} from '@luma.gl/shadertools';
 import {
   VIV_CHANNEL_INDEX_PLACEHOLDER,
   VIV_PLANE_INDEX_PLACEHOLDER
@@ -201,13 +205,15 @@ export function expandShaderModule(
  *
  * Registering viv-specific hooks here also reduces the places in which we break encapsulation of `ShaderAssembler`.
  */
-export class VivShaderAssembler extends ShaderAssembler {
+export class VivShaderAssembler extends GLSLShaderAssembler {
   static _default: VivShaderAssembler;
+
   constructor() {
     super();
     // make sure we copy over any default modules and hook functions that deck.gl might need
     // not sure how confident we are that this will work in all circumstances... but we seem to be ok for now.
-    const defaultShaderAssembler = ShaderAssembler.getDefaultShaderAssembler();
+    const defaultShaderAssembler =
+      ShaderAssembler.getDefaultShaderAssembler('glsl');
     const defaultModules = defaultShaderAssembler._getModuleList();
     //@ts-expect-error - private property but we need to access it (we already did even before messing about with this)
     const defaultHookFunctions = defaultShaderAssembler._hookFunctions;
