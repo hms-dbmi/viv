@@ -1,11 +1,19 @@
 # @hms-dbmi/viv
 
+## 0.23.0
+
+### Minor Changes
+
+- Update deck.gl and luma.gl dependencies to the stable 9.4 release line. (`@hms-dbmi/viv`, `@vivjs/constants`, `@vivjs/extensions`, `@vivjs/layers`, `@vivjs/loaders`, `@vivjs/types`, `@vivjs/viewers`, `@vivjs/views`) ([#982](https://github.com/hms-dbmi/viv/pull/982))
+
+### Patch Changes
+
+
 ## 0.22.1
 
 ### Patch Changes
 
 - Place partial (edge) tiles in MultiscaleImageLayer at their true footprint instead of snapping them to the full image extent. The old bounds assumed every pyramid level was an exact halving of its parent; on a floor-halved pyramid (level k spanning size_k \* 2\*\*k, up to 2\*\*k - 1 px short of the base) they over-scaled the right-column and bottom-row tiles by a level-dependent amount, so the image shifted slightly in x/y as tiles of different levels were drawn. Full tiles are unaffected, as are exactly-halving pyramids. (`@vivjs/layers`) ([#976](https://github.com/hms-dbmi/viv/pull/976))
-
 
 ## 0.22.0
 
