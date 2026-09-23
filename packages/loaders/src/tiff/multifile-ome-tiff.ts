@@ -135,6 +135,22 @@ async function getPixelSourceOptionsForImage(
   };
 }
 
+// Blocks requests to loopback/private/link-local hosts (e.g. cloud metadata
+// endpoints like 169.254.169.254) to mitigate server-side request forgery.
+const UNSAFE_HOSTNAME_PATTERN =
+  /^(127\.|10\.|192\.168\.|169\.254\.|0\.0\.0\.0$|::1$|localhost$)|^172\.(1[6-9]|2\d|3[01])\./i;
+
+function assertSafeUrl(url: URL) {
+  assert(
+    url.protocol === 'http:' || url.protocol === 'https:',
+    `Unsupported protocol for OME-TIFF source: ${url.protocol}`
+  );
+  assert(
+    !UNSAFE_HOSTNAME_PATTERN.test(url.hostname),
+    `Refusing to fetch OME-TIFF source from disallowed host: ${url.hostname}`
+  );
+}
+
 export async function loadMultifileOmeTiff(
   source: string | File,
   options: {
@@ -147,6 +163,7 @@ export async function loadMultifileOmeTiff(
     'File or Blob not supported for multifile OME-TIFF'
   );
   const url = new URL(source);
+  assertSafeUrl(url);
   const text = await fetch(url).then(res => res.text());
   const rootMeta = fromString(text);
   const images: OmeTiffImage[] = [];
